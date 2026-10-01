@@ -155,3 +155,7 @@ Microphone access requires a secure context (HTTPS; localhost is generally allow
 
 ### Automatic avatar genre detection (Last.fm)
 Create a Last.fm API key at https://www.last.fm/api/account/create and set `LASTFM_API_KEY` in `.env.local` and Vercel Project Settings → Environment Variables. The key is used only by the server route `/api/genre`; it is never sent to the browser. The route checks Last.fm track top tags first, then artist top tags if the track has no tags, and maps recognized tags to the avatar genres. Results are cached for one day. Unknown tags leave the current/manual genre selection intact.
+
+
+### Genre state in MusicContext
+Last.fm genre lookup now runs in `MusicProvider` whenever the current track changes. Components can read `genre`, `detectedGenre`, `genreStatus`, `genreSource`, `genreMatchedTag`, `genreError`, and `genreOverride` through `useMusic()`. Use `setGenreOverride(genre)` to choose a genre manually, or `setGenreOverride(null)` to return to Last.fm detection. The animation controller only renders this context state and does not call the genre endpoint itself.

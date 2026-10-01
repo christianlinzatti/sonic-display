@@ -23,4 +23,4 @@ Spotify OAuth and token refresh run in server routes. The client polls `/api/spo
 
 
 ## Genre detection
-`MusicAnimationController` requests `/api/genre` when the current track changes. The server-only route queries Last.fm `track.getTopTags`, falling back to `artist.getTopTags`, then maps known tags to the supported avatar genre IDs. Last.fm API credentials stay server-side; unknown tags or API failures do not block playback or avatar rendering. Responses are cached for 24 hours.
+`MusicContext` requests `/api/genre` when the current track changes and exposes the detected genre, lookup status/source/tag, and an optional manual override through `useMusic()`. The server-only route queries Last.fm `track.getTopTags`, falling back to `artist.getTopTags`, then maps known tags to supported avatar genre IDs. Last.fm credentials stay server-side; unknown tags or lookup failures do not block playback or avatar rendering. Responses are cached for 24 hours. The animation controller is presentation-only and does not fetch genre data.
