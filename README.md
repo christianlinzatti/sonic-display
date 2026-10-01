@@ -151,3 +151,7 @@ Lyrics lookup is server-side and runs through `services/lyrics/server.ts`. LRCLI
 The display includes an opt-in browser microphone analyzer. Click **Mikrofon aktivieren** and grant microphone permission. The signal is analyzed locally with the Web Audio API; raw audio is not uploaded to Vercel. It exposes normalized bass, mids, highs, volume and a heuristic beat impulse through `AudioAnalysisContext`, ready to be passed as props to visualizer modules. Disable the microphone to stop the media tracks and close the AudioContext.
 
 Microphone access requires a secure context (HTTPS; localhost is generally allowed). On a Raspberry Pi kiosk, grant/allow the site's microphone permission in Chromium. Room noise and speaker placement affect results; beat detection is heuristic, not guaranteed musical beat tracking. Use a USB microphone for a first setup. No microphone permission is requested until the user enables it.
+
+
+### Automatic avatar genre detection (Last.fm)
+Create a Last.fm API key at https://www.last.fm/api/account/create and set `LASTFM_API_KEY` in `.env.local` and Vercel Project Settings → Environment Variables. The key is used only by the server route `/api/genre`; it is never sent to the browser. The route checks Last.fm track top tags first, then artist top tags if the track has no tags, and maps recognized tags to the avatar genres. Results are cached for one day. Unknown tags leave the current/manual genre selection intact.

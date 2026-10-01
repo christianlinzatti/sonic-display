@@ -20,3 +20,7 @@ Spotify OAuth and token refresh run in server routes. The client polls `/api/spo
 
 ### Optional audio analysis
 `AudioAnalysisProvider` owns the opt-in microphone lifecycle and `useMicrophoneAnalysis` performs local Web Audio frequency analysis. It publishes normalized `bass`, `mids`, `highs`, `volume`, and heuristic `beat` metrics. UI/visualizer components consume metrics through context or can receive the metrics as props from a host. Audio capture is never required for Spotify metadata/lyrics and is stopped when disabled/unmounted.
+
+
+## Genre detection
+`MusicAnimationController` requests `/api/genre` when the current track changes. The server-only route queries Last.fm `track.getTopTags`, falling back to `artist.getTopTags`, then maps known tags to the supported avatar genre IDs. Last.fm API credentials stay server-side; unknown tags or API failures do not block playback or avatar rendering. Responses are cached for 24 hours.
