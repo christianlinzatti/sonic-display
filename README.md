@@ -9,7 +9,7 @@ A Raspberry Pi-friendly Next.js/React starter for a Spotify now-playing display 
 - Encrypted AES-256-GCM `HttpOnly` session cookie (access + refresh token)
 - Access-token refresh when near expiry
 - Current track, artist, album, cover, playback state and progress
-- LRCLIB lookup and basic LRC timestamp parsing
+- Lyrics provider chain: LRCLIB (synced when available), then lyrics.ovh (plain-text fallback); both normalize to the app-owned `Lyrics` type
 - Responsive fullscreen UI suitable for Chromium kiosk mode
 - No database required
 
@@ -116,14 +116,16 @@ Key files:
 - `types/music.ts` — extensible app-owned data model
 - `lib/spotify.ts` — server-side token exchange/refresh
 - `lib/session.ts` — encrypted cookie helpers
-- `lib/lrclib.ts` — lyrics lookup and LRC parser
+- `services/lyrics/server.ts` — provider orchestration and normalized `Lyrics` result
+- `services/lyrics/providers/lrclib.ts` — LRCLIB adapter and LRC parser
+- `services/lyrics/providers/lyricsOvh.ts` — plain-text fallback adapter
 - `components/SonicDisplay.tsx` — presentation only
 
 ## Notes / troubleshooting
 
 - **Invalid redirect URI:** exact mismatch between dashboard URI and `SPOTIFY_REDIRECT_URI`.
 - **No current track:** start playback on Spotify and verify the account authorized the app.
-- **No lyrics:** LRCLIB may not have a match; the initial implementation queries by title, artist, album and duration.
+- **No lyrics:** the app tries LRCLIB by title, artist, album and duration, then lyrics.ovh by title and artist. lyrics.ovh provides unsynchronized plain text; provider availability and catalog coverage can vary.
 - **Session not retained:** verify HTTPS in production and that `SESSION_SECRET` is configured consistently across deployments.
 - **Token refresh failure:** reconnect Spotify; the app clears the session on an API 401.
 
@@ -139,3 +141,7 @@ Hinweis: Auf Vercel sind einzelne Serverless-Aufrufe nicht garantiert seriell. D
 ## Erweiterbare Architektur (v3)
 
 Die Anwendung trennt API-Adapter (`services/`), Polling/Retry (`hooks/`), globalen Musikzustand (`context/`), Datenverträge (`types/`) und Darstellung (`components/`). Spotify-Tokens bleiben serverseitig. Details und Erweiterungspunkte stehen in `ARCHITECTURE.md`. Neue Lyrics-Anbieter sollen auf den app-eigenen `Lyrics`-Typ normalisieren; Visualizer erhalten Daten als Props und führen keine eigenen API-Aufrufe aus.
+
+## Lyrics providers
+
+Lyrics lookup is server-side and runs through `services/lyrics/server.ts`. LRCLIB is preferred because it can return timestamped lines. If it has no usable result or is temporarily unavailable, the app tries lyrics.ovh. Both adapters normalize results to the app-owned `Lyrics` shape (`provider`, `synced`, `lines`, `plainText`); lyrics.ovh results are marked `synced: false`. To add another source, implement an adapter under `services/lyrics/providers/` and return the normalized type. Review each provider's terms and usage limits before deployment.
