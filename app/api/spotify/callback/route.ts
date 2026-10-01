@@ -1,0 +1,4 @@
+import {NextRequest,NextResponse} from "next/server";
+import {exchangeCode} from "@/lib/spotify";
+import {clearStateCookie,setSessionCookie,stateCookieName} from "@/lib/session";
+export async function GET(req:NextRequest){const url=new URL(req.url);const code=url.searchParams.get("code");const state=url.searchParams.get("state");const saved=req.cookies.get(stateCookieName())?.value;if(url.searchParams.has("error"))return NextResponse.redirect(new URL("/?auth_error=denied",url.origin));if(!code||!state||!saved||state!==saved)return NextResponse.redirect(new URL("/?auth_error=invalid_state",url.origin));try{const session=await exchangeCode(code);const res=NextResponse.redirect(new URL("/",url.origin));setSessionCookie(res,session);clearStateCookie(res);return res;}catch{return NextResponse.redirect(new URL("/?auth_error=token_exchange",url.origin));}}

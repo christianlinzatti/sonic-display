@@ -1,0 +1,3 @@
+import {NextRequest,NextResponse} from "next/server";
+import {lookupLyrics} from "@/lib/lrclib";
+export async function GET(req:NextRequest){const p=req.nextUrl.searchParams;const title=p.get("title"),artist=p.get("artist"),duration=Number(p.get("duration"));if(!title||!artist||!Number.isFinite(duration)||duration<=0)return NextResponse.json({error:"title, artist and positive duration required"},{status:400});try{return NextResponse.json(await lookupLyrics({title,artist,album:p.get("album")??"",duration}));}catch(e){return NextResponse.json({error:e instanceof Error?e.message:"Lyrics lookup failed"},{status:502});}}
