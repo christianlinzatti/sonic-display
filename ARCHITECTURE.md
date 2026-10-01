@@ -24,3 +24,10 @@ Spotify OAuth and token refresh run in server routes. The client polls `/api/spo
 
 ## Genre detection
 `MusicContext` requests `/api/genre` when the current track changes and exposes the detected genre, lookup status/source/tag, and an optional manual override through `useMusic()`. The server-only route queries Last.fm `track.getTopTags`, falling back to `artist.getTopTags`, then maps known tags to supported avatar genre IDs. Last.fm credentials stay server-side; unknown tags or lookup failures do not block playback or avatar rendering. Responses are cached for 24 hours. The animation controller is presentation-only and does not fetch genre data.
+
+
+## Music source and UI preferences
+`MusicSource` defines the source adapter boundary. Provider responses are mapped into normalized app playback data before entering `MusicContext`. The current adapter is `services/musicSource.ts` (Spotify). UI-only choices live in `UiPreferencesContext`, persisted independently from playback state in localStorage. `MusicProvider` composes playback polling and `useGenreDetection`; add future features as focused hooks/contexts rather than expanding this provider with unrelated concerns.
+
+## Genius lyrics
+The lyrics chain is LRCLIB → lyrics.ovh → Genius. The Genius adapter is server-only and normalizes plain text into `Lyrics` lines with `synced: false`. Configure `GENIUS_ACCESS_TOKEN`; without it Genius is skipped.

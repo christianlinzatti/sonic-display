@@ -1,6 +1,7 @@
 import type { Lyrics } from "@/types/music";
 import { lookupLrclibLyrics } from "@/services/lyrics/providers/lrclib";
 import { lookupLyricsOvh } from "@/services/lyrics/providers/lyricsOvh";
+import { lookupGeniusLyrics } from "@/services/lyrics/providers/genius";
 
 export interface LyricsQuery {
   title: string;
@@ -19,19 +20,20 @@ export async function findLyrics(query: LyricsQuery): Promise<Lyrics | null> {
     lrclibError = error;
   }
 
+  let ovhError: unknown;
   try {
     const fallback = await lookupLyricsOvh(query.title, query.artist);
     if (fallback) return fallback;
-  } catch (fallbackError) {
-    if (lrclibError) {
-      throw new Error(
-        `All lyrics providers failed (LRCLIB: ${messageOf(lrclibError)}; lyrics.ovh: ${messageOf(fallbackError)})`,
-      );
-    }
-    throw fallbackError;
-  }
+  } catch (error) { ovhError = error; }
 
-  // No match is a normal result; if LRCLIB errored, the fallback was still attempted.
+
+  try {
+    const genius = await lookupGeniusLyrics(query);
+    if (genius) return genius;
+  } catch (error) {
+    if (lrclibError) throw new Error(`Lyrics providers failed (LRCLIB: ${messageOf(lrclibError)}; Genius: ${messageOf(error)})`);
+    throw error;
+  }
   return null;
 }
 

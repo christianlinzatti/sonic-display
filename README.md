@@ -9,7 +9,7 @@ A Raspberry Pi-friendly Next.js/React starter for a Spotify now-playing display 
 - Encrypted AES-256-GCM `HttpOnly` session cookie (access + refresh token)
 - Access-token refresh when near expiry
 - Current track, artist, album, cover, playback state and progress
-- Lyrics provider chain: LRCLIB (synced when available), then lyrics.ovh (plain-text fallback); both normalize to the app-owned `Lyrics` type
+- Lyrics provider chain: LRCLIB (synced when available), then lyrics.ovh, then optional Genius (plain text); all normalize to the app-owned `Lyrics` type
 - Responsive fullscreen UI suitable for Chromium kiosk mode
 - No database required
 
@@ -159,3 +159,13 @@ Create a Last.fm API key at https://www.last.fm/api/account/create and set `LAST
 
 ### Genre state in MusicContext
 Last.fm genre lookup now runs in `MusicProvider` whenever the current track changes. Components can read `genre`, `detectedGenre`, `genreStatus`, `genreSource`, `genreMatchedTag`, `genreError`, and `genreOverride` through `useMusic()`. Use `setGenreOverride(genre)` to choose a genre manually, or `setGenreOverride(null)` to return to Last.fm detection. The animation controller only renders this context state and does not call the genre endpoint itself.
+
+
+### Genius lyrics provider
+Set `GENIUS_ACCESS_TOKEN` from your Genius developer account in `.env.local` and Vercel environment variables. It is only read server-side. Provider order is LRCLIB, lyrics.ovh, then Genius; Genius results are unsynchronized plain text. The `genius-lyrics-api` package searches Genius and extracts lyrics from the Genius page, so it depends on the site's markup and applicable terms; treat it as a best-effort fallback. Do not expose the token in `NEXT_PUBLIC_*` variables.
+
+### Music source boundary and UI preferences
+`MusicSource` is the adapter contract in `types/music.ts`. A source adapter fetches its provider-specific data and maps it into the app-owned `CurrentTrackResponse`/`MusicState` shape before React context sees it. `services/musicSource.ts` currently implements Spotify. UI preferences are kept separately in `UiPreferencesContext` and persisted to browser localStorage; playback/connection state remains transient in `MusicContext`.
+
+### MusicProvider organization
+`MusicProvider` composes playback polling with `useGenreDetection` and owns only cross-feature orchestration (manual genre override and disconnect). Keep future independent features in focused hooks/contexts rather than adding unrelated state/effects directly to the provider.

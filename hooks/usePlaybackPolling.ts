@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { fetchCurrentTrack } from "@/services/spotify/client";
+import { spotifyMusicSource } from "@/services/musicSource";
 import { fetchLyrics } from "@/services/lyrics/client";
 import type { CurrentTrackResponse, Lyrics, MusicState } from "@/types/music";
 
@@ -19,7 +19,7 @@ export function usePlaybackPolling() {
     if (busy.current) return;
     busy.current = true;
     try {
-      const data: CurrentTrackResponse = await fetchCurrentTrack();
+      const data: CurrentTrackResponse = await spotifyMusicSource.fetchPlayback();
       if (!mounted.current) return;
       const changed = !!data.track && data.track.id !== trackId.current;
       trackId.current = data.track?.id ?? null;
