@@ -128,3 +128,9 @@ Key files:
 - **Token refresh failure:** reconnect Spotify; the app clears the session on an API 401.
 
 LRCLIB docs: https://www.lrclib.net/docs
+
+## Robuste Spotify-Verbindung
+
+Die aktuelle Version erneuert Tokens 90 Sekunden vor Ablauf. Bei einem Spotify-401 wird einmalig ein Refresh versucht und die API-Anfrage wiederholt. Ein ungültiger Refresh-Token führt zu einer erneuten Anmeldung; vorübergehende Netzwerk-/Spotify-Fehler lassen die Session bestehen. API-Aufrufe haben ein 12-Sekunden-Timeout. Bei HTTP 429 wird `Retry-After` berücksichtigt, bei anderen Fehlern steigt das Polling-Intervall schrittweise bis maximal 60 Sekunden. Nach erfolgreicher Antwort wird auf 4 Sekunden zurückgestellt. Der letzte bekannte Track bleibt bei temporären Fehlern sichtbar.
+
+Hinweis: Auf Vercel sind einzelne Serverless-Aufrufe nicht garantiert seriell. Die Anwendung vermeidet parallele Refresh-Aufrufe innerhalb eines Browser-Tabs; mehrere gleichzeitig geöffnete Tabs/Geräte können weiterhin konkurrierende Refreshes auslösen. Für einen einzelnen Raspberry-Pi-Kiosk sollte daher nur ein Display-Tab laufen.
