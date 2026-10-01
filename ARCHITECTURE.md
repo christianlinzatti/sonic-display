@@ -17,3 +17,6 @@
 
 ## Runtime flow
 Spotify OAuth and token refresh run in server routes. The client polls `/api/spotify/current`, stores the latest normalized response in the context, and fetches lyrics only when track identity changes. Transient failures retain the last known track and set `connectionStatus` to `reconnecting`; authentication failures set it to `disconnected`.
+
+### Optional audio analysis
+`AudioAnalysisProvider` owns the opt-in microphone lifecycle and `useMicrophoneAnalysis` performs local Web Audio frequency analysis. It publishes normalized `bass`, `mids`, `highs`, `volume`, and heuristic `beat` metrics. UI/visualizer components consume metrics through context or can receive the metrics as props from a host. Audio capture is never required for Spotify metadata/lyrics and is stopped when disabled/unmounted.

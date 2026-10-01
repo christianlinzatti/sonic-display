@@ -145,3 +145,9 @@ Die Anwendung trennt API-Adapter (`services/`), Polling/Retry (`hooks/`), global
 ## Lyrics providers
 
 Lyrics lookup is server-side and runs through `services/lyrics/server.ts`. LRCLIB is preferred because it can return timestamped lines. If it has no usable result or is temporarily unavailable, the app tries lyrics.ovh. Both adapters normalize results to the app-owned `Lyrics` shape (`provider`, `synced`, `lines`, `plainText`); lyrics.ovh results are marked `synced: false`. To add another source, implement an adapter under `services/lyrics/providers/` and return the normalized type. Review each provider's terms and usage limits before deployment.
+
+## Optional microphone audio analysis
+
+The display includes an opt-in browser microphone analyzer. Click **Mikrofon aktivieren** and grant microphone permission. The signal is analyzed locally with the Web Audio API; raw audio is not uploaded to Vercel. It exposes normalized bass, mids, highs, volume and a heuristic beat impulse through `AudioAnalysisContext`, ready to be passed as props to visualizer modules. Disable the microphone to stop the media tracks and close the AudioContext.
+
+Microphone access requires a secure context (HTTPS; localhost is generally allowed). On a Raspberry Pi kiosk, grant/allow the site's microphone permission in Chromium. Room noise and speaker placement affect results; beat detection is heuristic, not guaranteed musical beat tracking. Use a USB microphone for a first setup. No microphone permission is requested until the user enables it.
