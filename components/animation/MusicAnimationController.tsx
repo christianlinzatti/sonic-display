@@ -1,12 +1,10 @@
 "use client";
 import { GENRES, type MusicGenre } from "@/types/animation";
-import { useMusic } from "@/context/MusicContext";
-import { useAudioAnalysis } from "@/context/AudioAnalysisContext";
+import { useVisualizer } from "@/context/VisualizerContext";
 import { GenreAvatar } from "./GenreAvatar";
 
 export function MusicAnimationController(){
- const {track,isPlaying,genre,genreStatus,genreSource,genreMatchedTag,genreError,genreOverride,setGenreOverride}=useMusic();
- const {metrics,active}=useAudioAnalysis();
+ const {track,isPlaying,genre,genreStatus,genreSource,genreMatchedTag,genreError,genreOverride,setGenreOverride,audio:metrics,audioActive:active}=useVisualizer();
  const selectedGenre=genre??"hardstyle";
  const genreLabel=genreStatus==="loading"?"Detecting genre with Last.fm…":genreStatus==="error"?`Last.fm unavailable${genreError?` · ${genreError}`:""} · choose genre manually`:genreStatus==="unknown"?"No matching Last.fm genre · using default avatar":genreMatchedTag?`Last.fm: ${genreMatchedTag} (${genreSource})${genreOverride?" · manual override":" · automatic"}`:"Choose an avatar genre";
  return <section className="music-animation" aria-label="Music animation controller">

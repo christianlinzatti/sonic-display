@@ -169,3 +169,6 @@ Set `GENIUS_ACCESS_TOKEN` from your Genius developer account in `.env.local` and
 
 ### MusicProvider organization
 `MusicProvider` composes playback polling with `useGenreDetection` and owns only cross-feature orchestration (manual genre override and disconnect). Keep future independent features in focused hooks/contexts rather than adding unrelated state/effects directly to the provider.
+
+### Visualizer state
+Visual components can consume `useVisualizer()` from `context/VisualizerContext.tsx`. It combines track/playback state, genre selection, audio metrics, and persisted UI preferences while keeping the underlying providers separate.

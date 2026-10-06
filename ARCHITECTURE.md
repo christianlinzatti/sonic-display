@@ -31,3 +31,6 @@ Spotify OAuth and token refresh run in server routes. The client polls `/api/spo
 
 ## Genius lyrics
 The lyrics chain is LRCLIB → lyrics.ovh → Genius. The Genius adapter is server-only and normalizes plain text into `Lyrics` lines with `synced: false`. Configure `GENIUS_ACCESS_TOKEN`; without it Genius is skipped.
+
+## Visualizer composition
+`VisualizerProvider` composes normalized playback/genre state, microphone audio metrics, and persisted UI preferences into one `useVisualizer()` interface for visual components. It is nested inside the music and audio providers; visual components should consume this interface rather than coupling directly to those underlying contexts.
