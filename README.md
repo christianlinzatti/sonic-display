@@ -172,3 +172,6 @@ Set `GENIUS_ACCESS_TOKEN` from your Genius developer account in `.env.local` and
 
 ### Visualizer state
 Visual components can consume `useVisualizer()` from `context/VisualizerContext.tsx`. It combines track/playback state, genre selection, audio metrics, and persisted UI preferences while keeping the underlying providers separate.
+
+### Visualizer modes
+Visual modes are registered in `components/visualizer/registry.tsx` (`wave`, `particles`, `album-glow`, `avatar`). The selected mode is read from persisted UI preferences by `VisualizerStage`. Add a mode by implementing `VisualizerProps` and adding a registry entry.

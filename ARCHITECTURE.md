@@ -34,3 +34,6 @@ The lyrics chain is LRCLIB → lyrics.ovh → Genius. The Genius adapter is serv
 
 ## Visualizer composition
 `VisualizerProvider` composes normalized playback/genre state, microphone audio metrics, and persisted UI preferences into one `useVisualizer()` interface for visual components. It is nested inside the music and audio providers; visual components should consume this interface rather than coupling directly to those underlying contexts.
+
+## Visualizer registry
+`components/visualizer/registry.tsx` maps stable mode IDs to metadata and components. `VisualizerStage` selects the registered mode from persisted UI preferences and passes normalized audio, track, playback, and reduced-motion props. Add new visualizers by implementing `VisualizerProps` and registering a definition; keep source/provider concerns outside visualizer components.
