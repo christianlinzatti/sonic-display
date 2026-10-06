@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { AudioMetrics } from "@/types/audio";
-const zero: AudioMetrics = { bass: 0, mids: 0, highs: 0, volume: 0, beat: 0 };
+const zero: AudioMetrics = { bass: 0, mids: 0, highs: 0, volume: 0, beat: false, beatStrength: 0 };
 export function useMicrophoneAnalysis(enabled: boolean) {
   const [metrics, setMetrics] = useState<AudioMetrics>(zero);
   const [active, setActive] = useState(false);
@@ -16,6 +16,7 @@ export function useMicrophoneAnalysis(enabled: boolean) {
     let previousBass = 0;
     let bassFloor = 0.08;
     let lastBeat = 0;
+    let smoothed = { bass: 0, mids: 0, highs: 0, volume: 0 };
     const start = async () => {
       try {
         if (!navigator.mediaDevices?.getUserMedia) throw new Error("Mikrofonzugriff wird in diesem Browser nicht unterstützt.");
@@ -39,10 +40,16 @@ export function useMicrophoneAnalysis(enabled: boolean) {
           const bass = band(35, 180), mids = band(180, 2000), highs = band(2000, 9000);
           bassFloor = bassFloor * 0.985 + bass * 0.015;
           const impulse = Math.max(0, bass - Math.max(0.12, bassFloor * 1.45) - previousBass * 0.18);
-          const beat = now - lastBeat > 180 && impulse > 0.075 ? Math.min(1, impulse * 5) : 0;
+          const beatStrength = now - lastBeat > 180 && impulse > 0.075 ? Math.min(1, impulse * 5) : 0;
+          const beat = beatStrength > 0;
           if (beat) lastBeat = now;
           previousBass = previousBass * 0.65 + bass * 0.35;
-          if (now - lastUpdate >= 33) { setMetrics({ bass, mids, highs, volume: (bass + mids + highs) / 3, beat }); lastUpdate = now; }
+          if (now - lastUpdate >= 33) {
+            const alpha = 0.28;
+            smoothed = { bass: smoothed.bass + (bass - smoothed.bass) * alpha, mids: smoothed.mids + (mids - smoothed.mids) * alpha, highs: smoothed.highs + (highs - smoothed.highs) * alpha, volume: smoothed.volume + (((bass + mids + highs) / 3) - smoothed.volume) * alpha };
+            setMetrics({ ...smoothed, beat, beatStrength });
+            lastUpdate = now;
+          }
           raf = requestAnimationFrame(tick);
         };
         raf = requestAnimationFrame(tick);
