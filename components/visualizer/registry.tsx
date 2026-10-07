@@ -10,6 +10,9 @@ export interface VisualizerProps {
   reducedMotion: boolean;
   genre?: string | null;
   avatarModelUrl?: string | null;
+  avatarScale?: number;
+  avatarOffsetY?: number;
+  avatarAnimationIntensity?: number;
 }
 export interface VisualizerDefinition {
   id: VisualizerMode;

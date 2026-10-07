@@ -49,3 +49,6 @@ The GLTF avatar reads embedded animation clips. Clip names containing `dance`, `
 
 ## Avatar library
 `avatarModels.ts` is the registry for avatar metadata, optional preview assets, and configured GLTF URLs. `SettingsPanel` presents selectable cards and disables unavailable external models. `VisualizerStage` resolves the selected model through `getAvatarModel`, keeping model selection separate from playback state.
+
+### Avatar customization
+Avatar presentation settings (scale, vertical offset, animation intensity, and optional genre-based model selection) live in `UiPreferences`, separate from playback state. `VisualizerStage` resolves the selected model and passes presentation values through `VisualizerProps`; the 3D component applies transforms and motion intensity.

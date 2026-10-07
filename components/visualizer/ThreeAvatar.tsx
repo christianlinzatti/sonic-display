@@ -6,20 +6,20 @@ import type { Group, Mesh } from "three";
 import type { VisualizerProps } from "./registry";
 import { animationMapping } from "./animationMapping";
 
-function ProceduralAvatar({ audio, isPlaying, reducedMotion }: VisualizerProps) {
+function ProceduralAvatar({ audio, isPlaying, reducedMotion, avatarScale = 1, avatarOffsetY = 0, avatarAnimationIntensity = 1 }: VisualizerProps) {
   const root = useRef<Group>(null);
   const head = useRef<Mesh>(null);
   const torso = useRef<Mesh>(null);
   useFrame((state, delta) => {
     if (!root.current || !head.current || !torso.current) return;
-    const movement = reducedMotion || !isPlaying ? 0 : 1;
+    const movement = reducedMotion || !isPlaying ? 0 : avatarAnimationIntensity;
     const smooth = Math.min(1, delta * 7);
     head.current.scale.y += (1 + audio.bass * 0.22 * movement - head.current.scale.y) * smooth;
     torso.current.scale.x += (1 + audio.volume * 0.12 * movement - torso.current.scale.x) * smooth;
     root.current.rotation.y += ((movement ? Math.sin(state.clock.elapsedTime * 0.65) * 0.16 + (audio.beat ? audio.beatStrength * 0.12 : 0) : 0) - root.current.rotation.y) * smooth;
     root.current.position.y += ((movement ? Math.sin(state.clock.elapsedTime * 2.1) * (0.025 + audio.mids * 0.07) : 0) - root.current.position.y) * smooth;
   });
-  return <group ref={root}>
+  return <group ref={root} scale={avatarScale} position={[0, avatarOffsetY, 0]}>
     <mesh ref={torso} position={[0, -0.48, 0]}><capsuleGeometry args={[0.48, 0.62, 6, 12]} /><meshStandardMaterial color="#7557d9" roughness={0.42} /></mesh>
     <mesh position={[0, 0.55, 0]}><sphereGeometry args={[0.43, 32, 24]} /><meshStandardMaterial color="#e7b99d" roughness={0.55} /></mesh>
     <mesh ref={head} position={[0, 0.57, 0.02]}><sphereGeometry args={[0.44, 32, 24]} /><meshStandardMaterial color="#e7b99d" roughness={0.55} /></mesh>
@@ -33,7 +33,7 @@ function ProceduralAvatar({ audio, isPlaying, reducedMotion }: VisualizerProps) 
 
 function propsGenreKey(genre?: string | null) { return genre?.toLowerCase() ?? "default"; }
 
-function GltfAvatar({ url, audio, isPlaying, reducedMotion, genre }: VisualizerProps & { url: string }) {
+function GltfAvatar({ url, audio, isPlaying, reducedMotion, genre, avatarScale = 1, avatarOffsetY = 0, avatarAnimationIntensity = 1 }: VisualizerProps & { url: string }) {
   const root = useRef<Group>(null);
   const { scene, animations } = useGLTF(url);
   const { actions, names } = useAnimations(animations, root);
@@ -43,9 +43,9 @@ function GltfAvatar({ url, audio, isPlaying, reducedMotion, genre }: VisualizerP
   useFrame((state, delta) => {
     if (!root.current) return;
     const active = isPlaying && !reducedMotion;
-    const target = active ? Math.sin(state.clock.elapsedTime * 1.8) * 0.06 + (audio.beat ? audio.beatStrength * 0.08 : 0) : 0;
+    const target = active ? (Math.sin(state.clock.elapsedTime * 1.8) * 0.06 + (audio.beat ? audio.beatStrength * 0.08 : 0)) * avatarAnimationIntensity : 0;
     root.current.rotation.y += (target - root.current.rotation.y) * Math.min(1, delta * 6);
-    const bob = active ? Math.sin(state.clock.elapsedTime * 2.2) * (0.015 + audio.bass * 0.045) : 0;
+    const bob = active ? Math.sin(state.clock.elapsedTime * 2.2) * (0.015 + audio.bass * 0.045) * avatarAnimationIntensity : 0;
     root.current.position.y += (bob - root.current.position.y) * Math.min(1, delta * 6);
   });
   // Prefer an authored dance/groove clip while playing; use idle when paused.
@@ -63,7 +63,7 @@ function GltfAvatar({ url, audio, isPlaying, reducedMotion, genre }: VisualizerP
     }
     return () => { nextAction?.fadeOut(0.15); };
   }, [actions, danceClip, idleClip, isPlaying, reducedMotion]);
-  return <group ref={root}><primitive object={scene.clone()} /></group>;
+  return <group ref={root} scale={avatarScale} position={[0, avatarOffsetY, 0]}><primitive object={scene.clone()} /></group>;
 }
 
 export function ThreeAvatar(props: VisualizerProps) {

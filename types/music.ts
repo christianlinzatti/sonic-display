@@ -8,6 +8,10 @@ export interface UiPreferences {
   microphoneEnabled: boolean;
   reducedMotion: boolean;
   avatarModelId: string;
+  avatarScale: number;
+  avatarOffsetY: number;
+  avatarAnimationIntensity: number;
+  autoAvatarByGenre: boolean;
 }
 export interface MusicState { connected:boolean; connectionStatus:ConnectionStatus; loading:boolean; error:string|null; track:Track|null; progressMs:number; isPlaying:boolean; fetchedAt:number; lyrics:Lyrics|null; }
 import type { MusicGenre } from "./animation";

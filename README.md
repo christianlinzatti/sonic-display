@@ -201,3 +201,6 @@ NEXT_PUBLIC_AVATAR_NEON_URL=/models/neon.glb
 NEXT_PUBLIC_AVATAR_FESTIVAL_URL=/models/festival.glb
 ```
 Models without a configured URL are disabled in the library. The built-in procedural avatar is always available.
+
+## Version 20 – Avatar controls
+The Settings panel now includes avatar scale, vertical offset, animation intensity, and optional genre-based model selection. Genre auto-selection uses a small editable mapping in `components/visualizer/VisualizerStage.tsx`; unavailable model URLs fall back through `getAvatarModel` to the procedural avatar. These preferences are persisted with the existing UI preferences.
