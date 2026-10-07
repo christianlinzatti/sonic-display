@@ -178,3 +178,6 @@ Visual modes are registered in `components/visualizer/registry.tsx` (`wave`, `pa
 
 ### 3D Avatar (v14)
 The Avatar visualizer uses React Three Fiber and a procedural, stylized 3D character. Bass drives a gentle head pulse, volume affects torso width, and beat strength adds a subtle rotation impulse. This is a procedural placeholder character; replace its geometry/materials in `components/visualizer/ThreeAvatar.tsx` with a GLTF avatar when ready. Install dependencies with `npm install` before running the app.
+
+### Optional custom GLTF avatar (v15)
+You can use your own `.glb`/`.gltf` character without changing the visualizer registry. Put the model in a publicly reachable location (for example `public/models/avatar.glb`) and set `NEXT_PUBLIC_AVATAR_MODEL_URL=/models/avatar.glb` in `.env.local`. Restart Next.js after changing the variable. When no model URL is configured, Sonic Display uses the built-in procedural avatar. The GLTF scene receives subtle beat/bobbing motion; rigged skeletal dance animations are not yet mapped.

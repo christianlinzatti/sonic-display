@@ -40,3 +40,6 @@ The lyrics chain is LRCLIB → lyrics.ovh → Genius. The Genius adapter is serv
 
 ## 3D Avatar
 The `avatar` registry entry renders `ThreeAvatar`, a client-side React Three Fiber scene. It consumes the same normalized `VisualizerProps` as other visualizers, keeping Three.js out of the playback and audio-analysis contexts.
+
+### Avatar model adapter
+`ThreeAvatar` selects a custom GLTF scene when `NEXT_PUBLIC_AVATAR_MODEL_URL` is configured; otherwise it renders the procedural fallback. The model is loaded client-side through `@react-three/drei`/`useGLTF`. The adapter applies subtle whole-model motion from normalized audio features. Animation-clip selection and rig-specific bone mapping remain future work.

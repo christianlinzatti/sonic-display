@@ -2,8 +2,29 @@
   "name": "sonic-display",
   "version": "0.1.0",
   "private": true,
-  "scripts": {"dev":"next dev","build":"next build","start":"next start","typecheck":"tsc --noEmit"},
-  "engines": {"node": ">=20.9.0"},
-  "dependencies": {"next":"^15.5.0","react":"^19.1.0","react-dom":"^19.1.0","three":"^0.179.1","@react-three/fiber":"^9.3.0","genius-lyrics-api":"^3.2.1"},
-  "devDependencies": {"@types/node":"^22.15.0","@types/react":"^19.1.0","@types/react-dom":"^19.1.0","@types/three":"^0.179.0","typescript":"^5.8.0"}
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "dependencies": {
+    "next": "^15.5.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "three": "^0.179.1",
+    "@react-three/fiber": "^9.3.0",
+    "genius-lyrics-api": "^3.2.1",
+    "@react-three/drei": "^10.7.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@types/three": "^0.179.0",
+    "typescript": "^5.8.0"
+  }
 }
