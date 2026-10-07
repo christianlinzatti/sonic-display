@@ -43,3 +43,6 @@ The `avatar` registry entry renders `ThreeAvatar`, a client-side React Three Fib
 
 ### Avatar model adapter
 `ThreeAvatar` selects a custom GLTF scene when `NEXT_PUBLIC_AVATAR_MODEL_URL` is configured; otherwise it renders the procedural fallback. The model is loaded client-side through `@react-three/drei`/`useGLTF`. The adapter applies subtle whole-model motion from normalized audio features. Animation-clip selection and rig-specific bone mapping remain future work.
+
+### Rigged GLTF animation clips
+The GLTF avatar reads embedded animation clips. Clip names containing `dance`, `move`, or `groove` are preferred during playback; names containing `idle`, `stand`, or `rest` are preferred while paused. Clips cross-fade on playback state changes. If no matching clips exist, the existing procedural motion remains active. `reducedMotion` suppresses authored dance clips.

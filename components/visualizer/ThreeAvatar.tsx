@@ -1,7 +1,7 @@
 "use client";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Suspense, useRef } from "react";
-import { useGLTF } from "@react-three/drei";
+import { Suspense, useEffect, useRef } from "react";
+import { useAnimations, useGLTF } from "@react-three/drei";
 import type { Group, Mesh } from "three";
 import type { VisualizerProps } from "./registry";
 
@@ -32,7 +32,10 @@ function ProceduralAvatar({ audio, isPlaying, reducedMotion }: VisualizerProps) 
 
 function GltfAvatar({ url, audio, isPlaying, reducedMotion }: VisualizerProps & { url: string }) {
   const root = useRef<Group>(null);
-  const { scene } = useGLTF(url);
+  const { scene, animations } = useGLTF(url);
+  const { actions, names } = useAnimations(animations, root);
+  const danceClip = names.find((name) => /dance|move|groove/i.test(name));
+  const idleClip = names.find((name) => /idle|stand|rest/i.test(name));
   useFrame((state, delta) => {
     if (!root.current) return;
     const active = isPlaying && !reducedMotion;
@@ -41,6 +44,21 @@ function GltfAvatar({ url, audio, isPlaying, reducedMotion }: VisualizerProps & 
     const bob = active ? Math.sin(state.clock.elapsedTime * 2.2) * (0.015 + audio.bass * 0.045) : 0;
     root.current.position.y += (bob - root.current.position.y) * Math.min(1, delta * 6);
   });
+  // Prefer an authored dance/groove clip while playing; use idle when paused.
+  // State changes cross-fade clips instead of restarting them every render.
+  useEffect(() => {
+    const active = isPlaying && !reducedMotion;
+    const selected = active ? (danceClip ?? idleClip) : (idleClip ?? danceClip);
+    const nextAction = selected ? actions[selected] : undefined;
+    if (nextAction) {
+      nextAction.reset().fadeIn(0.25).play();
+      if (!active && selected === danceClip) nextAction.paused = true;
+    }
+    for (const [name, action] of Object.entries(actions)) {
+      if (name !== selected) action?.fadeOut(0.2);
+    }
+    return () => { nextAction?.fadeOut(0.15); };
+  }, [actions, danceClip, idleClip, isPlaying, reducedMotion]);
   return <group ref={root}><primitive object={scene.clone()} /></group>;
 }
 

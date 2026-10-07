@@ -181,3 +181,6 @@ The Avatar visualizer uses React Three Fiber and a procedural, stylized 3D chara
 
 ### Optional custom GLTF avatar (v15)
 You can use your own `.glb`/`.gltf` character without changing the visualizer registry. Put the model in a publicly reachable location (for example `public/models/avatar.glb`) and set `NEXT_PUBLIC_AVATAR_MODEL_URL=/models/avatar.glb` in `.env.local`. Restart Next.js after changing the variable. When no model URL is configured, Sonic Display uses the built-in procedural avatar. The GLTF scene receives subtle beat/bobbing motion; rigged skeletal dance animations are not yet mapped.
+
+#### Rigged avatar animation clips
+For animated `.glb`/`.gltf` avatars, include animation clips in the model. Sonic Display automatically prefers clip names containing `dance`, `move`, or `groove` during playback and `idle`, `stand`, or `rest` while paused. Clips cross-fade when playback changes. Models without matching clips continue to use procedural movement. Reduced Motion suppresses dance clips.
