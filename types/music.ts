@@ -7,6 +7,7 @@ export interface UiPreferences {
   lyricsVisible: boolean;
   microphoneEnabled: boolean;
   reducedMotion: boolean;
+  avatarModelId: string;
 }
 export interface MusicState { connected:boolean; connectionStatus:ConnectionStatus; loading:boolean; error:string|null; track:Track|null; progressMs:number; isPlaying:boolean; fetchedAt:number; lyrics:Lyrics|null; }
 import type { MusicGenre } from "./animation";

@@ -67,7 +67,7 @@ function GltfAvatar({ url, audio, isPlaying, reducedMotion, genre }: VisualizerP
 }
 
 export function ThreeAvatar(props: VisualizerProps) {
-  const modelUrl = process.env.NEXT_PUBLIC_AVATAR_MODEL_URL;
+  const modelUrl = props.avatarModelUrl;
   return <div className="visualizer-stage three-avatar-stage" role="img" aria-label="3D music-reactive avatar">
     <Canvas camera={{ position: [0, 0.1, 4.2], fov: 38 }} dpr={[1, 1.5]}>
       <ambientLight intensity={1.7} /><directionalLight position={[3, 4, 5]} intensity={2.2} />

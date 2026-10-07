@@ -9,6 +9,7 @@ export interface VisualizerProps {
   isPlaying: boolean;
   reducedMotion: boolean;
   genre?: string | null;
+  avatarModelUrl?: string | null;
 }
 export interface VisualizerDefinition {
   id: VisualizerMode;

@@ -188,3 +188,6 @@ For animated `.glb`/`.gltf` avatars, include animation clips in the model. Sonic
 ### Avatar animation mapping (v17)
 
 Edit `components/visualizer/animationMapping.ts` to map your model's animation clip names to genre-specific playback and idle behavior. Matching is case-insensitive and uses regular expressions. For example, a Hardstyle model can expose clips named `Headbang_Loop` and `Idle`; the `hardstyle` mapping will select them automatically. If no genre-specific clip matches, generic dance/move/groove and idle/stand/rest names are used as fallback. Add a `default` mapping for other genres.
+
+### Avatar-Auswahl
+Unter Settings kannst du zwischen dem prozeduralen Avatar und einem konfigurierten GLTF-Modell wechseln. Für ein eigenes Modell setze `NEXT_PUBLIC_AVATAR_MODEL_URL=/models/avatar.glb` und lege die Datei unter `public/models/avatar.glb` ab. Weitere Modelle können in `components/visualizer/avatarModels.ts` ergänzt werden; dort jeweils eine eindeutige `id`, ein Label und eine URL eintragen. Die Auswahl wird als UI-Präferenz lokal gespeichert.
