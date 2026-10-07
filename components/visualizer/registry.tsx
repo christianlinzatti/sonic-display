@@ -8,6 +8,7 @@ export interface VisualizerProps {
   track: Track | null;
   isPlaying: boolean;
   reducedMotion: boolean;
+  genre?: string | null;
 }
 export interface VisualizerDefinition {
   id: VisualizerMode;

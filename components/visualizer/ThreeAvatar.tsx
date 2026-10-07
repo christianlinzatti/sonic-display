@@ -4,6 +4,7 @@ import { Suspense, useEffect, useRef } from "react";
 import { useAnimations, useGLTF } from "@react-three/drei";
 import type { Group, Mesh } from "three";
 import type { VisualizerProps } from "./registry";
+import { animationMapping } from "./animationMapping";
 
 function ProceduralAvatar({ audio, isPlaying, reducedMotion }: VisualizerProps) {
   const root = useRef<Group>(null);
@@ -30,12 +31,15 @@ function ProceduralAvatar({ audio, isPlaying, reducedMotion }: VisualizerProps) 
   </group>;
 }
 
-function GltfAvatar({ url, audio, isPlaying, reducedMotion }: VisualizerProps & { url: string }) {
+function propsGenreKey(genre?: string | null) { return genre?.toLowerCase() ?? "default"; }
+
+function GltfAvatar({ url, audio, isPlaying, reducedMotion, genre }: VisualizerProps & { url: string }) {
   const root = useRef<Group>(null);
   const { scene, animations } = useGLTF(url);
   const { actions, names } = useAnimations(animations, root);
-  const danceClip = names.find((name) => /dance|move|groove/i.test(name));
-  const idleClip = names.find((name) => /idle|stand|rest/i.test(name));
+  const mapping = animationMapping[propsGenreKey(genre)];
+  const danceClip = names.find((name) => mapping?.playing.some((pattern) => pattern.test(name))) ?? names.find((name) => /dance|move|groove/i.test(name));
+  const idleClip = names.find((name) => mapping?.idle.some((pattern) => pattern.test(name))) ?? names.find((name) => /idle|stand|rest/i.test(name));
   useFrame((state, delta) => {
     if (!root.current) return;
     const active = isPlaying && !reducedMotion;
