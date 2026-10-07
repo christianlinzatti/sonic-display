@@ -175,3 +175,6 @@ Visual components can consume `useVisualizer()` from `context/VisualizerContext.
 
 ### Visualizer modes
 Visual modes are registered in `components/visualizer/registry.tsx` (`wave`, `particles`, `album-glow`, `avatar`). The selected mode is read from persisted UI preferences by `VisualizerStage`. Add a mode by implementing `VisualizerProps` and adding a registry entry.
+
+### 3D Avatar (v14)
+The Avatar visualizer uses React Three Fiber and a procedural, stylized 3D character. Bass drives a gentle head pulse, volume affects torso width, and beat strength adds a subtle rotation impulse. This is a procedural placeholder character; replace its geometry/materials in `components/visualizer/ThreeAvatar.tsx` with a GLTF avatar when ready. Install dependencies with `npm install` before running the app.

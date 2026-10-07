@@ -37,3 +37,6 @@ The lyrics chain is LRCLIB → lyrics.ovh → Genius. The Genius adapter is serv
 
 ## Visualizer registry
 `components/visualizer/registry.tsx` maps stable mode IDs to metadata and components. `VisualizerStage` selects the registered mode from persisted UI preferences and passes normalized audio, track, playback, and reduced-motion props. Add new visualizers by implementing `VisualizerProps` and registering a definition; keep source/provider concerns outside visualizer components.
+
+## 3D Avatar
+The `avatar` registry entry renders `ThreeAvatar`, a client-side React Three Fiber scene. It consumes the same normalized `VisualizerProps` as other visualizers, keeping Three.js out of the playback and audio-analysis contexts.

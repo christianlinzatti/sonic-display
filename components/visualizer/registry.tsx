@@ -1,3 +1,4 @@
+import { ThreeAvatar } from "./ThreeAvatar";
 import type { ComponentType } from "react";
 import type { AudioFeatures, Track } from "@/types/music";
 
@@ -23,11 +24,11 @@ function ParticleVisualizer({ audio, isPlaying, reducedMotion }: VisualizerProps
 function AlbumGlowVisualizer({ audio, track }: VisualizerProps) {
   return <div className="visualizer-stage album-glow-stage" aria-label="Album art glow" style={{ "--glow-energy": audio.bass } as React.CSSProperties}>{track?.albumCoverUrl ? <img src={track.albumCoverUrl} alt="" /> : <span>♫</span>}</div>;
 }
-function AvatarPlaceholder({}: VisualizerProps) { return <div className="visualizer-stage avatar-stage">Avatar visualizer</div>; }
+
 
 export const visualizerRegistry: Record<VisualizerMode, VisualizerDefinition> = {
   wave: { id: "wave", label: "Waveform", Component: WaveVisualizer },
   particles: { id: "particles", label: "Particles", Component: ParticleVisualizer },
   "album-glow": { id: "album-glow", label: "Album glow", Component: AlbumGlowVisualizer },
-  avatar: { id: "avatar", label: "Avatar", Component: AvatarPlaceholder },
+  avatar: { id: "avatar", label: "3D Avatar", Component: ThreeAvatar },
 };
