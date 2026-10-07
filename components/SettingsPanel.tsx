@@ -19,7 +19,12 @@ export function SettingsPanel() {
       <label>Visualizer<select value={preferences.visualizerMode} onChange={e => updatePreferences({ visualizerMode: e.target.value as typeof preferences.visualizerMode })}>
         <option value="wave">Waveform</option><option value="particles">Particles</option><option value="album-glow">Album glow</option><option value="avatar">Avatar</option>
       </select></label>
-      <label>Avatar model<select value={preferences.avatarModelId} onChange={e => updatePreferences({ avatarModelId: e.target.value })}>{avatarModels.map(model => <option key={model.id} value={model.id}>{model.label}</option>)}</select></label>
+      <fieldset className="avatar-library"><legend>Avatar library</legend><div className="avatar-library-grid">{avatarModels.map(model => {
+        const available = model.id === "procedural" || Boolean(model.url);
+        return <button type="button" key={model.id} className={`avatar-card ${preferences.avatarModelId === model.id ? "selected" : ""}`} aria-pressed={preferences.avatarModelId === model.id} disabled={!available} onClick={() => updatePreferences({ avatarModelId: model.id })}>
+          <img src={model.preview ?? "/avatars/default-preview.svg"} alt="" width="96" height="72" /><strong>{model.label}</strong><small>{available ? model.description : "Set model URL in environment"}</small>
+        </button>;
+      })}</div></fieldset>
       <label className="setting-check"><input type="checkbox" checked={preferences.lyricsVisible} onChange={e => updatePreferences({ lyricsVisible: e.target.checked })}/> Show lyrics</label>
       <label className="setting-check"><input type="checkbox" checked={preferences.microphoneEnabled} onChange={e => setMicrophone(e.target.checked)}/> Enable microphone analysis</label>
       <label className="setting-check"><input type="checkbox" checked={preferences.reducedMotion} onChange={e => updatePreferences({ reducedMotion: e.target.checked })}/> Reduce motion</label>

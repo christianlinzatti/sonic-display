@@ -46,3 +46,6 @@ The `avatar` registry entry renders `ThreeAvatar`, a client-side React Three Fib
 
 ### Rigged GLTF animation clips
 The GLTF avatar reads embedded animation clips. Clip names containing `dance`, `move`, or `groove` are preferred during playback; names containing `idle`, `stand`, or `rest` are preferred while paused. Clips cross-fade on playback state changes. If no matching clips exist, the existing procedural motion remains active. `reducedMotion` suppresses authored dance clips.
+
+## Avatar library
+`avatarModels.ts` is the registry for avatar metadata, optional preview assets, and configured GLTF URLs. `SettingsPanel` presents selectable cards and disables unavailable external models. `VisualizerStage` resolves the selected model through `getAvatarModel`, keeping model selection separate from playback state.

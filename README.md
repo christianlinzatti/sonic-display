@@ -191,3 +191,13 @@ Edit `components/visualizer/animationMapping.ts` to map your model's animation c
 
 ### Avatar-Auswahl
 Unter Settings kannst du zwischen dem prozeduralen Avatar und einem konfigurierten GLTF-Modell wechseln. Für ein eigenes Modell setze `NEXT_PUBLIC_AVATAR_MODEL_URL=/models/avatar.glb` und lege die Datei unter `public/models/avatar.glb` ab. Weitere Modelle können in `components/visualizer/avatarModels.ts` ergänzt werden; dort jeweils eine eindeutige `id`, ein Label und eine URL eintragen. Die Auswahl wird als UI-Präferenz lokal gespeichert.
+
+### Avatar library (v19)
+Choose an avatar card in Settings. Register additional entries in `components/visualizer/avatarModels.ts`; set the corresponding model URL in environment variables. Optional preview images belong in `public/avatars/`.
+
+```env
+NEXT_PUBLIC_AVATAR_MODEL_URL=/models/avatar.glb
+NEXT_PUBLIC_AVATAR_NEON_URL=/models/neon.glb
+NEXT_PUBLIC_AVATAR_FESTIVAL_URL=/models/festival.glb
+```
+Models without a configured URL are disabled in the library. The built-in procedural avatar is always available.
