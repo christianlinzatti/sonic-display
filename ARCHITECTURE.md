@@ -52,3 +52,7 @@ The GLTF avatar reads embedded animation clips. Clip names containing `dance`, `
 
 ### Avatar customization
 Avatar presentation settings (scale, vertical offset, animation intensity, and optional genre-based model selection) live in `UiPreferences`, separate from playback state. `VisualizerStage` resolves the selected model and passes presentation values through `VisualizerProps`; the 3D component applies transforms and motion intensity.
+
+## Avatar Editor
+
+`components/visualizer/AvatarEditor.tsx` is an isolated preview/editor surface. It consumes `VisualizerContext`, loads the selected avatar model, discovers GLTF animation clips, and lets the user test a clip without changing playback state. Persistent avatar preferences remain in `UiPreferencesContext`; temporary editor state (selected clip, play state, test beat) is intentionally local to the editor.

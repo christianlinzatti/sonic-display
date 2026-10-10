@@ -204,3 +204,7 @@ Models without a configured URL are disabled in the library. The built-in proced
 
 ## Version 20 – Avatar controls
 The Settings panel now includes avatar scale, vertical offset, animation intensity, and optional genre-based model selection. Genre auto-selection uses a small editable mapping in `components/visualizer/VisualizerStage.tsx`; unavailable model URLs fall back through `getAvatarModel` to the procedural avatar. These preferences are persisted with the existing UI preferences.
+
+## Version 21 – Avatar Editor
+
+The Avatar settings now include a live React Three Fiber preview. For GLB/GLTF models, available animation clips are detected and can be selected and tested directly. The preview also reacts to live AudioFeatures and includes a temporary beat-test button. Procedural avatars use the same preview area and expose their audio reaction without authored clips.

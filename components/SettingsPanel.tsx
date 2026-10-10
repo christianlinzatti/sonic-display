@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useUiPreferences } from "@/context/UiPreferencesContext";
 import { useAudioAnalysis } from "@/context/AudioAnalysisContext";
 import { avatarModels } from "@/components/visualizer/avatarModels";
+import { AvatarEditor } from "@/components/visualizer/AvatarEditor";
 
 export function SettingsPanel() {
   const [open, setOpen] = useState(false);
@@ -31,6 +32,7 @@ export function SettingsPanel() {
         <label>Animation intensity ({preferences.avatarAnimationIntensity.toFixed(1)}×)<input type="range" min="0" max="2" step="0.1" value={preferences.avatarAnimationIntensity} onChange={e => updatePreferences({ avatarAnimationIntensity: Number(e.target.value) })}/></label>
         <label className="setting-check"><input type="checkbox" checked={preferences.autoAvatarByGenre} onChange={e => updatePreferences({ autoAvatarByGenre: e.target.checked })}/> Automatically select avatar by genre</label>
       </fieldset>
+      {preferences.visualizerMode === "avatar" && <AvatarEditor />}
       <label className="setting-check"><input type="checkbox" checked={preferences.lyricsVisible} onChange={e => updatePreferences({ lyricsVisible: e.target.checked })}/> Show lyrics</label>
       <label className="setting-check"><input type="checkbox" checked={preferences.microphoneEnabled} onChange={e => setMicrophone(e.target.checked)}/> Enable microphone analysis</label>
       <label className="setting-check"><input type="checkbox" checked={preferences.reducedMotion} onChange={e => updatePreferences({ reducedMotion: e.target.checked })}/> Reduce motion</label>
