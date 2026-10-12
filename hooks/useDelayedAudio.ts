@@ -8,7 +8,7 @@ export function useDelayedAudio(metrics: AudioFeatures, enabled: boolean, delayM
   const history = useRef<{ at: number; metrics: AudioFeatures }[]>([]);
   const [output, setOutput] = useState(metrics);
   useEffect(() => {
-    if (!enabled || delayMs <= 0) { history.current = []; setOutput(metrics); return; }
+    if (!enabled || delayMs <= 0) { history.current = []; setOutput(previous => previous === metrics ? previous : metrics); return; }
     const now = performance.now();
     history.current.push({ at: now, metrics });
     history.current = history.current.filter(item => now - item.at < 1000);

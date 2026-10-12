@@ -1,9 +1,14 @@
 /** Register locally hosted GLB/GLTF models here. Optional previews live under public/. */
-export type AvatarModel = { id: string; label: string; url: string | null; preview?: string; description: string };
-export const avatarModels: AvatarModel[] = [
-  { id: "procedural", label: "Procedural", url: null, preview: "/avatars/procedural-preview.svg", description: "Built-in animated character" },
-  { id: "custom", label: "Custom GLTF", url: process.env.NEXT_PUBLIC_AVATAR_MODEL_URL || null, preview: "/avatars/custom-preview.svg", description: "Model configured with NEXT_PUBLIC_AVATAR_MODEL_URL" },
-  { id: "neon", label: "Neon avatar", url: process.env.NEXT_PUBLIC_AVATAR_NEON_URL || null, preview: "/avatars/neon-preview.svg", description: "Optional second model" },
-  { id: "festival", label: "Festival avatar", url: process.env.NEXT_PUBLIC_AVATAR_FESTIVAL_URL || null, preview: "/avatars/festival-preview.svg", description: "Optional third model" },
-];
-export function getAvatarModel(id: string) { return avatarModels.find(model => model.id === id && (id === "procedural" || model.url)) ?? avatarModels[0]; }
+import type { AvatarDancePresetId } from "./avatarDancePresets";
+export type AvatarModel = { id: string; label: string; url: string | null; preview?: string; description: string; genre?: string[]; tags?: string[]; category?: string; favorite?: boolean; defaultDancePreset?: AvatarDancePresetId };
+import { defaultAvatarModels } from "@/config/avatarModels.default";
+export const avatarModels: AvatarModel[] = defaultAvatarModels;
+
+export function getAvatarModel(id: string) {
+  if (id.startsWith("local:")) {
+    const filename = id.slice("local:".length);
+    if (/^[^/\\]+\.(glb|gltf)$/i.test(filename) && filename !== "." && filename !== "..") {
+      return { id, label: filename.replace(/\.(glb|gltf)$/i, ""), url: `/avatars/${encodeURIComponent(filename)}`, description: "Lokales Modell" };
+    }
+  }
+ return avatarModels.find(model => model.id === id && (id === "procedural" || model.url)) ?? avatarModels[0]; }

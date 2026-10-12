@@ -5,7 +5,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useAnimations, useGLTF } from "@react-three/drei";
 import type { Group, Object3D } from "three";
 import { useVisualizer } from "@/context/VisualizerContext";
-import { getAvatarModel } from "./avatarModels";
+import { useAvatarModel } from "@/hooks/useAvatarModel";
 import { avatarRigProfiles } from "./avatarRigProfiles";
 import { avatarDancePresets } from "./avatarDancePresets";
 
@@ -57,7 +57,7 @@ function GltfPreview({ url, clip, playing, pulse, intensity, onClips }: {
 
 export function AvatarEditor() {
   const { preferences, audio, isPlaying, updatePreferences } = useVisualizer();
-  const model = getAvatarModel(preferences.avatarModelId);
+  const model = useAvatarModel(preferences.avatarModelId);
   const [clip, setClip] = useState<string | null>(null);
   const [clips, setClips] = useState<string[]>([]);
   const [playing, setPlaying] = useState(true);

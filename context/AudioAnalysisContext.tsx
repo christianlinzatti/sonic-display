@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useCallback } from "react";
 import { useMicrophoneAnalysis } from "@/hooks/useMicrophoneAnalysis";
 import { useDelayedAudio } from "@/hooks/useDelayedAudio";
 import { useBeatSync } from "@/hooks/useBeatSync";
@@ -9,8 +9,9 @@ import { useMusic } from "@/context/MusicContext";
 import { useEstimatedBeat } from "@/hooks/useEstimatedBeat";
 const Context = createContext<AudioAnalysisState | null>(null);
 export function AudioAnalysisProvider({ children }: { children: React.ReactNode }) {
-  const [enabled, setEnabled] = useState(false);
-  const { preferences } = useUiPreferences();
+  const { preferences, updatePreferences } = useUiPreferences();
+  const enabled = preferences.microphoneEnabled;
+  const setEnabled = useCallback((next: boolean) => updatePreferences({ microphoneEnabled: next }), [updatePreferences]);
   const music = useMusic();
   const estimatedMetrics = useEstimatedBeat(music);
   const { metrics, active, error, beatEvents } = useMicrophoneAnalysis(enabled, { sensitivity: preferences.beatSensitivity, cooldownMs: preferences.beatCooldownMs });

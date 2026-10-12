@@ -1,0 +1,18 @@
+{
+  "hardstyle-dancer.glb": {
+    "label": "Hardstyle Dancer",
+    "description": "Mein eigener Avatar",
+    "preview": "/avatars/custom-preview.svg",
+    "genre": [
+      "hardstyle",
+      "hardtekk"
+    ],
+    "tags": [
+      "festival",
+      "energetisch"
+    ],
+    "category": "Dancer",
+    "favorite": true,
+    "defaultDancePreset": "hardstyle"
+  }
+}

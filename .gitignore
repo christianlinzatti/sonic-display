@@ -7,3 +7,9 @@ out
 .vercel
 *.log
 .DS_Store
+
+# User-owned avatar metadata and downloaded models
+/data/avatars.local.json
+/public/avatars/*.glb
+/public/avatars/*.gltf
+/public/avatars/*.bin

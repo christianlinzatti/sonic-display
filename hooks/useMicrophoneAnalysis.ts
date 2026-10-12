@@ -14,7 +14,7 @@ export function useMicrophoneAnalysis(enabled: boolean, calibration: { sensitivi
   const [beatEvents, setBeatEvents] = useState<BeatEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    if (!enabled) { setActive(false); setMetrics(zero); setBeatEvents([]); setError(null); return; }
+    if (!enabled) { setActive(value => value ? false : value); setMetrics(value => value === zero ? value : zero); setBeatEvents(value => value.length ? [] : value); setError(value => value === null ? value : null); return; }
     let stream: MediaStream | undefined;
     let context: AudioContext | undefined;
     let raf = 0;

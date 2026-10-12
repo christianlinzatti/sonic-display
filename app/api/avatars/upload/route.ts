@@ -1,0 +1,5 @@
+import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
+import { NextRequest,NextResponse } from "next/server";
+import { isAdmin,sameOrigin } from "@/lib/avatarAdmin";
+export const runtime="nodejs";
+export async function POST(req:NextRequest){if(!await isAdmin())return NextResponse.json({error:"Nicht angemeldet"},{status:401});if(!sameOrigin(req))return NextResponse.json({error:"Origin mismatch"},{status:403});try{const body=(await req.json()) as HandleUploadBody;const response=await handleUpload({body,request:req,onBeforeGenerateToken:async(pathname)=>{if(!/^sonic\/(models\/[a-zA-Z0-9_-]+\.glb|previews\/[a-zA-Z0-9_-]+\.(png|jpg|jpeg|webp))$/i.test(pathname))throw Error("Ungültiger Upload-Pfad");return {allowedContentTypes:pathname.endsWith(".glb")?["model/gltf-binary","application/octet-stream"]:["image/png","image/jpeg","image/webp"],maximumSizeInBytes:pathname.endsWith(".glb")?100*1024*1024:5*1024*1024,addRandomSuffix:false};},onUploadCompleted:async()=>{}});return NextResponse.json(response);}catch(e){console.error(e);return NextResponse.json({error:"Upload fehlgeschlagen"},{status:400});}}
