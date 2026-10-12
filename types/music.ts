@@ -11,7 +11,16 @@ export interface UiPreferences {
   avatarScale: number;
   avatarOffsetY: number;
   avatarAnimationIntensity: number;
+  danceAggression: number;
+  danceVariation: number;
+  danceMotionStyle: "smooth" | "balanced" | "sharp";
+  avatarRigProfile: "auto" | "humanoid" | "mixamo" | "ready-player-me" | "robot";
+  avatarDancePreset: "auto" | "hardstyle" | "techno" | "rock-metal" | "robot" | "ambient" | "freestyle";
   autoAvatarByGenre: boolean;
+  beatSensitivity: number;
+  beatCooldownMs: number;
+  beatSyncMode: "off" | "auto" | "manual";
+  beatSyncOffsetMs: number;
 }
 export interface MusicState { connected:boolean; connectionStatus:ConnectionStatus; loading:boolean; error:string|null; track:Track|null; progressMs:number; isPlaying:boolean; fetchedAt:number; lyrics:Lyrics|null; }
 import type { MusicGenre } from "./animation";

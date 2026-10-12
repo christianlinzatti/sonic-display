@@ -8,9 +8,9 @@ export function MusicAnimationController(){
  const selectedGenre=genre??"hardstyle";
  const genreLabel=genreStatus==="loading"?"Detecting genre with Last.fm…":genreStatus==="error"?`Last.fm unavailable${genreError?` · ${genreError}`:""} · choose genre manually`:genreStatus==="unknown"?"No matching Last.fm genre · using default avatar":genreMatchedTag?`Last.fm: ${genreMatchedTag} (${genreSource})${genreOverride?" · manual override":" · automatic"}`:"Choose an avatar genre";
  return <section className="music-animation" aria-label="Music animation controller">
- <header className="animation-header"><div><strong>Music Animation</strong><span>{active?"Live microphone analysis":"Avatar reacts to playback state"}</span></div><label>Avatar genre<select value={selectedGenre} onChange={e=>setGenreOverride(e.target.value as MusicGenre)}>{GENRES.map(g=><option key={g.id} value={g.id}>{g.label}</option>)}</select></label></header>
+ <header className="animation-header"><div><strong>Music Animation</strong><span>{active?"Live microphone analysis":"Estimated rhythm (not Spotify audio analysis)"}</span></div><label>Avatar genre<select value={selectedGenre} onChange={e=>setGenreOverride(e.target.value as MusicGenre)}>{GENRES.map(g=><option key={g.id} value={g.id}>{g.label}</option>)}</select></label></header>
  <p className="genre-source">{genreLabel}{genreOverride&&<button type="button" onClick={()=>setGenreOverride(null)}>Use Last.fm genre</button>}</p>
  <GenreAvatar genre={selectedGenre} beat={active?metrics.beatStrength:0} bass={active?metrics.bass:0} highs={active?metrics.highs:0} isPlaying={isPlaying}/>
- <footer className="animation-track">{track?`${track.title} · ${track.artist}`:"Waiting for track"}<span>{active?"MIC INPUT":"MIC OFF"}</span></footer>
+ <footer className="animation-track">{track?`${track.title} · ${track.artist}`:"Waiting for track"}<span>{active?"MIC INPUT":"ESTIMATED"}</span></footer>
  </section>;
 }

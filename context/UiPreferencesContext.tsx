@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from "react";
 import type { UiPreferences } from "@/types/music";
 const KEY = "sonic-display-ui-preferences-v1";
-const defaults: UiPreferences = { visualizerMode: "avatar", lyricsVisible: true, microphoneEnabled: false, reducedMotion: false, avatarModelId: "procedural", avatarScale: 1, avatarOffsetY: 0, avatarAnimationIntensity: 1, autoAvatarByGenre: false };
+const defaults: UiPreferences = { visualizerMode: "avatar", lyricsVisible: true, microphoneEnabled: false, reducedMotion: false, avatarModelId: "procedural", avatarScale: 1, avatarOffsetY: 0, avatarAnimationIntensity: 1, danceAggression: 0.5, danceVariation: 0.5, danceMotionStyle: "balanced", avatarRigProfile: "auto", avatarDancePreset: "auto", autoAvatarByGenre: false, beatSensitivity: 1, beatCooldownMs: 180, beatSyncMode: "off", beatSyncOffsetMs: 0 };
 type Value = { preferences: UiPreferences; updatePreferences: (patch: Partial<UiPreferences>) => void; };
 const Context = createContext<Value | null>(null);
 export function UiPreferencesProvider({ children }: { children: ReactNode }) {

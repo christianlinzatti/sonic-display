@@ -6,6 +6,8 @@ import { useAnimations, useGLTF } from "@react-three/drei";
 import type { Group, Object3D } from "three";
 import { useVisualizer } from "@/context/VisualizerContext";
 import { getAvatarModel } from "./avatarModels";
+import { avatarRigProfiles } from "./avatarRigProfiles";
+import { avatarDancePresets } from "./avatarDancePresets";
 
 function ProceduralPreview({ pulse, intensity }: { pulse: number; intensity: number }) {
   const group = useRef<Group>(null);
@@ -54,7 +56,7 @@ function GltfPreview({ url, clip, playing, pulse, intensity, onClips }: {
 }
 
 export function AvatarEditor() {
-  const { preferences, audio, isPlaying } = useVisualizer();
+  const { preferences, audio, isPlaying, updatePreferences } = useVisualizer();
   const model = getAvatarModel(preferences.avatarModelId);
   const [clip, setClip] = useState<string | null>(null);
   const [clips, setClips] = useState<string[]>([]);
@@ -88,6 +90,15 @@ export function AvatarEditor() {
         <button type="button" onClick={() => setPlaying(value => !value)}>{playing ? "Pause" : "Play"}</button>
         <button type="button" onClick={() => setTestBeat(true)}>Test beat</button>
       </div>
+      {model.url && <><label>Rig profile
+        <select value={preferences.avatarRigProfile} onChange={event => updatePreferences({ avatarRigProfile: event.target.value as typeof preferences.avatarRigProfile })}>
+          {avatarRigProfiles.map(profile => <option key={profile.id} value={profile.id}>{profile.label}</option>)}
+        </select>
+      </label><label>Dance preset
+        <select value={preferences.avatarDancePreset} onChange={event => updatePreferences({ avatarDancePreset: event.target.value as typeof preferences.avatarDancePreset })}>
+          {avatarDancePresets.map(preset => <option key={preset.id} value={preset.id}>{preset.label}</option>)}
+        </select>
+      </label></>}
       {model.url ? <label>Animation clip
         <select value={clip ?? ""} onChange={event => setClip(event.target.value || null)}>
           <option value="">Auto / none</option>

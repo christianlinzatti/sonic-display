@@ -23,3 +23,28 @@
 
 /* Avatar editor */
 .avatar-editor{display:grid;gap:10px;padding-top:2px;border-top:1px solid #ffffff18}.avatar-editor-preview{position:relative;height:190px;overflow:hidden;border-radius:12px;background:radial-gradient(ellipse at 50% 65%,rgba(117,87,217,.3),transparent 68%),#0b0d14}.avatar-editor-preview canvas{display:block;width:100%;height:100%}.avatar-editor-live{position:absolute;left:9px;top:8px;padding:4px 7px;border:1px solid #ffffff20;border-radius:999px;background:#090a0ed9;color:#c1ff72;font-size:.56rem;font-weight:800;letter-spacing:.08em}.avatar-editor-controls{display:grid;gap:9px}.avatar-editor-actions{display:flex;gap:7px}.avatar-editor button{cursor:pointer;border:1px solid #ffffff30;border-radius:8px;background:#252735;color:#fff;padding:7px 9px;font-size:.72rem}.avatar-editor-controls label{display:grid;gap:5px}.avatar-editor-controls select{width:100%;padding:7px;border-radius:8px;background:#252735;color:#fff;border:1px solid #ffffff30}.avatar-editor-help{margin:0;color:#9295a1;font-size:.68rem;line-height:1.4}
+.audio-debug{margin:14px 0;padding:12px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(0,0,0,.2)}.audio-debug-heading,.audio-debug-meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;margin-bottom:10px}.audio-live{color:#67e8a5}.audio-idle{color:#aaa}.audio-meter{display:grid;grid-template-columns:54px 1fr 34px;align-items:center;gap:8px;margin:7px 0;font-size:11px}.audio-meter-track{height:7px;background:rgba(255,255,255,.12);border-radius:8px;overflow:hidden}.audio-meter-fill{height:100%;background:linear-gradient(90deg,#5b8cff,#a78bfa);transition:width 80ms linear}.audio-meter code{text-align:right;color:#cbd5e1}.audio-debug-error{color:#fca5a5;font-size:12px}
+
+.beat-timeline{margin:16px 0 10px}.beat-timeline-heading,.beat-timeline-axis{display:flex;justify-content:space-between;font-size:11px;color:#cbd5e1;margin-bottom:7px}.beat-timeline-track{height:62px;position:relative;border-radius:7px;overflow:hidden;background:repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0,rgba(255,255,255,.07) 1px,transparent 1px,transparent 20%);border-bottom:1px solid rgba(255,255,255,.2)}.beat-timeline-track span{position:absolute;bottom:0;width:3px;min-height:5px;background:#67e8a5;box-shadow:0 0 8px rgba(103,232,165,.5);transform:translateX(-50%)}.beat-timeline-axis{margin-top:4px;color:#888}
+
+/* BPM / beat grid visualizer */
+.beat-grid{margin:16px 0 10px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)}
+.beat-grid-heading,.beat-grid-axis,.beat-grid-stats{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:11px;color:#cbd5e1;margin-bottom:7px}
+.beat-grid-heading span{color:#67e8a5;font-weight:700}
+.beat-grid-track{height:70px;position:relative;overflow:hidden;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015));border-bottom:1px solid rgba(255,255,255,.18)}
+.beat-grid-track i,.beat-grid-track b{position:absolute;bottom:0;transform:translateX(-50%);pointer-events:none}
+.beat-grid-track i{height:100%;width:1px;background:rgba(255,255,255,.14)}
+.beat-grid-track i.major{width:2px;background:rgba(255,255,255,.3)}
+.beat-grid-track b{width:4px;height:calc(12px + var(--beat-height, 20px));max-height:58px;background:#67e8a5;box-shadow:0 0 9px rgba(103,232,165,.6);border-radius:4px 4px 0 0}
+.beat-grid-axis{margin-top:4px;color:#777d89}
+.beat-grid-stats{margin-top:8px;margin-bottom:0;color:#9ea4b1}
+.beat-grid-stats b{color:#e7e9ee}
+
+/* V55: read-only choreography telemetry */
+.dance-performance-preview{margin:16px 0 8px;padding:12px;border:1px solid rgba(167,139,250,.3);border-radius:12px;background:rgba(139,92,246,.06)}
+.dance-preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}
+.dance-preview-grid>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.dance-preview-grid small{color:#aeb6c6;font-size:11px}
+.dance-preview-grid strong{font-size:13px;overflow-wrap:anywhere}
+.dance-preview-progress{height:7px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}
+.dance-preview-progress>div{height:100%;background:linear-gradient(90deg,#60a5fa,#a78bfa);transition:width 150ms linear}

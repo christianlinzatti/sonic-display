@@ -10,9 +10,15 @@ export interface VisualizerProps {
   reducedMotion: boolean;
   genre?: string | null;
   avatarModelUrl?: string | null;
+  avatarModelId?: string;
   avatarScale?: number;
   avatarOffsetY?: number;
   avatarAnimationIntensity?: number;
+  danceAggression?: number;
+  danceVariation?: number;
+  danceMotionStyle?: "smooth" | "balanced" | "sharp";
+  avatarRigProfile?: "auto" | "humanoid" | "mixamo" | "ready-player-me" | "robot";
+  avatarDancePreset?: "auto" | "hardstyle" | "techno" | "rock-metal" | "robot" | "ambient" | "freestyle";
 }
 export interface VisualizerDefinition {
   id: VisualizerMode;

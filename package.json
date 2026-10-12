@@ -1,6 +1,6 @@
 {
   "name": "sonic-display",
-  "version": "0.1.0-v21",
+  "version": "0.1.0-v59",
   "private": true,
   "scripts": {
     "dev": "next dev",
