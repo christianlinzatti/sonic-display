@@ -1,6 +1,7 @@
 import { ThreeAvatar } from "./ThreeAvatar";
 import type { ComponentType } from "react";
-import type { AudioFeatures, Track } from "@/types/music";
+import type { Track } from "@/types/music";
+import type { AudioFeatures } from "@/types/audio";
 
 export type VisualizerMode = "wave" | "particles" | "album-glow" | "avatar";
 export interface VisualizerProps {

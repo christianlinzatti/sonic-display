@@ -1,6 +1,6 @@
 import type { AudioFeatures } from "@/types/audio";
 
-export type MusicalPhase = "intro" | "verse" | "build-up" | "drop" | "break" | "outro";
+export type MusicalPhase = "intro" | "verse" | "chorus" | "build-up" | "drop" | "break" | "outro";
 
 export type MusicalStructureState = {
   phase: MusicalPhase;

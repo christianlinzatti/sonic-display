@@ -40,8 +40,7 @@ function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, avatarScale 
     const intelligenceMultipliers = getDanceIntelligenceMultipliers(intelligence.current);
     musicalStructure.current = updateMusicalStructure(musicalStructure.current, audio, state.clock.elapsedTime, isPlaying, reducedMotion);
     const structure = getMusicalStructure(musicalStructure.current, state.clock.elapsedTime);
-    performanceDirector.current = updatePerformanceDirector(performanceDirector.current, audio, genre, intelligence.current, structure, state.clock.elapsedTime, isPlaying, reducedMotion, avatarDancePreset);
-    const performance = performanceDirector.current;
+    const performance = updatePerformanceDirector(performanceDirector.current, audio, genre, intelligence.current, structure, state.clock.elapsedTime, isPlaying, reducedMotion, avatarDancePreset);
     if (state.clock.elapsedTime - previewPublishedAt.current >= 0.15) {
       previewPublishedAt.current = state.clock.elapsedTime;
       publishDancePerformance({ playing: isPlaying, sequence: "baseline", move: isPlaying ? "procedural groove" : "idle",
@@ -124,8 +123,7 @@ function GltfAvatar({ url, audio, isPlaying, reducedMotion, genre, avatarModelId
     const intelligenceMultipliers = getDanceIntelligenceMultipliers(intelligence.current);
     musicalStructure.current = updateMusicalStructure(musicalStructure.current, audio, state.clock.elapsedTime, isPlaying, reducedMotion);
     const structure = getMusicalStructure(musicalStructure.current, state.clock.elapsedTime);
-    performanceDirector.current = updatePerformanceDirector(performanceDirector.current, audio, genre, intelligence.current, structure, state.clock.elapsedTime, isPlaying, reducedMotion, avatarDancePreset);
-    const performance = performanceDirector.current;
+    const performance = updatePerformanceDirector(performanceDirector.current, audio, genre, intelligence.current, structure, state.clock.elapsedTime, isPlaying, reducedMotion, avatarDancePreset);
     const rhythmDance = updateRhythmChoreography(rhythmChoreography.current, audio, state.clock.elapsedTime, delta, isPlaying && !reducedMotion);
     if (state.clock.elapsedTime - previewPublishedAt.current >= 0.15) {
       previewPublishedAt.current = state.clock.elapsedTime;
