@@ -8,7 +8,7 @@ const key=()=>createHash("sha256").update(getEnv().sessionSecret).digest();
 const b64=(b:Buffer)=>b.toString("base64url");
 export function encryptSession(s:SpotifySession){const iv=randomBytes(12);const c=createCipheriv("aes-256-gcm",key(),iv);const data=Buffer.concat([c.update(JSON.stringify(s)),c.final()]);return `${b64(iv)}.${b64(c.getAuthTag())}.${b64(data)}`;}
 export function decryptSession(v:string):SpotifySession|null{try{const [iv,tag,data]=v.split(".");if(!iv||!tag||!data)return null;const d=createDecipheriv("aes-256-gcm",key(),Buffer.from(iv,"base64url"));d.setAuthTag(Buffer.from(tag,"base64url"));return JSON.parse(Buffer.concat([d.update(Buffer.from(data,"base64url")),d.final()]).toString()) as SpotifySession;}catch{return null;}}
-const cookieOptions={httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"lax" as const,path:"/"};
+const cookieOptions={httpOnly:true,secure:getEnv().redirectUri.startsWith("https://"),sameSite:"lax" as const,path:"/"};
 export function setSessionCookie(res:NextResponse,s:SpotifySession){res.cookies.set(SESSION_COOKIE,encryptSession(s),{...cookieOptions,maxAge:60*60*24*30});}
 export function clearSessionCookie(res:NextResponse){res.cookies.set(SESSION_COOKIE,"",{...cookieOptions,maxAge:0});}
 export function setStateCookie(res:NextResponse,state:string){res.cookies.set(STATE_COOKIE,state,{...cookieOptions,path:"/api/spotify",maxAge:600});}
