@@ -7,7 +7,7 @@ import { OrbitControls, useGLTF } from "@react-three/drei";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { retargetHumanoidClips, readRetargetCalibration, RETARGET_EVENT } from "./avatarAnimationRetarget";
 import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUtils.js";
-import { AnimationMixer, LoopOnce, LoopRepeat, AnimationClip, type Group } from "three";
+import { AnimationMixer, AnimationClip, LoopOnce, LoopRepeat, type Group } from "three";
 import {GLB_BLEND_PRESET_LIMIT_V492,readBlendPresetsV492,writeBlendPresetsV492,mergeBlendPresetsV492,parseBlendPresetsV492,serializeBlendPresetsV492,scopedBlendPresetsV492,type GlbBlendPresetV492,type BlendGenreV492} from "./glbBlendPresetsV492";
 import { previewBlendRegionsV491, resolvePreviewBlendV491, previewBlendWeightV491, isPreviewBlendTrackV491, type PreviewBlendPlanV491 } from "./glbMotionBlendPreviewV491";
 import {readFootLockV322} from "./intelligentFootLockV322";

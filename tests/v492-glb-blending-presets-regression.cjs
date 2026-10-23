@@ -59,7 +59,8 @@ for(const fragment of ['preparedBlendsV492=useMemo','chooseLiveBlendPresetV492([
  'footIK.current.left?.contact.phase',"window.addEventListener(GLB_BLEND_CHANGE_V492,refresh)",
  '...preparedBlendsV492.map(p=>p.clip)'])assert(stage.includes(fragment),`missing live wiring: ${fragment}`);
 assert(stage.indexOf('preparedBlendsV492=useMemo')<stage.indexOf('useAnimations(playbackClips, root)'));
-assert(stage.includes('import { AnimationClip, type Group, type Mesh } from "three";'),'AnimationClip must be a runtime import for constructing masked clips');
+assert(/import\s*\{\s*AnimationClip\s*,[^}]*\}\s*from\s*["']three["']/.test(stage),'AnimationClip must be a runtime import for constructing masked clips');
+assert(/import\s*\{[^}]*\bVector3\b[^}]*\}\s*from\s*["']three["']/.test(stage),'Vector3 must be a runtime import for GLB ground contact');
 const preview=read('components/visualizer/AvatarPreview3D.tsx');
 for(const fragment of ['GLB Blending Preset Studio · V492','readBlendPresetsV492()', 'writeBlendPresetsV492(updated)',
  'parseBlendPresetsV492(await file.text())','mergeBlendPresetsV492','serializeBlendPresetsV492',

@@ -100,8 +100,7 @@ import {initialStructureState, advanceStructureState, structureEvidence, choreog
 import { CHARACTER_MOTION_CHANGE_EVENT, loadCharacterMotionStore, chooseCharacterMotion } from "./characterMotionLibrary";
 import { targetBlendWeight, smoothBlend, syncedClipSpeed } from "./motionBlendEngine";
 import { createMaskedAnimationClip } from "./animationBoneMask";
-import { AnimationClip, type Group, type Mesh } from "three";
-import { Vector3 } from "three";
+import { AnimationClip, Vector3, type Group, type Mesh } from "three";
 import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUtils.js";
 import type { VisualizerProps } from "./registry";
 import { Lyrics3DScene } from "./Lyrics3DScene";
