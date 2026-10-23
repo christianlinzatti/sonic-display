@@ -1,0 +1,271 @@
+{
+  "kind": "layout-only fixture",
+  "note": "Does not establish GLB quality, singer identity or Raspberry Pi FPS.",
+  "url": "local fixture",
+  "screens": [
+    {
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "w": 1024,
+        "h": 600,
+        "clipped": false
+      },
+      "overlay": {
+        "x": 645.125,
+        "y": 78,
+        "w": 348.15625,
+        "h": 444,
+        "clipped": false
+      },
+      "lyric": {
+        "x": 645.125,
+        "y": 78,
+        "w": 348.15625,
+        "h": 444,
+        "clipped": false
+      },
+      "line": {
+        "x": 659.421875,
+        "y": 219.4375,
+        "w": 319.5625,
+        "h": 127.75,
+        "clipped": false
+      },
+      "canvasCount": 0,
+      "labelCount": 0,
+      "visualMode": "lyrics-first",
+      "viewport": "1024x600",
+      "side": "right",
+      "fixture": true,
+      "hasLyricsOverlay": true,
+      "overlayWithinStage": true,
+      "errors": [],
+      "browserRafSample": {
+        "frames": 7,
+        "averageMs": 16.683333333333337,
+        "maxMs": 16.799999999999955
+      }
+    },
+    {
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "w": 1024,
+        "h": 600,
+        "clipped": false
+      },
+      "overlay": {
+        "x": 30.71875,
+        "y": 78,
+        "w": 348.15625,
+        "h": 444,
+        "clipped": false
+      },
+      "lyric": {
+        "x": 30.71875,
+        "y": 78,
+        "w": 348.15625,
+        "h": 444,
+        "clipped": false
+      },
+      "line": {
+        "x": 45.015625,
+        "y": 219.4375,
+        "w": 319.5625,
+        "h": 127.75,
+        "clipped": false
+      },
+      "canvasCount": 0,
+      "labelCount": 0,
+      "visualMode": "lyrics-first",
+      "viewport": "1024x600",
+      "side": "left",
+      "fixture": true,
+      "hasLyricsOverlay": true,
+      "overlayWithinStage": true,
+      "errors": [],
+      "browserRafSample": {
+        "frames": 7,
+        "averageMs": 16.666666666666668,
+        "maxMs": 16.69999999999999
+      }
+    },
+    {
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "w": 800,
+        "h": 480,
+        "clipped": false
+      },
+      "overlay": {
+        "x": 504,
+        "y": 62.390625,
+        "w": 272,
+        "h": 355.21875,
+        "clipped": false
+      },
+      "lyric": {
+        "x": 504,
+        "y": 62.390625,
+        "w": 272,
+        "h": 355.21875,
+        "clipped": false
+      },
+      "line": {
+        "x": 515.390625,
+        "y": 175.734375,
+        "w": 249.21875,
+        "h": 99.8125,
+        "clipped": false
+      },
+      "canvasCount": 0,
+      "labelCount": 0,
+      "visualMode": "lyrics-first",
+      "viewport": "800x480",
+      "side": "right",
+      "fixture": true,
+      "hasLyricsOverlay": true,
+      "overlayWithinStage": true,
+      "errors": [],
+      "browserRafSample": {
+        "frames": 8,
+        "averageMs": 16.671428571428578,
+        "maxMs": 16.80000000000001
+      }
+    },
+    {
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "w": 800,
+        "h": 480,
+        "clipped": false
+      },
+      "overlay": {
+        "x": 24,
+        "y": 62.390625,
+        "w": 272,
+        "h": 355.21875,
+        "clipped": false
+      },
+      "lyric": {
+        "x": 24,
+        "y": 62.390625,
+        "w": 272,
+        "h": 355.21875,
+        "clipped": false
+      },
+      "line": {
+        "x": 35.390625,
+        "y": 175.734375,
+        "w": 249.21875,
+        "h": 99.8125,
+        "clipped": false
+      },
+      "canvasCount": 0,
+      "labelCount": 0,
+      "visualMode": "lyrics-first",
+      "viewport": "800x480",
+      "side": "left",
+      "fixture": true,
+      "hasLyricsOverlay": true,
+      "overlayWithinStage": true,
+      "errors": [],
+      "browserRafSample": {
+        "frames": 8,
+        "averageMs": 16.64428571428571,
+        "maxMs": 16.700000000000045
+      }
+    },
+    {
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "w": 1280,
+        "h": 800,
+        "clipped": false
+      },
+      "overlay": {
+        "x": 806.421875,
+        "y": 104,
+        "w": 435.1875,
+        "h": 592,
+        "clipped": false
+      },
+      "lyric": {
+        "x": 806.421875,
+        "y": 104,
+        "w": 435.1875,
+        "h": 592,
+        "clipped": false
+      },
+      "line": {
+        "x": 824.046875,
+        "y": 300.78125,
+        "w": 399.9375,
+        "h": 159.6875,
+        "clipped": false
+      },
+      "canvasCount": 0,
+      "labelCount": 0,
+      "visualMode": "lyrics-first",
+      "viewport": "1280x800",
+      "side": "right",
+      "fixture": true,
+      "hasLyricsOverlay": true,
+      "overlayWithinStage": true,
+      "errors": [],
+      "browserRafSample": {
+        "frames": 8,
+        "averageMs": 16.67142857142857,
+        "maxMs": 16.80000000000001
+      }
+    },
+    {
+      "stage": {
+        "x": 0,
+        "y": 0,
+        "w": 1280,
+        "h": 800,
+        "clipped": false
+      },
+      "overlay": {
+        "x": 38.390625,
+        "y": 104,
+        "w": 435.1875,
+        "h": 592,
+        "clipped": false
+      },
+      "lyric": {
+        "x": 38.390625,
+        "y": 104,
+        "w": 435.1875,
+        "h": 592,
+        "clipped": false
+      },
+      "line": {
+        "x": 56.015625,
+        "y": 300.78125,
+        "w": 399.9375,
+        "h": 159.6875,
+        "clipped": false
+      },
+      "canvasCount": 0,
+      "labelCount": 0,
+      "visualMode": "lyrics-first",
+      "viewport": "1280x800",
+      "side": "left",
+      "fixture": true,
+      "hasLyricsOverlay": true,
+      "overlayWithinStage": true,
+      "errors": [],
+      "browserRafSample": {
+        "frames": 7,
+        "averageMs": 16.666666666666668,
+        "maxMs": 16.799999999999955
+      }
+    }
+  ]
+}

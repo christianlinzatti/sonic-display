@@ -1,0 +1,22 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
+const root=path.resolve(__dirname,'..');
+const src=fs.readFileSync(path.join(root,'components/visualizer/lyricsAwareRapChoreographyV413.ts'),'utf8');
+const avatar=fs.readFileSync(path.join(root,'components/visualizer/ThreeAvatar.tsx'),'utf8');
+assert.match(src,/source:"none"\|"line"\|"word"/);
+assert.match(src,/!lyrics\?\.synced/);
+assert.match(src,/word\.startMs/);
+assert.match(src,/lyricsRapGainV413/);
+assert.match(avatar,/sampleRapLyricsCueV413\(propsLipSyncV367\?\.lyrics/);
+assert.match(avatar,/rapLiveFrameV412\.current=\{\.\.\.sample,active:(?:sample\.active|liveActiveV414)\.map/);
+assert.match(avatar,/!activeSequence&&!activeLoop/);
+const tsc=(()=>{try{return require.resolve('typescript',{paths:[root]})}catch{return null}})();
+if(tsc){const ts=require(tsc);const out=ts.transpileModule(src,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;
+ const Module=require('node:module'),m=new Module('v413',module);m.filename='v413.js';m.paths=module.paths;m._compile(out,'v413.js');
+ const {sampleRapLyricsCueV413:sample,lyricsRapGainV413:gain}=m.exports;
+ const lyrics={synced:true,lines:[{startMs:1000,endMs:2200,text:'eins zwei',words:[{text:'eins',startMs:1000,endMs:1350},{text:'zwei',startMs:1600,endMs:1900}]}]};
+ assert.equal(sample(lyrics,1010,true,false).source,'word');assert.equal(sample(lyrics,1500,true,false).source,'line');assert.equal(sample(lyrics,2300,true,false).active,false);
+ assert.equal(sample({...lyrics,synced:false},1010,true,false).active,false);assert.equal(sample(lyrics,1010,false,false).active,false);assert.equal(sample(lyrics,1010,true,true).active,false);
+ assert.equal(sample(lyrics,1700,true,false).wordIndex,1);assert.ok(gain(100,sample(lyrics,1010,true,false))>100);assert.ok(gain(150,sample(lyrics,1010,true,false))<=150);
+}
+console.log('PASS V413: timestamp-sourced line/word accents, pause and reduced motion, bounded gains, isolated V412 live preset owner');

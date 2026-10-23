@@ -1,0 +1,23 @@
+SONIC DISPLAY V356 – RELEASE VALIDATION
+=====================================
+Source: full Sonic Display V355 project.
+Node: v22.16.0, npm 10.9.2.
+
+PASS  npm run test:v356 (deterministic planner, GLB variety, constraints, integration)
+PASS  npm run verify:offline (99/99 test commands)
+PASS  npm run check:syntax (457 .ts/.tsx files)
+PASS  isolated semantic TS typecheck: services/stageContent/autonomousShowV356.ts and showTimelineV354.ts
+PASS  ZIP archive CRC / file integrity (checked during packaging)
+
+NOT VERIFIED: Full npm run typecheck and next build, because node_modules
+and package-lock.json were not supplied, and npm registry access was not
+available. build:preflight: Node 22, 1/15 dependency manifests resolve.
+NOT VERIFIED: Raspberry Pi / small-display soak test.
+
+Commands for full local validation:
+  npm install
+  npm run verify
+
+Feature limitations: no prediction of unseen future song sections; planner
+provides provisional phrase windows only. Eligible GLB motion rotation
+requires two named compatible dance clips and hybrid mode.

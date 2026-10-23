@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const src=fs.readFileSync('components/visualizer/emotionExpressionV233.ts','utf8');
+const stage=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
+for(const token of ['createEmotionV233State','updateEmotionV233','Math.exp','gazeYaw','gazePitch','hardtekk','reducedMotion',"section==='drop'"])assert.ok(src.includes(token),token);
+assert.equal((stage.match(/updateEmotionV233\(/g)||[]).length,2);
+assert.ok(stage.includes('expressionJaw: expressiveCue.expressionJaw + emotion.jaw'));
+assert.ok(stage.includes('expressionHeadTilt: expressiveCue.headTilt + emotion.headTilt'));
+assert.ok(stage.includes('emotion.gazeYaw'));
+console.log('V233 emotion / expression regression passed');

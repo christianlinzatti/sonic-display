@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v455-core.json",
+  "files": [
+    "../services/show/ultimateAutomaticShowV456.ts",
+    "../services/show/visualBalanceV451.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "../services/show/showContinuityV457.ts"
+  ]
+}

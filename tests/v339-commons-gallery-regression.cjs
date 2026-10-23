@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict'),fs=require('fs'),ts=require('typescript');
+const r=f=>fs.readFileSync(f,'utf8');
+const path='services/stageContent/commonsGalleryV339.ts';
+const js=ts.transpileModule(r(path),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+const vm=require('node:vm');const sandboxModule={exports:{}};vm.runInNewContext(js,{module:sandboxModule,exports:sandboxModule.exports,URL,URLSearchParams});
+const {commonsSearchUrlV339,selectCommonsPhotosV339}=sandboxModule.exports;
+assert.match(commonsSearchUrlV339('Mehnersmoos'),/gsrnamespace=6/);
+const file=(name,license='CC BY-SA 4.0',url='https://upload.wikimedia.org/photo.jpg')=>({title:'File:'+name,imageinfo:[{thumburl:url,descriptionurl:'https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(name),width:900,height:700,extmetadata:{LicenseShortName:{value:license},Artist:{value:'Example photographer'}}}]});
+const photos=selectCommonsPhotosV339({query:{pages:[file('Mehnersmoos live stage.jpg'),file('Wrong band live.jpg'),file('Mehnersmoos album cover.jpg'),file('Mehnersmoos unknown.jpg','All rights reserved'),file('Mehnersmoos live stage 2.jpg','CC BY-SA 4.0','https://upload.wikimedia.org/photo2.jpg')]}},'Mehnersmoos');
+assert.equal(photos.length,2);assert.match(photos[0].credit,/Example photographer/);assert.equal(selectCommonsPhotosV339({},'X').length,0);
+assert.match(r('app/api/stage-content/artist/route.ts'),/selectCommonsPhotosV339/);
+assert.match(r('components/visualizer/StageImageGalleryV338.tsx'),/sonic-gallery-credit-v339/);
+assert.match(r('services/stageContent/stageContentV330.ts'),/imageCredits/);
+console.log('V339 Wikimedia gallery regression passed');

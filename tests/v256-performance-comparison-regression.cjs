@@ -1,0 +1,14 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const p = fs.readFileSync('components/visualizer/PerformanceBenchmarkPanel.tsx','utf8');
+const c = fs.readFileSync('components/visualizer/performanceComparisonV256.ts','utf8');
+assert.match(p,/compareBenchmarkTiers\(results\)/);
+assert.match(p,/p95FrameMs: mean\(/);
+assert.match(p,/fpsSpread: Math\.max/);
+assert.match(p,/qualityRef\.current\.tier === current/);
+assert.match(p,/setPerformanceMode\(run\.previousMode\)/);
+assert.match(p,/aria-label="V256 Qualitätsvergleich"/);
+assert.match(c,/Math\.min\(1, 16\.667/);
+assert.match(c,/slow \/ 100/);
+assert.match(require('../package.json').version,/^0\.1\.0-v25[6-9]$/);
+console.log('V256 Performance comparison regression: passed');

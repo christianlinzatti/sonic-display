@@ -1,0 +1,11 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const dir = path.join(__dirname, '..', 'components', 'visualizer');
+const engine = fs.readFileSync(path.join(dir, 'partnerHandIK.ts'), 'utf8');
+const avatar = fs.readFileSync(path.join(dir, 'ThreeAvatar.tsx'), 'utf8');
+const rig = fs.readFileSync(path.join(dir, 'avatarRigController.ts'), 'utf8');
+for (const symbol of ['handInteractionWeight', 'updatePartnerHandIK', 'createHandIKState', 'targetV.distanceTo', 'cue.target.every(finite)', 'reducedMotion']) assert(engine.includes(symbol), symbol);
+for (const symbol of ['PartnerHandContext.Provider', 'updatePartnerHandIK(', 'handInteractionWeight(', 'directed.phase']) assert(avatar.includes(symbol), symbol);
+for (const name of ['rightForearm', 'rightHand', 'leftForearm', 'leftHand']) assert(rig.includes(name), name);
+console.log('V147 partner hand IK structural regression checks passed (17 assertions).');

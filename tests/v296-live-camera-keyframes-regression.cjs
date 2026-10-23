@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
+assert.match(require('../package.json').version,/^0\.1\.0-v(?:29[6-9]|300|301|302|303|304|305|306|307|308|309|310|311|312|313|314|315|316|317|318|319|320|321|322|323|324|325|326|327|328|329|330|331|332|333|334|335|336|337|338|339|340|341|342|343|344|345|346|347|348|349|350|351|352|353|354|355|356|357|358|359|360|361|362|363|364|365|366|367|368|369|371|374|375|376|377|378|379|380|381|382|383|384|385|386|387|388|389|390|391|392|393|394|395|396|397|398|399|400|401|402|403|404|405|406|407|408|409|410|411|412|413|414|415|416|417)$/);
+const live=read('components/visualizer/liveCameraKeyframesV296.ts');
+const rig=read('components/visualizer/StageCameraDirectorV289.tsx');
+const panel=read('components/visualizer/CameraPresetStudioV290.tsx');
+const frames=read('components/visualizer/cameraKeyframesV295.ts');
+for(const word of ['resolveLiveCameraKeyframePose','readLiveCameraKeyframesEnabled','cameraPoseAtTime','elapsed % last','library.assignments[section]'])assert.ok(live.includes(word),word);
+for(const word of ['resolveLiveCameraKeyframePose','CAMERA_KEYFRAMES_EVENT','LIVE_CAMERA_KEYFRAMES_EVENT','?? resolveCameraPose','!reducedMotion'])assert.ok(rig.includes(word),word);
+for(const word of ['Gespeicherte Keyframe-Kamerafahrten live verwenden','writeLiveCameraKeyframesEnabled'])assert.ok(panel.includes(word),word);
+assert.ok(frames.includes('window.dispatchEvent(new Event(CAMERA_KEYFRAMES_EVENT))'));
+console.log('V296 live camera keyframes regression OK');

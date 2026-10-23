@@ -1,15 +1,25 @@
 /** Throttle costly choreography calculations, never the render loop or beat-reactive motion. */
 export type AnimationTier = "high" | "balanced" | "low";
-export type AnimationCadence = { lastRun: number; runs: number; skipped: number; lastPublish: number };
-export const createAnimationCadence = (): AnimationCadence => ({ lastRun: Number.NEGATIVE_INFINITY, runs: 0, skipped: 0, lastPublish: 0 });
+export type AnimationCadence = { lastRun: number; runs: number; skipped: number; lastPublish: number; phaseOffset: number };
+export const createAnimationCadence = (): AnimationCadence => ({ lastRun: Number.NEGATIVE_INFINITY, runs: 0, skipped: 0, lastPublish: 0, phaseOffset: 0 });
 export function animationInterval(tier: AnimationTier): number {
   return tier === "high" ? 0 : tier === "balanced" ? 1 / 30 : 1 / 20;
+}
+/** Spread secondary dancers across the quality interval without shifting beat or rig updates.
+ * Assign once per instance; 0 remains the default for existing callers.
+ */
+export function setAnimationCadencePhase(cadence: AnimationCadence, dancerIndex: number, dancerCount = 2) {
+  const count = Number.isFinite(dancerCount) ? Math.max(1, Math.floor(dancerCount)) : 1;
+  const index = Number.isFinite(dancerIndex) ? Math.max(0, Math.floor(dancerIndex)) : 0;
+  cadence.phaseOffset = (index % count) / count;
 }
 /** Returns true on first call and whenever the quality-dependent interval has elapsed. */
 export function shouldUpdateAnimation(cadence: AnimationCadence, now: number, tier: AnimationTier): boolean {
   const interval = animationInterval(tier);
-  if (now < cadence.lastRun || now - cadence.lastRun >= interval - 0.0001) {
-    cadence.lastRun = now;
+  // Phase affects cadence only, never timeline time passed into choreography.
+  const scheduledNow = now;
+  if (scheduledNow < cadence.lastRun || scheduledNow - cadence.lastRun >= interval - 0.0001) {
+    cadence.lastRun = now + (cadence.runs === 0 ? interval * cadence.phaseOffset : 0);
     cadence.runs++;
     return true;
   }

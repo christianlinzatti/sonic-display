@@ -1,0 +1,21 @@
+const fs=require('node:fs'),assert=require('node:assert/strict'),ts=require('./typescript-loader.cjs');
+const read=p=>fs.readFileSync(p,'utf8');
+function runModule(path){const content=read(path);const js=ts.transpileModule(content,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;const module={exports:{}};new Function('module','exports','require',js)(module,module.exports,require);return module.exports;}
+const m=runModule('services/stageContent/photoTransitionsV347.ts');
+assert.equal(m.DEFAULT_PHOTO_TRANSITIONS_V347.enabled,false,'safe disabled default');
+assert.equal(m.sanitizePhotoTransitionsV347({enabled:true,durationMs:999999,crossfadeMs:0,style:'evil',beatThreshold:42,maxBeatWaitMs:0}).durationMs,2200);
+assert.equal(m.sanitizePhotoTransitionsV347({crossfadeMs:0}).crossfadeMs,100);
+assert.equal(m.sanitizePhotoTransitionsV347({style:'evil'}).style,'smooth');
+assert.equal(m.sanitizePhotoTransitionsV347({beatThreshold:3}).beatThreshold,.98);
+assert.equal(m.sanitizePhotoTransitionsV347({maxBeatWaitMs:0}).maxBeatWaitMs,100);
+assert.equal(m.isTransitionBeatV347(.5,.81,.7),true);
+assert.equal(m.isTransitionBeatV347(.81,.9,.7),false);
+assert.equal(m.shouldWaitForBeatV347({...m.DEFAULT_PHOTO_TRANSITIONS_V347,enabled:true},true,false,false),true);
+assert.equal(m.shouldWaitForBeatV347({...m.DEFAULT_PHOTO_TRANSITIONS_V347,enabled:true},true,true,false),false);
+assert.equal(m.shouldWaitForBeatV347({...m.DEFAULT_PHOTO_TRANSITIONS_V347,enabled:true},true,false,true),false);
+const gallery=read('components/visualizer/StageImageGalleryV338.tsx'),ui=read('components/visualizer/PhotoTransitionSettingsV347.tsx'),preview=read('components/visualizer/GalleryPreviewEditorV343.tsx');
+assert.match(gallery,/isTransitionBeatV347/);assert.match(gallery,/pendingMood/);assert.match(gallery,/PhotoCrossfadeV347/);assert.match(gallery,/opacity:hidden\?0:1/);
+assert.match(ui,/Sanfte Foto-Übergänge aktivieren/);assert.match(ui,/Beat-Schwelle/);assert.match(preview,/PhotoTransitionSettingsV347/);
+assert.match(read('app/globals.css'),/prefers-reduced-motion:reduce/);
+assert.ok(Number(require('../package.json').version.match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 350);
+console.log('PASS V347 settings validation, beat-gating, renderer and UI regression');

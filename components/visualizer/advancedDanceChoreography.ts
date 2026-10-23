@@ -1,3 +1,5 @@
+import {resolveGenreMotionV471} from "./genreChoreographyV471";
+import type {GenreFusion} from "@/services/genre/genreIntelligence";
 import type { AudioFeatures } from "@/types/audio";
 import type { PerformancePattern, PerformanceSection } from "./performanceDirector";
 
@@ -70,12 +72,14 @@ export function updateDanceChoreography(
   reducedMotion: boolean,
   tuning: { aggression: number; variation: number; style: "smooth" | "balanced" | "sharp" } = { aggression: 0.5, variation: 0.5, style: "balanced" },
   rhythmMoves: ChoreographyMove[] | null = null,
+  fusion: GenreFusion | null = null,
 ): ChoreographyOutput {
   const bpm = Math.max(50, Math.min(220, audio.bpm ?? 120));
   const beats = elapsedSeconds * bpm / 60;
   const phraseIndex = Math.floor(beats / 8);
   const key = family(genre, preset);
-  const options = rhythmMoves && section !== "break" && section !== "drop" ? rhythmMoves : section === "break" ? ["flow", "groove"] as ChoreographyMove[]
+  const genreMotion = resolveGenreMotionV471({genre,fusion,section,playing:isPlaying,reducedMotion,energy:audio.energyEnvelope});
+  const options = genreMotion ? genreMotion.moves : rhythmMoves && section !== "break" && section !== "drop" ? rhythmMoves : section === "break" ? ["flow", "groove"] as ChoreographyMove[]
     : section === "drop" ? (key === "hard" || key === "metal" ? ["drop-hit", "alternating-kicks", "headbang-arms"] as ChoreographyMove[] : ["drop-hit", "robot-locks", "side-step"] as ChoreographyMove[])
     : sequences[key];
 
@@ -140,11 +144,15 @@ export function updateDanceChoreography(
     case "flow": armAccent = Math.sin(phase * 0.5) * 0.045 * energy; hipAccent = Math.sin(phase * 0.25) * 0.07 * energy; headAccent = Math.sin(phase * 0.5 - 0.5) * 0.035 * energy; break;
     default: armAccent = Math.sin(phase) * 0.065 * energy; legAccent = Math.sin(phase * 0.5) * 0.055 * energy; hipAccent = Math.sin(phase * 0.5) * 0.06 * energy;
   }
+  // V471 only amplifies the procedural accent layer, not imported mixer tracks.
+  // During pauses and reduced-motion mode the layer stays at zero.
+  const accentMix = genreMotion?.weight ?? 0;
+  const gain = (v:number)=>1+(v-1)*accentMix;
   const blend = active * transition;
   return {
     move: state.currentMove, previousMove: state.previousMove, transition,
-    armAccent: armAccent * blend * adaptiveIntensity, legAccent: legAccent * blend * adaptiveIntensity, hipAccent: hipAccent * blend * adaptiveIntensity,
-    headAccent: headAccent * blend * adaptiveIntensity, poseAccent: poseAccent * blend * adaptiveIntensity, phase,
+    armAccent: armAccent * blend * adaptiveIntensity * gain(genreMotion?.arms??1), legAccent: legAccent * blend * adaptiveIntensity * gain(genreMotion?.legs??1), hipAccent: hipAccent * blend * adaptiveIntensity * gain(genreMotion?.hips??1),
+    headAccent: headAccent * blend * adaptiveIntensity * gain(genreMotion?.head??1), poseAccent: poseAccent * blend * adaptiveIntensity * gain(genreMotion?.pose??1), phase,
     adaptiveIntensity, novelty,
   };
 }

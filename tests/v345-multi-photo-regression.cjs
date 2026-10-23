@@ -1,0 +1,13 @@
+const fs=require('fs'),assert=require('assert');
+const read=p=>fs.readFileSync(p,'utf8');
+const model=read('services/stageContent/multiPhotoLayoutV345.ts');
+const ui=read('components/visualizer/MultiPhotoLayoutEditorV345.tsx');
+const gallery=read('components/visualizer/StageImageGalleryV338.tsx');
+const preview=read('components/visualizer/GalleryPreviewEditorV343.tsx');
+const css=read('app/globals.css');
+assert.match(model,/sanitizeCompositionV345/);assert.match(model,/readPhotoPresetsV345/);assert.match(model,/savePhotoCompositionsV345/);assert.match(model,/slice\(0,8\)/);
+assert.match(ui,/setPointerCapture/);assert.match(ui,/onPointerMove/);assert.match(ui,/savePhotoPresetV345/);assert.match(ui,/prefers-reduced-motion|reduzierte Bewegung/i);
+assert.match(gallery,/composition\.enabled/);assert.match(gallery,/sonic-multi-photo-layer-v345/);assert.match(gallery,/credits\[url\]/);
+assert.match(preview,/MultiPhotoLayoutEditorV345/);assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+assert.ok(Number(require('../package.json').version.match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 350);
+console.log('PASS V345 multi-photo model/editor/stage wiring');

@@ -1,0 +1,29 @@
+SONIC DISPLAY V351 – VALIDATION REPORT
+Basis: hochgeladenes Projekt Sonic Display V350 (Lyrics & Photo Choreography)
+
+PASS: npm run verify:offline
+      Alle 93 ausgeführten V265–V351/Stage/Runtime-Regressionen erfolgreich.
+PASS: npm run check:syntax
+      446 TS/TSX-Quelldateien syntaktisch geprüft.
+PASS: npm run test:runtime
+      945 Strukturprüfungen über 446 Source-Dateien.
+PASS: npm run test:v351
+      Smart Stage Cue, Lyrics-Fokus, Drops, Kameragrenzen, Leinwandzonen,
+      FX-/Lichtbudget, Speicherung, manuelle Priorität, Source-Wiring.
+PASS: TypeScript isoliert auf services/stageContent/smartStageCompositionV351.ts
+      (--strict --noEmit --skipLibCheck --target ES2022 --lib DOM,ES2022)
+
+NICHT DURCHFÜHRBAR: npm run verify (vollständiger Next.js Produktions-Build).
+  npm run build:preflight: BLOCKED (Dependencies available: 1/15).
+  V350-ZIP enthielt weder node_modules noch package-lock.json.
+  npm-Registry-Verbindungsversuch: EAI_AGAIN registry.npmjs.org.
+  Daher weder vollständiger Typecheck der React-Komponenten mit aufgelösten
+  Paket-Typen noch Next.js Build oder WebGL-Browsertest nachweisbar.
+
+Auf einem Rechner mit Netzwerkzugriff:
+  npm install
+  npm run verify
+
+V351 ist ein ausführbarer Projektstand mit vollständigen Quelltexten,
+aber noch kein hier nachweislich production-build-geprüftes Release.
+V352–V355 sind Roadmap, nicht implementiert.

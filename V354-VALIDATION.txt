@@ -1,0 +1,20 @@
+Sonic Display V354 – Show Timeline Editor
+Based on V353. Package: sonic-display-v354-show-timeline-editor.zip
+
+Offline regression: PASS 97/97 commands
+Syntax scan: PASS 453 TypeScript/TSX files
+V354 pure-state and wiring regression: PASS
+New V354 files: services/stageContent/showTimelineV354.ts,
+  components/visualizer/ShowTimelineEditorV354.tsx,
+  tests/v354-show-timeline-regression.cjs,
+  V354-SHOW-TIMELINE-EDITOR.md
+
+Production build: NOT VERIFIED
+npm preflight: BLOCKED (14 of 15 dependencies missing; no node_modules or package-lock.json in supplied V353).
+TypeScript full tsc: INCOMPLETE (missing dependency typings; also legacy diagnostics in the source baseline).
+Do not interpret the syntax scan or regression tests as a confirmed Next.js build.
+
+Run on a network-connected development machine:
+  npm install
+  npm run test:v354
+  npm run verify

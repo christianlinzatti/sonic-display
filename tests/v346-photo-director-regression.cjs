@@ -1,0 +1,9 @@
+const fs=require('fs'),assert=require('assert');
+const read=p=>fs.readFileSync(p,'utf8');
+const model=read('services/stageContent/photoDirectorV346.ts'),ui=read('components/visualizer/PhotoDirectorSettingsV346.tsx'),gallery=read('components/visualizer/StageImageGalleryV338.tsx');
+assert.match(model,/decidePhotoMoodV346/);assert.match(model,/minimumHoldSeconds/);assert.match(model,/mode==='manual'/);assert.match(model,/hardtekk/);
+assert.match(ui,/Intelligenten Layout Director aktivieren/);assert.match(ui,/Test-Abschnitt/);assert.match(ui,/Manuelle Vorgabe/);
+assert.match(gallery,/directedAt/);assert.match(gallery,/displayLayers\.map/);assert.match(gallery,/PHOTO_DIRECTOR_EVENT_V346/);
+assert.match(read('components/visualizer/ThreeAvatar.tsx'),/genre=\{props.genre\}/);
+assert.match(read('components/visualizer/GalleryPreviewEditorV343.tsx'),/PhotoDirectorSettingsV346/);
+assert.ok(Number(require('../package.json').version.match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 350);console.log('PASS V346 photo director state, UI and stage wiring');

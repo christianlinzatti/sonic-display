@@ -1,0 +1,5 @@
+# V196 – Adaptive Choreography Timeline & Drop Learning
+
+An optional per-character choreography timeline, accessible from Character & Motion Library. Choose an installed motion for verse, build, drop, and break; manual assignments override existing automated motion selection when the feature is enabled. An optional, local observation learner counts independent *phase transitions* with confidence >=55% and proposes a motion once at least three observations exist and a candidate has >=60% support. Only observations from an open live stage can be learned; phases remain heuristic, not verified Spotify structural data. Manually assigned motion IDs are checked against installed character motions. All data is sanitized, bounded and saved to browser localStorage, never sent to a server. The V191 mixer retains responsibility for crossfades and V193/V194 scheduling.
+
+Validation: `npm run test:adaptive-choreography`, `npm run check:syntax`; npm dependencies are needed for TypeScript and production build.

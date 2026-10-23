@@ -13,3 +13,5 @@ out
 /public/avatars/*.glb
 /public/avatars/*.gltf
 /public/avatars/*.bin
+
+/public/animations/*.glb

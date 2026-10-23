@@ -1,0 +1,16 @@
+Sonic Display V369 Verification – 2026-10-19
+
+PASS npm run check:syntax – 491 TypeScript-/TSX-Quelldateien
+PASS npm run test:v369 – Facial Performance + Vocal Camera
+PASS npm run test:v368, test:v367, test:v366
+PASS Regression: test:v289, v290, v293, v296, v297, v298, v299, v300,
+  v301, v302, v305, v306, multi-avatar, v326, v350, v351, v354, v355
+PASS Regression: v358, v359, v360, v361, v362, v363, v365
+
+UNVERIFIED Next.js production build / strict typecheck: dependencies absent
+npm run build:preflight reports missing 16 of 17 npm packages and package-lock.json.
+To complete locally: npm install && npm run verify
+
+Notes: Timing-based mouth shapes and close-ups do NOT recover real phonemes,
+identify vocals, or read Spotify audio. Manual camera shots and lyrics protection
+are not overridden by automatic close-ups.

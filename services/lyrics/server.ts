@@ -2,16 +2,23 @@ import type { Lyrics } from "@/types/music";
 import { lookupLrclibLyrics } from "@/services/lyrics/providers/lrclib";
 import { lookupLyricsOvh } from "@/services/lyrics/providers/lyricsOvh";
 import { lookupGeniusLyrics } from "@/services/lyrics/providers/genius";
+import { lookupSpotifyColorLyrics } from "@/services/lyrics/providers/spotifyColorLyrics";
 
 export interface LyricsQuery {
   title: string;
   artist: string;
   album: string;
   duration: number;
+  trackId?: string;
+  albumId?: string;
 }
 
-/** Provider chain: prefer LRCLIB (including synchronized lyrics), then plain-text lyrics.ovh. */
-export async function findLyrics(query: LyricsQuery): Promise<Lyrics | null> {
+/** Optional Spotify client lyrics (best effort), then LRCLIB, lyrics.ovh, and Genius. */
+export async function findLyrics(query: LyricsQuery, spotifyAccessToken?: string): Promise<Lyrics | null> {
+  if (process.env.SPOTIFY_INTERNAL_LYRICS_ENABLED === "true" && spotifyAccessToken && query.trackId) {
+    const spotify = await lookupSpotifyColorLyrics(query.trackId, query.albumId, spotifyAccessToken);
+    if (spotify) return spotify;
+  }
   let lrclibError: unknown;
   try {
     const result = await lookupLrclibLyrics(query);

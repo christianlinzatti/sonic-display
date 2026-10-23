@@ -1,0 +1,11 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const file = fs.readFileSync('components/visualizer/adaptivePerformance.tsx','utf8');
+assert.equal((file.match(/durations\.push\(/g)||[]).length,1,'single frame sample push');
+assert.equal((file.match(/durations\.sort\(/g)||[]).length,1,'single percentile sort');
+assert.ok(!file.includes('const sampler = useRef'),'no duplicate sampler');
+assert.ok(file.includes('publishRenderMetrics({'),'diagnostics retained');
+assert.ok(file.includes('advancePerformanceDecision(decision.current, { fps, slowRatio, elapsed, p95FrameMs })'),'policy uses shared metrics');
+assert.ok(file.includes('delta >= 0.25'),'suspended frames ignored');
+assert.ok(file.includes('if (mode !== "auto") return'),'manual modes retained');
+console.log('V218 shared frame measurement: 7 checks passed');

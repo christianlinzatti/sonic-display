@@ -1,0 +1,39 @@
+"use client";
+import {useEffect,useRef,useState} from "react";
+import type {InstalledCharacterMotion} from "./characterMotionLibrary";
+import type {AvatarModel} from "./avatarModels";
+import {EMPTY_EVOLUTION,EVOLUTION_EVENT,readEvolution,writeEvolution,type EvolutionStep} from "./smartChoreographyEvolution";
+import type {TimelinePhase} from "./musicStructureTimeline";
+import {clampBars,clampCrossfade,normalizeTimeline,reorderTimeline,timelineAtBar,timelineBars,type TimelineEditStep} from "./choreographyTimelineEditor";
+import {AvatarPreview3D} from "./AvatarPreview3D";
+import type {UiPreferences} from "@/types/music";
+const PHASES:TimelinePhase[]=["verse","build","drop","break"];
+const KEY="sonic.timeline.editor.crossfades.v202";
+function loadFades(avatar:string,phase:TimelinePhase):number[]{try{const all=JSON.parse(localStorage.getItem(KEY)||"{}");return Array.isArray(all?.[avatar]?.[phase])?all[avatar][phase]:[];}catch{return [];}}
+function saveFades(avatar:string,phase:TimelinePhase,steps:TimelineEditStep[]){try{const all=JSON.parse(localStorage.getItem(KEY)||"{}");all[avatar]??={};all[avatar][phase]=steps.map(x=>x.crossfade);localStorage.setItem(KEY,JSON.stringify(all));}catch{}}
+export function VisualChoreographyTimelineEditor({avatarId,model,motions,preferences}:{avatarId:string;model:AvatarModel;motions:InstalledCharacterMotion[];preferences:UiPreferences}){
+ const [phase,setPhase]=useState<TimelinePhase>("drop");const [steps,setSteps]=useState<TimelineEditStep[]>([]);const [dirty,setDirty]=useState(false);const [notice,setNotice]=useState("");const [playing,setPlaying]=useState(false);const [position,setPosition]=useState(0);const [bpm,setBpm]=useState(180);const [drag,setDrag]=useState<number|null>(null);const [selected,setSelected]=useState(0);const last=useRef(0);
+ useEffect(()=>{const update=()=>{const state=readEvolution()??EMPTY_EVOLUTION;const seq=state.sequences[avatarId]?.[phase]??[];const fades=loadFades(avatarId,phase);setSteps(seq.map((s,i)=>({...s,crossfade:clampCrossfade(fades[i]??0.6)})));setDirty(false);setPlaying(false);setPosition(0);setSelected(0);};update();window.addEventListener(EVOLUTION_EVENT,update);window.addEventListener("storage",update);return()=>{window.removeEventListener(EVOLUTION_EVENT,update);window.removeEventListener("storage",update);};},[avatarId,phase]);
+ const edit=(next:TimelineEditStep[])=>{setSteps(normalizeTimeline(next));setDirty(true);};
+ const total=timelineBars(steps);const current=timelineAtBar(steps,position);const idx=Math.max(0,Math.min(steps.length-1,selected));const previewStep=steps[playing?Math.max(0,current):idx];const motion=motions.find(m=>m.id===previewStep?.motionId);
+ useEffect(()=>{if(!playing||!total)return;let raf=0;last.current=0;const tick=(t:number)=>{if(last.current){const diff=Math.min(0.1,(t-last.current)/1000);setPosition(old=>(old+diff*bpm/(60*4))%total);}last.current=t;raf=requestAnimationFrame(tick);};raf=requestAnimationFrame(tick);return()=>cancelAnimationFrame(raf);},[playing,bpm,total]);
+ const save=()=>{const state=readEvolution();saveFades(avatarId,phase,steps);writeEvolution({...state,sequences:{...state.sequences,[avatarId]:{...state.sequences[avatarId],[phase]:steps.map(({motionId,bars,crossfade}):EvolutionStep=>({motionId,bars,crossfade}))}}});setDirty(false);setNotice("Timeline gespeichert. Taktlängen und individuelle Crossfades gelten auf der Live-Bühne.");};
+ return <section className="avatar-metadata-editor" aria-label="Visual Choreography Timeline Editor V202" style={{minWidth:0}}><h3>Visual Choreography Timeline Editor · V203</h3>
+ <p>Blöcke per Drag-and-drop sortieren, Taktlängen und Crossfades bearbeiten und die Motion am 3D-Avatar prüfen. Änderungen werden erst beim Speichern auf die Live-Sequenz übernommen.</p>
+ <label>Songphase <select value={phase} onChange={e=>setPhase(e.target.value as TimelinePhase)}>{PHASES.map(p=><option key={p} value={p}>{p}</option>)}</select></label>{" "}
+ <label>Vorschau-BPM <input type="number" min={50} max={240} value={bpm} onChange={e=>setBpm(Math.max(50,Math.min(240,Number(e.target.value)||180)))}/></label>
+ <div aria-label="Choreografie-Timeline" style={{display:"flex",gap:3,width:"100%",minHeight:68,overflowX:"auto",border:"1px solid #8886",borderRadius:8,padding:5}}>
+ {steps.map((step,i)=><button type="button" key={`${i}-${step.motionId}`} draggable onDragStart={e=>{setDrag(i);e.dataTransfer.setData("text/plain",String(i));e.dataTransfer.effectAllowed="move";}} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();const source=drag??Number(e.dataTransfer.getData("text/plain"));edit(reorderTimeline(steps,source,i));setSelected(i);setDrag(null);}} onDragEnd={()=>setDrag(null)} onClick={()=>{setSelected(i);setPlaying(false);setPosition(steps.slice(0,i).reduce((n,s)=>n+s.bars,0));}} style={{flex:`${step.bars} 0 ${Math.max(70,step.bars*20)}px`,border:idx===i?"2px solid #64baff":"1px solid #8888",borderRadius:6,background:i%2?"#425b75":"#47525f",color:"white",padding:6,cursor:"grab"}} title="Ziehen zum Verschieben"><strong>{motions.find(m=>m.id===step.motionId)?.name??"Unbekannte Motion"}</strong><div>{step.bars} Takte</div><small>{step.crossfade.toFixed(2)} s Fade</small></button>)}
+ {!steps.length&&<p>Keine Sequenz vorhanden. Füge unten eine Motion hinzu.</p>}</div>
+ {total>0&&<><label>Position (Takte) <input aria-label="Abspielposition" type="range" min={0} max={total} step="0.05" value={Math.min(position,total)} onChange={e=>{setPosition(Number(e.target.value));setPlaying(false);}}/> {position.toFixed(1)} / {total}</label> <button type="button" onClick={()=>setPlaying(v=>!v)}>{playing?"Pause":"Sequenz abspielen"}</button> <button type="button" onClick={()=>{setPlaying(false);setPosition(0);}}>Stopp</button></>}
+ {steps.map((step,i)=><div key={i} style={{display:"flex",gap:6,flexWrap:"wrap",alignItems:"center",padding:6,borderBottom:"1px solid #8885"}}><strong>{i+1}.</strong>
+ <label>Motion <select value={step.motionId} onChange={e=>edit(steps.map((s,j)=>i===j?{...s,motionId:e.target.value}:s))}>{motions.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}</select></label>
+ <label>Takte <input aria-label={`Takte Schritt ${i+1}`} type="number" min={1} max={16} value={step.bars} style={{width:58}} onChange={e=>edit(steps.map((s,j)=>i===j?{...s,bars:clampBars(Number(e.target.value))}:s))}/></label>
+ <label>Crossfade (s) <input aria-label={`Crossfade Schritt ${i+1}`} type="number" min={0.1} max={4} step={0.05} value={step.crossfade} style={{width:72}} onChange={e=>edit(steps.map((s,j)=>i===j?{...s,crossfade:clampCrossfade(Number(e.target.value))}:s))}/></label>
+ <button type="button" disabled={i===0} onClick={()=>{edit(reorderTimeline(steps,i,i-1));setSelected(i-1);}}>↑</button><button type="button" disabled={i===steps.length-1} onClick={()=>{edit(reorderTimeline(steps,i,i+1));setSelected(i+1);}}>↓</button><button type="button" onClick={()=>edit(steps.filter((_,j)=>j!==i))}>Entfernen</button></div>)}
+ <button type="button" disabled={!motions.length||steps.length>=12} onClick={()=>edit([...steps,{motionId:motions[0].id,bars:2,crossfade:0.6}])}>+ Motion hinzufügen</button>{" "}<button type="button" disabled={!dirty} onClick={save}>Timeline speichern</button>
+ {dirty&&<small>Ungespeicherte Änderungen</small>}{notice&&<p role="status">{notice}</p>}
+ {model.url&&motion?.url&&<div style={{minHeight:260}}><h4>3D-Avatar-Vorschau: {motion.name}</h4><AvatarPreview3D key={`${model.url}|${motion.url}`} modelUrl={model.url} animationUrl={motion.url} preferences={preferences} studio/></div>}
+ <small>Vorschau zeigt die aktive GLB-Motion am Avatar; für eine echte Live-Crossfade-Demonstration zweier Clips verwende das Motion Transition Studio V192. V203 speichert Crossfades auch im Live-Sequenzformat. Taktgeber der Vorschau ist BPM-basiert, nicht Spotify-samplegenau.</small>
+ </section>;
+}

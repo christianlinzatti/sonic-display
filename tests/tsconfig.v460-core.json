@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.v459-core.json",
+  "files": [
+    "../components/visualizer/intelligentFeaturePerformanceV460.ts",
+    "../components/visualizer/smartAutomaticRapShowV446.ts",
+    "../components/visualizer/automaticMultiArtistStageV442.ts",
+    "../components/visualizer/artistNameBubblesV441.ts",
+    "../components/visualizer/artistSpotlightV443.ts",
+    "../components/visualizer/multiArtistInteractionV444.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

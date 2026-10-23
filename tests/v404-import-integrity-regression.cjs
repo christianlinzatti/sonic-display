@@ -1,0 +1,30 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const os=require('node:os');
+const path=require('node:path');
+const {checkSourceIntegrity,resolveLocal}=require('../scripts/source-integrity-v404.cjs');
+const temp=fs.mkdtempSync(path.join(os.tmpdir(),'sonic-v404-module-'));
+try {
+ fs.mkdirSync(path.join(temp,'components','Camera'),{recursive:true});
+ const src=path.join(temp,'components','Camera','Studio.ts');
+ const importer=path.join(temp,'app.ts');
+ fs.writeFileSync(src,'export const camera = 1;');
+ fs.writeFileSync(importer,"import {camera} from './components/Camera/Studio';\n");
+ assert.equal(checkSourceIntegrity(temp).problems.length,0,'valid imports should pass');
+ fs.writeFileSync(importer,"import {camera} from './components/camera/Studio';\n");
+ assert(checkSourceIntegrity(temp).problems.some(p=>p.kind==='case-mismatch'),'directory case mismatch must fail');
+ fs.writeFileSync(importer,"import {camera} from './components/Camera/studio';\n");
+ assert(checkSourceIntegrity(temp).problems.some(p=>p.kind==='case-mismatch'),'filename case mismatch must fail');
+ fs.writeFileSync(importer,"import {missing} from './components/Camera/Missing';\n");
+ assert(checkSourceIntegrity(temp).problems.some(p=>p.kind==='unresolved'),'missing imports must fail');
+ fs.writeFileSync(importer,"import {camera} from '@/components/Camera/Studio';\n");
+ assert.equal(checkSourceIntegrity(temp).problems.length,0,'@/ path aliases supported');
+ fs.writeFileSync(path.join(temp,'components','Camera','studio.tsx'),'export default null;');
+ assert(checkSourceIntegrity(temp).problems.some(p=>p.kind==='module-collision'),'case-only TS/TSX collision must fail');
+ fs.unlinkSync(path.join(temp,'components','Camera','studio.tsx'));
+ assert.equal(resolveLocal(temp,importer,'@/components/Camera/Studio'),null);
+} finally {fs.rmSync(temp,{force:true,recursive:true});}
+const repo=checkSourceIntegrity(path.resolve(__dirname,'..'));
+assert.deepEqual(repo.problems,[],JSON.stringify(repo.problems.slice(0,20),null,2));
+console.log(`PASS V404 import integrity: fixtures and ${repo.files} project files / ${repo.imports} imports`);

@@ -1,0 +1,11 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const source = fs.readFileSync('components/visualizer/ThreeAvatar.tsx', 'utf8');
+const procedural = source.slice(source.indexOf('function ProceduralAvatar('), source.indexOf('function GltfAvatar('));
+const gltf = source.slice(source.indexOf('function GltfAvatar('));
+assert.doesNotMatch(procedural, /updatePhraseMotionVariation\(phraseVariationV241\.current/);
+assert.match(gltf, /const phraseVariationV241\s*=\s*useRef\(createPhraseMotionVariation\(\)\)/);
+assert.match(gltf, /const varied\s*=\s*updatePhraseMotionVariation\(phraseVariationV241\.current/);
+assert.ok(gltf.indexOf('const varied =') < gltf.indexOf('varied.torso'));
+for (const field of ['torso', 'hip', 'shoulder', 'head', 'arm']) assert.ok(gltf.includes('varied.' + field));
+console.log('PASS V245 phrase variation hook scope and GLTF application');

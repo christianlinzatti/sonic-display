@@ -1,0 +1,14 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const file = fs.readFileSync(path.join(__dirname, '../components/visualizer/ThreeAvatar.tsx'),'utf8');
+const pkg = require('../package.json');
+const test = (name, fn) => { fn(); console.log('✓ '+name); };
+test('V246 version',()=>assert.match(pkg.version,/^0\.1\.0-v(?:24[8-9]|2[5-9]\d|[3-9]\d\d|324|325|326|327|328|329|330|331|332|333|334|335|336|337|338|339|340|341|342|343|344|345|346|347|348|349|350|351|352)$/));
+test('MotionPlan ref has explicit undefined',()=>assert.match(file,/useRef<MotionPlanSnapshot\s*\|\s*undefined>\(undefined\)/));
+test('beat transport handles nullable BPM',()=>assert.match(file,/advanceBeatTransport\(before,delta,isPlaying&&!reducedMotion,audio\.bpm\s*\?\?\s*undefined\)/));
+test('footwork handles nullable BPM',()=>assert.match(file,/kick:\s*audio\.kickAccentIntensity,\s*bpm:\s*audio\.bpm\s*\?\?\s*undefined/));
+test('GLTF root captured and narrowed before animation',()=>assert.match(file,/const avatarRoot = root\.current;\s*if \(!avatarRoot\) return;/));
+test('Foot IK uses narrowed GLTF root',()=>assert.match(file,/updateFootIK\(footIK\.current, avatarRoot,/));
+test('Foot contact uses narrowed GLTF root',()=>assert.match(file,/updateFootContact\(footContact\.current, avatarRoot,/));
+test('All LOD timing uses browser performance API',()=>{assert.match(file,/window\.performance\.now\(\)/);assert.equal((file.match(/(?<!window\.)performance\.now\(\)/g)||[]).length,0)});

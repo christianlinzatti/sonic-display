@@ -1,0 +1,33 @@
+const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const ts=require('typescript');
+const base=path.join(__dirname,'../components/visualizer');
+const src=fs.readFileSync(path.join(base,'genreSpecificDanceIntelligence.ts'),'utf8');
+const output=ts.transpileModule(src,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021}}).outputText;
+const moduleObject={exports:{}};new Function('module','exports','require',output)(moduleObject,moduleObject.exports,()=>({}));
+const {normalizeGenre,scoreGenreMotion,rankGenreDanceMotions,sanitizeGenreDanceSettings}=moduleObject.exports;
+const make=(id,name,genre='',bpmMin=0,bpmMax=300,section='any')=>({id,avatarId:'ava',name,genre,bpmMin,bpmMax,section,url:`/test/${id}.glb`,addedAt:1});
+let passed=0;function test(name,fn){fn();console.log('PASS',name);passed++}
+test('Hardtekk normalization',()=>assert.equal(normalizeGenre('Hard-Tekk'),'hardtekk'));
+test('Hardstyle normalization',()=>assert.equal(normalizeGenre('JUMPSTYLE'),'hardstyle'));
+test('Techno normalization',()=>assert.equal(normalizeGenre('TECHNO HOUSE'),'techno'));
+test('Deutschrap normalization',()=>assert.equal(normalizeGenre('Deutschrap'),'deutschrap'));
+test('German rap normalization',()=>assert.equal(normalizeGenre('german-rap'),'deutschrap'));
+test('Rap mapped to hip hop',()=>assert.equal(normalizeGenre('Trap Rap'),'hip-hop'));
+test('Unknown mapped to other',()=>assert.equal(normalizeGenre('unrecognized'),'other'));
+test('Hardtekk favors kick',()=>assert.ok(scoreGenreMotion(make('a','Kick Dance'),'hardtekk','drop',1,180)>scoreGenreMotion(make('b','Slow Sway'),'hardtekk','drop',1,180)));
+test('Hardstyle favors jump',()=>assert.ok(scoreGenreMotion(make('a','Jumpstyle'),'hardstyle','drop',.9,150)>scoreGenreMotion(make('b','Idle'),'hardstyle','drop',.9,150)));
+test('Techno favors shuffle',()=>assert.ok(scoreGenreMotion(make('a','Shuffle Flow'),'techno','verse',.5,125)>scoreGenreMotion(make('b','Stomp'),'techno','verse',.5,125)));
+test('Deutschrap favors nod',()=>assert.ok(scoreGenreMotion(make('a','Head Nod'),'deutschrap','verse',.5,95)>scoreGenreMotion(make('b','Stomp'),'deutschrap','verse',.5,95)));
+test('BPM filtered',()=>assert.deepEqual(rankGenreDanceMotions([make('a','Kick','',60,130),make('b','Kick','',130,210)],'ava','hardtekk','drop',180,1).map(x=>x.id),['b']));
+test('Avatar filtered',()=>assert.equal(rankGenreDanceMotions([{...make('x','Jump'),avatarId:'other'},make('a','Jump')],'ava','hardstyle','drop',150,1).length,1));
+test('Phase filtered',()=>assert.deepEqual(rankGenreDanceMotions([make('a','Kick','',0,300,'verse'),make('b','Kick','',0,300,'drop')],'ava','hardtekk','drop',180,1).map(x=>x.id),['b']));
+test('Strength zero neutral',()=>assert.equal(scoreGenreMotion(make('a','Kick'),'hardtekk','drop',1,180,0),0));
+test('Settings opt-in false',()=>assert.equal(sanitizeGenreDanceSettings(null).enabled,false));
+test('Settings bounds',()=>assert.equal(sanitizeGenreDanceSettings({enabled:true,strength:80,override:'oops'}).strength,1));
+test('Override whitelist',()=>assert.equal(sanitizeGenreDanceSettings({enabled:true,strength:.5,override:'oops'}).override,'auto'));
+const character=fs.readFileSync(path.join(base,'characterMotionLibrary.ts'),'utf8');const panel=fs.readFileSync(path.join(base,'SmartChoreographyEvolutionPanel.tsx'),'utf8');const composer=fs.readFileSync(path.join(base,'aiDanceChoreographer.ts'),'utf8');
+test('Runtime opt-in',()=>assert.match(character,/if\(genreSettings.enabled\)/));
+test('Legacy selection exists',()=>assert.match(character,/const eligible=store.motions.filter/));
+test('Composer uses rating',()=>assert.match(composer,/scoreGenreMotion\(/));
+test('UI opt-in and override',()=>{assert.match(panel,/Genre-Specific Dance Intelligence V210/);assert.match(panel,/writeGenreDanceSettings/)});
+test('Deutschrap accepted in library',()=>assert.match(character,/"deutschrap"/));
+console.log(`V210 ${passed} tests passed`)

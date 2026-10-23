@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>V467 – QA-Beratungs-Layoutprobe (keine GLB-Modelle)</title>
+<link rel="stylesheet" href="../../app/globals.css"/>
+<style>body{margin:0;background:#060b17;padding:10px;}.immersive-stage{position:relative;margin:auto;width:100%;height:calc(100vh - 20px);max-width:1100px}.immersive-stage>.visualizer-stage{position:absolute;inset:0;width:100%;height:100%;max-width:none;margin:0}.fixture-canvas{width:100%;height:100%;background:radial-gradient(#132742,#050916);}.fixture-lyric{position:absolute;left:10px;bottom:20px;width:40%;color:#fff;font:20px system-ui}.v466-quality-panel{display:block;}</style>
+</head><body>
+<section class="immersive-stage immersive-side-right" aria-label="Statische Testbühne">
+ <div class="visualizer-stage three-avatar-stage" role="group" aria-label="QA Fixture ohne Avatar">
+   <div class="fixture-canvas"></div>
+   <div class="v466-quality-ui" data-v466-inspector="open">
+     <button class="v466-quality-toggle" type="button" aria-pressed="true" aria-controls="v466-quality-panel">QA</button>
+     <div class="v466-quality-panel" role="region" id="v466-quality-panel" aria-label="Live-Konzertqualität">
+       <strong>V466 · Konzert-Qualität</strong>
+       <p>FPS 19.0 · P95 53.0 ms · balanced</p><p>FPS: Problem · Köpfe 2/2 · Lyrics: OK</p>
+       <p>Draw Calls 150 · Dreiecke 45000</p>
+       <section class="v467-advisor" aria-label="Show-Qualitätsberatung">
+         <strong>V467 · Qualitäts-Tipps</strong>
+         <ol>
+           <li class="v467-advice-important"><b>FPS dauerhaft niedrig</b><span>Drei Messungen unter 25 FPS (Ø 19 FPS, WebGL-Statistik).</span><span><b>Vorschlag:</b> Die automatische Qualitätsregelung prüfen oder testweise ein sparsameres Grafikprofil auswählen.</span><small>Quelle: gemessene FPS</small></li>
+           <li class="v467-advice-check"><b>Lyrics liegen nahe an Avatar-Köpfen</b><span>Mehrfacher Treffer zwischen projiziertem Kopfpunkt und echtem Lyrics-Rechteck.</span><span><b>Vorschlag:</b> Lyrics-Seite und Kamera im Live-Bild prüfen. Ein geometrischer Treffer ist keine nachgewiesene optische Verdeckung.</span><small>Quelle: DOM + projizierter Kopfpunkt</small></li>
+           <li class="v467-advice-check"><b>Avatar-Kopf außerhalb des Bildbereichs</b><span>In drei Kameraprojektionen lag ein Kopfpunkt außerhalb des sichtbaren Bereichs.</span><span><b>Vorschlag:</b> Kameraeinstellung und Gruppenaufstellung prüfen; keine automatische Kameraänderung.</span><small>Quelle: Kameraprojektion</small></li>
+         </ol><p class="v467-advisor-footnote">Nur lokale Hinweise · keine automatischen Änderungen oder Speicherung.</p>
+       </section>
+       <p class="v466-quality-disclaimer">Test-Werte, keine realen Messungen.</p>
+     </div>
+     <div class="v466-head-marker" style="left:25%;top:35%">1</div>
+   </div>
+ </div>
+</section><script>
+ document.querySelector('.v466-quality-toggle').addEventListener('click',e=>{
+  const root=document.querySelector('.v466-quality-ui');let open=root.dataset.v466Inspector==='open';
+  root.dataset.v466Inspector=open?'closed':'open';e.currentTarget.setAttribute('aria-pressed',String(!open));
+  document.querySelector('.v466-quality-panel').hidden=open;
+ });
+</script></body></html>

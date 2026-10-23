@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const read=p=>fs.readFileSync(p,'utf8');
+const stages=read('components/visualizer/stages/index.tsx');
+for(const key of ['classic','neon','festival','minimal','cyberpunk','vaporwave','galaxy','white','rock'])assert.match(stages,new RegExp('id:"'+key+'"'));
+for(const component of ['CyberpunkStage','VaporwaveStage','GalaxyStage','WhiteStudioStage','RockStage'])assert.match(stages,new RegExp('function '+component+'\\('));
+assert.match(read('components/visualizer/ThreeAvatar.tsx'),/<StageEnvironment theme=/);
+assert.match(read('components/SettingsPanel.tsx'),/STAGE_ENVIRONMENTS\.map/);
+assert.match(read('types/music.ts'),/StageEnvironmentId/);
+assert.match(read('components/visualizer/registry.tsx'),/StageEnvironmentId/);
+assert.match(stages,/reducedMotion/);
+console.log('V277 modular stage environments PASS');

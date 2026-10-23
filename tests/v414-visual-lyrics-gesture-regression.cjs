@@ -1,0 +1,60 @@
+'use strict';
+const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');
+const {load}=require('./helpers/ts-loader-v404.cjs');
+const lib=load('components/visualizer/rapGestureCuesV414');
+const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+const lyrics={provider:'spotify',synced:true,lines:[
+ {startMs:1000,endMs:2500,text:'Ich rappe schnell',words:[{text:'Ich',startMs:1000,endMs:1300},{text:'rappe',startMs:1330,endMs:1710},{text:'schnell',startMs:1720,endMs:2100}]},
+ {startMs:2600,endMs:3800,text:'Hände hoch',words:[]}],plainText:null};
+const mk=(lineIndex,wordIndex,startMs,kind='both',motionId='')=>({lineIndex,wordIndex,startMs,kind,strength:100,durationMs:500,motionId});
+assert.equal(lib.anchorRapGestureV414(lyrics,0,1),1330);
+assert.equal(lib.anchorRapGestureV414(lyrics,1,-1),2600);
+assert.equal(lib.anchorRapGestureV414(lyrics,1,0),null);
+assert.equal(lib.anchorRapGestureV414({...lyrics,synced:false},0,1),null);
+assert.equal(lib.normalizeRapGestureCueV414({...mk(0,1,1330),strength:800,durationMs:9000}).strength,150);
+assert.equal(lib.normalizeRapGestureCueV414({...mk(0,1,1330),durationMs:9000}).durationMs,1500);
+assert.equal(lib.normalizeRapGestureCueV414(mk(0,1,1330,'both','javascript:evil')),null);
+assert.equal(lib.normalizeRapGestureCueV414(mk(-1,1,1330)),null);
+assert.equal(lib.normalizeRapGestureCueV414(mk(0,252,1330)),null);
+assert.equal(lib.normalizeRapGestureDocumentV414({version:1,trackId:'track',avatarId:'avatar',cues:[mk(0,1,1330),mk(0,1,1330,'head')]}).cues.length,1);
+let doc=lib.normalizeRapGestureDocumentV414({version:1,trackId:'track',avatarId:'avatar',cues:[mk(0,1,1330,'head','embedded:0'),mk(1,-1,2600,'arms')]});
+assert.equal(doc.cues.length,2);
+const active=(t=1450,playing=true,reduce=false,assetIds=['embedded:0'],ly=lyrics,record=doc,tid='track',avatar='avatar')=>lib.sampleRapGestureV414(ly,record,tid,avatar,t,playing,reduce,0,assetIds);
+assert.equal(active().active,true);
+assert(active().head>1);assert.equal(active().arms,1);
+assert(active().motionBlend>0);assert(active().motionBlend<=.85);
+assert.equal(active(1450,true,false,[]).motionId,''); // preauthorised clips only
+assert.equal(active(1450,true,false,[]).motionBlend,0);
+assert.equal(active(1450,false).active,false);
+assert.equal(active(1450,true,true).active,false);
+assert.equal(active(1450,true,false,['embedded:0'],{...lyrics,synced:false}).active,false);
+assert.equal(active(1450,true,false,['embedded:0'],lyrics,doc,'otherTrack').active,false);
+assert.equal(active(1450,true,false,['embedded:0'],lyrics,doc,'track','otherAvatar').active,false);
+assert.equal(active(1450,true,false,['embedded:0'],{...lyrics,lines:[{...lyrics.lines[0],words:[{...lyrics.lines[0].words[0]},{...lyrics.lines[0].words[1],startMs:1380} ]},lyrics.lines[1]]}).active,false);
+assert.equal(active(2470).active,false);
+assert.equal(active(2750).head,1);assert(active(2750).arms>1);
+const clips=[{id:'base',motionId:'installed:original',localSec:1,weight:1,rapGain:80}];
+const blend=lib.applyRapGestureMotionV414(clips,active());
+assert.equal(blend.length,2);assert.equal(blend[1].motionId,'embedded:0');assert(Math.abs(blend.reduce((n,x)=>n+x.weight,0)-1)<1e-10);
+assert.equal(lib.applyRapGestureMotionV414(clips,active(1450,true,false,[])).length,1);
+assert.equal(clips[0].weight,1); // pure function
+let newDoc=lib.updateRapGestureDocumentV414(doc,mk(0,1,1330,'both'),{lineIndex:0,wordIndex:1});assert.equal(newDoc.cues.length,2);
+newDoc=lib.updateRapGestureDocumentV414(newDoc,null,{lineIndex:0,wordIndex:1});assert.equal(newDoc.cues.length,1);
+// Simulate Browser storage and explicit changes without touching real browser state.
+const saved={};const events=[];
+global.window={localStorage:{getItem:k=>saved[k]??null,setItem:(k,v)=>saved[k]=v},dispatchEvent:e=>events.push(e.type)};
+global.Event=class Event{constructor(type){this.type=type;}};
+assert.equal(lib.saveRapGestureDocumentV414(doc),true);
+assert.equal(events.at(-1),lib.RAP_GESTURES_CHANGE_V414);
+assert.equal(lib.loadRapGestureDocumentV414('track','avatar').cues.length,2);
+assert.equal(lib.loadRapGestureDocumentV414('track','otherAvatar').cues.length,0);
+assert.equal(lib.loadRapGestureDocumentV414('otherTrack','avatar').cues.length,0);
+saved[lib.RAP_GESTURES_STORAGE_V414]='not-json';assert.deepEqual(lib.loadRapGestureDocumentV414('track','avatar').cues,[]);
+const editor=read('components/visualizer/RapLyricsGestureTimelineV414.tsx');
+for(const marker of ['useMusic','lyrics!.lines.map','Zeile','Geste speichern','Geste entfernen','Gesten-Dauer V414','Gesten-Intensität V414','onPreviewGesture','rapLyricsGestureEnabledV414','Gespeicherte Lyrics-Gesten'])assert(editor.includes(marker),`UI: ${marker}`);
+const avatar=read('components/visualizer/ThreeAvatar.tsx');
+for(const marker of ['sampleRapGestureV414','applyRapGestureMotionV414','rapLyricsGestureEnabledV414','rapLiveEnabledV412','rapLyricsFrameV414.current.head','rapLyricsFrameV414.current.arms'])assert(avatar.includes(marker),`Live: ${marker}`);
+assert(read('components/visualizer/RapPerformanceEditorPanelV408.tsx').includes('<RapLyricsGestureTimelineV414'));
+assert(read('context/UiPreferencesContext.tsx').includes('rapLyricsGestureEnabledV414:false'));
+assert(read('types/music.ts').includes('rapLyricsGestureEnabledV414?: boolean'));
+console.log('PASS V414: track/avatar lyrics anchors, bounded gestural envelopes, opt-in live, no unowned motion, overlap blending, save/load/remove, UI preview');

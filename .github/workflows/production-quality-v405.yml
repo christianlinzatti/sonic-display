@@ -1,0 +1,23 @@
+name: Sonic Display V417 production quality
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  quality:
+    name: Quality checks (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # This project does not yet include package-lock.json; use npm install, not npm ci.
+      - name: Install project dependencies
+        run: npm install --no-audit --no-fund
+      - name: Full verification (regression suite, typecheck and production build)
+        run: npm run verify

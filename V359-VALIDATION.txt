@@ -1,0 +1,23 @@
+Sonic Display V359: Spotify Artist Follow – Verification
+=========================================================
+Base: V358 complete source tree
+Package version: 0.1.0-v359
+Spotify API: GET /me/library/contains; PUT /me/library; DELETE /me/library
+Identifier: spotify:artist:<id> (query parameter 'uris')
+
+PASS: V359 local mocked API regression (GET, PUT, DELETE, read-back confirmation, invalid URI, denied scope and Origin, unsupported writes)
+PASS: Full offline regression: 102/102 commands (including V350 through V359)
+PASS: TypeScript/TSX parser: 464 sources
+PASS: Isolated strict TypeScript check: lib/artist-follow-v359.ts
+PASS: ZIP archive integrity
+
+NOT VERIFIED:
+- Complete Next.js production build and project-wide semantic TypeScript check:
+  node_modules/package-lock are not available in this environment.
+- Real Spotify follow/unfollow writes: no authorized Spotify account was connected
+  for a live API test. Spotify's February 2026 migration guide indicates artists
+  use PUT/DELETE /me/library; current write endpoint reference excludes artist URIs
+  from its supported URI enumeration. The app reports unsupported requests honestly.
+
+Local steps: npm install && npm run verify
+Reconnect Spotify after update to grant user-follow-read/user-follow-modify.

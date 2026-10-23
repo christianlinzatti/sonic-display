@@ -1,0 +1,56 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {planCinematicLyricsV378,composeCinematicLyricsCameraV378} from '../components/visualizer/cinematicLyricsCompositionV378.ts';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const read=f=>fs.readFileSync(path.join(root,f),'utf8');
+const lyrics={provider:'spotify',synced:true,plainText:null,lines:Array.from({length:8},(_,i)=>({startMs:i*2400,endMs:(i+1)*2400,text:`Line ${i+1}${i===3?'!':''}`,words:[{text:'Rap',startMs:i*2400+120,endMs:i*2400+350}]}))};
+const config={mode:'cinematic',strength:80,playing:true,lyricsVisible:true,side:'right',lyrics,progressMs:1800,section:'verse'};
+const plan=(changes={})=>planCinematicLyricsV378({...config,...changes});
+assert.equal(plan().shot,'balanced');
+assert.equal(plan({progressMs:7700}).shot,'balanced','no text focus early in phrase-ending line');
+const lyricFocus=plan({progressMs:9360});
+assert.equal(lyricFocus.shot,'lyrics','one editorial lyric shot at actual phrase end');
+assert.equal(lyricFocus.reason,'phrase-end');
+assert.equal(lyricFocus.timed,true);
+assert.equal(plan({progressMs:9360,mode:'readable'}).shot,'balanced','readability mode never forces lyric focus');
+assert.ok(plan({progressMs:9360,mode:'readable'}).strength<lyricFocus.strength);
+assert.equal(plan({progressMs:9360,section:'hook'}).shot,'group');
+assert.equal(plan({progressMs:9360,section:'drop'}).shot,'group');
+assert.equal(plan({progressMs:9360,duet:{active:true,shot:'two-shot'}}).shot,'duet','handoffs override lyric focus');
+assert.equal(plan({progressMs:5100,duet:{active:true,shot:'lead'}}).shot,'face');
+for(const changes of [{mode:'off'},{strength:0},{lyricsVisible:false},{side:null},{playing:false},{reducedMotion:true},{manualPriority:true},{lyrics:null},{lyrics:{...lyrics,synced:false}},{progressMs:-1},{progressMs:20000},{progressMs:NaN}]){
+ assert.equal(plan(changes).active,false,`gating: ${JSON.stringify(changes)}`);
+}
+const bare={...lyrics,lines:lyrics.lines.map(({words,...line})=>line)};
+assert.equal(plan({lyrics:bare,progressMs:9360}).shot,'balanced','no fabricated important-word focus when only line timestamps exist');
+const withInvalid={...lyrics,lines:lyrics.lines.map(l=>({...l,words:[{text:'x',startMs:NaN,endMs:null}]}))};
+assert.equal(plan({lyrics:withInvalid,progressMs:9360}).shot,'balanced');
+const base={x:0,y:.1,z:5.5,fov:38,targetY:0,targetX:0,targetZ:0};
+const right=composeCinematicLyricsCameraV378(base,plan());
+const left=composeCinematicLyricsCameraV378(base,plan({side:'left'}));
+assert.ok(right.targetX>base.targetX&&left.targetX<base.targetX,'camera reserves opposite caption sides');
+assert.ok(right.z>base.z&&right.fov>base.fov,'safe framing widens closeups');
+const focus=composeCinematicLyricsCameraV378(base,lyricFocus);
+assert.ok(focus.fov>=right.fov&&focus.targetX>right.targetX,'brief lyric focus keeps additional space');
+assert.deepEqual(base,{x:0,y:.1,z:5.5,fov:38,targetY:0,targetX:0,targetZ:0},'base camera never mutated');
+assert.strictEqual(composeCinematicLyricsCameraV378(base,plan({mode:'off'})),base,'inactive is a no-op');
+for(const extreme of [0,100,NaN]){
+ const out=composeCinematicLyricsCameraV378(base,plan({strength:extreme}));
+ assert.ok(Object.values(out).every(v=>Number.isFinite(v)),'finite camera values');
+ assert.ok(out.fov<=76&&out.fov>=28);
+}
+const cam=read('components/visualizer/StageCameraDirectorV289.tsx');
+for(const key of ['planCinematicLyricsV378','composeCinematicLyricsCameraV378','automaticShot','manualPriority:!automaticShot','guardAutomaticCameraV351','effectiveShotV377','userHasPreset','liveEditPose'])assert.ok(cam.includes(key),`camera integration: ${key}`);
+const three=read('components/visualizer/ThreeAvatar.tsx');
+assert.ok(three.includes('cinematicLyricsModeV378')&&three.includes('StageCameraDirectorV289'));
+const lyric3d=read('components/visualizer/Lyrics3DScene.tsx');
+assert.ok(lyric3d.includes('plateStrengthV378')&&lyric3d.includes('scene.cinematicContrastV378'));
+for(const f of ['types/music.ts','context/UiPreferencesContext.tsx','components/SettingsPanel.tsx','components/visualizer/registry.tsx','components/visualizer/VisualizerStage.tsx','components/visualizer/VocalSyncInspectorV373.tsx'])assert.ok(read(f).includes('V378'),`UI/data wiring ${f}`);
+assert.match(read('context/UiPreferencesContext.tsx'),/avatarLyricsCameraModeV378:"off"/);
+assert.ok(read('app/globals.css').includes('v378-lyrics-contrast'));
+const pkg=JSON.parse(read('package.json'));
+assert.ok(['0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387','0.1.0-v390','0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v390','0.1.0-v391','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416'].includes(pkg.version));
+assert.match(pkg.scripts['verify:offline'],/test:v378/);
+console.log('PASS V378 lyrics-safe cinematic camera, phrase-end word gating, hook/duet priorities, pause, manual override, safe areas, immersive styling, inspector & settings');

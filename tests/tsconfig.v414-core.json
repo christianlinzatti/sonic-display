@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "strict": true, "noEmit": true, "skipLibCheck": true,
+    "target": "ES2022", "module": "ESNext", "moduleResolution": "Bundler",
+    "noUncheckedIndexedAccess": false, "types": []
+  },
+  "files": ["../components/visualizer/rapGestureCuesV414.ts", "v414-music-types.d.ts"]
+}

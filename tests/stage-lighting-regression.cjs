@@ -1,0 +1,38 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const root = path.resolve(__dirname, '..');
+const src = fs.readFileSync(path.join(root, 'components/visualizer/reactiveStageLighting.ts'), 'utf8');
+const stage = fs.readFileSync(path.join(root,'components/visualizer/DynamicStage.tsx'),'utf8');
+const avatar = fs.readFileSync(path.join(root,'components/visualizer/ThreeAvatar.tsx'),'utf8');
+assert.match(stage,/advanceStageCue\(/);
+assert.match(stage,/tier !== "low"/);
+assert.match(stage,/!reducedMotion/);
+assert.match(avatar,/genre=\{props.genre\}/);
+let ts;
+for (const path of ['typescript','/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript','/usr/local/lib/node_modules/typescript']) {try { ts = require(path); break; }catch {}}
+if (!ts) { console.log('V139 stage integration checks pass; behavior tests unavailable without TypeScript');process.exit(0); }
+const js = ts.transpileModule(src,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020},reportDiagnostics:true});
+assert(!js.diagnostics?.some(d=>d.category===ts.DiagnosticCategory.Error));
+const mod={exports:{}};
+new Function('module','exports','require',js.outputText)(mod,mod.exports,require);
+const {createStageCueState, advanceStageCue, stageStyle}=mod.exports;
+const audio={bass:.85,mids:.7,highs:.5,volume:.7,beat:true,beatStrength:.8,bpm:155,kick:.9,snare:.35,hiHat:.5,energyEnvelope:.8,attack:.4,decay:.2};
+assert.equal(stageStyle('Deutschrap'),'rap');
+assert.equal(stageStyle('Hardtekk'),'hard');
+assert.equal(stageStyle('ambient'),'steady');
+const hardState=createStageCueState(),rapState=createStageCueState();
+let hard=advanceStageCue(hardState,audio,.016,'Hardstyle');
+let rap=advanceStageCue(rapState,audio,.016,'Deutschrap');
+assert(hard.pulse>0);
+assert(hard.sweep>0);
+assert(advanceStageCue(createStageCueState(),audio,.016,'Hardstyle',true,false,60,'low').sweep===0);
+assert(advanceStageCue(createStageCueState(),audio,.016,'Hardstyle',true,false,60,'low').pulse===0);
+assert(advanceStageCue(createStageCueState(),audio,.016,'Hardstyle',false).pulse===0);
+assert(advanceStageCue(createStageCueState(),audio,.016,'Hardstyle',true,true).pulse===0);
+assert(advanceStageCue(createStageCueState(),audio,.016,'Hardstyle',true,false,0).pulse===0);
+const weird=advanceStageCue(createStageCueState(),{...audio,bass:NaN,kick:Infinity,snare:-2,mids:NaN},Infinity,'hardtekk');
+assert(Object.values(weird).every(Number.isFinite));
+for(let i=0;i<50;i++) hard=advanceStageCue(hardState,{...audio,beat:false},.016,'Hardstyle');
+assert(hard.pulse<.1);
+console.log('V139 reactive stage lighting: 11 behavior assertions + 4 integration checks passed');

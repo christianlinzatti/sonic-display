@@ -1,0 +1,13 @@
+const fs=require("node:fs");const assert=require("node:assert/strict");const path=require("node:path");
+const root=path.resolve(__dirname,"..");const read=p=>fs.readFileSync(path.join(root,p),"utf8");
+const panel=read("components/visualizer/DanceDiagnosticsPanel.tsx");
+const dashboard=read("components/visualizer/AdaptiveMotionQualityDashboard.tsx");
+const policy=read("components/visualizer/motionDashboardStatus.ts");
+assert.match(panel,/<AdaptiveMotionQualityDashboard \/>/);
+for(const store of ["useDanceDiagnostics","useMotionQuality","useRuntimeProfiler","useAdaptivePerformance","getAnimationQualitySnapshot","getAnimationSchedulerSnapshot"])assert.ok(dashboard.includes(store),store);
+assert.ok(!dashboard.includes("useFrame("),"dashboard must not sample per frame");
+assert.match(dashboard,/CPU-Werte sind instrumentierte/);
+assert.match(policy,/Keine Live-Messung/);
+assert.match(policy,/Hohe Last/);
+assert.match(policy,/Motion-Hinweis/);
+console.log("V221 dashboard regression: passed");

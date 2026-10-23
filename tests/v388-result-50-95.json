@@ -1,0 +1,317 @@
+[
+  {
+    "i": 50,
+    "name": "test:v308",
+    "ok": true,
+    "last": "V308 Concert Atmosphere: shader, haze, stage lights, show sections, blackouts, performance tier, pause, reduced motion, storage + UI PASS\n",
+    "seconds": 0.29
+  },
+  {
+    "i": 51,
+    "name": "test:v309",
+    "ok": true,
+    "last": "V309 One-Click Show Presets: 4 coherent shows, original UI preserved, reversible snapshots, sanitized custom storage, studio + scene wiring PASS\n",
+    "seconds": 0.53
+  },
+  {
+    "i": 52,
+    "name": "test:v310",
+    "ok": true,
+    "last": "V310 Smart Show Quality: section/phrase variety, calm breaks, FX ceiling, settings, pause/seek, reduced motion, V309 persistence and UI PASS\n",
+    "seconds": 0.36
+  },
+  {
+    "i": 53,
+    "name": "test:v311",
+    "ok": true,
+    "last": "V311 Advanced Dance Performance: natural counterbalance, filtered reactive motion, foot protection, crossfade, playback safety, presets, UI/GLB integration PASS\n",
+    "seconds": 0.49
+  },
+  {
+    "i": 54,
+    "name": "test:v312",
+    "ok": true,
+    "last": "V312 Intelligent Choreography Director: musical duet role swaps, drop sync, partner response, pause/seek safety, reduced motion, manual precedence, controls and reversible presets PASS\n",
+    "seconds": 0.58
+  },
+  {
+    "i": 55,
+    "name": "test:v313",
+    "ok": true,
+    "last": "V313 Dance Show Evolution: track-long story arc, musical break precedence, peak/finale composition, pause/seek/reduced-motion guards, V312 duet pacing, controls and presets PASS\n",
+    "seconds": 0.5
+  },
+  {
+    "i": 56,
+    "name": "test:v314",
+    "ok": true,
+    "last": "PASS V314 session-only bounded telemetry, kick-motion proxy, foot contact, camera/FX diagnostics, skip/reset/record controls, exports, UI and scene wiring\n",
+    "seconds": 0.35
+  },
+  {
+    "i": 57,
+    "name": "test:v315",
+    "ok": true,
+    "last": "PASS V315 deterministic diagnostics, evidence thresholds, honest before/after preview, user-approved writes, stale-value rejection, conflict-safe undo, UI integration\n",
+    "seconds": 0.38
+  },
+  {
+    "i": 58,
+    "name": "test:v316",
+    "ok": true,
+    "last": "PASS V316: pure A/B snapshot, stale guard, deterministic shared beat, actual R3F rig/show engines, lazy 3D preview\n",
+    "seconds": 0.34
+  },
+  {
+    "i": 59,
+    "name": "test:v317",
+    "ok": true,
+    "last": "PASS V317: isolated real source catalog, deterministic A/B clip sampling, retargeting, continuous two-clip loop, live review wiring\n",
+    "seconds": 0.28
+  },
+  {
+    "i": 60,
+    "name": "test:v318",
+    "ok": true,
+    "last": "PASS V318: safe provider adapters, seconds/ms import, non-inferred sections, stable bars and beats, track isolation, live fallback, local cache and director wiring\n",
+    "seconds": 0.38
+  },
+  {
+    "i": 61,
+    "name": "test:v319",
+    "ok": true,
+    "last": "PASS V319: measured bars/beats, track isolation, BPM fallback, song clock, safe edit/trim/fade, musical grid, real 3D timeline preview, legacy compatibility\n",
+    "seconds": 0.37
+  },
+  {
+    "i": 62,
+    "name": "test:v320",
+    "ok": true,
+    "last": "PASS V320: genre-aware groove, follow through, planted feet, clip priority, seek/pause/reduced motion, presets, both avatars and settings\n",
+    "seconds": 0.68
+  },
+  {
+    "i": 63,
+    "name": "test:v321",
+    "ok": true,
+    "last": "PASS V321: isolated quaternion repair, 3D comparison wiring, timestamps, foot-safety diagnostics, opt-in and source immutability\n",
+    "seconds": 0.3
+  },
+  {
+    "i": 64,
+    "name": "test:v322",
+    "ok": true,
+    "last": "PASS V322: contact acquisition, release, bounded world anchors, jumps, floor estimate, storage, integration, diagnostics\n",
+    "seconds": 0.32
+  },
+  {
+    "i": 65,
+    "name": "test:v323",
+    "ok": true,
+    "last": "PASS V323: support stance, critical-damping, turns, landings, permissions, reset, clip priority, UI and GLB integration\n",
+    "seconds": 0.3
+  },
+  {
+    "i": 66,
+    "name": "test:v324",
+    "ok": true,
+    "last": "PASS V324: shared duet, movement cap, gap, lane protection, role/drop, pause/reduced, foot-lock slowdown, track reset, safety and UI\n",
+    "seconds": 0.33
+  },
+  {
+    "i": 67,
+    "name": "test:v325",
+    "ok": true,
+    "last": "PASS V325: 2-dancer cue timeline, safe role/formation blending, import beat grid, seeking, track isolation, storage, UI/3D integration\n",
+    "seconds": 0.5
+  },
+  {
+    "i": 68,
+    "name": "test:v326",
+    "ok": true,
+    "last": "PASS V326: 3/4 independent stage slots, bounded spacing, track isolation, interpolation, cue editing, persistence, UI/3D integration\n",
+    "seconds": 0.34
+  },
+  {
+    "i": 69,
+    "name": "test:v327",
+    "ok": true,
+    "last": "PASS V327: 3/4 dancer unison, stagger, call/response, alternating, drop/solo, imported markers, track-safe read, persistence, rendering\n",
+    "seconds": 0.29
+  },
+  {
+    "i": 70,
+    "name": "test:v328",
+    "ok": true,
+    "last": "PASS V328: deterministic 3/4 GLB phases, beat offsets, mode/cycle, input clamping, imported beats, pause, persistence and runtime wiring\n",
+    "seconds": 0.33
+  },
+  {
+    "i": 71,
+    "name": "test:v329",
+    "ok": true,
+    "last": "PASS V329: source-safe keyframe fingerprints, group selection, manual priority, confidence gate, storage and runtime/preview wiring\n",
+    "seconds": 0.34
+  },
+  {
+    "i": 72,
+    "name": "test:v330",
+    "ok": true,
+    "last": "V330 stage content plugin regression passed\n",
+    "seconds": 0.47
+  },
+  {
+    "i": 73,
+    "name": "test:v331",
+    "ok": true,
+    "last": "V331 live push regression passed\n",
+    "seconds": 0.35
+  },
+  {
+    "i": 74,
+    "name": "test:v332",
+    "ok": true,
+    "last": "PASS V332 provider publish, scoped subscriber token, local fallback, errors, cleanup\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 75,
+    "name": "test:v333",
+    "ok": true,
+    "last": "PASS V333: layout bounds, uniqueness, routes, push policy, wiring, editor\n",
+    "seconds": 0.31
+  },
+  {
+    "i": 76,
+    "name": "test:v334",
+    "ok": true,
+    "last": "PASS V334: sanitizing, per-source priorities/durations, section gating, bounded weighted fairness, UI/wiring\n",
+    "seconds": 0.33
+  },
+  {
+    "i": 77,
+    "name": "test:v335",
+    "ok": true,
+    "last": "PASS V335: bio validation, strict artist matching, concert deduplication/recency, API keys, route wiring\n",
+    "seconds": 0.33
+  },
+  {
+    "i": 78,
+    "name": "test:v336",
+    "ok": true,
+    "last": "PASS V336: eventim strict matching, recency, safety, merge\n",
+    "seconds": 0.4
+  },
+  {
+    "i": 79,
+    "name": "test:v337",
+    "ok": true,
+    "last": "V337 concert display wiring regression passed\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 80,
+    "name": "test:v338",
+    "ok": true,
+    "last": "V338 multi-image gallery regression passed\n",
+    "seconds": 0.06
+  },
+  {
+    "i": 81,
+    "name": "test:v339",
+    "ok": true,
+    "last": "V339 Wikimedia gallery regression passed\n",
+    "seconds": 0.32
+  },
+  {
+    "i": 82,
+    "name": "test:v340",
+    "ok": true,
+    "last": "V340 smart image selection passed\n",
+    "seconds": 0.3
+  },
+  {
+    "i": 83,
+    "name": "test:v341",
+    "ok": true,
+    "last": "V341 music-synced gallery tests passed\n",
+    "seconds": 0.37
+  },
+  {
+    "i": 84,
+    "name": "test:v342",
+    "ok": true,
+    "last": "V342 cinematic gallery regression passed\n",
+    "seconds": 0.37
+  },
+  {
+    "i": 85,
+    "name": "test:v343",
+    "ok": true,
+    "last": "V343 gallery preview regression passed\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 86,
+    "name": "test:v344",
+    "ok": true,
+    "last": "V344 gallery layout regression passed\n",
+    "seconds": 0.32
+  },
+  {
+    "i": 87,
+    "name": "test:v345",
+    "ok": true,
+    "last": "PASS V345 multi-photo model/editor/stage wiring\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 88,
+    "name": "test:v346",
+    "ok": true,
+    "last": "PASS V346 photo director state, UI and stage wiring\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 89,
+    "name": "test:v347",
+    "ok": true,
+    "last": "PASS V347 settings validation, beat-gating, renderer and UI regression\n",
+    "seconds": 0.31
+  },
+  {
+    "i": 90,
+    "name": "test:v348",
+    "ok": true,
+    "last": "PASS V348 world-space geometry, sanitization, fallback, controls, stage wiring and regression\n",
+    "seconds": 0.35
+  },
+  {
+    "i": 91,
+    "name": "test:v349",
+    "ok": true,
+    "last": "PASS V349 image quality estimates, per-panel crop, 2D/3D integration, deduplication, offline controls\n",
+    "seconds": 0.35
+  },
+  {
+    "i": 92,
+    "name": "test:v350",
+    "ok": true,
+    "last": "PASS V350 lyrics presence, quiet verse, hook/drop photo emphasis, fallback, manual override, 2D/3D stage wiring and settings\n",
+    "seconds": 0.34
+  },
+  {
+    "i": 93,
+    "name": "test:v351",
+    "ok": true,
+    "last": "PASS V351 focus prioritization, manual safety, lyrics zones, panel placement, camera, light/FX budgets, SSR/storage, stage/UI integration\n",
+    "seconds": 0.33
+  },
+  {
+    "i": 94,
+    "name": "test:v352",
+    "ok": true,
+    "last": "PASS V352 genre resolution/profiles, cue phases, V351 protection, manual presets, controls, storage, SSR, reduced-motion and stage wiring\n",
+    "seconds": 0.42
+  }
+]

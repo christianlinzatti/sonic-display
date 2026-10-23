@@ -1,0 +1,10 @@
+const fs=require('node:fs'),assert=require('node:assert/strict'),path=require('node:path');
+const root=path.resolve(__dirname,'..');const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const engine=read('components/visualizer/advancedMusicDanceIntelligenceV273.ts');
+const host=read('components/visualizer/VisualizerStage.tsx');
+assert.match(engine,/candidateSince/);assert.match(engine,/committedAt/);assert.match(engine,/hardtekk/);assert.match(engine,/deutschrap/);
+assert.match(engine,/at < s.at - 1200/);assert.match(engine,/if \(!x.playing\)/);
+assert.match(host,/advanceDanceIntelligence/);assert.match(host,/detectedSection:directedSection/);assert.match(host,/liveSection:danceIntelligence.section/);
+assert.match(host,/eventSlot:danceIntelligenceSlot/);
+assert.ok(Number(JSON.parse(read('package.json')).version.match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 273);
+console.log('V273 advanced music dance intelligence integration PASS');

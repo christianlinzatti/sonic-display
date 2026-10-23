@@ -1,0 +1,17 @@
+const assert=require('node:assert/strict');const fs=require('node:fs');const vm=require('node:vm');const ts=require('typescript');
+const src=fs.readFileSync('services/stageContent/musicGalleryV341.ts','utf8');const out=ts.transpileModule(src,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;const m={exports:{}};vm.runInNewContext(out,{exports:m.exports,module:m});const x=m.exports;
+const s=x.sanitizeMusicGalleryV341({enabled:true,intensity:500,minGapSeconds:-3,beatThreshold:5,transition:'invalid'});
+assert.equal(s.intensity,100);assert.equal(s.minGapSeconds,1);assert.equal(s.beatThreshold,1);assert.equal(s.transition,'fade');
+const st={...x.DEFAULT_MUSIC_GALLERY_V341,enabled:true};
+assert(x.musicGalleryIntervalV341(8,'verse',st)>x.musicGalleryIntervalV341(8,'drop',st));
+assert(x.musicGalleryIntervalV341(8,'break',st)>x.musicGalleryIntervalV341(8,'hook',st));
+assert.equal(x.musicGalleryIntervalV341(8,'drop',{...st,enabled:false}),8);
+assert.equal(x.shouldBeatAdvanceV341(.9,.2,4,'drop',st),true);
+assert.equal(x.shouldBeatAdvanceV341(.9,.8,4,'drop',st),false);
+assert.equal(x.shouldBeatAdvanceV341(.9,.2,1,'drop',st),false);
+assert.equal(x.shouldBeatAdvanceV341(.9,.2,4,'verse',st),false);
+assert.match(fs.readFileSync('components/visualizer/StageImageGalleryV338.tsx','utf8'),/shouldBeatAdvanceV341/);
+assert.match(fs.readFileSync('components/visualizer/StageContentScreensV333.tsx','utf8'),/beatAccent/);
+assert.match(fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8'),/beatAccent=\{props.audio/);
+assert.match(fs.readFileSync('components/visualizer/StageContentPluginSettingsV330.tsx','utf8'),/MusicGallerySettingsV341/);
+console.log('V341 music-synced gallery tests passed');

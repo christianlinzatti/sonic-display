@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v452-core.json",
+  "files": [
+    "../components/visualizer/expressiveLipSyncV453.ts",
+    "../components/visualizer/rapLipPrecisionV415.ts",
+    "../components/visualizer/facialPerformanceV369.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

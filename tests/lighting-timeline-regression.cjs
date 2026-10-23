@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const read=p=>fs.readFileSync(p,'utf8');
+const model=read('components/visualizer/lightingTimeline.ts');
+const panel=read('components/visualizer/LightingChoreographyStudio.tsx');
+const stage=read('components/visualizer/DynamicStage.tsx');
+const shell=read('components/visualizer/VisualizerStage.tsx');
+const playback=read('components/visualizer/lightingPlayback.ts');
+const checks=[model.includes('sanitizeLightCues'),model.includes('loadLightCues'),model.includes('saveLightCues'),model.includes('timelineStorageKey'),model.includes('128'),model.includes('LIGHT_TIMELINE_CHANGED'),model.includes('evaluateLightTimeline'),model.includes('reducedMotion'),model.includes('Math.sin'),model.includes('suggestedLightCue'),panel.includes('Cue hinzufügen'),panel.includes('Timeline speichern'),panel.includes('Drop-Vorschlag'),panel.includes('Zurücksetzen'),panel.includes('type="color"'),stage.includes('evaluateLightTimeline'),stage.includes('LIGHT_TIMELINE_CHANGED'),stage.includes('timelineCue.scale'),playback.includes('setLightingPlayback'),shell.includes('setLightingPlayback'),shell.includes('trackId={track?.id'),Number(require('../package.json').version.match(/v(\d+)$/)?.[1])>=248];
+checks.forEach((value,i)=>assert.ok(value,`V172 regression condition ${i+1}`));
+console.log(`V172 lighting timeline: ${checks.length} checks passed`);

@@ -1,0 +1,3 @@
+# V238 – Automatic Performance Calibration Wizard
+
+Fünf sequenzielle Live-Browser-Messungen (Balanced/Full, Balanced/No-Rings, Balanced/Minimal-Lights, Low/Minimal-Lights, High/Full). Pro Variante 5,5 s mit 1,6 s Aufwärmen. Frische Messwerte werden benötigt; fehlende Daten brechen ab. Vorherige Grafik- und Szeneneinstellungen werden bei Abbruch, Abschluss und Unmount zurückgesetzt. Anwenden erfolgt ausdrücklich per Klick und gilt nur in der aktuellen Sitzung. Die Empfehlung bevorzugt stabile Bildrate mit guter Grafikqualität, sonst die höchste gemessene FPS. Kein CPU-/GPU-Thermal-Profiling, kein verlässlicher Vergleich bei unterschiedlich anspruchsvollen Songabschnitten.

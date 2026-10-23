@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v450-core.json",
+  "files": [
+    "../services/show/visualBalanceV451.ts",
+    "../services/genius/musicConnectionsSpotlightV450.ts",
+    "../services/genius/musicDiscoveryV449.ts",
+    "../services/genius/songInsightsV447.ts",
+    "v414-music-types.d.ts"
+  ]
+}

@@ -1,0 +1,15 @@
+const fs=require('node:fs'),assert=require('node:assert/strict');
+const p=fs.readFileSync('components/visualizer/avatarPerformanceAdvisor.ts','utf8');
+const ui=fs.readFileSync('components/AvatarFrameProfilerPanel.tsx','utf8');
+assert.match(p,/m\.samples>=30/);
+assert.match(p,/Number\.isFinite\(m\.p95Ms\)/);
+assert.match(p,/CALLBACK_BUDGET_MS=3\.5/);
+assert.match(p,/MAX_MODELS=4/);
+assert.match(p,/used\+model\.p95Ms>CALLBACK_BUDGET_MS/);
+assert.match(p,/sort\(\(a,b\)=>a\.p95Ms-b\.p95Ms/);
+assert.match(p,/Math\.max\(1,Math\.min\(MAX_MODELS/);
+assert.match(ui,/V258 · Smart Avatar Performance Advisor/);
+assert.match(ui,/adviseAvatarModels\(models,targetCount\)/);
+assert.match(ui,/Messungen auf dem Raspberry Pi selbst/);
+assert.match(require('../package.json').version,/v(25[89]|260)$/);
+console.log('V258 advisor regression passed (11 assertions)');

@@ -1,0 +1,13 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const policy = fs.readFileSync('components/visualizer/motionWorkloadPolicy.ts', 'utf8');
+const avatar = fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
+const scheduler = fs.readFileSync('components/visualizer/adaptiveAnimationScheduler.ts','utf8');
+assert.match(policy, /cpuTier === "critical" \? 2/);
+assert.match(policy, /cpuTier === "constrained" \? 1/);
+assert.match(policy, /Math\.max\(priority\[renderTier\], cpuFloor\)/);
+assert.match(policy, /if \(!enabled\) return renderTier/);
+assert.match(scheduler, /getAnimationSchedulerTier\(\)/);
+assert.match(avatar, /selectMotionWorkloadTier\(getActivePerformanceTier\(\), getAnimationSchedulerTier\(\)\)/);
+assert.match(avatar, /applyAvatarRigMotion\(/);
+console.log('V220: workload policy wiring and unchanged per-frame rig processing OK');

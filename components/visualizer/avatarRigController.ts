@@ -9,6 +9,10 @@ export type AvatarRigTargets = {
   hips?: Object3D;
   leftArm?: Object3D;
   rightArm?: Object3D;
+  leftForearm?: Object3D;
+  rightForearm?: Object3D;
+  leftHand?: Object3D;
+  rightHand?: Object3D;
   leftLeg?: Object3D;
   rightLeg?: Object3D;
   leftFoot?: Object3D;
@@ -39,6 +43,10 @@ export function findAvatarRigTargets(root: Object3D, profileId: AvatarRigProfile
     hips: findNode(root, [/\bhips?\b/i, /pelvis/i, /mixamorig:?Hips/i]),
     leftArm: findNode(root, aliases.leftArm ?? []),
     rightArm: findNode(root, aliases.rightArm ?? []),
+    leftForearm: findNode(root, [/left.*(forearm|lowerarm|elbow)/i, /(forearm|lowerarm).*left/i, /mixamorig:?LeftForeArm/i]),
+    rightForearm: findNode(root, [/right.*(forearm|lowerarm|elbow)/i, /(forearm|lowerarm).*right/i, /mixamorig:?RightForeArm/i]),
+    leftHand: findNode(root, [/left.*(hand|wrist)/i, /(hand|wrist).*left/i, /mixamorig:?LeftHand/i]),
+    rightHand: findNode(root, [/right.*(hand|wrist)/i, /(hand|wrist).*right/i, /mixamorig:?RightHand/i]),
     leftLeg: findNode(root, aliases.leftLeg ?? []),
     rightLeg: findNode(root, aliases.rightLeg ?? []),
     leftFoot: findNode(root, aliases.leftFoot ?? []),
@@ -57,6 +65,14 @@ export function describeAvatarRig(targets: AvatarRigTargets) {
 }
 
 export type AvatarRigMotion = {
+  /** V307: subtle independent arm gestures; bounded and zero when disabled. */
+  leftArmAccent?: number;
+  rightArmAccent?: number;
+  torsoTwist?: number;
+  counterArm?: number;
+  hipCounter?: number;
+  headCounter?: number;
+  kneeFollow?: number;
   headNod: number;
   headTurn: number;
   spineSway: number;
@@ -99,19 +115,19 @@ export function applyAvatarRigMotion(
     state[key] = next;
   };
 
-  rotate("head", "x", motion.headNod);
-  rotate("head", "y", motion.headTurn);
+  rotate("head", "x", motion.headNod + motion.headLag);
+  rotate("head", "y", motion.headTurn + (motion.headCounter ?? 0));
   rotate("neck", "x", motion.headNod * 0.55);
   rotate("neck", "y", motion.headTurn * 0.6);
   rotate("spine", "z", motion.spineSway + motion.shoulderRoll * 0.35);
-  rotate("hips", "y", motion.hipSway);
+  rotate("hips", "y", motion.hipSway + (motion.hipCounter ?? 0));
+  rotate("spine", "y", motion.torsoTwist ?? 0);
   rotate("hips", "z", motion.weightShift * 0.08);
-  rotate("head", "x", motion.headLag);
   rotate("chest", "x", motion.chestPulse);
-  rotate("leftArm", "z", motion.armSwing + motion.followThrough);
-  rotate("rightArm", "z", -motion.armSwing - motion.followThrough * 0.85);
-  rotate("leftLeg", "x", motion.legGroove + motion.weightShift * 0.12);
-  rotate("rightLeg", "x", motion.legGroove - motion.weightShift * 0.12);
+  rotate("leftArm", "z", motion.armSwing + motion.followThrough + (motion.counterArm ?? 0) + (motion.leftArmAccent ?? 0));
+  rotate("rightArm", "z", -motion.armSwing - motion.followThrough * 0.85 - (motion.counterArm ?? 0) + (motion.rightArmAccent ?? 0));
+  rotate("leftLeg", "x", motion.legGroove + motion.weightShift * 0.12 + (motion.kneeFollow ?? 0));
+  rotate("rightLeg", "x", motion.legGroove - motion.weightShift * 0.12 - (motion.kneeFollow ?? 0));
   rotate("leftFoot", "x", motion.footStep);
   rotate("rightFoot", "x", -motion.footStep);
   rotate("jaw", "x", motion.expressionJaw);
@@ -144,7 +160,7 @@ export function resetAvatarRigMotion(targets: AvatarRigTargets, delta: number) {
   }, delta);
 }
 
-export function collectAvatarRigNodes(root: Group, profileId: AvatarRigProfileId = "auto") {
+export function collectAvatarRigNodes(root: Object3D, profileId: AvatarRigProfileId = "auto") {
   const targets = findAvatarRigTargets(root, profileId);
   return { targets, description: describeAvatarRig(targets) };
 }

@@ -1,0 +1,10 @@
+const fs=require('fs'),assert=require('assert'),ts=require('typescript'),vm=require('vm');
+const source=fs.readFileSync('components/visualizer/lodAssetManifest.ts','utf8');
+const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
+const mod={exports:{}};vm.runInNewContext(js,{exports:mod.exports,module:mod});
+const {inferLodSiblings}=mod.exports;
+assert.deepEqual(Array.from(inferLodSiblings('/avatars/robot_LOD0.glb').variants,v=>v.file),['robot_LOD0.glb','robot_LOD1.glb','robot_LOD2.glb']);
+assert.equal(inferLodSiblings('/avatars/robot.glb').variants[2].file,'robot_LOD2.glb');
+assert.equal(inferLodSiblings('/avatars/robot.png'),null);
+assert.equal(inferLodSiblings('/avatars/%2e%2e_LOD0.glb'),null);
+console.log('4 manifest-free LOD regression checks passed');

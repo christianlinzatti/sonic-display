@@ -1,0 +1,14 @@
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+const component = fs.readFileSync('components/visualizer/StagePresetLibraryV286.tsx','utf8');
+const settings = fs.readFileSync('components/SettingsPanel.tsx','utf8');
+assert.match(component, /STORAGE_KEY/);
+assert.match(component, /function validatePreset/);
+assert.match(component, /Math\.max\(0, Math\.min\(100/);
+assert.match(component, /BUILT_INS/);
+assert.match(component, /Presets importieren/);
+assert.match(component, /Presets exportieren/);
+assert.match(component, /onApply\(/);
+assert.match(settings, /<StagePresetLibraryV286 current=/);
+assert.match(settings, /stageLightStrength:preferences\.stageLightStrength/);
+console.log('V286 Stage Preset Library regression: OK');

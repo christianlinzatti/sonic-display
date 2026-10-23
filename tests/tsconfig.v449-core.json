@@ -1,0 +1,1 @@
+{"extends":"./tsconfig.v448-core.json","files":["../services/genius/musicDiscoveryV449.ts","../services/genius/songInsightsV447.ts","../services/genius/cinematicInsightsV448.ts","v414-music-types.d.ts"]}

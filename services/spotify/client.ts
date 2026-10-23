@@ -15,5 +15,14 @@ export async function fetchCurrentTrack(signal?: AbortSignal): Promise<CurrentTr
 
 export async function disconnectSpotify(): Promise<void> {
   const response = await fetch("/api/spotify/disconnect", { method: "POST" });
-  if (!response.ok) throw new Error("Spotify konnte nicht getrennt werden.");
+  if (!response.ok) throw new Error("Spotify konnte nicht getrennt werden. Bei aktivem Web Push bitte die serverseitige Löschung erneut versuchen.");
+  // The server has now revoked any persistent push credentials for this account.
+  // Also unregister the device subscription locally; keep the PWA service worker itself.
+  try {
+    if ("serviceWorker" in navigator) {
+      const registration = await navigator.serviceWorker.getRegistration("/");
+      const subscription = await registration?.pushManager.getSubscription();
+      await subscription?.unsubscribe();
+    }
+  } catch { /* Server data is already revoked; browser-level cleanup may need another visit. */ }
 }

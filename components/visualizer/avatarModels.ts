@@ -1,6 +1,6 @@
 /** Register locally hosted GLB/GLTF models here. Optional previews live under public/. */
 import type { AvatarDancePresetId } from "./avatarDancePresets";
-export type AvatarModel = { id: string; label: string; url: string | null; preview?: string; description: string; genre?: string[]; tags?: string[]; category?: string; favorite?: boolean; defaultDancePreset?: AvatarDancePresetId };
+export type AvatarModel = { id: string; label: string; url: string | null; preview?: string; description: string; genre?: string[]; tags?: string[]; category?: string; favorite?: boolean; animationUrl?: string; defaultDancePreset?: AvatarDancePresetId };
 import { defaultAvatarModels } from "@/config/avatarModels.default";
 export const avatarModels: AvatarModel[] = defaultAvatarModels;
 

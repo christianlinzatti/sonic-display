@@ -1,0 +1,16 @@
+const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
+const read=p=>fs.readFileSync(path.join(__dirname,"..",p),"utf8");
+const store=read("components/visualizer/danceDiagnosticsStore.ts");
+const ui=read("components/visualizer/AdaptiveMotionQualityDashboard.tsx");
+const recommendations=read("components/visualizer/performanceRecommendations.ts");
+assert.match(store,/const HISTORY_LIMIT = 120/);
+assert.match(store,/recordPerformanceSample\(next\)/);
+assert.match(store,/next\.active/);
+assert.match(store,/performanceHistory\.slice/);
+assert.match(store,/clearPerformanceHistory/);
+assert.match(ui,/usePerformanceHistory\(\)/);
+assert.match(ui,/polyline/);
+assert.match(ui,/historyRecommendations/);
+assert.match(recommendations,/samples\.length<5/);
+assert.match(recommendations,/Auflösung\/DPR/);
+console.log("V222 history and recommendations checks passed (10 assertions).");

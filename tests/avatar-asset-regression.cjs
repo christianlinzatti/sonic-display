@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const ts=require('typescript');
+const vm=require('node:vm');
+const src=fs.readFileSync(require('node:path').join(__dirname,'../components/visualizer/glbAssetInspector.ts'),'utf8');
+const js=ts.transpileModule(src.replace(/export /g,''),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.None}}).outputText;
+const ctx={TextDecoder,Uint8Array,DataView,Set,Error,Number,Math,Array,JSON};vm.createContext(ctx);vm.runInContext(js,ctx);
+const json=JSON.stringify({asset:{version:'2.0'},meshes:[{primitives:[{attributes:{POSITION:0},mode:4}]}],accessors:[{count:300}],nodes:[{name:'Body_LOD0'},{name:'Body_LOD2'}],animations:[{channels:[{}]}],skins:[{}]});
+const data=Buffer.from(json);const padded=Buffer.alloc(Math.ceil(data.length/4)*4,0x20);data.copy(padded);
+const glb=Buffer.alloc(20+padded.length);glb.writeUInt32LE(0x46546c67,0);glb.writeUInt32LE(2,4);glb.writeUInt32LE(glb.length,8);glb.writeUInt32LE(padded.length,12);glb.writeUInt32LE(0x4e4f534a,16);padded.copy(glb,20);
+let r=ctx.inspectGlb(glb.buffer.slice(glb.byteOffset,glb.byteOffset+glb.byteLength));
+assert.equal(r.estimatedTriangles,100);assert.equal(r.meshes,1);assert.equal(r.animations,1);assert.equal(r.animationChannels,1);assert.equal(r.skins,1);assert.equal(r.lodFamilies[0],'body');
+assert.throws(()=>ctx.inspectGlb(new ArrayBuffer(5)));const bad=Buffer.from(glb);bad.writeUInt32LE(1,4);assert.throws(()=>ctx.inspectGlb(bad.buffer.slice(bad.byteOffset,bad.byteOffset+bad.byteLength)));
+console.log('Avatar asset regression: 8 checks passed');

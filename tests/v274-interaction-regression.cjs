@@ -1,0 +1,11 @@
+const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
+const root=path.resolve(__dirname,"..");const read=p=>fs.readFileSync(path.join(root,p),"utf8");
+const engine=read("components/visualizer/multiAvatarInteractionV274.ts");
+const host=read("components/visualizer/ThreeAvatar.tsx");
+const panel=read("components/visualizer/MultiAvatarChoreographyPanel.tsx");
+const config=read("components/visualizer/multiAvatarChoreography.ts");
+assert.match(engine,/advanceInteraction/);assert.match(engine,/state\.candidateSince/);assert.match(engine,/section==="drop"/);assert.match(engine,/settings\.smartInteraction/);
+assert.match(host,/advanceInteraction\(interaction\.current/);assert.match(host,/interaction\.current=initialInteractionState\(\)/);
+assert.match(panel,/Intelligente musikalische Interaktionen/);assert.match(config,/smartInteraction: false/);
+assert.ok(Number(JSON.parse(read("package.json")).version.match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 274);
+console.log("V274 multi-avatar interaction integration PASS");

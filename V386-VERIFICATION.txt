@@ -1,0 +1,10 @@
+Sonic Display V386 – verification record
+
+npm run check:syntax: PASS – 514 TypeScript/TSX source files
+npm run test:v386: PASS – directed lead/feature/handoff/hook; pausing, seeks, reduced motion, hand-authored priority, capped body/light overlays
+npm run test:v385: PASS – manual vocal casting maintained
+Full offline regression (127 npm test:* commands): PASS 127 / 127; independent parallel runner
+npm run build:preflight: BLOCKED – only 1 of 17 dependencies available
+npm run typecheck: NOT VERIFIED – missing React, Next, Three and 16 npm packages trigger cascading errors
+Next.js production build: NOT RUN, network dependency installation required
+ZIP integrity / V385 source file preservation checked during packaging

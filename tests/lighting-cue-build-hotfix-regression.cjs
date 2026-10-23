@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.join(__dirname,'..');
+const src=fs.readFileSync(path.join(root,'components/visualizer/lightingTimelineAnalyzer.ts'),'utf8');
+const css=fs.readFileSync(path.join(root,'app/globals.css'),'utf8');
+assert.ok(src.includes('Math.abs(s.cue.atMs-c.cue.atMs)'), 'Compare actual nested cue timestamps');
+assert.ok(!src.includes('s.cue.atMs-c.atMs'), 'No invalid timestamp access');
+assert.ok(!/align-items\s*:\s*end\b/.test(css), 'No unsupported CSS align-items:end');
+assert.ok(!/justify-content\s*:\s*end\b/.test(css), 'No unsupported CSS justify-content:end');
+console.log('Lighting cue typing and CSS compatibility: 4 checks passed');

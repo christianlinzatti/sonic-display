@@ -1,0 +1,21 @@
+Sonic Display V358 – Validation
+Base: Complete V357 release ZIP.
+Version: 0.1.0-v358
+
+OFFLINE: PASS – 101/101 npm run verify:offline commands, including V358 and preceding V265–V357 checks.
+SOURCE SYNTAX: PASS – 461 .ts/.tsx source files.
+RUNTIME STRUCTURE: PASS – 976 structural checks across the source tree (before final documentation changes).
+V358 REGRESSION: PASS – opt-in, plausible fresh measured FPS/P95, minimum contiguous playback, schema validation, local privacy, bounded aggregation, manual override, per-phrase change limits, settings, erase and live integration.
+ISOLATED STRICT TYPESCRIPT: PASS – stageContent/showTimelineV354.ts, autonomousShowV356.ts, showQualityV357.ts and adaptiveShowLearningV358.ts.
+ZIP INTEGRITY: checked after packaging.
+
+FULL PROJECT SEMANTIC TYPESCRIPT: NOT VERIFIED – original ZIP has no npm dependencies; TypeScript reports missing React/Next/etc packages.
+NEXT.JS PRODUCTION BUILD: NOT VERIFIED – npm run build:preflight reports 1/15 available dependencies and no package-lock.json.
+LIVE FPS IMPACT / RASPBERRY PI / TOUCH DEVICE / LONG-RUN HARDWARE VALIDATION: NOT PERFORMED.
+
+Privacy: locally stored aggregate genre/section/camera/formation statistics only, opt-in default off; no song IDs stored in history.
+Score signal: V357 score is heuristic, FPS/P95 are observed metrics. The resulting preference is not a verified causal quality improvement.
+
+Install and verify on a network-connected computer:
+ npm install
+ npm run verify

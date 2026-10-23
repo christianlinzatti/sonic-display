@@ -1,0 +1,15 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const root = path.resolve(__dirname, '..');
+const source = fs.readFileSync(path.join(root, 'components/visualizer/ThreeAvatar.tsx'), 'utf8');
+const loader = fs.readFileSync(path.join(root, 'components/visualizer/AutomaticLODAssetLoader.tsx'), 'utf8');
+const pkg = require('../package.json');
+assert.match(pkg.version, /^0\.1\.0-v(?:249|25[0-9]|324|325|326|327|328|329|330|331|332|333|334|335|336|337|338|339|340|341|342|343|344|345|346|347|348|349|350|351|352)$/);
+assert.match(source,/const concurrency = Math.min\(installed.length, 2\)/);
+assert.match(source,/if \(cancelled\) return;/);
+assert.match(source,/orderedClips\[index\]/);
+assert.match(source,/prefetchedCache\.current\.clear\(\)/);
+assert.match(loader,/controller\.abort\(\)/);
+assert.match(loader,/signal: controller\.signal/);
+console.log('V249 adaptive-memory regression: OK');

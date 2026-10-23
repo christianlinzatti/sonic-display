@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.v439-core.json",
+  "files": [
+    "../components/visualizer/glbMotionScanV439.ts",
+    "../components/visualizer/glbMotionAnalyzerV439.ts",
+    "../components/visualizer/glbMotionCacheV439.ts",
+    "stubs/v439-glb-loader.d.ts"
+  ]
+}

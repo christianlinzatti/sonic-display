@@ -1,0 +1,17 @@
+Sonic Display V361 — Validierungsbericht
+=======================================
+PASS   model library strict TypeScript (tsc --strict --noEmit; isolated config)
+PASS   source syntax: 471 TS/TSX files
+PASS   custom V361 API/search/library/CSRF/preview/release regression
+PASS   full offline regression 104/104 commands (V350–V361 included)
+PASS   ZIP integrity (verified separately after packaging)
+BLOCKED npm production build: package-lock.json absent, node_modules absent; 1/15 dependencies available
+NOT RUN Spotify live OAuth and mutation roundtrip with user's account
+NOT RUN Raspberry Pi hardware end-to-end / long-running bench
+
+Request endpoints:
+- GET /api/spotify/music-discovery?mode=genre|search|new|saved|album
+- GET /api/spotify/music-discovery/library?ids=<comma-separated-track-ids>
+- POST /api/spotify/music-discovery/library { trackId, save }
+
+Follow V359/V360 remains unchanged; V361 uses user-library-read/user-library-modify for tracks.

@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": [],
+    "lib": [
+      "ES2022",
+      "DOM"
+    ]
+  },
+  "files": [
+    "../components/visualizer/facialCalibrationV424.ts",
+    "../components/visualizer/facialRigStudioV370.ts",
+    "../components/visualizer/advancedFacialRigV383.ts",
+    "../components/visualizer/facialPerformanceV369.ts",
+    "stubs/v424-three-types.d.ts",
+    "v414-music-types.d.ts"
+  ]
+}

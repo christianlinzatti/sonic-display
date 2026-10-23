@@ -1,0 +1,7 @@
+const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');
+const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+const ui=read('components/MotionInstaller.tsx'),api=read('app/api/avatars/animations/install/route.ts'),settings=read('components/SettingsPanel.tsx');
+const pkg=require('../package.json');
+const checks=[pkg.version==='0.1.0-v248',pkg.scripts['verify:offline'].includes('test:motion-installer'),ui.startsWith('"use client"'),ui.includes('type="file"'),ui.includes('accept=".glb,model/gltf-binary"'),ui.includes('35 * 1024 * 1024'),ui.includes('signature !== "glTF"'),ui.includes('confirmReplace'),ui.includes('blobEnabled'),ui.includes('/api/avatars/animations/import'),ui.includes('/api/avatars/animations/install'),ui.includes('onInstalled()'),ui.includes('Keine Konfigurationsdatei'),api.includes('isAdmin()'),api.includes('sameOrigin(req)'),api.includes('modelId'),api.includes('animationUrl'),api.includes('readAvatarConfig()'),api.includes('...(config[key] ?? {})'),api.includes('writeAvatarConfig(config)'),api.includes('Modell nicht gefunden'),api.includes('defaultAvatarModels'),settings.includes('<MotionInstaller'),read('V187-MOTION-INSTALLER.md').includes('Retargeting')];
+checks.forEach((x,i)=>assert.ok(x,'V187 motion installer check '+(i+1)));
+console.log('V187 Motion Installer: '+checks.length+' Prüfungen bestanden');

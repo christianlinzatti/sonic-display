@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": [],
+    "lib": ["ES2022", "DOM"],
+    "jsx": "preserve"
+  },
+  "files": [
+    "../components/visualizer/rapCameraKeyframesV432.ts",
+    "../components/visualizer/rapCameraTimelineV431.ts",
+    "../components/visualizer/rapCameraShotStudioV430.ts",
+    "../components/visualizer/cinematicRapCameraV429.ts",
+    "../components/visualizer/expressiveRapDirectorV425.ts",
+    "v414-music-types.d.ts"
+  ]
+}

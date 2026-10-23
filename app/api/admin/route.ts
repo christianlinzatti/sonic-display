@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminCookie, isAdmin, passwordConfigured, passwordMatches, sameOrigin, sessionToken } from "@/lib/avatarAdmin";
 export const runtime="nodejs";
-export async function GET() { return NextResponse.json({ authenticated: await isAdmin(), configured: passwordConfigured() }, { headers:{"Cache-Control":"no-store"} }); }
+export async function GET() { return NextResponse.json({ authenticated: await isAdmin(), configured: passwordConfigured(), blobEnabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN) }, { headers:{"Cache-Control":"no-store"} }); }
 export async function POST(req: NextRequest) { if (!sameOrigin(req)) return NextResponse.json({error:"Origin mismatch"},{status:403}); if (!passwordConfigured()) return NextResponse.json({error:"SONIC_ADMIN_PASSWORD (min. 12 Zeichen) und SONIC_ADMIN_SESSION_SECRET (min. 32 Zeichen) konfigurieren."},{status:503}); const body=await req.json().catch(()=>null); if (!body || typeof body.password!=="string" || !passwordMatches(body.password)) return NextResponse.json({error:"Ungültiges Passwort"},{status:401}); const res=NextResponse.json({authenticated:true}); res.cookies.set(adminCookie,sessionToken(),{httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"strict",path:"/",maxAge:43200}); return res; }
 export async function DELETE(req:NextRequest) { if (!sameOrigin(req)) return NextResponse.json({error:"Origin mismatch"},{status:403}); const res=NextResponse.json({authenticated:false});res.cookies.delete(adminCookie);return res; }

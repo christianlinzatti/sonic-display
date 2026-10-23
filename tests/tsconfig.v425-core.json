@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": [],
+    "lib": [
+      "ES2022",
+      "DOM"
+    ]
+  },
+  "files": [
+    "../components/visualizer/expressiveRapDirectorV425.ts",
+    "../components/visualizer/rapDuetStudioV416.ts",
+    "v414-music-types.d.ts"
+  ]
+}

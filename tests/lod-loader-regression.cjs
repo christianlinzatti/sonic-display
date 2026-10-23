@@ -1,0 +1,12 @@
+const fs=require('fs'),assert=require('assert'),ts=require('typescript'),vm=require('vm');
+const code=fs.readFileSync('components/visualizer/lodAssetManifest.ts','utf8');
+const js=ts.transpileModule(code,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
+const moduleExports={};vm.runInNewContext(js,{exports:moduleExports,URL});
+const {normalizeManifest,pickManifestVariant,variantUrl}=moduleExports;
+const m=normalizeManifest({schemaVersion:1,source:'a.glb',variants:[{name:'LOD0',file:'a_LOD0.glb'},{name:'LOD1',file:'a_LOD1.glb'},{name:'LOD2',file:'a_LOD2.glb'}]});
+assert(m);assert.equal(pickManifestVariant(m,'low').name,'LOD2');assert.equal(pickManifestVariant(m,'balanced').name,'LOD1');assert.equal(pickManifestVariant(m,'high').name,'LOD0');
+assert.equal(variantUrl('https://example.org/avatar/lod-manifest.json','a_LOD0.glb'),'https://example.org/avatar/a_LOD0.glb');
+assert.equal(normalizeManifest({schemaVersion:1,variants:[{name:'LOD0',file:'../evil.glb'}]}),null);
+assert.equal(normalizeManifest({schemaVersion:1,variants:[{name:'LOD0',file:'https://evil.org/a.glb'}]}),null);
+assert.equal(pickManifestVariant({...m,variants:m.variants.slice(0,1)},'low').name,'LOD0');
+console.log('V126 LOD loader: 7 checks passed');

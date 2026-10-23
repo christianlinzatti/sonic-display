@@ -1,0 +1,16 @@
+Sonic Display V353 – Build and Regression Validation
+Source: full Sonic Display V352 ZIP; 0.1.0-v353
+
+SUCCESS: node tests/check-source-syntax.cjs – 451 TS/TSX source files parsed
+SUCCESS: node tests/v353-visual-effects-studio-regression.cjs
+SUCCESS: node scripts/run-offline-regression-v352.cjs – 96/96 commands passed
+SUCCESS: V350 / V351 / V352 existing tests passed within the offline suite
+BLOCKED: npm run build:preflight (1/15 package manifests locally available; package-lock.json absent)
+NOT RUN: tsc --noEmit / next build – cannot claim semantic TypeScript or production build success
+
+Run on a network-connected machine:
+  npm install
+  npm run test:v353
+  npm run verify
+
+Caveat: Offline regressions and syntax parsing do NOT guarantee runtime performance, GPU driver compatibility, all CSS rendering, or a successful Next.js production build.

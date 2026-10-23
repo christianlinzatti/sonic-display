@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict');
+const {load}=require('./helpers/ts-loader-v404.cjs');
+const {resolveExpressiveRapCueV425,applyExpressiveRapV425}=load('components/visualizer/expressiveRapDirectorV425.ts');
+const lyrics={synced:true,lines:[{startMs:1000,endMs:2400,text:'Hier ist die Hook',words:[]}]};
+const assignments=[{fromLine:0,toLine:0,style:'hook',leadSlot:0,partnerSlot:1,strength:90}];
+const opts={enabled:true,playing:true,reducedMotion:false,lyrics,progressMs:1700,trackId:'a',assignmentTrackId:'a',assignments,avatarCount:2,strength:90};
+const cue=resolveExpressiveRapCueV425(opts);
+assert.equal(cue.active,true);assert.equal(cue.scene,'hook');assert.ok(cue.faceStrength>0);assert.ok(cue.gestureStrength>0);
+assert.equal(resolveExpressiveRapCueV425({...opts,trackId:'b'}).active,false);
+assert.equal(resolveExpressiveRapCueV425({...opts,reducedMotion:true}).active,false);
+assert.equal(resolveExpressiveRapCueV425({...opts,manualPriority:true}).active,false);
+assert.equal(resolveExpressiveRapCueV425({...opts,progressMs:6000}).active,false);
+assert.equal(resolveExpressiveRapCueV425({...opts,enabled:false}).active,false);
+assert.equal(applyExpressiveRapV425(50,cue,'face')>50,true);
+assert.equal(applyExpressiveRapV425(50,resolveExpressiveRapCueV425({...opts,enabled:false}),'face'),50);
+console.log('PASS V425 expressive rap');

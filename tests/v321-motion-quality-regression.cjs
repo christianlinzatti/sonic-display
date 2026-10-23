@@ -1,0 +1,47 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const ts=require('./typescript-loader.cjs');
+const root=path.join(__dirname,'..');const read=f=>fs.readFileSync(path.join(root,f),'utf8');
+function load(file){const code=ts.transpileModule(read(file),{fileName:file,compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;const m={exports:{}};
+ new Function('module','exports','require',code)(m,m.exports,()=>{throw Error('unexpected runtime import')});return m.exports;}
+const v=load('components/visualizer/advancedMotionQualityV321.ts');
+const quat=(name,poses,times)=>({name,times,values:poses.flat(),getValueSize(){return 4;}});
+const foot=(name)=>({name,times:[0,.04,.08],values:[0,.02,0,.12,.02,0,.25,.02,0],getValueSize(){return 3;}});
+const testClip=(tracks)=>({name:'Dance',duration:.08,tracks,clone(){return testClip(this.tracks.map(t=>({name:t.name,times:[...t.times],values:[...t.values],getValueSize:t.getValueSize})));}});
+const neutral=[0,0,0,1],spike=[0,0,1,0];
+const original=testClip([quat('mixamorigSpine.quaternion',[neutral,spike,neutral],[0,.04,.08]),foot('mixamorigLeftFoot.position')]);
+const originalJson=JSON.stringify(original.tracks.map(t=>t.values));
+const events=v.inspectMotionQualityV321(original);const rotation=events.find(x=>x.kind==='isolated-rotation');
+assert.ok(rotation,'one-frame quaternion spike detected');assert.ok(rotation.autoFixable);assert.equal(rotation.atSeconds,.04);
+assert.ok(events.some(x=>x.kind==='possible-foot-slide'),'foot motion is flagged as heuristic');
+assert.equal(v.polishMotionClipV321(original,v.DEFAULT_MOTION_QUALITY_V321),original,'off by default');
+const repaired=v.polishMotionClipV321(original,{enabled:true,strength:100,protectAuthored:true});
+assert.notEqual(repaired,original);assert.deepEqual(repaired.tracks[0].values.slice(4,8),neutral,'remove isolated quaternion outlier');
+assert.deepEqual(repaired.tracks[1].values,original.tracks[1].values,'foot translations not modified');
+assert.deepEqual(repaired.tracks[0].times,original.tracks[0].times,'keyframe timestamps preserved');
+assert.equal(JSON.stringify(original.tracks.map(t=>t.values)),originalJson,'source tracks unchanged');
+assert.equal(v.inspectMotionQualityV321(repaired).filter(x=>x.kind==='isolated-rotation').length,0);
+const normal=testClip([quat('Spine.quaternion',[neutral,[0,0,.1,Math.sqrt(.99)],[0,0,.2,Math.sqrt(.96)]],[0,.04,.08])]);
+const normalCopy=v.polishMotionClipV321(normal,{enabled:true,strength:100,protectAuthored:false});
+assert.deepEqual(normalCopy.tracks[0].values,normal.tracks[0].values,'normal motion preserved');
+const authored=testClip([quat('Hip.quaternion',[neutral,spike,spike],[0,.04,.08])]);
+assert.equal(v.inspectMotionQualityV321(authored).some(x=>x.autoFixable),false,'intentional persistent pose change is not smoothed');
+const bad=testClip([{name:'Arm.quaternion',times:[0,0,.2],values:[...neutral,...spike,...neutral],getValueSize(){return 4;}}]);
+assert.ok(v.inspectMotionQualityV321(bad).some(x=>x.kind==='invalid-time'));
+const transition=v.transitionQualityV321(testClip([quat('X.quaternion',[neutral,neutral],[0,.1])]),testClip([quat('X.quaternion',[spike,spike],[0,.1])]));
+assert.equal(transition.matchedJoints,1);assert.ok(transition.angleRad>3);assert.ok(transition.recommendFadeSeconds<=.85);
+assert.equal(v.transitionQualityV321(original,testClip([])).matchedJoints,0,'missing channels safely handled');
+assert.deepEqual(v.normalizeMotionQualityV321({strength:Infinity,enabled:'true',protectAuthored:4}),v.DEFAULT_MOTION_QUALITY_V321);
+const seen=[];global.Event=class{constructor(type){this.type=type}};const store=new Map();global.window={localStorage:{getItem:k=>store.get(k)??null,setItem:(k,val)=>store.set(k,val)},dispatchEvent:e=>seen.push(e.type)};
+v.writeMotionQualityV321({enabled:true,strength:84,protectAuthored:false});assert.equal(v.readMotionQualityV321().strength,84);assert.deepEqual(seen,[v.MOTION_QUALITY_EVENT_V321]);
+store.set(v.MOTION_QUALITY_KEY_V321,'bad json');assert.equal(v.refreshMotionQualityV321().enabled,false);delete global.window;delete global.Event;
+const avatar=read('components/visualizer/ThreeAvatar.tsx');
+assert.ok(avatar.includes('polishMotionClipV321(clip,quality)'));assert.ok(avatar.includes('quality.protectAuthored'));
+const dashboard=read('components/visualizer/MotionQualityOptimizerDashboard.tsx');
+for(const marker of ['MotionQualityPreviewV321','Original und Glättung in 3D vergleichen','writeMotionQualityV321','transitionQualityV321','possible-foot-slide']){
+ if(marker==='possible-foot-slide')continue;assert.ok(dashboard.includes(marker),marker);}
+const preview=read('components/visualizer/MotionQualityPreviewV321.tsx');
+for(const marker of ['Canvas','AnimationMixer','retargetHumanoidClips','cloneSkinnedScene','Original · unverändert','Vorschlag · geglättete Kopie'])assert.ok(preview.includes(marker));
+assert.ok(read('components/CharacterMotionLibraryPanel.tsx').includes('modelUrl={model.url ?? undefined}'));
+const pack=require('../package.json');assert.ok(['0.1.0-v321','0.1.0-v322','0.1.0-v324','0.1.0-v325','0.1.0-v326','0.1.0-v329','0.1.0-v330','0.1.0-v331','0.1.0-v332','0.1.0-v333','0.1.0-v334','0.1.0-v335','0.1.0-v336','0.1.0-v337','0.1.0-v338','0.1.0-v339','0.1.0-v340','0.1.0-v341','0.1.0-v342','0.1.0-v343','0.1.0-v346','0.1.0-v347','0.1.0-v349','0.1.0-v350','0.1.0-v351','0.1.0-v352','0.1.0-v353','0.1.0-v354','0.1.0-v355','0.1.0-v356','0.1.0-v357','0.1.0-v358','0.1.0-v359','0.1.0-v360','0.1.0-v361','0.1.0-v362','0.1.0-v363','0.1.0-v364','0.1.0-v365','0.1.0-v366','0.1.0-v367','0.1.0-v368','0.1.0-v369','0.1.0-v370','0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387','0.1.0-v389','0.1.0-v390','0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416','0.1.0-v417','0.1.0-v418','0.1.0-v419','0.1.0-v420','0.1.0-v422','0.1.0-v424','0.1.0-v425','0.1.0-v426'].includes(pack.version));assert.ok(pack.scripts['verify:offline'].includes('test:v321'));
+console.log('PASS V321: isolated quaternion repair, 3D comparison wiring, timestamps, foot-safety diagnostics, opt-in and source immutability');

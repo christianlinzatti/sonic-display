@@ -1,0 +1,14 @@
+const fs=require("fs"), assert=require("assert");
+const read=p=>fs.readFileSync(p,"utf8");
+const store=read("components/visualizer/qualityDecisionHistoryV255.ts");
+const control=read("components/visualizer/adaptivePerformance.tsx");
+const panel=read("components/visualizer/RenderDiagnosticsPanel.tsx");
+assert.match(store,/MAX_ENTRIES = 24/);
+assert.match(store,/slice\(0, MAX_ENTRIES\)/);
+assert.match(store,/entry.from === entry.to/);
+assert.match(control,/recordQualityDecision\(\{/);
+assert.match(control,/if \(tier.current !== oldTier\)/);
+assert.match(panel,/subscribeQualityDecisionHistory/);
+assert.match(panel,/clearQualityDecisionHistory/);
+assert.match(panel,/V255 – Verlauf der Rendering-Entscheidungen/);
+console.log("V255 quality history regression passed");

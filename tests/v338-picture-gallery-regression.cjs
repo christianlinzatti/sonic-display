@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict'),fs=require('fs');
+const r=f=>fs.readFileSync(f,'utf8');
+const core=r('services/stageContent/stageContentV330.ts');
+assert.match(core,/posterUrls/);assert.match(core,/images:unique/);assert.match(core,/safeStageMediaV330/);
+const gallery=r('components/visualizer/StageImageGalleryV338.tsx');
+assert.match(gallery,/clearInterval/);assert.match(gallery,/reducedMotion/);assert.match(gallery,/onError/);
+assert.match(r('components/visualizer/ConcertDisplayV337.tsx'),/StageImageGalleryV338/);
+assert.match(r('components/visualizer/StageContentScreenV330.tsx'),/StageImageGalleryV338/);
+assert.match(r('app/api/stage-content/artist/route.ts'),/images/);
+assert.match(r('services/stageContent/concertProvidersV336.ts'),/selectOeticketImagesV338/);
+assert.match(r('services/stageContent/artistProvidersV335.ts'),/selectConcertImagesV338/);
+assert.match(r('components/visualizer/StageContentPluginSettingsV330.tsx'),/GallerySettingsV338/);
+assert.match(r('app/globals.css'),/sonic-gallery-collage-v338/);
+console.log('V338 multi-image gallery regression passed');

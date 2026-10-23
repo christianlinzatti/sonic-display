@@ -1,0 +1,11 @@
+const fs=require('fs'),assert=require('node:assert/strict');
+const r=(s)=>fs.readFileSync(s,'utf8');
+const root='services/stageContent/';
+const core=r(root+'concertDisplayV337.ts'),normal=r(root+'stageContentV330.ts'),prov=r(root+'concertProvidersV336.ts'),artist=r(root+'artistProvidersV335.ts');
+assert.match(core,/safePosterV337/);assert.match(core,/https:/);assert.match(core,/selectTicketmasterPosterV337/);assert.match(core,/selectOeticketPosterV337/);assert.match(core,/displayTicketStatusV337/);
+assert.match(normal,/posterUrl:safeStageMediaV330/);assert.match(normal,/status:limited/);
+assert.match(prov,/posterUrl:selectOeticketPosterV337/);assert.match(prov,/if\(!match.posterUrl/);assert.match(artist,/selectTicketmasterPosterV337/);
+assert.match(r('components/visualizer/StageContentScreenV330.tsx'),/ConcertDisplayV337/);
+assert.match(r('components/visualizer/StageContentPluginSettingsV330.tsx'),/ConcertDisplaySettingsV337/);
+assert.match(r('app/globals.css'),/sonic-concert-feature-v337/);
+console.log('V337 concert display wiring regression passed');

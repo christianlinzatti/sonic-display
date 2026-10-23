@@ -1,0 +1,44 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {suggestFacialChannelV370,scanFacialRigV370,bindingsForFacialProfileV370,facialGainV370,sampleFacialDemoV370} from '../components/visualizer/facialRigStudioV370.ts';
+const cases={jawOpen:'jaw',mouthFunnel:'round',mouthPucker:'round',viseme_ee:'wide',
+  'vrc.v_aa':'jaw','vrc.v_pp':'lipsClosed',mouthClose:'lipsClosed',eyeBlinkLeft:'blink',
+  mouthSmileRight:'smile',browInnerUp:'brow',cheekSquintLeft:'cheek',eyeSquintRight:'squint',
+  'Fcl_MTH_A':'jaw','Fcl_MTH_O':'round','Fcl_MTH_I':'wide'};
+for(const [name,channel] of Object.entries(cases))assert.equal(suggestFacialChannelV370(name).channel,channel,`detection: ${name}`);
+assert.equal(suggestFacialChannelV370('HairPhysics').channel,null);
+const morphTargetDictionary={jawOpen:0,mouthFunnel:1,eyeBlinkLeft:2,eyeBlinkRight:3,hairWind:4};
+const a={name:'Face',morphTargetDictionary,morphTargetInfluences:[0,0,0,0,0]};
+const b={name:'Face',morphTargetDictionary:{mouthClose:0},morphTargetInfluences:[0]};
+const jaw={name:'Mandible'};
+const model={traverse(visitor){for(const o of [a,b,jaw])visitor(o);}};
+const scan=scanFacialRigV370(model);
+assert.equal(scan.targets.length,6);
+assert.notEqual(scan.targets[0].id,scan.targets[5].id,'morph ids must be unique even with repeated mesh names');
+assert.equal(scan.targets[0].id,'Face#0::jawOpen');
+assert.equal(scan.targets[5].id,'Face#1::mouthClose');
+assert.equal(scan.jawBone,jaw);
+assert.equal(bindingsForFacialProfileV370(scan).filter(t=>t.channel==='blink').length,2,'left/right automatic');
+const handMapped=bindingsForFacialProfileV370(scan,{mapping:{jaw:'none',round:scan.targets[4].id,blink:scan.targets[2].id}});
+assert.equal(handMapped.filter(t=>t.channel==='jaw').length,0,'disabled channel');
+assert.equal(handMapped.filter(t=>t.channel==='blink').length,1,'manual mapping overrides auto duo');
+assert.equal(handMapped.find(t=>t.channel==='round')?.name,'hairWind','user can calibrate unconventional names');
+assert.equal(bindingsForFacialProfileV370(scan,{mapping:{round:scan.targets[0].id}}).find(t=>t.id===scan.targets[0].id)?.channel,'round','explicit remapping must win over an automatic suggestion');
+assert.equal(facialGainV370({gains:{jaw:1.5}},'jaw'),1.5);
+assert.equal(facialGainV370({gains:{jaw:8}},'jaw'),2);
+assert.equal(facialGainV370({gains:{jaw:-1}},'jaw'),0);
+assert.equal(facialGainV370({},'jaw'),1);
+assert.ok(sampleFacialDemoV370(.1,'rap').jaw>0);
+assert.ok(sampleFacialDemoV370(.1,'singing').jaw>0);
+assert.deepEqual(sampleFacialDemoV370(NaN,'rap'),{});
+assert.deepEqual(scanFacialRigV370({traverse(){}}).warnings.includes('Dieses Modell enthält keine Morph-Targets.'),true);
+const read=f=>readFileSync(f,'utf8');
+assert.match(read('components/visualizer/VocalRigV368.tsx'),/bindingsForFacialProfileV370/);
+assert.match(read('components/visualizer/ThreeAvatar.tsx'),/profileV370=\{propsLipSyncV367\?\.profilesV370/);
+assert.match(read('components/visualizer/VisualizerStage.tsx'),/profilesV370:preferences\.avatarFacialProfilesV370/);
+assert.match(read('components/visualizer/FacialAnimationStudioV370.tsx'),/cloneSkinnedScene/);
+assert.match(read('components/visualizer/FacialAnimationStudioV370.tsx'),/PreviewGltfV370/);
+assert.match(read('components/SettingsPanel.tsx'),/FacialAnimationStudioV370/);
+assert.match(read('context/UiPreferencesContext.tsx'),/avatarFacialProfilesV370/);
+assert.ok(['0.1.0-v370','0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387','0.1.0-v390','0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416','0.1.0-v424','0.1.0-v425','0.1.0-v426'].includes(JSON.parse(read('package.json')).version));
+console.log('PASS V370: ARKit/Oculus/VRM detection, stable mesh keys, manual mappings, overrides, gain clamps, preview and runtime integration');

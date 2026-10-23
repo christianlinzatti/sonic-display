@@ -1,0 +1,28 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const read=p=>fs.readFileSync(path.join(root,p),"utf8");
+const engine=read("components/visualizer/musicStructureTimeline.ts");
+const ui=read("components/visualizer/MusicStructureTimelineDirector.tsx");
+const stage=read("components/visualizer/ThreeAvatar.tsx");
+const panel=read("components/CharacterMotionLibraryPanel.tsx");
+let n=0;function check(name,cond){assert.ok(cond,name);n++;}
+check("typed observations",engine.includes("TimelineObservation"));
+check("bounded history",engine.includes("slice(-Math.max(1"));
+check("reject out of order",engine.includes("o.at<prev.until"));
+check("phase compaction",engine.includes("prev.phase===o.phase"));
+check("normalize evidence",engine.includes("normalizeTimelineEvidence"));
+check("drop explanation",engine.includes("Drop-Indiz"));
+check("build explanation",engine.includes("Build-up-Indiz"));
+check("break explanation",engine.includes("Ruhiger Abschnitt"));
+check("custom event",engine.includes("CustomEvent<TimelineObservation>"));
+check("opt-in",ui.includes("checked={enabled}"));
+check("avatar filtering",ui.includes("obs.avatarId===avatarId"));
+check("cleanup",ui.includes("removeEventListener"));
+check("reset",ui.includes("setSegments([])"));
+check("visible diagnostics",ui.includes("Entscheidungsgrund"));
+check("history",ui.includes("displayed.slice().reverse()"));
+check("hooked into settings",panel.includes("<MusicStructureTimelineDirector avatarId={avatar}"));
+check("published by live avatar",stage.includes("publishTimelineObservation({at,avatarId"));
+check("rate limited",stage.includes("at-lastTimelineSample.current>=0.25"));
+check("no fake track analysis",ui.includes("keine von Spotify gelieferten"));
+console.log(`${n} V195 music structure timeline checks passed`);

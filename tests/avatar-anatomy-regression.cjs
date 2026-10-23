@@ -1,0 +1,17 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const dir=path.resolve(__dirname,'..');
+const anatomy=fs.readFileSync(path.join(dir,'components/visualizer/avatarAnatomyCalibration.ts'),'utf8');
+const ui=fs.readFileSync(path.join(dir,'components/visualizer/AvatarAnatomyStudio.tsx'),'utf8');
+const settings=fs.readFileSync(path.join(dir,'components/SettingsPanel.tsx'),'utf8');
+const pkg=require('../package.json');
+for (const field of ['height','shoulderWidth','leftArmLength','rightArmLength','leftLegLength','rightLegLength','torsoLength','warnings','landmarks']) assert.match(anatomy,new RegExp(field));
+assert.match(anatomy,/updateWorldMatrix\(true, true\)/);
+assert.match(anatomy,/return null/);
+assert.match(ui,/GLTFLoader/);
+assert.match(ui,/cancelled = true/);
+assert.match(ui,/JSON\.stringify/);
+assert.match(settings,/<AvatarAnatomyStudio modelUrl=\{currentAvatar\.url\}/);
+assert.match(pkg.version,/^0\.1\.0-v\d+$/);
+console.log('V151 anatomy diagnostics: 17 structural checks passed');

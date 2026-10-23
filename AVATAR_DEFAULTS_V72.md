@@ -1,0 +1,1 @@
+V72: Standard-Avatare (procedural, custom, neon, festival) lassen sich über den Admin-Editor ändern. Overrides werden unter default:<id> in der Avatar-Konfiguration gespeichert (lokal JSON / Vercel Blob). GLB-Modelle zuerst hochladen, anschließend bei Custom/Neon/Festival im Editor zuweisen. Procedural bleibt ein eingebauter Fallback.

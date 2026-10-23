@@ -1,0 +1,17 @@
+const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
+const read=p=>fs.readFileSync(path.join(__dirname,"..",p),"utf8");
+const service=read("components/visualizer/performanceBenchmarkMetrics.ts");
+const ui=read("components/visualizer/AdaptiveMotionQualityDashboard.tsx");
+assert.match(service,/BENCHMARK_MIN_SAMPLES = 5/);
+assert.match(service,/BENCHMARK_MAX_RUNS = 8/);
+assert.match(service,/s\.time >= startedAt && s\.time <= endedAt/);
+assert.match(service,/if \(window\.length < BENCHMARK_MIN_SAMPLES\) return null/);
+assert.match(service,/summarizePerformance\(window\)/);
+assert.match(service,/\.slice\(-BENCHMARK_MAX_RUNS\)/);
+assert.match(service,/fps: b\.avgFps - a\.avgFps/);
+assert.match(ui,/Messlauf starten/);
+assert.match(ui,/Messlauf abschließen/);
+assert.match(ui,/Messung läuft/);
+assert.match(ui,/benchmarkDelta\(baseline,latest\)/);
+assert.match(ui,/Messläufe verwenden ausschließlich/);
+console.log("V223 benchmark static regression checks passed (12 assertions).");

@@ -1,0 +1,15 @@
+const fs=require('fs'),assert=require('assert'),p=require('path');
+const root=p.join(__dirname,'..');
+const logic=fs.readFileSync(p.join(root,'components/visualizer/adaptiveAvatarWorkloadV252.ts'),'utf8');
+const scene=fs.readFileSync(p.join(root,'components/visualizer/ThreeAvatar.tsx'),'utf8');
+const profiler=fs.readFileSync(p.join(root,'components/visualizer/avatarFrameProfiler.ts'),'utf8');
+assert(logic.includes('chooseAvatarWorkloadTier'));
+assert(logic.includes('stabilizeAvatarWorkload'));
+assert(logic.includes('active.length < 2'));
+assert(logic.includes('own.meanMs < 2.5'));
+assert(scene.includes('chooseAvatarWorkloadTier(baseAnimationTier, schedulerInstance'));
+assert(scene.includes('shouldUpdateAnimation(animationCadence.current, state.clock.elapsedTime, animationTier)'));
+assert(scene.includes('advanceBeatFlow(beatFlow.current, audio, delta'));
+assert(scene.includes('updateFootIK(footIK.current, avatarRoot'));
+assert(profiler.includes('getAvatarFrameStats'));
+console.log('V252 regression passed');

@@ -1,0 +1,27 @@
+Sonic Display V352 — Genre Visual Director
+Source: supplied sonic-display-v351-smart-stage-composition.zip
+Release: 0.1.0-v352
+
+Checks completed in this environment:
+  PASS - npm run test:v350
+  PASS - npm run test:v351
+  PASS - npm run test:v352
+  PASS - scripts/run-offline-regression-v352.cjs: 95/95 independent offline commands
+  PASS - node tests/check-source-syntax.cjs: 448 TS/TSX source files
+  PASS - ZIP integrity verified after creation
+
+Production build limitations:
+  NOT RUN / BLOCKED - npm run typecheck, npm run build
+  Source archive contains no node_modules or package-lock.json. Only 1 of 15
+  direct package manifests resolves. npm registry access is not available
+  from this runtime. Semantic type safety and full Next.js production build
+  must be checked on a machine that can install dependencies.
+
+Suggested verification on user machine:
+  npm install
+  npm run test:v352
+  npm run verify
+
+V351 prioritization retained. V352 only augments the same R3F stage; manual
+camera/keyframe edits and intentionally chosen stage presets remain higher
+priority. Unknown genres receive neutral behavior.

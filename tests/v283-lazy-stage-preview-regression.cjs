@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const read=p=>fs.readFileSync(p,'utf8');
+const grid=read('components/visualizer/StageThemePreviewGrid.tsx');
+assert.match(grid, /import dynamic from "next\/dynamic"/);
+assert.match(grid, /import\("@\/components\/visualizer\/StageThemeCardScene"\)/);
+assert.match(grid, /import\("@\/components\/visualizer\/StagePreviewModal"\)/);
+assert.match(grid, /ssr: false/);
+assert.match(grid, /hoveredStage \?\? activatedStage/);
+assert.match(grid, /setActivatedStage\(stage\.id\)/);
+assert.match(grid, /modalStage === null && previewStage === stage\.id/);
+assert.doesNotMatch(grid, /import \{ StageThemeCardScene \} from /);
+assert.doesNotMatch(grid, /import \{ StagePreviewModal \} from /);
+console.log('V283 lazy stage preview PASS');

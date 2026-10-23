@@ -1,0 +1,18 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const ts = require('./typescript-loader.cjs');
+require.extensions['.ts'] = (mod, name) => {const out = ts.transpileModule(fs.readFileSync(name, 'utf8'), {compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}});mod._compile(out.outputText,name);};
+const {createPhraseMotionVariation, targetPhraseMotionVariation, updatePhraseMotionVariation} = require('../components/visualizer/phraseMotionVariationV241.ts');
+let total=0; const test=(label,fn)=>{fn();total++;console.log('PASS '+label);};
+const audio = {bpm:140,energyEnvelope:.8};
+test('neutral start',()=>assert.ok(Object.values(createPhraseMotionVariation().value).every(x=>x===0)));
+test('deterministic target',()=>assert.deepEqual(targetPhraseMotionVariation(audio,3,'Hardtekk',1,.8,.5),targetPhraseMotionVariation(audio,3,'Hardtekk',1,.8,.5)));
+test('genres differ',()=>assert.notDeepEqual(targetPhraseMotionVariation(audio,3,'Deutschrap',1,1,.5),targetPhraseMotionVariation(audio,3,'Hardstyle',1,1,.5)));
+test('variation off',()=>assert.ok(Object.values(targetPhraseMotionVariation(audio,3,'Rap',1,0,.4)).every(x=>x===0)));
+test('safe limits across invalid inputs',()=>{for(const t of [0,3,100000,Infinity,NaN])for(const genre of ['Rap','Hardtekk',null]){const vals=targetPhraseMotionVariation({...audio,bpm:Infinity,energyEnvelope:NaN},t,genre,NaN,Infinity,NaN);assert.ok(Object.values(vals).every(x=>Number.isFinite(x)&&Math.abs(x)<=.08));}});
+test('paused fades smoothly to neutral',()=>{const s=createPhraseMotionVariation();for(let n=0;n<80;n++)updatePhraseMotionVariation(s,audio,3,1/60,true,false,'Rap',1,1,.3);for(let n=0;n<160;n++)updatePhraseMotionVariation(s,audio,3,1/60,false,false,'Rap',1,1,.3);assert.ok(Object.values(s.value).every(x=>Math.abs(x)<1e-6));});
+test('reduced motion stays neutral',()=>{const s=createPhraseMotionVariation();updatePhraseMotionVariation(s,audio,3,1/60,true,true,'Rap',1,1,.3);assert.ok(Object.values(s.value).every(x=>x===0));});
+test('bar boundaries approach zero',()=>assert.ok(Object.values(targetPhraseMotionVariation(audio,0,'Rap',1,1,.3)).every(x=>x===0)));
+test('actual live integration',()=>{const source=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');for(const key of ['varied.torso','varied.shoulder','varied.hip','varied.arm','varied.head','updatePhraseMotionVariation'])assert.ok(source.includes(key));});
+test('does not manipulate root or foot IK',()=>{const source=fs.readFileSync('components/visualizer/phraseMotionVariationV241.ts','utf8');assert.ok(!source.includes('root.position')&&!source.includes('footIK.current'));});
+console.log(total+' V241 regression checks passed');

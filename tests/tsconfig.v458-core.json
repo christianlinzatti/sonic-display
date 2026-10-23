@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v452-core.json",
+  "files": [
+    "../components/visualizer/advancedMultiAvatarPerformanceV452.ts",
+    "../components/visualizer/naturalStageInteractionV458.ts",
+    "../components/visualizer/partnerGestureEngine.ts",
+    "../components/visualizer/partnerLookAtEngine.ts",
+    "v414-music-types.d.ts"
+  ]
+}

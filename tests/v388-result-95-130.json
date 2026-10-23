@@ -1,0 +1,247 @@
+[
+  {
+    "i": 95,
+    "name": "test:v353",
+    "ok": false,
+    "last": "2','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(require('../package.json').version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v353-visual-effects-studio-regression.cjs:77:1)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.28
+  },
+  {
+    "i": 96,
+    "name": "test:v354",
+    "ok": false,
+    "last": "-v370','0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v354-show-timeline-regression.cjs:71:38)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.27
+  },
+  {
+    "i": 97,
+    "name": "test:v355",
+    "ok": false,
+    "last": "0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v355-performance-stability-regression.cjs:74:38)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.29
+  },
+  {
+    "i": 98,
+    "name": "test:v356",
+    "ok": false,
+    "last": "370','0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v356-autonomous-show-regression.cjs:74:38)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.35
+  },
+  {
+    "i": 99,
+    "name": "test:v357",
+    "ok": false,
+    "last": "0-v370','0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v357-show-quality-regression.cjs:79:38)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.32
+  },
+  {
+    "i": 100,
+    "name": "test:v358",
+    "ok": false,
+    "last": ".1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v358-adaptive-show-learning-regression.cjs:87:38)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.34
+  },
+  {
+    "i": 101,
+    "name": "test:v359",
+    "ok": false,
+    "last": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(['0.1.0-v359','0.1.0-v360','0.1.0-v361','0.1.0-v362','0.1.0-v363','0.1.0-v364','0.1.0-v365','0.1.0-v366','0.1.0-v367','0.1.0-v368','0.1.0-v369','0.1.0-v370','0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(require('../package.json').version))\n\n    at /mnt/data/sonic-v388-work/tests/v359-spotify-artist-follow-regression.cjs:95:3 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n",
+    "seconds": 0.28
+  },
+  {
+    "i": 102,
+    "name": "test:v360",
+    "ok": false,
+    "last": "','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(require('../package.json').version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v360-smart-artist-discovery-regression.cjs:51:8)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.36
+  },
+  {
+    "i": 103,
+    "name": "test:v361",
+    "ok": false,
+    "last": "0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v361-smart-music-discovery-regression.cjs:42:38)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.38
+  },
+  {
+    "i": 104,
+    "name": "test:v362",
+    "ok": false,
+    "last": "','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(require('../package.json').version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v362-personal-release-radar-regression.cjs:35:1)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.32
+  },
+  {
+    "i": 105,
+    "name": "test:v363",
+    "ok": false,
+    "last": "1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(require('../package.json').version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v363-smart-release-notifications-regression.cjs:56:1)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.34
+  },
+  {
+    "i": 106,
+    "name": "test:v365",
+    "ok": false,
+    "last": "0.1.0-v370','0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v365-web-push-regression.cjs:62:45)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.33
+  },
+  {
+    "i": 107,
+    "name": "test:v366",
+    "ok": false,
+    "last": "'0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v366-spotify-color-lyrics-regression.cjs:39:45)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.3
+  },
+  {
+    "i": 108,
+    "name": "test:v367",
+    "ok": true,
+    "last": "V367 vocal & karaoke checks passed\n(node:274904) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:274904) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///mnt/data/sonic-v388-work/components/visualizer/vocalLipSyncV367.ts is not specified and it doesn't parse as CommonJS.\nReparsing as ES module because module syntax was detected. This incurs a performance overhead.\nTo eliminate this warning, add \"type\": \"module\" to /mnt/data/sonic-v388-work/package.json.\n",
+    "seconds": 0.11
+  },
+  {
+    "i": 109,
+    "name": "test:v368",
+    "ok": true,
+    "last": "PASS V368 performance engine, rest states, multi-avatar integration and karaoke\n(node:274917) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:274917) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///mnt/data/sonic-v388-work/components/visualizer/vocalPerformanceV368.ts is not specified and it doesn't parse as CommonJS.\nReparsing as ES module because module syntax was detected. This incurs a performance overhead.\nTo eliminate this warning, add \"type\": \"module\" to /mnt/data/sonic-v388-work/package.json.\n",
+    "seconds": 0.12
+  },
+  {
+    "i": 110,
+    "name": "test:v369",
+    "ok": false,
+    "last": "ests/smart-choreography-evolution-regression.cjs\",\\n' +\n    '    \"test:beat-perfect\": \"node tests/beat-perfect-sequencer-regression.cjs\",\\n' +\n    '    \"test:ai-choreographer\": \"node tests/ai-dance-choreographer-regression.cjs\",\\n' +\n    '    \"test:dance-variation\": \"node tests/dance-variation-regression.cjs\",\\n' +\n    '    \"test:timeline-editor\": \"node tests/visual-choreography-timeline-editor-regression.cjs\",\\n' +\n    '    \"test:motion-style\": \"node tests/motion-style-live-crossfade-regression.cjs\",\\n' +\n    '    \"test:footwork-v204\": \"node tests/advanced-footwork-balance-v204.cjs\",\\n' +\n    '    \"test:expressive-v205\": \"node tests/expressive-dance-v205.cjs\",\\n' +\n    '    \"test:multi-choreo-v206\": \"node tests/multi-choreography-v206-regression.cjs\",\\n' +\n    '    \"test:motion-quality-v207\": \"node tests/motion-qual'... 13494 more characters,\n  expected: /0\\.1\\.0-v(?:369|370|371|372|373|374|375|376|377|378|379|380|381|382|383|384|385|386|387)/,\n  operator: 'match'\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.17
+  },
+  {
+    "i": 111,
+    "name": "test:v370",
+    "ok": false,
+    "last": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(['0.1.0-v370','0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(JSON.parse(read('package.json')).version))\n\n    at file:///mnt/data/sonic-v388-work/tests/v370-facial-studio-regression.mjs:43:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.11
+  },
+  {
+    "i": 112,
+    "name": "test:v371",
+    "ok": false,
+    "last": "','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(JSON.parse(read('package.json')).version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v371-expressive-vocal-regression.cjs:67:8)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.32
+  },
+  {
+    "i": 113,
+    "name": "test:v372",
+    "ok": false,
+    "last": "1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v372-unified-vocal-regression.cjs:81:8)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.42
+  },
+  {
+    "i": 114,
+    "name": "test:v373",
+    "ok": false,
+    "last": "alsy value:\n\n  assert.ok(['0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(json.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v373-vocal-sync-inspector-regression.cjs:80:8)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.54
+  },
+  {
+    "i": 115,
+    "name": "test:v374",
+    "ok": false,
+    "last": "ion evaluated to a falsy value:\n\n  assert.ok(['0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v374-vocal-quality-regression.cjs:86:45)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.5
+  },
+  {
+    "i": 116,
+    "name": "test:v375",
+    "ok": false,
+    "last": "expression evaluated to a falsy value:\n\n  assert.ok(['0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v375-adaptive-performance-regression.cjs:71:8)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.3
+  },
+  {
+    "i": 117,
+    "name": "test:v376",
+    "ok": false,
+    "last": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(['0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at file:///mnt/data/sonic-v388-work/tests/v376-interactive-vocal-duets-regression.mjs:76:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.12
+  },
+  {
+    "i": 118,
+    "name": "test:v377",
+    "ok": false,
+    "last": "t doesn't parse as CommonJS.\nReparsing as ES module because module syntax was detected. This incurs a performance overhead.\nTo eliminate this warning, add \"type\": \"module\" to /mnt/data/sonic-v388-work/package.json.\nnode:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(['0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at file:///mnt/data/sonic-v388-work/tests/v377-cinematic-duet-camera-regression.mjs:65:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.14
+  },
+  {
+    "i": 119,
+    "name": "test:v378",
+    "ok": false,
+    "last": "node:internal/modules/run_main:123\n    triggerUncaughtException(\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(['0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at file:///mnt/data/sonic-v388-work/tests/v378-cinematic-lyrics-composition-regression.mjs:54:8\n    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.11
+  },
+  {
+    "i": 120,
+    "name": "test:v379",
+    "ok": false,
+    "last": "row err;\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(['0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v379-visual-lyrics-studio-regression.cjs:85:8)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.32
+  },
+  {
+    "i": 121,
+    "name": "test:v380",
+    "ok": false,
+    "last": "node:internal/assert/utils:281\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: 3D scene dpr={[.75,1.3]}\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v380-real-3d-lyrics-regression.cjs:44:302)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.27
+  },
+  {
+    "i": 122,
+    "name": "test:v381",
+    "ok": false,
+    "last": "hrow err;\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(['0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(JSON.parse(read('package.json')).version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v381-visual-3d-lyrics-regression.cjs:55:8)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.3
+  },
+  {
+    "i": 123,
+    "name": "test:v382",
+    "ok": false,
+    "last": "node:internal/assert/utils:281\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(['0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v382-kinetic-lyrics-regression.cjs:79:8)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.28
+  },
+  {
+    "i": 124,
+    "name": "test:v383",
+    "ok": false,
+    "last": "node:internal/assert/utils:281\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(['0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v383-advanced-facial-rig-regression.cjs:62:8)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.32
+  },
+  {
+    "i": 125,
+    "name": "test:v384",
+    "ok": false,
+    "last": "node:internal/assert/utils:281\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(['0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387'].includes(pkg.version))\n\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v384-natural-vocal-articulation-regression.cjs:84:8)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.41
+  },
+  {
+    "i": 126,
+    "name": "test:v385",
+    "ok": true,
+    "last": "PASS V385 manual vocal casting, role lip sync, handoff, hook camera and UI wiring\n",
+    "seconds": 0.49
+  },
+  {
+    "i": 127,
+    "name": "test:v386",
+    "ok": false,
+    "last": "ive-choreography-regression.cjs\",\\n' +\n    '    \"test:evolution\": \"node tests/smart-choreography-evolution-regression.cjs\",\\n' +\n    '    \"test:beat-perfect\": \"node tests/beat-perfect-sequencer-regression.cjs\",\\n' +\n    '    \"test:ai-choreographer\": \"node tests/ai-dance-choreographer-regression.cjs\",\\n' +\n    '    \"test:dance-variation\": \"node tests/dance-variation-regression.cjs\",\\n' +\n    '    \"test:timeline-editor\": \"node tests/visual-choreography-timeline-editor-regression.cjs\",\\n' +\n    '    \"test:motion-style\": \"node tests/motion-style-live-crossfade-regression.cjs\",\\n' +\n    '    \"test:footwork-v204\": \"node tests/advanced-footwork-balance-v204.cjs\",\\n' +\n    '    \"test:expressive-v205\": \"node tests/expressive-dance-v205.cjs\",\\n' +\n    '    \"test:multi-choreo-v206\": \"node tests/multi-choreography-v206-regression.cjs\",\\n' +\n    '    \"test:motion-quality-v207\": \"node tests/motion-qual'... 13494 more characters,\n  expected: /0\\.1\\.0-v38[67]/,\n  operator: 'match'\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.33
+  },
+  {
+    "i": 128,
+    "name": "test:v387",
+    "ok": false,
+    "last": "node:internal/assert/utils:281\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: package.json: 0.1.0-v387\n    at Object.<anonymous> (/mnt/data/sonic-v388-work/tests/v387-intelligent-concert-show-regression.cjs:62:81)\n    at Module._compile (node:internal/modules/cjs/loader:1730:14)\n    at Object..js (node:internal/modules/cjs/loader:1895:10)\n    at Module.load (node:internal/modules/cjs/loader:1465:32)\n    at Function._load (node:internal/modules/cjs/loader:1282:12)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '=='\n}\n\nNode.js v22.16.0\n",
+    "seconds": 0.25
+  },
+  {
+    "i": 129,
+    "name": "test:v388",
+    "ok": true,
+    "last": "PASS V388 opt-in policy, DPR caps, hardware/ensemble safety, touch UI, preview visibility, old pipelines\n",
+    "seconds": 0.26
+  }
+]

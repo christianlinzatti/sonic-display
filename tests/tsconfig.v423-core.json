@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"noEmit":true,"skipLibCheck":true,"target":"ES2022","module":"ESNext","moduleResolution":"Bundler","types":[],"lib":["ES2022","DOM"]},"files":["../components/visualizer/rapAudioAwareV423.ts","../components/visualizer/vocalPerformanceQualityV374.ts","v414-music-types.d.ts","stubs/v415-three-types.d.ts"]}

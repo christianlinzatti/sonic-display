@@ -1,0 +1,20 @@
+Sonic Display V355 – Performance & Stability
+Based on the full V354 Show Timeline Editor archive.
+
+PASS: npm run verify:offline (98/98 regression commands)
+PASS: npm run check:syntax (455 TypeScript/TSX files)
+PASS: isolated strict TypeScript semantic check for new pure long-session policy (using an isolated React hook type shim)
+PASS: V355 state-policy regression (hysteresis, cooldown, recovery, hidden/stale frames, memory hints, storage, manual modes, live integration)
+PASS: legacy V350–V354 regression checks
+
+UNVERIFIED: Next.js production build and full-project TypeScript semantic check.
+BLOCKED: npm preflight reports package-lock.json absent; 14/15 dependencies unavailable in this environment.
+Global tsc fails primarily on missing Next/React/Three and associated @types packages and baseline follow-on diagnostics. No claim of a passing production build.
+UNVERIFIED: sustained Raspberry Pi / real 10-inch touch hardware soak test. Browser device inference is heuristic.
+
+Run on a network-connected local development machine:
+  npm install
+  npm run test:v355
+  npm run verify
+
+Features: one 5-s monitor reusing existing render measurements; capped incremental effect scaling; adaptive DPR cap in automatic mode; memory guard only when browser reports heap limit; desktop/display/Raspberry Pi profiles; 20-entry in-memory history; persistent settings; no additional Canvas.

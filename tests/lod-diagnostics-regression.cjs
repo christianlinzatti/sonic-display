@@ -1,0 +1,17 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const base=path.resolve(__dirname,'..');
+const diag=fs.readFileSync(path.join(base,'components/visualizer/lodContinuityDiagnostics.ts'),'utf8');
+const avatar=fs.readFileSync(path.join(base,'components/visualizer/ThreeAvatar.tsx'),'utf8');
+const panel=fs.readFileSync(path.join(base,'components/visualizer/LodContinuityDiagnosticsPanel.tsx'),'utf8');
+const settings=fs.readFileSync(path.join(base,'components/SettingsPanel.tsx'),'utf8');
+for(const name of ['quaternionAngularErrorDeg','compareLodPose','publishLodPoseSample','removeLodPoseSample','useLodContinuityDiagnostics']) assert.match(diag,new RegExp(`export function ${name}\\(`));
+assert.match(diag,/Math\.abs\(a\.clips\[k\]\.time-b\.clips\[k\]\.time\)/);
+assert.match(diag,/sample\.sampledAt-item\.sampledAt>0\.6/);
+assert.match(avatar,/publishLodPoseSample\(/);
+assert.match(avatar,/removeLodPoseSample\(/);
+assert.match(avatar,/now-lastLodDiagnostic\.current < 0\.12/);
+assert.match(panel,/LOD Motion Continuity/);
+assert.match(settings,/<LodContinuityDiagnosticsPanel \/>/);
+console.log('V130 LOD diagnostics structural regression passed');

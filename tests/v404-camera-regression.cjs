@@ -1,0 +1,33 @@
+'use strict';
+const assert=require('node:assert/strict');
+const {load}=require('./helpers/ts-loader-v404.cjs');
+const camera=load('components/visualizer/cameraPerformanceStudioV398');
+const timeline=load('components/visualizer/cinematicCameraTimelineV400');
+const {normalizeCameraStudioV398,previewCameraPoseV398,tuneCameraPoseV398}=camera;
+const defaults=normalizeCameraStudioV398(null);
+assert.equal(defaults.holdMs,1150,'missing settings use safe default');
+for(const input of [NaN,Infinity,-Infinity,undefined,'1100',null]) {
+  assert.equal(normalizeCameraStudioV398({enabled:true,holdMs:input}).holdMs,1150,'invalid holdMs fallback');
+}
+assert.equal(normalizeCameraStudioV398({enabled:true,holdMs:0}).holdMs,450);
+assert.equal(normalizeCameraStudioV398({enabled:true,holdMs:999999}).holdMs,2400);
+const profile=normalizeCameraStudioV398({enabled:true,holdMs:1600,scenes:{verse:{shot:'lead',distance:100,pan:100}}});
+const pose=previewCameraPoseV398('verse',profile);
+for(const key of ['x','y','z','targetX','targetY','fov'])assert(Number.isFinite(pose[key]),key);
+const basePose={x:0,y:0,z:6,targetX:0,targetY:0,targetZ:0,fov:40};
+const plan={active:true,shot:'lead',leadSlot:0,partnerSlot:null,strength:1,count:2,reason:'verse',source:'section'};
+const tuned=tuneCameraPoseV398(basePose,plan,'verse',profile,false);
+const protectedPose=tuneCameraPoseV398(basePose,plan,'verse',profile,true);
+assert(Math.abs(protectedPose.z-basePose.z)<Math.abs(tuned.z-basePose.z),'lyrics protection should reduce camera motion');
+assert.deepEqual(tuneCameraPoseV398(basePose,plan,'verse',{...profile,enabled:false},false),basePose);
+const {newCameraCueV400,normalizeCameraTimelineV400,activeCameraCueV400}=timeline;
+const intro=newCameraCueV400(0,1);
+const duet={...newCameraCueV400(1200,2),shot:'two-shot',partnerSlot:1};
+const library=normalizeCameraTimelineV400({enabled:true,tracks:{t:{durationMs:5000,cues:[duet,intro]}}});
+assert.equal(activeCameraCueV400(library,'t',1199,true,false,2)?.cue.id,intro.id);
+assert.equal(activeCameraCueV400(library,'t',1200,true,false,2)?.cue.id,duet.id);
+assert.equal(activeCameraCueV400(library,'t',1200,true,false,1),null,'no phantom duet');
+assert.equal(activeCameraCueV400(library,'t',1200,false,false,2),null,'paused camera timeline disabled');
+assert.equal(activeCameraCueV400(library,'unrelated',1200,true,false,2),null,'cue must be track scoped');
+assert.equal(activeCameraCueV400(library,'t',1200,true,true,2),null,'reduced motion guard');
+console.log('PASS V404 camera QA: durations, camera bounds, lyric protection, timing, invisible cast, pause, track and reduced-motion');

@@ -1,0 +1,9 @@
+const fs=require('fs'),assert=require('node:assert/strict');
+const hook=fs.readFileSync('hooks/useMicrophoneAnalysis.ts','utf8');
+const worker=fs.readFileSync('hooks/audioRhythm.worker.ts','utf8');
+const scene=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
+assert.match(worker,/BeatTempoTracker/);assert.match(worker,/RhythmLearningEngine/);assert.match(worker,/postMessage/);
+assert.match(hook,/new Worker\(new URL/);assert.match(hook,/worker\?\.terminate\(\)/);
+assert.match(hook,/pendingSnapshot/);assert.match(hook,/if \(!worker\) tempoTracker\.addOnset|worker \? measuredTempo : tempoTracker\.addOnset/);
+assert.match(scene,/webglcontextlost/);assert.match(scene,/webglcontextrestored/);assert.match(scene,/SceneErrorBoundary/);assert.match(scene,/updatePartnerHandIK[\s\S]*updateFootIK/);
+console.log('PASS V161 audio worker and WebGL recovery regression checks');

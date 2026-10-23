@@ -1,0 +1,18 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');const path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const correction=fs.readFileSync(path.join(root,'components/visualizer/lodPoseCorrection.ts'),'utf8');
+const sample=fs.readFileSync(path.join(root,'components/visualizer/lodContinuityDiagnostics.ts'),'utf8');
+const scene=fs.readFileSync(path.join(root,'components/visualizer/ThreeAvatar.tsx'),'utf8');
+assert.match(correction,/export function correctedLodQuaternion/);
+assert.match(correction,/export function applyLodPoseCorrection/);
+assert.match(correction,/maxErrorDeg=30/);
+assert.match(correction,/maxStepDeg=5/);
+assert.match(correction,/reference.some\(v=>!Number.isFinite\(v\)\)/);
+assert.match(correction,/rotateTowards/);
+assert.match(sample,/export function getOutgoingLodPose/);
+assert.match(sample,/now-s.sampledAt<0.35/);
+assert.match(scene,/getOutgoingLodPose\(url,\s*liveOwner.current/);
+assert.match(scene,/applyLodPoseCorrection\(bones,\s*reference,\s*true,\s*lodTuning.current.strength\)/);
+assert.match(scene,/if \(!isPlaying \|\| reducedMotion\)/);
+console.log('V131 LOD correction structural regression passed: 11 assertions');

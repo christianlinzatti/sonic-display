@@ -1,0 +1,12 @@
+Sonic Display V376 - verification record (2026-10-19)
+Base: V375 Adaptive Performance Director
+Source: complete project, no node_modules or lockfile included in base.
+
+PASS: npm run check:syntax - 500 TS/TSX source files
+PASS: npm run test:v376 - timed-line role exchange, handoff at phrase boundary, stop/seek/manual safety, procedural/GLB wiring, additive expression
+PASS: 92/92 selected npm regression scripts: V287-V376 where defined, multi-avatar, stage themes and lighting.
+PASS: archive structural validation (performed upon release packaging).
+BLOCKED: npm run build:preflight - 16/17 npm dependencies absent; package-lock.json absent.
+NOT RUN: production Next.js build / complete TypeScript checking / real GPU animation smoke test.
+
+The dialog/duet logic is visual choreography inferred from lyrics timing, not voice recognition or singer diarization.

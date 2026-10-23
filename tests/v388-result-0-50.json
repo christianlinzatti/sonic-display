@@ -1,0 +1,352 @@
+[
+  {
+    "i": 0,
+    "name": "check:syntax",
+    "ok": true,
+    "last": "PASS syntax: 517 TS/TSX source files\n",
+    "seconds": 1.22
+  },
+  {
+    "i": 1,
+    "name": "test:v265",
+    "ok": true,
+    "last": "V265 optimization impact regression: OK\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 2,
+    "name": "test:v264",
+    "ok": true,
+    "last": "V264 optimization assistant regression: OK\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 3,
+    "name": "test:v263",
+    "ok": true,
+    "last": "V263 Bottleneck Detector: PASS\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 4,
+    "name": "test:v266",
+    "ok": true,
+    "last": "V266 regression OK\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 5,
+    "name": "test:v267",
+    "ok": true,
+    "last": "V267 device profiles regression OK\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 6,
+    "name": "test:v268",
+    "ok": true,
+    "last": "V268 profile backup regression OK\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 7,
+    "name": "test:v269",
+    "ok": true,
+    "last": "V269 smart device auto selection regression OK\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 8,
+    "name": "test:v270",
+    "ok": true,
+    "last": "V270 Benchmark integration PASS\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 9,
+    "name": "test:v271",
+    "ok": true,
+    "last": "V271 Pi optimizer integration PASS\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 10,
+    "name": "test:v272",
+    "ok": true,
+    "last": "V272 stability guard integration PASS\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 11,
+    "name": "test:v273",
+    "ok": true,
+    "last": "V273 advanced music dance intelligence integration PASS\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 12,
+    "name": "test:v274",
+    "ok": true,
+    "last": "V274 multi-avatar interaction integration PASS\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 13,
+    "name": "test:v275",
+    "ok": true,
+    "last": "V275 Experience 2.0 integration PASS\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 14,
+    "name": "test:v277",
+    "ok": true,
+    "last": "V277 modular stage environments PASS\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 15,
+    "name": "test:v278",
+    "ok": true,
+    "last": "V278 stage settings preview PASS\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 16,
+    "name": "test:v279",
+    "ok": true,
+    "last": "V279 live stage preview FX PASS\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 17,
+    "name": "test:v280",
+    "ok": true,
+    "last": "V280 beat preview cards PASS\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 18,
+    "name": "test:v281",
+    "ok": true,
+    "last": "V281 stage card 3D preview PASS\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 19,
+    "name": "test:v282",
+    "ok": true,
+    "last": "PASS V282 orbitable stage preview modal\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 20,
+    "name": "test:stage-themes",
+    "ok": true,
+    "last": "13 V169 checks passed\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 21,
+    "name": "test:stage-lighting",
+    "ok": true,
+    "last": "V139 reactive stage lighting: 11 behavior assertions + 4 integration checks passed\n",
+    "seconds": 0.34
+  },
+  {
+    "i": 22,
+    "name": "test:runtime",
+    "ok": true,
+    "last": "PASS runtime-structure: 1100 checks across 518 source files\n",
+    "seconds": 0.12
+  },
+  {
+    "i": 23,
+    "name": "test:touch-kiosk",
+    "ok": true,
+    "last": "V166 touchscreen kiosk: 20 checks passed\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 24,
+    "name": "test:multi-avatar",
+    "ok": true,
+    "last": "V140 multi-avatar integration: 14 assertions and JSX transpile checks passed\n",
+    "seconds": 0.99
+  },
+  {
+    "i": 25,
+    "name": "test:v283",
+    "ok": true,
+    "last": "V283 lazy stage preview PASS\n",
+    "seconds": 0.02
+  },
+  {
+    "i": 26,
+    "name": "test:v284",
+    "ok": true,
+    "last": "V284 bundle splitting regressions PASS\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 27,
+    "name": "test:v285",
+    "ok": true,
+    "last": "V285 runtime performance instrumentation PASS\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 28,
+    "name": "test:v286",
+    "ok": true,
+    "last": "V286 Stage Preset Library regression: OK\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 29,
+    "name": "test:v287",
+    "ok": true,
+    "last": "V287 Stage Director integration regression passed\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 30,
+    "name": "test:v288",
+    "ok": true,
+    "last": "V288 cinematic stage regression passed\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 31,
+    "name": "test:v289",
+    "ok": true,
+    "last": "V289 real camera director regression passed\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 32,
+    "name": "test:v290",
+    "ok": true,
+    "last": "V290 interactive camera preset regression passed\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 33,
+    "name": "test:v291",
+    "ok": true,
+    "last": "V291 visual camera editor regression passed\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 34,
+    "name": "test:v292",
+    "ok": true,
+    "last": "V292 installed-avatar camera preview regression passed\n",
+    "seconds": 0.05
+  },
+  {
+    "i": 35,
+    "name": "test:v293",
+    "ok": true,
+    "last": "V293 animated camera preview regression OK\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 36,
+    "name": "test:v294",
+    "ok": true,
+    "last": "V294 motion timeline regression OK\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 37,
+    "name": "test:v295",
+    "ok": true,
+    "last": "V295 camera keyframe regression OK\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 38,
+    "name": "test:v296",
+    "ok": true,
+    "last": "V296 live camera keyframes regression OK\n",
+    "seconds": 0.07
+  },
+  {
+    "i": 39,
+    "name": "test:v297",
+    "ok": true,
+    "last": "V297 Smart Camera Tracking regression OK\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 40,
+    "name": "test:v298",
+    "ok": true,
+    "last": "V298 Smart Camera Composer regression OK\n",
+    "seconds": 0.03
+  },
+  {
+    "i": 41,
+    "name": "test:v299",
+    "ok": true,
+    "last": "V299 camera director studio regression OK\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 42,
+    "name": "test:v300",
+    "ok": true,
+    "last": "V300 visual camera dashboard projection, timeline and navigation regression OK\n",
+    "seconds": 0.32
+  },
+  {
+    "i": 43,
+    "name": "test:v301",
+    "ok": true,
+    "last": "V301 live stage preview regression passed\n",
+    "seconds": 0.04
+  },
+  {
+    "i": 44,
+    "name": "test:v302",
+    "ok": true,
+    "last": "V302 live camera editor, temporary control and persistence regression passed\n",
+    "seconds": 0.3
+  },
+  {
+    "i": 45,
+    "name": "test:v303",
+    "ok": true,
+    "last": "V303 gestures, orbit math, touch/wheel/keyboard controls, V302 saving integration and resource limits passed\n",
+    "seconds": 0.28
+  },
+  {
+    "i": 46,
+    "name": "test:v304",
+    "ok": true,
+    "last": "V304: 360-degree orbit, rear hemisphere, 3D panning, zoom, gesture validation, legacy migration, editor and keyframe integration passed\n",
+    "seconds": 0.31
+  },
+  {
+    "i": 47,
+    "name": "test:v305",
+    "ok": true,
+    "last": "V305: curved spherical camera paths, acceleration, time scaling, looping, local storage, 3D preview and live integration passed\n",
+    "seconds": 0.35
+  },
+  {
+    "i": 48,
+    "name": "test:v306",
+    "ok": true,
+    "last": "V306 Ultimate Show Director: deterministic show cues, transport safety, settings, camera, stage, FX and formations PASS\n",
+    "seconds": 0.34
+  },
+  {
+    "i": 49,
+    "name": "test:v307",
+    "ok": true,
+    "last": "V307 Dance Quality: style, section, phrase, GLB/procedural, storage, foot safety, pause/seek, controls PASS\n",
+    "seconds": 0.36
+  }
+]

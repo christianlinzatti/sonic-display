@@ -1,0 +1,8 @@
+{
+  "extends": "../tsconfig.json",
+  "include": [],
+  "files": [
+    "../config/musicGenres.ts",
+    "../services/genre/genreIntelligence.ts"
+  ]
+}

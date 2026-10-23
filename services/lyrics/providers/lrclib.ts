@@ -1,8 +1,11 @@
-import type { Lyrics, LyricLine } from "@/types/music";
+import type { Lyrics, LyricLine, LyricWord } from "@/types/music";
+import { parse as parseYaml } from "yaml";
 
 interface LrclibResponse {
   plainLyrics?: string | null;
   syncedLyrics?: string | null;
+  hasWordSync?: boolean;
+  lyricsfile?: string | null;
 }
 
 function timestampToMs(value: string): number | null {
@@ -23,6 +26,42 @@ export function parseLrc(raw: string): LyricLine[] {
   }
   parsed.sort((a, b) => a.startMs - b.startMs);
   return parsed.map((line, index) => ({ ...line, endMs: parsed[index + 1]?.startMs ?? null }));
+}
+
+/** Parse LRCLIB Lyricsfile (YAML). Invalid or incomplete word data gracefully falls back to LRC. */
+export function parseWordSyncedLyricsfile(raw: string): LyricLine[] {
+  try {
+    const document: unknown = parseYaml(raw);
+    if (!document || typeof document !== "object" || !("lines" in document)) return [];
+    const lines = (document as { lines?: unknown }).lines;
+    if (!Array.isArray(lines)) return [];
+    const parsed: LyricLine[] = [];
+    for (const entry of lines) {
+      if (!entry || typeof entry !== "object") continue;
+      const line = entry as Record<string, unknown>;
+      const rawWords = Array.isArray(line.words) ? line.words : [];
+      const words: LyricWord[] = [];
+      for (const candidate of rawWords) {
+        if (!candidate || typeof candidate !== "object") continue;
+        const word = candidate as Record<string, unknown>;
+        const start = word.start_ms;
+        const end = word.end_ms;
+        if (typeof word.text !== "string" || !word.text.trim() ||
+            typeof start !== "number" || !Number.isFinite(start) || start < 0) continue;
+        words.push({ text: word.text, startMs: start,
+          endMs: typeof end === "number" && Number.isFinite(end) && end > start ? end : null });
+      }
+      words.sort((a, b) => a.startMs - b.startMs);
+      if (!words.length) continue;
+      const startMs = typeof line.start_ms === "number" && Number.isFinite(line.start_ms)
+        ? line.start_ms : words[0].startMs;
+      const endMs = typeof line.end_ms === "number" && line.end_ms > startMs ? line.end_ms : null;
+      const text = typeof line.text === "string" && line.text.trim() ? line.text : words.map(w => w.text).join("");
+      parsed.push({ startMs, endMs, text, words });
+    }
+    parsed.sort((a,b) => a.startMs - b.startMs);
+    return parsed.map((line, index) => ({...line, endMs: line.endMs ?? parsed[index+1]?.startMs ?? null }));
+  } catch { return []; }
 }
 
 export async function lookupLrclibLyrics(query: {
@@ -48,7 +87,10 @@ export async function lookupLrclibLyrics(query: {
   const data = (await response.json()) as LrclibResponse;
   const plainText = data.plainLyrics?.trim() || null;
   const syncedLines = data.syncedLyrics ? parseLrc(data.syncedLyrics) : [];
-  const lines = syncedLines.length
+  const wordLines = data.hasWordSync && data.lyricsfile ? parseWordSyncedLyricsfile(data.lyricsfile) : [];
+  const lines = wordLines.length
+    ? wordLines
+    : syncedLines.length
     ? syncedLines
     : (plainText ?? "")
         .split(/\r?\n/)
@@ -58,7 +100,7 @@ export async function lookupLrclibLyrics(query: {
   if (!lines.length) return null;
   return {
     provider: "lrclib",
-    synced: syncedLines.length > 0,
+    synced: wordLines.length > 0 || syncedLines.length > 0,
     lines,
     plainText,
   };

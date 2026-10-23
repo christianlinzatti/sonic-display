@@ -1,0 +1,18 @@
+Sonic Display V360 – Smart Artist Discovery
+Source: V359 full ZIP; package version: 0.1.0-v360
+
+PASS: 103/103 independent offline verification commands, via scripts/run-offline-regression-v352.cjs
+PASS: npm run check:syntax – 467 TS/TSX files parsed
+PASS: V360 Spotify search, genre, top items, songs, DTO sanitization, image URL validation
+PASS: V360 server-side session and scope handling, limits, errors, follow integration
+PASS: V359 Spotify Library /contains/PUT/DELETE regression retained
+PASS: strict TypeScript isolated semantic check for lib/artist-discovery-v360.ts
+PASS: ZIP file checksum/integrity (verified during release packaging)
+
+NOT VERIFIED: full npm run typecheck; main project's direct dependencies are missing
+NOT VERIFIED: Next.js npm run build; no package-lock.json or installed Next/React packages
+NOT VERIFIED: live Spotify Web API / genre results / followed artist URI support
+
+Spotify Web API: 2026 Dev Mode Search limit 10, Top Artists requires user-top-read.
+No deprecated Related Artists or Artist Top Tracks calls. Song search != popular tracks ranking.
+Run npm install && npm run verify, then test with real authenticated Spotify account.

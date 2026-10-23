@@ -1,0 +1,13 @@
+const fs=require('fs'),assert=require('assert');
+const load=p=>fs.readFileSync(require('path').join(__dirname,'..',p),'utf8');
+const worker=load('hooks/useMicrophoneAnalysis.ts'),telemetry=load('components/visualizer/audioWorkerTelemetry.ts');
+const adaptive=load('components/visualizer/adaptivePerformance.tsx'),policy=load('components/visualizer/performancePolicy.ts');
+assert(worker.includes('workerRequests.set(++sequence, performance.now())'));
+assert(worker.includes('performance.now() - sentAt'));
+assert(worker.includes('workerRequests.clear()'));
+assert(telemetry.includes('Math.ceil(ordered.length*.95)-1'));
+assert(adaptive.includes('p95FrameMs'));
+assert(adaptive.includes('d.durations = []'));
+assert(policy.includes('window.p95FrameMs'));
+assert(Number(JSON.parse(load('package.json')).version.match(/v(\d+)$/)?.[1])>=248);
+console.log('V162 quality manager integration: 8 checks passed');

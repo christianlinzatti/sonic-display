@@ -1,0 +1,7 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),ts=require('typescript'),vm=require('node:vm');
+const source=fs.readFileSync('services/stageContent/imageSelectionV340.ts','utf8');const js=ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;const m={exports:{}};vm.runInNewContext(js,{module:m,exports:m.exports,URL});
+const a=m.exports;const settings=a.sanitizeImageSelectionV340({aspectWeight:999,minWidth:-55,mode:'bad'});assert.equal(settings.aspectWeight,100);assert.equal(settings.minWidth,0);assert.equal(settings.mode,'balanced');
+assert.equal(a.imageIdentityV340('https://a.org/p.jpg?size=200'),a.imageIdentityV340('https://a.org/p.jpg?size=600'));
+const images=[{url:'https://a.org/wide.jpg',width:1200,height:660},{url:'https://a.org/portrait.jpg',width:600,height:1100},{url:'https://a.org/wide.jpg?w=600',width:600,height:330}];
+const ranked=a.rankImagesV340(images,16/9,a.DEFAULT_IMAGE_SELECTION_V340);assert.equal(ranked.length,2);assert.equal(ranked[0].url,images[0].url);assert.equal(a.rankImagesV340(images,.55,a.DEFAULT_IMAGE_SELECTION_V340)[0].url,images[1].url);assert.equal(a.rankImagesV340(images,1,{...a.DEFAULT_IMAGE_SELECTION_V340,enabled:false}).length,3);
+assert.match(fs.readFileSync('components/visualizer/StageImageGalleryV338.tsx','utf8'),/rankImagesV340/);assert.match(fs.readFileSync('components/visualizer/StageContentPluginSettingsV330.tsx','utf8'),/ImageSelectionSettingsV340/);console.log('V340 smart image selection passed');

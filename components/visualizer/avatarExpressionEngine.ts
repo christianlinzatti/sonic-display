@@ -27,7 +27,7 @@ export function getAvatarExpressionState(
 
   const key = genreKey(genre);
   let expression: AvatarExpression = energy > 0.72 ? "euphoric" : energy < 0.28 ? "relaxed" : "cool";
-  if (/hardcore|hardstyle|metal/.test(key)) expression = energy > 0.45 ? "aggressive" : "cool";
+  if (/hardcore|hardstyle|hardtekk|metal/.test(key)) expression = energy > 0.45 ? "aggressive" : "cool";
   else if (/ambient|chill|classical/.test(key)) expression = "relaxed";
   else if (/rock|punk/.test(key) && energy > 0.5) expression = "aggressive";
 

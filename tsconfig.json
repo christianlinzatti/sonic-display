@@ -35,6 +35,8 @@
     "**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "tests/stubs/**/*",
+    "tests/v414-music-types.d.ts"
   ]
 }

@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const read=p=>fs.readFileSync(require('node:path').join(__dirname,'..',p),'utf8');
+const model=read('services/genre/genreMemoryManagement.ts');
+const ui=read('components/animation/GenreCorrectionDashboard.tsx');
+const context=read('context/MusicContext.tsx');
+const controller=read('components/animation/MusicAnimationController.tsx');
+const pkg=require('../package.json');
+const checks=[pkg.version==='0.1.0-v248',pkg.scripts['verify:offline'].includes('test:genre-dashboard'),model.includes('filterGenreCorrections'),model.includes('summarizeGenreCorrections'),model.includes('updateSelectedGenre'),model.includes('removeSelectedCorrections'),model.includes('exportGenreMemory'),model.includes('previewGenreMemoryImport'),model.includes('mergeGenreMemory'),model.includes('1024*1024'),model.includes('incoming.corrections.length!==value.data.corrections.length'),model.includes('overwrite||!existing.has'),ui.includes('Artist oder Track-ID suchen'),ui.includes('Gefilterte auswählen'),ui.includes('Auswahl ändern'),ui.includes('Auswahl löschen'),ui.includes('JSON exportieren'),ui.includes('JSON importieren'),ui.includes('Import-Vorschau'),ui.includes('bestehende behalten'),ui.includes('Konflikte ersetzen'),ui.includes('window.confirm'),context.includes('replaceGenreMemory'),controller.includes('<GenreCorrectionDashboard'),read('context/VisualizerContext.tsx').includes('genreMemory:music.genreMemory')];
+checks.forEach((v,i)=>assert.ok(v,`V182 check ${i+1}`));
+console.log(`V182 genre-dashboard: ${checks.length} Prüfungen bestanden`);

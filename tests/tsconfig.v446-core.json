@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.v445-core.json",
+  "files": ["../components/visualizer/smartAutomaticRapShowV446.ts", "v414-music-types.d.ts"]
+}

@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.v438-core.json",
+  "files": [
+    "../components/visualizer/glbMotionAnalyzerV439.ts",
+    "../components/visualizer/glbMotionCacheV439.ts",
+    "../components/visualizer/automaticMotionIntelligenceV438.ts",
+    "../components/visualizer/characterMotionLibrary.ts",
+    "../components/visualizer/intelligentDanceCombinationV242.ts",
+    "v414-music-types.d.ts"
+  ]
+}

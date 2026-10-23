@@ -1,0 +1,15 @@
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const root = path.resolve(__dirname, '..');
+const policy = fs.readFileSync(path.join(root,'components/visualizer/gpuRenderBudgetV253.ts'),'utf8');
+const adaptive = fs.readFileSync(path.join(root,'components/visualizer/adaptivePerformance.tsx'),'utf8');
+const scene = fs.readFileSync(path.join(root,'components/visualizer/ThreeAvatar.tsx'),'utf8');
+for (const name of ['initialRenderBudget', 'renderPressure', 'advanceRenderBudget', 'limitDpr']) assert.ok(policy.includes('function '+name));
+assert.match(policy,/pressureWindows >= 3/);
+assert.match(policy,/recoveryWindows >= 10/);
+assert.match(adaptive,/advanceRenderBudget\(renderBudget\.current/);
+assert.match(adaptive,/setDpr\(dpr\)/);
+assert.match(adaptive,/if \(mode !== "auto" \|\| isPiQualityTransitionV463\(Date\.now\(\)\)\) return/);
+assert.match(scene,/<AdaptivePerformanceController avatarCount=/);
+console.log('V253 render budget regression passed');

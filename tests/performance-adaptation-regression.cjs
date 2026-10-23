@@ -1,0 +1,17 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const ts = require('./typescript-loader.cjs');
+const filename = path.join(__dirname, '../components/visualizer/performancePolicy.ts');
+const js = ts.transpileModule(fs.readFileSync(filename, 'utf8'), { compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020}}).outputText;
+const mod={exports:{}};new Function('exports','module','require',js)(mod.exports,mod,require);
+const {advancePerformanceDecision: step,initialPerformanceDecision: init}=mod.exports;
+let s=init();
+s=step(s,{fps:18,slowRatio:0.6,elapsed:1});assert.equal(s.tier,'high');
+s=step(s,{fps:18,slowRatio:0.6,elapsed:1});assert.equal(s.tier,'high');
+s=step(s,{fps:18,slowRatio:0.6,elapsed:1});assert.equal(s.tier,'balanced');
+for(let i=0;i<10;i++)s=step(s,{fps:18,slowRatio:0.6,elapsed:1});assert.equal(s.tier,'low');
+for(let i=0;i<45;i++)s=step(s,{fps:60,slowRatio:0.01,elapsed:1});assert.equal(s.tier,'high');
+const stable=step(s,{fps:NaN,slowRatio:0,elapsed:1});assert.deepEqual(stable,s);
+let b=init('balanced'); for(let i=0;i<100;i++)b=step(b,{fps:48,slowRatio:0.1,elapsed:1});assert.equal(b.tier,'balanced');
+console.log('PASS performance regression: drop after 3, recover after stable windows, invalid samples, neutral FPS');

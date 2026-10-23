@@ -1,0 +1,14 @@
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const root=path.join(__dirname,"..");
+const source=fs.readFileSync(path.join(root,"components/visualizer/avatarPartnerAwareness.ts"),"utf8");
+const avatar=fs.readFileSync(path.join(root,"components/visualizer/ThreeAvatar.tsx"),"utf8");
+for(const name of ["facingYaw","partnerCue","separatePartners"]) assert.ok(source.includes(`export function ${name}(`));
+assert.match(avatar,/partnerCue\(/);
+assert.match(avatar,/separatePartners\(/);
+assert.match(avatar,/rotation\.y = formationApproach/);
+assert.match(avatar,/mode === "solo" \? scene\.lead/);
+assert.match(source,/reducedMotion/);
+assert.match(source,/Math\.hypot/);
+console.log("V143 partner awareness: 7 structural regression assertions passed");

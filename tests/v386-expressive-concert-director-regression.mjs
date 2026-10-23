@@ -1,0 +1,76 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+const Module=require('node:module');
+const ts=require('./typescript-loader.cjs');
+const root=path.resolve('.');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const cache=new Map();
+function load(relative){
+ const full=path.resolve(root,relative.endsWith('.ts')?relative:relative+'.ts');
+ if(cache.has(full))return cache.get(full).exports;
+ const t=ts.transpileModule(fs.readFileSync(full,'utf8'),{fileName:full,reportDiagnostics:true,compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}});
+ assert.equal(t.diagnostics?.filter(d=>d.category===ts.DiagnosticCategory.Error).length??0,0,relative);
+ const m=new Module(full);m.filename=full;m.paths=Module._nodeModulePaths(path.dirname(full));cache.set(full,m);
+ const original=m.require.bind(m);m.require=id=>id.startsWith('./')?load(path.relative(root,path.resolve(path.dirname(full),id))):original(id);
+ m._compile(t.outputText,full);return m.exports;
+}
+const {resolveConcertCueV386,overlayConcertExpressionV386,concertLightAccentV386}=load('components/visualizer/expressiveConcertDirectorV386');
+const {resolveManualVocalCueV385,applyManualVocalCueV385}=load('components/visualizer/manualVocalCastingV385');
+const {resolveDuetInteractionV376}=load('components/visualizer/interactiveVocalDuetsV376');
+const lyrics={synced:true,plainText:null,provider:'demo',lines:Array.from({length:8},(_,i)=>({startMs:i*2200,endMs:i*2200+1800,text:`Text ${i}`,words:[{text:'Beat',startMs:i*2200,endMs:i*2200+800}]}))};
+const assignments=[{fromLine:0,toLine:2,role:'lead',slot:0},{fromLine:3,toLine:4,role:'feature',slot:1},{fromLine:5,toLine:7,role:'hook',slot:1}];
+const manual=ms=>resolveManualVocalCueV385({lyrics,progressMs:ms,playing:true,count:3,enabled:true,assignments});
+const emptyDuet={enabled:false,leadSlot:0,partnerSlot:null,activeSlots:[0,1,2],fromSlot:null,toSlot:0,event:'none',phase:0,emphasis:0,source:'none',lineIndex:-1,count:3};
+const cue=(ms,options={})=>resolveConcertCueV386({mode:'expressive',strength:85,playing:true,count:3,
+ manual:manual(ms),duet:applyManualVocalCueV385(emptyDuet,manual(ms)),...options});
+assert.equal(cue(400).moment,'verse');
+assert.equal(cue(400).leadSlot,0);
+assert.deepEqual(cue(400).supportSlots,[1,2]);
+assert.equal(cue(400).camera,'lead');
+assert.equal(cue(6750).moment,'handoff');
+assert.equal(cue(6750).leadSlot,1);
+assert.equal(cue(6750).camera,'two-shot');
+assert.equal(cue(6750).partnerSlot,0);
+assert.equal(cue(8000).moment,'response');
+assert.equal(cue(8000).camera,'lead');
+assert.equal(cue(11100).moment,'hook');
+assert.equal(cue(11100).camera,'group');
+assert.deepEqual(cue(11100).singingSlots,[0,1,2]);
+assert.deepEqual(cue(11100).supportSlots,[]);
+assert.deepEqual(cue(6750),cue(6750),'seek safe, repeatable');
+for(const options of [{mode:'off'},{playing:false},{reducedMotion:true},{manualPriority:true},{count:1},{strength:0}])
+ assert.equal(cue(6750,options).active,false,JSON.stringify(options));
+assert.equal(cue(2000).active,false,'no acting in lyric gap');
+assert.equal(cue(400,{manual:null,duet:null}).active,false);
+assert.equal(cue(400,{manual:null,duet:emptyDuet}).active,false);
+const duet=resolveDuetInteractionV376({lyrics,progressMs:6650,playing:true,count:3,mode:'dialogue',strength:80});
+const auto=resolveConcertCueV386({mode:'subtle',playing:true,count:3,duet,section:'verse'});
+assert.equal(auto.source,'duet');assert.equal(auto.active,true);
+assert.ok(auto.emphasis<=.5,'subtle expressions bounded');
+assert.equal(resolveConcertCueV386({mode:'expressive',playing:true,count:3,duet,section:'hook'}).camera,'group');
+const base={headYaw:0,headPitch:0,headTilt:0,eyeYaw:0,chestLean:0,leftArm:0,rightArm:0};
+const lead=overlayConcertExpressionV386(base,cue(400),0);
+const backing=overlayConcertExpressionV386(base,cue(400),1);
+assert.ok(Math.abs(lead.chestLean)>0,'lead animated');
+assert.ok(Math.abs(backing.headYaw)>0,'supporting dancer turns to lead');
+assert.ok(Math.abs(backing.leftArm)+Math.abs(backing.rightArm)>0,'support gestures bounded');
+assert.deepEqual(overlayConcertExpressionV386(base,cue(400),1,{authoredPriority:true}),base);
+assert.deepEqual(overlayConcertExpressionV386(base,cue(400),1,{eyeContact:false,gestures:false}).headYaw,0);
+for(const a of [lead,backing])for(const v of Object.values(a))assert.ok(Number.isFinite(v)&&Math.abs(v)<=.25);
+const soft=concertLightAccentV386(cue(400));assert.ok(soft.gain>1&&soft.gain<=1.12+1e-8);
+assert.ok(soft.beamGain<=1.16+1e-8);assert.equal(soft.focusSlot,0);
+assert.equal(concertLightAccentV386(cue(11100)).focusSlot,null,'hooks remain wide');
+assert.deepEqual(concertLightAccentV386(cue(400),true),{gain:1,beamGain:1,focusSlot:null});
+assert.equal(concertLightAccentV386(cue(0,{playing:false})).gain,1);
+const all=['components/visualizer/ThreeAvatar.tsx','components/visualizer/DynamicStage.tsx',
+ 'components/visualizer/StageCameraDirectorV289.tsx','components/visualizer/VisualizerStage.tsx',
+ 'components/visualizer/registry.tsx','components/SettingsPanel.tsx','context/UiPreferencesContext.tsx','types/music.ts'];
+for(const file of all)assert.ok(read(file).includes('V386'),`missing V386 integration: ${file}`);
+assert.ok(read('components/visualizer/ThreeAvatar.tsx').includes('authoredPriority:avatarMotionMode==="choreography"'));
+assert.ok(read('components/visualizer/DynamicStage.tsx').includes('authoredLightsV386'));
+assert.ok(read('components/visualizer/StageCameraDirectorV289.tsx').includes('shotPlanV386'));
+assert.match(read('package.json'),/0\.1\.0-v(?:38[6789]|390|391|392|393|394|395|396|397|398|399|400|401|402|403|404|405|406|407|408|409|410|411|412|413|414|415|416|417)/);
+console.log('PASS V386 vocal direction, duet, hooks, backup reactions, camera/lighting/manual priority');

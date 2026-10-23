@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.v462-core.json",
+  "files": [
+    "../services/monitoring/piSessionStabilityV463.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

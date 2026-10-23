@@ -1,0 +1,13 @@
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+const source = fs.readFileSync('hooks/useMicrophoneAnalysis.ts', 'utf8');
+const pkg = require('../package.json');
+assert.match(source, /const bands = \[bandRange\(35, 180\)/, 'FFT ranges must be precomputed');
+assert.match(source, /const bass = band\(bands\[0\]\)/, 'FFT ranges must be reused');
+assert.match(source, /WORKER_STALL_MS = 1500/, 'stalled workers must time out');
+assert.match(source, /worker && pendingSnapshot && now - pendingSince > WORKER_STALL_MS/, 'timeout must run in capture loop');
+assert.match(source, /worker\.terminate\(\); worker = null; pendingSnapshot = false/, 'stalled worker must release resources');
+assert.match(source, /latestAdvanced = \{\}/, 'stale worker features must not leak into fallback');
+assert.match(source, /if \(!pendingSnapshot\) \{ pendingSnapshot = true; pendingSince = now;/, 'only one in-flight snapshot');
+assert.equal(pkg.version, '0.1.0-v248');
+console.log('PASS V216 audio pipeline and worker stall fallback regression checks');

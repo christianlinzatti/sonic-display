@@ -1,0 +1,17 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const ts = require('typescript');
+const vm = require('node:vm');
+const text = fs.readFileSync(require('node:path').join(__dirname,'../components/visualizer/avatarLodPolicy.ts'), 'utf8');
+const js = ts.transpileModule(text.replace(/export /g,''), {compilerOptions:{target:ts.ScriptTarget.ES2020,module:ts.ModuleKind.None}}).outputText;
+const context={};vm.runInNewContext(js,context);
+assert.equal(context.avatarLodLevel('high'),0);
+assert.equal(context.avatarLodLevel('balanced'),1);
+assert.equal(context.avatarLodLevel('low'),2);
+assert.equal(context.parseAvatarLodName('Body_LOD2').family,'body');
+assert.equal(context.parseAvatarLodName('Body_LOD2').level,2);
+assert.equal(context.parseAvatarLodName('Skeleton'),null);
+assert.equal(context.pickAvailableLod([0,2],'balanced'),0);
+assert.equal(context.pickAvailableLod([0,2],'low'),2);
+assert.equal(context.pickAvailableLod([],'low'),null);
+console.log('Avatar LOD regression: 9 checks passed');

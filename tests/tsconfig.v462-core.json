@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.v461-core.json",
+  "files": [
+    "../components/visualizer/concertLightingDirectorV462.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

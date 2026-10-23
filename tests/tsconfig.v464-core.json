@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.v463-core.json",
+  "files": [
+    "../services/show/automaticConcertExperienceV464.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

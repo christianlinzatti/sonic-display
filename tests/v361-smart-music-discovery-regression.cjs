@@ -1,0 +1,103 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const ts=require('./typescript-loader.cjs');
+function transpile(file,deps={}){
+ const code=fs.readFileSync(file,'utf8');const out=ts.transpileModule(code,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX},reportDiagnostics:true});
+ assert(!out.diagnostics.some(d=>d.category===ts.DiagnosticCategory.Error));
+ const mod={exports:{}};new Function('module','exports','require',out.outputText)(mod,mod.exports,id=>{if(!Object.hasOwn(deps,id))throw Error(`Unexpected import ${id}`);return deps[id];});return mod.exports;
+}
+const A='2takcwOaAZWiXQijPHIx7B',B='74ASZWbe4lXaubB36ztrGX';
+const artist=transpile('lib/artist-discovery-v360.ts');
+const lib=transpile('lib/music-discovery-v361.ts',{'@/lib/artist-discovery-v360':artist});
+const track=(id=A)=>({id,name:'Neuer Track',artists:[{id:B,name:'Künstler'}],album:{name:'Single',release_date:'2026-10-10',release_date_precision:'day',images:[{url:'https://i.scdn.co/image/demo'}]},preview_url:'https://p.scdn.co/mp3-preview/abcdef?cid=abc'});
+assert.equal(lib.musicDiscoveryPath('new',{genre:'deutschrap'}).includes('tag%3Anew'),true);
+assert.equal(lib.musicDiscoveryPath('new',{genre:'hardstyle',withGenre:true}).includes('hardstyle'),true);
+assert(lib.musicDiscoveryPath('new',{genre:'hardtekk'}).includes('type=album'));
+assert(lib.musicDiscoveryPath('genre',{genre:'hardstyle'}).includes('type=track'));
+assert(lib.musicDiscoveryPath('genre',{genre:'deutschrap'}).includes('german'));
+assert(lib.musicDiscoveryPath('saved',{}).startsWith('/me/tracks?'));
+assert.equal(lib.musicDiscoveryPath('album',{albumId:A}).includes(`/albums/${A}/tracks`),true);
+assert.equal(lib.musicDiscoveryPath('album',{albumId:'../../invalid'}),null);
+assert.equal(lib.musicDiscoveryPath('search',{query:'a'}),null);
+assert.equal(lib.musicDiscoveryPath('search',{query:'K.I.Z'}).includes('K.I.Z'),true);
+assert.equal(lib.musicDiscoveryPath('genre',{genre:'fake'}),null);
+assert.equal(lib.safeSpotifyPreview('http://p.scdn.co/mp3-preview/sound'),null);
+assert.equal(lib.safeSpotifyPreview('https://bad.example/mp3-preview/sound'),null);
+assert.equal(lib.safeSpotifyPreview('https://p.scdn.co/mp3-preview/a'), 'https://p.scdn.co/mp3-preview/a');
+assert.equal(lib.normalizeReleaseDate('2026-02-30','day').date,null);
+assert.equal(lib.normalizeReleaseDate('2026-02-28','day').date,'2026-02-28');
+assert.equal(lib.normalizeReleaseDate('2026-10','month').precision,'month');
+assert.equal(lib.normalizeReleaseDate('2026','year').precision,'year');
+assert.equal(lib.normalizeMusicTracks([track()])[0].album,'Single');
+assert.equal(lib.normalizeMusicTracks([{track:track()}]).length,1);
+assert.equal(lib.normalizeMusicTracks([track(),track()]).length,1);
+assert.equal(lib.normalizeMusicTracks([track()])[0].previewUrl,'https://p.scdn.co/mp3-preview/abcdef?cid=abc');
+assert.equal(lib.normalizeMusicReleases([{id:A,name:'New Single',artists:[{name:'Name'}],release_date:'2026-10-10',release_date_precision:'day',images:[{url:'https://i.scdn.co/image/abc'}]}])[0].title,'New Single');
+assert.equal(lib.normalizeMusicReleases([{id:'bad!',name:'Fake'}]).length,0);
+assert.equal(lib.trackUriQuery([A]),`uris=spotify%3Atrack%3A${A}`);
+assert.deepEqual(lib.parseTrackIds(`${A},${B},${A}`),[A,B]);
+assert.equal(lib.parseTrackIds('unsafe!'),null);
+assert.deepEqual(lib.normalizeLibraryContains([true,false],[A,B]),{[A]:true,[B]:false});
+assert.equal(lib.normalizeLibraryContains([true],[A,B]),null);
+const pkg=require('../package.json');assert(['0.1.0-v361','0.1.0-v362','0.1.0-v363','0.1.0-v364','0.1.0-v365','0.1.0-v366','0.1.0-v367','0.1.0-v368','0.1.0-v369','0.1.0-v370','0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387','0.1.0-v390','0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v390','0.1.0-v391','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416','0.1.0-v417','0.1.0-v418','0.1.0-v419','0.1.0-v420','0.1.0-v422','0.1.0-v424','0.1.0-v425','0.1.0-v426'].includes(pkg.version));assert(pkg.scripts['verify:offline'].includes('test:v361'));
+const ui=fs.readFileSync('components/MusicDiscoveryV361.tsx','utf8');
+assert(ui.includes('Smart Music Discovery')&&ui.includes('Neue Releases')&&ui.includes('Meine Songs'));
+assert(ui.includes('Hörprobe')&&ui.includes('<audio')&&ui.includes('onError'));
+assert(ui.includes('/api/spotify/music-discovery/library'));
+assert(ui.includes('new CustomEvent("sonic:track-library-changed-v361"'));
+assert(ui.includes('aria-modal="true"')&&ui.includes('AbortController'));
+assert(!ui.includes('Bearer '));
+const main=fs.readFileSync('components/SonicDisplay.tsx','utf8');assert.equal((main.match(/<MusicDiscoveryV361\/>/g)||[]).length,2);
+const login=fs.readFileSync('app/api/spotify/login/route.ts','utf8');assert(login.includes('user-library-read user-library-modify'));
+const now=[];let scopes='user-library-read user-library-modify',responses=[];
+const session=()=>({session:{accessToken:'secret',refreshToken:'refresh',scopes,expiresAt:Date.now()+100000},refreshed:false});
+const responseFactory={json(body,{status=200}={}){return {body,status,headers:{set(){}},cookies:{set(){}}};}};
+const deps={
+ 'next/server':{NextResponse:responseFactory},
+ '@/lib/spotify':{getValidSession:async()=>session(),refreshSession:async()=>{throw Error('Unexpected refresh');},ReauthRequiredError:class extends Error{}},
+ '@/lib/session':{clearSessionCookie(){},setSessionCookie(){}},
+ '@/lib/music-discovery-v361':lib,
+ '@/lib/spotify-origin':{spotifyCallbackUrl:()=>new URL('http://127.0.0.1:3000/api/spotify/callback')}
+};
+const searchRoute=transpile('app/api/spotify/music-discovery/route.ts',deps);
+const libraryRoute=transpile('app/api/spotify/music-discovery/library/route.ts',deps);
+const req=(path)=>({nextUrl:new URL('http://127.0.0.1:3000'+path)});
+const post=(trackId,save,origin='http://127.0.0.1:3000')=>({headers:{get:(k)=>k==='origin'?origin:null},json:async()=>({trackId,save})});
+global.fetch=async(url,opt)=>{now.push({url,method:opt.method||'GET',headers:opt.headers});const p=responses.shift();assert(p,'Unexpected external Spotify call');return {ok:p.status>=200&&p.status<300,status:p.status,headers:{get:()=>p.retry??null},json:async()=>p.body};};
+(async()=>{
+ responses=[{status:200,body:{albums:{items:[{id:A,name:'New',artists:[{name:'Artist'}],release_date:'2026-10-10',release_date_precision:'day'}],next:null}}}];
+ let result=await searchRoute.GET(req('/api/spotify/music-discovery?mode=new'));
+ assert.equal(result.status,200);assert.equal(result.body.releases[0].title,'New');assert(now.at(-1).url.includes('type=album'));
+ responses=[{status:200,body:{tracks:{items:[track()],next:null}}}];
+ result=await searchRoute.GET(req('/api/spotify/music-discovery?mode=genre&genre=hardstyle'));
+ assert.equal(result.status,200);assert.equal(result.body.tracks[0].releaseDate,'2026-10-10');
+ responses=[{status:200,body:{items:[{track:track()}],next:null}}];
+ result=await searchRoute.GET(req('/api/spotify/music-discovery?mode=saved'));
+ assert.equal(result.status,200);assert.equal(result.body.tracks[0].id,A);
+ let before=now.length;
+ result=await searchRoute.GET(req('/api/spotify/music-discovery?mode=album&albumId=../../evil'));
+ assert.equal(result.status,400);assert.equal(now.length,before);
+ scopes='user-library-modify';
+ result=await libraryRoute.GET(req(`/api/spotify/music-discovery/library?ids=${A}`));assert.equal(result.status,403);assert.equal(result.body.code,'consent_required');
+ scopes='user-library-read user-library-modify';
+ responses=[{status:200,body:[true,false]}];
+ result=await libraryRoute.GET(req(`/api/spotify/music-discovery/library?ids=${A},${B}`));
+ assert.equal(result.status,200);assert.deepEqual(result.body.statuses,{[A]:true,[B]:false});
+ assert(now.at(-1).url.includes('/me/library/contains?uris=spotify%3Atrack%3A'));
+ responses=[{status:200},{status:200,body:[true]}];before=now.length;
+ result=await libraryRoute.POST(post(A,true));assert.equal(result.status,200);assert.equal(result.body.saved,true);
+ assert.deepEqual(now.slice(before).map(c=>c.method),['PUT','GET']);
+ assert(now[before].url.includes('/me/library?uris=spotify%3Atrack%3A'));
+ responses=[{status:200},{status:200,body:[false]}];before=now.length;
+ result=await libraryRoute.POST(post(A,false));assert.equal(result.status,200);assert.equal(result.body.saved,false);
+ assert.deepEqual(now.slice(before).map(c=>c.method),['DELETE','GET']);
+ responses=[{status:200},{status:200,body:[false]}];
+ result=await libraryRoute.POST(post(A,true));assert.equal(result.status,409);assert.equal(result.body.code,'unconfirmed');
+ responses=[{status:429,retry:'60'}];result=await libraryRoute.POST(post(A,true));assert.equal(result.status,429);
+ before=now.length;result=await libraryRoute.POST(post(A,true,'https://evil.example'));assert.equal(result.status,403);assert.equal(now.length,before);
+ scopes='user-library-read';result=await libraryRoute.POST(post(A,true));assert.equal(result.status,403);assert.equal(now.length,before);
+ scopes='user-library-read user-library-modify';responses=[{status:400}];
+ result=await libraryRoute.POST(post(A,true));assert.equal(result.status,503);
+ delete global.fetch;
+ console.log('PASS V361 Spotify search/genres/tag:new/saved tracks/album songs/previews/dates/library PUT DELETE GET/status confirmation/auth/CSRF/UI');
+})().catch(e=>{delete global.fetch;console.error(e);process.exitCode=1;});

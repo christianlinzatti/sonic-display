@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v441-core.json",
+  "files": [
+    "../components/visualizer/automaticMultiArtistStageV442.ts",
+    "../components/visualizer/multiArtistCameraV442.ts",
+    "../components/visualizer/automaticFeatureShowV440.ts",
+    "../components/visualizer/artistNameBubblesV441.ts",
+    "v414-music-types.d.ts"
+  ]
+}

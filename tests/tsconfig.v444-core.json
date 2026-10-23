@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v443-core.json",
+  "files": [
+    "../components/visualizer/multiArtistInteractionV444.ts",
+    "../components/visualizer/multiAvatarStageDirectorV326.ts",
+    "../components/visualizer/partnerLookAtEngine.ts",
+    "../components/visualizer/partnerGestureEngine.ts",
+    "v414-music-types.d.ts"
+  ]
+}

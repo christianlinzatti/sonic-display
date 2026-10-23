@@ -1,0 +1,13 @@
+Sonic Display V363 – Validation (2026-10-19)
+
+PASS: V363 Smart Release Notifications pure-model, local storage, dedup, recency, cursor and UI-integration regression
+PASS: Existing Spotify discovery/follow/library/radar regressions V358–V362
+PASS: npm run verify:offline, full sequential verification chain (exit code 0)
+PASS: 476 TypeScript/TSX source files syntax-checked
+PASS: Strict isolated TypeScript model check V360/V361/V362/V363
+PASS: ZIP integrity and package content checked (see generation output)
+LIMIT: Automatic notifications only during an active connected page; not OS push or server background scheduling.
+LIMIT: At most 8 followed artists per scan / 10 releases per artist, 6h auto cadence, 14-day notification window, best-effort rotation, Spotify limits.
+LIMIT: Notification card metadata stored in localStorage of this browser, not account-isolated; clear via UI on shared devices.
+BLOCKED: Next.js production build: node_modules and package-lock.json missing; 14/15 npm dependencies absent in this offline environment.
+NOT VERIFIED: Spotify authenticated production API session and actual account-visible release list.

@@ -1,0 +1,15 @@
+{
+  "extends":"./tsconfig.v435-core.json",
+  "files":[
+    "../components/visualizer/autoRapSceneAssignmentsV436.ts",
+    "../components/visualizer/rapCameraAutoFixV436.ts",
+    "../components/visualizer/rapCameraQualityOptimizerV435.ts",
+    "../components/visualizer/rapCameraTransitionPreviewV434.ts",
+    "../components/visualizer/rapCameraTimelineV431.ts",
+    "../components/visualizer/smartRapCameraTransitionsV433.ts",
+    "../components/visualizer/rapCameraKeyframesV432.ts",
+    "../components/visualizer/cinematicRapCameraV429.ts",
+    "../components/visualizer/expressiveRapDirectorV425.ts",
+    "v414-music-types.d.ts"
+  ]
+}

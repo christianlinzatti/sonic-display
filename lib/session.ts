@@ -1,7 +1,7 @@
 import {createCipheriv,createDecipheriv,createHash,randomBytes} from "node:crypto";
 import type {NextResponse} from "next/server";
 import {getEnv} from "@/lib/env";
-export interface SpotifySession {accessToken:string;refreshToken:string;expiresAt:number;}
+export interface SpotifySession {accessToken:string;refreshToken:string;expiresAt:number;scopes?:string;}
 export const SESSION_COOKIE="sonic_session";
 const STATE_COOKIE="sonic_oauth_state";
 const key=()=>createHash("sha256").update(getEnv().sessionSecret).digest();

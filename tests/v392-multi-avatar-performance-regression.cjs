@@ -1,0 +1,61 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const ts=require('./typescript-loader.cjs');
+const root=path.resolve(__dirname,'..');
+const read=file=>fs.readFileSync(path.join(root,file),'utf8');
+const code=ts.transpileModule(read('components/visualizer/ensemblePerformanceV392.ts'),{fileName:'ensemblePerformanceV392.ts',compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+const mod={exports:{}};new Function('module','exports','require',code)(mod,mod.exports,require);
+const v=mod.exports;
+const input=(patch={})=>({settings:{mode:'expressive',strength:80},trackId:'track-A',progressMs:1000,delta:1/60,
+  playing:true,reducedMotion:false,count:4,leader:0,bpm:120,section:'verse',genre:'Deutschrap',energy:.65,beat:.7,kick:.45,...patch});
+function sample(patch={}){const state=v.initialEnsembleV392();let result;
+ for(let i=0;i<250;i++)result=v.advanceEnsembleV392(state,input({...patch,progressMs:1000+Math.round(i*1000/60)}));return {result,state};}
+assert.deepEqual(v.normalizeEnsembleV392(null),v.DEFAULT_ENSEMBLE_V392);
+assert.deepEqual(v.normalizeEnsembleV392({mode:'expressive',strength:Infinity}),{mode:'expressive',strength:60});
+assert.deepEqual(v.normalizeEnsembleV392({mode:'subtle',strength:150}),{mode:'subtle',strength:100});
+assert.equal(v.normalizeEnsembleV392({mode:'hack',strength:-2}).mode,'off');
+let verse=sample().result;
+assert.equal(verse.active,true);
+assert.equal(verse.section,'verse');
+assert.equal(verse.roles.length,4);assert.equal(verse.gains.length,4);assert.equal(verse.yaw.length,4);
+assert.equal(verse.roles.filter(x=>x==='lead').length,1);
+assert.ok(verse.gains.every(x=>x>=.48&&x<=1.08));
+assert.ok(verse.yaw.every(x=>Math.abs(x)<=.13));
+assert.ok(verse.yaw.some(x=>x!==0),'backup performers gently face lead');
+assert.ok(verse.gains.some(x=>x<1),'backing dancers should be quieter during verse');
+const hook=sample({section:'hook'}).result;
+const drop=sample({section:'drop',energy:1,kick:1}).result;
+assert.equal(hook.section,'hook');assert.equal(drop.section,'drop');
+assert.ok(drop.gains.reduce((a,b)=>a+b,0)>verse.gains.reduce((a,b)=>a+b,0),'drop unites cast');
+assert.ok(drop.yaw.every(x=>x===0),'drop faces audience');
+const subtle=sample({settings:{mode:'subtle',strength:80}}).result;
+assert.ok(subtle.gains.every((x,i)=>Math.abs(x-1)<=Math.abs(verse.gains[i]-1)+.04),'subtle smaller than expressive');
+for(const patch of [{settings:{mode:'off',strength:100}},{settings:{mode:'expressive',strength:0}},
+ {manualPriority:true},{playing:false},{reducedMotion:true}]){
+ const r=sample(patch).result;assert.equal(r.active,false,JSON.stringify(patch));assert.ok(r.gains.every(x=>x===1));assert.ok(r.yaw.every(x=>x===0));
+}
+const duo=sample({count:2,leader:1}).result;
+assert.equal(duo.roles.length,2);assert.equal(duo.roles[1],'lead');
+assert.equal(sample({count:0}).result.gains.length,1);assert.equal(sample({count:99}).result.gains.length,4);
+const sequence=v.initialEnsembleV392();for(let i=0;i<180;i++)v.advanceEnsembleV392(sequence,input({progressMs:i*20}));
+const afterSeek=v.advanceEnsembleV392(sequence,input({progressMs:200}));assert.ok(afterSeek.phase<=2,'seek resets phase');
+const switched=v.advanceEnsembleV392(sequence,input({trackId:'track-B',progressMs:0}));assert.equal(sequence.trackId,'track-B');assert.equal(switched.active,true);
+const steady=v.initialEnsembleV392();
+for(let i=0;i<120;i++)v.advanceEnsembleV392(steady,input({progressMs:i*16.667,section:'verse'}));
+const brief=v.advanceEnsembleV392(steady,input({progressMs:2100,section:'drop'}));assert.equal(brief.section,'verse','single drop hint never causes instant switch');
+const manual=v.advanceEnsembleV392(steady,input({progressMs:2130,manualPriority:true}));assert.equal(manual.active,false,'manual always wins');
+for(let i=0;i<140;i++)v.advanceEnsembleV392(steady,input({progressMs:2150+i*16.7,section:'hook'}));
+assert.equal(steady.stable,'hook');
+assert.ok(read('components/visualizer/ThreeAvatar.tsx').includes('advanceEnsembleV392(ensembleStateV392.current'),'actual duo/group integration');
+assert.equal((read('components/visualizer/ThreeAvatar.tsx').match(/advanceEnsembleV392\(ensembleStateV392.current/g)||[]).length,2);
+assert.match(read('components/visualizer/ThreeAvatar.tsx'),/music\.gains\[i\]\*ensembleV392\.gains\[i\]/);
+assert.match(read('components/visualizer/ThreeAvatar.tsx'),/directedLead.*ensembleCueV392\.current\?\.gains\[0\]/);
+assert.match(read('components/visualizer/ThreeAvatar.tsx'),/g\.rotation\.y=formationApproach\(g\.rotation\.y,ensembleV392\.yaw\[i\]/);
+assert.match(read('components/visualizer/ThreeAvatar.tsx'),/manualPriority:!!manualPose/);
+assert.match(read('components/visualizer/MultiAvatarChoreographyPanel.tsx'),/<EnsemblePerformanceControlsV392\s*\/>/);
+assert.match(read('components/visualizer/EnsemblePerformanceControlsV392.tsx'),/Gemeinsame Rollenregie/);
+const pkg=JSON.parse(read('package.json'));assert.ok(Number(pkg.version.match(/v(\d+)$/)?.[1])>=392, "version newer than v392");
+assert.ok(pkg.scripts['verify:offline'].includes('test:v392'));
+console.log('PASS V392 multi-avatar – section hysteresis, roles, manual priority, integration, UI, version');

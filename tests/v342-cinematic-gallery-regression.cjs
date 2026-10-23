@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
+const source=fs.readFileSync('services/stageContent/cinematicGalleryV342.ts','utf8');
+const js=ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;
+const m={exports:{}};vm.runInNewContext(js,{exports:m.exports,module:m});const x=m.exports;
+const s=x.sanitizeCinematicV342({enabled:true,zoomPercent:999,panPercent:-5,parallaxPercent:999,transitionMs:1,style:'bad'});
+assert.equal(s.zoomPercent,14);assert.equal(s.panPercent,0);assert.equal(s.parallaxPercent,5);assert.equal(s.transitionMs,150);assert.equal(s.style,'mixed');
+const enabled={...x.DEFAULT_CINEMATIC_V342,enabled:true};
+const a=x.cinematicMotionV342(0,7,enabled);assert(a.durationMs>=7000);assert(a.fromX!==a.toX);assert(a.fromScale>a.toScale);
+assert(x.cinematicMotionV342(1,7,enabled).fromX!==a.fromX);
+assert.equal(x.cinematicMotionV342(1,7,enabled,true).durationMs,0);
+assert.equal(x.cinematicMotionV342(1,7,{...enabled,enabled:false}).parallax,0);
+assert(x.cinematicMotionV342(0,7,{...enabled,lowPower:true}).toX<a.toX);
+assert.match(fs.readFileSync('components/visualizer/StageImageGalleryV338.tsx','utf8'),/cinematicMotionV342/);
+assert.match(fs.readFileSync('components/visualizer/StageContentPluginSettingsV330.tsx','utf8'),/CinematicGallerySettingsV342/);
+assert.match(fs.readFileSync('app/globals.css','utf8'),/prefers-reduced-motion:reduce/);
+console.log('V342 cinematic gallery regression passed');

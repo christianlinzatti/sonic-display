@@ -1,0 +1,268 @@
+[
+  {
+    "i": 94,
+    "name": "test:v352",
+    "ok": true,
+    "last": "PASS V352 genre resolution/profiles, cue phases, V351 protection, manual presets, controls, storage, SSR, reduced-motion and stage wiring\n",
+    "seconds": 0.36
+  },
+  {
+    "i": 95,
+    "name": "test:v353",
+    "ok": true,
+    "last": "PASS V353 genre presets, custom library, input sanitization, V347 opt-in, V351 lyrics protection, GPU budgets, pause/reduced motion, single-canvas rendering and UI wiring\n",
+    "seconds": 0.33
+  },
+  {
+    "i": 96,
+    "name": "test:v354",
+    "ok": true,
+    "last": "PASS V354 clips, timeline playback boundaries, overlap priority, track scoping, pause/reduced-motion, safety, JSON sanitization, UI and live integration\n",
+    "seconds": 0.28
+  },
+  {
+    "i": 97,
+    "name": "test:v355",
+    "ok": true,
+    "last": "PASS V355 hysteresis, recovery, cooldown, hidden/stale samples, manual overrides, memory guard, settings, live wiring\n",
+    "seconds": 0.27
+  },
+  {
+    "i": 98,
+    "name": "test:v356",
+    "ok": true,
+    "last": "PASS V356 deterministic next-phrase planning, no repeats, safety/manual priority, clock validity, data validation and live wiring\n",
+    "seconds": 0.27
+  },
+  {
+    "i": 99,
+    "name": "test:v357",
+    "ok": true,
+    "last": "PASS V357 automatic show quality, deterministic planning, content caps, user priority, storage and integration\n",
+    "seconds": 0.36
+  },
+  {
+    "i": 100,
+    "name": "test:v358",
+    "ok": true,
+    "last": "PASS V358 learning opt-in, verified measurements, bounded privacy-safe aggregation, safe planning, controls, reset and integration\n",
+    "seconds": 0.36
+  },
+  {
+    "i": 101,
+    "name": "test:v359",
+    "ok": true,
+    "last": "PASS V359 Spotify library API /contains, PUT, DELETE, URI encoding, confirmation, auth, rate/error-safe flow, UI integration\n",
+    "seconds": 0.32
+  },
+  {
+    "i": 102,
+    "name": "test:v360",
+    "ok": true,
+    "last": "PASS V360 discovery model, genre/search/top/songs, safe URLs, server auth/scopes, 10-result limit, UI and follow integration\n",
+    "seconds": 0.33
+  },
+  {
+    "i": 103,
+    "name": "test:v361",
+    "ok": true,
+    "last": "PASS V361 Spotify search/genres/tag:new/saved tracks/album songs/previews/dates/library PUT DELETE GET/status confirmation/auth/CSRF/UI\n",
+    "seconds": 0.39
+  },
+  {
+    "i": 104,
+    "name": "test:v362",
+    "ok": true,
+    "last": "V362 Personal Release Radar regression passed\n",
+    "seconds": 0.37
+  },
+  {
+    "i": 105,
+    "name": "test:v363",
+    "ok": true,
+    "last": "V363 Smart Release Notifications regression passed\n",
+    "seconds": 0.35
+  },
+  {
+    "i": 106,
+    "name": "test:v365",
+    "ok": true,
+    "last": "V365 Web Push regression passed (boundaries, crypto, push security, consent UI, cron, SW, config)\n",
+    "seconds": 0.34
+  },
+  {
+    "i": 107,
+    "name": "test:v366",
+    "ok": true,
+    "last": "V366 Spotify Color Lyrics regression passed: IDs, paths, parsing, secure optional Spotify relay, fallbacks\n",
+    "seconds": 0.26
+  },
+  {
+    "i": 108,
+    "name": "test:v367",
+    "ok": true,
+    "last": "V367 vocal & karaoke checks passed\n(node:297948) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:297948) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///mnt/data/sonic-v389-work/components/visualizer/vocalLipSyncV367.ts is not specified and it doesn't parse as CommonJS.\nReparsing as ES module because module syntax was detected. This incurs a performance overhead.\nTo eliminate this warning, add \"type\": \"module\" to /mnt/data/sonic-v389-work/package.json.\n",
+    "seconds": 0.1
+  },
+  {
+    "i": 109,
+    "name": "test:v368",
+    "ok": true,
+    "last": "PASS V368 performance engine, rest states, multi-avatar integration and karaoke\n(node:297959) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:297959) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///mnt/data/sonic-v389-work/components/visualizer/vocalPerformanceV368.ts is not specified and it doesn't parse as CommonJS.\nReparsing as ES module because module syntax was detected. This incurs a performance overhead.\nTo eliminate this warning, add \"type\": \"module\" to /mnt/data/sonic-v389-work/package.json.\n",
+    "seconds": 0.11
+  },
+  {
+    "i": 110,
+    "name": "test:v369",
+    "ok": true,
+    "last": "PASS V369 facial coordination, performance close-ups, lyrics protection, holds and wiring\n(node:297970) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:297970) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///mnt/data/sonic-v389-work/components/visualizer/vocalPerformanceV368.ts is not specified and it doesn't parse as CommonJS.\nReparsing as ES module because module syntax was detected. This incurs a performance overhead.\nTo eliminate this warning, add \"type\": \"module\" to /mnt/data/sonic-v389-work/package.json.\n",
+    "seconds": 0.13
+  },
+  {
+    "i": 111,
+    "name": "test:v370",
+    "ok": true,
+    "last": "PASS V370: ARKit/Oculus/VRM detection, stable mesh keys, manual mappings, overrides, gain clamps, preview and runtime integration\n(node:297981) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:297981) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///mnt/data/sonic-v389-work/components/visualizer/facialRigStudioV370.ts is not specified and it doesn't parse as CommonJS.\nReparsing as ES module because module syntax was detected. This incurs a performance overhead.\nTo eliminate this warning, add \"type\": \"module\" to /mnt/data/sonic-v389-work/package.json.\n",
+    "seconds": 0.11
+  },
+  {
+    "i": 112,
+    "name": "test:v371",
+    "ok": true,
+    "last": "PASS V371: timed phrases, seek/pause, rap/singing, partner/choreography priority, gaze, gestures, additive rig release and UI integration\n",
+    "seconds": 0.35
+  },
+  {
+    "i": 113,
+    "name": "test:v372",
+    "ok": true,
+    "last": "PASS V372: shared vocal clock, focus, rap/singing, shift, multi-avatar, legacy, reduced motion, pause, lyric gaps, IK/partner priority, settings and stage\n",
+    "seconds": 0.36
+  },
+  {
+    "i": 114,
+    "name": "test:v373",
+    "ok": true,
+    "last": "PASS V373: source provenance, timestamp coverage, word/line/silence, pauses, sync offset, reduced motion, live/studio wiring and sample controls\n",
+    "seconds": 0.43
+  },
+  {
+    "i": 115,
+    "name": "test:v374",
+    "ok": true,
+    "last": "PASS V374: coarticulation, closure, calm rap, singer-agnostic lead/backing, call response, multi-avatar, pause, word/line/none, reduced motion, settings, inspector\n",
+    "seconds": 0.4
+  },
+  {
+    "i": 116,
+    "name": "test:v375",
+    "ok": true,
+    "last": "PASS V375 adaptive performance director: scene changes, manual overrides, seek safety, settings, inspector and wiring\n",
+    "seconds": 0.26
+  },
+  {
+    "i": 117,
+    "name": "test:v376",
+    "ok": true,
+    "last": "PASS V376 interactive vocal duets: line responses, handoffs, manual priority, safe pose overlays, settings and integration\n(node:298027) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:298027) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///mnt/data/sonic-v389-work/components/visualizer/interactiveVocalDuetsV376.ts is not specified and it doesn't parse as CommonJS.\nReparsing as ES module because module syntax was detected. This incurs a performance overhead.\nTo eliminate this warning, add \"type\": \"module\" to /mnt/data/sonic-v389-work/package.json.\n",
+    "seconds": 0.1
+  },
+  {
+    "i": 118,
+    "name": "test:v377",
+    "ok": true,
+    "last": "PASS V377 cinematic duet camera: lead, handoff, hooks, camera anchoring, lyrics protection, priority, pause, seek, multi-avatar and integration\n(node:298038) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:298038) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///mnt/data/sonic-v389-work/components/visualizer/cinematicDuetCameraV377.ts is not specified and it doesn't parse as CommonJS.\nReparsing as ES module because module syntax was detected. This incurs a performance overhead.\nTo eliminate this warning, add \"type\": \"module\" to /mnt/data/sonic-v389-work/package.json.\n",
+    "seconds": 0.11
+  },
+  {
+    "i": 119,
+    "name": "test:v378",
+    "ok": true,
+    "last": "PASS V378 lyrics-safe cinematic camera, phrase-end word gating, hook/duet priorities, pause, manual override, safe areas, immersive styling, inspector & settings\n(node:298049) ExperimentalWarning: Type Stripping is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:298049) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///mnt/data/sonic-v389-work/components/visualizer/cinematicLyricsCompositionV378.ts is not specified and it doesn't parse as CommonJS.\nReparsing as ES module because module syntax was detected. This incurs a performance overhead.\nTo eliminate this warning, add \"type\": \"module\" to /mnt/data/sonic-v389-work/package.json.\n",
+    "seconds": 0.12
+  },
+  {
+    "i": 120,
+    "name": "test:v379",
+    "ok": true,
+    "last": "PASS V379 demo timing, preview plans, presets, sources, safe zones, typography, accessibility, state wiring and Spotify read-only\n",
+    "seconds": 0.27
+  },
+  {
+    "i": 121,
+    "name": "test:v380",
+    "ok": true,
+    "last": "PASS V380 camera plans, cast bounds, scrubbed clips, real WebGL integration, selected/installed GLBs, 3D Troika lyrics, lighting, safe Spotify and opt-in rendering\n",
+    "seconds": 0.26
+  },
+  {
+    "i": 122,
+    "name": "test:v381",
+    "ok": true,
+    "last": "PASS V381 spatial drag, scale, limits, projected collision math, auto-layout, persistent presets and shared 3D stage wiring\n",
+    "seconds": 0.24
+  },
+  {
+    "i": 123,
+    "name": "test:v382",
+    "ok": true,
+    "last": "PASS V382 synchronized word envelopes, estimates, reduced motion, pause, rap/festival/cinematic, measured drop gates, 2D+3D and settings\n",
+    "seconds": 0.25
+  },
+  {
+    "i": 124,
+    "name": "test:v383",
+    "ok": true,
+    "last": "PASS V383 diagnosis, VRM/Oculus, channel collisions, safe calibration, isolated morph audition, portable profiles, UI integration\n",
+    "seconds": 0.3
+  },
+  {
+    "i": 125,
+    "name": "test:v384",
+    "ok": true,
+    "last": "PASS V384 natural articulation: B/P/M closure, rap jaw stabilization, vowel continuity, fallback, reduced motion, deterministic seek, V383 profile compatibility and settings\n",
+    "seconds": 0.4
+  },
+  {
+    "i": 126,
+    "name": "test:v385",
+    "ok": true,
+    "last": "PASS V385 manual vocal casting, role lip sync, handoff, hook camera and UI wiring\n",
+    "seconds": 0.37
+  },
+  {
+    "i": 127,
+    "name": "test:v386",
+    "ok": true,
+    "last": "PASS V386 vocal direction, duet, hooks, backup reactions, camera/lighting/manual priority\n",
+    "seconds": 0.33
+  },
+  {
+    "i": 128,
+    "name": "test:v387",
+    "ok": true,
+    "last": "PASS V387 sections, envelopes, real beat, safety limits, manual priorities, wiring\n",
+    "seconds": 0.26
+  },
+  {
+    "i": 129,
+    "name": "test:v388",
+    "ok": true,
+    "last": "PASS V388 opt-in policy, DPR caps, hardware/ensemble safety, touch UI, preview visibility, old pipelines\n",
+    "seconds": 0.23
+  },
+  {
+    "i": 130,
+    "name": "test:v389",
+    "ok": true,
+    "last": "PASS V389 real scene telemetry, profile restoration, cast validation, scoped recommendations, persistence, UX\n",
+    "seconds": 0.27
+  },
+  {
+    "i": 131,
+    "name": "test:v389",
+    "ok": true,
+    "last": "PASS V389 real scene telemetry, profile restoration, cast validation, scoped recommendations, persistence, UX\n",
+    "seconds": 0.25
+  }
+]

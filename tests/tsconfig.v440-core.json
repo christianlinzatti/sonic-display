@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v439-core.json",
+  "files": [
+    "../components/visualizer/automaticFeatureShowV440.ts",
+    "../components/visualizer/automaticMotionIntelligenceV438.ts",
+    "../components/visualizer/characterMotionLibrary.ts",
+    "../components/visualizer/intelligentDanceCombinationV242.ts",
+    "v414-music-types.d.ts"
+  ]
+}

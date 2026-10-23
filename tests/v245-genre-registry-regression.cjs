@@ -1,0 +1,17 @@
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const registry=read('config/musicGenres.ts'),avatar=read('components/animation/GenreAvatar.tsx'),types=read('types/animation.ts');
+for(const key of ['hardstyle','hardtekk','techno','hiphop','rock','ambient','pop']) assert.match(registry,new RegExp('\\b'+key+'\\s*:'),key);
+assert.match(registry,/keyof typeof MUSIC_GENRES/);
+assert.match(registry,/Object.keys\(MUSIC_GENRES\)/);
+assert.match(avatar,/MUSIC_GENRES\[genre\]/);
+assert.match(avatar,/p.avatarLabel/);
+assert.doesNotMatch(avatar,/const palette:/);
+assert.match(types,/export type \{ MusicGenre \}/);
+assert.match(types,/export \{ GENRES \}/);
+assert.ok(fs.existsSync(path.join(root,'components/visualizer/PerformanceBenchmarkPanel.tsx')));
+assert.ok(!fs.existsSync(path.join(root,'components/visualizer/PerformanceBenchmark.tsx')));
+assert.match(read('components/SettingsPanel.tsx'),/visualizer\/PerformanceBenchmarkPanel/);
+assert.match(read('components/visualizer/PerformanceBenchmarkPanel.tsx'),/export function PerformanceBenchmark\(/);
+assert.match(read('components/visualizer/AdaptiveMotionQualityDashboard.tsx'),/performanceBenchmarkMetrics/);
+console.log('V245 central genre registry + benchmark module naming checks passed');

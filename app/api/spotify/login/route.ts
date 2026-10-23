@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     authorize.searchParams.set("response_type", "code");
     authorize.searchParams.set("client_id", env.clientId);
     authorize.searchParams.set("redirect_uri", callback.toString());
-    authorize.searchParams.set("scope", "user-read-currently-playing user-read-playback-state");
+    authorize.searchParams.set("scope", "user-read-currently-playing user-read-playback-state user-follow-read user-follow-modify user-top-read user-library-read user-library-modify");
     authorize.searchParams.set("state", state);
     authorize.searchParams.set("show_dialog", "false");
     const response = NextResponse.redirect(authorize);

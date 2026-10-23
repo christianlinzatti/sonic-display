@@ -1,0 +1,14 @@
+const fs=require('fs');const assert=require('assert');const base=require('path').resolve(__dirname,'..');
+const read=p=>fs.readFileSync(require('path').join(base,p),'utf8');
+const src=read('components/visualizer/ThreeAvatar.tsx');
+const profiler=read('components/visualizer/avatarFrameProfiler.ts');
+const panel=read('components/AvatarFrameProfilerPanel.tsx');
+assert(src.includes('recordAvatarFrame(schedulerInstance, "Procedural"'));
+assert(src.includes('recordAvatarFrame(schedulerInstance, `GLTF:'));
+assert.equal((src.match(/releaseAvatarFrame\(schedulerInstance\)/g)||[]).length,2);
+assert(profiler.includes('entry.samples.length>=120'));
+assert(profiler.includes('entries.delete(id)'));
+assert(panel.includes('useAvatarFrameProfiler'));
+assert(read('components/SettingsPanel.tsx').includes('<AvatarFrameProfilerPanel />'));
+assert(Number(JSON.parse(read('package.json')).version.match(/-v(\d+)$/)?.[1]) >= 251);
+console.log('V251 avatar profiling regression passed (8 assertions).');

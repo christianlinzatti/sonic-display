@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "include": [],
+  "files": [
+    "../config/musicGenres.ts",
+    "../services/genre/genreIntelligence.ts",
+    "../components/visualizer/adaptiveGenreDance.ts",
+    "../services/stageContent/genreVisualDirectorV352.ts",
+    "../components/visualizer/genreSpecificDanceIntelligence.ts",
+    "../components/visualizer/lightingGenreProfiles.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

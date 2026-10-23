@@ -1,0 +1,8 @@
+const assert=require('node:assert/strict');const fs=require('node:fs');const ts=require('typescript');const vm=require('node:vm');
+const cache={};function load(name){if(cache[name])return cache[name].exports;const js=ts.transpileModule(fs.readFileSync(`components/visualizer/${name}.ts`,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;const module={exports:{}};cache[name]=module;vm.runInNewContext(js,{module,exports:module.exports,require:(path)=>load(path.replace('./','')),window:undefined,Event:class{}});return module.exports;}
+const d=load('motionDebugControls');const p=load('motionLayerPresets');const rap=p.BUILTIN_MOTION_PRESETS[0],hard=p.BUILTIN_MOTION_PRESETS[3];
+d.configureMotionMorphDuration(2);d.transitionToMotionPreset(rap);assert.equal(d.getRuntimeMotionSettings().weights.head,1);d.updateMotionPresetMorph(.1);assert(d.getRuntimeMotionSettings().weights.head<1);assert(d.getRuntimeMotionSettings().weights.head>.8);
+d.transitionToMotionPreset(hard);const start=d.getRuntimeMotionSettings().weights.head;d.updateMotionPresetMorph(.1);assert(d.getRuntimeMotionSettings().weights.head>start);for(let i=0;i<40;i++)d.updateMotionPresetMorph(.1);assert(Math.abs(d.getRuntimeMotionSettings().weights.head-1.1)<1e-8);
+d.transitionToMotionPreset(rap,0);assert.equal(d.getRuntimeMotionSettings().weights.head,.8);assert.equal(d.motionMorphStatus().active,false);
+d.transitionToMotionPreset(hard,2);d.setMotionDebugSettings({...d.readMotionDebugSettings(),weights:{...d.DEFAULT_LAYER_WEIGHTS}});assert.equal(d.motionMorphStatus().active,false);
+console.log('PASS V120 transition, interruption, bounded interpolation, immediate mode and manual override');

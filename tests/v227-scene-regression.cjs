@@ -1,0 +1,14 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const root = path.join(__dirname,'..');
+const read = name => fs.readFileSync(path.join(root,name),'utf8');
+const store=read('components/visualizer/scenePerformanceControls.ts');
+const stage=read('components/visualizer/DynamicStage.tsx');
+const ui=read('components/visualizer/ScenePerformanceStudio.tsx');
+const integration=read('components/visualizer/PerformanceBenchmarkPanel.tsx');
+for(const token of ['useSyncExternalStore','getSceneDetail','setSceneDetail','no-pulse','no-rings','minimal-lights']) assert(store.includes(token), token);
+for(const token of ['useSceneDetail','sceneFlags.pulse','sceneFlags.rings','sceneFlags.extraLights','sceneFlags.beamSweep']) assert(stage.includes(token), token);
+for(const token of ['Date.now() - d.updatedAt','r.samples.length < 2','setSceneDetail(run.current.original)','restore();','Testvariante übernehmen','scenePerformanceAdvice']) assert(ui.includes(token), token);
+assert(integration.includes('<ScenePerformanceStudio disabled={running} />'));
+console.log('V227 scene studio regression checks passed');

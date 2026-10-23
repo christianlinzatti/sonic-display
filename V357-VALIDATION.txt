@@ -1,0 +1,14 @@
+Sonic Display V357 – Validation summary
+
+Base: V356 release ZIP.
+Version: 0.1.0-v357
+Offline regression: PASS (100/100 npm run verify:offline commands).
+Source syntax: PASS (459 .ts/.tsx files).
+Strict semantic TypeScript: PASS for isolated services/stageContent/showTimelineV354.ts, autonomousShowV356.ts and showQualityV357.ts using global tsc.
+V357 regression: PASS (deterministic absolute-phrase camera/formation choices, settings sanitation, lyrics/photo caps, no FX increase, manual/pause/reduced-motion priority).
+Full project TypeScript and Next.js production build: NOT VERIFIED. npm preflight blocked (no node_modules or package-lock.json in base ZIP; 14 direct dependencies unresolved).
+Hardware endurance/FPS/occlusion assessment: NOT PERFORMED. Score preview is a heuristic based on planned cues, not observed image quality.
+
+To verify fully on a connected workstation:
+ npm install
+ npm run verify

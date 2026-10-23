@@ -1,0 +1,70 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const {load}=require('./helpers/ts-loader-v404.cjs');
+const {recommendConcertQualityV467:recommend,observationFromConcertQualityV467:observe}=load('services/show/concertQualityAdvisorV467');
+const base={at:10000,fps:60,fpsLevel:'ok',headsInFrame:2,activeAvatarCount:2,headsNearLyrics:0,
+ lyricLevel:'ok',headLevel:'ok',estimatedOverlaps:0,unloadedAvatars:0,qualityTier:'balanced'};
+const history=(patch={},start=10000)=>Array.from({length:3},(_,i)=>({...base,at:start+i*1000,...patch}));
+const run=(patch={})=>recommend(history(patch),12000);
+assert.equal(recommend([],0).status,'waiting');
+assert.equal(recommend(history().slice(0,2),11000).status,'waiting');
+assert.equal(run().status,'ready');assert.deepEqual(run().advice,[]);
+assert.equal(recommend(history(),20000).status,'stale');
+assert.equal(recommend(history(),9000).status,'stale');
+assert.equal(recommend([base,{...base,at:15000},{...base,at:16000}],16000).status,'waiting');
+assert.equal(recommend([base,base,base],10000).status,'waiting');
+assert.equal(recommend([{...base,at:0}],11000).status,'waiting');
+const low=run({fps:19,fpsLevel:'issue'});
+assert.equal(low.advice[0].id,'low-fps');assert.equal(low.advice[0].severity,'important');
+assert.equal(low.advice[0].evidence,'fps-measured');
+assert(low.advice[0].suggestion.includes('Qualitätsregelung'));
+assert(run({fps:19,fpsLevel:'issue',qualityTier:'low'}).advice[0].suggestion.includes('GLB'));
+assert.equal(run({fps:35,fpsLevel:'watch'}).advice[0].id,'moderate-fps');
+assert.equal(run({fps:null,fpsLevel:'unavailable'}).advice[0].id,'missing-fps');
+assert(!run({fps:0,fpsLevel:'ok'}).advice.some(a=>a.id.includes('fps')),'cannot infer FPS from invalid measurement');
+assert.equal(run({unloadedAvatars:1}).advice[0].id,'loading');
+assert.equal(run({headsInFrame:1}).advice[0].id,'out-of-frame');
+assert.equal(run({headsNearLyrics:1,lyricLevel:'watch'}).advice[0].id,'lyrics-overlap');
+assert.equal(run({headsNearLyrics:1,lyricLevel:'watch',estimatedOverlaps:1}).advice[0].evidence,'head-estimated');
+assert.equal(run({headsNearLyrics:1,lyricLevel:'watch'}).advice[0].evidence,'dom-projected');
+assert.equal(run({headsNearLyrics:0,lyricLevel:'watch'}).advice[0].id,'lyrics-bounds');
+assert.equal(run({lyricLevel:'unavailable',headsNearLyrics:1}).advice.length,0,'no overlap alert without applicable lyrics');
+let interrupted=history({fps:18,fpsLevel:'issue'});
+interrupted[1]={...interrupted[1],fps:59,fpsLevel:'ok'};
+assert(!recommend(interrupted,12000).advice.some(a=>a.id==='low-fps'),'transient one-frame dip must not become advisory');
+const mixed=run({fps:18,fpsLevel:'issue',headsInFrame:0,headsNearLyrics:1,lyricLevel:'watch',unloadedAvatars:1});
+assert.equal(mixed.advice.length,3,'top 3 bounded and ranked');
+assert.deepEqual(mixed.advice.map(t=>t.id),['low-fps','loading','lyrics-overlap']);
+assert.deepEqual(mixed,recommend(history({fps:18,fpsLevel:'issue',headsInFrame:0,headsNearLyrics:1,lyricLevel:'watch',unloadedAvatars:1}),12000));
+const raw=observe({at:10000,fps:58,qualityTier:'high',lyrics:{x:10,y:20,width:100,height:100},
+  avatars:[{slot:0,x:20,y:40,inFront:true,anchor:'estimated'},{slot:1,x:300,y:300,inFront:true,anchor:'head-bone',loaded:false}],
+  assessment:{fps:'ok',headsInFrame:1,activeAvatarCount:2,headsNearLyrics:1,lyrics:'watch',headVisibility:'watch'}});
+assert(raw);assert.equal(raw.estimatedOverlaps,1);assert.equal(raw.unloadedAvatars,1);
+assert.equal(raw.fps,58);assert.equal(observe({...raw,assessment:null,avatars:[],lyrics:null}),null);
+assert.equal(observe({at:1,fps:NaN,qualityTier:'low',lyrics:null,avatars:[],assessment:{fps:'unavailable',headsInFrame:0,activeAvatarCount:0,headsNearLyrics:0,lyrics:'unavailable',headVisibility:'unavailable'}}).fps,null);
+// More than a half hour of samples cannot lead to ever-growing advisory history.
+for(let i=3;i<1803;i++){
+ const observations=history({fps:i%5===0?19:57,fpsLevel:i%5===0?'issue':'ok'},i*1000);
+ const hints=recommend(observations,observations.at(-1).at);
+ assert(hints.advice.length<=3);
+}
+const read=file=>fs.readFileSync(file,'utf8');
+const store=read('components/visualizer/concertQualityStoreV466.ts');
+const hud=read('components/visualizer/ConcertQualityInspectorV466.tsx');
+const advisor=read('components/visualizer/ConcertQualityAdvisorV467.tsx');
+const probe=read('components/visualizer/ConcertQualityProbeV466.tsx');
+const stage=read('components/visualizer/ThreeAvatar.tsx');
+assert(store.includes('observationFromConcertQualityV467(next)'));
+assert(store.includes('recentV467.slice(-3)'),'ring of 4 only');
+assert(store.includes('if(next.at<=0){recentV467=[];}'),'reset clears history');
+assert(store.includes('historyV467:recentV467'));
+assert(hud.includes('<ConcertQualityAdvisorV467 history={live.historyV467??[]} now={Date.now()}/>'));
+assert(hud.includes('valid&&<ConcertQualityAdvisorV467'),'advisor only while inspector has data');
+assert(advisor.includes('Nur lokale Hinweise')&&advisor.includes('Vorschlag:'));
+assert(!/setTimeout|setInterval|localStorage|fetch\(|requestAnimationFrame|Math\.random/.test(store+advisor), 'no extra scheduling, network or persistence');
+assert(probe.includes('publishConcertQualityV466'),'still shares V466 probe');
+assert(stage.includes('{qualityInspectorEnabledV466&&<ConcertQualityProbeV466 enabled />}'),'probe remains opt-in');
+const css=read('app/globals.css');assert(css.includes('.v467-advisor'));
+const pkg=require('../package.json');assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=467);
+console.log('PASS V467: three consecutive observations, rated actionable tips, provenance/fallback, no automatic intervention, no transient false positives, bounded history and 30-minute deterministic simulation');

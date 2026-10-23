@@ -1,0 +1,62 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const ts=require('./typescript-loader.cjs');
+const root=path.join(__dirname,'..'),read=f=>fs.readFileSync(path.join(root,f),'utf8');
+const file='components/visualizer/multiAvatarStageDirectorV326.ts';
+const js=ts.transpileModule(read(file),{fileName:file,compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+const m={exports:{}};new Function('module','exports','require',js)(m,m.exports,()=>{throw Error('No external runtime dependency expected');});
+const v=m.exports;
+assert.equal(v.GROUP_DEFAULT_V326.enabled,false);
+assert.equal(v.GROUP_DEFAULT_V326.count,4);
+const base=v.normalizeGroupV326({...v.GROUP_DEFAULT_V326,enabled:true});
+assert.equal(base.cues.length,3);
+assert.equal(v.canRunGroupV326(base,'song-a'),true);
+assert.equal(v.canRunGroupV326({...base,songSync:true,trackId:'song-a'},'song-b'),false);
+assert.equal(v.canRunGroupV326({...base,songSync:true,trackId:'song-a'},'song-a'),true);
+assert.equal(v.canRunGroupV326({...base,songSync:true,trackId:''},''),false);
+for(const count of [3,4]){
+ const s=v.normalizeGroupV326({...base,count,cues:base.cues.map(c=>({...c,positions:v.layoutV326(c.formation,count)}))});
+ for(const t of [0,8,8.3,16,16.4,22,60,NaN,Infinity]){
+  const p=v.evaluateGroupV326(s,t);assert.equal(p.positions.length,count);
+  assert.ok(p.positions.every(q=>q.length===3&&q.every(Number.isFinite)));
+  assert.ok(p.positions.every((q,i)=>i===0||q[0]-p.positions[i-1][0]>=s.minSpacing-.002));
+  assert.ok(p.positions.every(q=>q[0]>=-4.501&&q[0]<=4.501));
+  assert.deepEqual(p,v.evaluateGroupV326(s,t),'must be seek/replay deterministic');
+ }
+ assert.equal(v.evaluateGroupV326(s,10).focus,0);
+ assert.equal(v.evaluateGroupV326(s,20).drop,true);
+ const p=v.layoutV326('arc',count),q=v.layoutV326('stagger',count);
+ assert.equal(p.length,count);assert.equal(q.length,count);
+ assert.ok(p.some(x=>x[2]!==0));assert.ok(q.some(x=>x[2]!==0));
+}
+const at8=v.evaluateGroupV326(base,8),at84=v.evaluateGroupV326(base,8.4),at10=v.evaluateGroupV326(base,10);
+assert.equal(at8.blend,0);assert.ok(at84.blend>0&&at84.blend<1);assert.equal(at10.blend,1);
+const far=v.protectGroupSpacingV326([[0,0,0],[0,0,0],[0,0,0],[0,0,0]],2.3);
+assert.equal(far.adjusted,true);assert.ok(far.distance>=2.3-.002);
+assert.equal(far.points.length,4);assert.ok(far.points.every(x=>x[0]>=-4.501&&x[0]<=4.501));
+const tiny=v.protectGroupSpacingV326([[-2,0,0],[0,0,0],[2,0,0]],.7);
+assert.equal(tiny.adjusted,false);
+const input=JSON.stringify(base);v.evaluateGroupV326(base,16.3);assert.equal(JSON.stringify(base),input);
+const changed=v.updateGroupCueV326(base,'drop',{at:-50,transition:999,focus:55,positions:[[Infinity,12,Infinity],[-500,1,Infinity],[.5,1,3],[999,1,999]]});
+assert.equal(changed.cues.find(x=>x.id==='drop').at,0);
+assert.equal(changed.cues.find(x=>x.id==='drop').transition,8);
+assert.equal(changed.cues.find(x=>x.id==='drop').focus,-1);
+assert.equal(changed.cues.find(x=>x.id==='drop').positions[0][1],0);
+assert.equal(base.cues.find(x=>x.id==='drop').at,16);
+const corrupt=v.normalizeGroupV326({enabled:1,count:99,trackId:'x'.repeat(300),minSpacing:100,bpm:Infinity,
+ cues:Array.from({length:80},()=>({id:'duplicate',at:NaN,positions:Array.from({length:4},()=>[Infinity,NaN,Infinity])}))});
+assert.equal(corrupt.enabled,false);assert.equal(corrupt.count,4);assert.equal(corrupt.cues.length,64);
+assert.equal(new Set(corrupt.cues.map(c=>c.id)).size,64);assert.equal(corrupt.trackId.length,200);
+assert.equal(corrupt.minSpacing,2.3);assert.equal(corrupt.bpm,128);
+assert.equal(v.evaluateGroupV326({...base,cues:[]},10),null);
+const store=new Map(),events=[];global.Event=class{constructor(type){this.type=type;}};global.window={localStorage:{setItem:(key,val)=>store.set(key,val),getItem:key=>store.get(key)??null},dispatchEvent:e=>events.push(e.type)};
+v.writeGroupV326(base);assert.equal(v.readGroupV326().enabled,true);assert.deepEqual(events,[v.GROUP_EVENT_V326]);
+store.set(v.GROUP_KEY_V326,'{broken');assert.equal(v.readGroupV326().enabled,false);
+delete global.window;delete global.Event;
+const stage=read('components/visualizer/ThreeAvatar.tsx');
+for(const tag of ['groupOnV326','GroupDancersV326','readGroupV326','canRunGroupV326','evaluateGroupV326','GROUP_EVENT_V326','slot={i}','<Dancer props={groupProps} slot={i}/>'])assert.ok(stage.includes(tag),`stage ${tag}`);
+const legacy=read('components/visualizer/MultiAvatarChoreographyPanel.tsx');assert.ok(legacy.includes('<EnsembleChoreographyStudioV325 />')&&legacy.includes('<MultiAvatarStageStudioV326 />'));
+const ui=read('components/visualizer/MultiAvatarStageStudioV326.tsx');for(const tag of ['useMusic','gridMarkersV325','snapEnsembleSecondV325','onPointerDown','3D-Vorschau','Songposition folgen','JSON importieren','Gruppen-Choreografie exportieren'])assert.ok(ui.includes(tag),tag);
+const preview=read('components/visualizer/MultiAvatarPreviewV326.tsx');assert.ok(preview.includes('Canvas')&&preview.includes('useGLTF')&&preview.includes('AnimationMixer'));
+const pkg=require('../package.json');assert.ok(Number(pkg.version.match(/v(\d+)$/)?.[1])>=326, "version newer than v326");assert.ok(pkg.scripts['verify:offline'].includes('test:v326'));
+console.log('PASS V326: 3/4 independent stage slots, bounded spacing, track isolation, interpolation, cue editing, persistence, UI/3D integration');

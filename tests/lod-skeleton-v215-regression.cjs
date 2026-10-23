@@ -1,0 +1,13 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const source = fs.readFileSync(path.join(__dirname, '../components/visualizer/ThreeAvatar.tsx'), 'utf8');
+const region = source.slice(source.indexOf('// V215: the skeleton graph'), source.indexOf('// V127: preserve clip phase'));
+assert.ok(region.includes('useMemo(() => {'), 'cached skeleton references');
+assert.ok(region.includes('}, [model])'), 'cache invalidated on model replacement');
+assert.equal((region.match(/model\.traverse\(/g) || []).length, 1, 'only one traversal during skeleton initialization');
+assert.ok(region.includes('for (const [name, q] of lodBones)'), 'reuse bone lookup for correction');
+assert.ok(region.includes('for (const [name,q] of lodBones)'), 'reuse bone lookup for diagnostics');
+assert.ok(region.includes('lodTargetQuaternion.set('), 'reuse scratch quaternion');
+assert.ok(!region.includes('new Quaternion(...r)'), 'avoid allocating target quaternion for each bone per frame');
+console.log('PASS V215: cached skeleton and allocation regression checks');

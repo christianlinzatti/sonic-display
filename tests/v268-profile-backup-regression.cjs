@@ -1,0 +1,5 @@
+const assert=require('node:assert/strict');const fs=require('node:fs');const root=require('node:path').resolve(__dirname,'..');const read=p=>fs.readFileSync(require('node:path').join(root,p),'utf8');const s=read('services/monitoring/performanceProfileBackupV268.ts'),ui=read('components/DevicePerformanceProfilesV267.tsx'),pkg=require('../package.json');
+assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 268, 'Projektversion muss >= V268 sein');for(const fn of ['exportProfileBackup','parseProfileBackup','mergeImportedProfiles'])assert.ok(s.includes(`function ${fn}(`));
+for(const part of ['validProfile','MAX_BACKUP_BYTES','BACKUP_VERSION','ids.has(p.id)','choice.conflict',"choice?.selected"])assert.ok(s.includes(part),part);
+for(const part of ['downloadBackup','readBackup','commitImport','Import-Vorschau','Profil-Sicherung und Geräteübertragung','Import abbrechen','Vorhandenes ersetzen','URL.revokeObjectURL'])assert.ok(ui.includes(part),part);
+console.log('V268 profile backup regression OK');
