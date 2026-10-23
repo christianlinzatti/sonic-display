@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v484-core.json",
+  "compilerOptions": {"incremental": false},
+  "files": [
+    "../components/visualizer/naturalDanceMotionStudioV485.ts",
+    "../components/visualizer/expressiveLowPosePerformanceV484.ts",
+    "../components/visualizer/naturalLowPoseInteractionV483.ts",
+    "../components/visualizer/intelligentLowPoseV481.ts"
+  ]
+}

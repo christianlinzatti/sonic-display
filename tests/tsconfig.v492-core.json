@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.v491-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/glbBlendPresetsV492.ts"
+  ]
+}

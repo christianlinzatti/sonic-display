@@ -6,12 +6,13 @@ import { useUiPreferences } from "@/context/UiPreferencesContext";
 import type { Lyrics } from "@/types/music";
 import { planBeautifulLyricsV455 } from "@/components/visualizer/beautifulLyricsV455";
 import { planCinematicLyricsV461 } from "@/components/visualizer/cinematicLyricsV461";
+import { planBeautifulLyricsV477, lyricPlaybackFractionV477 } from "@/components/visualizer/beautifulLyricsV477";
 import {resolveKineticStyleV382,resolveKineticWordV382,kineticDropCueV382} from "@/components/visualizer/kineticLyricsV382";
 
-type Props = { lyrics: Lyrics | null; progressMs: number; activeIndex: number; playing: boolean; genre?: string; immersive?: boolean };
+type Props = { lyrics: Lyrics | null; progressMs: number; activeIndex: number; playing: boolean; genre?: string; immersive?: boolean; avatarCountV477?: number };
 
 /** Text animation driven by the existing playback clock; does not create timers or audio listeners. */
-export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre = "", immersive = false }: Props) {
+export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre = "", immersive = false, avatarCountV477 = 1 }: Props) {
   const { preferences } = useUiPreferences();
   const { metrics, active: microphoneActive } = useAudioAnalysis();
   const style = preferences.lyricsStyle ?? "kinetic";
@@ -60,7 +61,12 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
     synchronized: lyrics?.synced === true, playing, reducedMotion: reduced,
     layout: immersive ? "immersive" : "standard", userScale: fontSize,
   }) : null;
-  const windowSize = immersive && activePlanV461?.visibleLineCount === 1 ? 1 : focus ? 3 : cinematic ? 3 : neon ? 3 : 5;
+  const activePlanV477 = activeForPlanV461 ? planBeautifulLyricsV477({
+    line: activeForPlanV461, nextLineStart: lines[activeIndex + 1]?.startMs,
+    synchronized: lyrics?.synced === true, playing, reducedMotion: reduced,
+    layout: immersive ? "immersive" : "standard", avatarCount: avatarCountV477, userScale: fontSize,
+  }) : null;
+  const windowSize = immersive && (activePlanV461?.visibleLineCount === 1 || activePlanV477?.visibleLineCount === 1) ? 1 : focus ? 3 : cinematic ? 3 : neon ? 3 : 5;
   const first = Math.max(0, Math.min(Math.max(0, lines.length - windowSize), activeIndex - (windowSize === 1 ? 0 : focus || cinematic || neon ? 1 : 2)));
   const visible = useMemo(() => lines.slice(first, first + windowSize), [lines, first, windowSize]);
   const synchronized = lyrics?.synced === true;
@@ -73,12 +79,12 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
   ) : 0;
   const lineProgress = synchronized && activeLine && activeLineEnd>activeLine.startMs
     ? Math.max(0,Math.min(1,(progressMs-activeLine.startMs)/(activeLineEnd-activeLine.startMs))) : 0;
-  const hasTrueWordTiming = activePlanV461?.realWordTiming ?? false;
+  const hasTrueWordTiming = activePlanV477?.timingMode === "verified-word";
   const wordsEnabled = (kinetic || cinematic || neon) && (preferences.lyricsWordHighlight ?? true) && synchronized;
 
   if (!lines.length) return <section className="lyrics"><p className="empty">Keine Lyrics für diesen Titel gefunden.</p></section>;
-  return <section className={`lyrics v461-cinematic-lyrics ${immersive ? "v461-stage-lyrics" : ""} ${focus ? "lyrics-focus-v367" : ""} lyrics-studio-position-${preferences.lyricsPosition ?? "center"} ${kinetic ? "lyrics-kinetic" : cinematic ? "lyrics-cinematic" : neon ? "lyrics-neon" : "lyrics-classic"} ${kineticStyleV382?"v382-kinetic-active v382-preset-"+kineticStyleV382:""}`} aria-label="Songtext" style={{ "--studio-font-family": family, "--studio-font-scale": fontSize, "--studio-glow": glow, "--studio-speed": 1 / speed, "--studio-color-from": gradientFrom, "--studio-color-to": gradientTo, "--reactive-kick": kick, "--reactive-bass": bass, "--reactive-drop": drop } as CSSProperties}>
-    <p className="lyrics-source">{lyrics?.provider}{synchronized ? " · zeilensynchronisiert" : " · ohne Zeitmarken"}{wordsEnabled ? hasTrueWordTiming ? " · echte Wort-Zeitstempel" : " · Wort-Timing geschätzt" : ""}</p>
+  return <section className={`lyrics v461-cinematic-lyrics v477-beautiful-lyrics ${immersive ? "v461-stage-lyrics" : ""} ${focus ? "lyrics-focus-v367" : ""} lyrics-studio-position-${preferences.lyricsPosition ?? "center"} ${kinetic ? "lyrics-kinetic" : cinematic ? "lyrics-cinematic" : neon ? "lyrics-neon" : "lyrics-classic"} ${kineticStyleV382?"v382-kinetic-active v382-preset-"+kineticStyleV382:""}`} aria-label="Songtext" style={{ "--studio-font-family": family, "--studio-font-scale": fontSize, "--studio-glow": glow, "--studio-speed": 1 / speed, "--studio-color-from": gradientFrom, "--studio-color-to": gradientTo, "--reactive-kick": kick, "--reactive-bass": bass, "--reactive-drop": drop } as CSSProperties}>
+    <p className="lyrics-source">{lyrics?.provider}{synchronized ? " · zeilensynchronisiert" : " · ohne Zeitmarken"}{wordsEnabled ? hasTrueWordTiming ? " · echte Wort-Zeitstempel" : " · Zeilenfortschritt (keine Wort-Zeitstempel)" : ""}</p>
     {focus && <div className="lyrics-v367-eyebrow" aria-hidden="true"><span className="lyrics-v367-led"/> LIVE LYRICS <span className="lyrics-v367-divider"/> {synchronized ? hasTrueWordTiming ? "WORD SYNC" : "LINE SYNC" : "PLAIN TEXT"}</div>}
     <div className="lyrics-window" style={{ "--lyrics-intensity": intensity, "--lyrics-beat": beat } as CSSProperties}>
       {visible.map((line, index) => {
@@ -91,17 +97,19 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
         const v455 = planBeautifulLyricsV455({line,nextLineStart:nextStart,synchronized,playing,reducedMotion:reduced,userScale:fontSize});
         const v461 = planCinematicLyricsV461({line,nextLineStart:nextStart,synchronized,playing,
           reducedMotion:reduced,layout:immersive?"immersive":"standard",userScale:fontSize});
-        const ratio = synchronized ? Math.max(0, Math.min(1, (progressMs - line.startMs) / duration)) : 0;
-        const wordTimed = v461.realWordTiming;
-        const words = wordTimed ? line.words!.map(word => word.text) : (line.text.match(/\S+\s*/g) ?? []);
+        const ratio = synchronized ? lyricPlaybackFractionV477(progressMs, line.startMs, line.startMs + duration) : 0;
+        const v477 = planBeautifulLyricsV477({line,nextLineStart:nextStart,synchronized,playing,
+          reducedMotion:reduced,layout:immersive?"immersive":"standard",avatarCount:avatarCountV477,userScale:fontSize});
+        const wordTimed = v477.timingMode === "verified-word";
+        const words = wordTimed ? line.words!.map(word => word.text) : [];
         const elapsedWords = active && wordsEnabled ? ratio * words.length : 0;
-        return <p key={`${line.startMs}-${lineIndex}`} className={`lyric v455-lyric-line v461-lyric-line v455-${v455.density} v461-${v461.density} ${active ? "active" : near ? "near" : ""} ${lineIndex < activeIndex ? "past-v367" : "upcoming-v367"}`} style={{ "--v455-font-scale": v455.fontScale*v461.fontScale, "--v455-motion-scale": v455.motionScale, "--v455-word-spacing": `${v455.wordSpacingEm}em`, "--v461-motion-scale":v461.motionScale, "--v461-stagger-ms":`${v461.wordEntranceDelayMs}ms` } as CSSProperties} aria-current={active ? "true" : undefined}>
-          {wordsEnabled ? words.map((word, wi) => {
+        return <p key={`${line.startMs}-${lineIndex}`} className={`lyric v455-lyric-line v461-lyric-line v455-${v455.density} v461-${v461.density} v477-${v477.density} ${active ? "active" : near ? "near" : ""} ${lineIndex < activeIndex ? "past-v367" : "upcoming-v367"}`} style={{ "--v455-font-scale": v455.fontScale*v461.fontScale*v477.fontScale, "--v477-line-height":v477.lineHeight, "--v477-motion-scale":v477.motionScale, "--v477-backdrop-opacity":v477.backdropOpacity, "--v477-context-opacity":v477.focusOpacity, "--v477-line-progress":`${(ratio*100).toFixed(1)}%`, "--v455-motion-scale": v455.motionScale, "--v455-word-spacing": `${v455.wordSpacingEm}em`, "--v461-motion-scale":v461.motionScale, "--v461-stagger-ms":`${v477.entranceDelayMs}ms` } as CSSProperties} aria-current={active ? "true" : undefined}>
+          {wordsEnabled && wordTimed ? words.map((word, wi) => {
             const timedWord = wordTimed ? line.words![wi] : null;
             const wordEnd = timedWord ? (timedWord.endMs && timedWord.endMs > timedWord.startMs
               ? timedWord.endMs : line.words![wi + 1]?.startMs ?? lineEnd) : 0;
             const amount = active ? (timedWord
-              ? Math.max(0, Math.min(1, (progressMs - timedWord.startMs) / Math.max(50, wordEnd - timedWord.startMs)))
+              ? lyricPlaybackFractionV477(progressMs, timedWord.startMs, wordEnd)
               : Math.max(0, Math.min(1, elapsedWords - wi))) : lineIndex < activeIndex ? 1 : 0;
             const wordLabel = wordTimed && wi < words.length-1 && !/\s$/.test(word) &&
               !/^[,.;:!?…)]/.test(words[wi+1].trimStart()) && !/[([{]$/.test(word)
@@ -113,7 +121,7 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
             return <span key={wi} className={`kinetic-word ${active ? "kinetic-word-active" : ""} ${active && amount > 0 && amount < 1 ? "v367-speaking" : ""}`} style={{ "--word-fill": `${(shownAmountV382 * 100).toFixed(1)}%`, "--word-order": wi,
               "--v382-word-scale":1+((cueV382?.scale??1)-1)*v455.motionScale*v461.motionScale,"--v382-word-lift":`${-(cueV382?.lift??0)*v455.motionScale*v461.motionScale}px`,
               "--v382-word-glow":(cueV382?.glow??0)*v455.motionScale*v461.motionScale } as CSSProperties}>{wordLabel}</span>;
-          }) : <span className="kinetic-whole-line">{line.text || "♪"}</span>}
+          }) : <span className={wordsEnabled && v477.timingMode === "line-progress" ? "kinetic-whole-line v477-line-progress-text" : "kinetic-whole-line"}>{line.text || "♪"}</span>}
         </p>;
       })}
     </div>

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v481-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/naturalLowPoseTransitionsV482.ts",
+    "../components/visualizer/intelligentLowPoseV481.ts"
+  ]
+}

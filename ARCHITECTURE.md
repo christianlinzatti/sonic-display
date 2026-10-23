@@ -1,239 +1,255 @@
-# Sonic Display architecture
+# Sonic Display – Systemarchitektur
+
+> **Dokumentationsstand:** V492 (23.10.2026)
+> **Quellbasis:** Sonic Display V492; der npm-Paketversionsstring lautet `0.1.0-v492`.
+> **Zweck:** Aktuelle Architektur und Verantwortlichkeiten, nicht chronologische Release-Historie.  
+> **Pflege:** Bei neuen/umgebauten Komponenten, Datenflüssen, Routen und Prioritätsregeln mitaktualisieren. Der Build kontrolliert referenzierte Quelldateien; fachliche Aussagen benötigen weiterhin ein Review.
+
+## 1. System auf einen Blick
+
+Sonic Display ist eine Next.js-15-/React-/TypeScript-Anwendung mit Spotify-Wiedergabedaten, Lyrics, optionaler Mikrofonanalyse und einer 3D-Konzertbühne auf Basis von React Three Fiber/Three.js. Die Anzeige spielt Spotify-Musik **nicht selbst ab**: Wiedergabestatus und Position werden abgefragt und die Darstellung darauf synchronisiert. Das Raspberry-Pi-/Touchscreen-Ziel beeinflusst die Render- und Laufzeitstrategie. **Versionierte `Vxxx`-Dateien sind die Entwicklungshistorie; dieses Dokument beschreibt den gegenwärtigen Aufbau.**
+
+```mermaid
+flowchart TD
+    SP[Spotify Web API / OAuth] --> API[Next.js app/api/* – Servergrenze]
+    LS[LRCLIB / lyrics.ovh / Genius] --> API
+    SC[Optional: Spotify Color Lyrics] --> API
+    FM[Last.fm / optionale Event- und Mediendienste] --> API
+    API --> SA[Browser-Adapter: services/spotify, services/lyrics/client, services/musicSource]
+    SA --> MC[MusicProvider – Playback, Lyrics, Genre]
+    MIC[Optionales Mikrofon – Web Audio] --> AC[AudioAnalysisProvider]
+    MC --> AC
+    MC --> VC[VisualizerProvider]
+    AC --> VC
+    PREF[UiPreferencesProvider – lokale Einstellungen] --> VC
+    VC --> VS[VisualizerStage / Show- und Bühnenplanung]
+    VS --> R3F[ThreeAvatar – R3F/GLB/Procedural]
+    VS --> LYR[Lyrics, Bühne, Licht, Kamera, Medien]
+    PREF --> VS
+```
+
+**Zentrale Grenzen:** Tokens und Zugangsdaten bleiben in Server-Routen; Browser-Komponenten erhalten normalisierte Modelle aus `types/music.ts`, keine Spotify-Rohantworten. Mikrofonanalyse ist freiwillig. Aufnahme-/Analyseergebnisse dürfen nicht als echte Spotify-Audio-Analyse oder Sängererkennung ausgegeben werden.
+
+## 2. Einstiegspunkte, Provider und Datenfluss
+
+| Schicht | Aktueller Einstieg / Verantwortung |
+| --- | --- |
+| Next.js App Router | `app/layout.tsx` setzt die globale `UiPreferencesProvider`-Grenze. |
+| Startseite | `app/page.tsx` schachtelt `MusicProvider` → `AudioAnalysisProvider` → `VisualizerProvider` → `SonicDisplay`. |
+| Anzeige | `components/SonicDisplay.tsx` verarbeitet Track-/Lyrics-Zustand, Lazy-Loading, Kiosk-/Ambient-Ansichten und Visual-Balance. |
+| Musik | `context/MusicContext.tsx` kombiniert `hooks/usePlaybackPolling.ts` und `hooks/useGenreDetection.ts` mit manuellen Genre-Korrekturen. |
+| Audio | `context/AudioAnalysisContext.tsx` wählt Live-Mikrofonmesswerte oder geschätzte Beat-Metriken und gibt den aktiven Quellentyp weiter. |
+| Visualizer | `context/VisualizerContext.tsx` bündelt Playback, Genre, Audio und Präferenzen zu `useVisualizer()`. |
+| Präferenzen | `context/UiPreferencesContext.tsx` hält UI-Einstellungen getrennt vom Playback in Browser-`localStorage`. |
+| Typen | `types/music.ts` definiert unter anderem `Track`, `Lyrics`, `MusicState`, `MusicSource` und `UiPreferences`; `types/audio.ts` die Audiomesswerte. |
+
+**Wiedergabeablauf:** `services/musicSource.ts` → `services/spotify/client.ts` → `/api/spotify/current` → `hooks/usePlaybackPolling.ts` → `MusicContext`. Die Abfrage erfolgt normal alle 5 Sekunden; Fehler führen zu begrenztem Backoff bzw. `reconnecting`. Bei Trackwechsel werden Lyrics neu geladen. `SonicDisplay` interpoliert die Fortschrittsanzeige zwischen den Serverabfragen; das ist keine samplegenaue Audiouhr. Bei Seek, Pause, Trackwechsel und Tab-Wechsel müssen die Direktor-Module ihre Zustände prüfen bzw. zurücksetzen.
+
+**Präferenzen:** Manuelle Optionen, gespeicherte Rap-/Kamera-Edits und Avatar-Auswahl sind getrennt von der Spotify-Session. `localStorage` ist eine browser-/gerätegebundene Speicherung und keine automatische geräteübergreifende Synchronisierung. Einstellungen können vor der Hydrierung zunächst Defaults verwenden.
+
+## 3. Serverseitige Integration und Sicherheit
+
+### Spotify-Anmeldung und Wiedergabe
+
+- `app/api/spotify/login/route.ts`: OAuth-Einstieg mit CSRF-`state`; kanonischer Callback-Ursprung aus `lib/spotify-origin.ts` (wichtig für `localhost` gegenüber `127.0.0.1`).
+- `app/api/spotify/callback/route.ts`: `state`-Validierung und Code-Austausch; danach Session-Cookie.
+- `lib/spotify.ts`, `lib/session.ts`: Token-Aktualisierung und AES-256-GCM-verschlüsseltes, `HttpOnly`/`SameSite=Lax`-Session-Cookie; keine Browserausgabe von Spotify-Tokens.
+- `app/api/spotify/current/route.ts`: Spotify-Status in das `Track`-Modell umwandeln, 401/204/429 und Refresh behandeln. Die API liefert auch Contributor-/Artist-Credits, **keine** zeitcodierten Sängerrollen.
+- `app/api/spotify/artists/follow/route.ts` und die Discovery-/Library-Routen: eigene serverseitige Spotify-Zugriffe; Benutzeraktionen bleiben ausdrücklich zugeordnet.
+- `app/api/canvas/route.ts`: optionaler, inoffizieller Spotify-Canvas-Endpunkt; Verfügbarkeit ist nicht garantiert.
+
+Konfiguration und Secrets kommen aus `.env.example`/Serverumgebung, **nicht** aus `NEXT_PUBLIC_*` (ausgenommen ausdrücklich öffentliche Werte wie ein VAPID-Public-Key). Spotify-OAuth-Redirect-URL, Origin und Cookies müssen zusammenpassen. Die Version unterstützt nur die in `lib/env.ts` definierten gültigen Konfigurationen.
+
+### Lyrics und Genius
+
+`services/lyrics/client.ts` fragt `/api/lyrics` an. `services/lyrics/server.ts` ist der zentrale Provider-Orchestrator:
+
+1. **Optional zuerst Spotify Color Lyrics**, wenn `SPOTIFY_INTERNAL_LYRICS_ENABLED=true`, ein gültiger Spotify-Track und ein autorisierter Session-Token vorliegen. `services/lyrics/providers/spotifyColorLyrics.ts` nutzt einen **nicht öffentlichen/undokumentierten Endpoint**: Web-API-Tokens können mit 401/403 abgewiesen werden, dann folgt normaler Fallback; keine Cookie-/Token-Extraktion aus dem Spotify-Webplayer.
+2. **LRCLIB** (`services/lyrics/providers/lrclib.ts`), insbesondere für echte synchronisierte Lyrics.
+3. **lyrics.ovh** (`services/lyrics/providers/lyricsOvh.ts`) als Text-Fallback.
+4. **Genius** (`services/lyrics/providers/genius.ts`) als weiterer Text-Fallback, soweit konfiguriert.
+
+Ergebnisse werden zu `Lyrics`/`LyricLine`/optional `LyricWord` normalisiert. `synced: false` bedeutet **keine** belegbare zeitgenaue Karaoke-Zuordnung. Die Reihenfolge ist eine *Fallback-Reihenfolge*, keine parallele Qualitätsbewertung aller Anbieter. Genius-Metadaten sind separat: `/api/genius/insights` und `services/genius/songInsightsV447.ts`, `services/genius/cinematicInsightsV448.ts`, `services/genius/musicDiscoveryV449.ts`, `services/genius/musicConnectionsSpotlightV450.ts` liefern vorsichtig zugeordnete Credits, Samples und Verknüpfungen. **Genius liefert hier keine verifizierten Zeitstempel für den tatsächlich singenden Feature-Künstler.**
+
+### Genre und externe Inhalte
+
+- `app/api/genre/route.ts` + `hooks/useGenreDetection.ts`: genrebezogene Last.fm-Tags/Heuristiken, Fusion/Overrides; `services/genre/genreCorrectionMemory.ts` verwaltet gespeicherte Korrekturen. Genre bleibt eine Zuordnung/Heuristik, nicht Audiosignalerkennung.
+- `app/api/stage-content/concerts/route.ts` + `services/stageContent/concertProvidersV336.ts`: optionale österreichische **oeticket/Eventim**-Abfrage (`STAGE_OETICKET_ENABLED=true`) und Ticketmaster bei vorhandenem Schlüssel; validierte Künstler-/Eventlinks, deduplizierte Events. Keine Bandsintown-Abhängigkeit.
+- `services/stageContent/*` enthält Foto-/Galerie-, Layout-, Regie-, Echtzeit- und Quellenlogik; passende serverseitige Endpunkte liegen in `app/api/stage-content/`.
+- `app/api/avatars/` + `lib/avatarBlob.ts`: administrativer Avatar-/Motion-Import, Konfiguration, lokaler JSON-Fallback oder optionaler Vercel-Blob-Speicher. Keine Annahme, dass Blob in jeder Installation eingerichtet ist.
+- `app/api/push/subscription/route.ts` und `app/api/cron/release-push/route.ts`: optionale Web-Push-/Release-Workflows; zugehörige Server-Credentials müssen konfiguriert sein.
+
+**Integrationsprinzip:** Externe Daten sind untrusted. IDs, URLs und API-Ergebnisse werden serverseitig validiert/normalisiert. Optionale Quellen dürfen die Grundanzeige bei Ausfall nicht blockieren.
+
+## 4. Visualisierung und Bühnenarchitektur
+
+`components/visualizer/registry.tsx` registriert `VisualizerProps` und die wählbaren Modi (`wave`, `particles`, `album-glow`, `avatar`). `components/visualizer/VisualizerStage.tsx` ist heute der **zentrale Orchestrator**: Dort laufen Präferenzen, Audio, Lyrics, Sänger-Credits, Bühneninhalte sowie Kamera-, Licht-, Tanz- und Show-Cues zusammen. `components/visualizer/ThreeAvatar.tsx` setzt die 3D-Performance in React Three Fiber um – für skinnte GLB-Modelle und die prozedurale Ausweichdarstellung.
+
+```mermaid
+flowchart LR
+    I[Track + Lyrics + Audio + Prefs] --> ST[VisualizerStage]
+    ST --> SHOW[Show: V446 / V456 / V457 / V464]
+    ST --> CAST[Feature-Cast: V440 / V442 / V460]
+    ST --> VIS[Visual Balance: V451 / V465]
+    SHOW --> R[ThreeAvatar]
+    CAST --> R
+    VIS --> L[Kinetic/3D Lyrics + Name-Bubbles]
+    R --> CAM[StageCameraDirector / V454]
+    R --> LIGHT[Licht- und Bühnen-Effekte]
+```
+
+### Tanz, Avatare, GLB und Motion-Bibliothek
 
-## Boundaries
-- `app/api/**`: server-side routes; OAuth, encrypted session and Spotify tokens remain server-only.
-- `services/spotify`: browser-facing API adapter. It calls our own Next.js routes and never handles credentials.
-- `services/lyrics`: server-side provider orchestration and adapters. LRCLIB is preferred; lyrics.ovh is a plain-text fallback. Both normalize to `Lyrics`, and the UI does not depend on external response formats.
-- `hooks/usePlaybackPolling`: polling, retry/backoff, visibility handling, last-known-state retention and lyrics refresh.
-- `context/MusicContext`: shared application state and commands; components consume `useMusic()` only.
-- `components`: presentation only. Keep data fetching out of visual components.
-- `types`: stable app-level contracts, independent from external API response types.
+- Avatarauswahl und GLTF-Modelle: `components/visualizer/avatarModels.ts`, `hooks/useAvatarModel.ts`, `components/visualizer/AvatarEditor.tsx`; Import und Bibliothek: `components/visualizer/characterMotionLibrary.ts` und Avatar-API-Routen.
+- Motion-Playback, GLB-Clip-Analyse und Auswahl: `components/visualizer/glbMotionAnalyzerV439.ts`, `components/visualizer/automaticMotionIntelligenceV438.ts`, `components/visualizer/rapFlowIntelligenceV473.ts`, `components/visualizer/naturalRapGestureVarietyV474.ts`, `components/visualizer/intelligentMultiAvatarInteractionV475.ts`. Rhythmus-/Genre-/Vocal-Cues ergänzen die vorhandenen Bewegungen und ersetzen weder echte Clip-Anatomie noch unbekannte Gesangsdaten.
+- Multi-Avatar-Formationen und Interaktionen: `components/visualizer/automaticFeatureShowV440.ts`, `components/visualizer/automaticMultiArtistStageV442.ts`, `components/visualizer/intelligentFeaturePerformanceV460.ts`, `components/visualizer/advancedMultiAvatarPerformanceV452.ts`.
+- Bei Feature-Songs kann die Spotify-Credit-Liste die **Anzahl und Beschriftung** von bis zu vier Avataren steuern. **Credits sind keine Stimmtrennung.** Exakte Rollen-/Zeitzuweisungen bleiben ein eigener, manueller/autorisiert annotierter Vorgang.
 
-## Extension points
-1. Add further lyrics providers under `services/lyrics/providers/`, then register them in `services/lyrics/server.ts`; normalize each result to `Lyrics`. Current chain: LRCLIB first, lyrics.ovh fallback.
-2. Add visualizer implementations under `components/visualizer`; pass normalized playback/track props rather than fetching data.
-3. Add a `MusicSource` interface if another player/source is introduced; map it into `MusicState` before it reaches the context.
-4. Persist UI preferences separately from playback state.
+### V489 – GLB-Hockbewegungen und Clipübergänge
 
-## Runtime flow
-Spotify OAuth and token refresh run in server routes. The client polls `/api/spotify/current`, stores the latest normalized response in the context, and fetches lyrics only when track identity changes. Transient failures retain the last known track and set `connectionStatus` to `reconnecting`; authentication failures set it to `disconnected`.
+Die automatische Choreografie nutzt die vorhandene Clipauswahl aus
+`components/visualizer/intelligentLowPoseV481.ts` und die Hysterese aus
+`components/visualizer/naturalLowPoseTransitionsV482.ts`. Neu in
+`components/visualizer/naturalGlbFullBodyMotionV489.ts` ist ein reiner, begrenzter
+Planer für Crossfade-Dauer und Pose-Match-Freigabe. **Nur** wenn ein bestehender
+GLB-Hock-/Knieclip automatisch beginnt, endet oder auf einen anderen Low-Clip
+wechselt, verfeinert `components/visualizer/ThreeAvatar.tsx` die bereits vorhandene
+V311-Blend-Entscheidung. Linke/rechte Fußkontaktphasen aus V322/V487 werden
+nur als konservatives Indiz verwendet. Die eigentliche IK-Skelettkorrektur,
+manuelle Timeline, importierte Clipdateien, Sänger-/Lyrics-Timing und reguläre
+Tanzclips bleiben unangetastet. Kein neuer Animator, kein dauernder React-State
+für die Crossfades und kein universelles IK-Retargeting.
 
-### Optional audio analysis
-`AudioAnalysisProvider` owns the opt-in microphone lifecycle and `useMicrophoneAnalysis` performs local Web Audio frequency analysis. It publishes normalized `bass`, `mids`, `highs`, `volume`, and heuristic `beat` metrics. UI/visualizer components consume metrics through context or can receive the metrics as props from a host. Audio capture is never required for Spotify metadata/lyrics and is stopped when disabled/unmounted.
+### Lippensynchronisation und Rap-Performance
 
+- Gemeinsame Performance-Integration in `components/visualizer/ThreeAvatar.tsx` und die passenden Rig-/Face-Module; Lyrics und Playback-Zeit stammen aus den zentralen Zuständen.
+- `components/visualizer/rapSyllableArticulationV419.ts` nutzt geschätzte Silbenformung; `components/visualizer/rapSyllableKeyframesV420.ts` hält benutzereditierte Keyframes vor; `components/visualizer/rapAudioAwareV423.ts` erlaubt explizit bereitgestellte Audiodaten – **keine** heimliche Spotify-Audioaufnahme.
+- `components/visualizer/rapFlowIntelligenceV473.ts` nutzt **nur** belegbare Lyrics-Zeitpunkte, Zeilen-/Wortdichte und dezente *Text*-Ad-lib-Hinweise für bounded Gestik; keine Vocal-Isolation, Sprecher-Diarisierung oder automatisch erfundenen Wort-Timestamps.
+- `components/visualizer/naturalRapGestureVarietyV474.ts` variiert diese bestehenden Bewegungen mit fünf deterministischen Gestenmotiven pro Track/Zeile/Avatar. Bei Hooks teilen sich die Avatare ein Motiv, behalten aber eine dezente Seiten-Asymmetrie. Anwender-Choreografien, pausierte Darstellung und unbekannte Sängerrollen bleiben unverändert.
+- `components/visualizer/expressiveLipSyncV476.ts` ist ein kleiner, deterministischer **Finishing-Pass hinter V453/V459**: Er formt Mundöffnung und -breite sehr vorsichtig anhand des schon bestätigten Wortfensters und von **geschriebenen** Vokalhinweisen (keine Phonemerkennung), akzentuiert Braue/Wange und passt die Attack-/Release-Glättung innerhalb dieses Fensters an. **V420-editiertes Mund-Material und V423-Audio-Mundsignale bleiben unverändert**, ebenso V415-Lippenverschluss sowie der V459-Kopf-/Körperpfad. `components/visualizer/VocalRigV368.tsx` übernimmt den Pass für GLB-Morphs und das Jaw-Bone-Overlay; `components/visualizer/ThreeAvatar.tsx` für den prozeduralen Mund. Demo-/Editorvorschauen und unbekannte Lyrics-Zeitstempel erhalten keine erfundenen Bewegungen.
+- `components/visualizer/beautifulLyricsV477.ts` erweitert den V455/V461-Typografiepfad. Das Modul unterscheidet **validierte Wortmarken**, **reinen Zeilenfortschritt** und **unsynchronisierten Text**. Für 3–4 Avatare wird die visuelle Beschriftung verkleinert oder die immersive Anzeige auf die aktive Zeile reduziert; die vorhandenen Lyrics, Künstlerrollen und Wort-Zeitstempel bleiben unverändert. `components/KineticLyrics.tsx` zeichnet Wortkaraoke nur mit echten Wortmarken; andernfalls eine zeilenbezogene Farbfüllung. `components/visualizer/Lyrics3DScene.tsx` reduziert Wortmeshes bei fehlenden validierten Zeitstempeln und benutzt die vorhandene Qualitätsstufe.
+- `components/visualizer/intelligentMultiAvatarInteractionV475.ts` verfeinert den V444/V460-Auto-Cast (3–4 Artists) mit leichten Blick-, Schulter- und Gestenreaktionen für Verses, visuelle Reply-Szenen und Hooks. Die vorhandenen Look-/Gesture-Mixer begrenzen die Ausgabe; gespeicherte Sängerrollen und manuelle Stage-Steuerung werden nicht überschrieben. 2er-Duette verbleiben im eigenen vorhandenen Renderer.
+- `components/visualizer/rapDuetStudioV416.ts` und die entsprechenden Panels erlauben manuelle Zuordnungen; sie haben Vorrang vor automatisch geschätzten Rollen.
 
-## Genre detection
-`MusicContext` requests `/api/genre` when the current track changes and exposes the detected genre, lookup status/source/tag, and an optional manual override through `useMusic()`. The server-only route queries Last.fm `track.getTopTags`, falling back to `artist.getTopTags`, then maps known tags to supported avatar genre IDs. Last.fm credentials stay server-side; unknown tags or lookup failures do not block playback or avatar rendering. Responses are cached for 24 hours. The animation controller is presentation-only and does not fetch genre data.
+### Lyrics, Kamera, Licht und visuelle Balance
 
-
-## Music source and UI preferences
-`MusicSource` defines the source adapter boundary. Provider responses are mapped into normalized app playback data before entering `MusicContext`. The current adapter is `services/musicSource.ts` (Spotify). UI-only choices live in `UiPreferencesContext`, persisted independently from playback state in localStorage. `MusicProvider` composes playback polling and `useGenreDetection`; add future features as focused hooks/contexts rather than expanding this provider with unrelated concerns.
-
-## Genius lyrics
-The lyrics chain is LRCLIB → lyrics.ovh → Genius. The Genius adapter is server-only and normalizes plain text into `Lyrics` lines with `synced: false`. Configure `GENIUS_ACCESS_TOKEN`; without it Genius is skipped.
-
-## Visualizer composition
-`VisualizerProvider` composes normalized playback/genre state, microphone audio metrics, and persisted UI preferences into one `useVisualizer()` interface for visual components. It is nested inside the music and audio providers; visual components should consume this interface rather than coupling directly to those underlying contexts.
-
-## Visualizer registry
-`components/visualizer/registry.tsx` maps stable mode IDs to metadata and components. `VisualizerStage` selects the registered mode from persisted UI preferences and passes normalized audio, track, playback, and reduced-motion props. Add new visualizers by implementing `VisualizerProps` and registering a definition; keep source/provider concerns outside visualizer components.
-
-## 3D Avatar
-The `avatar` registry entry renders `ThreeAvatar`, a client-side React Three Fiber scene. It consumes the same normalized `VisualizerProps` as other visualizers, keeping Three.js out of the playback and audio-analysis contexts.
-
-### Avatar model adapter
-`ThreeAvatar` selects a custom GLTF scene when `NEXT_PUBLIC_AVATAR_MODEL_URL` is configured; otherwise it renders the procedural fallback. The model is loaded client-side through `@react-three/drei`/`useGLTF`. The adapter applies subtle whole-model motion from normalized audio features. Animation-clip selection and rig-specific bone mapping remain future work.
-
-### Rigged GLTF animation clips
-The GLTF avatar reads embedded animation clips. Clip names containing `dance`, `move`, or `groove` are preferred during playback; names containing `idle`, `stand`, or `rest` are preferred while paused. Clips cross-fade on playback state changes. If no matching clips exist, the existing procedural motion remains active. `reducedMotion` suppresses authored dance clips.
-
-## Avatar library
-`avatarModels.ts` is the registry for avatar metadata, optional preview assets, and configured GLTF URLs. `SettingsPanel` presents selectable cards and disables unavailable external models. `VisualizerStage` resolves the selected model through `getAvatarModel`, keeping model selection separate from playback state.
-
-### Avatar customization
-Avatar presentation settings (scale, vertical offset, animation intensity, and optional genre-based model selection) live in `UiPreferences`, separate from playback state. `VisualizerStage` resolves the selected model and passes presentation values through `VisualizerProps`; the 3D component applies transforms and motion intensity.
-
-## Avatar Editor
-
-`components/visualizer/AvatarEditor.tsx` is an isolated preview/editor surface. It consumes `VisualizerContext`, loads the selected avatar model, discovers GLTF animation clips, and lets the user test a clip without changing playback state. Persistent avatar preferences remain in `UiPreferencesContext`; temporary editor state (selected clip, play state, test beat) is intentionally local to the editor.
-
-## Audio feature extraction (V23)
-`useMicrophoneAnalysis` computes normalized frequency bands, transient attack/decay, a smoothed energy envelope, and a rolling BPM estimate from detected bass onsets. The estimate is intentionally approximate and remains `null` until enough plausible beat intervals are observed.
-
-### Live audio debug (v24)
-`AudioDebugPanel` reads the normalized `AudioFeatures` from `AudioAnalysisContext` and renders live meters for kick, snare, hi-hat, frequency bands, energy envelope, attack, and decay, plus beat/BPM estimates. It is displayed in Settings when microphone analysis is enabled. Frequency bands are heuristic and overlap; they should not be interpreted as reliable instrument classification.
-
-### Beat calibration assistant
-`BeatCalibrationAssistant` samples normalized kick-band values during an explicit eight-second user session and proposes (but does not automatically apply) a sensitivity value. The user confirms whether to persist it through `UiPreferencesContext`.
-
-
-## Version 27: Beat timeline
-The audio debug panel shows recent detected beat impulses over a rolling five-second window, with marker height representing beat strength. Events are generated by microphone beat detection and cleared when analysis is disabled.
-
-## BPM / beat grid
-
-`BeatGridVisualizer` renders a short rolling view of detected beat events together with an extrapolated beat grid based on the current BPM estimate. It is diagnostic only: the grid is derived from the microphone beat detector and should not be treated as a phase-accurate music clock.
-
-### Avatar animation engine (v29)
-
-`components/visualizer/avatarAnimationEngine.ts` is a pure mapping layer from audio/playback inputs to body bounce, head nod, sway, and beat impulse targets. It is deliberately independent of React Three Fiber so its behavior can be unit-tested and reused by future bone/node animation adapters. The avatar components apply frame-based smoothing when consuming the targets.
-
-
-## V30 avatar rig layer
-
-`components/visualizer/avatarRigController.ts` is the GLTF-specific motion layer. It discovers common bone/node names, then applies small additive local rotation overlays for head, neck, spine/chest and arms. `avatarAnimationEngine.ts` remains the source of music-reactive targets. Authored GLTF clips remain responsible for the main pose/dance.
-
-
-## V32 – Avatar Rig Profiles
-
-V32 adds configurable GLTF rig profiles (`auto`, generic humanoid, Mixamo, Ready Player Me, robot). Profiles control node/bone aliases and per-part music-reaction multipliers. The selected profile is persisted with UI preferences and applied additively on top of authored GLTF animation clips.
-
-
-## V32 – Avatar Dance Presets
-
-V32 separates the avatar rig profile from the dance style. Dance presets can be selected independently and combine with Auto/Generic/Mixamo/Ready Player Me/Robot rig profiles. Presets affect kick response, head movement, sway, body bounce, chest pulse and arm swing. Auto selects a style from the detected genre. Preferences are persisted locally.
-
-
-## V33 Dance Intelligence
-
-V33 adds a stateful dance-intelligence layer that detects beat accents, energy build-ups and drops, then introduces controlled phrase variation. The layer sits above the audio animation engine and below rig/preset application, so existing profiles remain reusable.
-
-
-## V35 – Full-Body Music Performance
-
-Adds lower-body music-reactive dance: leg groove, alternating weight shift and foot-step impulses. These targets are applied through the existing GLTF rig overlay and remain independent from authored animation clips, dance presets and rig profiles.
-
-## V36 – Avatar Expression Engine
-
-`avatarExpressionEngine.ts` is an independent face/mood layer. It derives a coarse expression mood and subtle jaw/eye/head targets from genre and normalized energy/beat data. Missing facial nodes are safe because the rig controller treats every target as optional.
-
-## V37 – Performance Director
-
-`performanceDirector.ts` is the orchestration layer above Dance Intelligence, dance presets and the Expression Engine. It infers coarse performance sections (`intro`, `verse`, `chorus`, `drop`, `break`, `outro`) from the normalized energy envelope, attack and beat accents. Because section timing is not guaranteed by the current Spotify-facing model, these are intentionally heuristic rather than claims about the song's actual arrangement.
-
-The director selects phrase-aware performance patterns, keeps minimum section/pattern durations to prevent flicker, and exposes smooth transition blending, performance intensity, drop pose impulses and expression intensity. It does not replace the lower-level dance, full-body or expression systems; it coordinates their strength and timing.
-
-Runtime flow:
-`Spotify audio features → Dance Intelligence → Performance Director → Dance Pattern / intensity → Animation + Full Body Dance`
-`                                                   ↘ Expression intensity → Expression Engine → Rig`
-
-## V38 – Musical Structure & Dramaturgy
-
-`musicalStructureEngine.ts` adds a lightweight state machine for musical dramaturgy. It tracks smoothed energy, energy trend, phrase position, build-up strength, drop impulses and post-drop release. It infers coarse phases (`intro`, `verse`, `build-up`, `drop`, `break`, `outro`) from the normalized audio model rather than claiming access to exact song-section metadata.
-
-The Performance Director now consumes this structure layer. Build-ups increase the eventual performance target, drops receive a stronger pose impulse, and phrase progress drives deterministic pattern variation. The structure engine is presentation logic only: it does not access Spotify, microphone devices, or network services.
-
-Runtime flow:
-`Normalized audio → Musical Structure → Performance Director → Dance Pattern / Expression → Animation Engine → Rig Profile → GLTF`
-
-## V39 – Natural Motion & Personality
-
-`naturalMotionEngine.ts` adds a stateful motion-shaping layer for anticipation, follow-through, hip sway, shoulder roll, head lag and weight shift. Motion profiles are selected from genre/dance-preset hints (`hardstyle`, `hardcore`, `techno`, `rock`, `metal`, `ambient`, `robot`, `default`). Inputs are smoothed with frame-rate-independent exponential easing; variation is phase-based and deterministic rather than random on every frame.
-
-The GLTF rig controller applies these values as small additive overlays to available hips, spine, arms and head nodes. Missing nodes remain optional, and authored GLTF clips continue to provide the main choreography. The natural-motion layer shapes timing and secondary motion; it does not replace Dance Intelligence, Musical Structure, Performance Director, Dance Presets or Rig Profiles. Reduced-motion and paused states fade its targets back toward neutral.
-
-Runtime flow:
-`Audio + genre/preset → Natural Motion (anticipation/follow-through/personality) → GLTF rig overlays`
-
-
-## V40: Advanced Dance Choreography
-
-The `Advanced Dance Choreography` layer runs after the Performance Director. It selects a deterministic, genre-family movement sequence per 8-beat phrase and smoothly blends its accents into the existing natural-motion and full-body targets. The layer does not replace the Dance Preset, Rig Profile, Expression Engine, or authored GLTF clips; it adds small coordinated accents to arms, legs, hips and head. Section-specific move pools emphasize drop hits during drops and flow during breaks.
-
-
-## V41 – Avatar Personality & Signature Moves
-
-`avatarPersonalityEngine.ts` selects a stable avatar personality from model ID, genre, and dance preset, then chooses a signature move per musical phrase. Signature accents are blended into the existing full-body choreography; no per-frame randomization is used. These are heuristic movements derived from the available audio features, not authored Spotify song-section metadata.
-
-
-## V42 – Adaptive Dance Intelligence
-
-The advanced choreography selector now tracks recent movement history and a smoothed energy trend. At each 8-beat phrase boundary it scores eligible genre/section moves, discourages recent repetition, and biases selection toward energetic or flowing moves as the trend rises or falls. Output includes adaptive intensity and a novelty signal. This is deterministic, stateful heuristic logic; it does not train a model or claim exact Spotify song-section access.
-
-
-## V43 – Dance Memory & Long-Term Variety
-
-`advancedDanceChoreography.ts` maintains two memory horizons: a short recent-move queue and song-session move counts/history. The selector penalizes both immediate repetition and moves overused earlier in the session. Drop entries are counted so repeated high-energy sections can vary without losing their signature. The history list is capped at 96 entries; aggregate counts remain small and bounded by the finite move set.
-
-
-## V44 – Live Dance Tuning
-
-Dance intensity (existing 0–2× control), aggression (0–100%), variation (0–100%) and Smooth/Balanced/Sharp motion style are editable live in Settings. They are persisted in the existing local UI preferences and passed to the avatar renderer without replacing dance presets or rig profiles. Aggression biases choreography selection and boosts rig accents; variation changes repeat avoidance and phrase tie-breaks; style adjusts transition/interpolation responsiveness. Procedural fallback supports intensity, aggression and style, while detailed phrase variation requires a GLTF rig. No microphone input is required.
-
-
-## V45 — Dance Preset Studio
-
-Create, save, select, apply and delete custom dance profiles in Settings → Dance Preset Studio. A profile snapshots the selected built-in dance preset, rig profile, animation intensity, aggression, variation and motion style. Four built-in starter profiles cover Hardstyle, Hardtekk, Metal and Smooth Flow. Custom profiles persist in browser localStorage (up to 40); starter profiles cannot be deleted. Applying a profile updates existing UI preferences and therefore the active avatar without replacing the underlying dance engine. No microphone is required for this feature.
-
-
-## V46 – Optional microphone / estimated rhythm
-
-The microphone analyzer is still available as an explicit opt-in in Settings and the audio panel. When it is off, a synthetic visual rhythm is derived from the current Spotify playback position and a genre-based *assumed* BPM. This is not genuine Spotify beat detection and cannot identify real kicks, tempo changes, or drops. When microphone capture is active, the measured frequency bands and beat events drive the visualizers instead. If capture is denied or still starting, estimated data is shown with beat impulses suppressed. Microphone processing stays local and stops when disabled.
-
-
-## V47 — Microphone / playback phase alignment
-
-Optional synchronization settings: Off, Auto (phase estimate against synthetic genre BPM), and Manual. Manual positive offsets delay microphone-driven animation by up to 500 ms using a local sample history. Negative offsets are shown but cannot predict incoming audio. Auto measures circular phase consistency of recent microphone kick transients against the estimated track grid; it reports a phase estimate and confidence, **without automatically applying it**, since the genre BPM is not authoritative Spotify beat data and incorrect alignment would degrade live responsiveness. No microphone audio is uploaded.
-
-
-## V48 – Automatic microphone BPM detection
-
-Microphone kick onset timestamps feed `BeatTempoTracker`, which evaluates 70–200 BPM candidates, beat subdivisions and skipped beats, temporal phase coherence and confidence. A confidence of at least 0.55 is required before exposing live BPM to the animation engine; otherwise BPM is `null` (the existing synthetic mode remains available when the microphone is off). The Audio Debug Panel displays BPM confidence. Microphone permission remains opt-in. Tempo estimates are heuristic and can be ambiguous at half/double time.
-
-
-## V49 — Microphone Beat Phase Lock
-
-An optional microphone-derived phase-locked beat clock (`hooks/beatPhaseTracker.ts`) anchors to detected kicks, accepts only onsets close to the predicted grid, and gently corrects drift. When BPM confidence is at least 55% and phase lock is stable, predicted beat pulses supplement real onset pulses in the existing dance engine. Phase and lock confidence appear in the audio debug panel. Loss of tempo confidence or long silence disables phase lock; no Spotify audio analysis is claimed. Manual sync offset remains available.
-
-
-## V50 — Kick Prediction Engine
-
-`hooks/kickPrediction.ts` creates a confidence-gated, smooth pre-kick envelope from the microphone phase-locked beat grid. When the phase lock is reliable, the avatar prepares for the next predicted beat by slightly lowering its body/head and shifting its weight; on the beat the existing accent logic takes over. The Audio Debug Panel displays time until the next predicted kick and pre-kick intensity. Predictions are disabled without microphone phase lock, during silence or at low confidence; they do not detect or forecast actual song drops.
-
-
-## V51 – Adaptive Kick Choreography
-Optional microphone-onset classifier tracks a moving baseline of detected bass transients and labels measured accents soft/normal/strong. A decaying accent envelope drives stronger avatar head, arm and chest motion on comparatively strong kicks. Predicted phase pulses are not classified as real microphone kicks. Audio Debug shows accent class and envelope. This is relative transient detection, not instrument identification; it depends on microphone quality and loudspeaker placement.
-
-## V52 – Kick Pattern Recognition
-
-`hooks/kickPatternTracker.ts` classifies **measured microphone kick-onset intervals** as `steady`, `double`, `syncopated` or `unknown` relative to the microphone-derived BPM. Classification is confidence-gated and expires after silence; predicted beats are excluded. The Audio Debug Panel shows pattern and confidence. In the 3D avatar, double kicks add a short leg/beat accent and syncopated patterns add a small lateral accent; these effects are disabled without reliable microphone data or when reduced motion is enabled. This is a heuristic rhythmic classifier, not instrument separation, reliable genre recognition or full song structure detection.
-
-
-## V53 – Rhythm Learning Engine
-`hooks/rhythmLearningEngine.ts` groups **measured microphone kick onsets** into four-beat phrases using the microphone-derived BPM. It compares up to six completed phrases, estimates repeatability, and classifies four-on-floor, double-accent, offbeat-accent or variable patterns. Confidence gates a subtle additional beat accent in both 3D avatar paths; the debug panel shows learned rhythm, confidence and phrase count. State is session-only, expires on silence and is reset when microphone capture stops. No microphone permission is requested when microphone mode is off. This is a heuristic classifier, not audio transcription, predictive knowledge of future song sections, or verified kick separation.
-
-
-## V54 – Rhythm-Aware Choreography
-
-The GLTF avatar now chooses a choreography move vocabulary based on the microphone-derived learned rhythm: four-on-floor, double-accent, offbeat-accent or variable. Switching happens at eight-beat phrase boundaries, with confidence (>= 0.62) and repeated-phrase (>= 2) gating and a three-second dropout grace period. Break/drop dramaturgy still takes precedence. Without reliable microphone learning, existing genre and dance-preset choreography remains in control. The detector is heuristic; it does not transcribe individual instruments.
-
-
-## V55 – Dance Performance Preview
-
-The microphone Audio Debug Panel includes a read-only Dance Performance Preview. It reports the currently active GLTF choreography sequence and move, estimated song section, learned rhythm/confidence, transition progress and the next *possible* eight-beat switch boundary. The preview reads telemetry from the existing R3F animation loop through a throttled external store (about 6.7 updates/s); it does not independently choose dances. For the procedural avatar it explicitly reports baseline/procedural groove. The switch countdown is a BPM-based estimate, **not** a prediction that a change will occur. The preview appears when microphone analysis is enabled, including when the mic is inactive.
-
-
-## V56 – Dance Engine Diagnostics & Render Sampling
-- Added a lightweight `danceDiagnosticsStore` sampled approximately once per second from the R3F `useFrame` loop (no per-frame React state updates).
-- The Audio Debug Panel now shows sampled canvas FPS, mean frame interval, frames slower than 33 ms, active avatar renderer, microphone/estimated source, phase lock and choreography sequence. Diagnostics remain visible when the microphone is off.
-- Beat age is shown explicitly as an event-age indicator; it is **not** end-to-end beat/audio/display latency.
-- Existing rhythm learning, beat prediction and dance modules retain their previous behavior. This release adds instrumentation, not an unverified claim of better FPS or automatic engine conflict resolution.
-
-
-## V57 – Adaptive Performance Mode
-
-The 3D avatar Canvas now has an adaptive pixel-ratio controller with Auto, High, Balanced and Low modes. Auto drops one quality tier after three consecutive slow one-second windows (<42 FPS or >30% slow frames), waits eight seconds after a change, and raises quality after twelve consecutive healthy windows (>56 FPS and <8% slow frames). Quality settings persist locally and appear in Dance Engine Diagnostics, even with the microphone off. Only the render pixel ratio changes; animation and audio processing stay intact. FPS is measured from frame intervals and may be limited by browser throttling or device refresh rate.
-
-
-## V58 — Adaptive Animation Quality
-
-The V57 quality tier now also controls the update cadence of costly GLTF choreography, personality and full-body pattern calculations: High evaluates each frame, Balanced up to 30 Hz, Low up to 20 Hz. Cached motion is reused between evaluations; beat accents, microphone processing, rig interpolation and rendering continue on every frame. The diagnostics panel shows the active cadence and cumulative evaluation/reuse counts. This is a targeted CPU optimization, not a measured Raspberry Pi performance guarantee.
-
-
-## V59 – GLTF render-path optimization
-
-- Memoizes the loaded GLTF scene instance so ordinary React rerenders no longer clone the model.
-- Uses SkeletonUtils.clone for correct skinned-mesh / bone bindings. The cloned hierarchy shares cached geometry and materials; it does not dispose shared GLTF resources.
-- Disables shadow-map rendering explicitly for the music stage and its avatar meshes. The stage previously did not enable shadows, so this is a safeguard, **not** a measured FPS improvement.
-- Retains V57 adaptive device pixel ratio and V58 animation cadence without changing beat timing.
-- No automatic polygon reduction, material simplification or hardware benchmark is claimed.
+- Lyrics-Darstellung: `components/KineticLyrics.tsx`, `components/visualizer/Lyrics3DScene.tsx`, `components/visualizer/kineticLyricsV382.ts`, `components/visualizer/cinematicLyricsV461.ts`; vorhandene Timing-Information wird genutzt, bei fehlendem Sync gelten Fallbacks.
+- Kamera: `components/visualizer/StageCameraDirectorV289.tsx`, `components/visualizer/cinematicRapCameraV429.ts`, `components/visualizer/cinematicConcertCameraV454.ts`; gespeicherte Keyframes, manuelle Kamera und Lyrics-Lesbarkeit begrenzen automatische Kamerabewegungen.
+- Licht: `components/visualizer/concertLightingDirectorV462.ts`, zusätzlich bestehende Bühnen-/Lichtcontroller. Effekte sind nach Leistungsprofil und Schutzregeln begrenzt. Eine Laser-Show gehört nicht zum gewünschten Standard; die vorhandene Laser-Option ist in den UI-Defaults deaktiviert.
+- Gemeinsame Show-Regie: `components/visualizer/smartAutomaticRapShowV446.ts`, `services/show/ultimateAutomaticShowV456.ts`, `services/show/showContinuityV457.ts`, `services/show/automaticConcertExperienceV464.ts`.
+- **V478 – autonome visuelle Konzertregie:** `services/show/autonomousConcertDirectorV478.ts` arbeitet **nach** der V464-Bühnen-Dramaturgie in `components/visualizer/VisualizerStage.tsx`. Es koordiniert die vorhandenen automatischen V454-Kamera-Cues mit den bereits aktiven V456-Lichtstärken: Intro/Finale und Hooks als Ensemble, Verse eher als Portrait, visuelle Replies als Ensemble. Der Lyrics-Fokus unterbindet neue Kameraentscheidungen, um die Lesbarkeit zu sichern; schwache Geräteprofile, Pausen, reduzierte Animationen, manuelle Sänger- und Kamera-Einstellungen sind Schutzbedingungen. Dies ist eine **visuelle Regie auf Basis des vorhandenen zeitlichen Plans**, keine Erkennung echter Song-Sections oder Feature-Stimmen. Die nachgelagerten Kamera-Haltezeiten, manuelle Licht-Timelines, Blackouts und Renderbudgets bleiben zuständig. Keine zusätzlichen Lichter, Kamerarenderer, Timer oder Spotify-Zugriffe.
+- `services/show/visualBalanceV451.ts` und `services/show/visualShowQualityV465.ts` begrenzen Informationsdichte, Lyrics-Überlagerungen und Beschriftungen. Die sichtbare Umsetzung ist weiterhin von gewählten Modi/Präferenzen abhängig.
+
+**Vorrangregeln (designorientiert, durch Tests abgesichert):** explizite manuelle Vorgaben und gespeicherte Keyframes vor automatischen Vorschlägen; echte synchronisierte Lyrics vor Schätzungen; Pause, Seek, fehlende Daten und `reducedMotion` werden berücksichtigt. Automatik ist keine Garantie dafür, dass in jedem Song Künstlerwechsel, Drop oder Gesangsstimme korrekt erkannt werden.
+
+**V492 – GLB Blending Preset Studio:** `components/visualizer/glbBlendPresetsV492.ts` validiert und speichert modell- und animationsquellgebundene Presets mit Basis-/Gestenclip-ID und Originalnamen, Region, Gewicht, Genre und Auto-Opt-in. `AvatarPreview3D.tsx` bietet Speichern/Aktualisieren/Löschen, gespeicherte Vorschau und begrenzten JSON-Import/-Export. `ThreeAvatar.tsx` bindet maximal acht gültige automatisch freigegebene sichere Oberkörper-Overlays in den vorhandenen GLB-Mixer ein, ausschließlich bei bereits ausgewähltem Basisclip; manuelle Choreografie, Foot-IK, reduzierte Bewegung und niedrige Qualität haben Vorrang. Tests: `tests/v492-glb-blending-presets-regression.cjs`, `tests/tsconfig.v492-core.json`.
+
+**V491 – GLB Motion Preview & Blending Studio:** `components/visualizer/AvatarPreview3D.tsx` bietet im bestehenden Avatar-3D-Studio eine bedienbare Vorschau mit zwei bereits installierten Clips, eigener Basisclip-Timeline, maskiertem zweitem Gestenclip, Körperbereich (Arme oder Arme/Brust), 0–50 % Mischgewicht und pausiertem Scrubbing. `components/visualizer/glbMotionBlendPreviewV491.ts` validiert Masken und Gewichte ohne Nebenwirkungen und verwendet den konservativen V490-Bone-Filter. Das Overlay wird im vorhandenen Vorschau-`AnimationMixer` auf einem geklonten Rig abgespielt; Original-GLBs, Live-Bühne, Fuß-IK, Kopf und Lip-Sync bleiben unverändert. Bei reduzierter Bewegung/fehlenden Clips ist die Mischung deaktiviert. Tests: `tests/v491-glb-motion-preview-blending-regression.cjs`, `tests/tsconfig.v491-core.json`.
+
+**V490 – automatisches GLB-Oberkörper-Masking:** Bei einer aktiven automatischen Low-Pose kann `components/visualizer/automaticGlbUpperBlendV490.ts` aus vorhandenen Gestenclips nur sichere Arm-/Brustrotationen auswählen; `components/visualizer/automaticGlbUpperClipV490.ts` klont diese Tracks und `components/visualizer/ThreeAvatar.tsx` mischt sie im bestehenden GLB-Mixer zum primären Knie-/Hockclip. Root, Becken, Beine, Füße, Kopf und Face-Morphs sind ausgeschlossen. Manuelle Animation, Timeline, Reduced Motion und Low-Tier deaktivieren die zusätzliche Ebene. V487-Foot-IK bleibt nach dem Mixer verantwortlich.
+
+## 5. Audio- und Zeitquellen: Messung ≠ Schätzung
+
+- **Spotify:** Track-ID, Play/Pause, Zeitposition und Metadaten. `hooks/useEstimatedBeat.ts` liefert daraus eine geschätzte Musikbewegung ohne Zugang zu Spotify-Roh-Audio.
+- **Mikrofon optional:** `hooks/useMicrophoneAnalysis.ts` verarbeitet Web-Audio-Daten nach ausdrücklichem Opt-in; `hooks/audioRhythm.worker.ts`, `hooks/beatTempoTracker.ts`, `hooks/beatPhaseTracker.ts` und `hooks/rhythmLearningEngine.ts` enthalten zusätzliche Rhythmus-/Timing-Komponenten.
+- **Lyrics:** Zeilen- und gegebenenfalls Wort-Timestamps sind eine dritte, getrennte Quelle; sie belegen weder Kick-Onsets noch Sängeridentität.
+- **Abstimmung:** `context/AudioAnalysisContext.tsx` steuert, welche Metriken als live bzw. geschätzt gelten. Confidence, Pausen-/Seek-Handling und Offset-Vorgaben sollen diese Unterscheidung durch alle Darstellungen bewahren.
+
+Die Mikrofonanalyse erkennt keine Instrumente oder Sprecher sicher. Geschätzte Phrasen-/Hook-Zuordnungen dürfen nicht als verifizierte Songstruktur dargestellt werden.
+
+## 6. Laufzeit, Ressourcen und Raspberry Pi
+
+- `components/SonicDisplay.tsx` lädt nicht notwendige Oberfläche und Bühnenansicht mit `next/dynamic` nach; Mikrofon und Audio-Visualizer werden nicht für bloße Spotify-Metadaten benötigt.
+- `components/visualizer/ThreeAvatar.tsx` verwendet Qualitätsstufen, gezielte Aktualisierungsraten, begrenzte Avatar-/Animationsberechnung sowie GLB-/Motion-Fallbacks; tatsächliche FPS bleiben geräte- und szenenabhängig.
+- `services/monitoring/piSessionStabilityV463.ts` und `services/monitoring/performanceStabilityGuardV272.ts` implementieren Stabilitäts-/Erholungsrichtlinien; Messwerte und Tests sind **keine** Hardware-FPS-Garantie.
+- **V479 – Pi-Konzertbudget:** `components/visualizer/RaspberryPiEdition.tsx` aktiviert nur nach expliziter Profilauswahl (oder opt-in *Auto* bei Linux-ARM-Hinweis) die reine Zustandsmaschine `services/monitoring/piConcertBudgetV479.ts`. Der einmal pro Sekunde gemessene FPS-/P95-Framezeit-Block aus `components/visualizer/adaptivePerformance.tsx` wird durch `components/visualizer/piConcertRuntimeV479.tsx` an `components/visualizer/ThreeAvatar.tsx` weitergereicht; es gibt keine zusätzliche RAF-Schleife. Fünf schlechte Messfenster reduzieren optionale automatische Postprocessing-/Shader-/DanceFX-Effekte; nach 18 guten Fenstern und mindestens 30 Sekunden Cooldown wird wieder mehr Automatik erlaubt. Bei drei bis vier Avataren unterbleibt bereits in Balanced automatisches Postprocessing. *Pi Low* bleibt ausdrücklich Eco; manuell eingeschaltete Effekte bleiben erhalten. Pausen, versteckte Tabs und veraltete/ungültige Messwerte führen nicht zu einer Herabstufung. Die Qualität wird weiterhin maßgeblich durch DPR-/V388-/V403-Pixelbudget und den übrigen Renderer-Schutz gesteuert. Dies misst keine GPU-Temperatur und garantiert keine feste Pi-Bildrate.
+- **V480 – passives Konzert-Diagnose-Dashboard:** `components/visualizer/piConcertRuntimeV479.tsx` reicht dieselben V479-Ein-Sekunden-Messfenster zusammen mit `components/visualizer/renderDiagnostics.ts` an die reine Session-Policy `services/monitoring/concertPerformanceDiagnosticsV480.ts` weiter. `components/visualizer/concertDiagnosticsRuntimeV480.tsx` hält einen begrenzten, nicht persistenten Store (90 valide Messungen/24 tatsächliche Pi-Budgetwechsel). Das Diagnosepanel `components/visualizer/ConcertPerformanceDiagnosticsV480.tsx` ist nur über `components/visualizer/RenderDiagnosticsPanel.tsx` im Diagnose-Tab geladen; es zeigt FPS/P95-/Avatar-/Draw-Call-Verläufe und erlaubt einen **lokalen JSON-Export**. Ungültige, pausierte oder versteckte Fenster werden nicht gezählt. Keine weitere Render- oder Netzwerk-Messschleife und keine zusätzliche Qualitätsregelung. Die Statushinweise sind Schwellenheuristiken; keine echten GPU-/Temperaturmessungen.
+- **V487 – Realistic Ground Contact Studio 3.0:** `components/visualizer/groundContactStudioV487.ts` bewertet bereits vorhandene GLB-Foot-IK-Standanker und Knöchel-Weltpositionen **modellbezogen** (Konfidenz ≥ 0,35; Drift-Schwellen 1,5 cm und 4 cm). Im alten `components/visualizer/ThreeAvatar.tsx`-Frame-Callback publizieren vier unabhängige Context-Refs Messwerte; die vorhandene optionale V485/V486-Bühnen-Schrittverschiebung wird bei gemeldeter Drift weiter verlangsamt, *nicht* die ursprünglichen Formations- oder Clip-Ziele. `components/visualizer/GroundContactPanelV487.tsx` ist eine leichte, lesende Diagnose im `components/visualizer/StageDirectorControlsV287.tsx`: zwei Updates pro Songsekunde, maximal 40 Verlaufspunkte im RAM, keine zweite Render-Schleife. Standankerabweichung ist keine garantierte reale Bodenberührung, keine physikalische Kollision und keine neue Foot-IK. Keine GLB-Korrektur bei unbekanntem Rig. Tests: `tests/v487-realistic-ground-contact-regression.cjs`, `tests/tsconfig.v487-core.json`.
+- **V486 – Advanced Dance Footwork 2.0:** `components/visualizer/advancedDanceFootworkV486.ts` verfeinert ausschließlich V485s opt-in Formationsschritte: der prozedurale Fußhub kommt aus Song-/Cue-Zeit und optional vorhandenem BPM, ist links/rechts abwechselnd und hat glatte Fußaufsetzpunkte. Bei importierten GLB-Avataren meldet die **bestehende** `components/visualizer/avatarFootIK.ts` über ein mutables Context-Ref die tatsächlich beobachteten `planted`-Zustände an die Gruppe; die optionale Bühnenverschiebung wird bei beiden Stützfüßen merklich gebremst. Ohne aktive IK gibt es keine unterstellten Fußkontaktmessungen. Root-Verschiebungen werden auf 90 % des V485-Offsets begrenzt; die V485-Abstandsprüfung und alle manuellen, Lyrics-/Foot-Lock-/Pause-/Low-Tier-Schutzregeln bleiben vorgeordnet. Die ursprünglichen GLB-Keyframes bleiben unverändert. Root-Drosselung ersetzt **keine** Kontaktphysik und ist keine Garantie gegen Rig-spezifisches Fußgleiten. Keine zusätzlichen Frame-Loops oder Animation-Mixer. Tests: `tests/v486-advanced-dance-footwork-regression.cjs` und `tests/tsconfig.v486-core.json`.
+- **V485 – Natural Dance Motion Studio 5.0:** `components/visualizer/naturalDanceMotionStudioV485.ts` plant für automatisch dirigierte Dreier-/Vierergruppen einen kleinen **seitlichen Schritt mit Vorder-/Hintergrundstaffelung** zwischen einem stehenden und einem hockenden Bühnenpartner. Die ursprüngliche Slot-Reihenfolge bleibt fest; es gibt kein tatsächliches Durchlaufen der GLB-Modelle oder automatisches Umordnen der Rollen. Der Ausdruck „Vorbeitanzen“ bedeutet hier eine optische, begrenzte Annäherung **vor** dem Partner (max. 10,5 cm seitlich/20 cm Tiefe), nicht kollisionsgeprüftes Überholen. Bei jeder Tanzphrase fahren alle optionalen Verschiebungen sanft auf Null zurück. Die Policy nutzt nur vorhandene V481/V483-Tiefposen, Cue-/Beat-/Kick-/Energiewerte und die Performance-Tier-Information. Sie deaktiviert sich vollständig bei manueller Choreografie/Vocal-Rolle, Foot-/Contact-IK-Lock, `reducedMotion`, Lyrics-Vordergrund, Pause, schwacher Evidenz, Low-Tier oder eng beieinanderliegenden Stage-Roots (unter 1,03 m). Sie überprüft Stage-Root-Abstände, **nicht** die Mesh-/Fuß-Kollisionen. Die prozedurale Ersatzfigur benutzt die bestehende 2-Segment-Beinkette für eine kleine zusätzliche Schritthebung nur bei fast vollständig aufgerichtetem Bein; importierte GLB-Rigs bleiben bei ihren vorhandenen Clips und können bei Root-Bewegung weiterhin rigabhängiges Fußgleiten zeigen. Integration ausschließlich in dem schon bestehenden `components/visualizer/ThreeAvatar.tsx`-`useFrame`, keine neuen Timer, Dienste, GPU-Objekte oder Animationsmixer. Tests: `tests/v485-natural-dance-motion-studio-regression.cjs` und `tests/tsconfig.v485-core.json`.
+- **V484 – Expressive Dance Performance 4.0:** `components/visualizer/expressiveLowPosePerformanceV484.ts` wertet ausschließlich die bereits von V481/V483 genehmigten automatischen Tiefposen aus und erzeugt begrenzte additive `PartnerGestureCue`-Akzente für vorhandene Schulter-, Arm- und Oberkörper-Rigkanäle. Bei Deutschrap verteilen sich linke/rechte Arm-Akzente asymmetrisch, bei Hardstyle-/Hardtekk-Drops gibt es sanft eingefadete Gruppenakzente, bei einem stehenden Lead nur eine zurückhaltende Reaktion. Der Algorithmus verwendet vorhandene Beat-/Kick-/Snare-/Energiewerte; er erkennt **keine** Punchline-Timestamps oder Singstimmen und bleibt ohne hinreichende rhythmische Evidenz neutral. Die bestehende GLB-Animation/Foot-IK darf nicht retargetiert oder überschrieben werden. In der prozeduralen Ersatzfigur ergänzt `components/visualizer/ThreeAvatar.tsx` eine kleine, auf 0,11 rad begrenzte Vorwärtsdrehung beider bereits vorhandener Arme. Manuelle Sänger- und Motion-Keyframes, `reducedMotion`, Pause, Lyrics-Vordergrund und nichtautomatische Formationen unterdrücken den Zusatz. Die Leistungsstufe reduziert nur diese optionalen Akzente. Keine neue RAF-Schleife, kein Animationsmixer und keine zusätzlichen 3D-Objekte. Tests: `tests/v484-expressive-dance-performance-regression.cjs` und `tests/tsconfig.v484-core.json`.
+- **V483 – Natural Dance Interaction 3.0:** `components/visualizer/naturalLowPoseInteractionV483.ts` ergänzt die bestehende V481-Tiefposen-Policy und V482-Übergänge um leichtes partnerbezogenes Head-/Eye-Tracking, kleine asymmetrische Schulter-/Armakzente sowie **maximal 240 ms versetztes Aufrichten** nach automatisch gespielten Low-Pose-Abschnitten. Die vier festen Slot-Zustände laufen ausschließlich in `components/visualizer/ThreeAvatar.tsx` im vorhandenen V326-`useFrame`, ohne eigenen Taktgeber, neue React-Frame-Updates oder zusätzliche GPU-Ressourcen. Offizielle Rollen-Zeitstempel werden nicht behauptet: Blickrichtung folgt allein sichtbaren Bühnenpositionen. Bei manueller Choreografie, manuell zugeordneten Sängern, Pause, Seek, Lyrics-Vordergrund, `reducedMotion` oder Trackwechsel wird der kurzzeitige Release-Cache verworfen. Ein neuer aktiver Plan behält Vorrang und beachtet die eingestellte Normal-Höchstzahl; der Nachlauf eines explizit erlaubten synchronen Vierer-Drops darf die Vierergruppe für maximal 240 ms freigeben; die V475-/V458-Gesten werden nur vorsichtig über die bestehenden V452-Sicherheits-Clamps ergänzt. Der zusätzliche Blickkontakt beeinflusst weder GLB-Keyframes noch Clips, Foot-IK, Root-Positionen oder Lippenbewegungen. Prüfungen: `tests/v483-natural-dance-interaction-regression.cjs` und `tests/tsconfig.v483-core.json`.
+- **V482 – natürliche Tiefposen-Übergänge:** `components/visualizer/naturalLowPoseTransitionsV482.ts` ergänzt V481 um pro Avatar **eine** kritisch gedämpfte Tiefenposition und eine begrenzte Oberkörper-Gewichtsverschiebung. In `components/visualizer/ThreeAvatar.tsx` treiben derselbe Tiefenwert und `solveProceduralLowLegV481` die prozedurale Beckenabsenkung und beide Bein-Ketten gemeinsam an; normale Beat-Bounce-Bewegung wird getrennt geglättet. Bei GLB-Tänzern bleiben vorhandene importierte Squat-/Kneel-Clips Pflicht. Ein kleiner Clip-Latch verhindert hektische Wechsel zwischen unterschiedlichen Low-Pose-Clips, hebt aber Stand/Pause/Manuell sofort auf. Die V481-Gruppen-Policy, das V326-UI, Foot-IK und die manuellen Eingriffe behalten Vorrang. Keine neue Rigsynthese, kein Physiksimulationsversprechen, kein zusätzlicher Frame-Sampler. Tests: `tests/v482-natural-low-pose-transitions-regression.cjs` und `tests/tsconfig.v482-core.json`.
+- **V481 – intelligente Tiefposen/Formation:** `components/visualizer/intelligentLowPoseV481.ts` erstellt aus V326-Gruppen-Cues, Echtzeit-Beat-/Kick-Energie, V442-Automatik, Genre und Leistungsstufe pro Avatar eine deterministische Low-Pose-Absicht. Die Policy läuft in `components/visualizer/ThreeAvatar.tsx` nur für automatisch inszenierte Dreier-/Vierergruppen, nach manuellen Sänger- und Gruppen-Vorrangprüfungen. Eine für jeden Tänzer stabile Context-Ref wird pro Frame aktualisiert, ohne React-Render-Loop. Der bestehende GLB-Mixer verwendet Low-Pose-Animationsclips **nur dann, wenn sie vorhanden sind**, sonst bleiben normale Clip- und Foot-IK-Steuerung erhalten. Der prozedurale Renderer besitzt eigene zweigliedrige Beine (Hüft- und Kniebewegung) und senkt den Körperschwerpunkt kompensiert ab. `components/visualizer/LowPoseControlsV481.tsx` ist in `components/visualizer/MultiAvatarStageStudioV326.tsx` als Steuerung für Intensität, Normal-Limit und explizite gemeinsame Drops eingebunden. Automatische Tiefposen sind bei manueller Regie, Pause, `reducedMotion`, Lyrics-Vordergrund oder kritischem Performance-Tier eingeschränkt. Kein zweiter Animation-Mixer, kein zusätzlicher Audio-Analyzer und keine behauptete echte Bodenkollision. **GLB-Squat-Clips können weiterhin rigabhängige Fußrutsch-/Retargeting-Artefakte besitzen.**
+
+- `components/visualizer/glbMotionAnalyzerV439.ts` und die Caches sollen Clipanalysen von Live-Frames entkoppeln. Riesige GLB-Dateien und vier komplexe Avatare können dennoch stark belasten.
+- Keine dauerhaften per-Frame-React-State-Updates für hochfrequente Rendering-Telemetrie; Einstellungen, Audiosignale und Frame-Sampling bewusst entkoppeln.
+
+### V488 – Ausdrucksstarke Ganzkörper-Koordination
+
+`components/visualizer/naturalFullBodyDanceV488.ts` berechnet **nur für prozedurale Multi-Avatar-Tänzer** kleine, deterministische, pro-Avatar differenzierte Zielwerte für Hüftgewichtung, Oberkörperneigung, Schulter-/Armschwung, Blickausgleich und den Knie-Fuß-Schwung. Die Eingaben stammen aus dem bestehenden V482-Hockfilter und den V486-Footwork-Signalen und der Songzeit, nicht aus einer neuen Audio- oder Render-Schleife. `components/visualizer/ThreeAvatar.tsx` mischt diese Werte in vorhandene ProceduralAvatar-Rig-Refs; kein neues GLB-Retargeting oder Fuß-IK-Override. Bei Pause, manueller Choreografie, Reduced Motion, niedriger Qualitätsstufe, fehlender Track-ID oder deaktivierter automatischer Gruppe bleibt die Zusatzpose neutral. Aufgesetzte Füße werden von V488 nicht angehoben. V487 bleibt für importierte GLB-Fußkontakte verantwortlich. Rein visuelle Oberkörperbewegungen sind **keine** physikalische Gewichtsschwerpunkt- oder Bodenkontaktsimulation.
+
+## 7. Datenspeicher und Schutzgrenzen
+
+| Daten | Speicher/Verantwortung | Hinweise |
+| --- | --- | --- |
+| Spotify-Session / OAuth-State | `lib/session.ts`, serverseitig verschlüsselte Cookies | Cookies sind `HttpOnly`; Refresh bleibt serverseitig. |
+| UI-, Rap-, Kamera- und Avatar-Präferenzen | `context/UiPreferencesContext.tsx` / Browser-`localStorage` | Lokal, nicht automatisch synchronisiert; Normalisierung einzelner Versionen beim Laden. |
+| Genre-Korrekturen | `services/genre/genreCorrectionMemory.ts` | Gespeicherte Nutzerkorrekturen und temporäre Session-Overrides. |
+| Avatar-Konfiguration/Modelle | `lib/avatarBlob.ts` / lokale Dateien oder optional Vercel Blob | Administration und öffentliche Blob-URLs sind getrennt von Spotify-Tokens. |
+| Release Push | `lib/push-storage-v365.ts` und Push-API | Nur bei entsprechend konfigurierten Diensten/Schlüsseln funktionsfähig. |
+| Playback-/Renderdaten | Context, Browserzustand, temporäre Caches | Keine automatische Langzeitspeicherung vollständiger Audioaufnahmen zugesichert. |
+
+## 8. Test- und Build-Architektur
+
+In `package.json` ruft `npm run build` zuerst `prebuild` → `build:preflight` auf, **danach** `next build`. In der V488-Kette liegen `check:syntax`, versionsspezifische Regressionstests (u. a. V483, V482, V481, V480, V479, V478, V477, V473.7, V473.5, V473.4 und Kamera-/Lyrics-/Rap-Tests), `scripts/build-preflight.cjs` (Node, Lockfile, installierte Pakete) und `typecheck` (`tsc --noEmit`). Die Suite enthält auch isolierte TypeScript-Checks unter `tests/tsconfig.v*.json`.
+
+Der vorherige Testfehler bei V454/V456/V460/V464 war eine **fragile exakte Quelltextprüfung**, kein nachgewiesener Kamera-Laufzeitfehler. `tests/v4737-camera-test-compatibility-regression.cjs` sichert die semantische Auswertung der Kamera-Cues und die Genius-Track-Zuordnung ab. Für weitere Änderungen nach Möglichkeit konkrete Eingabe-/Ausgabe-Verträge testen statt unveränderte Schreibweisen von Source-Zeilen.
+
+**Dokumentationsprüfung:** `tests/check-architecture.cjs` überprüft bei `npm run check:architecture`, ob die hier ausdrücklich referenzierten Quellpfade noch existieren und die Kernabschnitte vorhanden sind. Das ersetzt kein Architektur-Review und kann insbesondere semantische Verhaltensänderungen nicht automatisch erkennen.
+
+### Lokale Prüfkommandos
+
+```powershell
+npm run check:architecture
+npm run check:syntax
+npm run typecheck
+npm run build
+```
+
+Der zuletzt vom Nutzer unter Windows gemeldete vollständige **V473.7-Produktions-Build war erfolgreich** (Next.js 15.5.27, TypeScript, statische Seiten und Preflight). Ein vollständiger V488-Next.js-Build muss auf einer Umgebung mit installierten npm-Abhängigkeiten separat bestätigt werden.
+
+## 9. Erweiterungspunkte und Wartungsregeln
+
+1. **Neuer Musik-/Lyrics-Anbieter:** Serveradapter und Normalisierung ergänzen; `types/music.ts` als Client-Vertrag erhalten; Zeitquelle/Vertrauensniveau dokumentieren.
+2. **Neue Visualizer-/Avatarfunktion:** `registry.tsx`-Vertrag und `VisualizerStage`/`ThreeAvatar`-Durchleitung betrachten; manuelle Priorität, `reducedMotion`, Pause und Seek testen.
+3. **Neue Show-Regie:** Ein klar abgegrenzter Pure-Planner statt zusätzlicher unkoordinierter Live-Korrekturen; Konflikte zwischen Kamera, Lyrics, Licht und Motion explizit auflösen.
+4. **Neue externe API/Cloudspeicherung:** serverseitige Schlüssel, Opt-in, Fallback, Länderbezug und Ausfallverhalten dokumentieren.
+5. **Neue Version:** `ARCHITECTURE.md` bei Architekturänderungen im selben Commit anpassen; Version-Release-Notes separat belassen; `npm run check:architecture` und anschließend `npm run build` ausführen.
+
+### Bekannte technische Risiken
+
+- **Große Orchestratoren:** `VisualizerStage.tsx` und `ThreeAvatar.tsx` bündeln viele Versionen und haben hohe Änderungs-/Integrationskosten. Langfristig in testbare Controller, Datenverträge und schlankere R3F-Adapter zerlegen, **nicht** ungetestet in einem großen Refactoring.
+- **Präferenzschema:** Viele versionierte optionale Felder in `types/music.ts` erleichtern Rückwärtskompatibilität, erschweren aber Migration, Validierung und Übersicht.
+- **Undokumentierte Spotify-Endpoints:** Color Lyrics und Canvas sind best effort, keine unterstützten öffentlichen API-Verträge. Es muss immer eine funktionierende Grundanzeige ohne diese Daten geben.
+- **Feature-Song-Zuordnung:** Artist-Credits, Genius-Informationen und heuristische Vokalwechsel dürfen nicht zu behaupteten exakten Sprecher-Timestamps verschmelzen.
+- **Testabdeckung:** Statische Tests und simulierte Langlaufszenarien ergänzen, ersetzen aber keinen echten Raspberry-Pi-Dauertest, WebGL-Gerätetest oder echten Spotify-Integrationslauf.
+
+## 10. Weitere Referenzen
+
+- [README](README.md) – Installation und Einstieg.
+- [Spotify-Setup](SPOTIFY_LOCAL_SETUP.md) – OAuth/Entwicklungsumgebung.
+- [V488 – Natural Full-Body Dance 5.0](V488-NATURAL-FULL-BODY-DANCE-5.md)
+- [V492 – GLB Blending Preset Studio](V492-GLB-BLENDING-PRESET-STUDIO.md)
+- [V491 – GLB Motion Preview & Blending Studio](V491-GLB-MOTION-PREVIEW-BLENDING-STUDIO.md)
+- [V490 – Intelligent GLB Motion Blending 2.0](V490-INTELLIGENT-GLB-MOTION-BLENDING-2.md)
+- [V489 – Natural GLB Full-Body Motion](V489-NATURAL-GLB-FULL-BODY-MOTION.md)
+- [V488 – Natural Full-Body Dance 5.0](V488-NATURAL-FULL-BODY-DANCE-5.md)
+- [V487 – Realistic Ground Contact Studio 3.0](V487-REALISTIC-GROUND-CONTACT-STUDIO-3.md)
+- [V486 – Advanced Dance Footwork 2.0](V486-ADVANCED-DANCE-FOOTWORK-2.md)
+- [V485 – Natural Dance Motion Studio 5.0](V485-NATURAL-DANCE-MOTION-STUDIO-5.md)
+- [V484 – Expressive Dance Performance 4.0](V484-EXPRESSIVE-DANCE-PERFORMANCE-4.md)
+- [V483 – Natural Dance Interaction 3.0](V483-NATURAL-DANCE-INTERACTION-3.md)
+- [V482 – Natural Low-Pose Transitions](V482-NATURAL-LOW-POSE-TRANSITIONS.md)
+- [V481 – Intelligent Stage Formation + Low Pose Choreography](V481-INTELLIGENT-STAGE-FORMATION-LOW-POSES.md)
+- [V480 – Concert Performance Diagnostics](V480-CONCERT-PERFORMANCE-DIAGNOSTICS.md)
+- [V479 – Raspberry Pi Concert Performance Optimization](V479-RASPBERRY-PI-CONCERT-PERFORMANCE.md)
+- [V478 – Autonomous Concert Director 4.0](V478-AUTONOMOUS-CONCERT-DIRECTOR-4.md)
+- [V477 – Beautiful Lyrics 4.0](V477-BEAUTIFUL-LYRICS-4.md)
+- [V476 – Expressive Lip-Sync 3.0](V476-EXPRESSIVE-LIP-SYNC-3.md)
+- [V475 – Intelligent Multi-Avatar Interaction](V475-INTELLIGENT-MULTI-AVATAR-INTERACTION.md)
+- [V474 – Natural Rap Gesture Variety](V474-NATURAL-RAP-GESTURE-VARIETY.md)
+- [Letzter Build-Fix](V473.4-TYPESCRIPT-BUILD-HOTFIX.md) und [V473-Feature](V473-AUTOMATIC-RAP-FLOW-ADLIBS.md).
+- [Automatische Show V456](V456-ULTIMATE-AUTOMATIC-SHOW-DIRECTOR.md), [Multi-Artist V442](V442-MULTI-ARTIST-STAGE-DIRECTOR.md), [Lip-Sync V453](V453-EXPRESSIVE-LIP-SYNC-2.md), [Performance V463](V463-RASPBERRY-PI-PERFORMANCE-STABILITY.md).
+
+**Abgrenzung:** Diese Architekturdatei beschreibt das reale Modulnetz in V492. V492 – GLB Blending Preset Studio und V491 – GLB Motion Preview & Blending Studio und V490 – Intelligent GLB Motion Blending 2.0 und V489 – Natural GLB Full-Body Motion und V488 – Natural Full-Body Dance 5.0 und V487 – Realistic Ground Contact Studio 3.0 und V486 – Advanced Dance Footwork 2.0 und V485 – Natural Dance Motion Studio 5.0 und V484 – Expressive Dance Performance 4.0 und V483 – Natural Dance Interaction 3.0 und V482 – Natural Low-Pose Transitions und V481 – Intelligent Stage Formation und V480 – Concert Performance Diagnostics sowie V479 – Raspberry Pi Concert Performance Optimization sind implementiert. Eine feste FPS-Zusage für einen Raspberry Pi erfordert reale Geräte- und Langlauftests.

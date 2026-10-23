@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useSyncExternalStore, useState } from "react";
 import {useDisplayProfileV388} from "../DisplayPerformanceV388";
+import {samplePiConcertV479} from "./piConcertRuntimeV479";
 import {limitDisplayDprV388,resolveDisplayBudgetV388} from "./displayPerformancePolicyV388";
 import { useFrame, useThree } from "@react-three/fiber";
 import { publishRenderMetrics } from "./renderDiagnostics";
@@ -38,7 +39,7 @@ export function setPerformanceMode(mode: QualityMode) {
 }
 const dprFor = (tier: QualityState["tier"], deviceDpr: number) => Math.min(deviceDpr, tier === "high" ? 1.5 : tier === "balanced" ? 1.15 : 0.8);
 /** Adaptive resolution controller. Hysteresis and a cooldown prevent oscillation. */
-export function AdaptivePerformanceController({avatarCount=1}:{avatarCount?:number}) {
+export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avatarCount?:number;playing?:boolean}) {
   const setDpr = useThree(state => state.setDpr);
   const gl = useThree(state => state.gl);
   const gpuDescription = useRef<{renderer: string; webgl: string}>({renderer: "Nicht verfügbar", webgl: "Nicht verfügbar"});
@@ -85,8 +86,10 @@ export function AdaptivePerformanceController({avatarCount=1}:{avatarCount?:numb
   useEffect(() => {
     const clearFrameWindow=()=>{diagnostic.current={elapsed:0,frames:0,slow:0,frameSeconds:0,durations:[]};};
     document.addEventListener("visibilitychange",clearFrameWindow);
-    return ()=>document.removeEventListener("visibilitychange",clearFrameWindow);
-  },[]);
+    const resetPi=()=>{if(document.hidden)samplePiConcertV479({at:Date.now(),fps:NaN,p95FrameMs:NaN,avatarCount,playing,visible:false});};
+    document.addEventListener("visibilitychange",resetPi);
+    return ()=>{document.removeEventListener("visibilitychange",clearFrameWindow);document.removeEventListener("visibilitychange",resetPi);};
+  },[avatarCount,playing]);
   useEffect(() => {
     deviceDpr.current=Math.max(.5,displayDeviceV388.pixelRatio||1);
   },[displayDeviceV388.pixelRatio]);
@@ -136,6 +139,8 @@ export function AdaptivePerformanceController({avatarCount=1}:{avatarCount?:numb
       samples: d.frames, avatarCount, updatedAt: Date.now(),
     });
     d.elapsed = 0; d.frameSeconds = 0; d.frames = 0; d.slow = 0; d.durations = [];
+    // V479 consumes the same once-per-second frame window (no duplicate RAF or GPU timer).
+    samplePiConcertV479({at:Date.now(),fps,p95FrameMs,avatarCount,playing,visible:true});
 
     if (mode !== "auto" || isPiQualityTransitionV463(Date.now())) return;
     // V254: passive calibration from real scene load. Collect once, then reuse the

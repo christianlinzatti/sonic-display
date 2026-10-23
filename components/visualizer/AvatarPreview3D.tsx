@@ -7,7 +7,9 @@ import { OrbitControls, useGLTF } from "@react-three/drei";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { retargetHumanoidClips, readRetargetCalibration, RETARGET_EVENT } from "./avatarAnimationRetarget";
 import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUtils.js";
-import { AnimationMixer, LoopOnce, type AnimationClip, type Group } from "three";
+import { AnimationMixer, LoopOnce, LoopRepeat, AnimationClip, type Group } from "three";
+import {GLB_BLEND_PRESET_LIMIT_V492,readBlendPresetsV492,writeBlendPresetsV492,mergeBlendPresetsV492,parseBlendPresetsV492,serializeBlendPresetsV492,scopedBlendPresetsV492,type GlbBlendPresetV492,type BlendGenreV492} from "./glbBlendPresetsV492";
+import { previewBlendRegionsV491, resolvePreviewBlendV491, previewBlendWeightV491, isPreviewBlendTrackV491, type PreviewBlendPlanV491 } from "./glbMotionBlendPreviewV491";
 import {readFootLockV322} from "./intelligentFootLockV322";
 import { createFootIKState, initializeFootIK, updateFootIK } from "./avatarFootIK";
 import { collectAvatarRigNodes } from "./avatarRigController";
@@ -77,12 +79,12 @@ function ProceduralModel() {
   </group>;
 }
 
-type TimelineClip = { id: string; label: string; duration: number };
+type TimelineClip = { id: string; name: string; label: string; duration: number; blendArmsV491: number; blendUpperV491: number };
 type TimelineState = { clipId: string; start: number; end: number; cursor: number; playing: boolean; speed: number };
 
 /** Each preview owns an independent mixer; external clips are retargeted against its cloned rig. */
-function GltfPreview({ url, animationUrl, timeline, onClips, onPosition, footIK, preferences }: {
-  url: string; animationUrl?: string; timeline: TimelineState;
+function GltfPreview({ url, animationUrl, timeline, blendV491, onClips, onPosition, footIK, preferences }: {
+  url: string; animationUrl?: string; timeline: TimelineState; blendV491?: PreviewBlendPlanV491;
   onClips: (clips: TimelineClip[]) => void; onPosition: (time: number) => void;
   footIK: boolean; preferences: UiPreferences;
 }) {
@@ -122,21 +124,47 @@ function GltfPreview({ url, animationUrl, timeline, onClips, onPosition, footIK,
     ...animations.map((clip, i) => ({ id: `embedded:${i}`, label: clip.name || `Clip ${i+1}`, clip })),
     ...externalClips.map((clip, i) => ({ id: `external:${i}`, label: `Import · ${clip.name || `Clip ${i+1}`}`, clip })),
   ], [animations, externalClips]);
-  useEffect(() => { onClips(allClips.map(({ id, label, clip }) => ({ id, label, duration: clip.duration }))); }, [allClips, onClips]);
+  useEffect(() => { onClips(allClips.map(({ id, label, clip }) => ({ id, name:clip.name, label, duration: clip.duration, blendArmsV491: clip.tracks.filter(t=>isPreviewBlendTrackV491(t.name,"arms")).length, blendUpperV491: clip.tracks.filter(t=>isPreviewBlendTrackV491(t.name,"upper")).length }))); }, [allClips, onClips]);
   const selected = allClips.find(c => c.id === timeline.clipId) ?? allClips[0];
+  // This preview is isolated from live playback and manual mixer preferences.
+  // Mask clips are cloned from the imported animation; no GLB asset is altered.
+  const blendClipV491 = useMemo(() => {
+    const result = blendV491 ? resolvePreviewBlendV491(allClips, selected?.id ?? "", {...blendV491,weight:.25}, preferences.reducedMotion) : null;
+    if (!result) return null;
+    const masked = result.clip.clip.tracks.filter(t => result.trackNames.includes(t.name)).map(t => t.clone());
+    return new AnimationClip(`PreviewMixV491:${result.clip.id}:${blendV491?.region}`, result.clip.clip.duration, masked);
+  }, [allClips, blendV491?.enabled, blendV491?.sourceId, blendV491?.region, selected?.id, preferences.reducedMotion]);
+  const overlayActionV491 = useRef<ReturnType<AnimationMixer["clipAction"]> | null>(null);
+  const overlayWeightV491 = blendClipV491 ? previewBlendWeightV491(blendV491?.weight ?? 0) : 0;
+
   useEffect(() => {
     mixer.stopAllAction();
     selectedAction.current = null;
+    overlayActionV491.current = null;
     if (!selected) return;
     const action = mixer.clipAction(selected.clip);
     action.reset(); action.setLoop(LoopOnce, 1); action.clampWhenFinished = true;
-    action.play(); action.paused = true;
+    action.play(); // The clock is driven explicitly by mixer.setTime (also when scrubbing).
     selectedAction.current = action;
     clock.current = Math.max(0, Math.min(selected.clip.duration, timeline.start));
     mixer.setTime(clock.current);
     return () => { action.stop(); selectedAction.current = null; };
     // Only rebind when selected clip changes, not on every timeline edit.
   }, [mixer, selected?.id, selected?.clip]);
+  useEffect(() => {
+    const old = overlayActionV491.current;
+    if (old) { old.stop(); overlayActionV491.current = null; }
+    if (!blendClipV491 || !selected) return;
+    const overlay = mixer.clipAction(blendClipV491);
+    overlay.reset(); overlay.setLoop(LoopRepeat, Infinity);
+    overlay.setEffectiveWeight(overlayWeightV491); overlay.play();
+    overlayActionV491.current = overlay;
+    mixer.setTime(clock.current);
+    return () => { overlay.stop(); if (overlayActionV491.current === overlay) overlayActionV491.current = null; };
+  }, [mixer, blendClipV491, selected?.id]);
+  useEffect(() => {
+    overlayActionV491.current?.setEffectiveWeight(overlayWeightV491);
+  }, [overlayWeightV491]);
   const seekRequest = useRef(timeline.cursor);
   useEffect(() => {
     if (Math.abs(timeline.cursor - seekRequest.current) > 0.035) {
@@ -173,6 +201,16 @@ export function AvatarPreview3D({ modelUrl, preferences, studio = false, animati
   const [playing, setPlaying] = useState(false);
   const [compareIK, setCompareIK] = useState(false);
   const [previewIK, setPreviewIK] = useState(true);
+  const [blendV491, setBlendV491] = useState<PreviewBlendPlanV491>({enabled:false,sourceId:"",weight:.25,region:"upper"});
+  useEffect(() => setBlendV491({enabled:false,sourceId:"",weight:.25,region:"upper"}), [modelUrl, animationUrl]);
+  // V492: presets are browser-local data, scoped to the current model + source.
+  const [blendPresetsV492,setBlendPresetsV492]=useState<GlbBlendPresetV492[]>([]);
+  const [chosenPresetV492,setChosenPresetV492]=useState("");
+  const [presetNameV492,setPresetNameV492]=useState("");
+  const [presetGenreV492,setPresetGenreV492]=useState<BlendGenreV492>("all");
+  const [presetAutoV492,setPresetAutoV492]=useState(false);
+  const [presetMessageV492,setPresetMessageV492]=useState("");
+  useEffect(()=>{if(studio){setBlendPresetsV492(readBlendPresetsV492());setChosenPresetV492("");setPresetMessageV492("");}},[studio,modelUrl,animationUrl]);
   const [speed, setSpeed] = useState(1);
   const [clips, setClips] = useState<TimelineClip[]>([]);
   const [clipId, setClipId] = useState("");
@@ -329,6 +367,66 @@ export function AvatarPreview3D({ modelUrl, preferences, studio = false, animati
     }
   }, [clips, clipId]);
   const timeline: TimelineState = { clipId, start: loopStart, end: loopEnd, cursor, playing, speed };
+  const blendOptionsV491 = clips.filter(c=>c.id!==clipId);
+  const blendSelectionV491 = blendOptionsV491.find(c=>c.id===blendV491.sourceId);
+  const blendSafeCountV491 = blendSelectionV491 ? blendV491.region==="arms"?blendSelectionV491.blendArmsV491:blendSelectionV491.blendUpperV491 : 0;
+  const canBlendV491 = Boolean(modelUrl && clips.length>=2 && !preferences.reducedMotion);
+  const currentBlendPresetsV492=scopedBlendPresetsV492(blendPresetsV492,modelUrl??"",animationUrl??"");
+  const selectedBlendPresetV492=currentBlendPresetsV492.find(p=>p.id===chosenPresetV492);
+  // UI clips also need their safe-track names. Actual usability is validated in
+  // GltfPreview / ThreeAvatar, not inferred from the selected index alone.
+  const currentPresetValidV492=selectedBlendPresetV492&&clips.some(c=>c.id===selectedBlendPresetV492.base.id&&c.name===selectedBlendPresetV492.base.name)
+    &&clips.some(c=>c.id===selectedBlendPresetV492.overlay.id&&c.name===selectedBlendPresetV492.overlay.name
+      &&(selectedBlendPresetV492.region==='arms'?c.blendArmsV491:c.blendUpperV491)>0);
+  const persistBlendV492=(updated:GlbBlendPresetV492[],message:string)=>{
+    try{writeBlendPresetsV492(updated);setBlendPresetsV492(updated);setPresetMessageV492(message);}
+    catch{setPresetMessageV492('Presets konnten nicht gespeichert werden (Browserspeicher prüfen).');}
+  };
+  const saveBlendPresetV492=(forceNew=false)=>{
+    const base=clips.find(c=>c.id===clipId), overlay=clips.find(c=>c.id===blendV491.sourceId);
+    const name=presetNameV492.trim().slice(0,60);
+    if(!modelUrl||!name||!base?.name||!overlay?.name||base.id===overlay.id||base.name===overlay.name||!blendV491.enabled||blendV491.weight<=0
+      ||(blendV491.region==='arms'?overlay.blendArmsV491:overlay.blendUpperV491)<=0){
+      setPresetMessageV492('Bitte einen Namen, zwei verschiedene Clips mit passenden Gelenken und ein Mischgewicht über 0 wählen.');return;
+    }
+    const old=forceNew?undefined:selectedBlendPresetV492;
+    if(!old&&blendPresetsV492.length>=GLB_BLEND_PRESET_LIMIT_V492){setPresetMessageV492('Maximal 40 gespeicherte Kombinationen.');return;}
+    const preset:GlbBlendPresetV492={version:1,id:old?.id??`blend-${Date.now()}-${Math.random().toString(36).slice(2,9)}`,name,
+      modelUrl,animationUrl:animationUrl??'',base:{id:base.id,name:base.name},overlay:{id:overlay.id,name:overlay.name},
+      region:blendV491.region,weight:previewBlendWeightV491(blendV491.weight),genre:presetGenreV492,autoEnabled:presetAutoV492};
+    const updated=old?blendPresetsV492.map(p=>p.id===old.id?preset:preset):[...blendPresetsV492,preset];
+    persistBlendV492(updated,`„${name}“ ${old?'aktualisiert':'gespeichert'}.`);setChosenPresetV492(preset.id);
+  };
+  const loadBlendPresetV492=()=>{
+    const preset=selectedBlendPresetV492;
+    if(!preset||!currentPresetValidV492){setPresetMessageV492('Preset nicht ladbar: GLB-Clip fehlt oder passende Gelenkkanäle wurden entfernt.');return;}
+    setClipId(preset.base.id);
+    setBlendV491({enabled:true,sourceId:preset.overlay.id,weight:preset.weight,region:preset.region});
+    setPresetNameV492(preset.name);setPresetGenreV492(preset.genre);setPresetAutoV492(preset.autoEnabled);
+    setPlaying(false);setPresetMessageV492(`„${preset.name}“ in die 3D-Vorschau geladen.`);
+  };
+  const deleteBlendPresetV492=()=>{
+    if(!selectedBlendPresetV492)return;
+    persistBlendV492(blendPresetsV492.filter(p=>p.id!==selectedBlendPresetV492.id),'Preset gelöscht.');
+    setChosenPresetV492('');setPresetNameV492('');
+  };
+  const exportBlendPresetsV492=()=>{
+    const json=serializeBlendPresetsV492(blendPresetsV492);
+    const url=URL.createObjectURL(new Blob([json],{type:'application/json'}));
+    const a=document.createElement('a');a.href=url;a.download='sonic-glb-blending-presets-v492.json';a.click();
+    URL.revokeObjectURL(url);
+    setPresetMessageV492('Preset-Backup exportiert.');
+  };
+  const importBlendPresetsV492=async(file:File|undefined)=>{
+    if(!file)return;
+    try{
+      if(file.size>128000)throw new Error('Preset-Datei zu groß (maximal 128 KB).');
+      const incoming=parseBlendPresetsV492(await file.text());
+      const merged=mergeBlendPresetsV492(readBlendPresetsV492(),incoming);
+      persistBlendV492(merged,`${incoming.length} Presets importiert / aktualisiert. Nur passende Modelle werden hier angezeigt.`);
+    }catch(error){setPresetMessageV492(error instanceof Error?error.message:'Import fehlgeschlagen.');}
+  };
+  const activeBlendV491 = canBlendV491 ? blendV491 : {...blendV491,enabled:false};
   const [autoRotate, setAutoRotate] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const [beatEnabled, setBeatEnabled] = useState(false);
@@ -354,16 +452,16 @@ export function AvatarPreview3D({ modelUrl, preferences, studio = false, animati
           {studio && compareIK && modelUrl ? <>
             <group position={[-1.12, 0, 0]} scale={0.72}>
               <PreviewMotion playing={playing && !preferences.reducedMotion} speed={speed} intensity={intensity} beatEnabled={beatEnabled} bpm={bpm} style={style} onBeat={handleBeat}>
-                <Suspense fallback={<ProceduralModel/>}><GltfPreview url={modelUrl} animationUrl={animationUrl} timeline={timeline} onClips={handleClips} onPosition={handlePosition} footIK={false} preferences={preferences}/></Suspense>
+                <Suspense fallback={<ProceduralModel/>}><GltfPreview url={modelUrl} animationUrl={animationUrl} timeline={timeline} blendV491={activeBlendV491} onClips={handleClips} onPosition={handlePosition} footIK={false} preferences={preferences}/></Suspense>
               </PreviewMotion>
             </group>
             <group position={[1.12, 0, 0]} scale={0.72}>
               <PreviewMotion playing={playing && !preferences.reducedMotion} speed={speed} intensity={intensity} beatEnabled={beatEnabled} bpm={bpm} style={style} onBeat={() => {}}>
-                <Suspense fallback={<ProceduralModel/>}><GltfPreview url={modelUrl} animationUrl={animationUrl} timeline={timeline} onClips={handleClips} onPosition={() => {}} footIK={true} preferences={preferences}/></Suspense>
+                <Suspense fallback={<ProceduralModel/>}><GltfPreview url={modelUrl} animationUrl={animationUrl} timeline={timeline} blendV491={activeBlendV491} onClips={handleClips} onPosition={() => {}} footIK={true} preferences={preferences}/></Suspense>
               </PreviewMotion>
             </group>
           </> : <PreviewMotion playing={playing && !preferences.reducedMotion} speed={speed} intensity={intensity} beatEnabled={beatEnabled} bpm={bpm} style={style} onBeat={handleBeat}>
-            {modelUrl ? <Suspense fallback={<ProceduralModel/>}><GltfPreview url={modelUrl} animationUrl={animationUrl} timeline={timeline} onClips={handleClips} onPosition={handlePosition} footIK={previewIK} preferences={preferences}/></Suspense> : <ProceduralModel/>}
+            {modelUrl ? <Suspense fallback={<ProceduralModel/>}><GltfPreview url={modelUrl} animationUrl={animationUrl} timeline={timeline} blendV491={activeBlendV491} onClips={handleClips} onPosition={handlePosition} footIK={previewIK} preferences={preferences}/></Suspense> : <ProceduralModel/>}
           </PreviewMotion>}
         </group>
         <OrbitControls enablePan={false} enableZoom minDistance={1.8} maxDistance={8} autoRotate={autoRotate && !playing} autoRotateSpeed={1.2}/>
@@ -379,6 +477,63 @@ export function AvatarPreview3D({ modelUrl, preferences, studio = false, animati
       <button type="button" aria-pressed={autoRotate} onClick={() => setAutoRotate(value => !value)}>{autoRotate ? "Rotation aus" : "Auto-Rotation"}</button>
       <button type="button" onClick={() => setResetKey(value => value + 1)}>Ansicht zurücksetzen</button>
     </div>
+    {studio && <fieldset className="avatar-timeline-editor avatar-motion-blend-preview-v491" aria-label="GLB Motion Preview & Blending Studio V491">
+      <legend>GLB Motion Preview & Blending Studio · V491</legend>
+      <p>Kombiniere zwei bereits installierte Clips live in dieser 3D-Vorschau. Der Basisclip wird in der Timeline ausgewählt; nur sichere Arm- und Brustrotationen werden vom zweiten Clip übernommen. GLB-Dateien und die Live-Bühne bleiben unverändert.</p>
+      <label><input type="checkbox" checked={blendV491.enabled} disabled={!canBlendV491} onChange={e=>setBlendV491(v=>({...v,enabled:e.target.checked}))}/> Zweiten Clip einblenden</label>
+      <div className="avatar-v491-blend-controls">
+        <label>Gestenclip <select aria-label="Zusätzliche GLB-Animation" value={blendOptionsV491.some(c=>c.id===blendV491.sourceId)?blendV491.sourceId:""}
+          disabled={!canBlendV491} onChange={e=>setBlendV491(v=>({...v,sourceId:e.target.value}))}>
+          <option value="">Clip auswählen…</option>
+          {blendOptionsV491.map(c=><option key={c.id} value={c.id}>{c.label}{!(blendV491.region==="arms"?c.blendArmsV491:c.blendUpperV491)?" (keine geeigneten Gelenke)":""}</option>)}
+        </select></label>
+        <label>Körperbereich <select aria-label="Körperbereich für den Gestenclip" value={blendV491.region} disabled={!canBlendV491}
+          onChange={e=>setBlendV491(v=>({...v,region:e.target.value as PreviewBlendPlanV491["region"]}))}>
+          {previewBlendRegionsV491.map(region=><option key={region.value} value={region.value}>{region.label}</option>)}
+        </select></label>
+        <label>Mischgewicht: {Math.round(blendV491.weight*100)} %
+          <input type="range" aria-label="GLB Mischgewicht" min={0} max={50} step={1} value={Math.round(blendV491.weight*100)} disabled={!canBlendV491}
+            onChange={e=>setBlendV491(v=>({...v,weight:Number(e.target.value)/100}))}/>
+        </label>
+        <button type="button" onClick={()=>setBlendV491({enabled:false,sourceId:"",weight:.25,region:"upper"})}>Mischung zurücksetzen</button>
+      </div>
+      {!modelUrl?<p role="status">Bitte zuerst einen GLB-Avatar auswählen.</p>:
+        clips.length<2?<p role="status">Für diese Vorschau werden mindestens zwei Clips benötigt. Importiere eine zusätzliche GLB-Animation.</p>:
+        preferences.reducedMotion?<p role="status">Bei aktivierter Bewegungsreduktion bleibt das Blending deaktiviert.</p>:
+        blendV491.enabled&&!blendV491.sourceId?<p role="status">Wähle einen zweiten Clip aus.</p>:
+        blendV491.enabled&&blendSelectionV491&&blendSafeCountV491===0?<p role="status">Dieser Clip enthält keine passenden Arm- oder Brustrotationen. Bitte einen anderen Clip oder Körperbereich auswählen.</p>:
+        blendV491.enabled&&blendSelectionV491?<p role="status">{blendSafeCountV491} sichere Animationskanäle verfügbar · {Math.round(blendV491.weight*100)} % Mischung</p>:null}
+      <small>Geschützte Kanäle: Hüfte, Beine, Füße, Root-Bewegung, Kopf, Gesicht und Hände. Foot-IK bleibt separat steuerbar. Ohne explizite Aktivierung beeinflusst kein gespeichertes Preset die Live-Bühne.</small>
+      <fieldset className="avatar-blending-presets-v492" aria-label="GLB Blending Preset Studio V492">
+        <legend>GLB Blending Preset Studio · V492</legend>
+        <p>Speichere die Kombination für dieses GLB-Modell und diese Animationsquelle. Nur wenn du die automatische Verwendung aktivierst und die Basisanimation gerade tatsächlich läuft, kann sie auf der Live-Bühne verwendet werden.</p>
+        <label>Preset-Name <input type="text" maxLength={60} placeholder="z. B. Deep Crouch + Rap-Gesten" value={presetNameV492} onChange={e=>setPresetNameV492(e.target.value)}/></label>
+        <label>Genre für automatische Verwendung <select value={presetGenreV492} onChange={e=>setPresetGenreV492(e.target.value as BlendGenreV492)}>
+          <option value="all">Alle Genres</option><option value="rap">Deutschrap / Hip-Hop / Trap</option><option value="hard">Hardstyle / Hardtekk / Hardcore</option>
+        </select></label>
+        <label><input type="checkbox" checked={presetAutoV492} onChange={e=>setPresetAutoV492(e.target.checked)}/> Bei passender Basisanimation automatisch in der Live-Show nutzen</label>
+        <div className="avatar-editor-actions">
+          <button type="button" onClick={()=>saveBlendPresetV492()} disabled={!canBlendV491}>Preset speichern / aktualisieren</button>
+          <button type="button" onClick={()=>saveBlendPresetV492(true)} disabled={!canBlendV491}>Als neues Preset speichern</button>
+        </div>
+        <label>Gespeicherte GLB-Kombination <select aria-label="Gespeicherte GLB-Mischung" value={chosenPresetV492} onChange={e=>setChosenPresetV492(e.target.value)}>
+          <option value="">Preset auswählen…</option>
+          {currentBlendPresetsV492.map(p=><option key={p.id} value={p.id}>{p.name}{p.autoEnabled?' · live':''}</option>)}
+        </select></label>
+        <div className="avatar-editor-actions">
+          <button type="button" disabled={!selectedBlendPresetV492||!currentPresetValidV492} onClick={loadBlendPresetV492}>In Vorschau laden</button>
+          <button type="button" disabled={!selectedBlendPresetV492} onClick={deleteBlendPresetV492}>Preset löschen</button>
+        </div>
+        {selectedBlendPresetV492&&!currentPresetValidV492&&<p role="status">Dieses Preset verwendet fehlende oder geänderte Clips. Es wird in der Live-Show sicher übersprungen.</p>}
+        <div className="avatar-editor-actions">
+          <button type="button" onClick={exportBlendPresetsV492}>Presets als JSON exportieren</button>
+          <label>Preset-JSON importieren <input type="file" accept=".json,application/json" onChange={e=>{
+            const file=e.target.files?.[0];void importBlendPresetsV492(file);e.target.value='';}}/></label>
+        </div>
+        {presetMessageV492&&<p role="status">{presetMessageV492}</p>}
+        <small>Maximal {GLB_BLEND_PRESET_LIMIT_V492} Presets, browserlokal gespeichert. Bei fehlenden Clips erfolgt kein Ersatz durch zufällige Animationen. Import und Export enthalten nur Einstellungen, keine GLB-Dateien.</small>
+      </fieldset>
+    </fieldset>}
     {studio && <fieldset className="avatar-timeline-editor"><legend>Animation Timeline · V93</legend>
       <p>Wähle einen eingebetteten oder importierten Clip, positioniere die Abspielmarke und lege eine Loop-Spanne fest. Die GLB-Dateien bleiben unverändert.</p>
       <label>Animation <select value={clipId} disabled={!clips.length} onChange={event => setClipId(event.target.value)}>

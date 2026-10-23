@@ -34,7 +34,8 @@ const checks={
 'components/visualizer/ThreeAvatar.tsx':['AdaptivePerformanceController avatarCount=','effectiveGroupSettingsV442.count'],
 'components/visualizer/RealLyricsStagePreviewV380.tsx':['IntersectionObserver','previewVisibleV388','previewDprCap','frameloop={playing&&previewVisibleV388'],
 'app/globals.css':['touch-v388','kiosk-extra-v388','orientation:landscape','orientation:portrait','prefers-reduced-motion:reduce'],
-'package.json':['0.1.0-v463','test:v388'],
+'package.json':['test:v388'],
 };
 for(const [file,tokens] of Object.entries(checks))for(const token of tokens)assert.ok(fs.readFileSync(file,'utf8').includes(token),`${file}: missing ${token}`);
+assert(Number(require('../package.json').version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=388,'V388 regression supported on newer releases');
 console.log('PASS V388 opt-in policy, DPR caps, hardware/ensemble safety, touch UI, preview visibility, old pipelines');

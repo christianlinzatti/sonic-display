@@ -40,12 +40,12 @@ assert(karaoke.includes('v461.motionScale')&&karaoke.includes('v461.fontScale'))
 assert(karaoke.includes('windowSize === 1 ? 0'));
 assert(karaoke.includes('"--word-fill"')&&karaoke.includes('progressMs'));
 assert(scene.includes('planCinematicLyricsV461('));
-assert(scene.includes('maxWidth={visualV461.max3DWidth}'));
+assert(scene.includes('maxWidth={visualV477.max3DWidth}'), 'V477 must preserve or tighten the V461 caption width');
 assert(scene.includes('visualV461.allowWordMeshes'));
 assert(scene.includes('activeCaptionV461?.visibleLineCount === 1'));
-assert(karaoke.includes('const wordTimed = v461.realWordTiming;'));
-assert(karaoke.includes('activePlanV461?.realWordTiming')); 
-assert(stage.includes('immersi'+'ve/>')&&stage.includes('v461-immersive-overlay'));
+assert(karaoke.includes('const wordTimed = v477.timingMode === "verified-word";'), 'word karaoke requires verified timings');
+assert(karaoke.includes('activePlanV477?.timingMode === "verified-word"'));  
+assert(stage.includes('immersive/></div>')&&stage.includes('v461-immersive-overlay'), 'immersive display remains wired');
 assert(css.includes('immersive-lyrics-overlay.v461-immersive-overlay'));
 assert(css.includes('prefers-reduced-motion:reduce'));
 assert(Number(require('../package.json').version.match(/v(\d+)$/)?.[1])>=461);

@@ -1,3 +1,64 @@
+> **Aktuelles Release V492 – GLB Blending Preset Studio:** GLB-Mischungen aus der V491-3D-Vorschau lassen sich speichern, wiederverwenden, importieren/exportieren und bei passender Basisanimation optional automatisch in der Konzertshow anwenden. Details: [V492-GLB-BLENDING-PRESET-STUDIO.md](V492-GLB-BLENDING-PRESET-STUDIO.md).
+
+> **Aktuelles Release V491 – GLB Motion Preview & Blending Studio:** Im Avatar-3D-Studio lassen sich jetzt zwei installierte GLB-Animationsclips mit einem frei einstellbaren Arm-/Brust-Mischgewicht direkt am Modell vergleichen. Details: [V491-GLB-MOTION-PREVIEW-BLENDING-STUDIO.md](V491-GLB-MOTION-PREVIEW-BLENDING-STUDIO.md).
+
+> **Aktuelles Release V490 – Intelligent GLB Motion Blending 2.0:** Vorhandene GLB-Gestenclips können beim automatischen Hocken konservativ nur auf sichere Arm-/Brustrotationen gemischt werden. Details: [V490-INTELLIGENT-GLB-MOTION-BLENDING-2.md](V490-INTELLIGENT-GLB-MOTION-BLENDING-2.md).
+
+## V489 – Natural GLB Full-Body Motion (23.10.2026)
+
+Die automatische Hock- und Aufrichtchoreografie überblendet importierte GLB-Clips nun vorsichtiger:
+Passende vorhandene Posen dürfen nur bei gutem Motion-Match direkt angesprungen werden;
+andernfalls startet der Clip am Anfang. Sichtbare Fußkontaktmeldungen beeinflussen die
+Dauer des Crossfades (nicht die IK-Korrekturen selbst). Manuelle Timeline- und
+Library-Motions sind ausgenommen. Neue Tests: `npm run test:v489` und
+`npm run test:v489:types`; Details in `V489-NATURAL-GLB-FULL-BODY-MOTION.md`.
+
+## V488 – Natural Full-Body Dance 5.0
+
+Neu: prozedurale Multi-Avatar-Tänzer kombinieren Hocke, Seitwärtsschritt, leichte Gewichtsverlagerung und Armgegenbewegung durch einen kontrollierten Ganzkörper-Overlay. GLB-Motions, Foot-IK, Lyrics, manuelle Cues und V487-Diagnose bleiben unverändert. Tests: `npm run test:v488`, `npm run test:v488:types`, `npm run build`. Mehr: `V488-NATURAL-FULL-BODY-DANCE-5.md`.
+
+## Neu in V487 – Realistic Ground Contact Studio 3.0
+
+Im Multi-Avatar-Stage-Director zeigt V487 eine **lokale Live-Diagnose der geschätzten Fußkontakte** importierter GLB-Avatare (links/rechts, Kontaktkonfidenz und modellbezogene Standankerabweichung). Bei deutlicher Abweichung bremst V487 ausschließlich optionale automatische Seitwärtsschritte, niemals manuelle Choreografie oder GLB-Keyframes. Die Anzeige behauptet keine echte Fußsohlen-Physik. Details: [V487-Release](V487-REALISTIC-GROUND-CONTACT-STUDIO-3.md) und [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Neu in V486 – Advanced Dance Footwork 2.0
+
+Neue, **songzeitsynchrone abwechselnde Fußbewegungen** für die prozeduralen Tänzer; Hocke und Aufrichten bleiben bei V481/V482. Für GLB-Modelle nutzt V486 bereits vorhandene Foot-IK-Stützinformation und bremst die kleinen optionalen V485-Bühnenbewegungen, wenn beide Füße als aufgesetzt erkannt werden. Keine neue IK-Engine, keine Animationen überschrieben, keine Fußrutsch-Garantie. Siehe [V486-Release](V486-ADVANCED-DANCE-FOOTWORK-2.md) und [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Neu in V485 – Natural Dance Motion Studio 5.0
+
+Bei automatischen Dreier-/Vierergruppen kann ein aufrecht tanzender Avatar während einer Hock-Szene kurz **seitlich vor einem anderen Avatar entlanggehen** und danach sanft an seinen festen Platz zurückkehren. Die Bühne behält dieselbe Aufstellung, Foot-/Contact-IK-Lock und manuelle Bewegungen unterbinden neue Stage-Root-Offsets. Prozedurale Tänzer erhalten eine begrenzte zusätzliche Bein-/Knieschrittbewegung, GLB-Modelle behalten ihre realen Clips (die Optik hängt weiterhin vom importierten Modell ab). Keine echte Mesh-Kollisionserkennung oder Sänger-/Drop-Timestamp-Behauptung. Mehr: [V485-Release](V485-NATURAL-DANCE-MOTION-STUDIO-5.md) und [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Neu in V484 – Expressive Dance Performance 4.0
+
+Aufbauend auf V481–V483 gibt es jetzt **konservativ ergänzte Ganzkörperakzente** während automatischer Hock- und Low-Bounce-Szenen mit drei bis vier Tänzern. Für Deutschrap werden linke und rechte Armreaktionen abwechselnd betont, für Hardstyle-/Hardtekk-Drops werden kleine Gruppenakzente auf tatsächliche vorhandene Beat-/Kick-Werte abgestimmt. Die prozedurale Figur hebt ihre bereits vorhandenen Arme beim Abtauchen leicht nach vorne. GLB-Clips, Fuß-IK und manuelle Bewegungen haben Vorrang. Kein Versprechen einer echten Punchline-/Sängererkennung oder kompatibler Hock-Animationen bei allen importierten GLBs. Siehe [V484-Release](V484-EXPRESSIVE-DANCE-PERFORMANCE-4.md) und [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Neu in V482 – Natural Low-Pose Transitions
+
+Das automatische V481-Hocken wird natürlicher: prozedurale Avatar-Beine und Körperabsenkung teilen sich jetzt exakt dieselbe sanfte Bewegungskurve. Bei 3–4 Tänzern sorgen kleine gegensätzliche Oberkörperverlagerungen für mehr Bühnenleben, ohne die V481-Fußkontakt-Logik zu übersteuern. GLB-Tänzer verwenden weiterhin nur **tatsächlich vorhandene** Squat-/Kneel-Clips; ein kurzer Clip-Haltezeitraum vermeidet hektische Motivwechsel. Manuelle Choreografien, Pause und Lyrics-Vordergrund bleiben geschützt. Siehe [V482-Release](V482-NATURAL-LOW-POSE-TRANSITIONS.md) und [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Neu in V480 – Concert Performance Diagnostics
+
+Unter **Einstellungen → Diagnose** zeigt V480 die vorhandenen Browser-Renderdaten als begrenzten Live-Verlauf (FPS, P95-Framezeit, langsame Frames, Avatar-Anzahl, Draw Calls), zusammen mit Renderqualität und Pi-Effektbudget. Tatsächliche automatische Pi-Budgetwechsel sind nachvollziehbar; ein lokaler JSON-Bericht lässt sich speichern. Keine zusätzliche Render-Schleife, kein Upload und keine Änderung an Musik-, Lyrics-, Tanz- oder Grafikregeln. Siehe [V480-Release](V480-CONCERT-PERFORMANCE-DIAGNOSTICS.md) und [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Neu in V479 – Raspberry Pi Concert Performance
+
+Optionales adaptives Effektbudget für mehrere Avatare auf ARM-/Pi-Kiosks: Das bestehende Pi-Profil aktiviert einen kleinen, deterministischen Wächter über die vorhandenen FPS-/P95-Messwerte. Bei länger anhaltender Frame-Last reduziert er nur **automatische** Postprocessing-, Shader- und DanceFX-Effekte, mit Hysterese und Schonzeit. Manuelle Visuals, Spotify-Sync, Lyrics, Lip-Sync, Tanzzeiten und gespeicherte Einstellungen bleiben unverändert. Unter [V479](V479-RASPBERRY-PI-CONCERT-PERFORMANCE.md) und [ARCHITECTURE.md](ARCHITECTURE.md) dokumentiert.
+
+## Neu in V476 – Expressive Lip-Sync 3.0
+
+Ein deterministischer Mund- und Mimik-Finishing-Pass auf den V453/V459-Ergebnissen verbessert kurze Deutschrap-Wortakzente und längere gesungene Silben. Er nutzt ausschließlich vorhandene verifizierte Wortmarker und sparsame Hinweise aus **geschriebenen** Vokalen – keine erfundenen Phonem-Timestamps, automatische Sängererkennung oder zusätzliches Mikrofon. Bestehende V420-Mund-Edits, V423-Audio-Munddaten, manuelle Sängerrollen, Lippenverschlüsse, Pause und Reduced Motion bleiben geschützt. Eingebunden in GLB-Morph-Rig und prozeduralen Avatar. Siehe [V476](V476-EXPRESSIVE-LIP-SYNC-3.md) und [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Neu in V475 – Intelligent Multi-Avatar Interaction
+
+Automatische 3-/4-Avatar-Feature-Auftritte reagieren nun natürlicher: kurze Blicke zum Partner, rhythmisch versetzte Antworten in Verses und gemeinsam akzentuierte Hooks. Alle Bewegungen sind dezent, seek-stabil und bleiben hinter manuellen Vocal-/Stage-Eingriffen zurück. Die bestehende 2-Avatar-Duo-Pipeline bleibt erhalten. Technische Details: [V475](V475-INTELLIGENT-MULTI-AVATAR-INTERACTION.md) und [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Neu in V474 – Natural Rap Gesture Variety
+
+Für 3D- und prozedurale Avatare ergänzen fünf deterministische, nicht wiederholte Gesten-Motive die vorhandenen V472/V473-Rap-Akzente. Bei Feature-Hooks ein gemeinsames Motiv mit dezenter Asymmetrie, in Verses unterschiedliche Muster je Avatar. Keine neue Audioanalyse, keine behauptete Sängererkennung, keine zusätzlichen Einstellungen; importierte Clips und manuelle Choreografie haben Vorrang. Mehr: [V474-NATURAL-RAP-GESTURE-VARIETY.md](V474-NATURAL-RAP-GESTURE-VARIETY.md); Architektur: [ARCHITECTURE.md](ARCHITECTURE.md).
+
+**Architektur (Stand V484):** [ARCHITECTURE.md](ARCHITECTURE.md) dokumentiert den aktuellen Datenfluss, Spotify-/Lyrics-Schnittstellen, Multi-Avatar-Regie, Kamera, Licht, Performance und Tests. Beim Ändern dieser Bereiche bitte mitpflegen; `npm run check:architecture` prüft die referenzierten Pfade vor dem Build.
+
 **V473.3 – Next.js Client Directive Build-Hotfix:** korrigiert die Platzierung von `"use client"` in `StageCameraDirectorV289.tsx`, ergänzt die SWC-konforme Prüfung in `npm run check:syntax` und einen gezielten Regressionstest `npm run test:v4733`. Details: `V473.3-WEBPACK-CLIENT-DIRECTIVE-HOTFIX.md`.
 
 # Sonic Display V473 — Automatic Rap Flow & Adlib Intelligence
@@ -1156,3 +1217,22 @@ Automatischer Bühnen-Lyrics-Fokus, Textbreitenbegrenzung und ruhigere Wortanima
 ## V472 — Vocal-Aware Choreography (Deutschrap)
 
 Synchronisierte Wort-/Zeilenakzente steuern additive, bounded Rap-Gesten; manuelle Feature- und Duett-Rollen können den Fokus pro Avatar festlegen. Unterbricht weder GLB-Tänze noch die Lippensynchronisation. Siehe [`V472-VOCAL-AWARE-CHOREOGRAPHY.md`](V472-VOCAL-AWARE-CHOREOGRAPHY.md).
+
+## V477 – Beautiful Lyrics 4.0
+
+Die Lyrics-Anzeige nutzt verifizierte Wort-Zeitstempel für echtes Karaoke und andernfalls einen zeilenbezogenen Farbfortschritt. Immersive Bühnen mit drei bis vier Avataren erhalten automatisch kompaktere, lesbare Untertitel. Siehe [Versionshinweise](V477-BEAUTIFUL-LYRICS-4.md) und [Architektur](ARCHITECTURE.md).
+
+
+## V478 – Autonomous Concert Director 4.0
+
+Automatische Abstimmung von bereits vorhandenen Konzertkamera-Cues und reaktiver Lichtstärke auf Basis des V464-Bühnenverlaufs. Portrait bei Solo-Verses, Ensembleszenen bei Hooks/visuellen Antworten sowie Eröffnungs- und Finalmomenten. Lyrics haben Vorrang; es gibt keine neue Sprechererkennung und keine zusätzlichen GPU-Lichtquellen. Siehe [V478-Release-Notizen](V478-AUTONOMOUS-CONCERT-DIRECTOR-4.md) und [Architektur](ARCHITECTURE.md).
+
+
+## V481 – Intelligent Stage Formation + Low Pose Choreography
+
+Automatische Rap-/Hardstyle-/Hardtekk-Konzerte mit drei bis vier Avataren können neue gestaffelte Hock-/Low-Bounce-Momente und bei passenden Beat-Akzenten gemeinsame Drop-Posen erhalten. GLB-Modelle benötigen einen passenden eingebetteten/geladenen Clip (`crouch`, `squat`, `kneel`); ohne Clip keine erzwungene GLB-Kniebeuge. Prozedurale Avatare erhalten eine echte Zweiglied-Beinbewegung. Einstellungen im bestehenden Multi-Avatar Stage Studio (V326) unter „Hocke & Low-Pose-Choreografie“; explizite manuelle Regie behält Vorrang. Siehe [V481-Release-Notizen](V481-INTELLIGENT-STAGE-FORMATION-LOW-POSES.md) und [Architektur](ARCHITECTURE.md).
+
+
+## V483 – Natural Dance Interaction 3.0
+
+Bei automatisch inszenierten Gruppen aus drei oder vier Avataren ergänzt V483 die bisherigen Hockbewegungen um **dezenten gegenseitigen Blickkontakt**, abwechselnde Rap-Gesten und bei geeigneten Abschnittsübergängen ein **kurz versetztes Aufrichten**. Ohne zusätzliche Animation-Clips; GLB-Modelle benötigen weiterhin passende importierte Hock-Animationen. Pausen, reduzierte Bewegung, manuelle Choreografien, Lyrics-Vordergrund und Sängerzuordnungen werden respektiert. Details: [V483-Release-Notizen](V483-NATURAL-DANCE-INTERACTION-3.md).

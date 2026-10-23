@@ -3,6 +3,7 @@ import {useEffect,useMemo,useRef,useState,type PointerEvent} from 'react';
 import dynamic from 'next/dynamic';
 import {useMusic} from '@/context/MusicContext';
 import {GroupDanceSyncControlsV327} from './GroupDanceSyncControlsV327';
+import {LowPoseControlsV481} from './LowPoseControlsV481';
 import {GroupMotionSyncControlsV328} from './GroupMotionSyncControlsV328';
 import {GroupMotionPhraseControlsV329} from './GroupMotionPhraseControlsV329';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
@@ -79,6 +80,7 @@ export function MultiAvatarStageStudioV326(){
    <label className="setting-check"><input type="checkbox" checked={show3d} onChange={e=>setShow3d(e.target.checked)}/> 3D-Vorschau anzeigen</label>
   </div>
   {show3d&&<Preview pose={pose} seconds={seconds} urls={urls} bpm={analysis?.tempo??settings.bpm} analysis={analysis?.trackId===trackId?analysis:null} playing={playing||follow&&isPlaying} songSync={settings.songSync&&settings.trackId===trackId}/>}
+  <LowPoseControlsV481/>
   <GroupDanceSyncControlsV327 seconds={seconds} count={settings.count} bpm={settings.bpm} pose={pose} analysis={analysis} playing={playing||follow&&isPlaying} trackMatches={!analysis||analysis.trackId===trackId}/>
   <GroupMotionSyncControlsV328 seconds={seconds} count={settings.count} bpm={settings.bpm} analysis={analysis} playing={playing||follow&&isPlaying} songSync={settings.songSync} />
   <GroupMotionPhraseControlsV329 />

@@ -7,6 +7,7 @@ import {expressiveFaceV390} from "./expressiveFacialV390";
 import {composeRapFaceV406} from "./rapStagePerformanceV406";
 import {enhanceExpressiveLipV453} from "./expressiveLipSyncV453";
 import {refineAdvancedVocalV459} from "./advancedVocalPerformanceV459";
+import {refineExpressiveLipV476} from "./expressiveLipSyncV476";
 import {resolveVocalPerformanceQualityV374} from "./vocalPerformanceQualityV374";
 import {resolveFacialPoseV369,type FacialPoseV369} from "./facialPerformanceV369";
 import {scanFacialRigV370,bindingsForFacialProfileV370,facialGainV370,sampleFacialDemoV370,type FacialProfileV370,type FacialChannelV370} from "./facialRigStudioV370";
@@ -98,6 +99,13 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
        manualSilent:manualSilentV453,editedWords:editsV453,intensity:lipSync?.strength??90,
        preserveAudioMouth:!!lipSync?.rapAudioEnabledV423&&!!lipSync.rapAudioDocumentV423&&
          lipSync.rapAudioTrackIdV423===lipSync.rapAudioDocumentV423.trackId});
+    const lipV476=refineExpressiveLipV476(lipSync?.lyrics??null,lipV459,
+      coordinated?{...coordinated,face:rapFaceV406}:null,
+      {playing:lipSync?.playing??false,enabled:lipSync?.enabled!==false,
+       reducedMotion:reducedMotion||!!lipSync?.reducedMotionV390,
+       manualSilent:manualSilentV453,editedWords:editsV453,intensity:lipSync?.strength??90,
+       preserveAudioMouth:!!lipSync?.rapAudioEnabledV423&&!!lipSync.rapAudioDocumentV423&&
+         lipSync.rapAudioTrackIdV423===lipSync.rapAudioDocumentV423.trackId});
     // Seeking or changing the song must not keep a previous singer's mouth shape.
     const clockV453=lipSync?.progressMs??0;
     const previousV453=lastClockV453.current;
@@ -108,8 +116,9 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
     const delta=Math.max(0,Math.min(.12,Number.isFinite(dt)?dt:0));
     for (const c of channels) {
       const articulatingV384=!!coordinated?.articulationV384.active;
-      const speed=lipV459.face[c]>current.current[c] ? (c==="blink"?40:articulatingV384&&c==="lipsClosed"?lipV459.closureHz:lipV459.attackHz) : (c==="blink"?32:articulatingV384&&c==="lipsClosed"?Math.max(26,lipV459.releaseHz):lipV459.releaseHz);
-      current.current[c]+=(lipV459.face[c]-current.current[c])*(1-Math.exp(-speed*delta));
+      const mouthTargetV476=lipV476.activeV476?lipV476.face[c]:lipV459.face[c];
+      const speed=mouthTargetV476>current.current[c] ? (c==="blink"?40:articulatingV384&&c==="lipsClosed"?lipV476.closureHz:lipV476.attackHz) : (c==="blink"?32:articulatingV384&&c==="lipsClosed"?Math.max(26,lipV476.releaseHz):lipV476.releaseHz);
+      current.current[c]+=(mouthTargetV476-current.current[c])*(1-Math.exp(-speed*delta));
     }
     if (coordinated?.articulationV384.active) {
       // Preserve bilabial contact even during the attack/release filter. V383 gains remain authoritative.

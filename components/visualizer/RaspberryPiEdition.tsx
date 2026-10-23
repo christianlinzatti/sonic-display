@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { setPerformanceMode } from "./adaptivePerformance";
+import {configurePiConcertV479,usePiConcertBudgetV479} from "./piConcertRuntimeV479";
 import { detectPiHints, readPiProfile, resolvePiQuality, writePiProfile, type PiProfile, type PiHints } from "./piDeviceProfile";
 
 function browserHints(): PiHints {
@@ -13,7 +14,10 @@ function browserHints(): PiHints {
 export function RaspberryPiProfileBootstrap() {
   useEffect(() => {
     const apply = () => {
-      const quality = resolvePiQuality(readPiProfile(), browserHints());
+      const profile=readPiProfile();
+      const hints=browserHints();
+      configurePiConcertV479(profile,hints);
+      const quality = resolvePiQuality(profile,hints);
       if (quality) setPerformanceMode(quality);
     };
     apply();
@@ -25,6 +29,7 @@ export function RaspberryPiProfileBootstrap() {
 
 export function RaspberryPiEditionSettings() {
   const [profile, setProfile] = useState<PiProfile>("off");
+  const concertBudgetV479=usePiConcertBudgetV479();
   const [hints, setHints] = useState<PiHints>(() => detectPiHints(""));
   const [fullscreen, setFullscreen] = useState(false);
   const [message, setMessage] = useState("");
@@ -56,6 +61,7 @@ export function RaspberryPiEditionSettings() {
       <option value="pi-low">Pi Low – Performance-Fokus</option>
     </select>
     <p className="settings-note">Aktuelle Profil-Empfehlung: {resolvePiQuality(profile, hints) ?? "keine Änderung"}. Bei Profilwechsel wird nur die Renderqualität angepasst; Spotify, Lyrics, Beat-Sync und IK bleiben unverändert.</p>
+    <p className="settings-note">V479 Konzertbudget: {concertBudgetV479.enabled ? concertBudgetV479.level : "aus"}. Nutzt nur gemessene Framezeiten und reduziert bei längerer Last optionale automatische Shader-/Postprocessing-Effekte. Manuell eingeschaltete Effekte, Audio, Lyrics und Tanzzeiten bleiben unverändert.</p>
     <button type="button" onClick={toggleFullscreen}>{fullscreen ? "Vollbild verlassen" : "Vollbild aktivieren"}</button>
     {message && <p role="status">{message}</p>}
     <p className="settings-note">Browser-Vollbild benötigt einen Klick. Automatischer Kioskstart erfolgt außerhalb der Web-App über einen Chromium-Autostart.</p>

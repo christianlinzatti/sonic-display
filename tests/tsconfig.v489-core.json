@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.v488-core.json",
+  "compilerOptions": {"incremental": false},
+  "files": ["../components/visualizer/naturalGlbFullBodyMotionV489.ts"]
+}

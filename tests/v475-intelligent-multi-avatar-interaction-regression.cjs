@@ -1,0 +1,56 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const {load}=require('./helpers/ts-loader-v404.cjs');
+const {refineMultiAvatarInteractionV475:refine}=load('components/visualizer/intelligentMultiAvatarInteractionV475');
+const {planMultiArtistInteractionV444}=load('components/visualizer/multiArtistInteractionV444');
+const {planMultiArtistGroupV442}=load('components/visualizer/automaticMultiArtistStageV442');
+const {evaluateGroupV326}=load('components/visualizer/multiAvatarStageDirectorV326');
+const plan=planMultiArtistGroupV442({trackId:'example-spotify-track',count:4,lyrics:{synced:true,lines:Array.from({length:32},(_,i)=>({startMs:i*1200,text:'line-'+i}))}});
+const pose=evaluateGroupV326(plan,6);
+const base=planMultiArtistInteractionV444({pose,count:4,enabled:true,playing:true,reducedMotion:false,manualStage:false,beat:.9,seconds:6,cueAt:4.8,strength:65});
+assert.equal(base.enabled,true);
+const active={trackId:'example-spotify-track',base,pose,feature:null,count:4,seconds:6,cueSeconds:4.8,beat:.9,strength:65,playing:true,reducedMotion:false,manualPriority:false,tier:'high'};
+const result=refine(active);
+assert.notStrictEqual(result,base);
+assert.equal(result.source,'visual-stage');
+assert.deepEqual(result,refine(active),'identical playback timestamp must be replay-deterministic');
+assert.deepEqual(base,planMultiArtistInteractionV444({pose,count:4,enabled:true,playing:true,reducedMotion:false,manualStage:false,beat:.9,seconds:6,cueAt:4.8,strength:65}),'caller state cannot mutate');
+assert(result.slots.some((item,i)=>JSON.stringify(item)!==JSON.stringify(base.slots[i])));
+const reply={active:true,moment:'reply',lead:1,partner:2,group:true,eventId:'visual-reply',responseGain:1,cameraCue:null};
+const replied=refine({...active,feature:reply,seconds:6.6});
+assert(replied.slots[2].gesture.intensity>=base.slots[2].gesture.intensity);
+assert.equal(replied.lead,base.lead,'do not change singer/stage ownership');
+const hookPose={...pose,drop:true,focus:-1};
+const hookBase=planMultiArtistInteractionV444({pose:hookPose,count:4,enabled:true,playing:true,reducedMotion:false,manualStage:false,seconds:6,cueAt:4.8,beat:.9,strength:65});
+const hook=refine({...active,pose:hookPose,base:hookBase,feature:{...reply,moment:'hook',group:true,responseGain:0}});
+assert.equal(hook.group,true);
+assert(hook.slots.every(x=>x.look.yaw===0),'hooks face the audience');
+const baselinePitch=hookBase.slots.map(x=>x.look.pitch),pitch=hook.slots.map(x=>x.look.pitch);
+assert(pitch.every((x,i)=>Math.abs((x-baselinePitch[i])-(pitch[0]-baselinePitch[0]))<1e-10),'hook nods must be synchronized');
+const low=refine({...active,tier:'low'});
+const highDifference=Math.abs(result.slots[1].gesture.intensity-base.slots[1].gesture.intensity);
+const lowDifference=Math.abs(low.slots[1].gesture.intensity-base.slots[1].gesture.intensity);
+assert(lowDifference<=highDifference+1e-12,'low-tier microgesture load must be lower');
+for(const plan of [result,replied,hook,low])for(const slot of plan.slots){
+ assert(Math.abs(slot.look.yaw)<=.38&&Math.abs(slot.look.pitch)<=.075);
+ assert(Math.abs(slot.look.eyeYaw)<=.105&&slot.look.weight<=.72);
+ assert(slot.gesture.leftLift>=0&&slot.gesture.leftLift<=.21);
+ assert(slot.gesture.rightLift>=0&&slot.gesture.rightLift<=.24);
+ assert(Math.abs(slot.gesture.lean)<=.035&&Math.abs(slot.gesture.shoulder)<=.085);
+}
+const manual=planMultiArtistInteractionV444({pose,count:4,enabled:true,playing:true,reducedMotion:false,manualStage:false,seconds:6,cueAt:4.8,strength:65,singer:{active:true,leadSlot:2,singingSlots:[2],handoffFrom:1}});
+assert.strictEqual(refine({...active,base:manual}),manual,'explicit singer assignments remain untouched');
+for(const patch of [{playing:false},{reducedMotion:true},{manualPriority:true},{trackId:''},{trackId:null},{pose:null},{count:2},{count:5},{tier:'low',strength:0},{seconds:0},{seconds:Number.NaN},{beat:Number.NaN}]){
+ assert.strictEqual(refine({...active,...patch}),base,`disabled invalid input ${JSON.stringify(patch)}`);
+}
+const renderer=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
+assert(renderer.includes('const interactionV475=refineMultiAvatarInteractionV475({'));
+assert(renderer.includes('base:interactionV444,pose,feature:props.featureDirectionV460'));
+assert(renderer.includes('interactionV475.slots[i]?.look'));
+assert(renderer.includes('interactionV475.slots[i]?.gesture'));
+assert(renderer.includes('manualPriority:!!settings.trackId||!!selectedSingerV444'));
+const pkg=require('../package.json');
+assert(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=475,'V475 behavior persists in later releases');
+assert(pkg.scripts['build:preflight'].includes('npm run test:v475 && npm run test:v475:types'));
+console.log('PASS V475: deterministic visual feature replies and 4-avatar hook reactions, protected manual vocal roles, bounded look/gesture cues, performance tiers, pause/seek and live 3D integration');

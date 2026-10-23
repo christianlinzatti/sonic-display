@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.v486-core.json",
+  "compilerOptions": {"incremental": false},
+  "files": [
+    "../components/visualizer/groundContactStudioV487.ts",
+    "../components/visualizer/advancedDanceFootworkV486.ts"
+  ]
+}

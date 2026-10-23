@@ -6,6 +6,7 @@ import { memo, useMemo, useRef } from "react";
 import { useAdaptivePerformance } from "./adaptivePerformance";
 import type { Group } from "three";
 import { planCinematicLyricsV461 } from "./cinematicLyricsV461";
+import { planBeautifulLyricsV477, lyricPlaybackFractionV477 } from "./beautifulLyricsV477";
 import { normalizeSpatialLayoutV381 } from "./lyricsSpatialEditorV381";
 import {resolveKineticStyleV382,resolveKineticWordV382,kineticDropCueV382,blendKineticColorV382} from "./kineticLyricsV382";
 import type { AudioFeatures } from "@/types/audio";
@@ -59,9 +60,14 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
     synchronized:scene.lyrics.synced,playing:scene.playing,reducedMotion,
     layout:"stage-3d",userScale:scene.fontScale/100,
   }) : null;
-  const visible = useMemo(() => (tier === "low" || activeCaptionV461?.visibleLineCount === 1
+  const activeCaptionV477 = lines[index] ? planBeautifulLyricsV477({
+    line: lines[index], nextLineStart:lines[index+1]?.startMs,
+    synchronized:scene.lyrics.synced,playing:scene.playing,reducedMotion,
+    layout:"stage-3d",avatarCount:scene.avatarCountV477??1,userScale:scene.fontScale/100,
+  }) : null;
+  const visible = useMemo(() => (tier === "low" || activeCaptionV477?.visibleLineCount === 1 || activeCaptionV461?.visibleLineCount === 1
     ? [index] : [index - 1, index, index + 1])
-    .filter(i => i >= 0 && i < lines.length), [index, lines.length, tier, activeCaptionV461?.visibleLineCount]);
+    .filter(i => i >= 0 && i < lines.length), [index, lines.length, tier, activeCaptionV461?.visibleLineCount, activeCaptionV477?.visibleLineCount]);
   const from = safeColor(scene.colorFrom, "#79f7ff");
   const to = safeColor(scene.colorTo, "#d789ff");
   const right = scene.side === "right";
@@ -87,7 +93,7 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
     {/* V367: stage-space translucent caption plate for legibility over lighting/fog. */}
     <mesh position={[(right ? 1 : -1) * (1.22 + depth * .20) + (composition?.lyricsOffsetX ?? 0), 0, -.96 - depth * .65]} renderOrder={8}>
       <planeGeometry args={[2.7, tier === "low" ? .53 : 1.16]} />
-      <meshBasicMaterial color="#091022" transparent opacity={clamp(.64+plateStrengthV378*.25)} depthWrite={false} depthTest={false} />
+      <meshBasicMaterial color="#091022" transparent opacity={clamp(Math.max(activeCaptionV477?.backdropOpacity??.72,.64+plateStrengthV378*.25))} depthWrite={false} depthTest={false} />
     </mesh>
     {visible.map(i => {
       const line = lines[i];
@@ -102,23 +108,26 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
       const visualV461 = planCinematicLyricsV461({line,nextLineStart:lines[i+1]?.startMs,
         synchronized:scene.lyrics.synced,playing:scene.playing,reducedMotion,
         layout:"stage-3d",userScale:scene.fontScale/100});
-      const size = baseSize * (current ? 1.18 : .88) * visualV461.fontScale;
+      const visualV477 = planBeautifulLyricsV477({line,nextLineStart:lines[i+1]?.startMs,
+        synchronized:scene.lyrics.synced,playing:scene.playing,reducedMotion,
+        layout:"stage-3d",avatarCount:scene.avatarCountV477??1,userScale:scene.fontScale/100});
+      const size = baseSize * (current ? 1.18 : .88) * visualV461.fontScale * visualV477.fontScale;
       // A full line costs one GPU text mesh. Limit glyph/mesh pressure on slower devices
       // without truncating lyrics. High quality keeps per-word karaoke on normal lines.
       const wordLimit = tier === "high" ? 28 : tier === "balanced" ? 14 : 0;
-      const useWordMeshes = current && visualV461.allowWordMeshes && tokens.length <= wordLimit;
-      const positions = useWordMeshes ? layoutWords(tokens, size, visualV461.max3DWidth) : [];
-      const shouldHighlight = scene.wordHighlight && scene.lyrics.synced && current;
+      const useWordMeshes = current && visualV461.allowWordMeshes && visualV477.allowWordMeshes && tokens.length <= wordLimit;
+      const positions = useWordMeshes ? layoutWords(tokens, size, visualV477.max3DWidth) : [];
+      const shouldHighlight = scene.wordHighlight && visualV477.timingMode === "verified-word" && current;
       return <group key={`${i}-${line.startMs}`} position={[x, y, z]}>
         {!useWordMeshes && <WordText text={line.text || "♪"} size={size} color={current ? from : "#8b93ad"}
-          opacity={current ? 1 : .5} maxWidth={visualV461.max3DWidth} outline={tier === "low" ? 0 : current ? .002+plateStrengthV378*.002 : 0} outlineColor={to} />}
+          opacity={current ? 1 : visualV477.focusOpacity} maxWidth={visualV477.max3DWidth} outline={tier === "low" ? 0 : current ? .002+plateStrengthV378*.002 : 0} outlineColor={to} />}
         {positions.map((token, wi) => {
           const timed = line.words?.[wi];
           const next = line.words?.[wi + 1];
           const wordEnd = timed ? (timed.endMs && timed.endMs > timed.startMs ? timed.endMs : next?.startMs ?? end) : 0;
           const progress = !shouldHighlight ? 0 : timed
-            ? clamp((scene.progressMs - timed.startMs) / Math.max(60, wordEnd - timed.startMs))
-            : clamp(ratio * tokens.length - wi);
+            ? lyricPlaybackFractionV477(scene.progressMs, timed.startMs, wordEnd)
+            : 0;
           const cueV382 = kineticStyleV382 && shouldHighlight
             ? resolveKineticWordV382({line,nextLineStart:lines[i+1]?.startMs,index:wi,progressMs:scene.progressMs,
               synced:scene.lyrics.synced,playing:scene.playing,reducedMotion,preset:kineticStyleV382,
@@ -130,7 +139,7 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
           const color=cueV382?blendKineticColorV382(from,to,wordProgress):(lit ? to : current ? from : "#8b93ad");
           return <group key={`${wi}-${token.text}`} position={[token.x, token.y, 0]} scale={scale}>
             <WordText text={token.text} size={size} color={color}
-              opacity={current ? 1 : .5} outline={tier === "low" ? 0 : current ? .003 + plateStrengthV378*.002 + clamp(scene.glow / 100) * (lit ? .012 : .004) * (tier === "balanced" ? .5 : 1) + (cueV382?.glow??0)*.008 : 0}
+              opacity={current ? 1 : visualV477.focusOpacity} outline={tier === "low" ? 0 : current ? .003 + plateStrengthV378*.002 + clamp(scene.glow / 100) * (lit ? .012 : .004) * (tier === "balanced" ? .5 : 1) + (cueV382?.glow??0)*.008 : 0}
               outlineColor={lit ? from : to} />
           </group>;
         })}

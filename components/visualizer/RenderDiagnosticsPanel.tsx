@@ -1,5 +1,6 @@
 "use client";
 import { useSyncExternalStore, useState } from "react";
+import {ConcertPerformanceDiagnosticsV480} from "./ConcertPerformanceDiagnosticsV480";
 import { subscribeAnimationScheduler, getAnimationSchedulerSnapshot, setAnimationSchedulerEnabled, isAnimationSchedulerEnabled } from "./adaptiveAnimationScheduler";
 import { useAdaptivePerformance } from "./adaptivePerformance";
 import { useRuntimeProfiler } from "./runtimeProfiler";
@@ -33,6 +34,7 @@ export function RenderDiagnosticsPanel() {
       <p className="settings-note">GPU / Renderer: {metrics.renderer}</p>
       <p className="settings-note">WebGL: {metrics.webgl}</p>
     </>}
+    <ConcertPerformanceDiagnosticsV480 />
     <h4>V255 – Verlauf der Rendering-Entscheidungen</h4>
     <p className="settings-note">Automatische Qualitätswechsel während dieser Sitzung. Es werden maximal 24 Wechsel gespeichert, ohne Upload oder dauerhafte Speicherung. Die Werte sind Näherungen, keine GPU-Ausführungszeiten.</p>
     <button type="button" onClick={clearQualityDecisionHistory} disabled={decisions.length === 0}>Verlauf löschen</button>

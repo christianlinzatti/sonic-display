@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.v474-core.json",
+  "compilerOptions": {"incremental": false},
+  "files": [
+    "../config/musicGenres.ts",
+    "../services/genre/genreIntelligence.ts",
+    "../components/visualizer/genreChoreographyV471.ts",
+    "../components/visualizer/advancedDanceChoreography.ts",
+    "../components/visualizer/vocalAwareChoreographyV472.ts",
+    "../components/visualizer/rapFlowIntelligenceV473.ts",
+    "../components/visualizer/naturalRapGestureVarietyV474.ts",
+    "../components/visualizer/multiAvatarStageDirectorV326.ts",
+    "../components/visualizer/multiArtistInteractionV444.ts",
+    "../components/visualizer/intelligentFeaturePerformanceV460.ts",
+    "../components/visualizer/intelligentMultiAvatarInteractionV475.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

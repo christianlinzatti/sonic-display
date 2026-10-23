@@ -1,0 +1,5 @@
+{
+ "extends":"./tsconfig.v489-core.json",
+ "compilerOptions":{"incremental":false},
+ "files":["../components/visualizer/automaticGlbUpperBlendV490.ts"]
+}

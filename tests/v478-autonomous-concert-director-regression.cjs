@@ -1,0 +1,93 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const {load}=require('./helpers/ts-loader-v404.cjs');
+const {coordinateAutonomousConcertV478:coordinate}=load('services/show/autonomousConcertDirectorV478');
+const {buildSmartRapShowV446,sampleSmartRapShowV446}=load('components/visualizer/smartAutomaticRapShowV446');
+const {planUltimateAutomaticShowV456}=load('services/show/ultimateAutomaticShowV456');
+const {planIntelligentFeatureV460}=load('components/visualizer/intelligentFeaturePerformanceV460');
+const {planAutomaticConcertExperienceV464}=load('services/show/automaticConcertExperienceV464');
+const balance={attention:'balanced',reason:'long-break',allowAutomaticInsight:true,allowCinematic:true,allowConnectionSpotlight:true};
+const hook=['Die ganze Stadt singt mit uns die ganze Nacht','Zusammen sind wir laut und niemand bleibt allein'];
+const lines=Array.from({length:36},(_,i)=>({startMs:i*5500,text:[4,5,12,13,20,21,28,29].includes(i)?hook[i%2===0?0:1]:`Ein frischer Deutschrap Vers Nummer ${i} mit neuem Rhythmus`}));
+const plan=buildSmartRapShowV446({trackId:'v478-fixture',lyrics:{synced:true,lines},count:4,durationMs:210000,enabled:true});
+assert(plan.beats.length>=4);
+function sample(ms,patch={}) {
+ const cue=sampleSmartRapShowV446(plan,ms,{enabled:true,playing:true,reducedMotion:false,manualProtected:false});
+ const dir=planUltimateAutomaticShowV456({enabled:true,playing:true,reducedMotion:false,automaticDance:true,cue,balance,count:4,energy:.6});
+ const feature=planIntelligentFeatureV460({plan,cue,progressMs:ms,count:4,enabled:true,playing:true,reducedMotion:false,manualProtected:false});
+ const experience=planAutomaticConcertExperienceV464({plan,progressMs:ms,trackId:plan.trackId,playing:true,reducedMotion:false,direction:dir,feature,quality:'high'});
+ const input={cue,plan,trackId:plan.trackId,progressMs:ms,playing:true,reducedMotion:false,enabled:true,cameraEnabled:true,manualCamera:false,manualVocal:false,quality:'high',lightingReactive:true};
+ return {experience,input,output:coordinate(experience,{...input,...patch})};
+}
+const opening=sample(2100),mid=sample(71000),ending=sample(192000);
+for (const {experience,input,output} of [opening,mid,ending]){
+ assert(experience.active&&output.visualV478.active);
+ assert(['portrait','ensemble','lyrics'].includes(output.visualV478.shot));
+ assert(output.direction.lightMultiplier>=.9&&output.direction.lightMultiplier<=1.15);
+ assert(output.direction.interactionMultiplier===experience.direction.interactionMultiplier);
+ assert(output.feature.eventId===experience.feature.eventId);
+ assert(output.visualV478.eventId.includes(plan.trackId));
+ assert.deepEqual(output,coordinate(experience,input),'pure and deterministic');
+ assert.equal(output.direction.scene,experience.direction.scene,'must never rewrite choreography');
+ assert.equal(output.energyAccent,experience.energyAccent,'must never rewrite audio energy');
+}
+assert.equal(opening.output.visualV478.shot,'ensemble');
+assert.equal(ending.output.visualV478.shot,'ensemble');
+const verse=plan.beats.find(b=>b.section==='verse'&&b.atMs>=35000&&b.atMs<145000);
+assert(verse);
+const verseShow=sample(verse.atMs+1300);
+assert.equal(verseShow.output.visualV478.shot,'portrait');
+const hookBeat=plan.beats.find(b=>b.section==='hook');
+assert(hookBeat);
+const hookShow=sample(hookBeat.atMs+1800);
+assert.equal(hookShow.output.visualV478.shot,'ensemble');
+assert.equal(hookShow.output.feature.cameraCue?.group,true);
+const lyric={...mid.experience,direction:{...mid.experience.direction,balance:{...balance,attention:'lyrics'}}};
+const lyricOut=coordinate(lyric,mid.input);
+assert.equal(lyricOut.visualV478.shot,'lyrics');
+assert.equal(lyricOut.feature.cameraCue,mid.experience.feature.cameraCue,'do not replace camera cue over lyrics');
+assert.equal(lyricOut.direction.cameraCue,mid.experience.direction.cameraCue);
+const manualCamera=sample(hookBeat.atMs+1800,{manualCamera:true});
+assert.equal(manualCamera.output.feature.cameraCue,manualCamera.experience.feature.cameraCue);
+assert.equal(manualCamera.output.direction.cameraCue,manualCamera.experience.direction.cameraCue);
+for(const patch of [{playing:false},{enabled:false},{reducedMotion:true},{manualVocal:true},{quality:'low'},{trackId:'other-track'},{progressMs:NaN}]){
+ const o=coordinate(mid.experience,{...mid.input,...patch});
+ assert.equal(o.visualV478.active,false,JSON.stringify(patch));
+ assert.equal(o.direction,mid.experience.direction,'inactive passthrough');
+ assert.equal(o.feature,mid.experience.feature,'inactive feature passthrough');
+}
+const noCamera=sample(hookBeat.atMs+1800,{cameraEnabled:false});
+assert.equal(noCamera.output.feature.cameraCue,noCamera.experience.feature.cameraCue);
+const noLights=sample(hookBeat.atMs+1800,{lightingReactive:false});
+assert.equal(noLights.output.direction.lightMultiplier,noLights.experience.direction.lightMultiplier);
+const withoutCue=coordinate(mid.experience,{...mid.input,cue:null});
+assert.equal(coordinate(mid.experience,{...mid.input,plan:null}).visualV478.active,false);
+assert.equal(coordinate(mid.experience,{...mid.input,plan:{...plan,trackId:'wrong'}}).visualV478.active,false);
+const start=sample(hookBeat.atMs+1);
+assert(Math.abs(start.output.visualV478.lightGain-1)<.000001,'smooth entrance into a phrase');
+const finish=sample(hookBeat.untilMs-1);
+assert(Math.abs(finish.output.visualV478.lightGain-1)<.000001,'smooth leave at phrase end');
+assert.equal(withoutCue.visualV478.active,false);
+const noAuto={...mid.experience,direction:{...mid.experience.direction,cameraCue:null},feature:{...mid.experience.feature,cameraCue:null}};
+const noAutoOut=coordinate(noAuto,mid.input);
+assert.equal(noAutoOut.direction.cameraCue,null);
+assert.equal(noAutoOut.feature.cameraCue,null);
+for(let ms=0;ms<1800000;ms+=233){
+ const {experience,input}=sample(ms%210000);
+ const result=coordinate(experience,input);
+ assert(Number.isFinite(result.direction.lightMultiplier));
+ assert(result.direction.lightMultiplier>=.9&&result.direction.lightMultiplier<=1.15);
+ assert.deepEqual(result,coordinate(experience,input),'deterministic across seeks and long loops');
+}
+const stage=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');
+assert(stage.includes('coordinateAutonomousConcertV478(concertExperienceV464Base,{'));
+assert(stage.includes('const ultimateShowV456=concertExperienceV464.direction'));
+assert(stage.includes('const featureDirectionV460=concertExperienceV464.feature'));
+assert(stage.includes('data-v478-shot={concertExperienceV464.visualV478.shot}'));
+assert(stage.includes('concertCameraCueV454:(featureDirectionV460.cameraCue??'));
+assert(stage.includes('lightStrengthForUltimateShowV456(ultimateShowV456'));
+const source=fs.readFileSync('services/show/autonomousConcertDirectorV478.ts','utf8');
+assert(!/localStorage|setTimeout|setInterval|requestAnimationFrame|Math.random|fetch\(|Date.now/.test(source));
+assert.match(require('../package.json').version,/^0\.1\.0-v(47[8-9]|4[8-9]\d|[5-9]\d{2,})$/);
+console.log('PASS V478: ensemble/portrait/lyrics coordinated camera, existing lighting gain, authored guards, low-tier, seek/pause, 30-minute pure show direction');

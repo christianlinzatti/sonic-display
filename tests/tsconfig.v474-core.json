@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.v473-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../config/musicGenres.ts",
+    "../services/genre/genreIntelligence.ts",
+    "../components/visualizer/genreChoreographyV471.ts",
+    "../components/visualizer/advancedDanceChoreography.ts",
+    "../components/visualizer/vocalAwareChoreographyV472.ts",
+    "../components/visualizer/rapFlowIntelligenceV473.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "../components/visualizer/naturalRapGestureVarietyV474.ts"
+  ]
+}

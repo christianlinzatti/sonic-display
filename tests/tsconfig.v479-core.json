@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.v478-core.json",
+  "compilerOptions": {"incremental":false},
+  "files": [
+    "../services/monitoring/piConcertBudgetV479.ts",
+    "../components/visualizer/piDeviceProfile.ts"
+  ]
+}

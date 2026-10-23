@@ -100,7 +100,8 @@ import {initialStructureState, advanceStructureState, structureEvidence, choreog
 import { CHARACTER_MOTION_CHANGE_EVENT, loadCharacterMotionStore, chooseCharacterMotion } from "./characterMotionLibrary";
 import { targetBlendWeight, smoothBlend, syncedClipSpeed } from "./motionBlendEngine";
 import { createMaskedAnimationClip } from "./animationBoneMask";
-import type { Group, Mesh, AnimationClip } from "three";
+import { AnimationClip, type Group, type Mesh } from "three";
+import { Vector3 } from "three";
 import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUtils.js";
 import type { VisualizerProps } from "./registry";
 import { Lyrics3DScene } from "./Lyrics3DScene";
@@ -110,6 +111,7 @@ import {composeVocalBodyV393} from "./vocalPerformanceIntelligenceV393";
 import {composeRapFaceV406,composeRapStageV406} from "./rapStagePerformanceV406";
 import {enhanceExpressiveLipV453,addExpressiveHeadV453} from "./expressiveLipSyncV453";
 import {refineAdvancedVocalV459,addAdvancedVocalHeadV459} from "./advancedVocalPerformanceV459";
+import {refineExpressiveLipV476} from "./expressiveLipSyncV476";
 import {composeRapRhythmStageV407} from "./rapRhythmPerformanceV407";
 import {normalizeRapPresetV412,sampleRapLiveV412,liveRapClipNameV412,type RapLiveSampleV412} from "./rapChoreographyPresetsV412";
 import {sampleRapLyricsCueV413,lyricsRapGainV413} from "./lyricsAwareRapChoreographyV413";
@@ -135,12 +137,29 @@ import {SHOW_QUALITY_EVENT_V357,readShowQualityV357,refineShowQualityV357} from 
 import {SHOW_LEARNING_EVENT_V358,readShowLearningSettingsV358,readShowLearningHistoryV358,recordShowLearningV358,storeShowLearningHistoryV358,refineLearnedShowV358,type ShowLearningContextV358,type ShowLearningObservationV358} from "@/services/stageContent/adaptiveShowLearningV358";
 import {getRenderMetricsSnapshot} from "./renderDiagnostics";
 import { DancePostProcessingV468 } from './DancePostProcessingV468';
+import {usePiConcertBudgetV479} from "./piConcertRuntimeV479";
+import {resolvePiConcertEffectsV479} from "@/services/monitoring/piConcertBudgetV479";
 import { ProceduralShaderEnvironmentV468 } from './ProceduralShaderEnvironmentV468';
 import {prepareAvatarWardrobeV468} from './avatarWardrobeV468';
 import {useAudioMotionEngine} from '@/hooks/useAudioMotionEngine';
 import {resolveVocalDanceAccentV472} from "./vocalAwareChoreographyV472";
 import {enhanceRapAccentV473} from "./rapFlowIntelligenceV473";
+import {resolveNaturalRapGestureV474} from "./naturalRapGestureVarietyV474";
 import {featureSpotlightV460,featureInteractionV460} from "./intelligentFeaturePerformanceV460";
+import {refineMultiAvatarInteractionV475} from "./intelligentMultiAvatarInteractionV475";
+import {LOW_POSE_EVENT_V481,readLowPoseV481,planLowPosesV481,findLowPoseClipV481,solveProceduralLowLegV481,type LowPoseSlotV481} from "./intelligentLowPoseV481";
+import {newNaturalLowPoseStateV482,stepNaturalLowPoseV482,newLowClipStateV482,stepLowClipV482} from "./naturalLowPoseTransitionsV482";
+import {newLowInteractionStateV483,stepLowInteractionV483} from "./naturalLowPoseInteractionV483";
+import {planExpressiveLowPoseV484} from "./expressiveLowPosePerformanceV484";
+import {planNaturalDanceMotionV485,type NaturalDanceSlotV485} from "./naturalDanceMotionStudioV485";
+import {planAdvancedDanceFootworkV486, type FootSupportV486, type FootworkSlotV486} from "./advancedDanceFootworkV486";
+import {buildGroundContactReportV487,emptyGroundObservationV487,GROUND_CONTACT_REPORT_EVENT_V487,type GroundObservationV487} from './groundContactStudioV487';
+import {planNaturalFullBodyV488} from "./naturalFullBodyDanceV488";
+import {planNaturalGlbMotionV489} from "./naturalGlbFullBodyMotionV489";
+import {chooseUpperGestureClipV490,planUpperBlendV490} from "./automaticGlbUpperBlendV490";
+import {createAutomaticUpperClipV490} from "./automaticGlbUpperClipV490";
+import {GLB_BLEND_CHANGE_V492,readBlendPresetsV492,chooseLiveBlendPresetV492,type GlbBlendPresetV492} from "./glbBlendPresetsV492";
+import {isPreviewBlendTrackV491} from "./glbMotionBlendPreviewV491";
 import { DanceFX } from "./DanceFX";
 import { DynamicStage } from "./DynamicStage";
 import { SmartStageCameraV236 } from "./SmartStageCameraV236";
@@ -185,6 +204,11 @@ import { normalizeRapEditorV408 } from "./rapPerformanceEditorV408";
 /** Per-dancer mutable cue avoids rerendering or restarting animation mixers each frame. */
 const GroupMotionClockContextV328=createContext<{settings:MotionSyncV328;clock:{current:MotionSyncClockV328}}|null>(null);
 // V329: clip signatures published only on asset/clip changes, never per animation frame.
+const GroupLowPoseContextV481=createContext<{current:LowPoseSlotV481}|null>(null);
+const GroupDanceMotionContextV485=createContext<{current:NaturalDanceSlotV485}|null>(null);
+const GroupFootworkContextV486=createContext<{current:FootworkSlotV486}|null>(null);
+const GroupFootSupportContextV486=createContext<{current:FootSupportV486}|null>(null);
+const GroupGroundObservationContextV487=createContext<{current:GroundObservationV487}|null>(null);
 const GroupPhraseContextV329=createContext<{settings:PhraseSettingsV329;plan:PhraseMatchV329;register:(slot:number,profiles:readonly PhraseSignatureV329[])=>void}|null>(null);
 const PartnerLookContext = createContext<{current: LookAtCue} | null>(null);
 function usePartnerLook() { return useContext(PartnerLookContext); }
@@ -247,6 +271,15 @@ function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genreFusion,
   const eyes = useRef<Group>(null);
   const browsV406 = useRef<Group>(null);
   const torso = useRef<Mesh>(null);
+  const leftLegV481=useRef<Group>(null);
+  const rightLegV481=useRef<Group>(null);
+  const leftKneeV481=useRef<Group>(null);
+  const rightKneeV481=useRef<Group>(null);
+  const lowPoseV481=useContext(GroupLowPoseContextV481);
+  const groupDanceV485=useContext(GroupDanceMotionContextV485);
+  const groupFootworkV486=useContext(GroupFootworkContextV486);
+  const naturalLowV482=useRef(newNaturalLowPoseStateV482());
+  const baseRootYV482=useRef(0);
   const leftArm = useRef<Mesh>(null);
   const rightArm = useRef<Mesh>(null);
   useFrame((state, delta) => {
@@ -361,6 +394,16 @@ function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genreFusion,
         lipSync.rapAudioTrackIdV423===lipSync.rapAudioDocumentV423.trackId,
       authoredBody:avatarMotionMode==="choreography",
     });
+    const lipV476=refineExpressiveLipV476(argumentsLipSync.lyrics,lipV459,synchronizedV372,{
+      playing:isPlaying,enabled:argumentsLipSync.enabled,reducedMotion,
+      manualSilent:!!manualVocalV453?.active&&!manualVocalV453.singingSlots.includes(workloadSlot),
+      editedWords:lipSync?.rapSyllableEditsEnabledV420&&lipSync.rapSyllableDocumentV420!=null&&lipSync.rapSyllableTrackIdV420===lipSync.rapSyllableDocumentV420.trackId
+        ?lipSync.rapSyllableDocumentV420.edits:undefined,
+      intensity:argumentsLipSync.strength,
+      preserveAudioMouth:!!lipSync?.rapAudioEnabledV423&&!!lipSync.rapAudioDocumentV423&&
+        lipSync.rapAudioTrackIdV423===lipSync.rapAudioDocumentV423.trackId,
+      authoredBody:avatarMotionMode==="choreography",
+    });
     const rapBodyV453=addAdvancedVocalHeadV459(addExpressiveHeadV453(rapBodyV407,lipV453),lipV459);
     if (mouth.current) {
       const face=composeRapFaceV406(synchronizedV372.face,synchronizedV372,{
@@ -368,13 +411,13 @@ function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genreFusion,
         enabled:lipSync?.enabled!==false&&lipSync?.coordinationEnabledV372!==false,
         energy:audio.mids,strength:lipSync?.expression,slot:workloadSlot,
       });
-      mouth.current.scale.y += ((.32 + lipV459.face.jaw * 1.9 - lipV459.face.lipsClosed*.16) - mouth.current.scale.y) * Math.min(1,delta*(lipV459.rapid?27:18));
-      mouth.current.scale.x += ((1 + lipV459.face.wide*.34 - lipV459.face.round*.50 - lipV459.face.lipsClosed*.25) - mouth.current.scale.x) * Math.min(1,delta*(lipV459.rapid?22:14));
-      if (eyes.current) { eyes.current.scale.y += ((1-face.blink*.88-lipV459.face.squint*.30)-eyes.current.scale.y)*Math.min(1,delta*30); eyes.current.rotation.y += (rapBodyV407.eyeYaw-eyes.current.rotation.y)*Math.min(1,delta*12); }
-      if (browsV406.current) browsV406.current.position.y += ((.78 + Math.max(face.brow,lipV459.face.brow)*.10)-browsV406.current.position.y)*Math.min(1,delta*16);
+      mouth.current.scale.y += ((.32 + lipV476.face.jaw * 1.9 - lipV476.face.lipsClosed*.16) - mouth.current.scale.y) * Math.min(1,delta*(lipV459.rapid?27:18));
+      mouth.current.scale.x += ((1 + lipV476.face.wide*.34 - lipV476.face.round*.50 - lipV476.face.lipsClosed*.25) - mouth.current.scale.x) * Math.min(1,delta*(lipV459.rapid?22:14));
+      if (eyes.current) { eyes.current.scale.y += ((1-face.blink*.88-lipV476.face.squint*.30)-eyes.current.scale.y)*Math.min(1,delta*30); eyes.current.rotation.y += (rapBodyV407.eyeYaw-eyes.current.rotation.y)*Math.min(1,delta*12); }
+      if (browsV406.current) browsV406.current.position.y += ((.78 + Math.max(face.brow,lipV476.face.brow)*.10)-browsV406.current.position.y)*Math.min(1,delta*16);
     }
     // Matching bounded vocal gestures for the procedural fallback avatar.
-    const vocalV472=enhanceRapAccentV473(resolveVocalDanceAccentV472({lyrics:lipSync?.lyrics,progressMs:lipSync?.progressMs,
+    const variationV474=resolveNaturalRapGestureV474(enhanceRapAccentV473(resolveVocalDanceAccentV472({lyrics:lipSync?.lyrics,progressMs:lipSync?.progressMs,
       playing:isPlaying&&lipSync?.enabled!==false&&lipSync?.playing!==false,reducedMotion,
       rap:genreMotionV471?.family==='rap',section:showCue?.enabled?showCue.section:performance.section,
       slot:workloadSlot,authored:avatarMotionMode==='choreography',
@@ -394,19 +437,86 @@ function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genreFusion,
       playing:isPlaying&&lipSync?.enabled!==false&&lipSync?.playing!==false,
       rap:genreMotionV471?.family==='rap',reducedMotion,
       section:showCue?.enabled?showCue.section:performance.section,
-    });
+    }),{trackId:track?.id,slot:workloadSlot,playing:isPlaying,reducedMotion,
+       authored:avatarMotionMode==='choreography',section:showCue?.enabled?showCue.section:performance.section});
+    const vocalV472=variationV474.accent;
     const genreAccentV471=(genreMotionV471?.weight??0)*Math.min(1,audio.beatStrength??0)*.07;
     head.current.scale.y += (1 + (motion.beatImpulse + kickAccent * 0.55 + patternKick + learnedAccent) * 0.18 * (0.7 + danceAggression * 0.6) * intelligenceMultipliers.kick * performance.danceMultiplier * motionMix + performance.poseImpulse * 0.08 + performance.buildUp * 0.025 - preKick * 0.055 - head.current.scale.y) * smooth;
-    head.current.rotation.z += (emotion.headTilt + rap.shoulder*.6 + performanceV391.expressionHeadTilt + rapBodyV407.headTilt - head.current.rotation.z) * smooth;
+    head.current.rotation.z += (emotion.headTilt + rap.shoulder*.6 + performanceV391.expressionHeadTilt + rapBodyV407.headTilt + variationV474.headTilt - head.current.rotation.z) * smooth;
     head.current.rotation.x += (rap.headNod + performanceV391.headNod + genreAccentV471*((genreMotionV471?.head??1)-.8) + (partnerLook?.current.pitch ?? 0) + emotion.gazePitch + rapBodyV453.headPitch + vocalV472.head - head.current.rotation.x) * smooth;
-    head.current.rotation.y += ((partnerLook?.current.yaw ?? 0) + emotion.gazeYaw + performanceV391.headTurn + rapBodyV407.headYaw - head.current.rotation.y) * smooth;
+    head.current.rotation.y += ((partnerLook?.current.yaw ?? 0) + emotion.gazeYaw + performanceV391.headTurn + rapBodyV407.headYaw + variationV474.headTurn - head.current.rotation.y) * smooth;
     if (leftArm.current) leftArm.current.rotation.z += ((-0.25 + genreAccentV471*((genreMotionV471?.arms??1)-.6) + (partnerGesture?.current.leftLift ?? 0) + (performanceV391.leftArmAccent ?? 0) + (performanceV391.counterArm ?? 0) + rapBodyV407.leftArm + vocalV472.arms*Math.max(0,vocalV472.side)) - leftArm.current.rotation.z) * smooth;
     if (rightArm.current) rightArm.current.rotation.z += ((0.25 - genreAccentV471*((genreMotionV471?.arms??1)-.6) - (partnerGesture?.current.rightLift ?? 0) + (performanceV391.rightArmAccent ?? 0) - (performanceV391.counterArm ?? 0) + rapBodyV407.rightArm - vocalV472.arms*Math.max(0,-vocalV472.side)) - rightArm.current.rotation.z) * smooth;
-    root.current.position.y += (motion.bodyBounce + rap.bounce + Math.abs(rap.legGroove)*.15 - root.current.position.y) * smooth;
+    // V484: restrained forward/back counter-swing while the procedural legs
+    // crouch. Existing V481 IK remains responsible for feet, and authored
+    // choreography never receives this extra arm-axis motion.
+    const lowWeightV484=isPlaying&&!reducedMotion&&avatarMotionMode!=='choreography'
+      ?Math.min(1,Math.max(0,(lowPoseV481?.current.depth??0)/.4)):0;
+    const lowGestureV484=partnerGesture?.current;
+    if(leftArm.current){const x=-Math.min(.11,lowWeightV484*(.045+(lowGestureV484?.leftLift??0)*.3));leftArm.current.rotation.x+=(x-leftArm.current.rotation.x)*smooth;}
+    if(rightArm.current){const x=-Math.min(.11,lowWeightV484*(.045+(lowGestureV484?.rightLift??0)*.3));rightArm.current.rotation.x+=(x-rightArm.current.rotation.x)*smooth;}
+    // V482: the pelvis and procedural leg solve share a single filtered depth below.
     torso.current.scale.x += (1 + audio.volume * 0.12 * motion.intensity - torso.current.scale.x) * smooth;
-    torso.current.rotation.z += (performanceV391.spineSway + (performanceV391.torsoTwist ?? 0) + rapBodyV407.chestLean + vocalV472.chest*vocalV472.side*.4 - torso.current.rotation.z) * smooth;
+    // Torso roll is resolved once with the low-pose counterbalance below (V488).
     root.current.rotation.y += ((motion.bodySway * performance.danceMultiplier * motionMix + rap.hipSway*.6 + performanceV391.hipSway + (performanceV391.hipCounter ?? 0)) - root.current.rotation.y) * smooth;
-    root.current.position.y += (motion.bodyBounce * performance.danceMultiplier * motionMix * (0.5 + avatarLegResponse * 0.5) - preKick * 0.065 + Math.sin(state.clock.elapsedTime * 2.1) * audio.mids * 0.025 * motion.intensity - root.current.position.y) * smooth;
+    // V481: two real articulated procedural leg chains. The inverse two-link
+    // angle keeps each ankle at its original stage height as the pelvis lowers.
+    const requestedLowV481=isPlaying&&!reducedMotion&&avatarMotionMode!=="choreography"?lowPoseV481?.current:null;
+    const lowerV481=requestedLowV481?.mode==='rap-lean'?0:Math.min(.26,Math.max(0,(requestedLowV481?.depth??0)*.46));
+    const lowV482=stepNaturalLowPoseV482(naturalLowV482.current,{
+      depth:lowerV481,mode:requestedLowV481?.mode??'stand',seconds:(lipSync?.progressMs??0)/1000,
+      slot:workloadSlot,beat:audio.beatStrength??0,playing:isPlaying,reducedMotion,
+      manualPriority:avatarMotionMode==='choreography',
+    },delta);
+    const lowLegV481=solveProceduralLowLegV481(lowV482.depth);
+    // V488: safe coordination targets for procedural torso/arms/leg swing.
+    // Song-time beats come from the same media clock as V486's footwork;
+    // GLB rigs receive NO synthetic root/bone/IK adjustments.
+    const fullBodyV488=planNaturalFullBodyV488({
+      trackId:track?.id,seconds:Math.max(0,(lipSync?.progressMs??0)/1000||state.clock.elapsedTime),
+      slot:workloadSlot,lowDepth:lowV482.depth,
+      footwork:groupFootworkV486?.current??{offsetX:0,offsetZ:0,liftLeft:0,liftRight:0,rootSpeed:1,weightShift:0},
+      beat:audio.beatStrength??0,kick:audio.kickAccentIntensity??0,energy:audio.energyEnvelope??0,
+      genre,playing:isPlaying,reducedMotion,manualPriority:avatarMotionMode==='choreography',
+      automaticGroup:!!lowPoseV481&&!!groupFootworkV486,tier:getActivePerformanceTier(),
+    });
+    // V485: a very small raised-foot sidestep only for the procedural standing
+    // dancer. Low-pose IK stays unaltered for the crouching partner; GLB rigs
+    // continue to use their own mixer/clips and are never retargeted here.
+    const stepV485=isPlaying&&!reducedMotion&&avatarMotionMode!=='choreography'&&lowV482.depth<.025
+      ?Math.min(1,Math.max(0,groupDanceV485?.current.step??0)):0;
+    // V486: song-time, alternating foot swings (not renderer elapsed time).
+    // The V485 step remains the conservative enable/strength source.
+    const stepLeftV485=stepV485>0?Math.max(0,Math.min(1,groupFootworkV486?.current.liftLeft??0)):0;
+    const stepRightV485=stepV485>0?Math.max(0,Math.min(1,groupFootworkV486?.current.liftRight??0)):0;
+    // One exact target for knee angles and pelvis height prevents filter drift.
+    if(leftLegV481.current)leftLegV481.current.rotation.x=-lowLegV481.hipAngle+stepLeftV485*.038;
+    if(rightLegV481.current)rightLegV481.current.rotation.x=-lowLegV481.hipAngle+stepRightV485*.038;
+    if(leftKneeV481.current)leftKneeV481.current.rotation.x=lowLegV481.kneeAngle+stepLeftV485*.11+fullBodyV488.leftKneeExtra;
+    if(rightKneeV481.current)rightKneeV481.current.rotation.x=lowLegV481.kneeAngle+stepRightV485*.11+fullBodyV488.rightKneeExtra;
+    const rapLeanV482=(requestedLowV481?.mode==='rap-lean'?(requestedLowV481.depth*.4):lowV482.depth*.22)
+      +(stepV485>0?(groupFootworkV486?.current.weightShift??0):0);
+    torso.current.rotation.x+=(rapLeanV482+fullBodyV488.torsoPitch-torso.current.rotation.x)*smooth;
+    // Keep hips near planted feet. A few millimetres of weight shift belong to
+    // the torso visual only, NOT to the stage/root or ankle anchors.
+    torso.current.position.x+=(fullBodyV488.hipShiftX-torso.current.position.x)*smooth;
+    if(leftArm.current)leftArm.current.rotation.x+=(fullBodyV488.leftArmSwing-leftArm.current.rotation.x)*smooth;
+    if(rightArm.current)rightArm.current.rotation.x+=(fullBodyV488.rightArmSwing-rightArm.current.rotation.x)*smooth;
+    const headPitchTargetV488=rap.headNod + performanceV391.headNod
+      + genreAccentV471*((genreMotionV471?.head??1)-.8)
+      + (partnerLook?.current.pitch ?? 0) + emotion.gazePitch + rapBodyV453.headPitch
+      + vocalV472.head + fullBodyV488.headCounterPitch;
+    head.current.rotation.x+=(headPitchTargetV488-head.current.rotation.x)*smooth;
+    // V488 counter-roll is a target offset with its own state so it cannot
+    // accumulate frame after frame (unlike adding a constant every tick).
+    const bodyRollTargetV488=(performanceV391.spineSway + (performanceV391.torsoTwist ?? 0)
+      + rapBodyV407.chestLean + vocalV472.chest*vocalV472.side*.4 + variationV474.torsoSway)
+      + lowV482.torsoShift + fullBodyV488.torsoRoll;
+    torso.current.rotation.z+=(bodyRollTargetV488-torso.current.rotation.z)*smooth;
+    // Keep normal beat bounce separate from the low-pose compensation.
+    const normalBounceV482=motion.bodyBounce * performance.danceMultiplier * motionMix * (0.5 + avatarLegResponse * 0.5) - preKick * 0.065 + Math.sin(state.clock.elapsedTime*2.1)*audio.mids*.025*motion.intensity;
+    baseRootYV482.current+=(normalBounceV482-baseRootYV482.current)*smooth;
+    root.current.position.y=baseRootYV482.current-lowV482.depth;
     } finally {
       if (v251StartedAt >= 0) recordAvatarFrame(schedulerInstance, "Procedural", performance.now() - v251StartedAt, performance.now());
     }
@@ -425,6 +535,14 @@ function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genreFusion,
     </group>
     <mesh ref={mouth} position={[0, 0.42, 0.418]}><sphereGeometry args={[0.093, 16, 12]} /><meshStandardMaterial color="#44202b" roughness={0.85} /></mesh>
     <mesh position={[0, 1.03, 0]}><sphereGeometry args={[0.27, 20, 12]} /><meshStandardMaterial color="#35264b" /></mesh>
+    {/* V481: articulated 2-segment legs with a fixed ankle-height relation. */}
+    {([['left',-0.24],['right',0.24]] as const).map(([side,x])=><group key={side} ref={side==='left'?leftLegV481:rightLegV481} position={[x,-0.81,0]}>
+      <mesh position={[0,-0.24,0]}><capsuleGeometry args={[.155,.30,6,9]}/><meshStandardMaterial color="#454064" roughness={.72}/></mesh>
+      <group ref={side==='left'?leftKneeV481:rightKneeV481} position={[0,-.48,0]}>
+        <mesh position={[0,-.24,0]}><capsuleGeometry args={[.115,.30,6,9]}/><meshStandardMaterial color="#302d4d" roughness={.76}/></mesh>
+        <mesh position={[0,-.48,.12]} scale={[1,.45,1.4]}><sphereGeometry args={[.16,12,10]}/><meshStandardMaterial color="#211e36" roughness={.8}/></mesh>
+      </group>
+    </group>)}
     <mesh ref={leftArm} position={[-0.59, -0.42, 0]} rotation={[0, 0, -0.25]}><capsuleGeometry args={[0.13, 0.55, 4, 8]} /><meshStandardMaterial color="#e7b99d" /></mesh>
     <mesh ref={rightArm} position={[0.59, -0.42, 0]} rotation={[0, 0, 0.25]}><capsuleGeometry args={[0.13, 0.55, 4, 8]} /><meshStandardMaterial color="#e7b99d" /></mesh>
   </group>;
@@ -447,6 +565,9 @@ function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, 
   const partnerLook = usePartnerLook();
   const partnerGesture = usePartnerGesture();
   const partnerHand = usePartnerHand();
+  const groupSupportV486=useContext(GroupFootSupportContextV486);
+  const groupGroundV487=useContext(GroupGroundObservationContextV487);
+  const groundProbeV487=useRef(new Vector3());
   const contactCalibration = useContext(PartnerCalibrationContext);
   const measuredProportions = useRef<AvatarProportions | null>(null);
   const expressiveSettings = useRef(readExpressiveSettings(avatarModelId??""));
@@ -464,6 +585,7 @@ function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, 
   const lastPartnerLook = useRef({ yaw: 0, pitch: 0, eye: 0 });
   const lastPartnerGesture = useRef<PartnerGestureCue>({...NEUTRAL_GESTURE});
   const root = useRef<Group>(null);
+  const groupLowPoseV481=useContext(GroupLowPoseContextV481);
   const {preferences: timelinePrefs} = useUiPreferences();
   const timelineEnabled = !!timelinePrefs.avatarTimelineEnabled;
   const rapLivePresetV412=useMemo(()=>normalizeRapPresetV412(groovePreferences.rapLivePresetV412),[groovePreferences.rapLivePresetV412]);
@@ -559,7 +681,7 @@ function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, 
           playing:isPlaying,count:Math.max(1,propsLipSyncV367.ensembleCountV374??1),
           enabled:true,assignments:propsLipSyncV367.rapDuetAssignmentsV416,
           reducedMotion,manualPriority:avatarMotionMode==='choreography'}):null;
-    const vocalV472=enhanceRapAccentV473(resolveVocalDanceAccentV472({
+    const vocalV472=resolveNaturalRapGestureV474(enhanceRapAccentV473(resolveVocalDanceAccentV472({
       lyrics:propsLipSyncV367?.lyrics,progressMs:propsLipSyncV367?.progressMs,
       playing:isPlaying&&propsLipSyncV367?.playing!==false&&propsLipSyncV367?.enabled!==false,
       reducedMotion,rap:genreCue?.family==='rap',section:showCue?.enabled?showCue.section:cameraDirectorSection,
@@ -573,7 +695,8 @@ function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, 
       playing:isPlaying&&propsLipSyncV367?.playing!==false&&propsLipSyncV367?.enabled!==false,
       rap:genreCue?.family==='rap',reducedMotion,
       section:showCue?.enabled?showCue.section:cameraDirectorSection,
-    });
+    }),{trackId:track?.id,slot:workloadSlot,playing:isPlaying,reducedMotion,
+       authored:avatarMotionMode==='choreography',section:showCue?.enabled?showCue.section:cameraDirectorSection}).accent;
     musicMotionV468.updateMotion(audio,delta,isPlaying&&!reducedMotion&&(audioMotionEnabledV468??true),genreCue,vocalV472);
   },1);
   // Match humanoid bones across Mixamo/Blender-style names and preserve rest-pose differences.
@@ -921,18 +1044,71 @@ function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, 
     return source.map(clip => quality.protectAuthored && !/^(Imported:|Library:)/.test(clip.name)
       ?clip:polishMotionClipV321(clip,quality));
   }, [animations, libraryClips, rapLiveExtraClipsV412, retargeted.clips,qualityRevisionV321]);
+  // V492: Browser-local presets do not poll or consume frame time. Read only
+  // when the underlying model/source changes or the studio saves/imports.
+  const [savedBlendsV492,setSavedBlendsV492]=useState<GlbBlendPresetV492[]>([]);
+  useEffect(()=>{
+    const refresh=()=>setSavedBlendsV492(readBlendPresetsV492());
+    refresh();window.addEventListener(GLB_BLEND_CHANGE_V492,refresh);window.addEventListener('storage',refresh);
+    return()=>{window.removeEventListener(GLB_BLEND_CHANGE_V492,refresh);window.removeEventListener('storage',refresh);};
+  },[url,animationUrl]);
+  // Bind only safe arm/chest rotation channels of a matching, installed GLB.
+  // Multiple presets can be saved, but at most 8 auto-enabled clips per model
+  // are prepared for the live mixer. None owns root/hips/feet/face/IK.
+  const preparedBlendsV492=useMemo(()=>{
+    const output:{baseName:string;actionName:string;clip:AnimationClip;weight:number}[]=[];
+    const eligible=savedBlendsV492.filter(p=>p.autoEnabled&&p.modelUrl===url&&p.animationUrl===(animationUrl??''));
+    for(const preset of eligible){
+      if(output.length>=8)break;
+      const baseName=preset.base.id.startsWith('external:')?`Imported: ${preset.base.name}`:preset.base.name;
+      const match=chooseLiveBlendPresetV492([preset],clips,url,animationUrl??'',baseName,genre);
+      if(!match)continue;
+      const safe=match.overlay.tracks.filter(t=>isPreviewBlendTrackV491(t.name,preset.region)).map(t=>t.clone());
+      if(!safe.length)continue;
+      const actionName=`GlbPresetV492:${preset.id}`;
+      output.push({baseName,actionName,clip:new AnimationClip(actionName,match.overlay.duration,safe),weight:preset.weight});
+    }
+    return output;
+  },[savedBlendsV492,clips,url,animationUrl,genre]);
   const maskedOverlay = useMemo(() => {
     if (avatarBlendMask === "full" || !avatarBlendClip) return null;
     const source = clips.find(clip => clip.name === avatarBlendClip);
     if (!source) return null;
     return createMaskedAnimationClip(source, avatarBlendMask);
   }, [clips, avatarBlendClip, avatarBlendMask]);
-  const playbackClips = useMemo(() => maskedOverlay ? [...clips, maskedOverlay] : clips, [clips, maskedOverlay]);
+  // V490: select an existing gesture/dance clip with SAFE rotation channels;
+  // never duplicate hips/feet/root or vocal face/head channels in the overlay.
+  const autoUpperGestureV490 = useMemo(() => {
+    const source=chooseUpperGestureClipV490(clips,genre);
+    return createAutomaticUpperClipV490(source);
+  },[clips,genre]);
+  const playbackClips = useMemo(() => [
+    ...clips, ...(maskedOverlay?[maskedOverlay]:[]), ...(autoUpperGestureV490?[autoUpperGestureV490]:[]),
+    ...preparedBlendsV492.map(p=>p.clip)
+  ], [clips, maskedOverlay, autoUpperGestureV490,preparedBlendsV492]);
   const groupClockV328=useContext(GroupMotionClockContextV328);
   const groupPhraseV329=useContext(GroupPhraseContextV329);
   const phraseProfilesV329=useMemo(()=>groupPhraseV329?.settings.enabled?describeAnimationClipsV329(playbackClips,groupPhraseV329.settings.maxCandidates):[],[playbackClips,groupPhraseV329?.settings.enabled,groupPhraseV329?.settings.maxCandidates]);
   useEffect(()=>{if(groupClockV328 && groupPhraseV329?.settings.enabled)groupPhraseV329.register(groupClockV328.clock.current.slot,phraseProfilesV329);},[groupClockV328?.clock,groupPhraseV329?.register,groupPhraseV329?.settings.enabled,phraseProfilesV329]);
-  const { actions, names, mixer:groupMixerV328 } = useAnimations(playbackClips, root);
+  const { actions, names:allActionNamesV490, mixer:groupMixerV328 } = useAnimations(playbackClips, root);
+  // Never offer the generated overlay as a standalone selectable/beat-aligned dance.
+  const names=useMemo(()=>allActionNamesV490.filter(n=>n!==autoUpperGestureV490?.name&&
+    !preparedBlendsV492.some(p=>p.actionName===n)),
+    [allActionNamesV490,autoUpperGestureV490?.name,preparedBlendsV492]);
+  // V481: a real imported squat/kneel clip is preferred over synthetic knee
+  // rotations. Update only on pose transitions, never setState every frame.
+  const [lowClipV481,setLowClipV481]=useState<string|null>(null);
+  const clipLatchV482=useRef(newLowClipStateV482());
+  useFrame((_,delta)=>{
+    const cue=groupLowPoseV481?.current;
+    const safe=isPlaying&&!reducedMotion&&avatarMotionMode!=="choreography"&&
+      !timelineEnabled&&!activeSequence&&!activeLoop&&!avatarBlendEnabled&&
+      !smartDanceOverride&&!stableLibraryClip&&!groupClockV328?.settings.enabled&&
+      !groupPhraseV329?.settings.enabled;
+    const candidate=safe&&cue&&cue.depth>=.08?findLowPoseClipV481(names,cue.mode):null;
+    const next=stepLowClipV482(clipLatchV482.current,candidate,delta,track?.id,!safe);
+    if(next!==lowClipV481)setLowClipV481(next);
+  });
   const [activeLoop, setActiveLoop] = useState<AvatarLoopPreset | null>(null);
   const [activeSequence, setActiveSequence] = useState<ReturnType<typeof getActiveChoreography>>(null);
   const directorLastCheck = useRef(-100);
@@ -1272,6 +1448,31 @@ function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, 
       window.dispatchEvent(new CustomEvent(FOOT_LOCK_DIAGNOSTIC_EVENT_V322,{detail:groundLockReportV322(footIK.current.groundV322)}));
     }
     if (!activeIK) updateFootContact(footContact.current, avatarRoot, rigTargets.current, delta, enableIK, avatarFootIKStrength / 100);
+    // V486: publish only the existing measured IK stance to the parent group.
+    // No new sensor, animation solver or React state update per frame.
+    if(groupSupportV486){
+      groupSupportV486.current.tracked=activeIK;
+      groupSupportV486.current.leftPlanted=activeIK&&footIK.current.left?.contact.phase==='planted';
+      groupSupportV486.current.rightPlanted=activeIK&&footIK.current.right?.contact.phase==='planted';
+    }
+    // V487: observe the existing world-space IK anchor only. Model-relative
+    // drift is sampled from real planted ankle positions; no new bone solver.
+    if(groupGroundV487){
+      const record=groupGroundV487.current;
+      record.tracked=enableIK&&activeIK;
+      const observe=(leg:typeof footIK.current.left)=>{
+        if(!enableIK||!activeIK||!leg||leg.contact.phase!=='planted')return {planted:false,confidence:0,drift:0};
+        const confidence=Math.max(0,Math.min(1,leg.contact.confidence));
+        const ankle=leg.ankle.getWorldPosition(groundProbeV487.current);
+        const relativeScale=Math.max(.1,leg.upperLength+leg.lowerLength);
+        const drift=Math.min(99,Math.hypot(ankle.x-leg.contact.plantedX,ankle.z-leg.contact.plantedZ)*90/relativeScale);
+        return {planted:true,confidence,drift:Number.isFinite(drift)?drift:0};
+      };
+      const left=observe(footIK.current.left),right=observe(footIK.current.right);
+      record.leftPlanted=left.planted;record.rightPlanted=right.planted;
+      record.leftConfidence=left.confidence;record.rightConfidence=right.confidence;
+      record.leftDriftCm=left.drift;record.rightDriftCm=right.drift;
+    }
     sampleIKQuality(ikQualitySampler.current, {dancer:avatarModelId ?? url, dt:delta, active:isPlaying && !reducedMotion, foot:footIK.current, rig:{upper:arm.rightArm,lower:arm.rightForearm,hand:arm.rightHand}, handState:handIK.current, cue:activeHandCue});
     } finally {
       if (v251StartedAt >= 0) recordAvatarFrame(schedulerInstance, `GLTF: ${avatarModelId ?? url.split("/").pop() ?? "Avatar"}`, performance.now() - v251StartedAt, performance.now());
@@ -1296,8 +1497,19 @@ function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, 
     ? names[phraseIndexV329] : undefined;
   const autoMotionV356=autonomousShowPhraseV356?.enabled && avatarMotionMode==='hybrid' && !stableLibraryClip && !activeLoop && !activeSequence && !timelineEnabled && !avatarBlendEnabled && !groupClockV328?.settings.enabled && !groupPhraseV329?.settings.enabled && !smartDanceOverride && isPlaying && !reducedMotion
     ? selectAutonomousMotionV356(names,undefined,track?.id,autonomousShowPhraseV356.index,workloadSlot):undefined;
-  const selectedClip=clipChoiceV328 && actions[clipChoiceV328] ? clipChoiceV328 : phraseChoiceV329 && actions[phraseChoiceV329]?phraseChoiceV329:autoMotionV356 && actions[autoMotionV356]?autoMotionV356:selectedClipLegacy;
+  const selectedClip=lowClipV481 && actions[lowClipV481] && isPlaying&&!reducedMotion ? lowClipV481 : clipChoiceV328 && actions[clipChoiceV328] ? clipChoiceV328 : phraseChoiceV329 && actions[phraseChoiceV329]?phraseChoiceV329:autoMotionV356 && actions[autoMotionV356]?autoMotionV356:selectedClipLegacy;
+  // V492: a saved combination activates only when its original *base* is
+  // already the chosen live clip. Never hijack a manual selection / timeline.
+  const liveBlendV492=preparedBlendsV492.find(p=>p.baseName===selectedClip)??null;
+  const liveBlendAllowedV492=!!liveBlendV492&&isPlaying&&!reducedMotion&&!timelineEnabled&&
+    !activeSequence&&!activeLoop&&!avatarBlendEnabled&&!rapLiveEnabledV412&&
+    avatarMotionMode!=='choreography'&&!stableLibraryClip&&!smartDanceOverride&&
+    !groupClockV328?.settings.enabled&&!groupPhraseV329?.settings.enabled&&
+    getActivePerformanceTier()!=='low';
+  const activeLiveBlendV492=liveBlendAllowedV492?liveBlendV492:null;
+
   const previousClipRef = useRef<string | null>(null);
+  const previousWasLowClipV489 = useRef(false);
   useEffect(() => {
     if (activeSequence || rapLiveEnabledV412 || (timelineEnabled && timeline.segments.length)) return;
     const nextAction = selectedClip ? actions[selectedClip] : undefined;
@@ -1322,14 +1534,32 @@ function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, 
         : null;
       const usableMatch = match && match.comparedTracks > 0 && Number.isFinite(match.score)
         && match.score < 1.5 && Number.isFinite(match.time);
-      if (usableMatch) nextAction.time = Math.max(0, Math.min(match.time, Math.max(0, incomingClip.duration - 0.001)));
-      else if (plan.preservePhase) nextAction.time = matchedClipTime(plan, incomingClip.duration);
+      // V489: only automatic low-pose entry/exit may refine clip alignment and
+      // blend time. A high-confidence planted foot extends the crossfade but
+      // never resets the existing IK contact anchors.
+      const enteringLowV489 = !!lowClipV481 && selectedClip === lowClipV481 && !previousWasLowClipV489.current;
+      const leavingLowV489 = previousWasLowClipV489.current && selectedClip !== lowClipV481;
+      const switchingLowV489 = previousWasLowClipV489.current && !!lowClipV481 && selectedClip === lowClipV481;
+      const lowMotionV489 = planNaturalGlbMotionV489({
+        enteringLow:enteringLowV489,leavingLow:leavingLowV489,switchingLow:switchingLowV489,
+        baseFadeSeconds:plan.duration,incomingDuration:incomingClip.duration,
+        plantedLeft:footIK.current.left?.contact.phase==='planted',
+        plantedRight:footIK.current.right?.contact.phase==='planted',
+        manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!smartDanceOverride||
+          !!activeSequence||!!activeLoop||timelineEnabled||avatarBlendEnabled||rapLiveEnabledV412,
+        playing:isPlaying,reducedMotion,quality:getActivePerformanceTier(),
+        matchScore:usableMatch?match?.score:null,matchTime:usableMatch?match?.time:null,
+      });
+      if (usableMatch && (!lowMotionV489.active || lowMotionV489.allowPoseMatch))
+        nextAction.time = Math.max(0, Math.min(match.time, Math.max(0, incomingClip.duration - 0.001)));
+      else if (plan.preservePhase && (!lowMotionV489.active || lowMotionV489.allowPhaseFallback))
+        nextAction.time = matchedClipTime(plan, incomingClip.duration);
       const fadeDurationV311 = polishAutomaticCrossfadeV311(plan, {
         settings:readDancePerformanceV311(), bpm:audio.bpm, genre, planted:grounded,
         manual:avatarMotionMode==="choreography" || !!stableLibraryClip, reducedMotion, playing:isPlaying,
         matchScore:usableMatch ? match?.score : undefined,
       });
-      effectiveFadeDurationV311 = fadeDurationV311;
+      effectiveFadeDurationV311 = lowMotionV489.active ? lowMotionV489.fadeSeconds : fadeDurationV311;
       nextAction.paused = !isPlaying || reducedMotion;
       nextAction.fadeIn(effectiveFadeDurationV311).play();
       // A valid foot plant remains anchored by V135 IK while both actions overlap.
@@ -1338,10 +1568,12 @@ function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, 
       nextAction.paused = !isPlaying || reducedMotion;
     }
     Object.entries(actions).forEach(([name, action]) => {
-      if (name !== selectedClip && !(avatarBlendEnabled && name === (maskedOverlay?.name ?? avatarBlendClip))) action?.fadeOut(effectiveFadeDurationV311);
+      if (name !== selectedClip && name !== autoUpperGestureV490?.name &&
+          name !== activeLiveBlendV492?.actionName && !(avatarBlendEnabled && name === (maskedOverlay?.name ?? avatarBlendClip))) action?.fadeOut(effectiveFadeDurationV311);
     });
     previousClipRef.current = selectedClip ?? null;
-  }, [actions, selectedClip, avatarCrossfadeSeconds, audio.bpm, genre, isPlaying, reducedMotion, activeSequence, timelineEnabled, timeline.segments.length, rapLiveEnabledV412, avatarBlendEnabled, avatarBlendClip, maskedOverlay, liveTransition, stableLibraryClip, sequenceCrossfade]);
+    previousWasLowClipV489.current = !!lowClipV481 && selectedClip === lowClipV481;
+  }, [actions, selectedClip, avatarCrossfadeSeconds, audio.bpm, genre, isPlaying, reducedMotion, activeSequence, timelineEnabled, timeline.segments.length, rapLiveEnabledV412, avatarBlendEnabled, avatarBlendClip, maskedOverlay, liveTransition, stableLibraryClip, sequenceCrossfade, lowClipV481, smartDanceOverride, avatarMotionMode, activeLoop, autoUpperGestureV490?.name, activeLiveBlendV492?.actionName]);
   // V129: read the still-running outgoing LOD before falling back to the
   // unmount snapshot. Publish per-frame clip state for seamless handoff.
   const liveOwner = useRef(`lod-${Math.random().toString(36).slice(2)}`);
@@ -1545,6 +1777,59 @@ function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, 
     overlay.setEffectiveWeight(weight);
     primary.setEffectiveWeight(maskedOverlay ? 1 : 1 - weight);
     overlay.timeScale = syncedClipSpeed(avatarBlendSpeed, audio.bpm, avatarBlendReferenceBpm, avatarBlendBpmSync);
+  });
+  // V490: automatic arm/chest-only gesture overlay while a genuine installed GLB
+  // low-pose clip owns the legs. All authored mixer modes and manual blending win.
+  const autoUpperNameV490=autoUpperGestureV490?.name;
+  const autoUpperEligibleV490=!!autoUpperNameV490 && !!lowClipV481 && selectedClip===lowClipV481 &&
+    isPlaying&&!reducedMotion&&!timelineEnabled&&!activeSequence&&!activeLoop&&
+    !avatarBlendEnabled&&!rapLiveEnabledV412&&avatarMotionMode!=='choreography'&&
+    !stableLibraryClip&&!smartDanceOverride&&!groupClockV328?.settings.enabled&&
+    !groupPhraseV329?.settings.enabled&&!activeLiveBlendV492;
+  const activeAutoUpperV490=autoUpperEligibleV490?autoUpperNameV490:null;
+  useEffect(()=>{
+    const overlay=activeAutoUpperV490?actions[activeAutoUpperV490]:undefined;
+    if(!overlay)return;
+    overlay.reset().stopFading().setEffectiveWeight(0).play();
+    return ()=>{overlay.stop();};
+  },[actions,activeAutoUpperV490]);
+  const autoUpperWeightV490=useRef(0);
+  useFrame((_,delta)=>{
+    const overlay=activeAutoUpperV490?actions[activeAutoUpperV490]:undefined;
+    if(!overlay){autoUpperWeightV490.current=0;return;}
+    const desired=planUpperBlendV490({
+      playing:isPlaying,reducedMotion,manualPriority:!autoUpperEligibleV490,
+      activeLowPose:!!lowClipV481&&selectedClip===lowClipV481,
+      quality:getActivePerformanceTier(),energy:audio.energyEnvelope,genre,
+      section:showCue?.enabled?showCue.section:null,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+    });
+    // No React state per frame. The underlying low-clip keeps full strength;
+    // Three's mixer blends shared upper channels while lower joints stay untouched.
+    const response=Math.min(1,Math.max(0,delta)*5);
+    autoUpperWeightV490.current += (desired-autoUpperWeightV490.current)*response;
+    overlay.setEffectiveWeight(autoUpperWeightV490.current);
+  });
+  // V492: explicit saved preset uses the SAME mixer as V489/V490. The source
+  // clip is cloned/masked at setup time; no additional useFrame state updates.
+  useEffect(()=>{
+    const action=activeLiveBlendV492?actions[activeLiveBlendV492.actionName]:undefined;
+    if(!action)return;
+    action.reset().stopFading().setEffectiveWeight(0).play();
+    return()=>{action.stop();};
+  },[actions,activeLiveBlendV492?.actionName]);
+  const livePresetWeightV492=useRef(0);
+  useFrame((_,delta)=>{
+    const p=activeLiveBlendV492;
+    const action=p?actions[p.actionName]:undefined;
+    if(!p||!action){livePresetWeightV492.current=0;return;}
+    const left=footIK.current.left?.contact.phase==='planted';
+    const right=footIK.current.right?.contact.phase==='planted';
+    const support=left&&right?.82:left||right?.92:1;
+    const target=Math.max(0,Math.min(.5,p.weight*support));
+    livePresetWeightV492.current+=(target-livePresetWeightV492.current)*Math.min(1,Math.max(0,delta)*5);
+    action.setEffectiveWeight(livePresetWeightV492.current);
   });
   useEffect(() => {
     if (overlayName) return;
@@ -2020,6 +2305,15 @@ function GroupDancersV326({props,settings}:{props:VisualizerProps;settings:Group
  // Stable mutable contexts: individual avatar rigs read these inside their existing
  // V144/V145 head/arm overlay without React renders or resetting motion mixers.
  const looksV444=useRef(Array.from({length:4},()=>({current:{...NEUTRAL_LOOK}})));
+ const lowPosesV481=useRef(Array.from({length:4},()=>({current:{mode:"stand" as LowPoseSlotV481["mode"],depth:0}})));
+ const danceMotionV485=useRef(Array.from({length:4},()=>({current:{offsetX:0,offsetZ:0,step:0,lean:0} as NaturalDanceSlotV485})));
+ const footworkV486=useRef(Array.from({length:4},()=>({current:{offsetX:0,offsetZ:0,liftLeft:0,liftRight:0,rootSpeed:1,weightShift:0} as FootworkSlotV486})));
+ const supportV486=useRef(Array.from({length:4},()=>({current:{tracked:false,leftPlanted:false,rightPlanted:false} as FootSupportV486})));
+ const groundV487=useRef(Array.from({length:4},()=>({current:emptyGroundObservationV487()})));
+ const lastGroundReportV487=useRef(-1);
+ const lowInteractionV483=useRef(newLowInteractionStateV483());
+ const [lowSettingsV481,setLowSettingsV481]=useState(readLowPoseV481);
+ useEffect(()=>{const update=()=>setLowSettingsV481(readLowPoseV481());window.addEventListener(LOW_POSE_EVENT_V481,update);return()=>window.removeEventListener(LOW_POSE_EVENT_V481,update);},[]);
  const gesturesV444=useRef(Array.from({length:4},()=>({current:{...NEUTRAL_GESTURE}})));
  // V445: ephemeral track-scoped band summaries; no waveform, uploads or artist identities.
  const vocalEvidenceV445=useRef(emptyVocalEvidenceV445());
@@ -2189,6 +2483,17 @@ function GroupDancersV326({props,settings}:{props:VisualizerProps;settings:Group
   });
   const interactionV444=featureInteractionV460(interactionBaseV444,
     props.featureDirectionV460??{active:false,moment:"off",lead:0,partner:0,group:false,eventId:"",responseGain:0,cameraCue:null});
+  // V475: only refine automatically directed visual interactions. Explicit singer
+  // assignments, saved stage cues, GLB clips and lip-sync ownership are untouched.
+  const interactionV475=refineMultiAvatarInteractionV475({
+    base:interactionV444,pose,feature:props.featureDirectionV460,
+    trackId:props.track?.id,count:settings.count,seconds,cueSeconds:currentCueAtV443,
+    beat:props.audio.beatStrength??0,strength:props.artistInteractionStrengthV444??60,
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,
+    manualPriority:!!settings.trackId||!!selectedSingerV444||
+      displayPerformanceV375.enabled||finalDuetV385.enabled,
+    tier:getActivePerformanceTier(),
+  });
   // V452: additive visual crew accents. Explicitly authored V385/V416 singer
   // parts, manual stage cues and alternative performance directors keep priority.
   const crewV452=planCrewAccentsV452({
@@ -2217,12 +2522,129 @@ function GroupDancersV326({props,settings}:{props:VisualizerProps;settings:Group
   for(let i=0;i<settings.count;i++){
     const accent=crewV458.slots[i];
     Object.assign(looksV444.current[i].current,accent?
-      combineCrewLooksV452(interactionV444.slots[i]?.look??NEUTRAL_LOOK,accent.look):
-      interactionV444.slots[i]?.look??NEUTRAL_LOOK);
+      combineCrewLooksV452(interactionV475.slots[i]?.look??NEUTRAL_LOOK,accent.look):
+      interactionV475.slots[i]?.look??NEUTRAL_LOOK);
     Object.assign(gesturesV444.current[i].current,accent?
-      combineCrewGesturesV452(interactionV444.slots[i]?.gesture??NEUTRAL_GESTURE,accent.gesture):
-      interactionV444.slots[i]?.gesture??NEUTRAL_GESTURE);
+      combineCrewGesturesV452(interactionV475.slots[i]?.gesture??NEUTRAL_GESTURE,accent.gesture):
+      interactionV475.slots[i]?.gesture??NEUTRAL_GESTURE);
   }
+  // V481: bounded automatic group-only body-pose intentions. No manual V326
+  // cue, karaoke foreground or authored vocal/timeline may trigger low poses.
+  const lowPlanV481=planLowPosesV481({
+    settings:lowSettingsV481,count:settings.count,trackId:props.track?.id,
+    seconds,cueSeconds:settings.cues.find(c=>c.id===pose.cueId)?.at??0,focus:pose.focus,drop:pose.drop,
+    section:props.cameraDirectorSection,genre:props.genre,
+    beat:props.audio.beatStrength??0,kick:props.audio.kickAccentIntensity??0,
+    energy:props.audio.energyEnvelope??0,playing:props.isPlaying,reducedMotion:props.reducedMotion,
+    automaticGroup:settings===props.autoMultiArtistGroupV442,
+    manualPriority:!!selectedSingerV444||displayPerformanceV375.enabled||finalDuetV385.enabled||
+      (props.avatarMotionMode==='choreography')||
+      (props.lipSync?.manualVocalEnabledV385===true)||
+      (props.lipSync?.rapDuetEnabledV416===true&&!!props.lipSync.rapDuetAssignmentsV416?.length),
+    lyricsForeground:props.lipSync?.cinematicLyricsVisibleV378===true && !props.lipSync?.cinematicLyricsSideV378,
+    tier:getActivePerformanceTier(),
+  });
+  // V483: stage-wide crouch responses are layered on top of V475/V458 gaze
+  // and gestures. Only the fresh V481 plan is updated; existing rigs own IK.
+  const lowInteractionPlanV483=stepLowInteractionV483(lowInteractionV483.current,{
+    plan:lowPlanV481,positions:pose.positions,count:settings.count,
+    trackId:props.track?.id,seconds,
+    cueSeconds:settings.cues.find(c=>c.id===pose.cueId)?.at??0,
+    focus:pose.focus,drop:pose.drop,beat:props.audio.beatStrength??0,
+    energy:props.audio.energyEnvelope??0,playing:props.isPlaying,
+    reducedMotion:props.reducedMotion,
+    manualPriority:!!selectedSingerV444||!!settings.trackId||displayPerformanceV375.enabled||
+      finalDuetV385.enabled||props.avatarMotionMode==='choreography'||
+      props.lipSync?.manualVocalEnabledV385===true||
+      (props.lipSync?.rapDuetEnabledV416===true&&!!props.lipSync.rapDuetAssignmentsV416?.length),
+    automaticGroup:settings===props.autoMultiArtistGroupV442,
+    lyricsForeground:props.lipSync?.cinematicLyricsVisibleV378===true&&!props.lipSync?.cinematicLyricsSideV378,
+    enabled:lowSettingsV481.enabled,tier:getActivePerformanceTier(),
+    maxConcurrent:lowSettingsV481.maxConcurrent,
+  });
+  for(let i=0;i<settings.count;i++){
+    Object.assign(lowPosesV481.current[i].current,lowInteractionPlanV483.plan.slots[i]);
+    const accent=lowInteractionPlanV483.slots[i];
+    if(accent){
+      Object.assign(looksV444.current[i].current,combineCrewLooksV452(looksV444.current[i].current,accent.look));
+      Object.assign(gesturesV444.current[i].current,combineCrewGesturesV452(gesturesV444.current[i].current,accent.gesture));
+    }
+  }
+  // V484: optional whole-body expressive accents on existing partner gesture
+  // channels. A low-pose scene must already have passed V481/V483 priority
+  // guards; no new rig, GLB retarget or beat/voice inference is introduced.
+  const expressiveV484=planExpressiveLowPoseV484({
+    plan:lowInteractionPlanV483.plan,count:settings.count,focus:pose.focus,
+    seconds,cueSeconds:settings.cues.find(c=>c.id===pose.cueId)?.at??0,
+    genre:props.genre,section:props.cameraDirectorSection,
+    beat:props.audio.beatStrength??0,kick:props.audio.kickAccentIntensity??0,
+    snare:props.audio.snare??0,energy:props.audio.energyEnvelope??0,
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,
+    manualPriority:!!selectedSingerV444||!!settings.trackId||displayPerformanceV375.enabled||
+      finalDuetV385.enabled||props.avatarMotionMode==='choreography'||
+      props.lipSync?.manualVocalEnabledV385===true||
+      (props.lipSync?.rapDuetEnabledV416===true&&!!props.lipSync.rapDuetAssignmentsV416?.length),
+    automaticGroup:settings===props.autoMultiArtistGroupV442,
+    lyricsForeground:props.lipSync?.cinematicLyricsVisibleV378===true&&!props.lipSync?.cinematicLyricsSideV378,
+    tier:getActivePerformanceTier(),
+  });
+  if(expressiveV484.active)for(let i=0;i<settings.count;i++){
+    Object.assign(gesturesV444.current[i].current,
+      combineCrewGesturesV452(gesturesV444.current[i].current,expressiveV484.accents[i]));
+  }
+  // V485: deterministic, corridor-safe near-passes and synchronized returns.
+  // Every avatar retains its own original stage slot, mixer and Foot IK. A
+  // crowding/foot-lock/manual cue inhibits all optional translations.
+  const naturalMotionV485=planNaturalDanceMotionV485({
+    plan:lowInteractionPlanV483.plan,count:settings.count,positions:pose.positions,
+    focus:pose.focus,trackId:props.track?.id,seconds,
+    cueSeconds:settings.cues.find(c=>c.id===pose.cueId)?.at??0,
+    beat:props.audio.beatStrength??0,kick:props.audio.kickAccentIntensity??0,
+    energy:props.audio.energyEnvelope??0,genre:props.genre,
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,
+    manualPriority:!!selectedSingerV444||!!settings.trackId||displayPerformanceV375.enabled||
+      finalDuetV385.enabled||props.avatarMotionMode==='choreography'||
+      props.lipSync?.manualVocalEnabledV385===true||
+      (props.lipSync?.rapDuetEnabledV416===true&&!!props.lipSync.rapDuetAssignmentsV416?.length),
+    lyricsForeground:props.lipSync?.cinematicLyricsVisibleV378===true&&!props.lipSync?.cinematicLyricsSideV378,
+    automaticGroup:settings===props.autoMultiArtistGroupV442,
+    footLocked:footLock,tier:getActivePerformanceTier(),
+  });
+  // V486: single song-time foot cadence + existing GLB Foot-IK stance reports;
+  // scale only OPTIONAL V485 translation, never authored formation or clips.
+  const advancedFootworkV486=planAdvancedDanceFootworkV486({
+    motion:naturalMotionV485,count:settings.count,seconds,
+    cueSeconds:settings.cues.find(c=>c.id===pose.cueId)?.at??0,
+    bpm:props.audio.bpm,playing:props.isPlaying,reducedMotion:props.reducedMotion,
+    manualPriority:!!selectedSingerV444||!!settings.trackId||displayPerformanceV375.enabled||
+      finalDuetV385.enabled||props.avatarMotionMode==='choreography'||
+      props.lipSync?.manualVocalEnabledV385===true||
+      (props.lipSync?.rapDuetEnabledV416===true&&!!props.lipSync.rapDuetAssignmentsV416?.length),
+    footLocked:footLock,tier:getActivePerformanceTier(),
+    support:supportV486.current.map(ref=>ref.current),
+  });
+  const contactReportV487=buildGroundContactReportV487(
+    groundV487.current.map(item=>item.current),advancedFootworkV486.slots,settings.count,
+    props.isPlaying&&!props.reducedMotion);
+  // Reuse the existing group frame callback. Emit at most twice per second;
+  // React controls never update component state from individual frame reports.
+  if(typeof window!=='undefined'&&seconds-lastGroundReportV487.current>=.5){
+    lastGroundReportV487.current=seconds;
+    window.dispatchEvent(new CustomEvent(GROUND_CONTACT_REPORT_EVENT_V487,{detail:contactReportV487}));
+  } else if(seconds<lastGroundReportV487.current-0.2){
+    lastGroundReportV487.current=seconds-0.5; // seek backwards
+  }
+  for(let i=0;i<settings.count;i++){
+    Object.assign(footworkV486.current[i].current,advancedFootworkV486.slots[i]);
+    Object.assign(danceMotionV485.current[i].current,naturalMotionV485.slots[i]);
+    // Add only small expressive upper-body compensation to existing clamps.
+    if(naturalMotionV485.active){
+      const g=gesturesV444.current[i].current;
+      Object.assign(g,combineCrewGesturesV452(g,{leftLift:0,rightLift:0,shoulder:0,
+        lean:naturalMotionV485.slots[i].lean,intensity:Math.abs(naturalMotionV485.slots[i].lean)}));
+    }
+  }
+  const groundTravelV487=contactReportV487.slots.map(slot=>slot.travelMultiplier);
   const speed=props.reducedMotion?20:footLock?1.65:3.4;
   const beat=props.isPlaying&&!props.reducedMotion?Math.max(0,Math.min(1,props.audio.beatStrength??0)):0;
   for(let i=0;i<settings.count;i++){
@@ -2241,8 +2663,8 @@ function GroupDancersV326({props,settings}:{props:VisualizerProps;settings:Group
    const targetZ=(displayPerformanceV375.enabled&&present?(focus?-.18-.20*(duetV376.enabled?duetV376.emphasis:displayPerformanceV375.emphasis):0):p[2]+(pose.focus===i?-.18:0))+(spotlightV443.slots[i]?.offsetZ??0);
    // V452 accents are stage-root translations, below 5 cm; spacing preserved
    // for hooks (all dancers receive the same lateral offset).
-   g.position.x=formationApproach(g.position.x,targetX+(crewV458.slots[i]?.offsetX??0),delta,speed);
-   g.position.z=formationApproach(g.position.z,targetZ+(crewV458.slots[i]?.offsetZ??0),delta,speed);
+   g.position.x=formationApproach(g.position.x,targetX+(crewV458.slots[i]?.offsetX??0)+advancedFootworkV486.slots[i].offsetX,delta,speed*advancedFootworkV486.slots[i].rootSpeed*(groundTravelV487[i]??1));
+   g.position.z=formationApproach(g.position.z,targetZ+(crewV458.slots[i]?.offsetZ??0)+advancedFootworkV486.slots[i].offsetZ,delta,speed*advancedFootworkV486.slots[i].rootSpeed*(groundTravelV487[i]??1));
    g.position.y=0;
    g.rotation.y=formationApproach(g.rotation.y,ensembleV392.yaw[i]+(spotlightV443.slots[i]?.turnY??0)+(crewV458.slots[i]?.turnY??0),delta,props.reducedMotion?20:3.1);
    const desiredScale=present?1:.001;
@@ -2264,11 +2686,21 @@ function GroupDancersV326({props,settings}:{props:VisualizerProps;settings:Group
    <PartnerCalibrationContext.Provider value={usingPartner?props.secondaryContactCalibration??null:props.partnerContactCalibration??null}>
     <GroupMotionClockContextV328.Provider value={{settings:motionSyncV328,clock:motionClocksV328.current[i]}}>
      <GroupPhraseContextV329.Provider value={{settings:phraseSettingsV329,plan:phrasePlanV329,register:registerPhrasesV329}}>
+      <GroupLowPoseContextV481.Provider value={lowPosesV481.current[i]}>
+      <GroupDanceMotionContextV485.Provider value={danceMotionV485.current[i]}>
+      <GroupFootworkContextV486.Provider value={footworkV486.current[i]}>
+      <GroupFootSupportContextV486.Provider value={supportV486.current[i]}>
+      <GroupGroundObservationContextV487.Provider value={groundV487.current[i]}>
       <PartnerLookContext.Provider value={looksV444.current[i]}>
        <PartnerGestureContext.Provider value={gesturesV444.current[i]}>
         <Dancer props={groupProps} slot={i}/>
        </PartnerGestureContext.Provider>
       </PartnerLookContext.Provider>
+      </GroupGroundObservationContextV487.Provider>
+      </GroupFootSupportContextV486.Provider>
+      </GroupFootworkContextV486.Provider>
+      </GroupDanceMotionContextV485.Provider>
+      </GroupLowPoseContextV481.Provider>
       <ArtistNameBubbleV441 plan={props.artistBubblePlanV441} slot={i} reducedMotion={props.reducedMotion} spotlightV443={props.artistSpotlightV443}/>
      </GroupPhraseContextV329.Provider>
     </GroupMotionClockContextV328.Provider>
@@ -2304,6 +2736,7 @@ function WebGLWatch({ onLost, onRestored, onStable }: {onLost: () => void; onRes
   return null;
 }
 export function ThreeAvatar(props: VisualizerProps) {
+  const piConcertBudgetV479=usePiConcertBudgetV479();
   // V466: voluntary, read-only live QA – no extra sampling while closed.
   const [qualityInspectorEnabledV466,setQualityInspectorEnabledV466]=useState(false);
   useEffect(()=>()=>resetConcertQualityV466(),[]);
@@ -2526,6 +2959,12 @@ export function ThreeAvatar(props: VisualizerProps) {
   useEffect(()=>{
     if(recoveryV395.phase==='ready')lastRestartV395.current=-1;
   },[recoveryV395.phase]);
+  const piConcertEffectsV479=resolvePiConcertEffectsV479(piConcertBudgetV479,{
+    avatarCount:groupOnV326?effectiveGroupSettingsV442.count:dual||auto||multiEnabled||Boolean(showFormation)?2:1,
+    manualFx:props.danceFxEnabled===true,
+    manualPostProcess:props.dancePostEnabledV468===true,
+    manualShader:props.shaderEnvironmentV468!==undefined&&props.shaderEnvironmentV468!=='auto',
+  });
   return <div className="visualizer-stage three-avatar-stage" role="group" aria-label={groupOnV326 ? `${effectiveGroupSettingsV442.count} music-reactive 3D avatars` : dual ? "Two music-reactive 3D avatars" : "3D music-reactive avatar"}>
     <RaspberryPiProfileBootstrap />
     <LongRunStabilityControllerV355 graphicsReady={!graphicsLost&&!graphicsFailure} />
@@ -2542,7 +2981,7 @@ export function ThreeAvatar(props: VisualizerProps) {
       {!groupOnV326 && auto && <DuoDirectorTick props={props} onScene={setAutoScene} />}
       {!groupOnV326 && multiEnabled && <MultiAvatarDirectorTick props={props} settings={multiSettings} onCue={setChoreography} />}
       {!groupOnV326 && intelligentEnabled && <IntelligentChoreographyTickV312 props={props} settings={intelligentSettings} onCue={setIntelligentCue} />}
-      <AdaptivePerformanceController avatarCount={groupOnV326?effectiveGroupSettingsV442.count:dual||auto||multiEnabled||Boolean(showFormation)?2:1}/>{props.cameraDirectorEnabled || props.lipSync?.concertCameraArmedV454===true || props.lipSync?.rapCameraArmedV429===true || (props.lipSync?.vocalCameraModeV401!=="off" && props.lipSync?.vocalCameraModeV401!==undefined) || props.lipSync?.visualDirectorModeV397!=="off" && props.lipSync?.visualDirectorModeV397!==undefined || (props.lipSync?.cinematicLyricsModeV378!=="off" && props.lipSync?.cinematicLyricsSideV378 && props.lipSync?.cinematicLyricsVisibleV378 || (props.lipSync?.cinematicDuetCameraModeV377!=="off" && props.lipSync?.cinematicDuetCameraModeV377!==undefined && props.lipSync?.duetModeV376!=="off" && dual || props.lipSync?.manualVocalEnabledV385===true && props.lipSync.manualVocalCameraV385!==false && (dual||groupOnV326) || props.lipSync?.rapDuetEnabledV416===true && props.lipSync.rapDuetCameraV416!==false && (dual||groupOnV326) || props.lipSync?.concertModeV386!=="off" && props.lipSync?.concertModeV386!==undefined && props.lipSync?.concertCameraV386!==false && (dual||groupOnV326) || props.concertShowCueV387?.active && props.concertShowCameraV387!==false || props.festivalShowCueV394?.active && props.festivalShowCameraV394!==false)) ? <StageCameraDirectorV289 section={props.cameraDirectorSection ?? "verse"} progressMs={props.cameraDirectorProgressMs ?? 0} intensity={props.cameraDirectorIntensity ?? 55} playing={props.isPlaying} reducedMotion={props.reducedMotion} duo={dual || auto || !!showFormation || intelligentEnabled} showCue={props.showCue} concertShowCueV387={props.concertShowCueV387} festivalShowCueV394={props.festivalShowCueV394} festivalShowCameraV394={props.festivalShowCameraV394}
+      <AdaptivePerformanceController avatarCount={groupOnV326?effectiveGroupSettingsV442.count:dual||auto||multiEnabled||Boolean(showFormation)?2:1} playing={props.isPlaying}/>{props.cameraDirectorEnabled || props.lipSync?.concertCameraArmedV454===true || props.lipSync?.rapCameraArmedV429===true || (props.lipSync?.vocalCameraModeV401!=="off" && props.lipSync?.vocalCameraModeV401!==undefined) || props.lipSync?.visualDirectorModeV397!=="off" && props.lipSync?.visualDirectorModeV397!==undefined || (props.lipSync?.cinematicLyricsModeV378!=="off" && props.lipSync?.cinematicLyricsSideV378 && props.lipSync?.cinematicLyricsVisibleV378 || (props.lipSync?.cinematicDuetCameraModeV377!=="off" && props.lipSync?.cinematicDuetCameraModeV377!==undefined && props.lipSync?.duetModeV376!=="off" && dual || props.lipSync?.manualVocalEnabledV385===true && props.lipSync.manualVocalCameraV385!==false && (dual||groupOnV326) || props.lipSync?.rapDuetEnabledV416===true && props.lipSync.rapDuetCameraV416!==false && (dual||groupOnV326) || props.lipSync?.concertModeV386!=="off" && props.lipSync?.concertModeV386!==undefined && props.lipSync?.concertCameraV386!==false && (dual||groupOnV326) || props.concertShowCueV387?.active && props.concertShowCameraV387!==false || props.festivalShowCueV394?.active && props.festivalShowCameraV394!==false)) ? <StageCameraDirectorV289 section={props.cameraDirectorSection ?? "verse"} progressMs={props.cameraDirectorProgressMs ?? 0} intensity={props.cameraDirectorIntensity ?? 55} playing={props.isPlaying} reducedMotion={props.reducedMotion} duo={dual || auto || !!showFormation || intelligentEnabled} showCue={props.showCue} concertShowCueV387={props.concertShowCueV387} festivalShowCueV394={props.festivalShowCueV394} festivalShowCameraV394={props.festivalShowCameraV394}
       concertShowCameraV387={props.concertShowCameraV387} composition={compositionV354} genreCue={genreCueV352} timelineCue={timelineCueV354} lipSync={props.lipSync?{...props.lipSync,cameraCastCountV377:groupOnV326?effectiveGroupSettingsV442.count:dual?2:1,cameraManualStagePriorityV377:authoredEnabled||manualFormationV354||authoredCueV354.active||props.showCue?.formationsEnabled===true||manualGroupOnV326&&!!groupSettingsV326.trackId||canPlayEnsembleTimelineV325(readEnsembleTimelineV325(),props.track?.id)}:undefined} genre={props.genre} /> : <SmartStageCameraV236 audio={props.audio} genre={props.genre} playing={props.isPlaying} reducedMotion={props.reducedMotion} duo={dual || auto} composition={compositionV354} genreCue={genreCueV352} timelineCue={timelineCueV354} lipSync={props.lipSync} />}<DynamicStage musicPalette={directedPaletteV352} theme={directedThemeV352} genre={props.genre} audio={props.audio} showCue={props.showCue} isPlaying={props.isPlaying} reducedMotion={props.reducedMotion} reactive={props.stageReactive ?? true} strength={props.stageLightStrength ?? 60} composition={compositionV354} glowGainV353={visualFxCueV355.glowGain} timelineGainV354={timelineCueV354.active&&timelineCueV354.activeLanes.includes("lighting")?timelineCueV354.lightGain:1}
        concertShowCueV387={props.concertShowCueV387} festivalShowCueV394={props.festivalShowCueV394} festivalShowLightingV394={props.festivalShowLightingV394} festivalShowAtmosphereV394={props.festivalShowAtmosphereV394} festivalShowLasersV394={props.festivalShowLasersV394} concertShowLightingV387={props.concertShowLightingV387}
        concertShowAtmosphereV387={props.concertShowAtmosphereV387} concertLipSyncV386={props.lipSync?{...props.lipSync,cameraCastCountV377:groupOnV326?effectiveGroupSettingsV442.count:dual?2:1,
@@ -2550,13 +2989,13 @@ export function ThreeAvatar(props: VisualizerProps) {
       <StageVisualEffectsV353 cue={visualFxCueV355}/>
       {props.stageScreenSettingsV330?.enabled && props.stageLayoutEnabledV333 && <StageContentScreensV333 screens={props.stageScreensV333??[]} slides={props.stageSlidesV333??[]} push={props.stageLivePushV333??null} index={props.stageRotationIndexV333??0} settings={props.stageScreenSettingsV330} playing={props.isPlaying} reducedMotion={props.reducedMotion} albumCoverUrl={props.track?.albumCoverUrl??null} section={props.cameraDirectorSection??"verse"} beatAccent={props.audio?.kickAccentIntensity??0} genre={props.genre??undefined} lyricsActive={props.lyricsSignalV350?.active??hasActiveLyricsV350(props.lyricsScene?.lyrics,props.lyricsScene?.activeIndex,props.lyricsScene?.progressMs)} lyricsSide={props.lyricsSignalV350?.side??props.lyricsScene?.side??null} composition={compositionV354} genreCue={genreCueV352} fxCue={visualFxCueV355}/>}
       {props.stageScreenSettingsV330?.enabled && !props.stageLayoutEnabledV333 && <StageContentScreenV330 content={props.stageScreenV330??null} settings={props.stageScreenSettingsV330} playing={props.isPlaying} reducedMotion={props.reducedMotion} albumCoverUrl={props.track?.albumCoverUrl??null} section={props.cameraDirectorSection??"verse"} beatAccent={props.audio?.kickAccentIntensity??0} genre={props.genre??undefined} lyricsActive={props.lyricsSignalV350?.active??hasActiveLyricsV350(props.lyricsScene?.lyrics,props.lyricsScene?.activeIndex,props.lyricsScene?.progressMs)} lyricsSide={props.lyricsSignalV350?.side??props.lyricsScene?.side??null} composition={compositionV354} genreCue={genreCueV352} fxCue={visualFxCueV355}/>}
-      <ProceduralShaderEnvironmentV468 mode={props.shaderEnvironmentV468??'auto'} theme={directedThemeV352} audio={props.audio} playing={props.isPlaying} reducedMotion={props.reducedMotion} color={directedPaletteV352?.primary}/>
+      <ProceduralShaderEnvironmentV468 mode={piConcertEffectsV479.automaticShader?props.shaderEnvironmentV468??'auto':'off'} theme={directedThemeV352} audio={props.audio} playing={props.isPlaying} reducedMotion={props.reducedMotion} color={directedPaletteV352?.primary}/>
       <StageEnvironment theme={directedThemeV352} audio={props.audio} isPlaying={props.isPlaying} reducedMotion={props.reducedMotion} reactive={props.stageReactive ?? true} />
       <DancePostProcessingV468 audio={props.audio} playing={props.isPlaying} reducedMotion={props.reducedMotion}
-        enabled={(props.dancePostEnabledV468??true) && Boolean(props.danceFxEnabled || props.showCue?.fxEnabled) && compositionV354.fxGain>0.15 && stabilityGainV355>.35}
+        enabled={(props.dancePostEnabledV468??true) && piConcertEffectsV479.automaticPostProcess && Boolean(props.danceFxEnabled || props.showCue?.fxEnabled) && compositionV354.fxGain>0.15 && stabilityGainV355>.35}
         strength={(props.danceFxStrength??60)*compositionV354.fxGain*stabilityGainV355}
         drop={props.cameraDirectorSection==='drop' || props.showCue?.section==='drop'}/>
-      <DanceFX audio={props.audio} isPlaying={props.isPlaying} reducedMotion={props.reducedMotion} settings={{ tint:visualFxCueV355.active?visualFxCueV355.color:undefined, enabled: props.danceFxEnabled || props.showCue?.fxEnabled, strength: (props.showCue?.fxEnabled ? Math.max(props.danceFxEnabled ? (props.danceFxStrength ?? 0) : 0,Math.round(props.showCue.fxGain*85)) : (props.danceFxStrength ?? 0)) * compositionV354.fxGain * fxScaleV354 * stabilityGainV355, shockwaves: props.danceFxShockwaves || (props.showCue?.fxGain ?? 0) > .7, footprints: props.danceFxFootprints, trails: props.danceFxTrails }} />
+      <DanceFX audio={props.audio} isPlaying={props.isPlaying} reducedMotion={props.reducedMotion} settings={{ tint:visualFxCueV355.active?visualFxCueV355.color:undefined, enabled: props.danceFxEnabled || (piConcertEffectsV479.automaticFx && props.showCue?.fxEnabled), strength: (props.showCue?.fxEnabled ? Math.max(props.danceFxEnabled ? (props.danceFxStrength ?? 0) : 0,Math.round(props.showCue.fxGain*85)) : (props.danceFxStrength ?? 0)) * compositionV354.fxGain * fxScaleV354 * stabilityGainV355, shockwaves: props.danceFxShockwaves || (props.showCue?.fxGain ?? 0) > .7, footprints: props.danceFxFootprints, trails: props.danceFxTrails }} />
       {props.lyricsScene && <Suspense fallback={null}><Lyrics3DScene scene={props.lyricsScene} audio={props.audio} reducedMotion={props.reducedMotion} composition={compositionV354} /></Suspense>}
       <group name={TRACKING_ROOT_NAME}>{groupOnV326 ? <GroupDancersV326 props={autoGroupOnV442?dancerPropsV356:{...dancerPropsV356,multiArtistMotionsV442:undefined}} settings={effectiveGroupSettingsV442}/> : (dual || auto || multiEnabled || showFormation) ? <FormationDancers props={dancerPropsV356} mode={mode} choreography={authoredEnabled ? null : multiEnabled ? choreography : intelligentEnabled ? intelligentCue : null} /> : <group><Dancer props={dancerPropsV356}/><ArtistNameBubbleV441 plan={props.artistBubblePlanV441} slot={0} reducedMotion={props.reducedMotion}/></group>}</group>
     </Canvas></SceneErrorBoundary>}

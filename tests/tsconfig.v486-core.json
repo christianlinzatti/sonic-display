@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v485-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/advancedDanceFootworkV486.ts",
+    "../components/visualizer/naturalDanceMotionStudioV485.ts"
+  ]
+}
