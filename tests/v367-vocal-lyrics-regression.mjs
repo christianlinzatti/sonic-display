@@ -1,3 +1,6 @@
+import './helpers/threeAvatarSourcesV492.cjs';
+import { install as installThreeAvatarCompatV492 } from './helpers/threeAvatarSourcesV492.cjs';
+installThreeAvatarCompatV492();
 import {strict as assert} from "node:assert";
 import {readFileSync} from "node:fs";
 import {resolveVocalCueV367,wordMouthShapeV367} from "../components/visualizer/vocalLipSyncV367.ts";

@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
 const read=p=>fs.readFileSync(path.join(__dirname,"../",p),"utf8");
 const logic=read("components/visualizer/danceVariationEngine.ts"),ui=read("components/visualizer/SmartChoreographyEvolutionPanel.tsx"),runtime=read("components/visualizer/ThreeAvatar.tsx"),pkg=JSON.parse(read("package.json"));

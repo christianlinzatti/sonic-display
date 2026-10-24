@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),vm=require('node:vm');
 const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript');
 const root=path.resolve(__dirname,'..');

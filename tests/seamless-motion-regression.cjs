@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const assert=require('node:assert/strict');const fs=require('node:fs');
 const player=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
 const stage=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');

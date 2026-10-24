@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require('node:fs'),assert=require('node:assert/strict'),path=require('node:path');
 const source=fs.readFileSync(path.join(__dirname,'../components/visualizer/advancedDropPredictor.ts'),'utf8');
 const stage=fs.readFileSync(path.join(__dirname,'../components/visualizer/ThreeAvatar.tsx'),'utf8');

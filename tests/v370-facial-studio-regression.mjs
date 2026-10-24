@@ -1,3 +1,6 @@
+import './helpers/threeAvatarSourcesV492.cjs';
+import { install as installThreeAvatarCompatV492 } from './helpers/threeAvatarSourcesV492.cjs';
+installThreeAvatarCompatV492();
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {suggestFacialChannelV370,scanFacialRigV370,bindingsForFacialProfileV370,facialGainV370,sampleFacialDemoV370} from '../components/visualizer/facialRigStudioV370.ts';

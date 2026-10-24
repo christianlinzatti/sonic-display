@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
 const root=path.resolve(__dirname,"..");const read=p=>fs.readFileSync(path.join(root,p),"utf8");
 const engine=read("components/visualizer/multiAvatarInteractionV274.ts");

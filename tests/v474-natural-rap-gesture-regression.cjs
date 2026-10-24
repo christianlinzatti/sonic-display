@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 'use strict';
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -76,7 +77,7 @@ for(let i=0;i<5;i++)for(let slot=0;slot<4;slot++){
 assert.equal(v474.selectRapGestureMotifV474('',0,0,'verse'),'none');
 assert.equal(v474.selectRapGestureMotifV474(trackId,-1,0,'verse'),'none');
 const renderer=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
-assert(renderer.includes('import {resolveNaturalRapGestureV474}'));
+assert(/import\s*\{\s*resolveNaturalRapGestureV474\s*\}/.test(renderer));
 assert(renderer.includes('const variationV474=resolveNaturalRapGestureV474(enhanceRapAccentV473('));
 assert(renderer.includes('const vocalV472=variationV474.accent;'));
 assert(renderer.includes('const vocalV472=resolveNaturalRapGestureV474(enhanceRapAccentV473('));

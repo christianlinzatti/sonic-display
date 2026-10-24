@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require('node:fs');const assert=require('node:assert/strict');
 const source=fs.readFileSync('components/visualizer/lodAutoTuning.ts','utf8');
 const correction=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');

@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const load=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 const scheduler=load('components/visualizer/adaptiveAnimationScheduler.ts'), scene=load('components/visualizer/ThreeAvatar.tsx'), panel=load('components/visualizer/RenderDiagnosticsPanel.tsx'), pkg=require('../package.json');

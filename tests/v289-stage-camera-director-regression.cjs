@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require("node:fs"),path=require("node:path"),assert=require("node:assert/strict");
 const root=path.resolve(__dirname,"..");const read=p=>fs.readFileSync(path.join(root,p),"utf8");
 const director=read("components/visualizer/stageCameraPoseHelpersV289.ts");const camera=read("components/visualizer/StageCameraDirectorV289.tsx");

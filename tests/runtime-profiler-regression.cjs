@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const assert=require('node:assert/strict'); const fs=require('node:fs');const path=require('node:path');
 const get=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 const engine=get('components/visualizer/runtimeProfiler.ts'),scene=get('components/visualizer/ThreeAvatar.tsx'),panel=get('components/visualizer/RenderDiagnosticsPanel.tsx'),pkg=require('../package.json');

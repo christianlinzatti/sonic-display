@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require('fs');const assert=require('assert');const base=require('path').resolve(__dirname,'..');
 const read=p=>fs.readFileSync(require('path').join(base,p),'utf8');
 const src=read('components/visualizer/ThreeAvatar.tsx');

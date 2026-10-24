@@ -1,0 +1,86 @@
+diff --git a/V492-GLTF-OBJECT3D-TYPE-HOTFIX.md b/V492-GLTF-OBJECT3D-TYPE-HOTFIX.md
+new file mode 100644
+index 0000000..6cf397d
+--- /dev/null
++++ b/V492-GLTF-OBJECT3D-TYPE-HOTFIX.md
+@@ -0,0 +1,19 @@
++# V492 – GLB-Hook Object3D TypeScript-Hotfix
++
++Nach der zweiten `ThreeAvatar`-Modularisierung lieferte `npm run typecheck` zwei Fehler `TS2741`/`TS2345` in `GltfDancerAvatarV492.tsx` bei den Aufrufen von `useGltfVocalMotionV492` und `useGltfFootContactV492`.
++
++## Ursache und Behebung
++
++`cloneSkinnedScene(scene)` liefert ein `Object3D`, das keine `Group` sein muss. Die Hook-Parameter `model` waren irrtümlich als `Group` deklariert. Beide neuen Hooks nehmen nun `model: Object3D` an. Der tatsächliche `<group>`-Root für die Foot-IK bleibt `RefObject<Group | null>`.
++
++Es wird kein unsicherer Cast verwendet. Die Hooks benutzen am `model` lediglich `Object3D`-Funktionen (`traverse`, `bindBones`, `prepareAvatarWardrobeV468`). Die Animation und Foot-IK selbst bleiben unverändert. Der GLB-Hook-Regressionstest überprüft beide Parameterverträge.
++
++## Auf Windows verifizieren
++
++```powershell
++npm run test:gltf-hook-split
++npm run typecheck
++npm run build
++```
++
++Die Versionsnummer bleibt `0.1.0-v492` (Typecheck-Hotfix ohne Feature-Änderung).
+diff --git a/components/visualizer/useGltfFootContactV492.ts b/components/visualizer/useGltfFootContactV492.ts
+index 9d3eb72..f41c81b 100644
+--- a/components/visualizer/useGltfFootContactV492.ts
++++ b/components/visualizer/useGltfFootContactV492.ts
+@@ -4,7 +4,7 @@
+  * point, after authored clips / additive rig animation; do not add another useFrame.
+  */
+ import { useContext, useEffect, useRef, type RefObject } from "react";
+-import { Vector3, type Group } from "three";
++import { Vector3, type Group, type Object3D } from "three";
+ import { GroupFootSupportContextV486, GroupGroundObservationContextV487 } from "./ThreeAvatarContextsV492";
+ import { createFootContactState, updateFootContact } from "./avatarFootContact";
+ import { createFootIKState, initializeFootIK, updateFootIK } from "./avatarFootIK";
+@@ -30,7 +30,7 @@ type GroundingArgs = {
+   handIK:{current:Parameters<typeof sampleIKQuality>[1]['handState']};
+   activeHandCue:Parameters<typeof updatePartnerHandIK>[2];
+ };
+-export function useGltfFootContactV492(root:RefObject<Group|null>,model:Group,rigTargets:{current:AvatarRigTargets},profile:AvatarRigProfileId) {
++export function useGltfFootContactV492(root:RefObject<Group|null>,model:Object3D,rigTargets:{current:AvatarRigTargets},profile:AvatarRigProfileId) {
+   const groupSupportV486=useContext(GroupFootSupportContextV486);
+   const groupGroundV487=useContext(GroupGroundObservationContextV487);
+   const groundProbeV487=useRef(new Vector3());
+diff --git a/components/visualizer/useGltfVocalMotionV492.ts b/components/visualizer/useGltfVocalMotionV492.ts
+index 1b69628..9e441a3 100644
+--- a/components/visualizer/useGltfVocalMotionV492.ts
++++ b/components/visualizer/useGltfVocalMotionV492.ts
+@@ -2,7 +2,7 @@
+ /** GLB wardrobe and music/vocal-reaction hooks, no additional render loop. */
+ import {useMemo,useEffect} from "react";
+ import {useFrame} from "@react-three/fiber";
+-import type {Group} from "three";
++import type {Object3D} from "three";
+ import type {VisualizerProps} from "./registry";
+ import {prepareAvatarWardrobeV468} from "./avatarWardrobeV468";
+ import {useAudioMotionEngine} from "@/hooks/useAudioMotionEngine";
+@@ -16,7 +16,7 @@ type Args = Pick<VisualizerProps, 'audio'|'isPlaying'|'reducedMotion'|'genre'|'g
+   'wardrobeModeV468'|'wardrobeColorV468'|'wardrobePatternV468'|'wardrobeGlowV468'|
+   'audioMotionEnabledV468'|'audioMotionStrengthV468'|'avatarFootIKEnabled'|'track'|
+   'cameraDirectorSection'|'showCue'|'avatarMotionMode'> & {
+-  model:Group; propsLipSyncV367:VisualizerProps['lipSync']; workloadSlot:number;
++  model:Object3D; propsLipSyncV367:VisualizerProps['lipSync']; workloadSlot:number;
+ };
+ export function useGltfVocalMotionV492({model,audio,isPlaying,reducedMotion,genre,genreFusion,
+   stagePalette,wardrobeModeV468,wardrobeColorV468,wardrobePatternV468,wardrobeGlowV468,
+diff --git a/tests/v492-gltf-hook-modularization-regression.cjs b/tests/v492-gltf-hook-modularization-regression.cjs
+index b579656..eb9bf0b 100644
+--- a/tests/v492-gltf-hook-modularization-regression.cjs
++++ b/tests/v492-gltf-hook-modularization-regression.cjs
+@@ -29,6 +29,12 @@ assert.equal((combined.match(/\buseAnimations\s*\(/g)||[]).length,1,'exactly one
+ assert(!/\buseAnimations\s*\(/.test(file),'mixer delegated to hook');
+ assert.match(texts['useGltfAnimationMixerV492.ts'],/groupPhraseV329\.register\(/,'group phrase registration stays with mixer');
+ assert.match(texts['useGltfAnimationMixerV492.ts'],/preparedBlendsV492\.some\(/,'synthetic clips are not selectable as base dance');
++// Type contract: SkeletonUtils.clone returns Object3D, not necessarily Group.
++// Keep the true group root ref for foot-IK, but allow a generic cloned scene as model.
++assert.match(texts['useGltfFootContactV492.ts'],/model:Object3D/,'foot contact accepts cloned Object3D');
++assert.match(texts['useGltfFootContactV492.ts'],/root:RefObject<Group\|null>/,'foot contact keeps actual Group root');
++assert.match(texts['useGltfVocalMotionV492.ts'],/model:Object3D/,'vocal hook accepts cloned Object3D');
++assert(!/model:Group/.test(texts['useGltfFootContactV492.ts']+texts['useGltfVocalMotionV492.ts']),'hooks must not require Group model');
+ assert.match(texts['useGltfFootContactV492.ts'],/updateFootIK\(/,'real V135 foot IK invoked');
+ assert.match(texts['useGltfFootContactV492.ts'],/updateFootContact\(/,'foot contact fallback retained');
+ assert.match(texts['useGltfFootContactV492.ts'],/FOOT_LOCK_DIAGNOSTIC_EVENT_V322/,'existing foot-lock event retained');

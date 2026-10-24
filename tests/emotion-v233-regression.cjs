@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const src=fs.readFileSync('components/visualizer/emotionExpressionV233.ts','utf8');

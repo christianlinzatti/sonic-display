@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require('fs'),assert=require('assert');
 const read=p=>fs.readFileSync(p,'utf8');
 const model=read('services/stageContent/photoDirectorV346.ts'),ui=read('components/visualizer/PhotoDirectorSettingsV346.tsx'),gallery=read('components/visualizer/StageImageGalleryV338.tsx');

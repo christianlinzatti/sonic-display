@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const ts=require('./typescript-loader.cjs');

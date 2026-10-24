@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript');
 const root=path.resolve(__dirname,'..');const file='components/visualizer/advancedMusicStructureV208.ts';

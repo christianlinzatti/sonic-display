@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require('fs'),assert=require('assert'),p=require('path');
 const root=p.join(__dirname,'..');
 const logic=fs.readFileSync(p.join(root,'components/visualizer/adaptiveAvatarWorkloadV252.ts'),'utf8');

@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const ts=require('./typescript-loader.cjs'),root=path.resolve(__dirname,'..');const cache={};

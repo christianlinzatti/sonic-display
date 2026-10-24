@@ -1,3 +1,5 @@
+> **V492 – ThreeAvatar Modular Refactor:** Der bisherige 3.000-Zeilen-Renderer wurde in sechs gezielte Module aufgeteilt. Keine Änderung an Choreografie, GLB-Animation, Foot-IK oder Lip-Sync. `ThreeAvatar.tsx` ist weiterhin der öffentliche Einstiegspunkt. Details: [V492-THREE-AVATAR-MODULE-REFACTOR.md](V492-THREE-AVATAR-MODULE-REFACTOR.md).
+
 > **Aktuelles Release V492 – GLB Blending Preset Studio:** GLB-Mischungen aus der V491-3D-Vorschau lassen sich speichern, wiederverwenden, importieren/exportieren und bei passender Basisanimation optional automatisch in der Konzertshow anwenden. Details: [V492-GLB-BLENDING-PRESET-STUDIO.md](V492-GLB-BLENDING-PRESET-STUDIO.md).
 
 > **Aktuelles Release V491 – GLB Motion Preview & Blending Studio:** Im Avatar-3D-Studio lassen sich jetzt zwei installierte GLB-Animationsclips mit einem frei einstellbaren Arm-/Brust-Mischgewicht direkt am Modell vergleichen. Details: [V491-GLB-MOTION-PREVIEW-BLENDING-STUDIO.md](V491-GLB-MOTION-PREVIEW-BLENDING-STUDIO.md).
@@ -1236,3 +1238,8 @@ Automatische Rap-/Hardstyle-/Hardtekk-Konzerte mit drei bis vier Avataren könne
 ## V483 – Natural Dance Interaction 3.0
 
 Bei automatisch inszenierten Gruppen aus drei oder vier Avataren ergänzt V483 die bisherigen Hockbewegungen um **dezenten gegenseitigen Blickkontakt**, abwechselnde Rap-Gesten und bei geeigneten Abschnittsübergängen ein **kurz versetztes Aufrichten**. Ohne zusätzliche Animation-Clips; GLB-Modelle benötigen weiterhin passende importierte Hock-Animationen. Pausen, reduzierte Bewegung, manuelle Choreografien, Lyrics-Vordergrund und Sängerzuordnungen werden respektiert. Details: [V483-Release-Notizen](V483-NATURAL-DANCE-INTERACTION-3.md).
+
+
+### V492: GLB-Avatar modularisiert (zweiter Schritt)
+
+Die große GLB-Avatar-Komponente ist in Hooks für Mixer, Foot-IK, Vocal-/Rap-Gesten und Blending aufgeteilt; neue Überblendungen und AV-Features benötigen damit weniger Änderungen am zentralen GLB-Renderer. Siehe [`V492-GLB-AVATAR-HOOK-MODULARIZATION.md`](V492-GLB-AVATAR-HOOK-MODULARIZATION.md). Prüfen mit `npm run test:gltf-hook-split && npm run test:three-avatar-split && npm run typecheck && npm run build`.

@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 // Ensure production tsc never pulls the ambient one-off V414 test module into
 // the application. That module masks the real '@/types/music' exports and
 // cascades into dozens of misleading TS2305/TS7006 diagnostics.

@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require("node:fs"),assert=require("node:assert/strict");
 const path=require("node:path");
 const src=fs.readFileSync(path.join(__dirname,"../components/visualizer/aiDanceChoreographer.ts"),"utf8");

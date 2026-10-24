@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
 const read=p=>fs.readFileSync(path.join(__dirname,"..",p),"utf8");
 const files={main:read("components/SonicDisplay.tsx"),stage:read("components/visualizer/VisualizerStage.tsx"),registry:read("components/visualizer/registry.tsx"),avatar:read("components/visualizer/ThreeAvatar.tsx"),lights:read("components/visualizer/DynamicStage.tsx")};

@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require('fs'),assert=require('node:assert/strict');
 const hook=fs.readFileSync('hooks/useMicrophoneAnalysis.ts','utf8');
 const worker=fs.readFileSync('hooks/audioRhythm.worker.ts','utf8');

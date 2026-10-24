@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const assert=require("node:assert/strict");const fs=require("node:fs");const path=require("node:path");
 const read=n=>fs.readFileSync(path.join(__dirname,"..",n),"utf8");
 const source=read("components/visualizer/duoFormationEngine.ts");

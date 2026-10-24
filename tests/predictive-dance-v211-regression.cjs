@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');let n=0;
 function check(name,cond){assert.ok(cond,name);n++;console.log('PASS',name)}
 const dir=path.join(__dirname,'../components/visualizer');

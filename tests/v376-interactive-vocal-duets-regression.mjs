@@ -1,3 +1,6 @@
+import './helpers/threeAvatarSourcesV492.cjs';
+import { install as installThreeAvatarCompatV492 } from './helpers/threeAvatarSourcesV492.cjs';
+installThreeAvatarCompatV492();
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';

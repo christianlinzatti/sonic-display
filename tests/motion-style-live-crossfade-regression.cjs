@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require('node:fs');const assert=require('node:assert/strict');const path=require('node:path');const base=path.resolve(__dirname,'..');const read=p=>fs.readFileSync(path.join(base,p),'utf8');
 let n=0;const test=(name,fn)=>{fn();n++;console.log('✓',name)};
 const evolution=read('components/visualizer/smartChoreographyEvolution.ts');const stage=read('components/visualizer/ThreeAvatar.tsx');const editor=read('components/visualizer/VisualChoreographyTimelineEditor.tsx');const style=read('components/visualizer/motionStyleTransfer.ts');const panel=read('components/CharacterMotionLibraryPanel.tsx');

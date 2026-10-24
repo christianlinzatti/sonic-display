@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const assert=require('node:assert/strict');const fs=require('node:fs');const vm=require('node:vm');const ts=require('typescript');
 const src=fs.readFileSync('services/stageContent/musicGalleryV341.ts','utf8');const out=ts.transpileModule(src,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;const m={exports:{}};vm.runInNewContext(out,{exports:m.exports,module:m});const x=m.exports;
 const s=x.sanitizeMusicGalleryV341({enabled:true,intensity:500,minGapSeconds:-3,beatThreshold:5,transition:'invalid'});

@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require("fs"),assert=require("node:assert/strict"),path=require("path");const root=path.resolve(__dirname,"..");
 const engine=fs.readFileSync(path.join(root,"components/visualizer/smartChoreographyEvolution.ts"),"utf8");
 const panel=fs.readFileSync(path.join(root,"components/visualizer/SmartChoreographyEvolutionPanel.tsx"),"utf8");

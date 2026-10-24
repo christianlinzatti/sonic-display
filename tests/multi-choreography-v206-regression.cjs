@@ -1,3 +1,4 @@
+require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require('fs'),assert=require('assert');
 const root=require('path').resolve(__dirname,'..');
 const read=p=>fs.readFileSync(require('path').join(root,p),'utf8');
