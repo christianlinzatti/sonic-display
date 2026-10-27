@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.v556-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/performerLightingV557.ts",
+    "../components/visualizer/concertDetailPreviewV556.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

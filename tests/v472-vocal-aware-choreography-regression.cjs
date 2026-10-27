@@ -38,9 +38,10 @@ assert(lead.arms>backdrop.arms*5,'assigned feature gesticulates more than its pa
 assert.equal(cue({...base,casting:{...casting,lineIndex:1}}).role,'general','stale casting is ignored');
 const duet={active:true,style:'duet',lineIndex:0,leadSlot:0,partnerSlot:1,singingSlots:[0,1],handoffFrom:null,phase:1,emphasis:.5,startMs:1000,endMs:2400,source:'word-timed',count:2};
 assert.equal(cue({...base,slot:1,casting:duet}).role,'duet');
-const gltf=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
-assert(gltf.includes('resolveVocalDanceAccentV472({')&&gltf.includes('musicMotionV468.updateMotion(audio,delta,isPlaying&&!reducedMotion&&(audioMotionEnabledV468??true),genreCue,vocalV472)'), 'GLB uses new additive cue');
+const gltf=fs.readFileSync('components/visualizer/useGltfVocalMotionV492.ts','utf8');
+const procedural=fs.readFileSync('components/visualizer/ProceduralDancerAvatarV492.tsx','utf8');
+assert(gltf.includes('resolveVocalDanceAccentV472({')&&gltf.includes('musicMotionV468.updateMotion(')&&gltf.includes('coordinateRapDanceV526(synchronizedRapV516')&&gltf.includes('correctAutomaticAccentV515(wordDanceV567')&&gltf.includes('refineNaturalConcertPerformanceV586(naturalBodyV564.accent'), 'GLB keeps authored V472 cue, passed through V515 auto-only additive limiter');
 assert(gltf.includes('rapDuetTrackIdV416')&&gltf.includes('manualVocalTrackIdV385'), 'authored singer cues are track bound');
-assert(gltf.includes('vocalV472.arms*Math.max(0,vocalV472.side)'), 'procedural fallback gets body cue');
+assert(procedural.includes('wordDanceV567.arms*Math.max(0,wordDanceV567.side)')&&procedural.includes('coordinateWordDanceV567(concertV586.accent'), 'procedural fallback gets body cue');
 assert(fs.readFileSync('hooks/useAudioMotionEngine.ts','utf8').includes('vocalSmoothed'),'additive overlay releases smoothly');
 console.log('PASS V472: synced lyric windows, word vs line, hook, no false singer claims, authored cast + duet, pause, reduced motion, manual priority and GLB/procedural wiring');

@@ -1,6 +1,6 @@
 require('./helpers/threeAvatarSourcesV492.cjs').install();
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),vm=require('node:vm');
-const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript');
+const ts=require('./typescript-loader.cjs');
 const root=path.resolve(__dirname,'..');
 const source=fs.readFileSync(path.join(root,'components/visualizer/expressiveDanceCharacters.ts'),'utf8');
 const output=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;

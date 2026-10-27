@@ -1,6 +1,6 @@
 require('./helpers/threeAvatarSourcesV492.cjs').install();
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript');
+const ts=require('./typescript-loader.cjs');
 const root=path.resolve(__dirname,'..');const src=fs.readFileSync(path.join(root,'components/visualizer/adaptiveBeatIntelligence.ts'),'utf8');
 const compiled=ts.transpileModule(src,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}});
 assert.equal((compiled.diagnostics||[]).filter(d=>d.category===ts.DiagnosticCategory.Error).length,0);

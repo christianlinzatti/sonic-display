@@ -1,0 +1,10 @@
+{
+  "extends":"./tsconfig.v526-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/cinematicMultiAvatarV527.ts",
+    "../components/visualizer/advancedGroupPerformanceV517.ts",
+    "../components/visualizer/multiAvatarFormationDirectorV495.ts",
+    "stubs/v508-three-types.d.ts", "stubs/v415-three-types.d.ts", "v414-music-types.d.ts"
+  ]
+}

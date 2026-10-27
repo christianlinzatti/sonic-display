@@ -1,0 +1,63 @@
+===== test:v472 exit=0 secs=0.29 =====
+PASS V472: synced lyric windows, word vs line, hook, no false singer claims, authored cast + duet, pause, reduced motion, manual priority and GLB/procedural wiring
+
+===== test:v473 exit=0 secs=0.28 =====
+PASS V473: synced flow-density and switch hints, modest adlib candidates, silent gaps, manual cast priority, pause/reduced-motion, GLB + procedural paths
+
+===== test:v474 exit=0 secs=0.30 =====
+PASS V474: stable nonrepeating verse motifs, synchronized asymmetric hooks, 4 dancers, casting/manual priority, pause/silence/reduced motion, bounded GLB/procedural integration
+
+===== test:v475 exit=0 secs=0.33 =====
+PASS V475: deterministic visual feature replies and 4-avatar hook reactions, protected manual vocal roles, bounded look/gesture cues, performance tiers, pause/seek and live 3D integration
+
+===== test:v476 exit=0 secs=0.45 =====
+PASS V476: verified word-bounded shaping, fast rap coarticulation, closures/audio/manual author priority, pause/seeks, deterministic 30-minute playback, GLB and procedural render paths
+
+===== test:v477 exit=0 secs=0.36 =====
+PASS V477: verified timestamps vs line-sync, seek/pause/reduced motion, multi-avatar typography, 3D mesh protection, 5k deterministic plans
+
+===== test:v478 exit=0 secs=0.43 =====
+PASS V478: ensemble/portrait/lyrics coordinated camera, existing lighting gain, authored guards, low-tier, seek/pause, 30-minute pure show direction
+
+===== test:v479 exit=0 secs=0.25 =====
+PASS V479: Pi opt-in, 1–4 avatar budgets, 5 bad/18 good frames, cooldown, manual FX priority, pause/hidden/stale, 30-minute deterministic run
+
+===== test:v480 exit=0 secs=0.30 =====
+PASS V480: 30-min bounded session diagnostics, truthful FPS/P95, pause/hidden/stale guards, budget transition events, Pi off, local report and passive UI wiring
+
+===== test:v481 exit=0 secs=0.30 =====
+PASS V481: actual clip lookup, procedural two-leg crouch wiring, staggered 4-avatar verses, protected manuals, gated sync drops, playback replay, bounded 30-min check
+
+===== test:v482 exit=0 secs=0.31 =====
+PASS V482: smooth pelvis/knee coupling, torso weight shifts, GLB clip hysteresis & overrides, 30-minute stability, stage wiring
+
+===== test:v483 exit=0 secs=0.49 =====
+PASS V483: interactive low-pose glances, staggered rise, limits, overrides, seek reset, 30-minute stability, R3F wiring
+
+===== test:v484 exit=0 secs=0.43 =====
+PASS V484: expressive low-pose arms, rap/hardstyle patterns, GLB-safe layering, overrides, tiers, seek safety, 33-minute simulation
+
+===== test:v485 exit=0 secs=0.48 =====
+PASS V485: automatic near-pass, procedural step, rejoin, low-drop, lyrics/manual/IK guards, collision centers, seek, 33-min simulation
+
+===== test:v486 exit=0 secs=0.57 =====
+PASS V486: song-clock stance, alternating foot swings, measured GLB IK support, guard priority, BPM seek, 33-min simulation
+
+===== test:v487 exit=0 secs=0.33 =====
+PASS V487: real IK anchor drift estimates, contact confidence, slot diagnosis, only optional travel damping, 33-minute guard test and UI wiring
+
+===== test:v488 exit=0 secs=0.36 =====
+PASS V488: bounded full-body squat/step coupling, no planted-foot knee override, manual/reduced-motion safeguards, source wiring, deterministic 33-minute playback
+
+===== test:v489 exit=0 secs=0.27 =====
+PASS V489: grounded low-clip transitions, bounded motion matching, authored/IK protection, deterministic long-play, live mixer wiring
+
+===== test:v490 exit=0 secs=0.29 =====
+PASS V490: safe upper channels, installed GLB source selection, planted-foot weighting, authored priority, runtime mixer integration, long-play
+
+===== test:v491 exit=0 secs=0.30 =====
+PASS V491: safe channel masks, missing/reduced-motion fallbacks, bounded weight, mixer-driven GLB preview and scrub
+
+===== test:v492 exit=0 secs=0.36 =====
+PASS V492: strict import/export, scope, update/delete contract, missing clips, safe channels, genre, manual protection and live mixer
+

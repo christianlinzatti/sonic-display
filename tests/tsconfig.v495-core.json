@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.v494-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/multiAvatarFormationDirectorV495.ts"
+  ]
+}

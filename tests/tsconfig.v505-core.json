@@ -1,0 +1,11 @@
+{
+  "extends":"./tsconfig.v504-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/stageSpatialInteractionV505.ts",
+    "../components/visualizer/naturalMultiAvatarStageInteractionV504.ts",
+    "../components/visualizer/rapDuetStudioV416.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

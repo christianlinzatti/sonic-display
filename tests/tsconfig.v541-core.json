@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.v525-core.json",
+  "compilerOptions": {"incremental": false},
+  "files": ["../components/visualizer/cinematicLyricsExperienceV541.ts", "v414-music-types.d.ts", "stubs/v415-three-types.d.ts"]
+}

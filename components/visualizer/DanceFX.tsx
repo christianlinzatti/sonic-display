@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react";
 import { AdditiveBlending, Color, DoubleSide, Group, Mesh, MeshBasicMaterial } from "three";
 import type { AudioFeatures } from "@/types/audio";
 import { getActivePerformanceTier } from "./adaptivePerformance";
+import {shouldSkipDormantFxV552} from "./piConcertDrawBudgetV552";
 
 type FxSettings = { tint?:string; enabled?: boolean; strength?: number; shockwaves?: boolean; footprints?: boolean; trails?: boolean };
 type Pulse = { active: boolean; age: number; x: number; z: number; side: number };
@@ -20,6 +21,7 @@ export function DanceFX({ audio, isPlaying, reducedMotion, settings }: {audio: A
   const elapsed = useRef(0);
   const lastKick = useRef(-10);
   const lastBeat = useRef(false);
+  const wasEnabledV552=useRef(false);
   const tint = useMemo(() => new Color("#4feafa"), []);
   tint.set(settings.tint ?? "#4feafa");
   useFrame((state, delta) => {
@@ -31,6 +33,21 @@ export function DanceFX({ audio, isPlaying, reducedMotion, settings }: {audio: A
     const isBeat = !!audio.beat;
     const onset = isBeat && !lastBeat.current;
     lastBeat.current = isBeat;
+    // V552: a disabled pool has nothing to simulate/render after the first
+    // disable frame. Stop visiting 24 meshes each frame; preserve beat edge.
+    if(shouldSkipDormantFxV552(enabled,wasEnabledV552.current))return;
+    if(!enabled){
+      for(const pulse of pulses.current)pulse.active=false;
+      for(let i=0;i<POOL;i++){
+        if(rings.current[i])rings.current[i]!.visible=false;
+        if(marks.current[i])marks.current[i]!.visible=false;
+        if(trails.current[i])trails.current[i]!.visible=false;
+      }
+      if(group.current)group.current.visible=false;
+      wasEnabledV552.current=false;
+      return;
+    }
+    wasEnabledV552.current=true;
     const kick = Math.max(clamp(audio.kickAccentIntensity ?? 0), clamp(audio.kick), clamp(audio.beatStrength));
     // Fire on the first beat edge or a strong kick accent, never on each rendered frame.
     const trigger = enabled && tier !== "low" && (onset || (audio.kickAccent === "strong" && kick > .75)) &&

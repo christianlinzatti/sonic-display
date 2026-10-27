@@ -1,0 +1,5 @@
+{
+  "extends":"./tsconfig.v521-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../services/monitoring/concertBenchmarkValidationV522.ts"]
+}

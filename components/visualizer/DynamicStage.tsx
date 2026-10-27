@@ -3,7 +3,10 @@ import type {SmartStageCueV351} from "@/services/stageContent/smartStageComposit
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import { Color, Vector3 } from "three";
+import type {Scene,Object3D} from "three";
 import type {VisualizerProps} from "./registry";
+import {concertLightMultiplierV497} from "./cinematicConcertChoreographyV497";
+import type {VocalConcertHandoffV498} from "./vocalHandoffDirectorV498";
 import {resolveDuetInteractionV376} from "./interactiveVocalDuetsV376";
 import {resolveManualVocalCueV385,applyManualVocalCueV385} from "./manualVocalCastingV385";
 import type {ConcertShowCueV387} from "./concertShowDirectorV387";
@@ -23,6 +26,18 @@ import { advancePredictiveLighting, createPredictiveLightingState, defaultLighti
 
 import type { ShowCue } from "./ultimateShowDirectorV306";
 import {planConcertLightingV462} from "./concertLightingDirectorV462";
+import {planPerformerLightingV557} from "./performerLightingV557";
+import {planAvatarPortraitLightingV558} from "./avatarPortraitLightingV558";
+import {planBeatVocalPortraitLightingV559} from "./beatVocalPortraitLightingV559";
+import {planCinematicAvatarLightingV566} from "./cinematicAvatarLightingV566";
+import type {ConcertDetailSettingsV555,ConcertDetailsCueV555} from "./concertDetailEffectsV555";
+import {refineConcertLightingV542} from "./intelligentConcertLightingV542";
+import {planStageAtmosphereV551} from "./intelligentStageAtmosphereV551";
+import {planDynamicConcertLightingV608} from "./dynamicConcertLightingV608";
+import {planGenreConcertV610} from "./genreConcertExperienceV610";
+import {planContinuousConcertV611} from "./continuousConcertExperienceV611";
+import {planSeamlessConcertTransitionV609} from "./seamlessConcertTransitionsV609";
+import type {NarrativePlanV604,NarrativeCueV604} from "./fullSongConcertDramaturgyV604";
 import type { StageSection } from "./stageDirectorV287";
 import {combineFestivalGainsV394,type FestivalShowCueV394} from "./festivalShowDirectorV394";
 import { ConcertAtmosphereRendererV308 } from "./ConcertAtmosphereRendererV308";
@@ -40,20 +55,56 @@ const palettes = {
   rock: {base:"#141314",primary:"#ff9d3e",secondary:"#e53c37",floor:"#2a292c"},
 } as const;
 
+
+/** Reuse the stage's two point lights and one world-space vector (no frame allocations). */
+function followPerformerLightV557(scene:Scene,slot:number|null,home:Vector3,
+  light:PointLight|null,work:Vector3,side:number,alpha:number,faceBodyBalance=0){
+  if(!light)return;
+  let target=home;
+  if(slot!==null){
+    const root=scene.getObjectByName(`v377-vocal-stage-slot-${slot}`);
+    let visible=!!root;
+    for(let p:Object3D|null|undefined=root;p;p=p.parent){if(!p.visible){visible=false;break;}}
+    if(visible&&root){
+      root.updateWorldMatrix(true,false);root.getWorldPosition(work);
+      if(Number.isFinite(work.x)&&Number.isFinite(work.y)&&Number.isFinite(work.z)){
+        target=work;
+        target.set(Math.max(-3,Math.min(3,target.x+side)),
+          Math.max(-.25,Math.min(3,target.y+1.7-.36*faceBodyBalance)),
+          Math.max(-2,Math.min(3.2,target.z+2-.24*faceBodyBalance)));
+      }
+    }
+  }
+  light.position.lerp(target,Math.min(.12,alpha*.42));
+}
+
 /** Lights are reused across frames; low tier disables animated beam sweeping and floor pulse geometry. */
-export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotion, reactive = true, strength = 60, genre, musicPalette, showCue, composition, glowGainV353=1, timelineGainV354=1, concertLipSyncV386, concertShowCueV387, concertShowLightingV387=true,concertShowAtmosphereV387=true,festivalShowCueV394,festivalShowLightingV394=true,festivalShowAtmosphereV394=true,festivalShowLasersV394=false }: {
-  theme?: StageTheme; audio: AudioFeatures; isPlaying: boolean; reducedMotion: boolean; reactive?: boolean; strength?: number; genre?: string | null; musicPalette?: { primary: string; secondary: string; glow: string }; showCue?: ShowCue; composition?:SmartStageCueV351;glowGainV353?:number; timelineGainV354?:number;concertLipSyncV386?:VisualizerProps["lipSync"];concertShowCueV387?:ConcertShowCueV387;concertShowLightingV387?:boolean;concertShowAtmosphereV387?:boolean;festivalShowCueV394?:FestivalShowCueV394;festivalShowLightingV394?:boolean;festivalShowAtmosphereV394?:boolean;festivalShowLasersV394?:boolean;
+export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotion, reactive = true, strength = 60, genre, musicPalette, showCue, composition, glowGainV353=1, timelineGainV354=1, cinematicCueV497, concertLipSyncV386, concertShowCueV387, concertShowLightingV387=true,concertShowAtmosphereV387=true,festivalShowCueV394,festivalShowLightingV394=true,festivalShowAtmosphereV394=true,festivalShowLasersV394=false,lyricsProtectedV542=false,groupCountV542=1,vocalFocusV542=false,performerLightingV557,cameraNarrativeV605,cameraSectionV608 }: {
+  theme?: StageTheme; audio: AudioFeatures; isPlaying: boolean; reducedMotion: boolean; reactive?: boolean; strength?: number; genre?: string | null; musicPalette?: { primary: string; secondary: string; glow: string }; showCue?: ShowCue; composition?:SmartStageCueV351;glowGainV353?:number; timelineGainV354?:number;cinematicCueV497?:VocalConcertHandoffV498;concertLipSyncV386?:VisualizerProps["lipSync"];concertShowCueV387?:ConcertShowCueV387;concertShowLightingV387?:boolean;concertShowAtmosphereV387?:boolean;festivalShowCueV394?:FestivalShowCueV394;festivalShowLightingV394?:boolean;festivalShowAtmosphereV394?:boolean;festivalShowLasersV394?:boolean;lyricsProtectedV542?:boolean;groupCountV542?:number;vocalFocusV542?:boolean;performerLightingV557?:{settings:ConcertDetailSettingsV555;cue:ConcertDetailsCueV555;scene?:import("./cinematicConcertCoordinationV528").ConcertSceneV528|null;progressMs?:number};cameraNarrativeV605?:{plan:NarrativePlanV604;cue:NarrativeCueV604;manualCamera:boolean};cameraSectionV608?:StageSection;
 }) {
   const palette = palettes[theme];
   const sceneFlags = sceneDetailFlags(useSceneDetail());
   const key = useRef<PointLight>(null);
   const targetPrimary = useRef(new Color());
   const targetSecondary = useRef(new Color());
+  // V558 cached neutral portrait temperatures; no per-frame Color allocations.
+  const warmPortraitV558 = useRef(new Color('#ffe5d6'));
+  const coolDuetV558 = useRef(new Color('#c3d9ff'));
+  // V559: smoothed accents, no geometry/shadow/light allocations in render loop.
+  const beatAccentV559 = useRef(0);
+  // Cached V566 camera directions + sampled performer position; never allocate in frame loop.
+  const cameraFaceV566=useRef(new Vector3());
+  const cameraForwardV566=useRef(new Vector3());
+  const cameraToFaceV566=useRef(new Vector3());
+  const cinematicMixV566=useRef(0);
   const fill = useRef<PointLight>(null);
   const beam = useRef<SpotLight>(null);
   const floorLight = useRef<PointLight>(null);
   const pulseMesh = useRef<Mesh>(null);
   const concertFocusPositionV386=useRef(new Vector3());
+  const followPositionV557=useRef(new Vector3());
+  const homeKeyV557=useRef(new Vector3(-2.3,2.4,2.2));
+  const homeFillV557=useRef(new Vector3(2.4,1.5,1.8));
   const cueState = useRef(createStageCueState());
   const smartStage = useRef(createStageDirectorState());
   const directorState = useRef(createLightingDirectorState());
@@ -92,15 +143,11 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     atmosphereTimelineGain.current = Math.max(0,Math.min(1,timelineCue.scale * (1 - timelineCue.blackout) * (1 - timelineCue.strobe)));
     const stageLimit = tier === "low" ? 1.06 : tier === "balanced" ? 1.22 : 1.48;
     const directed = (value: number) => Math.min(stageLimit * Math.max(.1, value), value * directorScale * cueScale);
-    const lerp = 1 - Math.exp(-Math.min(Math.max(delta, 0), .1) * 9);
+
     // Music colors affect existing lights only: no new draw calls, shadow maps or post-processing.
     targetPrimary.current.set(timelineCue.color ?? musicPalette?.primary ?? palette.primary);
     targetSecondary.current.set(musicPalette?.secondary ?? palette.secondary);
-    const colorFade = reducedMotion ? 1 : 1 - Math.exp(-Math.min(Math.max(delta, 0), .1) * 2.4);
-    if (key.current) key.current.color.lerp(targetPrimary.current, colorFade);
-    if (fill.current) fill.current.color.lerp(targetSecondary.current, colorFade);
-    if (floorLight.current) floorLight.current.color.lerp(targetPrimary.current, colorFade);
-    if (beam.current) beam.current.color.lerp(targetSecondary.current, colorFade);
+
     const lightScale = tier === "low" ? .65 : tier === "balanced" ? .85 : 1;
     // V306: gentle shared show cues layer over saved lighting timelines; capped for Pi/low-tier.
     const voice=concertLipSyncV386;
@@ -133,18 +180,202 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       playing:isPlaying,reactive,reducedMotion,tier,authored:authoredLightsV386 ||
         (showCue?.enabled===true&&showCue.lightingEnabled===false),
       blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineGainV354<=0});
+    // V542 refines the established V462 budget without adding new lights or GPU effects.
+    // Authored light timelines and deliberate blackouts remain authoritative.
+    const lightingV542=refineConcertLightingV542({base:lightingV462,section:atmosphereSection.current,
+      energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,
+      playing:isPlaying,reactive,reducedMotion,tier,
+      authored:authoredLightsV386||(showCue?.enabled===true&&showCue.lightingEnabled===false),
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542});
+    // V551 follows only confirmed V528 vocal casts, and reuses V462/V542 light budgets.
+    const lightingV551=planStageAtmosphereV551({base:lightingV542,mood:lightingV462.mood,
+      section:atmosphereSection.current,energy:audio.energyEnvelope??audio.bass??0,
+      kick:audio.kickAccentIntensity??0,tier,playing:isPlaying,reactive,reducedMotion,
+      authored:authoredLightsV386||(showCue?.enabled===true&&showCue.lightingEnabled===false),
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,groupCount:groupCountV542,
+      scene:concertLipSyncV386?.cinematicSceneV528});
+    // V608: use the same live V604 act, playback clock and V551 verified singers
+    // for one extra bounded envelope over the existing key/fill/spot/fog lights.
+    const lightingV608=planDynamicConcertLightingV608({
+      narrative:cameraNarrativeV605,trackId:playback.trackId,
+      durationMs:playback.durationMs,positionMs:playback.positionMs,
+      section:cameraSectionV608??atmosphereSection.current,mood:lightingV462.mood,
+      energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,
+      cast:lightingV551,playing:isPlaying&&playback.playing,reactive,reducedMotion,tier,
+      authored:authoredLightsV386||(showCue?.enabled===true&&showCue.lightingEnabled===false),
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,
+    });
+    // V610: true genre-specific artistic balance over the EXISTING lighting budget.
+    const concertGenreV610=planGenreConcertV610({
+      narrative:cameraNarrativeV605,trackId:playback.trackId,
+      durationMs:playback.durationMs,positionMs:playback.positionMs,
+      section:cameraSectionV608??atmosphereSection.current,genre,
+      energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,
+      playing:isPlaying&&playback.playing,reducedMotion,tier,
+      lyricsProtected:lyricsProtectedV542,manualDance:true,manualCamera:true,
+      manualLighting:authoredLightsV386||!reactive||
+        timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||
+        timelineGainV354<=0||showCue?.lightingEnabled===false,
+    });
+    // V611: one evidence-bound song arc for the same automatic lanes, no new clock.
+    const concertContinuityV611=planContinuousConcertV611({
+    genreCue:concertGenreV610,
+      narrative:cameraNarrativeV605,trackId:playback.trackId,
+      durationMs:playback.durationMs,positionMs:playback.positionMs,
+      section:cameraSectionV608??atmosphereSection.current,genre,
+      energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,
+      playing:isPlaying&&playback.playing,reducedMotion,tier,
+      lyricsProtected:lyricsProtectedV542,manualDance:true,manualCamera:true,
+      manualLighting:authoredLightsV386||!reactive||
+        timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||
+        timelineGainV354<=0||showCue?.lightingEnabled===false,
+    });
+    // V609 shares the same verified playback/act across camera and both lighting
+    // rigs. No extra polling or render callback; authored blackout stays instant.
+    const lightingBlendV609=planSeamlessConcertTransitionV609({
+      narrative:cameraNarrativeV605,trackId:playback.trackId,
+      positionMs:playback.positionMs,playing:isPlaying&&playback.playing,
+      reducedMotion,tier,manualCamera:true,
+      manualLighting:authoredLightsV386||!reactive||
+        timelineCue.blackout>0||timelineCue.strobe>0||timelineGainV354<=0||
+        showCue?.lightingEnabled===false,
+    });
+    const lerp=1-Math.exp(-Math.min(Math.max(delta,0),.1)*9*lightingBlendV609.lightingRate);
+    const colorFade=reducedMotion?1:1-Math.exp(-Math.min(Math.max(delta,0),.1)*2.4*lightingBlendV609.lightingRate);
+    // V497 uses only existing rig lights; do not brighten manual timelines or blackouts.
+    const cinematicKeyV497=concertLightMultiplierV497(cinematicCueV497,"key",{
+      authored:authoredLightsV386,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      playing:isPlaying&&reactive,reducedMotion,lowTier:tier==="low"});
+    const cinematicBeamV497=concertLightMultiplierV497(cinematicCueV497,"beam",{
+      authored:authoredLightsV386,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      playing:isPlaying&&reactive,reducedMotion,lowTier:tier==="low"});
     const showGain = festivalLightV387 * lightAccentV386.gain * (reactive && isPlaying && !reducedMotion ? (showCue?.lightGain ?? 1) : 1) * (composition?.lightGain ?? 1) * (reducedMotion||timelineCue.blackout>0?1:timelineGainV354);
     const showBeam = festivalBeamV387 * lightAccentV386.beamGain * (reactive && isPlaying && !reducedMotion ? (showCue?.beamGain ?? 1) : 1) * (composition?.beamGain ?? 1) * (reducedMotion||timelineCue.blackout>0?1:timelineGainV354);
     // Face floor is limited to un-authored active scenes and never defeats a manual blackout.
-    const keyTargetV462=Math.min(3,Math.max(lightingV462.faceFloor,directed(cue.key)*lightScale*showGain*lightingV462.keyGain));
-    const fillTargetV462=Math.min(2.4,Math.max(lightingV462.faceFloor*.75,directed(cue.fill)*lightScale*showGain*lightingV462.fillGain));
-    if (key.current) key.current.intensity += (keyTargetV462-key.current.intensity)*lerp;
-    if (fill.current) fill.current.intensity += (fillTargetV462-fill.current.intensity)*lerp;
+    const performerPlanV557=planPerformerLightingV557({
+      cue:performerLightingV557?.cue,settings:performerLightingV557?.settings,
+      scene:performerLightingV557?.scene,count:groupCountV542,progressMs:performerLightingV557?.progressMs,playing:isPlaying&&reactive,
+      reducedMotion,tier,authored:authoredLightsV386||showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+    });
+    const portraitPlanV558=planAvatarPortraitLightingV558({
+      performer:performerPlanV557,cue:performerLightingV557?.cue,
+      settings:performerLightingV557?.settings,tier,
+    });
+    // Authored colors/timelines and blackouts are upstream of the portrait planner.
+    // Only the existing key/fill are warmed; decorative beams/floor keep stage palette.
+    if(portraitPlanV558.enabled && !timelineCue.color){
+      targetPrimary.current.lerp(warmPortraitV558.current,portraitPlanV558.keyWarmth);
+      targetSecondary.current.lerp(portraitPlanV558.mode==='duet'?coolDuetV558.current:warmPortraitV558.current,
+        portraitPlanV558.fillWarmth);
+    }
+    const beatPortraitPlanV559=planBeatVocalPortraitLightingV559({
+      performer:performerPlanV557,portrait:portraitPlanV558,
+      cue:performerLightingV557?.cue,audio,settings:performerLightingV557?.settings,
+      playing:isPlaying,reactive,reducedMotion,tier,authored:authoredLightsV386||showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,
+    });
+    // V566: measure actual camera sightline to V557 trusted, visible performer stage root.
+    // Do not infer face orientation, mouth openness or the active singer from lyrics.
+    let rootVisibleV566=false;
+    let distanceV566=Infinity;
+    let alignmentV566=-1;
+    if(performerPlanV557.focusSlot!==null){
+      const performerRootV566=state.scene.getObjectByName(`v377-vocal-stage-slot-${performerPlanV557.focusSlot}`);
+      if(performerRootV566){
+        rootVisibleV566=true;
+        for(let p:Object3D|null=performerRootV566;p;p=p.parent){if(!p.visible){rootVisibleV566=false;break;}}
+        if(rootVisibleV566){
+          performerRootV566.updateWorldMatrix(true,false);
+          performerRootV566.getWorldPosition(cameraFaceV566.current);
+          cameraFaceV566.current.y+=1.55;
+          state.camera.getWorldPosition(cameraToFaceV566.current);
+          cameraToFaceV566.current.subVectors(cameraFaceV566.current,cameraToFaceV566.current);
+          distanceV566=cameraToFaceV566.current.length();
+          if(distanceV566>0){
+            state.camera.getWorldDirection(cameraForwardV566.current);
+            alignmentV566=cameraForwardV566.current.dot(cameraToFaceV566.current)/distanceV566;
+          }
+        }
+      }
+    }
+    const cinematicPlanV566=planCinematicAvatarLightingV566({
+      performer:performerPlanV557,portrait:portraitPlanV558,cue:performerLightingV557?.cue,
+      settings:performerLightingV557?.settings,cameraDistance:distanceV566,
+      cameraAlignment:alignmentV566,rootVisible:rootVisibleV566,
+      playing:isPlaying,reactive,reducedMotion,tier,
+      authored:authoredLightsV386||showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,
+    });
+    const cinematicTargetV566=cinematicPlanV566.enabled?1:0;
+    // A soft attack and release, no camera-cut flash or stateful timers.
+    const cinematicRateV566=1-Math.exp(-Math.min(.1,Math.max(0,delta))*(cinematicTargetV566?2.8:4.0));
+    cinematicMixV566.current+=(cinematicTargetV566-cinematicMixV566.current)*cinematicRateV566;
+    const cinematicScaleV566=cinematicPlanV566.enabled?cinematicMixV566.current:0;
+    if(cinematicScaleV566>0&&!timelineCue.color){
+      targetPrimary.current.lerp(warmPortraitV558.current,cinematicPlanV566.colorMix*cinematicScaleV566);
+      targetSecondary.current.lerp(portraitPlanV558.mode==='duet'?coolDuetV558.current:warmPortraitV558.current,
+        cinematicPlanV566.colorMix*.65*cinematicScaleV566);
+    }
+    // Ease into beats and decay afterwards; bypass immediately on off/blackout/authoring.
+    const targetBeatV559=beatPortraitPlanV559.enabled?1:0;
+    const beatResponseV559=1-Math.exp(-Math.min(.1,Math.max(0,delta))*(targetBeatV559?4.0:2.8));
+    beatAccentV559.current+=(targetBeatV559-beatAccentV559.current)*beatResponseV559;
+    const beatScaleV559=beatPortraitPlanV559.enabled?beatAccentV559.current:0;
+    if(beatScaleV559>0 && !timelineCue.color){
+      targetPrimary.current.lerp(warmPortraitV558.current,beatPortraitPlanV559.keyColorMix*beatScaleV559);
+      targetSecondary.current.lerp(portraitPlanV558.mode==='duet'?coolDuetV558.current:warmPortraitV558.current,
+        beatPortraitPlanV559.fillColorMix*beatScaleV559);
+    }
+    if (key.current) key.current.color.lerp(targetPrimary.current, colorFade);
+    if (fill.current) fill.current.color.lerp(targetSecondary.current, colorFade);
+    if (floorLight.current) floorLight.current.color.lerp(
+      targetPrimary.current.set(timelineCue.color ?? musicPalette?.primary ?? palette.primary),colorFade);
+    if (beam.current) beam.current.color.lerp(
+      targetSecondary.current.set(musicPalette?.secondary ?? palette.secondary),colorFade);
+    const keyTargetV462=Math.min(3,Math.max(lightingV542.faceFloor||lightingV462.faceFloor,directed(cue.key)*lightScale*showGain*lightingV462.keyGain*lightingV542.keyGain*lightingV551.keyGain*lightingV608.key*concertGenreV610.key*concertContinuityV611.key*cinematicKeyV497)*performerPlanV557.keyGain);
+    const fillTargetV462=Math.min(2.4,Math.max(Math.max(lightingV462.faceFloor,lightingV542.faceFloor)*.75,directed(cue.fill)*lightScale*showGain*lightingV462.fillGain*lightingV542.fillGain*lightingV551.fillGain*lightingV608.fill*concertGenreV610.fill*concertContinuityV611.fill)*performerPlanV557.fillGain);
+    // V559 applies only capped percentages to existing V462/V557 light targets.
+    // These factors never overpower a manual cue, low tier, pause, or blackout.
+    const beatKeyTargetV559=Math.min(3,keyTargetV462*(1+beatPortraitPlanV559.keyLift*beatScaleV559+cinematicPlanV566.keyLift*cinematicScaleV566));
+    const beatFillTargetV559=Math.min(2.4,fillTargetV462*(1+beatPortraitPlanV559.fillLift*beatScaleV559+cinematicPlanV566.fillLift*cinematicScaleV566));
+    if (key.current) key.current.intensity += (beatKeyTargetV559-key.current.intensity)*lerp;
+    if (fill.current) fill.current.intensity += (beatFillTargetV559-fill.current.intensity)*lerp;
     if (floorLight.current) floorLight.current.intensity += ((sceneFlags.extraLights ? Math.min(2.5,directed(cue.floor) * lightScale * showGain) : 0) - floorLight.current.intensity) * lerp;
     if (beam.current) {
-      beam.current.intensity += ((sceneFlags.extraLights ? (theme === "minimal" ? .2 : Math.min(3.0,directed(cue.beam) * (1 + smartCue.sweep * .12) * showBeam * lightingV462.beamGain)) * lightScale : 0) - beam.current.intensity) * lerp;
+      beam.current.intensity += ((sceneFlags.extraLights ? (theme === "minimal" ? .2 : Math.min(3.0,directed(cue.beam) * (1 + smartCue.sweep * .12) * showBeam * lightingV462.beamGain * lightingV542.beamGain * lightingV551.beamGain * lightingV608.beam * concertGenreV610.beam * concertContinuityV611.beam * cinematicBeamV497)) * lightScale : 0) - beam.current.intensity) * lerp;
       beam.current.position.x = sceneFlags.beamSweep && cue.sweep && !reducedMotion && tier === "high"
-        ? Math.sin(state.clock.elapsedTime * .65) * (1.2 + cue.sweep + director.sweep + predictive.anticipation * .15 + smartCue.sweep * .24) * lightingV462.sweepGain : 0;
+        ? Math.sin(state.clock.elapsedTime * .65) * (1.2 + cue.sweep + director.sweep + predictive.anticipation * .15 + smartCue.sweep * .24) * lightingV462.sweepGain * lightingV542.sweepGain * lightingV551.sweepGain * lightingV608.sweep * concertGenreV610.sweep * concertContinuityV611.sweep : 0;
+      // V497 may focus the existing beam even when V386 concert lighting is disabled.
+      // Never steer a user-authored lighting timeline or a deliberate blackout.
+      const lightFocusV497=cinematicBeamV497>1?cinematicCueV497?.focusSlot:null;
+      if(lightFocusV497!==null&&lightFocusV497!==undefined&&sceneFlags.extraLights){
+        const dancer=state.scene.getObjectByName(`v377-vocal-stage-slot-${lightFocusV497}`);
+        if(dancer?.visible){dancer.updateWorldMatrix(true,false);dancer.getWorldPosition(concertFocusPositionV386.current);
+          let goal=Math.max(-2.1,Math.min(2.1,concertFocusPositionV386.current.x));
+          // V498: follow the *actual* old/new avatar world positions during an
+          // authored singer hand-off. Reuse the existing Vector3 and spotlight.
+          const fromSlotV498=cinematicCueV497?.focusFromV498;
+          if(fromSlotV498!==null&&fromSlotV498!==undefined){
+            const previous=state.scene.getObjectByName(`v377-vocal-stage-slot-${fromSlotV498}`);
+            if(previous?.visible){
+              previous.updateWorldMatrix(true,false);
+              previous.getWorldPosition(concertFocusPositionV386.current);
+              const oldX=Math.max(-2.1,Math.min(2.1,concertFocusPositionV386.current.x));
+              const mix=cinematicCueV497?.focusBlendV498??1;
+              goal=oldX+(goal-oldX)*mix;
+            }
+          }
+          beam.current.position.x+=(goal-beam.current.position.x)*Math.min(.17,cinematicBeamV497-1);
+        }
+      }
       if(lightAccentV386.focusSlot!==null&&sceneFlags.extraLights){
         const dancer=state.scene.getObjectByName(`v377-vocal-stage-slot-${lightAccentV386.focusSlot}`);
         if(dancer?.visible){dancer.updateWorldMatrix(true,false);dancer.getWorldPosition(concertFocusPositionV386.current);
@@ -154,6 +385,13 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
         }
       }
     }
+    // V557: track real stage roots, not a synthetic singer position. Existing lights only.
+    // Target position follows the actual performers with smooth, bounded travel and returns
+    // to the authored default when no trusted cast is present or light cues take priority.
+    followPerformerLightV557(state.scene,performerPlanV557.focusSlot,homeKeyV557.current,
+      key.current,followPositionV557.current,-.65,lerp,cinematicPlanV566.enabled?cinematicPlanV566.faceBalance:portraitPlanV558.faceBodyBalance);
+    followPerformerLightV557(state.scene,portraitPlanV558.enabled?portraitPlanV558.fillSlot:performerPlanV557.partnerSlot,homeFillV557.current,
+      fill.current,followPositionV557.current,.65,lerp,cinematicPlanV566.enabled?cinematicPlanV566.faceBalance:portraitPlanV558.faceBodyBalance);
     if (pulseMesh.current) {
       const visible = sceneFlags.pulse && tier !== "low" && theme !== "minimal" && reactive && isPlaying && !reducedMotion && cue.glow > .015;
       pulseMesh.current.visible = visible;
@@ -166,8 +404,8 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
   return <group>
     <color attach="background" args={[palette.base]}/>
     <ambientLight intensity={theme === "minimal" ? 1.2 : 0.9}/>
-    <ConcertAtmosphereRendererV308 genreV462={genre} audio={audio} isPlaying={isPlaying} reducedMotion={reducedMotion} reactive={reactive} theme={theme} musicPalette={musicPalette} showCue={showCue} timelineGainRef={atmosphereTimelineGain} sectionRef={atmosphereSection} concertShowCueV387={concertShowAtmosphereV387?concertShowCueV387:undefined} festivalShowCueV394={festivalShowAtmosphereV394?festivalShowCueV394:undefined} festivalShowLasersV394={festivalShowLasersV394}
-      authoredLightingV387={timeline.current.cues.length>0||timelineGainV354!==1||showCue?.lightingEnabled===false}/>
+    <ConcertAtmosphereRendererV308 cameraSectionV608={cameraSectionV608} cameraNarrativeV605={cameraNarrativeV605} concertSceneV551={concertLipSyncV386?.cinematicSceneV528} genreV462={genre} lyricsProtectedV542={lyricsProtectedV542} groupCountV542={groupCountV542} vocalFocusV542={vocalFocusV542} audio={audio} isPlaying={isPlaying} reducedMotion={reducedMotion} reactive={reactive} theme={theme} musicPalette={musicPalette} showCue={showCue} timelineGainRef={atmosphereTimelineGain} sectionRef={atmosphereSection} concertShowCueV387={concertShowAtmosphereV387?concertShowCueV387:undefined} festivalShowCueV394={festivalShowAtmosphereV394?festivalShowCueV394:undefined} festivalShowLasersV394={festivalShowLasersV394}
+      authoredLightingV387={timeline.current.cues.length>0||timelineGainV354!==1||showCue?.lightingEnabled===true||showCue?.lightingEnabled===false}/>
     <pointLight ref={key} color={palette.primary} position={[-2.3, 2.4, 2.2]} intensity={1.1} distance={11}/>
     <pointLight ref={fill} color={palette.secondary} position={[2.4, 1.5, 1.8]} intensity={0.65} distance={10}/>
     <pointLight ref={floorLight} color={palette.primary} position={[0, -1.6, 0.4]} intensity={0.45} distance={7}/>

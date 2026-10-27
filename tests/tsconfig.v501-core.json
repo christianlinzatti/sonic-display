@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.v477-core.json",
+  "compilerOptions": {"incremental": false},
+  "files": [
+    "../components/visualizer/cinematicLyricsExperienceV501.ts",
+    "../components/visualizer/beautifulLyricsV477.ts",
+    "../components/visualizer/cinematicLyricsV461.ts",
+    "../components/visualizer/beautifulLyricsV455.ts",
+    "v414-music-types.d.ts", "stubs/v415-three-types.d.ts"
+  ]
+}

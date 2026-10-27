@@ -5,6 +5,8 @@ import type {AnimationAction,AnimationClip} from "three";
 import type {VisualizerProps} from "./registry";
 import {planDanceTransition,matchedClipTime} from "./smartDanceTransition";
 import {findMotionMatch} from "./smartMotionMatching";
+import {planNaturalMotionTransitionV537} from "./naturalMotionTransitionsV537";
+import {planIntelligentDanceTransitionV565} from "./intelligentDanceTransitionsV565";
 import {resolveLiveTransitionDuration} from "./liveMotionTransitionDirector";
 import type {readMotionTransitionSettings} from "./motionTransitionStudioSettings";
 import {planNaturalGlbMotionV489} from "./naturalGlbFullBodyMotionV489";
@@ -27,13 +29,13 @@ type Args={
   lowClipV481:string|null;smartDanceOverride:string;avatarMotionMode:NonNullable<VisualizerProps['avatarMotionMode']>;
   activeLoop:AvatarLoopPreset|null;autoUpperGestureV490:AnimationClip|null;
   activeLiveBlendV492:{actionName:string}|null;avatarCrossfadeSeconds:number;
-  footIK:GltfFootIKRefV492;beatFlowData:{current:BeatFlowResult};
+  footIK:GltfFootIKRefV492;beatFlowData:{current:BeatFlowResult};musicSectionV565?:string|null;manualSelectionV565?:boolean;
 };
 export function useGltfClipTransitionsV492({actions,selectedClip,audio,genre,isPlaying,reducedMotion,
   activeSequence,rapLiveEnabledV412,timelineEnabled,timeline,avatarBlendEnabled,avatarBlendClip,
   maskedOverlay,liveTransition,stableLibraryClip,sequenceCrossfade,lowClipV481,smartDanceOverride,
   avatarMotionMode,activeLoop,autoUpperGestureV490,activeLiveBlendV492,avatarCrossfadeSeconds,
-  footIK,beatFlowData}:Args) {
+  footIK,beatFlowData,musicSectionV565,manualSelectionV565}:Args) {
   const previousClipRef = useRef<string | null>(null);
   const previousWasLowClipV489 = useRef(false);
   useEffect(() => {
@@ -76,7 +78,22 @@ export function useGltfClipTransitionsV492({actions,selectedClip,audio,genre,isP
         playing:isPlaying,reducedMotion,quality:getActivePerformanceTier(),
         matchScore:usableMatch?match?.score:null,matchTime:usableMatch?match?.time:null,
       });
-      if (usableMatch && (!lowMotionV489.active || lowMotionV489.allowPoseMatch))
+      // V537: leg/foot-weighted matching is limited to automatic clip changes.
+      // Manual timelines, saved motion loops and explicit dance selections keep V492 entry semantics.
+      const automaticV537 = avatarMotionMode !== 'choreography' && !stableLibraryClip &&
+        !smartDanceOverride && !activeLoop && !avatarBlendEnabled && !rapLiveEnabledV412 &&
+        !timelineEnabled && !activeSequence && !lowMotionV489.active && isPlaying && !reducedMotion;
+      const naturalV537 = planNaturalMotionTransitionV537({
+        outgoing: outgoingClip, incoming: incomingClip, outgoingSeconds: previousAction?.time ?? NaN,
+        baselineSeconds: plan.duration, fallbackSeconds: usableMatch ? match.time :
+          plan.preservePhase ? matchedClipTime(plan,incomingClip.duration) : 0,
+        plantedLeft: footIK.current.left?.contact.phase === 'planted',
+        plantedRight: footIK.current.right?.contact.phase === 'planted',
+        automatic: automaticV537, reducedMotion,
+      });
+      if (naturalV537.mode === 'matched')
+        nextAction.time = naturalV537.entrySeconds;
+      else if (usableMatch && (!lowMotionV489.active || lowMotionV489.allowPoseMatch))
         nextAction.time = Math.max(0, Math.min(match.time, Math.max(0, incomingClip.duration - 0.001)));
       else if (plan.preservePhase && (!lowMotionV489.active || lowMotionV489.allowPhaseFallback))
         nextAction.time = matchedClipTime(plan, incomingClip.duration);
@@ -85,7 +102,24 @@ export function useGltfClipTransitionsV492({actions,selectedClip,audio,genre,isP
         manual:avatarMotionMode==="choreography" || !!stableLibraryClip, reducedMotion, playing:isPlaying,
         matchScore:usableMatch ? match?.score : undefined,
       });
-      effectiveFadeDurationV311 = lowMotionV489.active ? lowMotionV489.fadeSeconds : fadeDurationV311;
+      effectiveFadeDurationV311 = lowMotionV489.active ? lowMotionV489.fadeSeconds :
+        naturalV537.mode === 'matched' ? Math.max(fadeDurationV311,naturalV537.fadeSeconds) : fadeDurationV311;
+      // V565 only refines automatic duration after V537/V489/V311 decisions.
+      // Never alters the matched entry time, manual priorities, planted IK anchors
+      // or any prepared V493 blend action's own lifecycle.
+      const autoV565=automaticV537 && !lowMotionV489.active && !manualSelectionV565;
+      const intelligentV565=planIntelligentDanceTransitionV565({
+        baselineSeconds:effectiveFadeDurationV311,section:musicSectionV565,
+        playing:isPlaying,reducedMotion,automatic:autoV565,
+        quality:getActivePerformanceTier(),
+        plantedLeft:footIK.current.left?.contact.phase==='planted',
+        plantedRight:footIK.current.right?.contact.phase==='planted',
+        kickOnset:beatFlowData.current.kickOnset,snareOnset:beatFlowData.current.snareOnset,
+        matchScore:naturalV537.mode==='matched'?naturalV537.score:usableMatch?match?.score:null,
+        outgoingSeconds:previousAction?.time,outgoingDuration:outgoingClip?.duration,
+        incomingDuration:incomingClip.duration,
+      });
+      if(intelligentV565.enabled)effectiveFadeDurationV311=intelligentV565.fadeSeconds;
       nextAction.paused = !isPlaying || reducedMotion;
       nextAction.fadeIn(effectiveFadeDurationV311).play();
       // A valid foot plant remains anchored by V135 IK while both actions overlap.
@@ -94,10 +128,13 @@ export function useGltfClipTransitionsV492({actions,selectedClip,audio,genre,isP
       nextAction.paused = !isPlaying || reducedMotion;
     }
     Object.entries(actions).forEach(([name, action]) => {
+      // V493 owns the fade of *every* prepared GLB preset action, including the
+      // outgoing preset. Otherwise a primary-clip effect could cut the overlay.
       if (name !== selectedClip && name !== autoUpperGestureV490?.name &&
-          name !== activeLiveBlendV492?.actionName && !(avatarBlendEnabled && name === (maskedOverlay?.name ?? avatarBlendClip))) action?.fadeOut(effectiveFadeDurationV311);
+          !name.startsWith('GlbPresetV492:') && name !== activeLiveBlendV492?.actionName &&
+          !(avatarBlendEnabled && name === (maskedOverlay?.name ?? avatarBlendClip))) action?.fadeOut(effectiveFadeDurationV311);
     });
     previousClipRef.current = selectedClip ?? null;
     previousWasLowClipV489.current = !!lowClipV481 && selectedClip === lowClipV481;
-  }, [actions, selectedClip, avatarCrossfadeSeconds, audio.bpm, genre, isPlaying, reducedMotion, activeSequence, timelineEnabled, timeline.segments.length, rapLiveEnabledV412, avatarBlendEnabled, avatarBlendClip, maskedOverlay, liveTransition, stableLibraryClip, sequenceCrossfade, lowClipV481, smartDanceOverride, avatarMotionMode, activeLoop, autoUpperGestureV490?.name, activeLiveBlendV492?.actionName]);
+  }, [actions, selectedClip, avatarCrossfadeSeconds, audio.bpm, genre, isPlaying, reducedMotion, activeSequence, timelineEnabled, timeline.segments.length, rapLiveEnabledV412, avatarBlendEnabled, avatarBlendClip, maskedOverlay, liveTransition, stableLibraryClip, sequenceCrossfade, lowClipV481, smartDanceOverride, avatarMotionMode, activeLoop, autoUpperGestureV490?.name, activeLiveBlendV492?.actionName, musicSectionV565, manualSelectionV565]);
 }

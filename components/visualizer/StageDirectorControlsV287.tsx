@@ -13,6 +13,7 @@ import { DancePerformanceControlsV311 } from "./DancePerformanceControlsV311";
 import { AdvancedFullBodyBalanceControlsV323 } from "./AdvancedFullBodyBalanceControlsV323";
 import { IntelligentFootLockControlsV322 } from "./IntelligentFootLockControlsV322";
 import { GroundContactStudioV487 } from "./GroundContactPanelV487";
+import { GlbGroundingCalibrationPanelV494 } from "./GlbGroundingCalibrationPanelV494";
 import { NaturalDanceControlsV320 } from "./NaturalDanceControlsV320";
 import { ConcertAtmosphereControlsV308 } from "./ConcertAtmosphereControlsV308";
 import { CameraPresetStudioV290 } from "./CameraPresetStudioV290";
@@ -34,5 +35,5 @@ export function StageDirectorControlsV287() {
     <label>Kamerabewegung ({settings.cameraIntensity} %)<input type="range" min="0" max="100" step="5" value={settings.cameraIntensity} disabled={!settings.enabled || !settings.realCamera} onChange={e => update({ cameraIntensity: Number(e.target.value) })}/></label>
     <small>Die 3D-Kamera reagiert auf Verse, Break, Build, Hook und Drop. Bei deaktivierter Automatik oder Reduced Motion bleibt die bisherige Kameraführung aktiv.</small>
     <small>Eigene Bühnenwahl überschreibt die Automatik bis zum nächsten Track. Die Musikanalyse ist eine Schätzung; ohne Mikrofon nutzt Sonic Display synthetische Audio-Werte.</small>
-  </fieldset><TrackAnalysisControlsV318 /><UltimateShowControlsV306 /><ShowQualityControlsV310 /><DanceShowEvolutionControlsV313 /><DancePerformanceReviewStudioV314 /><VisualDanceImprovementStudioV315 /><IntelligentChoreographyControlsV312 /><DanceQualityControlsV307 /><DancePerformanceControlsV311 /><NaturalDanceControlsV320 /><IntelligentFootLockControlsV322 /><GroundContactStudioV487 /><AdvancedFullBodyBalanceControlsV323 /><ConcertAtmosphereControlsV308 /><CameraPresetStudioV290 /></>;
+  </fieldset><TrackAnalysisControlsV318 /><UltimateShowControlsV306 /><ShowQualityControlsV310 /><DanceShowEvolutionControlsV313 /><DancePerformanceReviewStudioV314 /><VisualDanceImprovementStudioV315 /><IntelligentChoreographyControlsV312 /><DanceQualityControlsV307 /><DancePerformanceControlsV311 /><NaturalDanceControlsV320 /><IntelligentFootLockControlsV322 /><GroundContactStudioV487 /><GlbGroundingCalibrationPanelV494 /><AdvancedFullBodyBalanceControlsV323 /><ConcertAtmosphereControlsV308 /><CameraPresetStudioV290 /></>;
 }

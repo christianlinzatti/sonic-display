@@ -1,0 +1,15 @@
+{
+  "extends":"./tsconfig.v588-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/visualDanceReviewV589.ts",
+    "../components/visualizer/longSongQualityProbeV589.ts",
+    "../components/visualizer/advancedMotionInspectorV534.ts",
+    "../components/visualizer/longFormChoreographyV588.ts",
+    "../components/visualizer/genreAwareMotionDirectorV536.ts",
+    "../components/visualizer/motionLibraryIntelligenceV535.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v569-react-types.d.ts",
+    "stubs/v588-react-hooks.d.ts"
+  ]
+}

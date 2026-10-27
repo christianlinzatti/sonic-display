@@ -1,0 +1,6 @@
+{
+  "extends":"./tsconfig.v538-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../components/visualizer/crewConcertInteractionV539.ts",
+    "v414-music-types.d.ts","stubs/v415-three-types.d.ts","stubs/v508-three-types.d.ts"]
+}

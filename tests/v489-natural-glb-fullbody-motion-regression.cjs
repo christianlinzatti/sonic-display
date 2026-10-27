@@ -61,7 +61,7 @@ assert(source.includes('updateFootIK(footIK.current') && source.includes('initia
 const pure=fs.readFileSync('components/visualizer/naturalGlbFullBodyMotionV489.ts','utf8');
 assert(!/\b(fetch|setInterval|setTimeout|requestAnimationFrame|Math\.random|Date\.now|window|document|localStorage)\b/.test(pure),
  'no second loop, network, timers or state');
-const pkg=require('../package.json');assert.match(pkg.version,/^0\.1\.0-v49\d+$/);
+const pkg=require('../package.json');assert(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=489);
 assert(pkg.scripts['build:preflight'].includes('npm run test:v489 && npm run test:v489:types'));
 let peak=0;
 for(let i=0;i<126000;i++){

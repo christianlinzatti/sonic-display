@@ -10,7 +10,6 @@ assert.match(source, /cue\.role !== previous\.role/);
 assert.match(source, /cue\.phrase !== previous\.phrase/);
 assert.doesNotMatch(source, /const key=`\$\{cue\.scene\}/);
 assert.match(source, /useMemo\(\(\) => \(\{\.\.\.props, multiAvatarMode: mode\}\), \[props, mode\]\)/);
-let ts;
-for(const name of ["typescript", "/usr/local/lib/node_modules/typescript", "/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript"]) {try { ts=require(name);break;}catch{}}
+const ts = require('./typescript-loader.cjs');
 if(ts){const errors=(ts.transpileModule(source,{fileName:"ThreeAvatar.tsx",compilerOptions:{jsx:ts.JsxEmit.Preserve,module:ts.ModuleKind.ESNext},reportDiagnostics:true}).diagnostics||[]).filter(d=>d.category===ts.DiagnosticCategory.Error); assert.equal(errors.length,0);}
 console.log("V217 multi-avatar frame/render regression checks passed");

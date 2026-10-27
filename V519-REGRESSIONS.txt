@@ -1,0 +1,10 @@
+Sonic Display V519 – Offline-Versionsregressionen
+24.10.2026
+Tests: V451–V519, 69 vollständige Versionsskripte
+Ergebnis: 69 PASS; 0 FAIL
+Ausführung: unabhängige, parallel in drei Gruppen ausgeführte Skriptketten;
+alle Unterkommandos der betreffenden test:vXYZ Skripte mit Returncode 0.
+V519 speziell: 40.000 deterministische synthetische Capture-Varianten,
+Ein- und Mehrfachänderung, ungültige Messdaten, manuelle A/B-Empfehlungen,
+Gesicht/Lip-Sync/GLB-Unveränderbarkeit des rein lesenden Diagnosepfads.
+Keine echte Raspberry-Pi-FPS-Messung in dieser Offline-Testumgebung.

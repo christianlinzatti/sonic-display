@@ -4,6 +4,7 @@ import {readGroupV326,canRunGroupV326,GROUP_EVENT_V326} from "./multiAvatarStage
 import {useMusic} from "@/context/MusicContext";
 import {useUiPreferences} from "@/context/UiPreferencesContext";
 import {RapSceneSuggestionsPanelV417} from "./RapSceneSuggestionsPanelV417";
+import {VocalTimeEditorV496} from "./VocalTimeEditorV496";
 import {normalizeRapDuetAssignmentsV416,resolveRapDuetCueV416,
   type RapDuetAssignmentV416,type RapDuetStyleV416} from "./rapDuetStudioV416";
 
@@ -124,5 +125,6 @@ export function RapDuetStudioV416(){
     <small>Der Vorschau-Regler verändert die Spotify-Wiedergabe nicht. Im Modus „Antwort“ wechselt
       der visuelle Lead im letzten Teil der Zeile. In der „Duett“-Szene animieren beide
       Avatare ihre Lippen. Bei „Hook“ singen alle sichtbaren Avatare visuell mit.</small>
+  <VocalTimeEditorV496/>
   </fieldset>;
 }

@@ -3,6 +3,7 @@ import { lookupLrclibLyrics } from "@/services/lyrics/providers/lrclib";
 import { lookupLyricsOvh } from "@/services/lyrics/providers/lyricsOvh";
 import { lookupGeniusLyrics } from "@/services/lyrics/providers/genius";
 import { lookupSpotifyColorLyrics } from "@/services/lyrics/providers/spotifyColorLyrics";
+import { chooseBestLyricsV554 } from "@/services/lyrics/selectionV554";
 
 export interface LyricsQuery {
   title: string;
@@ -13,37 +14,24 @@ export interface LyricsQuery {
   albumId?: string;
 }
 
-/** Optional Spotify client lyrics (best effort), then LRCLIB, lyrics.ovh, and Genius. */
+/**
+ * Query every configured provider concurrently before selecting the best timing.
+ * Promise.allSettled ensures one failing/unavailable provider cannot hide a more
+ * accurately synchronized result returned by another provider.
+ */
 export async function findLyrics(query: LyricsQuery, spotifyAccessToken?: string): Promise<Lyrics | null> {
+  // Keep provider order deterministic for equally good versions. Private Spotify
+  // Color Lyrics stays strictly opt-in, requiring an authorized session token.
+  const requests: Array<Promise<Lyrics | null>> = [];
   if (process.env.SPOTIFY_INTERNAL_LYRICS_ENABLED === "true" && spotifyAccessToken && query.trackId) {
-    const spotify = await lookupSpotifyColorLyrics(query.trackId, query.albumId, spotifyAccessToken);
-    if (spotify) return spotify;
+    requests.push(lookupSpotifyColorLyrics(query.trackId, query.albumId, spotifyAccessToken));
   }
-  let lrclibError: unknown;
-  try {
-    const result = await lookupLrclibLyrics(query);
-    if (result?.synced || result?.plainText) return result;
-  } catch (error) {
-    lrclibError = error;
-  }
+  requests.push(
+    lookupLrclibLyrics(query),
+    lookupLyricsOvh(query.title, query.artist),
+    lookupGeniusLyrics(query),
+  );
 
-  let ovhError: unknown;
-  try {
-    const fallback = await lookupLyricsOvh(query.title, query.artist);
-    if (fallback) return fallback;
-  } catch (error) { ovhError = error; }
-
-
-  try {
-    const genius = await lookupGeniusLyrics(query);
-    if (genius) return genius;
-  } catch (error) {
-    if (lrclibError) throw new Error(`Lyrics providers failed (LRCLIB: ${messageOf(lrclibError)}; Genius: ${messageOf(error)})`);
-    throw error;
-  }
-  return null;
-}
-
-function messageOf(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+  const results = await Promise.allSettled(requests);
+  return chooseBestLyricsV554(results.map(result => result.status === "fulfilled" ? result.value : null));
 }

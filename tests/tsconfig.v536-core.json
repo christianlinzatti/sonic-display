@@ -1,0 +1,5 @@
+{
+  "extends":"./tsconfig.v535-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../components/visualizer/genreAwareMotionDirectorV536.ts"]
+}

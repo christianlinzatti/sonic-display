@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
-const ts = (() => { try { return require('typescript'); } catch { return require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript/lib/typescript.js'); } })();
+const ts = require('./typescript-loader.cjs');
 const path = require('node:path');
 const root = path.resolve(__dirname,'..');
 const moduleSource = fs.readFileSync(path.join(root, 'components/visualizer/deviceRenderCalibrationV254.ts'), 'utf8');

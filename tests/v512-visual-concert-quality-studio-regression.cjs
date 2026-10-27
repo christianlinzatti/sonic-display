@@ -1,0 +1,75 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const {load}=require('./helpers/ts-loader-v404.cjs');
+const {appendVisualFrameV512:append,demoStageV512:demo,schematicPointsV512:screen,
+ qualityComparisonV512:compare,MAX_VISUAL_FRAMES_V512:limit}=load('components/visualizer/visualConcertQualityV512');
+const risk=(value=0)=>({risk:value,gestureScale:1-value*.7,accentScale:1-value*.4,closestSurface:value?-.05:Infinity});
+const motion=(count,verified=count*(count-1)/2,level=0)=>({active:level>0,pairsChecked:verified,nearPairs:level>=.5?1:0,slots:Array.from({length:count},(_,i)=>risk(i===0?level:0))});
+const reading=(n,t,level=0,verified=n*(n-1)/2)=>({at:t,avatars:n,source:n===2?'duo':'group',checkedPairs:verified,possiblePairs:n*(n-1)/2,
+ nearPairs:level>=.5&&verified?1:0,maxRisk:level,closestSurface:level>0?-.05:null});
+const positions=n=>Array.from({length:n},(_,i)=>[i*1.05,0,i%2===0?-.5:.5]);
+let history=[];
+assert.strictEqual(append(history,reading(2,1000),undefined,motion(2)),history,'missing positions ignored');
+assert.strictEqual(append(history,reading(2,1000),[[0,0,0]],motion(2)),history,'partial geometry ignored');
+assert.strictEqual(append(history,reading(2,1000),[[0,0,0],[Infinity,0,0]],motion(2)),history,'invalid world position ignored');
+assert.strictEqual(append(history,reading(5,1000),positions(5),motion(5)),history,'only 2-4 avatars');
+assert.strictEqual(append(history,reading(2,-10),positions(2),motion(2)),history,'invalid timestamps');
+history=append(history,reading(2,1000),positions(2),motion(2));
+assert.equal(history.length,1);
+assert.strictEqual(append(history,reading(2,1000),positions(2),motion(2)),history,'no duplicate');
+assert.strictEqual(append(history,reading(2,900),positions(2),motion(2)),history,'no time-travel');
+assert.equal(history[0].risks[0],0,'full coverage can report measured 0 risk');
+const unverified=append(history,reading(3,2000,0,0),positions(3),motion(3,0));
+assert(unverified[1].risks.every(r=>r===null),'unverified pairs may NEVER show safe');
+const partial=append(history,reading(3,2000,.7,1),positions(3),motion(3,1,.7));
+assert.equal(partial[1].risks[0],.7);
+assert(partial[1].risks.slice(1).every(r=>r===null),'partial coverage keeps nonrisk slots unknown');
+assert.equal(screen(partial[1]).length,3);
+assert(screen(partial[1]).every(p=>p.x>=32&&p.x<=428&&p.y>=25&&p.y<=245));
+for(const n of [2,3,4]) for(const pi of ['off','balanced','eco']){
+ const c=compare(n,pi);
+ assert.deepEqual(c.map(v=>v.tier),['high','balanced','low']);
+ assert.deepEqual(c.map(v=>v.hz),pi==='off'||n===2?[12,7,0]:pi==='balanced'?[6,6,0]:[4,4,0]);
+ assert(c.every(v=>v.maxAvatarReadsPerSecond===v.hz*n));
+}
+let tested=0;
+for(let i=0;i<36000;i++){
+ const n=2+i%3, verified=i%11===0?0:i%7===0?Math.max(1,n*(n-1)/2-1):n*(n-1)/2;
+ const danger=i%9===0?.87:i%17===0?.36:0;
+ const next=append(history,reading(n,2000+i*1001,danger,verified),positions(n),motion(n,verified,danger));
+ assert.notStrictEqual(next,history);
+ assert(next.length<=limit);
+ const f=next[next.length-1];
+ assert.equal(f.positions.length,n);
+ assert.equal(f.risks.length,n);
+ assert(f.risks.every(x=>x===null||x>=0&&x<=1));
+ assert(f.checkedPairs<=f.possiblePairs);
+ assert(screen(f).every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)));
+ history=next;
+ const scenario=['crossing','formation','duet'][i%3];
+ const d=demo(n,(i%101)/100,scenario);
+ assert.equal(d.positions.length,n);
+ assert(d.risks.every(x=>x!==null&&x>=0&&x<=1));
+ assert(demo(n,0,scenario).positions.every((p,j)=>p.join(',')===demo(n,0,scenario).positions[j].join(',')));
+ tested++;
+}
+assert.equal(history.length,limit);
+assert(demo(4,.5,'crossing').maxRisk>.5,'crossing simulation shows collision-risk circles');
+assert.notEqual(demo(3,0,'crossing').positions[0][2],demo(3,1,'crossing').positions[0][2]);
+const studio=fs.readFileSync('components/visualizer/VisualConcertQualityStudioV512.tsx','utf8');
+const ui=fs.readFileSync('components/visualizer/RenderDiagnosticsPanel.tsx','utf8');
+const runtime=fs.readFileSync('components/visualizer/concertStageQualityRuntimeV511.ts','utf8');
+const duo=fs.readFileSync('components/visualizer/DanceFormationActorsV492.tsx','utf8');
+const group=fs.readFileSync('components/visualizer/GroupDancersV326SceneV492.tsx','utf8');
+assert(ui.includes('<VisualConcertQualityStudioV512 />'));
+assert(runtime.includes('publishVisualFrameV512(next.readings[next.readings.length-1],input.positions,input.plan)'));
+assert(runtime.includes('clearVisualFramesV512()'));
+assert(duo.includes('visible:mode!=="solo"&&!props.reducedMotion,positions:[[a.x,a.y,a.z],[b.x,b.y,b.z]]'));
+assert(group.includes('visible:!props.reducedMotion,positions:Array.from({length:settings.count}'));
+assert(studio.includes('SIMULATION')&&studio.includes('LIVE-SITZUNG')&&studio.includes('keine echten GLB'));
+assert(studio.includes('useVisualFramesV512')&&studio.includes('qualityComparisonV512')&&studio.includes('type="range"'));
+const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+assert(/^0\.1\.0-v(?:51[2-9]|5[2-9][0-9]|[6-9][0-9]{2,})$/.test(pkg.version),'V512 or newer release');
+assert(pkg.scripts['build:preflight'].includes('npm run test:v512 && npm run test:v512:types && npm run test:v511'));
+console.log(`PASS V512 Visual Concert Quality Studio: ${tested} deterministic frames, true stage position wiring, 2-4 dancers, missing evidence safety, touch timeline, 3-quality Pi budget comparison`);

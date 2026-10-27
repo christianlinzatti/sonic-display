@@ -1,0 +1,5 @@
+{
+  "extends":"./tsconfig.v534-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../components/visualizer/motionLibraryIntelligenceV535.ts"]
+}

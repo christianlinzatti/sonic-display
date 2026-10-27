@@ -1,0 +1,197 @@
+test:v451: PASS (0)
+PASS V451: deterministic lyrics priority, gaps, seek/stale index, paused, legacy, one metadata card, independent manual discovery
+
+test:v452: PASS (0)
+PASS V452: 2-4 avatars, shared hook groove, staggered verse responses, stable positions, easing, manual guards, no inferred artist or GLB rewrites
+
+test:v453: PASS (0)
+PASS V453: verified timed-word-only lip dynamics, bilabial closures, silence/seek guards, authorship, GLB/procedural sharing, reduced motion
+
+test:v454: PASS (0)
+PASS V454: portrait/ensemble coverage, lyric protection, 2–4 artist clearance, timing, pause/seek and manual camera priority
+
+test:v455: PASS (0)
+PASS V455: rapid-rap damping, long-line typography, valid timing, pause, reduced motion and render wiring
+
+test:v456: PASS (0)
+PASS V456: shared stage/info director, hook priority, solo/crew/interlude, lighting, camera, motion, pause, manual & reduced-motion safeguards
+
+test:v457: PASS (0)
+PASS V457: deterministic phrase-boundary continuity, 3-4 avatar energy, adaptive quality budgets, manual protections, track/pause guards and stage wiring
+
+test:v458: PASS (0)
+PASS V458: 2-4 avatar natural accents, hooks/verse, partner spacing, foot-IK, tiers, all manual/reduced-motion guards, 30-minute deterministic simulation
+
+test:v459: PASS (0)
+PASS V459: V453 continuity, verified next-word transitions, closure and edit priority, 3D/GLB, silence and reduced motion, bounded head motion
+
+test:v460: PASS (0)
+PASS V460: deterministic scene phrases; dual focus; camera, badges, automatic gestures; authored overrides; pause/reduced motion; seek-safe 30-minute simulation
+
+test:v461: PASS (0)
+PASS V461: lyric density, stage-safe typography, real word timing, reduced motion, 3D fallback, immutable performance controls, integration
+
+test:v462: PASS (0)
+PASS V462: rap face/verse/hook, kick-grounded hardstyle/hardtekk drops, bounded haze/sweeps, saved scenes/blackouts, low tier, no new GPU lights, 20k input matrix
+
+test:v463: PASS (0)
+PASS V463: song/recovery/visibility/pause guard, stale frames, manual priority, 30-minute 4-avatar policy simulation (330 accepted, 30 guarded), existing canvas/telemetry
+
+test:v464: PASS (0)
+PASS V464: musical arc (visual), repeated hooks, breathing, shared feature/camera/lighting, manual/lyrics priority, low tier, pauses/seeks, deterministic 30-minute playback
+
+test:v465: PASS (0)
+PASS V465: immersive 4-avatar label legibility, visual reply preservation, manual priority, reduced clutter, paused/split/unsynced behavior, 30-minute deterministic playback
+
+test:v466: PASS (0)
+PASS V466: real renderer wiring, opt-in projection, head-bone/estimated distinction, true DOM lyrics geometry, FPS/stale thresholds, no fabricated visibility or GPU data, 30-minute deterministic logic
+
+test:v467: PASS (0)
+PASS V467: three consecutive observations, rated actionable tips, provenance/fallback, no automatic intervention, no transient false positives, bounded history and 30-minute deterministic simulation
+
+test:v468: PASS (0)
+PASS V468: kick envelope, rate limiting, drop strength, reduced motion, low tier, 6000 frames, GLB material ownership and integration
+
+test:v469: PASS (0)
+V469 expanded genres passed: 34 genres, 22 Last.fm aliases, scene/dance/lighting/override/accessibility checks
+
+test:v470: PASS (0)
+PASS V470: 34 genres, 7 Rock/Pop variants, Last.fm fusion evidence, visual/dance blend, manual overrides, reduced motion, lyrics, integration
+
+test:v471: PASS (0)
+PASS V471: Deutschrap verse/hook, Pop/Rock motion style, fusion, authored protection, pause, reduced motion, scene integration
+
+test:v472: PASS (0)
+PASS V472: synced lyric windows, word vs line, hook, no false singer claims, authored cast + duet, pause, reduced motion, manual priority and GLB/procedural wiring
+
+test:v473: PASS (0)
+PASS V473: synced flow-density and switch hints, modest adlib candidates, silent gaps, manual cast priority, pause/reduced-motion, GLB + procedural paths
+
+test:v474: PASS (0)
+PASS V474: stable nonrepeating verse motifs, synchronized asymmetric hooks, 4 dancers, casting/manual priority, pause/silence/reduced motion, bounded GLB/procedural integration
+
+test:v475: PASS (0)
+PASS V475: deterministic visual feature replies and 4-avatar hook reactions, protected manual vocal roles, bounded look/gesture cues, performance tiers, pause/seek and live 3D integration
+
+test:v476: PASS (0)
+PASS V476: verified word-bounded shaping, fast rap coarticulation, closures/audio/manual author priority, pause/seeks, deterministic 30-minute playback, GLB and procedural render paths
+
+test:v477: PASS (0)
+PASS V477: verified timestamps vs line-sync, seek/pause/reduced motion, multi-avatar typography, 3D mesh protection, 5k deterministic plans
+
+test:v478: PASS (0)
+PASS V478: ensemble/portrait/lyrics coordinated camera, existing lighting gain, authored guards, low-tier, seek/pause, 30-minute pure show direction
+
+test:v479: PASS (0)
+PASS V479: Pi opt-in, 1–4 avatar budgets, 5 bad/18 good frames, cooldown, manual FX priority, pause/hidden/stale, 30-minute deterministic run
+
+test:v480: PASS (0)
+PASS V480: 30-min bounded session diagnostics, truthful FPS/P95, pause/hidden/stale guards, budget transition events, Pi off, local report and passive UI wiring
+
+test:v481: PASS (0)
+PASS V481: actual clip lookup, procedural two-leg crouch wiring, staggered 4-avatar verses, protected manuals, gated sync drops, playback replay, bounded 30-min check
+
+test:v482: PASS (0)
+PASS V482: smooth pelvis/knee coupling, torso weight shifts, GLB clip hysteresis & overrides, 30-minute stability, stage wiring
+
+test:v483: PASS (0)
+PASS V483: interactive low-pose glances, staggered rise, limits, overrides, seek reset, 30-minute stability, R3F wiring
+
+test:v484: PASS (0)
+PASS V484: expressive low-pose arms, rap/hardstyle patterns, GLB-safe layering, overrides, tiers, seek safety, 33-minute simulation
+
+test:v485: PASS (0)
+PASS V485: automatic near-pass, procedural step, rejoin, low-drop, lyrics/manual/IK guards, collision centers, seek, 33-min simulation
+
+test:v486: PASS (0)
+PASS V486: song-clock stance, alternating foot swings, measured GLB IK support, guard priority, BPM seek, 33-min simulation
+
+test:v487: PASS (0)
+PASS V487: real IK anchor drift estimates, contact confidence, slot diagnosis, only optional travel damping, 33-minute guard test and UI wiring
+
+test:v488: PASS (0)
+PASS V488: bounded full-body squat/step coupling, no planted-foot knee override, manual/reduced-motion safeguards, source wiring, deterministic 33-minute playback
+
+test:v489: PASS (0)
+PASS V489: grounded low-clip transitions, bounded motion matching, authored/IK protection, deterministic long-play, live mixer wiring
+
+test:v490: PASS (0)
+PASS V490: safe upper channels, installed GLB source selection, planted-foot weighting, authored priority, runtime mixer integration, long-play
+
+test:v491: PASS (0)
+PASS V491: safe channel masks, missing/reduced-motion fallbacks, bounded weight, mixer-driven GLB preview and scrub
+
+test:v492: PASS (0)
+PASS V492: strict import/export, scope, update/delete contract, missing clips, safe channels, genre, manual protection and live mixer
+
+test:v493: PASS (0)
+V493 Intelligent Motion Preset Director PASS: phase, energy, cooldown, dancer variation, seek, priority and mixer
+
+test:v494: PASS (0)
+PASS V494: contact-aware optional GLB travel, safe reset/guards, per-model calibration, 30-minute simulation, stable render architecture
+
+test:v495: PASS (0)
+PASS V495: phase-stable ensemble roles, manual priority, contact-safe choreography, seek resets, 30-minute simulation
+
+test:v496: PASS (0)
+PASS V496: manual timestamp singer timeline, duet/hook lip masks, seek, validation, integration, 30-minute simulation
+
+test:v497: PASS (0)
+PASS V497: joined solo/duet/hook camera & lights, lyric and manual priority, 30-minute simulation
+
+test:v498: PASS (0)
+PASS V498: timestamp-safe vocal transitions, cue precedence, actual avatar light handoff and 30-minute bounded simulation
+
+test:v499: PASS (0)
+PASS V499: deterministic manual-timeline vocal micro-expression, continuity, rap articulation, synced word bounds, priority/fallback, GLB and procedural wiring
+
+test:v500: PASS (0)
+PASS V500: editorial solo/reply/duet/hook, 2–4 performers, track safety, manual priority, bounds, 30min, both stages
+
+test:v501: PASS (0)
+PASS V501: timestamp-accurate accents, pause/seek, missing timing, 4-avatar/3D safe layout, 15k deterministic plans, CSS, wiring
+
+test:v502: PASS (0)
+PASS V502 concert genre cues, protected overrides, visual wiring, 18,000 bounded timeline samples
+
+test:v503: PASS (0)
+PASS V503 gesture and facial safeguards; GLB/procedural wiring, 20,000 bounded playback frames
+
+test:v504: PASS (0)
+PASS V504: 24,000 samples, solo/duet/reply/hook, 2-4 avatars, deterministic seeks, manual/cross-track safety, duo/group wiring
+
+test:v505: PASS (0)
+PASS V505: 26,000 deterministic frames, 77999 actor slots, spatial gaze, crowd-distance safety, V494 grounded auto-group spacing, manual priorities
+
+test:v506: PASS (0)
+PASS V506: 28,000 deterministic frames, 83999 actor samples, 77006 forecast close pairs, swept crossing, gesture and foot guards, 2-4 actors
+
+test:v507: PASS (0)
+PASS V507: 30,000 deterministic body profiles, rest-pose measurement, stale-cleanup registry, 2-4 avatar body-envelope integration
+
+test:v508: PASS (0)
+PASS V508: 32,000 4-avatar frames; live rig capsules, 3D segment distance, staleness/manual/low-tier guards and duo/group wiring
+
+test:v509: PASS (0)
+PASS V509 Natural Ensemble Choreography: 36,000 3/4-avatar frames, manual/vocal evidence guards, collision and foot IK
+
+test:v510: PASS (0)
+PASS V510: 26,000 validated word playback frames (1829 active); lip-seal, manual roles, bounded motion, 3 rendering paths
+
+test:v511: PASS (0)
+PASS V511 Concert Quality: 32000 deterministic ensemble windows, explicit measurement coverage, Pi opt-in cadence, duo/group/GLB/diagnostics wiring
+
+test:v512: PASS (0)
+PASS V512 Visual Concert Quality Studio: 36000 deterministic frames, true stage position wiring, 2-4 dancers, missing evidence safety, touch timeline, 3-quality Pi budget comparison
+
+test:v513: PASS (0)
+PASS V513 Real 3D Concert Quality Preview: 26000 sampled stages, 2–4 dancers, missing-measurement safety, lazy Canvas, cloned GLBs, embedded/external motions, Pi caps
+
+test:v514: PASS (0)
+PASS V514 Smart Concert Motion Quality Inspector: 28000 dynamic samples, joint angles, foot sliding, pose jumps, missing rigs, seek safety, bounded timeline, Pi sampler, opt-in preview integration
+
+test:v515: PASS (0)
+PASS V515 Intelligent Motion Correction: 30000 variable-FPS auto-accent frames, authored priority, safe reset, role integrity, advisory-only foot-sliding, V514 integration
+
+test:v516: PASS (0)
+PASS V516 Natural Vocal & Dance Synchronization: 32000 Deutschrap/duet/chorus frames, timed words only, sealed lip channels, authored roles, manual guards, three rendering paths

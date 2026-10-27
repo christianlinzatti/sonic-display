@@ -76,15 +76,16 @@ for(let i=0;i<5;i++)for(let slot=0;slot<4;slot++){
 }
 assert.equal(v474.selectRapGestureMotifV474('',0,0,'verse'),'none');
 assert.equal(v474.selectRapGestureMotifV474(trackId,-1,0,'verse'),'none');
-const renderer=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
-assert(/import\s*\{\s*resolveNaturalRapGestureV474\s*\}/.test(renderer));
-assert(renderer.includes('const variationV474=resolveNaturalRapGestureV474(enhanceRapAccentV473('));
-assert(renderer.includes('const vocalV472=variationV474.accent;'));
-assert(renderer.includes('const vocalV472=resolveNaturalRapGestureV474(enhanceRapAccentV473('));
-assert(renderer.includes('musicMotionV468.updateMotion(audio,delta,isPlaying&&!reducedMotion&&(audioMotionEnabledV468??true),genreCue,vocalV472)'));
-assert(renderer.includes('variationV474.headTurn'));
-assert(renderer.includes('variationV474.headTilt'));
-assert(renderer.includes('variationV474.torsoSway'));
+const gltf=fs.readFileSync('components/visualizer/useGltfVocalMotionV492.ts','utf8');
+const procedural=fs.readFileSync('components/visualizer/ProceduralDancerAvatarV492.tsx','utf8');
+assert(gltf.includes('resolveNaturalRapGestureV474(enhanceRapAccentV473(resolveVocalDanceAccentV472('));
+assert(gltf.includes('const vocalV472=resolveNaturalRapGestureV474('));
+assert(gltf.includes('musicMotionV468.updateMotion(audio,delta,isPlaying&&!reducedMotion&&(audioMotionEnabledV468??true),genreCue,correctedVocalV515,'));
+assert(procedural.includes('const variationV474=resolveNaturalRapGestureV474(enhanceRapAccentV473('));
+assert(procedural.includes('const vocalV472=coordinateRapDanceV526(rapDynamicsV583.accent,')&&procedural.includes('const rapDynamicsV583=planRapPerformanceDynamicsV583(variationV474.accent,')&&procedural.includes('variationV474.headTilt')); 
+assert(procedural.includes('variationV474.headTurn'));
+assert(procedural.includes('variationV474.headTilt'));
+assert(procedural.includes('variationV474.torsoSway'));
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1])>=474);
 assert(pkg.scripts['build:preflight'].includes('npm run test:v474 && npm run test:v474:types'));

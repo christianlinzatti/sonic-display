@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.v498-core.json",
+  "compilerOptions": {"incremental": false},
+  "files": [
+    "../components/visualizer/naturalVocalExpressionV499.ts",
+    "../components/visualizer/expressiveLipSyncV476.ts",
+    "../components/visualizer/advancedVocalPerformanceV459.ts",
+    "../components/visualizer/expressiveLipSyncV453.ts",
+    "../components/visualizer/vocalTimeDirectorV496.ts",
+    "v414-music-types.d.ts", "stubs/v415-three-types.d.ts"
+  ]
+}

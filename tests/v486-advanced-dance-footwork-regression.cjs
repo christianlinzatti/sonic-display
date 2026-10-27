@@ -76,8 +76,24 @@ const avatar=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
 for(const token of ['planAdvancedDanceFootworkV486({','GroupFootSupportContextV486.Provider',
  'GroupFootworkContextV486.Provider','groupSupportV486.current.leftPlanted',
  'groupSupportV486.current.rightPlanted','groupFootworkV486?.current.liftLeft',
- 'advancedFootworkV486.slots[i].rootSpeed','advancedFootworkV486.slots[i].offsetX']){
+ 'naturalFootworkV524.slots[i].rootSpeed']){
  assert(avatar.includes(token),`live R3F integration missing ${token}`);
+}
+// V494 scales only optional V486 offsets after checking planted-foot drift.
+// Accept the original wiring or the newer V494 safe forwarding without weakening
+// the requirement that the real V486 planner still feeds the visible root target.
+const groundingSource=fs.readFileSync('components/visualizer/realisticGlbFootContactV494.ts','utf8');
+for(const axis of ['X','Z']){
+ const original=avatar.includes(`advancedFootworkV486.slots[i].offset${axis}`);
+ const protectedV524=avatar.includes('const naturalFootworkV524=stabilizedBodyV524.footwork')&&
+  avatar.includes('footwork:advancedFootworkV486,')&&
+  fs.readFileSync('components/visualizer/naturalFullBodyDanceV524.ts','utf8').includes(`offset${axis}:source.offset${axis}`)&&
+  avatar.includes('stepNaturalFullBodyV524(naturalBodyStateV524.current');
+ const forwarded=avatar.includes(`groundDecisionsV494[i].offset${axis}`)&&
+  (avatar.includes('footwork:advancedFootworkV486.slots[i]')||
+   (avatar.includes('footwork:naturalFootworkV524.slots[i]')&&protectedV524))&&
+  groundingSource.includes(`offset${axis}:f.offset${axis}*gain`);
+ assert(original||forwarded,`V486 ${axis} optional travel forwarding must stay wired`);
 }
 assert(!avatar.includes('Math.sin(state.clock.elapsedTime*5+workloadSlot*.7)'),'V485 unscoped renderer clock must not drive step');
 const source=fs.readFileSync('components/visualizer/advancedDanceFootworkV486.ts','utf8');

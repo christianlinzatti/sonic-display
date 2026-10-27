@@ -1,0 +1,5 @@
+{
+  "extends":"./tsconfig.v605-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../components/visualizer/concertLyricsPerformerHarmonyV606.ts","../components/visualizer/cinematicFullSongCameraV605.ts","../components/visualizer/cinematicConcertCameraV550.ts","../components/visualizer/cinematicCameraCompositionV540.ts","v414-music-types.d.ts","stubs/v415-three-types.d.ts","stubs/v508-three-types.d.ts"]
+}

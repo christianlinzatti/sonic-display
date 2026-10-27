@@ -3,6 +3,7 @@
 import { useRef, useState, type CSSProperties } from "react";
 import { STAGE_ENVIRONMENTS, type StageEnvironmentId } from "@/components/visualizer/stages";
 import dynamic from "next/dynamic";
+import type {ConcertDetailSettingsV555} from "./concertDetailEffectsV555";
 
 // The heavy R3F / Three.js preview code is never needed for the initial card grid.
 const StageThemeCardScene = dynamic(
@@ -20,12 +21,14 @@ export function StageThemePreviewGrid({
   reactive = true,
   lightStrength = 60,
   reducedMotion = false,
+  concertDetailsV555,
 }: {
   value: StageEnvironmentId;
   onChange: (theme: StageEnvironmentId) => void;
   reactive?: boolean;
   lightStrength?: number;
   reducedMotion?: boolean;
+  concertDetailsV555?:ConcertDetailSettingsV555;
 }) {
   const [hoveredStage, setHoveredStage] = useState<StageEnvironmentId | null>(null);
   const [activatedStage, setActivatedStage] = useState<StageEnvironmentId | null>(null);
@@ -147,6 +150,7 @@ export function StageThemePreviewGrid({
     reactive={reactive}
     lightStrength={lightStrength}
     reducedMotion={reducedMotion}
+    concertDetailsV555={concertDetailsV555}
   />}
   </>;
 }

@@ -1,0 +1,10 @@
+{
+  "extends":"./tsconfig.v570-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/rapMouthDynamicsV572.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v569-react-types.d.ts"
+  ]
+}

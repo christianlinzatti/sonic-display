@@ -1,5 +1,6 @@
 import type { Mesh, Object3D } from "three";
 import type { FacialPoseV369 } from "./facialPerformanceV369";
+import type {MouthCalibrationV562} from "./advancedFacialCalibrationV562";
 
 /** Facial mappings are attached to an avatar's stable library ID, not to Three.js UUIDs. */
 export type FacialChannelV370 = keyof FacialPoseV369;
@@ -16,6 +17,8 @@ export type FacialProfileV370 = {
   mapping?: Partial<Record<FacialChannelV370,string>>;
   /** Per-channel multiplier 0–2 (0–200%). */
   gains?: Partial<Record<FacialChannelV370,number>>;
+  /** Opt-in V562 mouth/phoneme-shape limits, avatar-specific and shared with the live rig. */
+  mouthCalibrationV562?:MouthCalibrationV562;
 };
 export type FacialTargetV370 = {
   id:string; name:string; meshName:string; mesh:Mesh; index:number;

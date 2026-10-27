@@ -1,0 +1,5 @@
+{
+ "extends":"./tsconfig.v414-core.json",
+ "compilerOptions":{"incremental":false},
+ "files":["../components/visualizer/cinematicCameraCompositionV540.ts"]
+}

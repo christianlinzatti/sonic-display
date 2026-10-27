@@ -1,0 +1,13 @@
+{
+  "extends":"./tsconfig.v586-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/expressiveDanceFootworkV587.ts",
+    "../components/visualizer/naturalFullBodyDanceV524.ts",
+    "../components/visualizer/advancedDanceFootworkV486.ts",
+    "../components/visualizer/avatarRigController.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v569-react-types.d.ts"
+  ]
+}

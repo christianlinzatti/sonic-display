@@ -1,0 +1,11 @@
+{
+  "extends":"./tsconfig.v506-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/avatarBodyAwarenessV507.ts",
+    "../components/visualizer/multiAvatarCollisionAvoidanceV506.ts",
+    "../components/visualizer/partnerGestureEngine.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

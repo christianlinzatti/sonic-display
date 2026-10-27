@@ -5,6 +5,27 @@ export interface LyricLine { startMs:number; endMs:number|null; text:string; wor
 export interface Lyrics { provider:"lrclib" | "lyrics.ovh" | "genius" | "spotify"; synced:boolean; lines:LyricLine[]; plainText:string|null; }
 export type ConnectionStatus = "connected" | "reconnecting" | "disconnected";
 export interface UiPreferences {
+  concertDetailEnabledV555?: boolean;
+  concertGoboV555?: boolean;
+  concertPixelWallV555?: boolean;
+  concertFloorFogV555?: boolean;
+  concertDuetArcV555?: boolean;
+  concertAdlibEchoV555?: boolean;
+  concertHookProjectionV555?: boolean;
+  concertRhymeAccentV555?: boolean;
+  concertDetailStrengthV555?: number;
+  concertAvatarLightV557?: boolean;
+  concertAvatarLightStrengthV557?: number;
+  concertPortraitLightV558?: boolean;
+  concertPortraitWarmthV558?: number;
+  concertBeatPortraitLightV559?: boolean;
+  concertBeatPortraitStrengthV559?: number;
+  smartConcertDirectorEnabledV568?: boolean;
+  smartConcertDirectorStrengthV568?: number;
+  concertCinematicFaceLightV566?: boolean;
+  concertCinematicFaceStrengthV566?: number;
+  concertGlbMaterialQualityV560?: boolean;
+  concertGlbMaterialStrengthV560?: number;
   geniusSongInsightsEnabledV447?:boolean;
   geniusCinematicEnabledV448?:boolean;
   geniusDiscoveryEnabledV449?:boolean;
@@ -125,6 +146,8 @@ export interface UiPreferences {
   rapDuetEnabledV416?: boolean;
   rapDuetCameraV416?: boolean;
   rapDuetAssignmentsV416?: Record<string, import("@/components/visualizer/rapDuetStudioV416").RapDuetAssignmentV416[]>;
+  vocalTimeEnabledV496?: boolean;
+  vocalTimeSegmentsV496?: import("@/components/visualizer/vocalTimeDirectorV496").VocalTimeLibraryV496;
   avatarManualVocalEnabledV385?: boolean;
   avatarManualVocalCameraV385?: boolean;
   avatarVocalAssignmentsV385?: Record<string, import("@/components/visualizer/manualVocalCastingV385").VocalAssignmentV385[]>;

@@ -1,0 +1,12 @@
+{
+  "extends":"./tsconfig.v525-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/unifiedConcertPerformanceV526.ts",
+    "../components/visualizer/cinematicLyricsExperienceV525.ts",
+    "../components/visualizer/advancedDeutschrapLipSyncV523.ts",
+    "../components/visualizer/naturalDeutschrapSyncV516.ts",
+    "../components/visualizer/vocalAwareChoreographyV472.ts",
+    "v414-music-types.d.ts", "stubs/v415-three-types.d.ts", "stubs/v508-three-types.d.ts"
+  ]
+}

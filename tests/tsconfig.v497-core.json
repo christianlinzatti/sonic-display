@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.v496-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/cinematicConcertChoreographyV497.ts"
+  ]
+}

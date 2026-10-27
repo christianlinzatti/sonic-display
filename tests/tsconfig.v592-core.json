@@ -1,0 +1,8 @@
+{
+ "extends":"./tsconfig.v591-core.json",
+ "compilerOptions":{"incremental":false},
+ "files":[
+   "../components/visualizer/liveStageQualityV592.ts",
+   "stubs/v415-three-types.d.ts"
+ ]
+}

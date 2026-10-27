@@ -61,6 +61,6 @@ for(let i=0;i<115000;i++){
  assert(Number.isFinite(p)&&p>=0&&p<=.32);
 }
 const pkg=require('../package.json');
-assert(/^0\.1\.0-v49\d+$/.test(pkg.version),'V490 and subsequent compatible releases');
+assert(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=490,'V490 and subsequent compatible releases');
 assert(pkg.scripts['build:preflight'].includes('npm run test:v490 && npm run test:v490:types'));
 console.log('PASS V490: safe upper channels, installed GLB source selection, planted-foot weighting, authored priority, runtime mixer integration, long-play');

@@ -94,25 +94,34 @@ export function useGltfBlendPlaybackV492({actions,maskedOverlay,avatarBlendClip,
     autoUpperWeightV490.current += (desired-autoUpperWeightV490.current)*response;
     overlay.setEffectiveWeight(autoUpperWeightV490.current);
   });
-  // V492: explicit saved preset uses the SAME mixer as V489/V490. The source
-  // clip is cloned/masked at setup time; no additional useFrame state updates.
+  // V493: fade out the previous masked preset while the next fades in.
+  // No second mixer and no root/hip/foot tracks are ever driven here.
+  const activePresetNameV493=activeLiveBlendV492?.actionName??null;
+  const presetWeightsV493=useRef<Map<string,number>>(new Map());
   useEffect(()=>{
-    const action=activeLiveBlendV492?actions[activeLiveBlendV492.actionName]:undefined;
-    if(!action)return;
-    action.reset().stopFading().setEffectiveWeight(0).play();
-    return()=>{action.stop();};
-  },[actions,activeLiveBlendV492?.actionName]);
-  const livePresetWeightV492=useRef(0);
+    // When Drei replaces the mixer, dispose only actions registered on the old one.
+    const weights=presetWeightsV493.current;
+    return ()=>{for(const name of weights.keys())actions[name]?.stop();weights.clear();};
+  },[actions]);
   useFrame((_,delta)=>{
-    const p=activeLiveBlendV492;
-    const action=p?actions[p.actionName]:undefined;
-    if(!p||!action){livePresetWeightV492.current=0;return;}
-    const left=footIK.current.left?.contact.phase==='planted';
-    const right=footIK.current.right?.contact.phase==='planted';
-    const support=left&&right?.82:left||right?.92:1;
-    const target=Math.max(0,Math.min(.5,p.weight*support));
-    livePresetWeightV492.current+=(target-livePresetWeightV492.current)*Math.min(1,Math.max(0,delta)*5);
-    action.setEffectiveWeight(livePresetWeightV492.current);
+    const weights=presetWeightsV493.current;
+    const targetName=activePresetNameV493&&actions[activePresetNameV493]?activePresetNameV493:null;
+    if(targetName&&!weights.has(targetName)){
+      const action=actions[targetName];
+      if(action){action.reset().stopFading().setEffectiveWeight(0).play();weights.set(targetName,0);}
+    }
+    const response=Math.min(1,Math.max(0,delta)*4.5);
+    for(const [name,previous] of weights){
+      const action=actions[name];
+      if(!action){weights.delete(name);continue;}
+      const left=footIK.current.left?.contact.phase==='planted';
+      const right=footIK.current.right?.contact.phase==='planted';
+      const support=left&&right?.82:left||right?.92:1;
+      const target=name===targetName?Math.max(0,Math.min(.5,(activeLiveBlendV492?.weight??0)*support)):0;
+      const weight=previous+(target-previous)*response;
+      if(name!==targetName&&weight<.002){action.stop();weights.delete(name);}
+      else{action.setEffectiveWeight(weight);weights.set(name,weight);}
+    }
   });
   return overlayName;
 }

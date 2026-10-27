@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.v497-core.json",
+  "compilerOptions": { "incremental": false },
+  "files": ["../components/visualizer/vocalHandoffDirectorV498.ts"]
+}

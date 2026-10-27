@@ -1837,3 +1837,316 @@
 .avatar-v491-blend-controls :disabled{opacity:.55;cursor:not-allowed}
 .avatar-motion-blend-preview-v491 [role=status]{color:#b5d0ff}
 .avatar-motion-blend-preview-v491 small{color:#b6c4d4;display:block;line-height:1.45}
+
+/* V501 Cinematic Lyrics Experience 5.0 – playback-anchored, readable stage captions.
+   No free-running keyframe animations: seek/pause and true word timing stay authoritative. */
+.lyrics.v501-cinematic-lyrics .v501-active-line {
+  position:relative; isolation:isolate; opacity:var(--v501-reveal,1);
+  translate:0 var(--v501-offset,0px);
+}
+.lyrics.v501-cinematic-lyrics .v501-active-line::before {
+  content:""; position:absolute; z-index:-1; pointer-events:none;
+  inset:-.23em -.38em; border-radius:.36em;
+  background:linear-gradient(108deg,rgba(5,11,27,.84),rgba(12,18,43,.64) 58%,rgba(10,16,34,.36));
+  opacity:var(--v501-plate,.12);
+  box-shadow:0 .2em 1em rgba(0,0,0,.12);
+}
+.lyrics.v501-cinematic-lyrics .v501-active-line .kinetic-word {
+  text-shadow:0 0 calc(10px * var(--v501-word-accent,0)) var(--studio-color-from,#79f7ff);
+}
+/* Crowded performances need the stage actors in the center and a bounded lyric panel. */
+.immersive-lyrics-overlay.v461-immersive-overlay .lyrics.v501-cinematic-lyrics.v501-cast-3,
+.immersive-lyrics-overlay.v461-immersive-overlay .lyrics.v501-cinematic-lyrics.v501-cast-4 {
+  padding:clamp(10px,1vw,15px);
+  background:linear-gradient(105deg,rgba(5,10,24,.74),rgba(7,13,31,.90));
+  text-shadow:0 2px 9px rgba(0,0,0,.74);
+}
+.immersive-lyrics-overlay.v461-immersive-overlay .lyrics.v501-cinematic-lyrics.v501-cast-4 .lyric.active {
+  overflow-wrap:anywhere; text-wrap:pretty;
+}
+@media(max-width:760px) {
+  .immersive-lyrics-overlay.v461-immersive-overlay .lyrics.v501-cinematic-lyrics .v501-active-line::before {
+    inset:-.18em -.2em;
+  }
+  .immersive-lyrics-overlay.v461-immersive-overlay .lyrics.v501-cinematic-lyrics.v501-cast-4 { padding:10px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .lyrics.v501-cinematic-lyrics .v501-active-line {translate:none!important;transition:none!important;}
+  .lyrics.v501-cinematic-lyrics .v501-active-line .kinetic-word {text-shadow:none!important;animation:none!important;}
+}
+
+/* V502: small visual-only hook/drop emphasis; no word-fill or font-size mutation. */
+.lyrics.v502-concert-lyrics .v501-active-line {
+  text-shadow: 0 0 calc(7px * var(--v502-concert-accent,0)) var(--studio-color-to,#d789ff);
+}
+.lyrics.v502-concert-lyrics .v501-active-line::before {
+  opacity:clamp(0,calc(var(--v501-plate,.12) + var(--v502-concert-accent,0) * .25),1);
+}
+@media (prefers-reduced-motion:reduce) {
+  .lyrics.v502-concert-lyrics .v501-active-line {text-shadow:none!important;}
+}
+
+/* V512 - touch-friendly, read-only stage-safety storyboard */
+.v512-quality-studio{padding:1rem;margin:1.15rem 0;border:1px solid rgba(140,160,200,.35);border-radius:12px}
+.v512-quality-studio h4{margin:.35rem 0 .65rem}
+.v512-controls{display:flex;flex-wrap:wrap;gap:.85rem;margin:.6rem 0}
+.v512-controls label,.v512-quality-studio label{font-size:.88rem}
+.v512-quality-studio select,.v512-quality-studio input,.v512-quality-studio button{margin-left:.45rem;min-height:34px;max-width:100%}
+.v512-scrubber{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;margin:.8rem 0}
+.v512-scrubber input{flex:1;min-width:115px}
+.v512-stage-diagram{display:block;width:100%;height:auto;max-height:340px;margin:.65rem auto;touch-action:pan-y}
+.v512-legend{display:flex;gap:.5rem 1rem;flex-wrap:wrap;font-size:.78rem;margin:.6rem 0}
+.v512-legend span{display:inline-flex;align-items:center;gap:.3rem}
+.v512-legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.v512-tier-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;margin:.75rem 0}
+.v512-tier-cards>div{display:flex;flex-direction:column;gap:.3rem;padding:.65rem;background:rgba(120,148,190,.10);border:1px solid transparent;border-radius:8px;min-width:0}
+.v512-tier-cards>div.v512-active-tier{border-color:rgba(103,232,249,.72)}
+.v512-tier-cards span{font-size:1.3rem;font-weight:bold;font-variant-numeric:tabular-nums}
+.v512-tier-cards small{font-size:.76rem;opacity:.85;overflow-wrap:anywhere}
+@media(max-width:520px){.v512-quality-studio{padding:.65rem}.v512-tier-cards{gap:.25rem}.v512-tier-cards>div{padding:.45rem}}
+
+/* V514 — opt-in motion-inspector markers and tactile event timeline */
+.v514-motion-quality{margin:.8rem 0;padding:.8rem;border:1px solid rgba(135,166,200,.40);border-radius:10px;background:rgba(70,100,150,.07)}
+.v514-motion-quality h5{font-size:.98rem;margin:0 0 .5rem}
+.v514-event-timeline{overscroll-behavior:contain;scrollbar-width:thin}
+.v514-event-timeline button{font-size:.83rem;line-height:1.4;color:inherit;background:rgba(110,132,182,.13);touch-action:manipulation}
+.v514-event-timeline button:hover,.v514-event-timeline button:focus-visible{outline:2px solid rgba(102,221,246,.82);outline-offset:1px}
+@media(max-width:520px){.v514-motion-quality{padding:.6rem}.v514-event-timeline button{font-size:.78rem}}
+
+/* V525 – readable stage captions, no additional animation clock or stage actor movement.
+   Never alter user-defined 3D spatial coordinates or the actual word-fill gradient. */
+.lyrics.v525-cinematic-lyrics .v525-active-line {
+  overflow-wrap:anywhere;
+  text-wrap:pretty;
+  text-shadow:0 2px 10px rgba(0,0,0,.94),0 0 22px rgba(0,0,0,.43);
+}
+.lyrics.v525-cinematic-lyrics .v525-active-line::before {
+  background:linear-gradient(112deg,rgba(4,9,22,.94),rgba(9,16,36,.87) 60%,rgba(9,16,33,.76));
+  box-shadow:0 .2em .85em rgba(0,0,0,.32);
+}
+.immersive-lyrics-overlay.v461-immersive-overlay .lyrics.v525-cinematic-lyrics.v525-dense-stage {
+  color:#f8faff;
+  border:1px solid rgba(210,232,255,.22);
+}
+/* 10-inch landscape touchscreen: reserve the stage center, increase the side
+   caption's usable area slightly without overlapping the avatar group. */
+@media (min-width:761px) and (max-width:1100px) {
+  .immersive-lyrics-overlay.v461-immersive-overlay:has(.v525-cinematic-lyrics.v525-dense-stage) {
+    width:min(39vw,425px);
+    max-width:calc(47% - 14px);
+  }
+  .immersive-lyrics-overlay.v461-immersive-overlay .lyrics.v525-cinematic-lyrics.v525-dense-stage {
+    padding:clamp(10px,1.3vw,16px);
+  }
+}
+@media (max-width:760px) {
+  .immersive-lyrics-overlay.v461-immersive-overlay .lyrics.v525-cinematic-lyrics {
+    padding:clamp(10px,2.2vw,15px);
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .lyrics.v525-cinematic-lyrics .v525-active-line {transition:none!important;translate:none!important;}
+  .lyrics.v525-cinematic-lyrics .v525-active-line .kinetic-word {animation:none!important;transition:none!important;transform:none!important;}
+}
+
+/* V541 – Cinematic Lyrics Experience 7.0. Visual-only enhancements anchored to
+   existing lyric timestamps and V540 camera-safe stage boundaries. */
+.lyrics.v541-cinematic-lyrics .v541-active-line {
+  text-wrap:pretty;
+  overflow-wrap:anywhere;
+  hyphens:none;
+  text-shadow:0 2px 9px rgba(0,0,0,var(--v541-contrast,.75));
+}
+.lyrics.v541-cinematic-lyrics .v541-active-line::before {
+  opacity:var(--v541-plate,.84);
+  box-shadow:0 .22em 1.1em rgba(0,0,0,.27);
+}
+.lyrics.v541-cinematic-lyrics .v541-active-line .kinetic-word {
+  /* No additional animation clock. A modest, clock-derived focus ring is easier
+     to read during rapid Deutschrap without overriding true karaoke fill. */
+  text-shadow:0 0 calc(4px * var(--v541-word-focus,0)) var(--studio-color-from,#79f7ff);
+  filter:drop-shadow(0 0 calc(5px * var(--v541-word-glow,0)) var(--studio-color-from,#79f7ff));
+}
+.lyrics.v541-cinematic-lyrics .v541-rapid.v541-active-line .kinetic-word {
+  animation:none;
+  transition:filter .10s linear, transform .10s linear;
+  letter-spacing:.012em;
+}
+.lyrics.v541-cinematic-lyrics .v541-dense.v541-active-line {line-height:1.42}
+@media (min-width:761px) and (max-width:1100px) {
+  .immersive-lyrics-overlay.v461-immersive-overlay .lyrics.v541-cinematic-lyrics .v541-active-line {
+    max-width:100%;overflow-wrap:anywhere;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .lyrics.v541-cinematic-lyrics .v541-active-line .kinetic-word {
+    animation:none!important;transition:none!important;transform:none!important;
+    filter:none!important;text-shadow:none!important;
+  }
+}
+
+/* V544: opt-in A/B review of real head projections; viewport stays untouched. */
+.v544-live-compare{margin:10px 0;padding:8px;border:1px solid #547b9c;border-radius:8px;background:#102238;color:#edf6ff}
+.v544-live-compare summary{cursor:pointer;font-weight:700;min-height:32px}
+.v544-live-compare p{font-size:11px;line-height:1.5}
+.v544-buttons{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}
+.v544-buttons button,.v544-live-compare button{background:#193b56;color:#fff;border:1px solid #7faccb;padding:5px 7px;border-radius:6px;font:inherit;cursor:pointer}
+.v544-live-compare button:disabled{cursor:not-allowed;opacity:.6}
+.v544-compare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.v544-scene{min-width:0;border:1px solid #4d6d85;padding:6px;border-radius:6px;background:#152b42;font-size:10px}
+.v544-scene svg{width:100%;height:auto;display:block;margin:6px auto}
+.v544-scene small{display:block;line-height:1.45;color:#cbe0ee}
+.v544-scene ul{margin:5px 0;padding-left:14px;overflow-wrap:anywhere}
+.v544-review-row{display:block;font-size:10px;margin:4px 0}
+.v544-review-row select{display:block;width:100%;color:#fff;background:#123049;border:1px solid #7faccb;border-radius:4px;font-size:11px;padding:3px}
+@media(max-width:330px){.v544-compare-grid{grid-template-columns:1fr}}
+
+/* V549 – keeps the per-word fill linked directly to the playback clock. Only
+   small decorative accents transition, never the karaoke width or position. */
+.lyrics.v549-cinematic-lyrics .v549-vocal-caption {
+  display:block;max-width:100%;margin:.15rem auto .35rem;padding:.2rem .65rem;
+  width:max-content;border:1px solid rgba(121,247,255,.34);border-radius:99px;
+  color:#c7f9ff;background:rgba(5,16,29,.75);font-size:.75em;font-weight:600;
+  overflow-wrap:anywhere;letter-spacing:.018em;
+}
+.lyrics.v549-cinematic-lyrics .v549-active-line .kinetic-word {
+  --v549-safe-motion:var(--v549-word-motion,0);
+  text-shadow:0 0 calc(3px * var(--v549-safe-motion)) var(--studio-color-from,#79f7ff);
+}
+.lyrics.v549-cinematic-lyrics .v549-handoff.v549-active-line::before {
+  opacity:var(--v541-plate,.94);
+}
+.lyrics.v549-cinematic-lyrics .v549-active-line {
+  overflow-wrap:anywhere;hyphens:none;
+}
+@media (prefers-reduced-motion:reduce) {
+  .lyrics.v549-cinematic-lyrics .v549-active-line .kinetic-word {
+    animation:none!important;transition:none!important;transform:none!important;
+    filter:none!important;text-shadow:none!important;
+  }
+}
+
+/* V555 – overlays never move or obscure the primary lyric lines. */
+.lyrics:has(.v555-adlib-echo){position:relative;}
+.lyrics .v555-adlib-echo{position:absolute;inset:auto .6rem 12% auto;pointer-events:none;
+  font-size:clamp(.75rem,1.5vw,1.2rem);font-weight:800;color:#a7eaff;
+  text-shadow:0 0 8px #3bd1ff;transform:translateX(0);z-index:1;display:flex;gap:.45rem;}
+.lyrics .v555-adlib-echo span:last-child{opacity:.28;transform:translate(10px,-7px) scale(.9);}
+.lyrics .v555-rhyme{box-shadow:inset 0 -2px var(--v555-rhyme-color,#83e4ff);}
+@media(prefers-reduced-motion:reduce){.lyrics .v555-adlib-echo{display:none;}}
+/* V556 – preview-only baseline: the actual karaoke position is never changed. */
+.v556-preview-main-lyrics{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  width:min(90%,680px);padding:8px 18px;pointer-events:none;text-align:center;
+  background:rgba(3,8,19,.83);border:1px solid rgba(188,220,255,.22);border-radius:10px;
+  color:#f8fbff;text-shadow:0 1px 3px #000;display:flex;flex-direction:column;gap:3px;
+  max-height:32%;overflow:hidden;}
+.v556-preview-main-lyrics small{font-size:.57rem;letter-spacing:.1em;color:#b5c9ea;}
+.v556-preview-main-lyrics strong{font-size:clamp(.85rem,1.7vw,1.25rem);line-height:1.28;}
+.v556-preview-control{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:#cde0f7;font-size:.82rem;}
+.v556-preview-control button{min-height:38px;padding:6px 12px;border-radius:8px;
+  color:#eaf3ff;background:#26394e;border:1px solid #ffffff3a;cursor:pointer;}
+.v556-preview-control button[aria-pressed="true"]{background:#315142;border-color:#baff74;color:#fff;}
+.v556-preview-budget{font-variant-numeric:tabular-nums;color:#a6c2df;font-size:.74rem;}
+@media(max-width:700px){.v556-preview-control button{flex:1 1 30%;font-size:.77rem;}
+  .v556-preview-main-lyrics{padding:5px 9px;max-height:29%;}}
+
+/* V570 – an explicit input audit; never badges a synthetic demo as hardware-verified. */
+.v570-experience-audit{padding:10px 13px;border:1px solid #c1d3e83d;border-radius:11px;background:#121f30;color:#e2eaf6;font-size:.84rem;}
+.v570-experience-audit summary{cursor:pointer;font-weight:700;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:7px;}
+.v570-experience-audit summary span{font-weight:400;color:#afc5dd;font-size:.76rem;}
+.v570-experience-audit p,.v570-experience-audit small{color:#b6c7dc;line-height:1.5;}
+.v570-experience-audit ul{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:8px;padding:0;margin:12px 0;}
+.v570-experience-audit li{display:flex;flex-direction:column;gap:4px;border:1px solid #ffffff1d;border-radius:8px;padding:9px 11px;background:#ffffff06;}
+.v570-experience-audit li strong{color:#e7effc;}
+.v570-experience-audit li span{color:#b6c7dc;font-size:.77rem;line-height:1.35;}
+.v570-experience-audit li[data-v570-status="ok"] strong{color:#a7e5c4;}
+.v570-experience-audit li[data-v570-status="pending"] strong{color:#c9d5e5;}
+
+/* V578: line-density-aware typography; protects 10-inch displays without movement. */
+.lyrics.v578-lyrics-readable.v578-dense .lyric.active,
+.lyrics.v578-lyrics-readable.v578-very-dense .lyric.active {
+  max-width:min(100%,calc(var(--v578-width-ch,48) * 1ch));
+  overflow-wrap:anywhere;
+  margin-inline:auto;
+  text-wrap:balance;
+  border-radius:.32em;
+  background:rgba(5,9,24,var(--v578-plate,0));
+  text-shadow:0 1px 3px rgba(0,0,0,.75), 0 0 calc(5px * var(--v578-glow-gain,1)) rgba(131,228,255,.18);
+}
+.lyrics.v578-very-dense .lyric.active {font-size:clamp(1.15rem,3.4vw,2.25rem);line-height:1.23;}
+@media (prefers-reduced-motion:reduce) { .lyrics.v578-lyrics-readable .lyric.active {transition:none;} }
+
+/* V598 – Beautiful Lyrics Experience 10.0.
+   Readable first: uses the existing text and timestamp-driven karaoke fill.
+   Extra accents must not move words, resize a performer or cover an avatar. */
+.lyrics.v598-beautiful-lyrics .v598-active-line {
+  max-width:min(100%,calc(var(--v598-width-ch,60) * 1ch));
+  margin-inline:auto;
+  text-wrap:balance;
+  overflow-wrap:anywhere;
+  font-kerning:normal;
+  font-optical-sizing:auto;
+  line-height:var(--v598-line-height,1.3);
+  text-shadow:0 2px 7px rgba(0,0,0,var(--v598-contrast,.8));
+  isolation:isolate;
+}
+/* Retain the V541 backdrop when stronger; never weaken an existing concert safety plate. */
+.lyrics.v598-beautiful-lyrics .v598-active-line::before {
+  opacity:max(var(--v541-plate,.82),var(--v598-plate,.1));
+}
+/* A modest inset highlight preserves the established V501/V541 backdrop plate. */
+.lyrics.v598-beautiful-lyrics.v598-hook .v598-active-line {
+  box-shadow:inset 0 -2px 0 rgba(135,227,255,var(--v598-hook-accent,0));
+}
+.lyrics.v598-beautiful-lyrics .v598-active-line .kinetic-word {
+  text-shadow:0 0 calc(3px * var(--v549-word-motion,0)) var(--studio-color-from,#79f7ff),
+    0 0 calc(6px * var(--v598-word-accent,0)) var(--studio-color-from,#79f7ff);
+  /* No transform or fill animation: rapid rap words must not jump or lag. */
+}
+.lyrics.v598-beautiful-lyrics.v598-dense .v598-active-line,
+.lyrics.v598-beautiful-lyrics.v598-very-dense .v598-active-line {
+  text-wrap:balance;
+}
+@media (max-width:1024px) {
+  .lyrics.v598-beautiful-lyrics .v598-active-line {
+    max-width:min(100%,calc(var(--v598-width-ch,60) * 1ch));
+  }
+  .immersive-lyrics-overlay .lyrics.v598-beautiful-lyrics .v598-active-line {
+    text-wrap:pretty;
+    line-height:max(1.24,var(--v598-line-height,1.3));
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .lyrics.v598-beautiful-lyrics .v598-active-line .kinetic-word {
+    transition:none!important;animation:none!important;
+    text-shadow:none!important;
+  }
+  .lyrics.v598-beautiful-lyrics.v598-hook .v598-active-line {box-shadow:none;}
+}
+
+
+/* V606 – shared concert lyric/performer harmony. Never changes user font,
+   manual positioning, actual karaoke fill or word-timing clock. */
+.lyrics.v606-harmony .v606-active-line {
+  max-width:min(100%,calc(var(--v606-width-ch,48) * 1ch));
+  margin-inline:auto;overflow-wrap:anywhere;text-wrap:balance;
+}
+.lyrics.v606-harmony .v606-active-line::before {
+  opacity:min(1,max(var(--v541-plate,.82),calc(var(--v598-plate,.1) + var(--v606-plate-boost,0))));
+}
+.lyrics.v606-hook .v606-active-line {
+  border-bottom:1px solid rgba(142,237,255,var(--v606-hook-accent,0));
+  box-shadow:inset 0 -2px 0 rgba(142,237,255,var(--v606-hook-accent,0));
+}
+.lyrics.v606-harmony .v606-active-line .kinetic-word {
+  text-shadow:0 0 calc(3px * var(--v549-word-motion,0)) var(--studio-color-from,#79f7ff),
+    0 0 calc(6px * var(--v598-word-accent,0)) var(--studio-color-from,#79f7ff),
+    0 0 calc(5px * var(--v606-word-accent,0)) var(--studio-color-to,#d789ff);
+}
+@media (max-width:1024px) {
+ .immersive-lyrics-overlay .lyrics.v606-harmony .v606-active-line {text-wrap:pretty;max-width:min(100%,calc(var(--v606-width-ch,48) * 1ch));}
+}
+@media (prefers-reduced-motion:reduce) {
+ .lyrics.v606-harmony .v606-active-line .kinetic-word {text-shadow:none!important;animation:none!important;transition:none!important;}
+ .lyrics.v606-hook .v606-active-line {border-bottom:none;box-shadow:none;}
+}

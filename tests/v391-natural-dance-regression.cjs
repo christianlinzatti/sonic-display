@@ -69,6 +69,6 @@ const controls=read('components/visualizer/NaturalDanceControlsV320.tsx');
 assert.match(controls,/V391 Flow-Variation aktivieren/);
 assert.match(controls,/readDanceFlowV391|refreshDanceFlowV391/);
 const pkg=JSON.parse(read('package.json'));
-assert.ok(['0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416','0.1.0-v417','0.1.0-v418','0.1.0-v419','0.1.0-v420','0.1.0-v422','0.1.0-v424','0.1.0-v425','0.1.0-v426'].includes(pkg.version));
+assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=391, 'version must not precede V391');
 assert.ok(pkg.scripts['verify:offline'].includes('test:v391'));
 console.log('PASS V391 natural dance – behavioral, rig-safety, UI, version, integration');

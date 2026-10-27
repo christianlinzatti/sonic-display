@@ -1,0 +1,35 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const ts=require('./typescript-loader.cjs');
+const root=path.resolve(__dirname,'..');
+const src=f=>fs.readFileSync(path.join(root,f),'utf8');
+const mod='components/visualizer/performerLightingV557.ts';
+const compiled=ts.transpileModule(src(mod),{fileName:mod,reportDiagnostics:true,
+ compilerOptions:{target:ts.ScriptTarget.ES2020,module:ts.ModuleKind.CommonJS}});
+assert.equal(compiled.diagnostics?.length??0,0);
+const m={exports:{}};new Function('module','exports','require',compiled.outputText)(m,m.exports,require);
+const plan=m.exports.planPerformerLightingV557;
+const settings={enabled:true,strength:65,avatarLight:true,avatarLightStrength:70};
+const cue={hook:true,density:.25};
+const scene={active:true,trackId:'song123',cueStartMs:0,count:2,leadSlot:1,singingSlots:[0,1],handoffFrom:0,focus:'handoff'};
+const base={settings,cue,scene,count:2,progressMs:600,playing:true,reducedMotion:false,tier:'balanced',authored:false,blackout:false};
+let count=0;
+function test(label,callback){callback();count++;console.log('PASS V557',label);}
+test('verified singer and duet partner keep exact assigned slots',()=>{const x=plan(base);assert.equal(x.focusSlot,1);assert.equal(x.partnerSlot,0);});
+test('handoff crossfade expires; old performer is not lit throughout new solo verse',()=>{assert.equal(plan({...base,progressMs:1300}).partnerSlot,null);});
+test('no cast, multiple avatars = no invented singer',()=>{const x=plan({...base,scene:null});assert.equal(x.focusSlot,null);assert.equal(x.partnerSlot,null);});
+test('one avatar receives normal neutral single-stage tracking',()=>{const x=plan({...base,scene:null,count:1});assert.equal(x.focusSlot,0);assert.equal(x.partnerSlot,null);});
+test('hook brightness is bounded and stage lyrics are unaffected',()=>{const x=plan(base);assert.ok(x.keyGain>1&&x.keyGain<=1.35);assert.ok(x.fillGain>1&&x.fillGain<=1.25);});
+test('dense rap softens hook to keep lyrics visible',()=>{const a=plan(base),b=plan({...base,cue:{...cue,density:.95}});assert.ok(b.keyGain<a.keyGain);});
+test('verse weaker than hook',()=>{assert.ok(plan({...base,cue:{...cue,hook:false},scene:null}).keyGain<plan({...base,scene:null}).keyGain);});
+test('blackout and authored cues never get extra lighting',()=>{for(const patch of [{authored:true},{blackout:true}]){const x=plan({...base,...patch});assert.equal(x.keyGain,1);assert.equal(x.focusSlot,null);}});
+test('low tier and reduced motion avoid performer tracking',()=>{for(const patch of [{tier:'low'},{reducedMotion:true}]){const x=plan({...base,...patch});assert.equal(x.keyGain,1);assert.equal(x.focusSlot,null);}});
+test('disabled, paused, strength zero and no settings stay neutral',()=>{for(const patch of [{playing:false},{settings:{...settings,enabled:false}},{settings:{...settings,avatarLight:false}},{settings:{...settings,avatarLightStrength:0}},{settings:undefined},{cue:undefined}]){const x=plan({...base,...patch});assert.equal(x.keyGain,1);assert.equal(x.focusSlot,null);}});
+test('invalid cast indices, counts or track names never steer wrong artist',()=>{for(const patch of [{scene:{...scene,count:3}},{scene:{...scene,leadSlot:5}},{scene:{...scene,trackId:''}},{scene:{...scene,singingSlots:[0]}}]){const x=plan({...base,...patch});assert.equal(x.focusSlot,null);}});
+test('intensities safe against malformed slider values',()=>{for(const v of [NaN,Infinity,-15,101]){const x=plan({...base,settings:{...settings,avatarLightStrength:v}});assert.ok(Number.isFinite(x.keyGain));assert.ok(x.keyGain>=1&&x.keyGain<=1.35);}});
+test('reuse only existing key and fill lights in actual 3D scene',()=>{const dynamic=src('components/visualizer/DynamicStage.tsx');assert.match(dynamic,/planPerformerLightingV557/);assert.match(dynamic,/followPerformerLightV557\(state.scene,performerPlanV557.focusSlot/);assert.match(dynamic,/getObjectByName\(`v377-vocal-stage-slot-\$\{slot\}`\)/);assert.doesNotMatch(dynamic,/pointLight.*V557/);});
+test('live 3D stage and the V556 preview receive the same plan',()=>{assert.match(src('components/visualizer/ThreeAvatar.tsx'),/performerLightingV557=\{\{/);const preview=src('components/visualizer/StagePreviewModal.tsx');assert.match(preview,/performerLightingV557=\{\{/);assert.match(preview,/Duett \(Demo\)/);assert.match(preview,/v377-vocal-stage-slot-\$\{i\}/);});
+test('controls and defaults persist independently of V555 effects',()=>{assert.match(src('components/SettingsPanel.tsx'),/concertAvatarLightStrengthV557/);assert.match(src('context/UiPreferencesContext.tsx'),/concertAvatarLightV557:true/);assert.match(src('types/music.ts'),/concertAvatarLightV557\?: boolean/);});
+console.log(`V557: ${count} checks passed`);

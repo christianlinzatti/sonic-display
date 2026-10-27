@@ -1,0 +1,13 @@
+{
+  "extends":"./tsconfig.v585-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/naturalConcertPerformanceV586.ts",
+    "../components/visualizer/vocalAwareChoreographyV472.ts",
+    "../components/visualizer/naturalDeutschrapBodyV564.ts",
+    "../components/visualizer/rapPerformanceDynamicsV583.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v569-react-types.d.ts"
+  ]
+}

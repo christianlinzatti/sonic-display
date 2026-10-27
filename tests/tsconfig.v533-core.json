@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.v532-core.json",
+  "compilerOptions": {"incremental": false},
+  "files": ["../components/visualizer/expandableMotionLibraryV533.ts", "../components/visualizer/glbMotionQualityAnalyzer.ts"]
+}

@@ -36,6 +36,6 @@ for(const fragment of ['blendV491?: PreviewBlendPlanV491','resolvePreviewBlendV4
 assert(!source.includes('action.paused = true'),'timeline scrubbing must update an active animation action');
 assert(!source.includes('new AnimationMixer(blendClipV491'),'no extra mixer');
 const pkg=require('../package.json');
-assert(/^0\.1\.0-v49\d+$/.test(pkg.version),'V491 or compatible later releases');
+assert(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=491,'V491 or compatible later releases');
 assert(pkg.scripts['build:preflight'].includes('npm run test:v491 && npm run test:v491:types && npm run test:v490'));
 console.log('PASS V491: safe channel masks, missing/reduced-motion fallbacks, bounded weight, mixer-driven GLB preview and scrub');

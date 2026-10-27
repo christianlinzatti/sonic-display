@@ -84,7 +84,7 @@ assert(rig.includes('const lipV476=refineExpressiveLipV476('));
 assert(rig.includes('lipV476.activeV476?lipV476.face[c]:lipV459.face[c]'));
 assert(rig.includes('morph.delta=overlay'),'GLB authored motion preserved');
 assert(avatar.includes('const lipV476=refineExpressiveLipV476('));
-assert(avatar.includes('lipV476.face.jaw'),'procedural avatar uses V476 mouth');
+assert(avatar.includes('lipV476.face.jaw')||avatar.includes('lipV499.activeV499?lipV499.face:lipV476.face')||avatar.includes('const lipV503=composeConcertFaceV503(lipV499,concertV503)')||avatar.includes('const lipV503=composeConcertFaceV503(wordFaceV567,concertV503)')&&avatar.includes('coordinateRapFaceV526(lipV523') && avatar.includes('refineDeutschrapLipV523(argumentsLipSync.lyrics,lipV499'),'procedural avatar must preserve V476 through V499/V503 mouth pipeline');
 assert(avatar.includes('addAdvancedVocalHeadV459('),'V459 head cues stay authoritative');
 const src=fs.readFileSync('components/visualizer/expressiveLipSyncV476.ts','utf8');
 assert(!/Math\.random|Date\.now|localStorage|AudioContext/.test(src),'no nondeterministic or invasive timing');

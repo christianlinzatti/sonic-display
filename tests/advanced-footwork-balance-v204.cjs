@@ -1,4 +1,4 @@
-const assert=require('node:assert/strict'); const fs=require('node:fs');const path=require('node:path');const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript');const vm=require('node:vm');
+const assert=require('node:assert/strict'); const fs=require('node:fs');const path=require('node:path');const ts=require('./typescript-loader.cjs');const vm=require('node:vm');
 const source=fs.readFileSync(path.join(__dirname,'../components/visualizer/advancedFootworkBalance.ts'),'utf8');
 const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
 const sandbox={exports:{}};vm.runInNewContext(js,sandbox);const m=sandbox.exports;let passed=0;const check=(f)=>{f();passed++};

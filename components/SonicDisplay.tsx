@@ -53,6 +53,8 @@ const manualDanceV456=preferences.avatarMotionMode==="choreography"||!!preferenc
   !!preferences.avatarBlendEnabled||!!preferences.smartDanceOverride||
   (preferences.avatarDancePreset??"auto")!=="auto";
 const vocalAuthoredV456=preferences.avatarManualVocalEnabledV385===true||
+  (preferences.vocalTimeEnabledV496===true&&Boolean(track?.id&&
+    (preferences.vocalTimeSegmentsV496??{})[track.id]?.length))||
   (preferences.rapDuetEnabledV416===true&&Boolean(track?.id&&
     (preferences.rapDuetAssignmentsV416??{})[track.id]?.length));
 const rootShowCueV456=sampleSmartRapShowV446(rootShowPlanV456,lyricsProgress,{

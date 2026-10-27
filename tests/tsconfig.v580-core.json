@@ -1,0 +1,15 @@
+{
+  "extends":"./tsconfig.v572-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/naturalRapFaceV573.ts",
+    "../components/visualizer/verifiedEyeContactV574.ts",
+    "../components/visualizer/duetResponseV575.ts",
+    "../components/visualizer/footworkSafetyV576.ts",
+    "../components/visualizer/showVariationV577.ts",
+    "../components/visualizer/beautifulLyricsV578.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v569-react-types.d.ts"
+  ]
+}

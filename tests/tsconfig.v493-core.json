@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.v492-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/intelligentMotionPresetDirectorV493.ts"
+  ]
+}

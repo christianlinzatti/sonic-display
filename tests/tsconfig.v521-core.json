@@ -1,0 +1,5 @@
+{
+  "extends":"./tsconfig.v520-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../services/monitoring/concertQualityPresetsV521.ts"]
+}

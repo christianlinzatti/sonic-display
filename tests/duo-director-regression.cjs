@@ -13,6 +13,6 @@ assert(eng.includes("reducedMotion"));assert(eng.includes("confidence"));assert(
 assert(avatar.includes("<DuoDirectorTick"));assert(avatar.includes("auto ? autoScene"));
 assert(avatar.includes("multiAvatarMode: mode"));assert(settings.includes("duoDirectorEnabled"));
 assert(registry.includes("duoDirectorEnabled?: boolean"));assert(stage.includes("duoDirectorEnabled={preferences.duoDirectorEnabled ?? false}"));
-let ts;for(const id of ["typescript","/usr/local/lib/node_modules/typescript","/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript"])try{ts=require(id);break}catch{}
+const ts = require('./typescript-loader.cjs');
 if(ts){for(const f of ["components/visualizer/duoChoreographyDirector.ts","components/visualizer/ThreeAvatar.tsx","components/SettingsPanel.tsx"]){const ds=ts.transpileModule(read(f),{fileName:f,compilerOptions:{jsx:ts.JsxEmit.Preserve,module:ts.ModuleKind.ESNext},reportDiagnostics:true}).diagnostics||[];assert.equal(ds.filter(x=>x.category===ts.DiagnosticCategory.Error).length,0,f);}}
 console.log("V141 Duo Director: 14 integration assertions and syntax checks passed");

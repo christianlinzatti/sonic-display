@@ -13,6 +13,12 @@ import {composeRapRhythmStageV407} from "./rapRhythmPerformanceV407";
 import {normalizeRapEditorV408} from "./rapPerformanceEditorV408";
 import {enhanceExpressiveLipV453,addExpressiveHeadV453} from "./expressiveLipSyncV453";
 import {refineAdvancedVocalV459,addAdvancedVocalHeadV459} from "./advancedVocalPerformanceV459";
+import {refineExpressiveLipV476} from "./expressiveLipSyncV476";
+import {refineNaturalVocalExpressionV499} from "./naturalVocalExpressionV499";
+import {refineDeutschrapLipV523} from "./advancedDeutschrapLipSyncV523";
+import {planIntelligentConcertPerformanceV503,composeConcertStageV503} from "./intelligentConcertPerformanceV503";
+import {synchronizeRapExpressionV516} from "./naturalDeutschrapSyncV516";
+import {planExpressiveRapV510,composeExpressiveRapStageV510} from "./expressiveRapPerformanceV510";
 import {applyVocalStageOverlayV371} from "./vocalStageExpressionV371";
 import type {createVocalStageOverlayV371} from "./vocalStageExpressionV371";
 import type {useUiPreferences} from "@/context/UiPreferencesContext";
@@ -23,9 +29,10 @@ import type {RapGestureSampleV414} from "./rapGestureCuesV414";
 import type {RapGrooveSettings} from "./rapGrooveEngine";
 import type {AvatarRigTargets} from "./avatarRigController";
 import type {VisualizerProps} from "./registry";
+import {getActivePerformanceTier} from "./adaptivePerformance";
 
 type Args={
-  propsLipSyncV367:VisualizerProps['lipSync'];audio:VisualizerProps['audio'];
+  propsLipSyncV367:VisualizerProps['lipSync'];trackId:string;audio:VisualizerProps['audio'];
   genre:VisualizerProps['genre'];showCue:VisualizerProps['showCue'];
   reducedMotion:boolean;isPlaying:boolean;workloadSlot:number;
   avatarMotionMode:NonNullable<VisualizerProps['avatarMotionMode']>;stableLibraryClip:string|undefined;
@@ -38,7 +45,7 @@ type Args={
   rigTargets:{current:AvatarRigTargets};vocalStageOverlayV371:{current:ReturnType<typeof createVocalStageOverlayV371>};
   delta:number;
 };
-export function applyGltfVocalPerformanceV492({propsLipSyncV367,audio,genre,showCue,reducedMotion,
+export function applyGltfVocalPerformanceV492({propsLipSyncV367,trackId,audio,genre,showCue,reducedMotion,
   isPlaying,workloadSlot,avatarMotionMode,stableLibraryClip,partnerGesture,partnerLook,
   partnerHand,groovePreferences,rapLiveEnabledV412,rapLiveFrameV412,rapLyricsFrameV414,
   preferencesRap,performanceSection,rigTargets,vocalStageOverlayV371,delta}:Args){
@@ -110,8 +117,93 @@ export function applyGltfVocalPerformanceV492({propsLipSyncV367,audio,genre,show
         propsLipSyncV367.rapAudioTrackIdV423===propsLipSyncV367.rapAudioDocumentV423.trackId,
       authoredBody:avatarMotionMode==="choreography"||!!stableLibraryClip,
     });
+    const lipHeadV476=refineExpressiveLipV476(propsLipSyncV367?.lyrics??null,lipHeadV459,synchronizedV372,{
+      playing:isPlaying,enabled:propsLipSyncV367?.enabled!==false,reducedMotion,
+      manualSilent:!!confirmedSingerV453?.active&&!confirmedSingerV453.singingSlots.includes(workloadSlot),
+      intensity:propsLipSyncV367?.strength??90,
+      editedWords:propsLipSyncV367?.rapSyllableEditsEnabledV420&&propsLipSyncV367.rapSyllableDocumentV420!=null&&
+        propsLipSyncV367.rapSyllableTrackIdV420===propsLipSyncV367.rapSyllableDocumentV420.trackId
+        ?propsLipSyncV367.rapSyllableDocumentV420.edits:undefined,
+      preserveAudioMouth:!!propsLipSyncV367?.rapAudioEnabledV423&&!!propsLipSyncV367.rapAudioDocumentV423&&
+        propsLipSyncV367.rapAudioTrackIdV423===propsLipSyncV367.rapAudioDocumentV423.trackId,
+    });
+    const lipHeadV499=refineNaturalVocalExpressionV499(lipHeadV459,lipHeadV476,{
+      playing:isPlaying,enabled:propsLipSyncV367?.enabled!==false,reducedMotion,
+      manualSilent:!!confirmedSingerV453?.active&&!confirmedSingerV453.singingSlots.includes(workloadSlot),
+      intensity:propsLipSyncV367?.strength??90,
+      preserveAudioMouth:!!propsLipSyncV367?.rapAudioEnabledV423&&!!propsLipSyncV367.rapAudioDocumentV423&&
+        propsLipSyncV367.rapAudioTrackIdV423===propsLipSyncV367.rapAudioDocumentV423.trackId,
+    },{
+      trackId,cueTrackId:propsLipSyncV367?.vocalTimeTrackIdV496??"",
+      progressMs:propsLipSyncV367?.progressMs??-1,playing:isPlaying,
+      enabled:propsLipSyncV367?.vocalTimeEnabledV496===true,reducedMotion,
+      avatarSlot:workloadSlot,castCount:propsLipSyncV367?.ensembleCountV374??1,
+      segments:propsLipSyncV367?.vocalTimeSegmentsV496,
+      manualPriority:propsLipSyncV367?.manualVocalEnabledV385===true&&
+        !!propsLipSyncV367.manualVocalAssignmentsV385?.length||avatarMotionMode==="choreography"||!!stableLibraryClip,
+    });
+    const lipHeadV523=refineDeutschrapLipV523(propsLipSyncV367?.lyrics??null,lipHeadV499,synchronizedV372,{
+      playing:isPlaying,enabled:propsLipSyncV367?.enabled!==false,reducedMotion,
+      manualSilent:!!confirmedSingerV453?.active&&!confirmedSingerV453.singingSlots.includes(workloadSlot),
+      editedWords:propsLipSyncV367?.rapSyllableEditsEnabledV420&&propsLipSyncV367.rapSyllableDocumentV420!=null&&
+        propsLipSyncV367.rapSyllableTrackIdV420===propsLipSyncV367.rapSyllableDocumentV420.trackId
+        ?propsLipSyncV367.rapSyllableDocumentV420.edits:undefined,
+      intensity:propsLipSyncV367?.strength??90,
+      preserveAudioMouth:!!propsLipSyncV367?.rapAudioEnabledV423&&!!propsLipSyncV367.rapAudioDocumentV423&&
+        propsLipSyncV367.rapAudioTrackIdV423===propsLipSyncV367.rapAudioDocumentV423.trackId,
+      authoredBody:avatarMotionMode==="choreography"||!!stableLibraryClip,
+      roleAllowed:(propsLipSyncV367?.ensembleCountV374??1)===1 ||
+        (!!confirmedSingerV453?.active&&confirmedSingerV453.singingSlots.includes(workloadSlot)) ||
+        (propsLipSyncV367?.vocalTimeEnabledV496===true&&trackId===propsLipSyncV367?.vocalTimeTrackIdV496&&lipHeadV499.activeV499),
+    });
+    // V503: slow, bounded torso/head phrase accents complement the existing
+    // word-aligned V407 cues. Never alter GLB clips, manual animation, or IK.
+    const concertV503=planIntelligentConcertPerformanceV503({
+      trackId,progressMs:propsLipSyncV367?.progressMs??-1,playing:isPlaying,
+      reducedMotion,enabled:propsLipSyncV367?.enabled!==false&&propsLipSyncV367?.coordinationEnabledV372!==false,
+      bodyEnabled:propsLipSyncV367?.bodyEnabledV371!==false,
+      gesturesEnabled:propsLipSyncV367?.gesturesV371!==false,faceEnabled:false,
+      manualBodyPriority:avatarMotionMode==="choreography"||!!stableLibraryClip,
+      manualFacePriority:true,genre,section:showCue?.enabled?showCue.section:performanceSection,
+      slot:workloadSlot,tier:getActivePerformanceTier(),
+      wordVerified:synchronizedV372.confidence==="word",rap:synchronizedV372.vocal.style==="rap",
+      focus:synchronizedV372.focus,rapidWord:lipHeadV459.rapid,
+      assignedSingers:confirmedSingerV453?.active&&
+        (trackId===propsLipSyncV367?.manualVocalTrackIdV385||trackId===propsLipSyncV367?.vocalTimeTrackIdV496||
+         trackId===propsLipSyncV367?.rapDuetTrackIdV416)?confirmedSingerV453.singingSlots:undefined,
+      beat:audio.beatStrength??0,energy:audio.energyEnvelope??0,
+    });
+    const rapBodyV503=composeConcertStageV503(rapBodyV407,concertV503);
+    const vocalTimeV510=propsLipSyncV367?.vocalTimeEnabledV496===true&&
+      trackId===propsLipSyncV367?.vocalTimeTrackIdV496&&
+      (propsLipSyncV367?.ensembleCountV374??1)>1&&!!propsLipSyncV367?.vocalTimeSegmentsV496?.length;
+    let expressiveRapV510=planExpressiveRapV510({
+      trackId,lyrics:propsLipSyncV367?.lyrics,progressMs:propsLipSyncV367?.progressMs??-1,
+      effectiveTimeMs:synchronizedV372.effectiveTimeMs,playing:isPlaying,
+      enabled:propsLipSyncV367?.enabled!==false&&propsLipSyncV367?.coordinationEnabledV372!==false,
+      reducedMotion,genre,section:showCue?.enabled?showCue.section:performanceSection,
+      slot:workloadSlot,castCount:propsLipSyncV367?.ensembleCountV374??1,tier:getActivePerformanceTier(),
+      verifiedWord:synchronizedV372.confidence==="word",rap:synchronizedV372.vocal.style==="rap",
+      activeWord:synchronizedV372.vocal.activeWord,rapid:lipHeadV459.rapid,
+      joinedWords:lipHeadV459.joinedWords,focus:synchronizedV372.focus,
+      bodyEnabled:propsLipSyncV367?.bodyEnabledV371!==false,faceEnabled:false,
+      gesturesEnabled:propsLipSyncV367?.gesturesV371!==false,
+      manualBodyPriority:avatarMotionMode==="choreography"||!!stableLibraryClip,
+      manualFacePriority:true,
+      assignedSingers:confirmedSingerV453?.active&&
+        (trackId===propsLipSyncV367?.manualVocalTrackIdV385||
+         trackId===propsLipSyncV367?.rapDuetTrackIdV416)?confirmedSingerV453.singingSlots:undefined,
+      authoredRoleAllowed:(propsLipSyncV367?.ensembleCountV374??1)===1||
+        (vocalTimeV510&&lipHeadV499.activeV499)||
+        (!!confirmedSingerV453?.active&&
+          (trackId===propsLipSyncV367?.manualVocalTrackIdV385||trackId===propsLipSyncV367?.rapDuetTrackIdV416)&&
+          confirmedSingerV453.singingSlots.includes(workloadSlot)),
+    });
+    expressiveRapV510=synchronizeRapExpressionV516(expressiveRapV510,{lyrics:propsLipSyncV367?.lyrics,effectiveTimeMs:synchronizedV372.effectiveTimeMs,section:showCue?.enabled?showCue.section:performanceSection});
+    const rapBodyV510=composeExpressiveRapStageV510(rapBodyV503,expressiveRapV510);
     applyVocalStageOverlayV371(rigTargets.current,
-      addAdvancedVocalHeadV459(addExpressiveHeadV453(rapBodyV407,lipHeadV453),lipHeadV459),
+      addAdvancedVocalHeadV459(addExpressiveHeadV453(rapBodyV510,lipHeadV453),lipHeadV523),
       delta,vocalStageOverlayV371.current);
+
 
  }

@@ -62,7 +62,7 @@ const stage=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx',
 const registry=fs.readFileSync('components/visualizer/registry.tsx','utf8');
 const visualizer=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');
 assert(stage.includes('holdConcertCameraV454('));
-assert(stage.includes('guardAutomaticCameraV351(concertFramedV454,composition)'));
+assert(stage.includes('guardAutomaticCameraV351(concertFramedV497,composition)'));
 assert(stage.includes('hasManualRapCameraV454')&&stage.includes('cameraManualStagePriorityV377'));
 assert(stage.includes('rapCameraKeyframesEnabledV432')&&stage.includes('blockedConcertCameraV454'));
 assert(stage.indexOf('composeRapCameraKeyframeV432(')<stage.indexOf('composeConcertCameraV454('));

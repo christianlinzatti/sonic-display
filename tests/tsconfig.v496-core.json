@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.v495-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/vocalTimeDirectorV496.ts"
+  ]
+}

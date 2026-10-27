@@ -1,0 +1,5 @@
+{
+  "extends":"./tsconfig.v518-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../services/monitoring/concertOptimizationAdvisorV519.ts"]
+}

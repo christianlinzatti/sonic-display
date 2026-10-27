@@ -87,7 +87,9 @@ export async function lookupLrclibLyrics(query: {
   const data = (await response.json()) as LrclibResponse;
   const plainText = data.plainLyrics?.trim() || null;
   const syncedLines = data.syncedLyrics ? parseLrc(data.syncedLyrics) : [];
-  const wordLines = data.hasWordSync && data.lyricsfile ? parseWordSyncedLyricsfile(data.lyricsfile) : [];
+  // Some responses include a lyricsfile even when hasWordSync is omitted.
+  // Trust only actual parseable word timestamps, never the metadata flag alone.
+  const wordLines = data.lyricsfile ? parseWordSyncedLyricsfile(data.lyricsfile) : [];
   const lines = wordLines.length
     ? wordLines
     : syncedLines.length

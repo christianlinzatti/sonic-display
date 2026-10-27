@@ -1,0 +1,36 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const ts=require('./typescript-loader.cjs');
+const root=path.resolve(__dirname,'..');
+const read=f=>fs.readFileSync(path.join(root,f),'utf8');
+function load(f){const compiled=ts.transpileModule(read(f),{fileName:f,reportDiagnostics:true,compilerOptions:{target:ts.ScriptTarget.ES2020,module:ts.ModuleKind.CommonJS}});assert.equal(compiled.diagnostics?.length??0,0);const m={exports:{}};new Function('module','exports','require',compiled.outputText)(m,m.exports,require);return m.exports;}
+const {planAvatarPortraitLightingV558:plan}=load('components/visualizer/avatarPortraitLightingV558.ts');
+const v557=load('components/visualizer/performerLightingV557.ts');
+const settings={enabled:true,avatarLight:true,portraitLight:true,portraitWarmth:52,avatarLightStrength:70,strength:65};
+const cue={hook:true,density:.15};
+const scene={active:true,trackId:'real-track',cueStartMs:0,cueEndMs:4000,count:2,focus:'handoff',leadSlot:1,singingSlots:[0,1],handoffFrom:0};
+const base={settings,cue,scene,count:2,progressMs:600,playing:true,reducedMotion:false,tier:'balanced',authored:false,blackout:false};
+const pipeline=(patch={})=>{const b={...base,...patch},performer=v557.planPerformerLightingV557(b);return plan({performer,cue:b.cue,settings:b.settings,tier:b.tier});};
+let checked=0;function test(name,f){f();checked++;console.log('PASS V558',name);}
+test('verified duet: color warms key, cools exactly assigned partner fill',()=>{const r=pipeline();assert.equal(r.enabled,true);assert.equal(r.fillSlot,0);assert.equal(r.mode,'duet');assert.ok(r.keyWarmth>0&&r.keyWarmth<=.48);assert.ok(r.fillWarmth>0&&r.fillWarmth<=.34);});
+test('solo uses same verified target for key and body fill',()=>{const r=pipeline({scene:null,count:1});assert.equal(r.enabled,true);assert.equal(r.fillSlot,0);});
+test('multiple avatars without trusted cast remain neutral',()=>{const r=pipeline({scene:null,count:2});assert.deepEqual(r,{enabled:false,keyWarmth:0,fillWarmth:0,faceBodyBalance:0,fillSlot:null,mode:'off'});});
+test('role count mismatch cannot target an unknown singer',()=>{assert.equal(pipeline({scene:{...scene,count:3}}).enabled,false);});
+test('duet handoff expires and no longer uses the old partner',()=>{assert.equal(pipeline({progressMs:1500}).fillSlot,1);});
+test('hook portrait has warmer accent than verse',()=>{const a=pipeline({scene:null,count:1});const b=pipeline({scene:null,count:1,cue:{hook:false,density:.1}});assert.ok(a.keyWarmth>b.keyWarmth);});
+test('dense Deutschrap suppresses color accent',()=>{const a=pipeline({scene:null,count:1});const b=pipeline({scene:null,count:1,cue:{hook:true,density:.98}});assert.ok(b.keyWarmth<a.keyWarmth);assert.equal(b.mode,'dense');});
+test('user warmth control alters color blend',()=>{const a=pipeline({settings:{...settings,portraitWarmth:20}});const b=pipeline({settings:{...settings,portraitWarmth:90}});assert.ok(b.keyWarmth>a.keyWarmth);});
+test('off switch restores existing V557 colors',()=>{for(const patch of [{settings:{...settings,portraitLight:false}},{settings:{...settings,portraitWarmth:0}}])assert.equal(pipeline(patch).enabled,false);});
+test('V557 off blocks V558 overrides',()=>{for(const patch of [{settings:{...settings,avatarLight:false}},{settings:{...settings,enabled:false}},{settings:{...settings,strength:0}}])assert.equal(pipeline(patch).enabled,false);});
+test('authored lighting and blackout have priority',()=>{for(const patch of [{authored:true},{blackout:true}])assert.equal(pipeline(patch).enabled,false);});
+test('low tier, reduced motion, and pause remain unchanged',()=>{for(const patch of [{tier:'low'},{reducedMotion:true},{playing:false}])assert.equal(pipeline(patch).enabled,false);});
+test('no cue or no settings remains off',()=>{for(const patch of [{cue:undefined},{settings:undefined}])assert.equal(pipeline(patch).enabled,false);});
+test('malformed inputs stay finite and bounded',()=>{for(const v of [NaN,Infinity,-5,500]){const r=pipeline({settings:{...settings,portraitWarmth:v}});for(const k of ['keyWarmth','fillWarmth','faceBodyBalance'])assert.ok(Number.isFinite(r[k])&&r[k]>=0&&r[k]<=1);}});
+test('existing two point lights reused; no additional light/shadow pass',()=>{const stage=read('components/visualizer/DynamicStage.tsx');assert.match(stage,/planAvatarPortraitLightingV558/);assert.match(stage,/portraitPlanV558\.keyWarmth/);assert.match(stage,/portraitPlanV558\.fillWarmth/);assert.match(stage,/portraitPlanV558\.fillSlot/);assert.match(stage,/warmPortraitV558/);assert.match(stage,/coolDuetV558/);assert.match(stage,/if\(portraitPlanV558.enabled && !timelineCue.color\)/);assert.equal((stage.match(/<pointLight\b/g)||[]).length,3);assert.equal((stage.match(/<spotLight\b/g)||[]).length,1);});
+test('no renderer change to primary lyric typography or GLB materials',()=>{const stage=read('components/visualizer/DynamicStage.tsx');assert.doesNotMatch(stage,/meshPhysicalMaterial.*V558|ShaderMaterial.*V558/);});
+test('live and preview supply the same settings type and planner',()=>{assert.match(read('components/visualizer/ThreeAvatar.tsx'),/performerLightingV557=/);assert.match(read('components/visualizer/VisualizerStage.tsx'),/concertPortraitWarmthV558/);const preview=read('components/visualizer/StagePreviewModal.tsx');assert.match(preview,/previewPortraitV558/);assert.match(preview,/setPreviewPortraitV558/);assert.match(preview,/Porträtlicht/);assert.match(preview,/Deutschrap-Hook/);assert.match(preview,/Duett \(Demo\)/);});
+test('stored settings and defaults are consistent',()=>{assert.match(read('types/music.ts'),/concertPortraitLightV558\?: boolean/);assert.match(read('context/UiPreferencesContext.tsx'),/concertPortraitLightV558:true,concertPortraitWarmthV558:52/);assert.match(read('components/SettingsPanel.tsx'),/concertPortraitLightV558/);assert.match(read('components/visualizer/concertDetailEffectsV555.ts'),/portraitLight:true,portraitWarmth:52/);});
+test('versioned preflight and verification scripts connected',()=>{const p=JSON.parse(read('package.json'));assert.match(p.version,/^0\.1\.0-v(?:55[8-9]|5[6-9][0-9]|[6-9][0-9]{2}|[1-9][0-9]{3,})$/);assert.match(p.scripts['build:preflight'],/npm run test:v558 && npm run test:v558:types/);assert.match(p.scripts['verify:v558'],/verify:v557/);});
+console.log(`V558: ${checked} checks passed`);

@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.v531-core.json",
+  "compilerOptions": {"incremental": false},
+  "files": ["../components/visualizer/avatarPreviewQualityV532.ts", "../components/visualizer/sharedEmbeddedMotionV531.ts", "v414-music-types.d.ts", "stubs/v415-three-types.d.ts", "stubs/v508-three-types.d.ts"]
+}

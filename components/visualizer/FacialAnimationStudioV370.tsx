@@ -12,6 +12,7 @@ import {
   type FacialChannelV370,type FacialProfileV370,
 } from "./facialRigStudioV370";
 import {measureFacialMotionV424,planFacialCalibrationV424,applyFacialCalibrationV424} from "./facialCalibrationV424";
+import {MOUTH_CALIBRATION_PRESETS_V562,normalizeMouthCalibrationV562,mouthCalibrationCoverageV562,type MouthCalibrationV562} from "./advancedFacialCalibrationV562";
 import type { FacialPoseV369 } from "./facialPerformanceV369";
 import {diagnoseFacialRigV383,suggestSafeFacialProfileV383,exportFacialProfileV383,importFacialProfileV383} from "./advancedFacialRigV383";
 import type { AvatarModel } from "./avatarModels";
@@ -96,6 +97,13 @@ export function FacialAnimationStudioV370({models,initialAvatarId}:Props) {
   const visibleTargets=report?.targets??[];
   const detected=visibleTargets.filter(t=>t.suggestion);
   const planV424=useMemo(()=>planFacialCalibrationV424(visibleTargets,profile,overwriteV424),[visibleTargets,profile,overwriteV424]);
+  const mouthCalibrationV562=normalizeMouthCalibrationV562(profile.mouthCalibrationV562);
+  const coverageV562=mouthCalibrationCoverageV562(visibleTargets.flatMap(t=>{
+    const selected=FACIAL_CHANNELS_V370.find(c=>profile.mapping?.[c]===t.id);
+    if(selected)return [selected];
+    return t.suggestion&&profile.mapping?.[t.suggestion]===undefined?[t.suggestion]:[];
+  }),Boolean(report?.jawBone),profile.mapping?.jaw==='none');
+  const patchMouthV562=(patch:Partial<MouthCalibrationV562>)=>patchProfile({mouthCalibrationV562:{...mouthCalibrationV562,...patch}});
   const rigDiagnosticV383=useMemo(()=>diagnoseFacialRigV383(visibleTargets,Boolean(report?.jawBone),profile),[visibleTargets,report?.jawBone,profile]);
   const auditionMorphV383=(id:string)=>{setPreviewMorphV383(id);setDemo("off");setPose({...EMPTY_POSE});};
   const restoreProfileV383=()=>{
@@ -192,6 +200,23 @@ export function FacialAnimationStudioV370({models,initialAvatarId}:Props) {
               </button>)}</div>
             </details>
             <p className="v370-info">Die Skalierung basiert auf der Mesh-Geometrie, nicht auf Bildanalyse oder echten Lauten. Es gibt keine automatische Änderung an GLB-Dateien. Für sichtbare Verbesserungen jeweils die Mundform-Proben verwenden.</p>
+          </section>
+          <section className="v383-rig-panel" aria-label="V562 Advanced Facial Calibration">
+            <h4>V562 · Präzisere Mundform-Kalibrierung</h4>
+            <p>Separat für diesen Avatar: Kieferöffnung begrenzen, M/B/P-Lippenverschluss sichern und konkurrierende A/E/O/U-Mundformen beruhigen. Keine echte Phonemerkennung.</p>
+            <p>{coverageV562.count} von 4 Mundkanälen verfügbar. {coverageV562.warning}</p>
+            <label><input type="checkbox" checked={mouthCalibrationV562.enabled} onChange={e=>patchMouthV562({enabled:e.target.checked})}/> V562-Mundkalibrierung aktivieren (auch auf Live-Bühne)</label>
+            <div className="v370-samples" role="group" aria-label="Mundkalibrierung Presets">
+              <button type="button" onClick={()=>patchProfile({mouthCalibrationV562:MOUTH_CALIBRATION_PRESETS_V562.neutral})}>Neutral</button>
+              <button type="button" onClick={()=>patchProfile({mouthCalibrationV562:MOUTH_CALIBRATION_PRESETS_V562.deutschrap})}>Deutschrap</button>
+              <button type="button" onClick={()=>patchProfile({mouthCalibrationV562:MOUTH_CALIBRATION_PRESETS_V562.singing})}>Gesang</button>
+            </div>
+            {([['jawCeiling','Maximale Kieferöffnung',45,100],['lipSeal','Lippenschluss bei M/B/P',50,100],['vowelSeparation','Trennung breiter/runder Vokale',0,100]] as const).map(([key,label,min,max])=><label key={key} className="v370-channel" style={{display:'block'}}>
+              {label}: {Math.round(mouthCalibrationV562[key]*100)} %
+              <input type="range" min={min} max={max} step="5" value={Math.round(mouthCalibrationV562[key]*100)} onChange={e=>patchMouthV562({[key]:Number(e.target.value)/100})}/>
+            </label>)}
+            <button type="button" onClick={()=>patchProfile({mouthCalibrationV562:{...mouthCalibrationV562,enabled:false}})}>V562 deaktivieren (bisherige Animation)</button>
+            <p className="v370-info">Aktivierung und Presets sind bewusst manuell. Gespeicherte Morph-Zuordnungen, V424-Geometrie-Kalibrierung und andere Gesichtskanäle bleiben erhalten. Zum Vergleich V561-GLB-Nahaufnahme verwenden.</p>
           </section>
           {FACIAL_CHANNELS_V370.map(channel=><div className="v370-channel" key={channel}>
             <label>{FACIAL_LABELS_V370[channel]}

@@ -65,6 +65,7 @@ for(const word of ['name="v377-vocal-stage-slot-0"','name="v377-vocal-stage-slot
 for(const f of ['types/music.ts','context/UiPreferencesContext.tsx','components/SettingsPanel.tsx','components/visualizer/registry.tsx','components/visualizer/VisualizerStage.tsx','components/visualizer/VocalSyncInspectorV373.tsx'])assert.ok(read(f).includes('V377'),`preferences/inspector wiring ${f}`);
 assert.match(read('context/UiPreferencesContext.tsx'),/avatarDuetCameraModeV377:"off"/);
 const pkg=JSON.parse(read('package.json'));
-assert.ok(['0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387','0.1.0-v390','0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v390','0.1.0-v391','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416'].includes(pkg.version));
+assert.match(pkg.version,/^0\.1\.0-v\d+$/);
+assert.ok(Number(pkg.version.split('-v')[1])>=377,'later releases must retain V377 camera contracts');
 assert.match(pkg.scripts['verify:offline'],/test:v377/);
 console.log('PASS V377 cinematic duet camera: lead, handoff, hooks, camera anchoring, lyrics protection, priority, pause, seek, multi-avatar and integration');

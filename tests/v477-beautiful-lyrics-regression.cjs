@@ -71,7 +71,7 @@ assert(kinetic.includes('wordsEnabled && wordTimed ? words.map'));
 assert(kinetic.includes('v477-line-progress-text'));
 assert(kinetic.includes('activePlanV477?.visibleLineCount === 1'));
 assert(stage.includes('avatarCountV477:performerCountV440'));
-assert(stage.includes('avatarCountV477={performerCountV440} immersive'));
+assert(/avatarCountV477=\{performerCountV440\}[^>]*\simmersive\s*\/>/.test(stage),'stage still forwards avatar count to immersive lyrics');
 assert(registry.includes('avatarCountV477?:number'));
 assert(scene.includes('visualV477.allowWordMeshes')&&scene.includes('visualV477.max3DWidth'));
 assert(scene.includes('visualV477.timingMode === "verified-word"'));

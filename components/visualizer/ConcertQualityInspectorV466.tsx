@@ -2,6 +2,7 @@
 import {useConcertQualityV466} from './concertQualityStoreV466';
 import type {QualityLevelV466} from '@/services/show/concertQualityInspectorV466';
 import {ConcertQualityAdvisorV467} from './ConcertQualityAdvisorV467';
+import {ConcertVisualCompareV544} from './ConcertVisualCompareV544';
 const label=(v:QualityLevelV466)=>v==='ok'?'OK':v==='watch'?'Prüfen':v==='issue'?'Problem':'Keine Daten';
 const pretty=(n:number|null,suffix='')=>n===null||!Number.isFinite(n)?'—':`${n.toFixed(1)}${suffix}`;
 export function ConcertQualityInspectorV466({enabled,onToggle}:{enabled:boolean;onToggle:()=>void}){
@@ -20,6 +21,7 @@ export function ConcertQualityInspectorV466({enabled,onToggle}:{enabled:boolean;
        <p>{valid?'Keine erkannten Projektions-/Layoutwarnungen.':'Nur bei aktiver 3D-Bühne verfügbar.'}</p>}
      {quality&&live.avatars.some(a=>a.anchor==='estimated')&&<p>Mindestens eine Kopfposition ist aus der Avatar-Höhe geschätzt.</p>}
      {valid&&<ConcertQualityAdvisorV467 history={live.historyV467??[]} now={Date.now()}/>}
+     {enabled&&<ConcertVisualCompareV544/>}
      <p className="v466-quality-disclaimer">Kopfprojektion ≠ sichtbares Gesicht. Keine Erkennung von Verdeckung, Lichtqualität oder GPU-Auslastung; Lyrics-Rechteck nur bei aktiver immersiver Zeile. Keine Aufzeichnung oder Übertragung.</p>
    </div>}
    {enabled&&valid&&live.canvas&&live.avatars.map(avatar=><div key={avatar.slot}

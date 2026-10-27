@@ -8,7 +8,8 @@ import {createMaskedAnimationClip} from "./animationBoneMask";
 import {chooseUpperGestureClipV490} from "./automaticGlbUpperBlendV490";
 import {createAutomaticUpperClipV490} from "./automaticGlbUpperClipV490";
 import type {VisualizerProps} from "./registry";
-export type PreparedGltfBlendV492={baseName:string;actionName:string;clip:AnimationClip;weight:number};
+export type PreparedGltfBlendV492={baseName:string;actionName:string;clip:AnimationClip;weight:number;
+  presetId:string;region:'arms'|'upper';genre:'all'|'rap'|'hard'};
 export function useGltfBlendSetupV492({clips,url,animationUrl,genre,avatarBlendMask,avatarBlendClip}: {
   clips:AnimationClip[];url:string;animationUrl?:string;genre:VisualizerProps['genre'];
   avatarBlendMask:NonNullable<VisualizerProps['avatarBlendMask']>;avatarBlendClip:string;
@@ -25,7 +26,7 @@ export function useGltfBlendSetupV492({clips,url,animationUrl,genre,avatarBlendM
   // Multiple presets can be saved, but at most 8 auto-enabled clips per model
   // are prepared for the live mixer. None owns root/hips/feet/face/IK.
   const preparedBlendsV492=useMemo(()=>{
-    const output:{baseName:string;actionName:string;clip:AnimationClip;weight:number}[]=[];
+    const output:PreparedGltfBlendV492[]=[];
     const eligible=savedBlendsV492.filter(p=>p.autoEnabled&&p.modelUrl===url&&p.animationUrl===(animationUrl??''));
     for(const preset of eligible){
       if(output.length>=8)break;
@@ -35,7 +36,8 @@ export function useGltfBlendSetupV492({clips,url,animationUrl,genre,avatarBlendM
       const safe=match.overlay.tracks.filter(t=>isPreviewBlendTrackV491(t.name,preset.region)).map(t=>t.clone());
       if(!safe.length)continue;
       const actionName=`GlbPresetV492:${preset.id}`;
-      output.push({baseName,actionName,clip:new AnimationClip(actionName,match.overlay.duration,safe),weight:preset.weight});
+      output.push({baseName,actionName,clip:new AnimationClip(actionName,match.overlay.duration,safe),
+        weight:preset.weight,presetId:preset.id,region:preset.region,genre:preset.genre});
     }
     return output;
   },[savedBlendsV492,clips,url,animationUrl,genre]);

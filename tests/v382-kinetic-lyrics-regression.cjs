@@ -76,7 +76,9 @@ for(const key of ['lyricsKineticPresetV382','lyricsKineticStrengthV382','lyricsK
   assert.ok(read('context/UiPreferencesContext.tsx').includes(key),'default: '+key);
 }
 const pkg=JSON.parse(read('package.json'));
-assert.ok(['0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387','0.1.0-v390','0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v390','0.1.0-v391','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416','0.1.0-v417','0.1.0-v418','0.1.0-v419','0.1.0-v420','0.1.0-v422','0.1.0-v424','0.1.0-v425','0.1.0-v426'].includes(pkg.version));
+// Forward-compatible release check: the old finite list stopped at V426.
+const version = /^0\.1\.0-v(\d+)$/.exec(pkg.version);
+assert.ok(version && Number(version[1]) >= 382, 'V382 feature must survive future releases');
 assert.ok(pkg.scripts['verify:offline'].includes('test:v382'));
 assert.ok(read('README.md').includes('V382-ADVANCED-KINETIC-LYRICS.md'));
 console.log('PASS V382 synchronized word envelopes, estimates, reduced motion, pause, rap/festival/cinematic, measured drop gates, 2D+3D and settings');

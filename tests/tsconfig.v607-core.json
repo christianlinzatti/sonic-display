@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.v599-core.json",
+  "compilerOptions":{"incremental":false},
+  "files": [
+    "../components/visualizer/naturalMultiArtistInteractionV607.ts",
+    "../components/visualizer/intelligentRapDuetPerformanceV500.ts",
+    "../components/visualizer/duetResponseV575.ts",
+    "../components/visualizer/naturalDuetStageInteractionV584.ts",
+    "../components/visualizer/cinematicDuetInteractionV585.ts",
+    "v414-music-types.d.ts", "stubs/v415-three-types.d.ts", "stubs/v508-three-types.d.ts"
+  ]
+}

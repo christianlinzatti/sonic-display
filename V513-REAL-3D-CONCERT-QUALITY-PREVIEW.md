@@ -1,0 +1,9 @@
+# Sonic Display V513 – Real 3D Concert Quality Preview
+
+Die V512-Bühnenplanung bekommt im Diagnose-Tab einen optionalen, separat einschaltbaren GLB-Canvas. Es können zwei bis vier unterschiedliche Bibliotheksmodelle gewählt werden (inklusive über `/api/avatars` installierter Modelle). Der Renderer arbeitet mit einzelnen, für die Vorschau geklonten GLB-Szenen und individuellen AnimationMixern. Eingebettete GLB-Motions und aus der installierten Character-Motion-Bibliothek gewählte GLB-Motions (mit vorhandenem Retargeter) werden abgespielt; fehlgeschlagene Ladevorgänge fallen auf Demo-Figuren zurück.
+
+V508-Skelett-Sampling misst aus den in der **Vorschau** tatsächlich animierten Schulter-/Arm-/Hüftknochen bis zu fünf einfache Körperkapseln je Avatar. Risikostufen stammen aus dem bestehenden V508-Algorithmus. Die Darstellung zeigt diese Kapseln im dreidimensionalen Raum und hebt riskante Avatar-Segmente hervor. Sie erkennt **nicht** Skinned-Mesh-/Hand-/Kleidungskollisionen, und kann unbekannte Rig-Paare nicht als sicher melden. Falls die GLB-Datei selbst keine brauchbaren Knochen hat, fehlt die Messung.
+
+Die gewählte V512-Demo- oder Sitzungsposition bestimmt den Aufstellungsort. Der GLB-Motion-Zeitverlauf wird separat abgespielt und ist *kein synchroner Mitschnitt* der Live-Show. Zu große Bühnenkoordinaten werden proportional an das sichtbare Vorschaufenster angepasst und entsprechend gekennzeichnet. Qualitätsstufen beeinflussen ausschließlich die optionale Kapselabtastrate (High maximal 8 Hz, Balanced 5 Hz, Pi Eco 2 Hz, Low aus). Die Vorschau lädt erst nach explizitem Klick; Schließen entfernt den eigenen WebGL-Canvas. Vorschau hat weder Schreibzugriff auf bestehende Choreografien noch Zugriff auf Live-Mixer oder IK.
+
+Tests: `npm run test:v513`, `npm run test:v513:types`, historische Regressionen, `npm run check:syntax`, `npm run check:architecture`. Produktionsbuild erfordert die vollständige lokale npm-Installation.

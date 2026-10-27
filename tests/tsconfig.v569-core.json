@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.v568-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/lodPlaybackBufferV569.ts",
+    "../components/visualizer/lodPlaybackContinuity.ts",
+    "../components/visualizer/lodContinuityDiagnostics.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v569-react-types.d.ts"
+  ]
+}

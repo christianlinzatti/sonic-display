@@ -36,18 +36,31 @@ export function compareLodPose(a:LodPoseSample,b:LodPoseSample):LodContinuityRep
 export function publishLodPoseSample(sample:LodPoseSample) {
   samples.set(sample.owner,sample);
   for(const [key,item] of samples) if(sample.sampledAt-item.sampledAt>0.6) samples.delete(key);
-  const active=Array.from(samples.values()).filter(s=>s.source===sample.source && s.owner!==sample.owner && s.asset!==sample.asset);
-  const next=active.length ? compareLodPose(active[0],sample) : EMPTY;
-  // Avoid React updates every frame; only the sampling caller controls cadence.
-  snapshot=next; listeners.forEach(fn=>fn());
+  // V569 – avoid arrays, pose comparisons and subscriber notifications when
+  // only one LOD of an avatar is present (normal operation on the Pi).
+  let outgoing:LodPoseSample|null=null;
+  for(const item of samples.values()){
+    if(item.source===sample.source&&item.owner!==sample.owner&&item.asset!==sample.asset){outgoing=item;break;}
+  }
+  const next=outgoing?compareLodPose(outgoing,sample):EMPTY;
+  if(next===EMPTY&&snapshot===EMPTY)return;
+  snapshot=next;listeners.forEach(fn=>fn());
 }
 /** Read the outgoing (first registered) LOD as a pose reference for the newer instance.
  * The pose correction must not feed back into the outgoing model.
  */
 export function getOutgoingLodPose(source:string, incomingOwner:string, now:number):LodPoseSample|null {
-  const matching=Array.from(samples.values()).filter(s=>s.source===source && now>=s.sampledAt && now-s.sampledAt<0.35);
-  if(matching.length<2 || matching[0].owner===incomingOwner) return null;
-  return matching.find(s=>s.owner===incomingOwner) ? matching[0] : null;
+  // No intermediate Array.from/filter/find allocations in the render loop.
+  let first:LodPoseSample|null=null;
+  let count=0;
+  let incomingPresent=false;
+  for(const item of samples.values()){
+    if(item.source!==source||now<item.sampledAt||now-item.sampledAt>=0.35)continue;
+    if(first===null)first=item;
+    count++;
+    if(item.owner===incomingOwner)incomingPresent=true;
+  }
+  return count>=2&&first?.owner!==incomingOwner&&incomingPresent?first:null;
 }
 export function removeLodPoseSample(owner:string) { samples.delete(owner); snapshot=EMPTY; listeners.forEach(fn=>fn()); }
 export function useLodContinuityDiagnostics() { return useSyncExternalStore(fn=>{listeners.add(fn);return ()=>{listeners.delete(fn);};},()=>snapshot,()=>EMPTY); }

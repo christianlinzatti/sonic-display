@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.v559-core.json",
+  "compilerOptions": {"incremental": false},
+  "files": [
+    "../components/visualizer/portraitMaterialSafetyV560.ts",
+    "../components/visualizer/applyGlbPortraitMaterialsV560.ts",
+    "stubs/v560-three-types.d.ts"
+  ]
+}

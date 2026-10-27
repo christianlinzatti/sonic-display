@@ -1,0 +1,5 @@
+{
+  "extends":"./tsconfig.v517-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../services/monitoring/piConcertPerformanceStudioV518.ts"]
+}

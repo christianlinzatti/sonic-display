@@ -33,7 +33,7 @@ export function VisualChoreographyTimelineEditor({avatarId,model,motions,prefere
  <button type="button" disabled={i===0} onClick={()=>{edit(reorderTimeline(steps,i,i-1));setSelected(i-1);}}>↑</button><button type="button" disabled={i===steps.length-1} onClick={()=>{edit(reorderTimeline(steps,i,i+1));setSelected(i+1);}}>↓</button><button type="button" onClick={()=>edit(steps.filter((_,j)=>j!==i))}>Entfernen</button></div>)}
  <button type="button" disabled={!motions.length||steps.length>=12} onClick={()=>edit([...steps,{motionId:motions[0].id,bars:2,crossfade:0.6}])}>+ Motion hinzufügen</button>{" "}<button type="button" disabled={!dirty} onClick={save}>Timeline speichern</button>
  {dirty&&<small>Ungespeicherte Änderungen</small>}{notice&&<p role="status">{notice}</p>}
- {model.url&&motion?.url&&<div style={{minHeight:260}}><h4>3D-Avatar-Vorschau: {motion.name}</h4><AvatarPreview3D key={`${model.url}|${motion.url}`} modelUrl={model.url} animationUrl={motion.url} preferences={preferences} studio/></div>}
+ {model.url&&motion?.url&&<div style={{minHeight:260}}><h4>3D-Avatar-Vorschau: {motion.name}</h4><AvatarPreview3D key={`${model.url}|${motion.url}`} modelUrl={model.url} animationUrl={motion.url} sharedMotionUrlV531={model.sharedMotionUrl} preferences={preferences} studio/></div>}
  <small>Vorschau zeigt die aktive GLB-Motion am Avatar; für eine echte Live-Crossfade-Demonstration zweier Clips verwende das Motion Transition Studio V192. V203 speichert Crossfades auch im Live-Sequenzformat. Taktgeber der Vorschau ist BPM-basiert, nicht Spotify-samplegenau.</small>
  </section>;
 }

@@ -1,4 +1,4 @@
-const fs=require('node:fs');const assert=require('node:assert/strict');const ts=require('/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript');
+const fs=require('node:fs');const assert=require('node:assert/strict');const ts=require('./typescript-loader.cjs');
 const mod=fs.readFileSync('services/stageContent/galleryLayoutV344.ts','utf8');
 const compiled=ts.transpileModule(mod,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 const m={exports:{}};new Function('module','exports',compiled)(m,m.exports);const v=m.exports;

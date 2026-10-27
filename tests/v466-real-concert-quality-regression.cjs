@@ -61,5 +61,5 @@ assert(hud.includes('aria-pressed={enabled}'),'accessible toggle');
 assert(store.includes('useSyncExternalStore')&&store.includes('resetConcertQualityV466'));
 assert(css.includes('.v466-quality-toggle'));
 assert(!/setInterval|setTimeout|localStorage|fetch\(|requestAnimationFrame|Math\.random/.test(probe+store),'no new timers, storage or transport');
-const p=require('../package.json');assert(/^0\.1\.0-v(?:466|46[7-9]|4[7-9]\d)$/.test(p.version),'V466 quality regression kept in later releases');
+const p=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(p.version) && Number(p.version.match(/v(\d+)$/)?.[1])>=466,'V466 quality regression kept in later releases');
 console.log('PASS V466: real renderer wiring, opt-in projection, head-bone/estimated distinction, true DOM lyrics geometry, FPS/stale thresholds, no fabricated visibility or GPU data, 30-minute deterministic logic');

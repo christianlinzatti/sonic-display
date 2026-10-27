@@ -1,6 +1,7 @@
 "use client";
 import { STAGE_ENVIRONMENTS, type StageEnvironmentId } from "@/components/visualizer/stages";
 import { StageThemePreviewGrid } from "@/components/visualizer/StageThemePreviewGrid";
+import { ConcertDetailPreviewLauncherV556 } from "@/components/visualizer/ConcertDetailPreviewLauncherV556";
 import { StageThemeLivePreview } from "@/components/visualizer/StageThemeLivePreview";
 const MultiAvatarChoreographyPanel = dynamic(() => import("@/components/visualizer/MultiAvatarChoreographyPanel").then(module => module.MultiAvatarChoreographyPanel), { ssr: false });
 const CharacterMotionBatchInstaller = dynamic(() => import("@/components/CharacterMotionBatchInstaller").then(module => module.CharacterMotionBatchInstaller), { ssr: false });
@@ -218,7 +219,7 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
         <label className="settings-search-label" htmlFor="settings-search">Einstellungen suchen</label>
         <input id="settings-search" ref={searchRef} className="settings-search" type="search" placeholder="z. B. Beat, Avatar, Lyrics…" value={search} onChange={e => setSearch(e.target.value)} />
         <nav className="settings-tabs" aria-label="Einstellungsbereiche">
-          {filteredSections.map(section => <button type="button" key={section.id} className={tab === section.id ? "active" : ""} aria-current={tab === section.id ? "page" : undefined} onClick={() => setTab(section.id)}>{section.label}<span aria-hidden="true">›</span></button>)}
+          {filteredSections.map(section => <button type="button" key={section.id} data-v571-tab={section.id} className={tab === section.id ? "active" : ""} aria-current={tab === section.id ? "page" : undefined} onClick={() => setTab(section.id)}>{section.label}<span aria-hidden="true">›</span></button>)}
         </nav>
         {filteredSections.length === 0 && <p className="settings-no-results">Keine passende Kategorie. Suche nach „Avatar“, „Beat“ oder „Lyrics“.</p>}
         <div className="settings-sidebar-footer">Einstellungen werden auf diesem Gerät gespeichert.</div>
@@ -231,7 +232,7 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
       </>}
       {tab === "avatar" && <>
       <div className="settings-avatar-preview" aria-label="Aktuell ausgewählter Avatar">
-        <AvatarPreview3D modelUrl={currentAvatar.url} preferences={preferences} />
+        <AvatarPreview3D modelUrl={currentAvatar.url} sharedMotionUrlV531={currentAvatar.sharedMotionUrl} preferences={preferences} />
         <div><span className="settings-eyebrow">AKTIVER AVATAR</span><h3>{currentAvatar.label}</h3><p>{currentAvatar.description}</p><span className="settings-preview-meta">Rig: {preferences.avatarRigProfile} · Dance: {preferences.avatarDancePreset}</span></div>
       </div>
       <fieldset className="avatar-library"><legend>Avatar-Bibliothek</legend>
@@ -300,7 +301,7 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
       <fieldset><legend>Advanced Retargeting Studio · V103</legend><RetargetingStudio modelUrl={currentAvatar.url} /></fieldset>
       <fieldset><legend>Dance Studio · Animation Timeline V93</legend>
         <p>Animation abspielen oder pausieren, in Zeitlupe betrachten und die Fußkorrektur direkt mit dem unveränderten Clip vergleichen. Die IK-Regler unterhalb wirken auch in dieser Vorschau.</p>
-        <AvatarPreview3D modelUrl={currentAvatar.url} animationUrl={currentAvatar.animationUrl} preferences={preferences} studio />
+        <AvatarPreview3D modelUrl={currentAvatar.url} animationUrl={currentAvatar.animationUrl} sharedMotionUrlV531={currentAvatar.sharedMotionUrl} preferences={preferences} studio />
         <small>Für den Vorher/Nachher-Vergleich werden zwei unabhängige Kopien desselben GLB geladen. Die Timeline unterstützt eingebettete Clips und separat zugewiesene Animations-GLBs mit kompatiblen humanoiden Bones.</small>
       </fieldset>
       <fieldset><legend>Smart Dance Director · V97</legend>
@@ -322,6 +323,11 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
           reactive={preferences.stageReactive ?? true}
           lightStrength={preferences.stageLightStrength ?? 60}
           reducedMotion={preferences.reducedMotion}
+          concertDetailsV555={{enabled:preferences.concertDetailEnabledV555??true,gobo:preferences.concertGoboV555??true,
+            pixelWall:preferences.concertPixelWallV555??true,floorFog:preferences.concertFloorFogV555??true,
+            duetArc:preferences.concertDuetArcV555??true,adlibEcho:preferences.concertAdlibEchoV555??true,
+            hookProjection:preferences.concertHookProjectionV555??true,rhymeAccent:preferences.concertRhymeAccentV555??true,
+            strength:preferences.concertDetailStrengthV555??45,avatarLight:preferences.concertAvatarLightV557??true,avatarLightStrength:preferences.concertAvatarLightStrengthV557??55,portraitLight:preferences.concertPortraitLightV558??true,portraitWarmth:preferences.concertPortraitWarmthV558??52,beatPortraitLight:preferences.concertBeatPortraitLightV559??true,beatPortraitStrength:preferences.concertBeatPortraitStrengthV559??45,cinematicFaceLightV566:preferences.concertCinematicFaceLightV566??true,cinematicFaceStrengthV566:preferences.concertCinematicFaceStrengthV566??50}}
         />
         <StageThemeLivePreview theme={preferences.stageTheme ?? "classic"} reactive={preferences.stageReactive ?? true} lightStrength={preferences.stageLightStrength ?? 60} reducedMotion={preferences.reducedMotion} />
         <label>Bühnenstil<select value={preferences.stageTheme ?? "classic"} onChange={e => updatePreferences({stageTheme: e.target.value as StageEnvironmentId})}>
@@ -334,6 +340,64 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
         <StageDirectorControlsV287 />
         <StagePresetLibraryV286 current={{stageTheme:preferences.stageTheme ?? "classic",stageReactive:preferences.stageReactive ?? true,stageLightStrength:preferences.stageLightStrength ?? 60}} onApply={next => updatePreferences(next)} />
         <small>Bei deaktivierter Mikrofonanalyse stehen möglicherweise nur geschätzte Beat-Signale zur Verfügung. Die Bühne bleibt auch ohne Musikreaktion beleuchtet.</small>
+      </fieldset>
+      <fieldset><legend>Konzert-Bühneneffekte · V555–V568</legend>
+        <p>Bewegte Gobo-Muster, LED-Wand, flacher Bodennebel und passende Lyrik-/Duett-Akzente. Die Haupt-Lyrics bleiben unverändert lesbar. Ohne bestätigte Performer-Zuordnung gibt es keinen Lichtbogen.</p>
+        <label className="setting-check"><input type="checkbox" checked={preferences.concertDetailEnabledV555??true} onChange={e=>updatePreferences({concertDetailEnabledV555:e.target.checked})}/> Konzertdetails aktivieren</label>
+        {([
+          ['concertGoboV555','Gobo-Projektionen'],['concertPixelWallV555','LED-Pixelwand'],
+          ['concertFloorFogV555','Dezenter Bodennebel'],['concertDuetArcV555','Lichtverbindung im Duett'],
+          ['concertAdlibEchoV555','Adlib-Echos'],['concertHookProjectionV555','Hook-Projektionen'],
+          ['concertRhymeAccentV555','Reim-Akzente'],
+        ] as const).map(([key,label])=><label className="setting-check" key={key}>
+          <input type="checkbox" checked={preferences[key]??true} onChange={e=>updatePreferences({[key]:e.target.checked})}/>{label}
+        </label>)}
+        <label>Effektstärke ({preferences.concertDetailStrengthV555??45} %)
+          <input type="range" min="0" max="100" step="5" value={preferences.concertDetailStrengthV555??45}
+            onChange={e=>updatePreferences({concertDetailStrengthV555:Number(e.target.value)})}/></label>
+        <label className="setting-check"><input type="checkbox" checked={preferences.concertAvatarLightV557??true}
+          onChange={e=>updatePreferences({concertAvatarLightV557:e.target.checked})}/> Avatar-Beleuchtung V557 (Hook &amp; Duett)</label>
+        <label>Avatar-Lichtbalance ({preferences.concertAvatarLightStrengthV557??55} %)
+          <input type="range" min="0" max="100" step="5" value={preferences.concertAvatarLightStrengthV557??55}
+            onChange={e=>updatePreferences({concertAvatarLightStrengthV557:Number(e.target.value)})}/></label>
+        <label className="setting-check"><input type="checkbox" checked={preferences.concertPortraitLightV558??true}
+          onChange={e=>updatePreferences({concertPortraitLightV558:e.target.checked})}/> Sanftes Gesicht- &amp; Körperlicht V558</label>
+        <label>Licht-Wärme ({preferences.concertPortraitWarmthV558??52} %)
+          <input type="range" min="0" max="100" step="5" value={preferences.concertPortraitWarmthV558??52}
+            onChange={e=>updatePreferences({concertPortraitWarmthV558:Number(e.target.value)})}/></label>
+        <label className="setting-check"><input type="checkbox" checked={preferences.concertBeatPortraitLightV559??true}
+          onChange={e=>updatePreferences({concertBeatPortraitLightV559:e.target.checked})}/> Beat- &amp; Musikenergie-Porträtlicht V559</label>
+        <label>Beat-Lichtakzent ({preferences.concertBeatPortraitStrengthV559??45} %)
+          <input type="range" min="0" max="100" step="5" value={preferences.concertBeatPortraitStrengthV559??45}
+            onChange={e=>updatePreferences({concertBeatPortraitStrengthV559:Number(e.target.value)})}/></label>
+        <label className="setting-check"><input type="checkbox" checked={preferences.concertCinematicFaceLightV566??true}
+          onChange={e=>updatePreferences({concertCinematicFaceLightV566:e.target.checked})}/> V566 · Kameraabhängiges Gesichtslicht</label>
+        <label>Gesichtslicht-Akzent V566 ({preferences.concertCinematicFaceStrengthV566??50} %)
+          <input type="range" min="0" max="100" step="5" value={preferences.concertCinematicFaceStrengthV566??50}
+            onChange={e=>updatePreferences({concertCinematicFaceStrengthV566:Number(e.target.value)})}/></label>
+        <label className="setting-check"><input type="checkbox" checked={preferences.smartConcertDirectorEnabledV568??true}
+          onChange={e=>updatePreferences({smartConcertDirectorEnabledV568:e.target.checked})}/> V568 · Smart Concert Show Director</label>
+        <label>Gemeinsame Show-Abstimmung ({preferences.smartConcertDirectorStrengthV568??65} %)
+          <input type="range" min="0" max="100" step="5" value={preferences.smartConcertDirectorStrengthV568??65}
+            onChange={e=>updatePreferences({smartConcertDirectorStrengthV568:Number(e.target.value)})}/></label>
+        <small>V568: Synchronisiert nur kleine automatische Tanz-, Kamera-, Licht- und dekorative Lyrics-Akzente auf derselben Song-Timeline. Sängerfokus nur aus geprüften manuellen Rollen; ohne Rollen keine automatische Sängererkennung. Manuelle Choreografien, Kamera- und Lichtvorgaben sowie gut lesbare Lyrics haben Vorrang.</small>
+        <small>V566: Kameranähe und Blickausrichtung zur sichtbaren Avatar-Position werden gemessen. Kein echter Blickkontakt, keine Haut-/Gesichtserkennung; keine zusätzlichen Schatten oder Lichter. Manuelle Licht-Cues und Blackouts bleiben vorrangig.</small>
+        <small>V559: Musikenergie und mittlere Frequenzen dienen als Näherung für Gesangsaktivität, ohne echte Stimmtrennung. Beat-Impulse werden sanft geglättet; manuelle Licht-Cues, Blackouts und reduzierte Bewegung haben Vorrang.</small>
+        <label className="setting-check"><input type="checkbox" checked={preferences.concertGlbMaterialQualityV560??true}
+          onChange={e=>updatePreferences({concertGlbMaterialQualityV560:e.target.checked})}/> V560 · Schonende Haut-/Gesichts-Materialkorrektur für GLB</label>
+        <label>GLB-Materialkorrektur ({preferences.concertGlbMaterialStrengthV560??65} %)
+          <input type="range" min="0" max="100" step="5" value={preferences.concertGlbMaterialStrengthV560??65}
+            onChange={e=>updatePreferences({concertGlbMaterialStrengthV560:Number(e.target.value)})}/></label>
+        <small>V560: Nur eindeutig bezeichnete PBR-Haut- und Gesichtsmaterialien werden auf der privaten Avatar-Kopie angepasst. Augen, Haare, transparente Teile, Texturen, Farben und Spezialmaterialien bleiben unverändert. Keine neuen Echtzeit-Schatten; unbekannte GLBs behalten ihre Originaloptik.</small>
+        <ConcertDetailPreviewLauncherV556 stageId={preferences.stageTheme??'classic'}
+          avatarModelUrl={currentAvatar?.url??null} duetModelsV563={libraryModels.filter(model=>Boolean(model.url)).map(model=>({id:model.id,label:model.label,url:model.url??null}))} onSelect={stageTheme=>updatePreferences({stageTheme})} reactive={preferences.stageReactive??true}
+          lightStrength={preferences.stageLightStrength??60} reducedMotion={preferences.reducedMotion}
+          concertDetails={{enabled:preferences.concertDetailEnabledV555??true,gobo:preferences.concertGoboV555??true,
+            pixelWall:preferences.concertPixelWallV555??true,floorFog:preferences.concertFloorFogV555??true,
+            duetArc:preferences.concertDuetArcV555??true,adlibEcho:preferences.concertAdlibEchoV555??true,
+            hookProjection:preferences.concertHookProjectionV555??true,rhymeAccent:preferences.concertRhymeAccentV555??true,
+            strength:preferences.concertDetailStrengthV555??45,avatarLight:preferences.concertAvatarLightV557??true,avatarLightStrength:preferences.concertAvatarLightStrengthV557??55,portraitLight:preferences.concertPortraitLightV558??true,portraitWarmth:preferences.concertPortraitWarmthV558??52,beatPortraitLight:preferences.concertBeatPortraitLightV559??true,beatPortraitStrength:preferences.concertBeatPortraitStrengthV559??45,cinematicFaceLightV566:preferences.concertCinematicFaceLightV566??true,cinematicFaceStrengthV566:preferences.concertCinematicFaceStrengthV566??50}}/>
+        <small>Pi/Low-Tier reduziert 3D-Effekte automatisch. Adlibs: (Hey) oder [adlib:Hey] in zeitmarkierten Lyrics. Reimfarben sind grafische Endungs-Ähnlichkeiten, keine Sprachanalyse.</small>
       </fieldset>
       <StageContentPluginSettingsV330 />
       <fieldset><legend>Dance FX · V100</legend>

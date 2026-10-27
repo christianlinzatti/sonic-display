@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v414-core.json",
+  "compilerOptions": { "incremental": false },
+  "files": [
+    "../services/lyrics/selectionV554.ts",
+    "../services/lyrics/server.ts",
+    "v414-music-types.d.ts",
+    "stubs/v554-lyrics-providers.d.ts"
+  ]
+}

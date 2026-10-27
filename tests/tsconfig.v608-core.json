@@ -1,0 +1,11 @@
+{
+  "extends":"./tsconfig.v607-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/dynamicConcertLightingV608.ts",
+    "../components/visualizer/fullSongConcertDramaturgyV604.ts",
+    "../components/visualizer/intelligentStageAtmosphereV551.ts",
+    "../components/visualizer/concertLightingDirectorV462.ts",
+    "v414-music-types.d.ts","stubs/v415-three-types.d.ts","stubs/v508-three-types.d.ts"
+  ]
+}

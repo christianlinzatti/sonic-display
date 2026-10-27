@@ -20,6 +20,17 @@ import { composeRapFaceV406, composeRapStageV406 } from "./rapStagePerformanceV4
 import { enhanceExpressiveLipV453, addExpressiveHeadV453 } from "./expressiveLipSyncV453";
 import { refineAdvancedVocalV459, addAdvancedVocalHeadV459 } from "./advancedVocalPerformanceV459";
 import { refineExpressiveLipV476 } from "./expressiveLipSyncV476";
+import { refineNaturalVocalExpressionV499 } from "./naturalVocalExpressionV499";
+import {refineDeutschrapLipV523} from "./advancedDeutschrapLipSyncV523";
+import {refineDeutschrapFaceV538} from "./deutschrapVocalPerformanceV538";
+import {refineAdvancedRapArticulationV546} from "./advancedDeutschrapArticulationV546";
+import {refineDeutschrapLipFlowV597,rapLipFlowRateV597} from "./advancedDeutschrapLipFlowV597";
+import {refineExpressiveVocalFaceV612,expressiveVocalRateV612} from "./expressiveVocalFaceV612";
+import {coordinateRapFaceV526,coordinateRapDanceV526} from "./unifiedConcertPerformanceV526";
+import {sampleWordConcertV567,coordinateWordFaceV567,coordinateWordDanceV567} from "./wordSyncedConcertV567";
+import {planIntelligentConcertPerformanceV503,composeConcertStageV503,composeConcertFaceV503} from "./intelligentConcertPerformanceV503";
+import {synchronizeRapExpressionV516} from "./naturalDeutschrapSyncV516";
+import {planExpressiveRapV510,composeExpressiveRapStageV510,composeExpressiveRapFaceV510} from "./expressiveRapPerformanceV510";
 import { composeRapRhythmStageV407 } from "./rapRhythmPerformanceV407";
 import { overlayDuetV376 } from "./interactiveVocalDuetsV376";
 import { overlayConcertExpressionV386 } from "./expressiveConcertDirectorV386";
@@ -27,6 +38,8 @@ import { resolveRapDuetCueV416 } from "./rapDuetStudioV416";
 import { resolveVocalDanceAccentV472 } from "./vocalAwareChoreographyV472";
 import { enhanceRapAccentV473 } from "./rapFlowIntelligenceV473";
 import { resolveNaturalRapGestureV474 } from "./naturalRapGestureVarietyV474";
+import { planRapPerformanceDynamicsV583 } from "./rapPerformanceDynamicsV583";
+import { refineNaturalConcertPerformanceV586 } from "./naturalConcertPerformanceV586";
 import { solveProceduralLowLegV481 } from "./intelligentLowPoseV481";
 import { newNaturalLowPoseStateV482, stepNaturalLowPoseV482 } from "./naturalLowPoseTransitionsV482";
 import { planNaturalFullBodyV488 } from "./naturalFullBodyDanceV488";
@@ -202,17 +215,128 @@ export function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genre
         lipSync.rapAudioTrackIdV423===lipSync.rapAudioDocumentV423.trackId,
       authoredBody:avatarMotionMode==="choreography",
     });
-    const rapBodyV453=addAdvancedVocalHeadV459(addExpressiveHeadV453(rapBodyV407,lipV453),lipV459);
+    const lipV499=refineNaturalVocalExpressionV499(lipV459,lipV476,{
+      playing:isPlaying,enabled:argumentsLipSync.enabled,reducedMotion,
+      manualSilent:!!manualVocalV453?.active&&!manualVocalV453.singingSlots.includes(workloadSlot),
+      editedWords:lipSync?.rapSyllableEditsEnabledV420&&lipSync.rapSyllableDocumentV420!=null&&
+        lipSync.rapSyllableTrackIdV420===lipSync.rapSyllableDocumentV420.trackId
+        ?lipSync.rapSyllableDocumentV420.edits:undefined,
+      intensity:argumentsLipSync.strength,
+      preserveAudioMouth:!!lipSync?.rapAudioEnabledV423&&!!lipSync.rapAudioDocumentV423&&
+        lipSync.rapAudioTrackIdV423===lipSync.rapAudioDocumentV423.trackId,
+    },{
+      trackId:track?.id??"",cueTrackId:lipSync?.vocalTimeTrackIdV496??"",
+      progressMs:argumentsLipSync.progressMs,playing:isPlaying,
+      enabled:lipSync?.vocalTimeEnabledV496===true,reducedMotion,
+      avatarSlot:workloadSlot,castCount:lipSync?.ensembleCountV374??1,
+      segments:lipSync?.vocalTimeSegmentsV496,
+      manualPriority:lipSync?.manualVocalEnabledV385===true&&!!lipSync.manualVocalAssignmentsV385?.length||avatarMotionMode==="choreography",
+    });
+    const lipV523=refineDeutschrapLipV523(argumentsLipSync.lyrics,lipV499,synchronizedV372,{
+      playing:isPlaying,enabled:argumentsLipSync.enabled,reducedMotion,
+      manualSilent:!!manualVocalV453?.active&&!manualVocalV453.singingSlots.includes(workloadSlot),
+      editedWords:lipSync?.rapSyllableEditsEnabledV420&&lipSync.rapSyllableDocumentV420!=null&&
+        lipSync.rapSyllableTrackIdV420===lipSync.rapSyllableDocumentV420.trackId
+        ?lipSync.rapSyllableDocumentV420.edits:undefined,
+      intensity:argumentsLipSync.strength,
+      preserveAudioMouth:!!lipSync?.rapAudioEnabledV423&&!!lipSync.rapAudioDocumentV423&&
+        lipSync.rapAudioTrackIdV423===lipSync.rapAudioDocumentV423.trackId,
+      authoredBody:avatarMotionMode==="choreography",
+      roleAllowed:(lipSync?.ensembleCountV374??1)===1 ||
+        (!!manualVocalV453?.active&&manualVocalV453.singingSlots.includes(workloadSlot)) ||
+        (lipSync?.vocalTimeEnabledV496===true&&track?.id===lipSync?.vocalTimeTrackIdV496&&lipV499.activeV499),
+    });
+    const unifiedLipV526=coordinateRapFaceV526(lipV523,{
+      lyrics:argumentsLipSync.lyrics,effectiveTimeMs:synchronizedV372?.effectiveTimeMs??-1,
+      genre,playing:isPlaying,reducedMotion,manualPriority:avatarMotionMode==='choreography',
+    });
+    const wordFaceV567=getActivePerformanceTier()==='low'?unifiedLipV526:coordinateWordFaceV567(unifiedLipV526,sampleWordConcertV567({
+      lyrics:argumentsLipSync.lyrics,timeMs:synchronizedV372?.effectiveTimeMs??-1,
+      playing:isPlaying,reducedMotion,
+    }),{manualPriority:avatarMotionMode==='choreography',roleAllowed:lipV523.activeV523});
+    const concertV503=planIntelligentConcertPerformanceV503({
+      trackId:track?.id,progressMs:argumentsLipSync.progressMs,playing:isPlaying,reducedMotion,
+      enabled:argumentsLipSync.enabled&&lipSync?.coordinationEnabledV372!==false,
+      bodyEnabled:lipSync?.bodyEnabledV371!==false,gesturesEnabled:lipSync?.gesturesV371!==false,
+      faceEnabled:true,manualBodyPriority:avatarMotionMode==="choreography",
+      manualFacePriority:avatarMotionMode==="choreography",
+      genre,section:showCue?.enabled?showCue.section:performance.section,
+      slot:workloadSlot,tier:getActivePerformanceTier(),
+      wordVerified:synchronizedV372.confidence==="word",rap:synchronizedV372.vocal.style==="rap",
+      focus:synchronizedV372.focus,rapidWord:lipV459.rapid,
+      assignedSingers:manualVocalV453?.active&&!!track?.id&&
+        (track.id===lipSync?.manualVocalTrackIdV385||track.id===lipSync?.vocalTimeTrackIdV496||
+         track.id===lipSync?.rapDuetTrackIdV416)?manualVocalV453.singingSlots:undefined,
+      beat:audio.beatStrength??0,energy:audio.energyEnvelope??0,
+    });
+    const rapBodyV503=composeConcertStageV503(rapBodyV407,concertV503);
+    const lipV503=composeConcertFaceV503(wordFaceV567,concertV503);
+    const vocalTimeV510=lipSync?.vocalTimeEnabledV496===true&&
+      track?.id===lipSync?.vocalTimeTrackIdV496&&
+      (lipSync?.ensembleCountV374??1)>1&&!!lipSync?.vocalTimeSegmentsV496?.length;
+    let expressiveRapV510=planExpressiveRapV510({
+      trackId:track?.id,lyrics:lipSync?.lyrics,progressMs:argumentsLipSync.progressMs,
+      effectiveTimeMs:synchronizedV372.effectiveTimeMs,playing:isPlaying,
+      enabled:argumentsLipSync.enabled&&lipSync?.coordinationEnabledV372!==false,
+      reducedMotion,genre,section:showCue?.enabled?showCue.section:performance.section,
+      slot:workloadSlot,castCount:lipSync?.ensembleCountV374??1,tier:getActivePerformanceTier(),
+      verifiedWord:synchronizedV372.confidence==="word",rap:synchronizedV372.vocal.style==="rap",
+      activeWord:synchronizedV372.vocal.activeWord,rapid:lipV459.rapid,
+      joinedWords:lipV459.joinedWords,focus:synchronizedV372.focus,
+      bodyEnabled:lipSync?.bodyEnabledV371!==false,faceEnabled:true,
+      gesturesEnabled:lipSync?.gesturesV371!==false,
+      manualBodyPriority:avatarMotionMode==="choreography",
+      manualFacePriority:avatarMotionMode==="choreography",
+      assignedSingers:manualVocalV453?.active&&!!track?.id&&
+        (track.id===lipSync?.manualVocalTrackIdV385||
+         track.id===lipSync?.rapDuetTrackIdV416)?manualVocalV453.singingSlots:undefined,
+      authoredRoleAllowed:(lipSync?.ensembleCountV374??1)===1||
+        (vocalTimeV510&&lipV499.activeV499)||
+        (!!manualVocalV453?.active&&!!track?.id&&
+          (track.id===lipSync?.manualVocalTrackIdV385||track.id===lipSync?.rapDuetTrackIdV416)&&
+          manualVocalV453.singingSlots.includes(workloadSlot)),
+    });
+    expressiveRapV510=synchronizeRapExpressionV516(expressiveRapV510,{lyrics:lipSync?.lyrics,effectiveTimeMs:synchronizedV372.effectiveTimeMs,section:showCue?.enabled?showCue.section:performance.section});
+    const rapBodyV510=composeExpressiveRapStageV510(rapBodyV503,expressiveRapV510);
+    const lipV510=composeExpressiveRapFaceV510(lipV503,expressiveRapV510);
+    const optionsV538={
+      lyrics:argumentsLipSync.lyrics,effectiveTimeMs:synchronizedV372.effectiveTimeMs,
+      activeWord:synchronizedV372.vocal.activeWord,playing:isPlaying,
+      enabled:argumentsLipSync.enabled,reducedMotion,
+      rap:synchronizedV372.vocal.style==='rap',verifiedWord:synchronizedV372.confidence==='word'&&unifiedLipV526.activeV523,
+      roleAllowed:(lipSync?.ensembleCountV374??1)===1||
+        (!!manualVocalV453?.active&&manualVocalV453.singingSlots.includes(workloadSlot))||
+        (vocalTimeV510&&lipV499.activeV499),
+      manualSilent:!!manualVocalV453?.active&&!manualVocalV453.singingSlots.includes(workloadSlot),
+      manualPriority:avatarMotionMode==='choreography',
+      preserveAudioMouth:!!lipSync?.rapAudioEnabledV423&&!!lipSync.rapAudioDocumentV423&&
+        lipSync.rapAudioTrackIdV423===lipSync.rapAudioDocumentV423.trackId,
+      editedWords:lipSync?.rapSyllableEditsEnabledV420&&lipSync.rapSyllableDocumentV420!=null&&
+        lipSync.rapSyllableTrackIdV420===lipSync.rapSyllableDocumentV420.trackId
+        ?lipSync.rapSyllableDocumentV420.edits:undefined,
+      intensity:argumentsLipSync.strength,
+      section:showCue?.enabled?showCue.section:performance.section,energy:audio.mids,
+    };
+    const lipV538=refineDeutschrapFaceV538(lipV510,optionsV538);
+    const lipV546=refineAdvancedRapArticulationV546(lipV538.frame,optionsV538);
+    const lipV597=refineDeutschrapLipFlowV597(lipV546.frame,optionsV538,getActivePerformanceTier());
+    const expressiveVocalV612=refineExpressiveVocalFaceV612(lipV597.frame,optionsV538,getActivePerformanceTier());
+    const rapBodyV453=addAdvancedVocalHeadV459(addExpressiveHeadV453(rapBodyV510,lipV453),unifiedLipV526.activeV523?{...lipV510,headPitchExtra:unifiedLipV526.headPitchExtra,headYawExtra:unifiedLipV526.headYawExtra}:lipV510);
     if (mouth.current) {
+      const mouthFaceV499=lipV510.face;
+      const mouthFaceV538=lipV538.active?lipV538.frame.face:mouthFaceV499;
+      const mouthFaceV546=lipV546.active?lipV546.frame.face:mouthFaceV538;
+      const mouthFaceV597=lipV597.active?lipV597.frame.face:mouthFaceV546;
+      const mouthFaceV612=expressiveVocalV612.active?expressiveVocalV612.frame.face:mouthFaceV597;
       const face=composeRapFaceV406(synchronizedV372.face,synchronizedV372,{
         playing:isPlaying,reducedMotion,
         enabled:lipSync?.enabled!==false&&lipSync?.coordinationEnabledV372!==false,
         energy:audio.mids,strength:lipSync?.expression,slot:workloadSlot,
       });
-      mouth.current.scale.y += ((.32 + lipV476.face.jaw * 1.9 - lipV476.face.lipsClosed*.16) - mouth.current.scale.y) * Math.min(1,delta*(lipV459.rapid?27:18));
-      mouth.current.scale.x += ((1 + lipV476.face.wide*.34 - lipV476.face.round*.50 - lipV476.face.lipsClosed*.25) - mouth.current.scale.x) * Math.min(1,delta*(lipV459.rapid?22:14));
-      if (eyes.current) { eyes.current.scale.y += ((1-face.blink*.88-lipV476.face.squint*.30)-eyes.current.scale.y)*Math.min(1,delta*30); eyes.current.rotation.y += (rapBodyV407.eyeYaw-eyes.current.rotation.y)*Math.min(1,delta*12); }
-      if (browsV406.current) browsV406.current.position.y += ((.78 + Math.max(face.brow,lipV476.face.brow)*.10)-browsV406.current.position.y)*Math.min(1,delta*16);
+      mouth.current.scale.y += ((.32 + mouthFaceV612.jaw * 1.9 - mouthFaceV612.lipsClosed*.16) - mouth.current.scale.y) * Math.min(1,delta*(lipV459.rapid?27:18)*rapLipFlowRateV597(lipV597,'jaw',true)*expressiveVocalRateV612(expressiveVocalV612,'jaw',true));
+      mouth.current.scale.x += ((1 + mouthFaceV612.wide*.34 - mouthFaceV612.round*.50 - mouthFaceV612.lipsClosed*.25) - mouth.current.scale.x) * Math.min(1,delta*(lipV459.rapid?22:14)*rapLipFlowRateV597(lipV597,'wide',true)*expressiveVocalRateV612(expressiveVocalV612,'wide',true));
+      if (eyes.current) { eyes.current.scale.y += ((1-face.blink*.88-mouthFaceV499.squint*.30)-eyes.current.scale.y)*Math.min(1,delta*30); eyes.current.rotation.y += (rapBodyV503.eyeYaw-eyes.current.rotation.y)*Math.min(1,delta*12); }
+      if (browsV406.current) browsV406.current.position.y += ((.78 + Math.max(face.brow,mouthFaceV612.brow)*.10)-browsV406.current.position.y)*Math.min(1,delta*16);
     }
     // Matching bounded vocal gestures for the procedural fallback avatar.
     const variationV474=resolveNaturalRapGestureV474(enhanceRapAccentV473(resolveVocalDanceAccentV472({lyrics:lipSync?.lyrics,progressMs:lipSync?.progressMs,
@@ -221,8 +345,9 @@ export function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genre
       slot:workloadSlot,authored:avatarMotionMode==='choreography',
       bodyEnabled:lipSync?.bodyEnabledV371,gesturesEnabled:lipSync?.gesturesV371,
       strength:(lipSync?.bodyStrengthV371??60)/100,offsetMs:lipSync?.coordinationOffsetMsV372,
-      casting:!!track?.id&&lipSync?.manualVocalEnabledV385===true&&
-        track.id===lipSync.manualVocalTrackIdV385&&lipSync.manualVocalCueRefV385?.current?.active
+      casting:!!track?.id&&lipSync?.manualVocalCueRefV385?.current?.active&&
+        (track.id===lipSync.manualVocalTrackIdV385||
+         track.id===lipSync.vocalTimeTrackIdV496||track.id===lipSync.rapDuetTrackIdV416)
         ?lipSync.manualVocalCueRefV385.current
         :!!track?.id&&lipSync?.rapDuetEnabledV416===true&&
           track.id===lipSync.rapDuetTrackIdV416
@@ -237,14 +362,43 @@ export function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genre
       section:showCue?.enabled?showCue.section:performance.section,
     }),{trackId:track?.id,slot:workloadSlot,playing:isPlaying,reducedMotion,
        authored:avatarMotionMode==='choreography',section:showCue?.enabled?showCue.section:performance.section});
-    const vocalV472=variationV474.accent;
+    const rapDynamicsV583=planRapPerformanceDynamicsV583(variationV474.accent,{
+      lyrics:lipSync?.lyrics,progressMs:lipSync?.progressMs,
+      offsetMs:lipSync?.coordinationOffsetMsV372,trackId:track?.id,slot:workloadSlot,
+      playing:isPlaying&&lipSync?.playing!==false&&lipSync?.enabled!==false,
+      rap:genreMotionV471?.family==='rap',reducedMotion,authored:avatarMotionMode==='choreography',
+      section:showCue?.enabled?showCue.section:performance.section,
+      performanceTier:getActivePerformanceTier(),
+    });
+    // Only solo here: for group roles V472 already owns the authored singer cue.
+    // No anonymous multi-avatar vocal assignments are inferred in this fallback.
+    const vocalV472=coordinateRapDanceV526(rapDynamicsV583.accent,{
+      lyrics:lipSync?.lyrics,effectiveTimeMs:(lipSync?.progressMs??-1)+(lipSync?.coordinationOffsetMsV372??0),
+      genre,trackId:track?.id,slot:workloadSlot,count:lipSync?.ensembleCountV374??1,
+      playing:isPlaying&&lipSync?.playing!==false,reducedMotion,
+      authored:avatarMotionMode==='choreography',
+    });
+    // V586: song-time, word-verified upper-body counterbalance on top of V472/V526.
+    const concertV586=refineNaturalConcertPerformanceV586(vocalV472,null,{
+      lyrics:lipSync?.lyrics,timeMs:(lipSync?.progressMs??-1)+(lipSync?.coordinationOffsetMsV372??0),
+      trackId:track?.id,slot:workloadSlot,count:lipSync?.ensembleCountV374??1,
+      playing:isPlaying&&lipSync?.playing!==false&&lipSync?.enabled!==false,
+      rap:genreMotionV471?.family==='rap',reducedMotion,authored:avatarMotionMode==='choreography',
+      enabled:lipSync?.bodyEnabledV371!==false&&lipSync?.gesturesV371!==false,
+      tier:getActivePerformanceTier(),mode:rapDynamicsV583.mode,
+    });
+    const wordDanceV567=getActivePerformanceTier()==='low'?concertV586.accent:coordinateWordDanceV567(concertV586.accent,sampleWordConcertV567({
+      lyrics:lipSync?.lyrics,timeMs:(lipSync?.progressMs??-1)+(lipSync?.coordinationOffsetMsV372??0),
+      playing:isPlaying&&lipSync?.playing!==false,reducedMotion,
+    }),{trackId:track?.id,slot:workloadSlot,count:lipSync?.ensembleCountV374??1,
+      authored:avatarMotionMode==='choreography'});
     const genreAccentV471=(genreMotionV471?.weight??0)*Math.min(1,audio.beatStrength??0)*.07;
     head.current.scale.y += (1 + (motion.beatImpulse + kickAccent * 0.55 + patternKick + learnedAccent) * 0.18 * (0.7 + danceAggression * 0.6) * intelligenceMultipliers.kick * performance.danceMultiplier * motionMix + performance.poseImpulse * 0.08 + performance.buildUp * 0.025 - preKick * 0.055 - head.current.scale.y) * smooth;
-    head.current.rotation.z += (emotion.headTilt + rap.shoulder*.6 + performanceV391.expressionHeadTilt + rapBodyV407.headTilt + variationV474.headTilt - head.current.rotation.z) * smooth;
-    head.current.rotation.x += (rap.headNod + performanceV391.headNod + genreAccentV471*((genreMotionV471?.head??1)-.8) + (partnerLook?.current.pitch ?? 0) + emotion.gazePitch + rapBodyV453.headPitch + vocalV472.head - head.current.rotation.x) * smooth;
-    head.current.rotation.y += ((partnerLook?.current.yaw ?? 0) + emotion.gazeYaw + performanceV391.headTurn + rapBodyV407.headYaw + variationV474.headTurn - head.current.rotation.y) * smooth;
-    if (leftArm.current) leftArm.current.rotation.z += ((-0.25 + genreAccentV471*((genreMotionV471?.arms??1)-.6) + (partnerGesture?.current.leftLift ?? 0) + (performanceV391.leftArmAccent ?? 0) + (performanceV391.counterArm ?? 0) + rapBodyV407.leftArm + vocalV472.arms*Math.max(0,vocalV472.side)) - leftArm.current.rotation.z) * smooth;
-    if (rightArm.current) rightArm.current.rotation.z += ((0.25 - genreAccentV471*((genreMotionV471?.arms??1)-.6) - (partnerGesture?.current.rightLift ?? 0) + (performanceV391.rightArmAccent ?? 0) - (performanceV391.counterArm ?? 0) + rapBodyV407.rightArm - vocalV472.arms*Math.max(0,-vocalV472.side)) - rightArm.current.rotation.z) * smooth;
+    head.current.rotation.z += (emotion.headTilt + rap.shoulder*.6 + performanceV391.expressionHeadTilt + rapBodyV510.headTilt + variationV474.headTilt - head.current.rotation.z) * smooth;
+    head.current.rotation.x += (rap.headNod + performanceV391.headNod + genreAccentV471*((genreMotionV471?.head??1)-.8) + (partnerLook?.current.pitch ?? 0) + emotion.gazePitch + rapBodyV453.headPitch + wordDanceV567.head - head.current.rotation.x) * smooth;
+    head.current.rotation.y += ((partnerLook?.current.yaw ?? 0) + emotion.gazeYaw + performanceV391.headTurn + rapBodyV510.headYaw + variationV474.headTurn+rapDynamicsV583.headTurn+(concertV586.pose?.headYaw??0) - head.current.rotation.y) * smooth;
+    if (leftArm.current) leftArm.current.rotation.z += ((-0.25 + genreAccentV471*((genreMotionV471?.arms??1)-.6) + (partnerGesture?.current.leftLift ?? 0) + (performanceV391.leftArmAccent ?? 0) + (performanceV391.counterArm ?? 0) + rapBodyV510.leftArm + wordDanceV567.arms*Math.max(0,wordDanceV567.side)+Math.max(0,concertV586.pose?.armSwing??0)) - leftArm.current.rotation.z) * smooth;
+    if (rightArm.current) rightArm.current.rotation.z += ((0.25 - genreAccentV471*((genreMotionV471?.arms??1)-.6) - (partnerGesture?.current.rightLift ?? 0) + (performanceV391.rightArmAccent ?? 0) - (performanceV391.counterArm ?? 0) + rapBodyV510.rightArm - wordDanceV567.arms*Math.max(0,-wordDanceV567.side)-Math.max(0,-(concertV586.pose?.armSwing??0))) - rightArm.current.rotation.z) * smooth;
     // V484: restrained forward/back counter-swing while the procedural legs
     // crouch. Existing V481 IK remains responsible for feet, and authored
     // choreography never receives this extra arm-axis motion.
@@ -303,12 +457,12 @@ export function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genre
     const headPitchTargetV488=rap.headNod + performanceV391.headNod
       + genreAccentV471*((genreMotionV471?.head??1)-.8)
       + (partnerLook?.current.pitch ?? 0) + emotion.gazePitch + rapBodyV453.headPitch
-      + vocalV472.head + fullBodyV488.headCounterPitch;
+      + concertV586.accent.head + fullBodyV488.headCounterPitch;
     head.current.rotation.x+=(headPitchTargetV488-head.current.rotation.x)*smooth;
     // V488 counter-roll is a target offset with its own state so it cannot
     // accumulate frame after frame (unlike adding a constant every tick).
     const bodyRollTargetV488=(performanceV391.spineSway + (performanceV391.torsoTwist ?? 0)
-      + rapBodyV407.chestLean + vocalV472.chest*vocalV472.side*.4 + variationV474.torsoSway)
+      + rapBodyV510.chestLean + concertV586.accent.chest*concertV586.accent.side*.4 + variationV474.torsoSway+rapDynamicsV583.torsoSway+(concertV586.pose?.torsoLean??0))
       + lowV482.torsoShift + fullBodyV488.torsoRoll;
     torso.current.rotation.z+=(bodyRollTargetV488-torso.current.rotation.z)*smooth;
     // Keep normal beat bounce separate from the low-pose compensation.

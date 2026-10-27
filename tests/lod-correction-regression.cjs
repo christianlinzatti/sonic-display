@@ -12,7 +12,7 @@ assert.match(correction,/maxStepDeg=5/);
 assert.match(correction,/reference.some\(v=>!Number.isFinite\(v\)\)/);
 assert.match(correction,/rotateTowards/);
 assert.match(sample,/export function getOutgoingLodPose/);
-assert.match(sample,/now-s.sampledAt<0.35/);
+assert.match(sample,/now-(?:s|item)\.sampledAt(?:<0\.35|>=0\.35)/);
 assert.match(scene,/getOutgoingLodPose\(url,\s*liveOwner.current/);
 assert.match(scene,/applyLodPoseCorrection\(bones,\s*reference,\s*true,\s*lodTuning.current.strength\)/);
 assert.match(scene,/if \(!isPlaying \|\| reducedMotion\)/);

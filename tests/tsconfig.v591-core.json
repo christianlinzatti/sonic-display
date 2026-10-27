@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.v590-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/concertQualityProtocolV591.ts",
+    "../components/visualizer/realConcertBenchmarkV590.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

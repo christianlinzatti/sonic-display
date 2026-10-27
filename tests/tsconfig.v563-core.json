@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.v561-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/realDuetPreviewV563.ts",
+    "../components/visualizer/concertLipPreviewV561.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

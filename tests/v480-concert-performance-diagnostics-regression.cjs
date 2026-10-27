@@ -62,7 +62,7 @@ const files={
  adaptive:fs.readFileSync('components/visualizer/adaptivePerformance.tsx','utf8'),
 };
 assert(files.runtime.includes('recordConcertDiagnosticsV480({sample,render:getRenderMetricsSnapshot(),before,after})'));
-assert(files.adaptive.includes('samplePiConcertV479({at:Date.now(),fps,p95FrameMs,avatarCount,playing,visible:true})'),'single existing sampling loop retained');
+assert(files.adaptive.includes('samplePiConcertV479({at:nowV518,fps,p95FrameMs,avatarCount,playing,visible:true})'),'single existing sampling loop retained');
 assert(files.diagnostics.includes('<ConcertPerformanceDiagnosticsV480 />'),'panel only mounted in diagnostics tab');
 assert(files.panel.includes('useConcertDiagnosticsV480()'));
 assert(files.panel.includes('clearConcertDiagnosticsV480()'));

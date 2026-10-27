@@ -11,6 +11,7 @@ import {resolveManualVocalCueV385,applyManualVocalCueV385} from "./manualVocalCa
 import {resolveConcertCueV386} from "./expressiveConcertDirectorV386";
 import type {StageSection} from "./stageDirectorV287";
 import {normalizeRapAudioDocumentV423,sampleRapAudioV423} from "./rapAudioAwareV423";
+import {sampleWordConcertV567} from "./wordSyncedConcertV567";
 
 const formatMs=(n:number)=>`${Math.floor(Math.max(0,n)/60000)}:${String(Math.floor(Math.max(0,n)%60000/1000)).padStart(2,"0")}.${String(Math.floor(Math.max(0,n)%1000/10)).padStart(2,"0")}`;
 const qualityLabels={word:"Wort-Timing",line:"Nur Zeilen-Timing",none:"Kein synchronisiertes Timing"} as const;
@@ -63,6 +64,8 @@ export function VocalSyncInspectorV373(){
   });
   const audioDocV423=!demo&&track?.id?normalizeRapAudioDocumentV423(track.id,(preferences.rapAudioDocumentsV423??{})[track.id],track.durationMs):null;
   const audioSampleV423=sampleRapAudioV423(audioDocV423,progress+(preferences.rapAudioOffsetMsV423??0));
+  const concertWordV567=sampleWordConcertV567({lyrics:activeLyrics,timeMs:inspected.effectiveTimeMs,
+    playing:isActive,reducedMotion:preferences.reducedMotion});
   const face=inspected.face,body=inspected.body;
   const qualityV374="qualityV374" in inspected ? inspected.qualityV374 as import("./vocalPerformanceQualityV374").VocalQualityResultV374["qualityV374"] : null;
   const articulationV384="articulationV384" in inspected ? inspected.articulationV384 as import("./naturalVocalArticulationV384").NaturalArticulationCueV384["articulationV384"] : null;
@@ -137,6 +140,11 @@ export function VocalSyncInspectorV373(){
       }):<span>Keine aktiven Wort-/Zeilenmarken in der Nähe.</span>}
     </div>
     <p className="v373-active">{inspected.vocal.activeWord?`Aktuelles Wort: ${inspected.vocal.activeWord}`:inspected.confidence==="line"?"Zeilentiming: Mundformen nur geschätzt":"Keine aktive vokale Wortmarke"} · Modus: {inspected.vocal.style}</p>
+    <p role="status" className="v373-active">V567 · Gemeinsame Wort-Zeitmarke: {concertWordV567.quality==='word'
+      ?`Wort „${concertWordV567.word}“ (${formatMs(concertWordV567.startMs)}–${formatMs(concertWordV567.endMs)}) · Rap-/Karaoke-Akzente nur innerhalb dieser Marke`
+      :concertWordV567.quality==='line'?'Nur Zeilen-Zeitmarke: keine zusätzlichen Wortakzente'
+      :concertWordV567.quality==='paused'?'Pausiert oder reduzierte Bewegung: keine zusätzlichen Akzente'
+      :'Keine geprüfte Wort- oder Zeilenmarke'}.</p>
     <fieldset className="v374-role-preview"><legend>V374 · Tänzerrollen-Vorschau</legend>
       <label>Tänzeranzahl (Simulation)<select value={previewDancersV374} onChange={e=>{setPreviewDancersV374(Number(e.target.value));setPreviewSlotV374(0);}}><option value={1}>Solo</option><option value={2}>Duo</option><option value={4}>Vier Tänzer</option></select></label>
       {previewDancersV374>1&&<label>Vorschau-Tänzer<select value={previewSlotV374} onChange={e=>setPreviewSlotV374(Number(e.target.value))}>{Array.from({length:previewDancersV374},(_,i)=><option value={i} key={i}>Tänzer {i+1}</option>)}</select></label>}

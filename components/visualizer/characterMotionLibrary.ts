@@ -1,5 +1,6 @@
+import {suggestMotionCategoryV535,validMotionCategoryV535,validMotionFingerprintV535,type MotionCategoryV535} from "./motionLibraryIntelligenceV535";
 import {readGenreDanceSettings,rankGenreDanceMotions} from "./genreSpecificDanceIntelligence";
-export type InstalledCharacterMotion = { id: string; avatarId: string; name: string; url: string; genre: string; bpmMin: number; bpmMax: number; section: "any" | "build" | "drop" | "verse" | "hook"; addedAt: number };
+export type InstalledCharacterMotion = { id: string; avatarId: string; name: string; url: string; genre: string; bpmMin: number; bpmMax: number; section: "any" | "build" | "drop" | "verse" | "hook"; addedAt: number; category?: MotionCategoryV535; favorite?: boolean; fingerprint?: string };
 export type CharacterMotionStore = { version: 1; motions: InstalledCharacterMotion[]; automatic: boolean };
 export const CHARACTER_MOTION_CHANGE_EVENT = "sonic:character-motions-changed";
 const STORAGE_KEY = "sonic.character.motion.library.v190";
@@ -18,7 +19,7 @@ export function sanitizeCharacterMotionStore(input: unknown): CharacterMotionSto
     const genre = GENRES.has(String(m.genre)) ? String(m.genre) : "";
     const bpmMin = Number.isFinite(m.bpmMin) ? Math.max(0,Math.min(300,Number(m.bpmMin))) : 0;
     const bpmMax = Number.isFinite(m.bpmMax) ? Math.max(bpmMin,Math.min(300,Number(m.bpmMax))) : 300;
-    const next = {id:m.id,avatarId:m.avatarId,name:m.name.trim(),url:m.url,genre,bpmMin,bpmMax,section,addedAt:Number.isFinite(m.addedAt)?Number(m.addedAt):0};
+    const next = {id:m.id,avatarId:m.avatarId,name:m.name.trim(),url:m.url,genre,bpmMin,bpmMax,section,addedAt:Number.isFinite(m.addedAt)?Number(m.addedAt):0,category:validMotionCategoryV535(m.category)?m.category:suggestMotionCategoryV535(String(m.name)),favorite:m.favorite===true,...(validMotionFingerprintV535(m.fingerprint)?{fingerprint:m.fingerprint}:{})};
     const prev = motions.findIndex(x=>x.id===next.id);if(prev>=0)motions.splice(prev,1);motions.push(next);
   }
   return {version:1,motions:motions.slice(-250),automatic:data.automatic===true};
@@ -32,10 +33,10 @@ export function saveCharacterMotionStore(input: CharacterMotionStore): Character
   if (typeof window !== "undefined") {localStorage.setItem(STORAGE_KEY,JSON.stringify(safe));window.dispatchEvent(new Event(CHARACTER_MOTION_CHANGE_EVENT));}
   return safe;
 }
-export function addCharacterMotion(avatarId:string,name:string,url:string) {
+export function addCharacterMotion(avatarId:string,name:string,url:string,metadata?:{fingerprint?:string;category?:MotionCategoryV535}) {
   const store=loadCharacterMotionStore();
-  if(store.motions.some(m=>m.avatarId===avatarId&&m.url===url))return store;
-  return saveCharacterMotionStore({...store,motions:[...store.motions,{id:crypto.randomUUID(),avatarId,name,url,genre:"",bpmMin:0,bpmMax:300,section:"any",addedAt:Date.now()}]});
+  if(store.motions.some(m=>m.avatarId===avatarId&&(m.url===url||(validMotionFingerprintV535(metadata?.fingerprint)&&m.fingerprint===metadata.fingerprint))))return store;
+  return saveCharacterMotionStore({...store,motions:[...store.motions,{id:crypto.randomUUID(),avatarId,name,url,genre:"",bpmMin:0,bpmMax:300,section:"any",addedAt:Date.now(),category:metadata?.category??suggestMotionCategoryV535(name),...(validMotionFingerprintV535(metadata?.fingerprint)?{fingerprint:metadata.fingerprint}:{})}]});
 }
 export function chooseCharacterMotion(store:CharacterMotionStore,avatarId:string,genre:string,bpm:number|undefined,section:string, fallback:string|undefined):string|undefined {
   if(!store.automatic)return fallback;

@@ -59,7 +59,7 @@ assert.ok(read('components/visualizer/FacialAnimationStudioV370.tsx').includes('
 for(const key of ['diagnoseFacialRigV383','suggestSafeFacialProfileV383','exportFacialProfileV383','importFacialProfileV383'])assert.ok(read('components/visualizer/FacialAnimationStudioV370.tsx').includes(key));
 assert.ok(read('app/globals.css').includes('.v383-rig-panel'));
 const pkg=JSON.parse(read('package.json'));
-assert.ok(['0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387','0.1.0-v390','0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v390','0.1.0-v391','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416','0.1.0-v417','0.1.0-v418','0.1.0-v419','0.1.0-v420','0.1.0-v422','0.1.0-v424','0.1.0-v425','0.1.0-v426'].includes(pkg.version));
+assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=383,'V383 features must remain usable in subsequent releases');
 assert.ok(pkg.scripts['verify:offline'].includes('test:v383'));
 assert.ok(read('README.md').includes('V383-ADVANCED-FACIAL-RIG.md'));
 console.log('PASS V383 diagnosis, VRM/Oculus, channel collisions, safe calibration, isolated morph audition, portable profiles, UI integration');

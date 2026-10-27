@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.v499-core.json",
+  "compilerOptions": {"incremental": false},
+  "files": [
+    "../components/visualizer/intelligentRapDuetPerformanceV500.ts",
+    "../components/visualizer/rapDuetStudioV416.ts",
+    "../components/visualizer/partnerLookAtEngine.ts",
+    "../components/visualizer/partnerGestureEngine.ts",
+    "../components/visualizer/naturalVocalExpressionV499.ts",
+    "v414-music-types.d.ts", "stubs/v415-three-types.d.ts"
+  ]
+}

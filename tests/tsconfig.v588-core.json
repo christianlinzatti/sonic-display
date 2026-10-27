@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.v587-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/genreAwareMotionDirectorV536.ts",
+    "../components/visualizer/longFormChoreographyV588.ts",
+    "../components/visualizer/useGenreAwareMotionDirectorV536.ts",
+    "../components/visualizer/expressiveDanceFootworkV587.ts",
+    "../components/visualizer/naturalFullBodyDanceV524.ts",
+    "../components/visualizer/advancedDanceFootworkV486.ts",
+    "../components/visualizer/avatarRigController.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v569-react-types.d.ts",
+    "stubs/v588-react-hooks.d.ts"
+  ]
+}

@@ -56,7 +56,7 @@ assert(p.matchesBlendGenreV492('all','jazz'));
 const stage=read('components/visualizer/ThreeAvatar.tsx');
 for(const fragment of ['preparedBlendsV492=useMemo','chooseLiveBlendPresetV492([preset],clips','new AnimationClip(actionName,match.overlay.duration,safe)',
  'name !== activeLiveBlendV492?.actionName','const activeLiveBlendV492=','!activeSequence&&!activeLoop&&!avatarBlendEnabled',
- '!groupClockV328?.settings.enabled','!activeLiveBlendV492','action.setEffectiveWeight(livePresetWeightV492.current)',
+ '!groupClockV328?.settings.enabled','!activeLiveBlendV492','action.setEffectiveWeight(weight)',
  'footIK.current.left?.contact.phase',"window.addEventListener(GLB_BLEND_CHANGE_V492,refresh)",
  '...preparedBlendsV492.map(p=>p.clip)'])assert(stage.includes(fragment),`missing live wiring: ${fragment}`);
 assert(stage.indexOf('preparedBlendsV492=useMemo')<stage.indexOf('useAnimations(playbackClips, root)'));
@@ -68,5 +68,5 @@ for(const fragment of ['GLB Blending Preset Studio · V492','readBlendPresetsV49
  'setBlendV491({enabled:true,sourceId:preset.overlay.id','setClipId(preset.base.id)',
  'disabled={!selectedBlendPresetV492||!currentPresetValidV492}', 'Preset-JSON importieren', 'Presets als JSON exportieren',
  'Bei passender Basisanimation automatisch in der Live-Show nutzen'])assert(preview.includes(fragment),`missing UI: ${fragment}`);
-assert(read('package.json').includes('0.1.0-v492'));
+assert(Number(JSON.parse(read('package.json')).version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=492);
 console.log('PASS V492: strict import/export, scope, update/delete contract, missing clips, safe channels, genre, manual protection and live mixer');

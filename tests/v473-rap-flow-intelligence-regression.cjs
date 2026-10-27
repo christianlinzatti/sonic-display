@@ -70,6 +70,7 @@ assert(authoredApplied.arms < updated.arms*.38,'user-authored motion has priorit
 const avatar=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
 assert(avatar.includes('import {enhanceRapAccentV473}'));
 assert.equal((avatar.match(/enhanceRapAccentV473\(resolveVocalDanceAccentV472\(/g)||[]).length,2);
-assert(avatar.includes('musicMotionV468.updateMotion(audio,delta,isPlaying&&!reducedMotion&&(audioMotionEnabledV468??true),genreCue,vocalV472)'));
-assert(avatar.includes('vocalV472.arms*Math.max(0,vocalV472.side)'));
+assert(fs.readFileSync('components/visualizer/useGltfVocalMotionV492.ts','utf8').includes('enhanceRapAccentV473(resolveVocalDanceAccentV472('));
+assert(fs.readFileSync('components/visualizer/useGltfVocalMotionV492.ts','utf8').includes('musicMotionV468.updateMotion(audio,delta,isPlaying&&!reducedMotion&&(audioMotionEnabledV468??true),genreCue,correctedVocalV515,'));
+assert(fs.readFileSync('components/visualizer/ProceduralDancerAvatarV492.tsx','utf8').includes('wordDanceV567.arms*Math.max(0,wordDanceV567.side)'));
 console.log('PASS V473: synced flow-density and switch hints, modest adlib candidates, silent gaps, manual cast priority, pause/reduced-motion, GLB + procedural paths');

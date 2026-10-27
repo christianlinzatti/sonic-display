@@ -1,0 +1,5 @@
+{
+  "extends":"./tsconfig.v536-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../components/visualizer/naturalMotionTransitionsV537.ts"]
+}

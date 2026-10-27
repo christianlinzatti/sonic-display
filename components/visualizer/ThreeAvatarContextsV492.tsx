@@ -12,6 +12,12 @@ import { type NaturalDanceSlotV485 } from "./naturalDanceMotionStudioV485";
 import { type FootSupportV486, type FootworkSlotV486 } from "./advancedDanceFootworkV486";
 import { type GroundObservationV487 } from './groundContactStudioV487';
 import { type AvatarRigTargets } from "./avatarRigController";
+import {type BodyRegistryV507} from "./avatarBodyAwarenessV507";
+import {type AnimatedBodyRegistryV508} from "./animatedCollisionV508";
+/** V508 mutable, stage-scoped snapshot bus; no state updates per frame. */
+export const AnimatedBodyContextV508=createContext<AnimatedBodyRegistryV508|null>(null);
+/** V507 stage-local per-slot rest-pose measurements, no per-frame React updates. */
+export const AvatarBodyContextV507=createContext<BodyRegistryV507|null>(null);
 
 export const GroupMotionClockContextV328=createContext<{settings:MotionSyncV328;clock:{current:MotionSyncClockV328}}|null>(null);
 // V329: clip signatures published only on asset/clip changes, never per animation frame.

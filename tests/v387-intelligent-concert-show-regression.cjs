@@ -58,7 +58,8 @@ const checks={
  'components/visualizer/StageCameraDirectorV289.tsx':['composeConcertShowCameraV387','lyricsProtected:'],
  'components/SettingsPanel.tsx':['v387-concert-show-settings','Festiva' ],
  'components/visualizer/registry.tsx':['concertShowCueV387'],
- 'package.json':['0.1.0-v418','test:v387'],
+ 'package.json':['test:v387'],
 };
 for(const [p,tokens] of Object.entries(checks))for(const token of tokens)assert.ok(fs.readFileSync(p,'utf8').includes(token),`${p}: ${token}`);
+assert(Number(require('../package.json').version.match(/-v(\d+)$/)?.[1]||0)>=387);
 console.log('PASS V387 sections, envelopes, real beat, safety limits, manual priorities, wiring');

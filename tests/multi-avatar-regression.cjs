@@ -18,6 +18,6 @@ assert(stage.includes('useAvatarModel(secondaryAvatarId)'));
 assert(stage.includes('secondaryAvatarModelUrl={secondaryAvatar.url}'));
 assert(prefs.includes('multiAvatarMode: "solo"'));
 assert(registry.includes('secondaryAvatarModelUrl?: string | null'));
-let ts;for(const loc of ['typescript','/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript','/usr/local/lib/node_modules/typescript']){try{ts=require(loc);break}catch{}}
+const ts = require('./typescript-loader.cjs');
 if(ts){for(const file of ['components/visualizer/ThreeAvatar.tsx','components/SettingsPanel.tsx','components/visualizer/VisualizerStage.tsx','components/visualizer/registry.tsx']){const diagnostics=ts.transpileModule(read(file),{fileName:file,compilerOptions:{jsx:ts.JsxEmit.Preserve,module:ts.ModuleKind.ESNext},reportDiagnostics:true}).diagnostics||[];assert.equal(diagnostics.filter(d=>d.category===ts.DiagnosticCategory.Error).length,0,file)}}
 console.log('V140 multi-avatar integration: 14 assertions and JSX transpile checks passed');

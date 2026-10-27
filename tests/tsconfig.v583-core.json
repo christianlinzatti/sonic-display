@@ -1,0 +1,12 @@
+{
+  "extends":"./tsconfig.v582-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/rapPerformanceDynamicsV583.ts",
+    "../components/visualizer/vocalAwareChoreographyV472.ts",
+    "../components/visualizer/rapFlowIntelligenceV473.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v569-react-types.d.ts"
+  ]
+}

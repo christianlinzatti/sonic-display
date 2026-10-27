@@ -1,0 +1,6 @@
+[
+  {"id":"verse-a","at":0.2,"line":"DEMO · Lead-Rap · Stelle A","focus":0,"camera":"lead","fx":"gobo"},
+  {"id":"reply-b","at":2.0,"line":"DEMO · Antwort · Stelle B","focus":1,"camera":"duet","fx":"led"},
+  {"id":"hook","at":4.2,"line":"DEMO · Gemeinsamer Hook","focus":0,"camera":"wide","fx":"hook"},
+  {"id":"outro","at":6.6,"line":"DEMO · Ruhiger Ausklang","focus":1,"camera":"wide","fx":"calm"}
+]

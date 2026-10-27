@@ -1,0 +1,5 @@
+{
+  "extends":"./tsconfig.v533-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../components/visualizer/advancedMotionInspectorV534.ts"]
+}

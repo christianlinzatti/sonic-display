@@ -1,0 +1,10 @@
+{
+  "extends":"./tsconfig.v608-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/seamlessConcertTransitionsV609.ts",
+    "../components/visualizer/fullSongConcertDramaturgyV604.ts",
+    "../components/visualizer/multiAvatarStageDirectorV326.ts",
+    "v414-music-types.d.ts","stubs/v415-three-types.d.ts","stubs/v508-three-types.d.ts"
+  ]
+}

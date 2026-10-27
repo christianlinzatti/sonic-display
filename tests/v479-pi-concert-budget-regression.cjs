@@ -58,7 +58,7 @@ assert(avatar.includes('piConcertEffectsV479.automaticPostProcess'));
 assert(avatar.includes('piConcertEffectsV479.automaticFx'));
 assert(avatar.includes('piConcertEffectsV479.automaticShader'));
 assert(avatar.includes('<AdaptivePerformanceController avatarCount=')&&avatar.includes('playing={props.isPlaying}'));
-assert(perf.includes('samplePiConcertV479({at:Date.now(),fps,p95FrameMs,avatarCount,playing,visible:true})'));
+assert(perf.includes('samplePiConcertV479({at:nowV518,fps,p95FrameMs,avatarCount,playing,visible:true})'));
 assert(ui.includes('configurePiConcertV479(profile,hints)'));
 assert(!/Date\.now|performance\.now|Math\.random|localStorage|fetch\(|setTimeout|setInterval/.test(fs.readFileSync('services/monitoring/piConcertBudgetV479.ts','utf8')));
 assert.match(require('../package.json').version,/^0\.1\.0-v(47[9]|4[89]\d|[5-9]\d{2,})$/,'V479 behavior remains tested in later releases');

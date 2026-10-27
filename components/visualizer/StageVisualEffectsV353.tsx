@@ -8,6 +8,7 @@ import type {VisualFxCueV353} from '@/services/stageContent/visualEffectsStudioV
  * Shader is behind all stage surfaces (z=-4.5); depthWrite=false and low alpha preserve lyrics. */
 export function StageVisualEffectsV353({cue}:{cue:VisualFxCueV353}){
  const particles=useRef<Points>(null);
+ const lastDrawCountV552=useRef(-1);
  const shader=useRef<ShaderMaterial>(null);
  const material=useRef<PointsMaterial>(null);
  const geometry=useMemo(()=>{
@@ -24,7 +25,8 @@ export function StageVisualEffectsV353({cue}:{cue:VisualFxCueV353}){
  useFrame((state,dt)=>{
   const tier=getActivePerformanceTier();
   const count=cue.active?(tier==='low'?0:Math.min(cue.particleCount,tier==='balanced'?42:96)):0;
-  geometry.setDrawRange(0,count);
+  // V552: skip redundant geometry work in the continuous render loop.
+  if(lastDrawCountV552.current!==count){geometry.setDrawRange(0,count);lastDrawCountV552.current=count;}
   if(particles.current){
    particles.current.visible=count>0;
    if(count>0)particles.current.rotation.z+=Math.min(dt,.08)*cue.particleSpeed*.02;

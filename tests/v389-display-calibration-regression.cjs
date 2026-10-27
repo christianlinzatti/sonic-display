@@ -38,10 +38,11 @@ const checks={
  'components/TouchKioskControls.tsx':['DisplayCalibrationStudioV389','V389 · Kalibrieren','calibrationOpenV389','trackId'],
  'components/SonicDisplay.tsx':['trackId={track?.id??""}'],
  'app/globals.css':['.v389-calibration','max-height','touch-action:pan-y','prefers-reduced-motion'],
- 'package.json':['0.1.0-v424','test:v389','v389-display-calibration-regression'],
+ 'package.json':['test:v389','v389-display-calibration-regression'],
  'V389-SMART-DISPLAY-CALIBRATION.md':['echte','2 Aufwärmwerte','10 aktuelle'],
 };
 for(const [file,tokens] of Object.entries(checks))for(const token of tokens)assert.ok(fs.readFileSync(file,'utf8').includes(token),`${file}: missing ${token}`);
 const ui=fs.readFileSync('components/DisplayCalibrationStudioV389.tsx','utf8');
 assert.ok(!ui.includes('<Canvas')&&!ui.includes('requestFullscreen')&&!ui.includes('new WebGLRenderer'));
+assert(Number(JSON.parse(fs.readFileSync('package.json','utf8')).version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=389);
 console.log('PASS V389 real scene telemetry, profile restoration, cast validation, scoped recommendations, persistence, UX');

@@ -1,0 +1,5 @@
+{
+ "extends":"./tsconfig.v552-core.json",
+ "compilerOptions":{"incremental":false},
+ "files":["../services/monitoring/concertReleaseGateV553.ts","v414-music-types.d.ts","stubs/v415-three-types.d.ts"]
+}

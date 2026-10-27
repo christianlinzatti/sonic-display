@@ -10,8 +10,7 @@ assert.match(stage,/advanceStageCue\(/);
 assert.match(stage,/tier !== "low"/);
 assert.match(stage,/!reducedMotion/);
 assert.match(avatar,/genre=\{props.genre\}/);
-let ts;
-for (const path of ['typescript','/opt/nvm/versions/node/v22.16.0/lib/node_modules/typescript','/usr/local/lib/node_modules/typescript']) {try { ts = require(path); break; }catch {}}
+const ts = require('./typescript-loader.cjs');
 if (!ts) { console.log('V139 stage integration checks pass; behavior tests unavailable without TypeScript');process.exit(0); }
 const js = ts.transpileModule(src,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020},reportDiagnostics:true});
 assert(!js.diagnostics?.some(d=>d.category===ts.DiagnosticCategory.Error));

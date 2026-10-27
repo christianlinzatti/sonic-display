@@ -24,9 +24,24 @@ export function clearLodPlayback(source: string): void { snapshots.delete(source
 /** V129: simultaneous LOD instances can read the outgoing pose clock without
  * consuming the one-shot unmount snapshot. The store is memory-only. */
 const liveSnapshots = new Map<string, { owner: string; snapshot: PlaybackSnapshot }>();
+/** V569 – keep abandoned live LOD sources bounded on month-long kiosk sessions.
+ * Idle entries are pruned only when another real frame is published: no timer.
+ */
+export const MAX_LIVE_LOD_SOURCES_V569=32;
+export const LIVE_LOD_MAX_IDLE_SECONDS_V569=6;
+let lastLiveLodSweepV569=-Infinity;
 export function publishLiveLodPlayback(source: string, owner: string, snapshot: PlaybackSnapshot): void {
-  if (!source || !owner || !Number.isFinite(snapshot.savedAt)) return;
+  if (!source || !owner || !Number.isFinite(snapshot.savedAt) || snapshot.savedAt<0) return;
+  // Sweep only once per second, not on every 60fps snapshot publication.
+  if(snapshot.savedAt-lastLiveLodSweepV569>=1 || snapshot.savedAt<lastLiveLodSweepV569){
+    for(const [key,entry] of liveSnapshots){
+      const age=snapshot.savedAt-entry.snapshot.savedAt;
+      if(age>LIVE_LOD_MAX_IDLE_SECONDS_V569||age<0)liveSnapshots.delete(key);
+    }
+    lastLiveLodSweepV569=snapshot.savedAt;
+  }
   liveSnapshots.set(source, {owner, snapshot});
+  while(liveSnapshots.size>MAX_LIVE_LOD_SOURCES_V569)liveSnapshots.delete(liveSnapshots.keys().next().value!);
 }
 export function readLiveLodPlayback(source: string, owner: string, now: number, maxAge = 0.5): PlaybackSnapshot | null {
   const entry = liveSnapshots.get(source);

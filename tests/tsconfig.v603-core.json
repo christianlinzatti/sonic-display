@@ -1,0 +1,12 @@
+{
+  "extends":"./tsconfig.v602-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/liveStageQualityV592.ts",
+    "../components/visualizer/piConcertOptimizationV602.ts",
+    "../components/visualizer/advancedConcertStageFxV601.ts",
+    "../services/monitoring/piConcertBudgetV479.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

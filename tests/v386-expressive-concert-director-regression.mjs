@@ -75,5 +75,7 @@ for(const file of all)assert.ok(read(file).includes('V386'),`missing V386 integr
 assert.ok(read('components/visualizer/ThreeAvatar.tsx').includes('authoredPriority:avatarMotionMode==="choreography"'));
 assert.ok(read('components/visualizer/DynamicStage.tsx').includes('authoredLightsV386'));
 assert.ok(read('components/visualizer/StageCameraDirectorV289.tsx').includes('shotPlanV386'));
-assert.match(read('package.json'),/0\.1\.0-v(?:38[6789]|390|391|392|393|394|395|396|397|398|399|400|401|402|403|404|405|406|407|408|409|410|411|412|413|414|415|416|417)/);
+const pkg=JSON.parse(read('package.json'));
+assert.match(pkg.version,/^0\.1\.0-v\d+$/);
+assert.ok(Number(pkg.version.split('-v')[1])>=386,'later releases retain V386 concert contracts');
 console.log('PASS V386 vocal direction, duet, hooks, backup reactions, camera/lighting/manual priority');

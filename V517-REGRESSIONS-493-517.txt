@@ -1,0 +1,75 @@
+===== test:v493 exit=0 secs=0.33 =====
+V493 Intelligent Motion Preset Director PASS: phase, energy, cooldown, dancer variation, seek, priority and mixer
+
+===== test:v494 exit=0 secs=0.39 =====
+PASS V494: contact-aware optional GLB travel, safe reset/guards, per-model calibration, 30-minute simulation, stable render architecture
+
+===== test:v495 exit=0 secs=0.57 =====
+PASS V495: phase-stable ensemble roles, manual priority, contact-safe choreography, seek resets, 30-minute simulation
+
+===== test:v496 exit=0 secs=0.53 =====
+PASS V496: manual timestamp singer timeline, duet/hook lip masks, seek, validation, integration, 30-minute simulation
+
+===== test:v497 exit=0 secs=0.45 =====
+PASS V497: joined solo/duet/hook camera & lights, lyric and manual priority, 30-minute simulation
+
+===== test:v498 exit=0 secs=0.50 =====
+PASS V498: timestamp-safe vocal transitions, cue precedence, actual avatar light handoff and 30-minute bounded simulation
+
+===== test:v499 exit=0 secs=0.59 =====
+PASS V499: deterministic manual-timeline vocal micro-expression, continuity, rap articulation, synced word bounds, priority/fallback, GLB and procedural wiring
+
+===== test:v500 exit=0 secs=0.45 =====
+PASS V500: editorial solo/reply/duet/hook, 2–4 performers, track safety, manual priority, bounds, 30min, both stages
+
+===== test:v501 exit=0 secs=0.42 =====
+PASS V501: timestamp-accurate accents, pause/seek, missing timing, 4-avatar/3D safe layout, 15k deterministic plans, CSS, wiring
+
+===== test:v502 exit=0 secs=0.34 =====
+PASS V502 concert genre cues, protected overrides, visual wiring, 18,000 bounded timeline samples
+
+===== test:v503 exit=0 secs=0.32 =====
+PASS V503 gesture and facial safeguards; GLB/procedural wiring, 20,000 bounded playback frames
+
+===== test:v504 exit=0 secs=0.56 =====
+PASS V504: 24,000 samples, solo/duet/reply/hook, 2-4 avatars, deterministic seeks, manual/cross-track safety, duo/group wiring
+
+===== test:v505 exit=0 secs=0.66 =====
+PASS V505: 26,000 deterministic frames, 77999 actor slots, spatial gaze, crowd-distance safety, V494 grounded auto-group spacing, manual priorities
+
+===== test:v506 exit=0 secs=0.51 =====
+PASS V506: 28,000 deterministic frames, 83999 actor samples, 77006 forecast close pairs, swept crossing, gesture and foot guards, 2-4 actors
+
+===== test:v507 exit=0 secs=0.49 =====
+PASS V507: 30,000 deterministic body profiles, rest-pose measurement, stale-cleanup registry, 2-4 avatar body-envelope integration
+
+===== test:v508 exit=0 secs=0.82 =====
+PASS V508: 32,000 4-avatar frames; live rig capsules, 3D segment distance, staleness/manual/low-tier guards and duo/group wiring
+
+===== test:v509 exit=0 secs=0.47 =====
+PASS V509 Natural Ensemble Choreography: 36,000 3/4-avatar frames, manual/vocal evidence guards, collision and foot IK
+
+===== test:v510 exit=0 secs=0.41 =====
+PASS V510: 26,000 validated word playback frames (1829 active); lip-seal, manual roles, bounded motion, 3 rendering paths
+
+===== test:v511 exit=0 secs=0.36 =====
+PASS V511 Concert Quality: 32000 deterministic ensemble windows, explicit measurement coverage, Pi opt-in cadence, duo/group/GLB/diagnostics wiring
+
+===== test:v512 exit=0 secs=0.76 =====
+PASS V512 Visual Concert Quality Studio: 36000 deterministic frames, true stage position wiring, 2-4 dancers, missing evidence safety, touch timeline, 3-quality Pi budget comparison
+
+===== test:v513 exit=0 secs=0.48 =====
+PASS V513 Real 3D Concert Quality Preview: 26000 sampled stages, 2–4 dancers, missing-measurement safety, lazy Canvas, cloned GLBs, embedded/external motions, Pi caps
+
+===== test:v514 exit=0 secs=0.59 =====
+PASS V514 Smart Concert Motion Quality Inspector: 28000 dynamic samples, joint angles, foot sliding, pose jumps, missing rigs, seek safety, bounded timeline, Pi sampler, opt-in preview integration
+
+===== test:v515 exit=0 secs=0.33 =====
+PASS V515 Intelligent Motion Correction: 30000 variable-FPS auto-accent frames, authored priority, safe reset, role integrity, advisory-only foot-sliding, V514 integration
+
+===== test:v516 exit=0 secs=0.44 =====
+PASS V516 Natural Vocal & Dance Synchronization: 32000 Deutschrap/duet/chorus frames, timed words only, sealed lip channels, authored roles, manual guards, three rendering paths
+
+===== test:v517 exit=0 secs=0.44 =====
+PASS V517 Advanced Group Performance Director: 38000 ensemble/Deutschrap duet frames, manual cast evidence, chorus/front-facing, risk gating
+

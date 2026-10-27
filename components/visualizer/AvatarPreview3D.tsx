@@ -32,6 +32,15 @@ type Props = {
   preferences: UiPreferences;
   studio?: boolean;
   animationUrl?: string;
+  sharedMotionUrlV531?: string;
+  /** Optional index for a compact installer preview of embedded model clips. */
+  selectedEmbeddedClipIndex?: number;
+  /** Fires only after the user presses Play; not a rendered-quality assertion. */
+  onPreviewPlaybackV532?: () => void;
+  /** V534 review-only seek request; never writes any choreography or preference. */
+  previewSeekV534?: {seconds:number;seq:number};
+  /** V534 only: choose the external source clip in a motion import preview. */
+  selectedExternalClipIndexV534?: number;
 };
 
 function PreviewMotion({ playing, speed, intensity, beatEnabled, bpm, style, onBeat, children }: {
@@ -83,8 +92,8 @@ type TimelineClip = { id: string; name: string; label: string; duration: number;
 type TimelineState = { clipId: string; start: number; end: number; cursor: number; playing: boolean; speed: number };
 
 /** Each preview owns an independent mixer; external clips are retargeted against its cloned rig. */
-function GltfPreview({ url, animationUrl, timeline, blendV491, onClips, onPosition, footIK, preferences }: {
-  url: string; animationUrl?: string; timeline: TimelineState; blendV491?: PreviewBlendPlanV491;
+function GltfPreview({ url, animationUrl, sharedMotionUrlV531, timeline, blendV491, onClips, onPosition, footIK, preferences }: {
+  url: string; animationUrl?: string; sharedMotionUrlV531?: string; timeline: TimelineState; blendV491?: PreviewBlendPlanV491;
   onClips: (clips: TimelineClip[]) => void; onPosition: (time: number) => void;
   footIK: boolean; preferences: UiPreferences;
 }) {
@@ -110,16 +119,21 @@ function GltfPreview({ url, animationUrl, timeline, blendV491, onClips, onPositi
   useEffect(() => {
     const request = ++externalRequest.current;
     setExternalClips([]);
-    if (!animationUrl) return;
-    new GLTFLoader().load(animationUrl, gltf => {
+    const motionUrl = animationUrl || sharedMotionUrlV531;
+    if (!motionUrl) return;
+    new GLTFLoader().load(motionUrl, gltf => {
       if (request !== externalRequest.current) return;
-      const converted = retargetHumanoidClips(gltf.animations, gltf.scene, model, readRetargetCalibration(url));
-      setExternalClips(converted.clips);
+      // Shared animations are exact-match skeletal tracks. Retarget only
+      // explicitly installed external motions (the legacy workflow).
+      const resolved = animationUrl
+        ? retargetHumanoidClips(gltf.animations, gltf.scene, model, readRetargetCalibration(url)).clips
+        : gltf.animations;
+      setExternalClips(resolved);
     }, undefined, error => {
       if (request === externalRequest.current) console.warn("Preview animation GLB could not be loaded", error);
     });
     return () => { externalRequest.current++; };
-  }, [animationUrl, model, url, calibrationVersion]);
+  }, [animationUrl, sharedMotionUrlV531, model, url, calibrationVersion]);
   const allClips = useMemo(() => [
     ...animations.map((clip, i) => ({ id: `embedded:${i}`, label: clip.name || `Clip ${i+1}`, clip })),
     ...externalClips.map((clip, i) => ({ id: `external:${i}`, label: `Import · ${clip.name || `Clip ${i+1}`}`, clip })),
@@ -197,7 +211,7 @@ function GltfPreview({ url, animationUrl, timeline, blendV491, onClips, onPositi
   return <group ref={root}><primitive object={model}/></group>;
 }
 
-export function AvatarPreview3D({ modelUrl, preferences, studio = false, animationUrl }: Props) {
+export function AvatarPreview3D({ modelUrl, preferences, studio = false, animationUrl, sharedMotionUrlV531, selectedEmbeddedClipIndex, onPreviewPlaybackV532, previewSeekV534, selectedExternalClipIndexV534 }: Props) {
   const [playing, setPlaying] = useState(false);
   const [compareIK, setCompareIK] = useState(false);
   const [previewIK, setPreviewIK] = useState(true);
@@ -341,6 +355,24 @@ export function AvatarPreview3D({ modelUrl, preferences, studio = false, animati
     setClips(old => JSON.stringify(old) === JSON.stringify(next) ? old : next);
   }, []);
   const handlePosition = useCallback((time: number) => setCursor(old => Math.abs(old - time) < 0.035 ? old : time), []);
+  // A/B checks must start each newly selected clip at 0s and require a
+  // deliberate new Play click; other preview callers keep their normal state.
+  useEffect(() => {
+    if (selectedEmbeddedClipIndex !== undefined || selectedExternalClipIndexV534 !== undefined) setPlaying(false);
+  }, [selectedEmbeddedClipIndex, selectedExternalClipIndexV534, modelUrl, sharedMotionUrlV531]);
+  // Installer-only selection; other previews keep their existing manual timeline state.
+  useEffect(() => {
+    if (selectedEmbeddedClipIndex === undefined || !Number.isInteger(selectedEmbeddedClipIndex)) return;
+    const requested = sharedMotionUrlV531 && !animationUrl ? `external:${selectedEmbeddedClipIndex}` : `embedded:${selectedEmbeddedClipIndex}`;
+    if (clips.some(clip => clip.id === requested)) setClipId(current => current === requested ? current : requested);
+  }, [selectedEmbeddedClipIndex, clips, modelUrl, sharedMotionUrlV531, animationUrl]);
+  // When importing a standalone motion GLB, the quality report and 3D preview
+  // must refer to the SAME source clip, not the avatar's embedded default.
+  useEffect(()=>{
+    if(selectedExternalClipIndexV534===undefined||!Number.isInteger(selectedExternalClipIndexV534))return;
+    const requested=`external:${selectedExternalClipIndexV534}`;
+    if(clips.some(c=>c.id===requested))setClipId(current=>current===requested?current:requested);
+  },[selectedExternalClipIndexV534,clips,modelUrl,animationUrl]);
   useEffect(() => {
     const index = previewIndexRef.current;
     if (index === null || !playing || nextStepPending.current || !loopEnd || cursor < loopEnd - 0.075) return;
@@ -366,6 +398,19 @@ export function AvatarPreview3D({ modelUrl, preferences, studio = false, animati
       setCursor(saved.start);
     }
   }, [clips, clipId]);
+  // V534: timestamp from the quality inspector, evaluated on the current
+  // preview clip only. The viewer remains paused for frame-by-frame checking.
+  useEffect(()=>{
+    if(!previewSeekV534||!clips.length)return;
+    const selectedClip=clips.find(c=>c.id===clipId);
+    if(!selectedClip)return;
+    setPlaying(false);
+    setCursor(Math.max(0,Math.min(selectedClip.duration,previewSeekV534.seconds)));
+  },[previewSeekV534?.seq,clips,clipId]);
+  const previewRequestedIdV532=selectedExternalClipIndexV534!==undefined?`external:${selectedExternalClipIndexV534}`:
+    selectedEmbeddedClipIndex===undefined?null:
+    sharedMotionUrlV531 && !animationUrl ? `external:${selectedEmbeddedClipIndex}` : `embedded:${selectedEmbeddedClipIndex}`;
+  const readyForSelectedV532=!previewRequestedIdV532 || (clipId===previewRequestedIdV532 && clips.some(c=>c.id===previewRequestedIdV532));
   const timeline: TimelineState = { clipId, start: loopStart, end: loopEnd, cursor, playing, speed };
   const blendOptionsV491 = clips.filter(c=>c.id!==clipId);
   const blendSelectionV491 = blendOptionsV491.find(c=>c.id===blendV491.sourceId);
@@ -452,23 +497,23 @@ export function AvatarPreview3D({ modelUrl, preferences, studio = false, animati
           {studio && compareIK && modelUrl ? <>
             <group position={[-1.12, 0, 0]} scale={0.72}>
               <PreviewMotion playing={playing && !preferences.reducedMotion} speed={speed} intensity={intensity} beatEnabled={beatEnabled} bpm={bpm} style={style} onBeat={handleBeat}>
-                <Suspense fallback={<ProceduralModel/>}><GltfPreview url={modelUrl} animationUrl={animationUrl} timeline={timeline} blendV491={activeBlendV491} onClips={handleClips} onPosition={handlePosition} footIK={false} preferences={preferences}/></Suspense>
+                <Suspense fallback={<ProceduralModel/>}><GltfPreview url={modelUrl} animationUrl={animationUrl} sharedMotionUrlV531={sharedMotionUrlV531} timeline={timeline} blendV491={activeBlendV491} onClips={handleClips} onPosition={handlePosition} footIK={false} preferences={preferences}/></Suspense>
               </PreviewMotion>
             </group>
             <group position={[1.12, 0, 0]} scale={0.72}>
               <PreviewMotion playing={playing && !preferences.reducedMotion} speed={speed} intensity={intensity} beatEnabled={beatEnabled} bpm={bpm} style={style} onBeat={() => {}}>
-                <Suspense fallback={<ProceduralModel/>}><GltfPreview url={modelUrl} animationUrl={animationUrl} timeline={timeline} blendV491={activeBlendV491} onClips={handleClips} onPosition={() => {}} footIK={true} preferences={preferences}/></Suspense>
+                <Suspense fallback={<ProceduralModel/>}><GltfPreview url={modelUrl} animationUrl={animationUrl} sharedMotionUrlV531={sharedMotionUrlV531} timeline={timeline} blendV491={activeBlendV491} onClips={handleClips} onPosition={() => {}} footIK={true} preferences={preferences}/></Suspense>
               </PreviewMotion>
             </group>
           </> : <PreviewMotion playing={playing && !preferences.reducedMotion} speed={speed} intensity={intensity} beatEnabled={beatEnabled} bpm={bpm} style={style} onBeat={handleBeat}>
-            {modelUrl ? <Suspense fallback={<ProceduralModel/>}><GltfPreview url={modelUrl} animationUrl={animationUrl} timeline={timeline} blendV491={activeBlendV491} onClips={handleClips} onPosition={handlePosition} footIK={previewIK} preferences={preferences}/></Suspense> : <ProceduralModel/>}
+            {modelUrl ? <Suspense fallback={<ProceduralModel/>}><GltfPreview url={modelUrl} animationUrl={animationUrl} sharedMotionUrlV531={sharedMotionUrlV531} timeline={timeline} blendV491={activeBlendV491} onClips={handleClips} onPosition={handlePosition} footIK={previewIK} preferences={preferences}/></Suspense> : <ProceduralModel/>}
           </PreviewMotion>}
         </group>
         <OrbitControls enablePan={false} enableZoom minDistance={1.8} maxDistance={8} autoRotate={autoRotate && !playing} autoRotateSpeed={1.2}/>
       </Canvas>
     </div>
     <div className="avatar-preview-toolbar">
-      <button type="button" onClick={() => setPlaying(value => !value)} disabled={preferences.reducedMotion} aria-pressed={playing}>{playing ? "⏸ Tanz pausieren" : "▶ Tanz testen"}</button>
+      <button type="button" onClick={() => { if (!playing) onPreviewPlaybackV532?.(); setPlaying(value => !value); }} disabled={preferences.reducedMotion || !readyForSelectedV532} aria-pressed={playing}>{playing ? "⏸ Tanz pausieren" : "▶ Tanz testen"}</button>
       {studio && <>
         <label><input type="checkbox" checked={previewIK} disabled={!modelUrl || compareIK} onChange={e => setPreviewIK(e.target.checked)}/> Foot IK</label>
         <label><input type="checkbox" checked={compareIK} disabled={!modelUrl} onChange={e => setCompareIK(e.target.checked)}/> Vorher/Nachher</label>
