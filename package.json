@@ -993,10 +993,11 @@
     "verify:v650": "npm run test:v650 && npm run test:v650:types && npm run verify:v649 && npm run test:v646 && npm run test:v635 && npm run test:v388 && npm run check:syntax && npm run check:architecture",
     "test:v651": "node tests/v651-smart-preset-automation-regression.cjs",
     "test:v651:types": "tsc -p tests/tsconfig.v651-core.json --noEmit",
+    "test:env:spotify-build": "node tests/spotify-session-build-regression.cjs",
     "test:smoke:v651": "npm run test:v651 && npm run test:v651:types && npm run test:smoke:v650",
     "verify:v651": "npm run test:v651 && npm run test:v651:types && npm run verify:v650 && npm run test:v647 && npm run test:v646 && npm run test:v638 && npm run check:syntax && npm run check:architecture",
     "check:test-types": "node tests/release-type-isolation-regression.cjs",
-    "check:release": "npm run test:module-case && npm run check:test-types && npm run typecheck"
+    "check:release": "npm run test:module-case && npm run check:test-types && npm run test:env:spotify-build && npm run typecheck"
   },
   "engines": {
     "node": ">=20.9.0"
