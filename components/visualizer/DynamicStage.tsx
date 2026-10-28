@@ -34,6 +34,12 @@ import type {ConcertDetailSettingsV555,ConcertDetailsCueV555} from "./concertDet
 import {refineConcertLightingV542} from "./intelligentConcertLightingV542";
 import {planStageAtmosphereV551} from "./intelligentStageAtmosphereV551";
 import {planDynamicConcertLightingV608} from "./dynamicConcertLightingV608";
+import {planUltimateConcertDramaturgyV623,composeConcertLightingV623} from "./ultimateConcertDramaturgyV623";
+import {planAdvancedStageLightingV621} from "./advancedStageLightingV621";
+import {planDynamicStageTransformationV622} from "./dynamicStageTransformationV622";
+import {planDynamicConcertStagesV635,LED_WALL_VERTEX_V635} from "./dynamicConcertStagesV635";
+import {planCinematicStageEnvironmentV647,LED_WALL_FRAGMENT_V647} from "./cinematicStageEnvironmentsV647";
+import {getVisualFactorsV640} from "./adaptiveVisualBudgetV640";
 import {planGenreConcertV610} from "./genreConcertExperienceV610";
 import {planContinuousConcertV611} from "./continuousConcertExperienceV611";
 import {planSeamlessConcertTransitionV609} from "./seamlessConcertTransitionsV609";
@@ -87,6 +93,16 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
   const key = useRef<PointLight>(null);
   const targetPrimary = useRef(new Color());
   const targetSecondary = useRef(new Color());
+  // V622: reuse mutable Three colors and the existing stage floor/background.
+  const warmTintV622=useRef(new Color('#ffc487'));
+  const coolTintV622=useRef(new Color('#77caff'));
+  const moodTintV622=useRef(new Color());
+  const backgroundTargetV622=useRef(new Color());
+  const floorTargetV622=useRef(new Color());
+  const floorMaterialV622=useRef<import('three').MeshStandardMaterial>(null);
+  // V635: one reusable planar LED wall, never any per-frame mesh/material allocation.
+  const ledWallV635=useRef<Mesh>(null);
+  const ledMaterialV635=useRef<import('three').ShaderMaterial>(null);
   // V558 cached neutral portrait temperatures; no per-frame Color allocations.
   const warmPortraitV558 = useRef(new Color('#ffe5d6'));
   const coolDuetV558 = useRef(new Color('#c3d9ff'));
@@ -208,6 +224,91 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
       lyricsProtected:lyricsProtectedV542,
     });
+    const lightingV621=composeConcertLightingV623(planAdvancedStageLightingV621({narrative:cameraNarrativeV605,
+      trackId:playback.trackId,durationMs:playback.durationMs,positionMs:playback.positionMs,
+      section:cameraSectionV608??atmosphereSection.current,genre,
+      energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,
+      playing:isPlaying&&playback.playing,reactive,reducedMotion,tier,
+      authored:authoredLightsV386||!reactive||showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+     }),planUltimateConcertDramaturgyV623({
+      narrative:cameraNarrativeV605,trackId:playback.trackId,durationMs:playback.durationMs,positionMs:playback.positionMs,
+      section:cameraSectionV608??atmosphereSection.current,playing:isPlaying&&playback.playing,reducedMotion,tier:tier,
+      energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      manualLighting:authoredLightsV386||showCue?.lightingEnabled===false||!concertShowLightingV387,
+    }));
+    // V622 transforms existing environment colors only when a verified V604
+    // act is active. No scene/theme replacement or hidden new lighting source.
+    const transformationV622=planDynamicStageTransformationV622({
+      narrative:cameraNarrativeV605,trackId:playback.trackId,positionMs:playback.positionMs,
+      durationMs:playback.durationMs,section:cameraSectionV608??atmosphereSection.current,
+      genre,playing:isPlaying&&playback.playing,reactive,reducedMotion,tier,
+      authored:authoredLightsV386||showCue?.lightingEnabled===false||!concertShowLightingV387,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+    });
+    // V635: obey precisely the same verified V604 act and manual lighting safety
+    // as V622. All patterns are faded out at genuine act boundaries.
+    const stageVisualV635=planDynamicConcertStagesV635({
+      narrative:cameraNarrativeV605,trackId:playback.trackId,positionMs:playback.positionMs,
+      durationMs:playback.durationMs,section:cameraSectionV608??atmosphereSection.current,
+      genre,playing:isPlaying&&playback.playing,reactive,reducedMotion,tier,
+      authored:authoredLightsV386||showCue?.lightingEnabled===false||!concertShowLightingV387,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      groupCount:Math.max(1,Math.min(4,Math.round(groupCountV542)||1)),
+      visualsEnabled:theme!=='minimal'&&sceneFlags.extraLights,
+      energy:Math.max(0,Math.min(1,audio.energyEnvelope??audio.bass??0)),
+      kick:Math.max(0,Math.min(1,audio.kickAccentIntensity??0)),
+      foundation:transformationV622,
+    });
+    // V647 adds genre-aware architectural stage motifs inside the SAME LED plane.
+    // V635 verified act/opacity remains the ceiling and manual theme remains intact.
+    const sceneMotifV647=planCinematicStageEnvironmentV647({
+      narrative:cameraNarrativeV605,trackId:playback.trackId,
+      positionMs:playback.positionMs,durationMs:playback.durationMs,
+      section:cameraSectionV608??atmosphereSection.current,genre,
+      playing:isPlaying&&playback.playing,reactive,reducedMotion,tier,
+      authored:authoredLightsV386||showCue?.lightingEnabled===false||!concertShowLightingV387,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      visualsEnabled:theme!=='minimal'&&sceneFlags.extraLights,
+      groupCount:Math.max(1,Math.min(4,Math.round(groupCountV542)||1)),base:stageVisualV635,
+    });
+    // V640: optional LED plane fades to zero before any avatar/lyrics reduction.
+    // A zero-opacity plane is also culled by the existing mesh.visible gate.
+    const ledBudgetV640=getVisualFactorsV640().led;
+    // The LED shader uses playback time, not state.clock, so seeking is deterministic.
+    const led=ledMaterialV635.current;
+    if(led){
+      const mix=1-Math.exp(-Math.min(Math.max(delta,0),.1)*5);
+      const o=led.uniforms.uOpacity;
+      o.value+=(stageVisualV635.opacity*ledBudgetV640-o.value)*mix;
+      led.uniforms.uPattern.value=stageVisualV635.pattern;
+      led.uniforms.uPhase.value=stageVisualV635.phase;
+      led.uniforms.uSpeed.value=stageVisualV635.speed*ledBudgetV640;
+      led.uniforms.uSceneStyle.value=sceneMotifV647.style;
+      led.uniforms.uVariation.value=sceneMotifV647.variation;
+      led.uniforms.uArchitecture.value=sceneMotifV647.architecture*ledBudgetV640;
+      led.uniforms.uDepth.value=sceneMotifV647.depth*ledBudgetV640;
+      led.uniforms.uMotion.value=sceneMotifV647.motion*ledBudgetV640;
+      (led.uniforms.uPrimary.value as Color).set(musicPalette?.primary??palette.primary);
+      (led.uniforms.uSecondary.value as Color).set(musicPalette?.secondary??palette.secondary);
+      if(ledWallV635.current)ledWallV635.current.visible=o.value>.004&&
+        stageVisualV635.active&&tier!=='low';
+    }
+    moodTintV622.current.copy(coolTintV622.current).lerp(warmTintV622.current,(transformationV622.tone+1)/2);
+    const environmentRateV622=reducedMotion?1:1-Math.exp(-Math.min(Math.max(delta,0),.1)*2.6*1);
+    backgroundTargetV622.current.set(palette.base).lerp(moodTintV622.current,Math.min(.19,transformationV622.background+stageVisualV635.ambientTint*ledBudgetV640));
+    if(state.scene.background instanceof Color){state.scene.background.lerp(backgroundTargetV622.current,environmentRateV622);}
+    floorTargetV622.current.set(palette.floor).lerp(moodTintV622.current,Math.min(.22,transformationV622.floor+stageVisualV635.floorTint*ledBudgetV640));
+    if(floorMaterialV622.current)floorMaterialV622.current.color.lerp(floorTargetV622.current,environmentRateV622);
+    // Portrait key/fill are altered only very slightly and never override authored colors.
+    if(transformationV622.active&&!timelineCue.color){
+      targetPrimary.current.lerp(moodTintV622.current,transformationV622.accent*.10);
+      targetSecondary.current.lerp(moodTintV622.current,transformationV622.accent*.13);
+    }
     // V610: true genre-specific artistic balance over the EXISTING lighting budget.
     const concertGenreV610=planGenreConcertV610({
       narrative:cameraNarrativeV605,trackId:playback.trackId,
@@ -334,14 +435,18 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       targetSecondary.current.lerp(portraitPlanV558.mode==='duet'?coolDuetV558.current:warmPortraitV558.current,
         beatPortraitPlanV559.fillColorMix*beatScaleV559);
     }
+    if(transformationV622.active&&!timelineCue.color){
+      targetPrimary.current.lerp(moodTintV622.current,transformationV622.accent*.07);
+      targetSecondary.current.lerp(moodTintV622.current,transformationV622.accent*.09);
+    }
     if (key.current) key.current.color.lerp(targetPrimary.current, colorFade);
     if (fill.current) fill.current.color.lerp(targetSecondary.current, colorFade);
     if (floorLight.current) floorLight.current.color.lerp(
       targetPrimary.current.set(timelineCue.color ?? musicPalette?.primary ?? palette.primary),colorFade);
     if (beam.current) beam.current.color.lerp(
       targetSecondary.current.set(musicPalette?.secondary ?? palette.secondary),colorFade);
-    const keyTargetV462=Math.min(3,Math.max(lightingV542.faceFloor||lightingV462.faceFloor,directed(cue.key)*lightScale*showGain*lightingV462.keyGain*lightingV542.keyGain*lightingV551.keyGain*lightingV608.key*concertGenreV610.key*concertContinuityV611.key*cinematicKeyV497)*performerPlanV557.keyGain);
-    const fillTargetV462=Math.min(2.4,Math.max(Math.max(lightingV462.faceFloor,lightingV542.faceFloor)*.75,directed(cue.fill)*lightScale*showGain*lightingV462.fillGain*lightingV542.fillGain*lightingV551.fillGain*lightingV608.fill*concertGenreV610.fill*concertContinuityV611.fill)*performerPlanV557.fillGain);
+    const keyTargetV462=Math.min(3,Math.max(lightingV542.faceFloor||lightingV462.faceFloor,directed(cue.key)*lightScale*showGain*lightingV462.keyGain*lightingV542.keyGain*lightingV551.keyGain*lightingV608.key*concertGenreV610.key*lightingV621.key*concertContinuityV611.key*cinematicKeyV497)*performerPlanV557.keyGain);
+    const fillTargetV462=Math.min(2.4,Math.max(Math.max(lightingV462.faceFloor,lightingV542.faceFloor)*.75,directed(cue.fill)*lightScale*showGain*lightingV462.fillGain*lightingV542.fillGain*lightingV551.fillGain*lightingV608.fill*concertGenreV610.fill*lightingV621.fill*concertContinuityV611.fill)*performerPlanV557.fillGain);
     // V559 applies only capped percentages to existing V462/V557 light targets.
     // These factors never overpower a manual cue, low tier, pause, or blackout.
     const beatKeyTargetV559=Math.min(3,keyTargetV462*(1+beatPortraitPlanV559.keyLift*beatScaleV559+cinematicPlanV566.keyLift*cinematicScaleV566));
@@ -350,9 +455,9 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     if (fill.current) fill.current.intensity += (beatFillTargetV559-fill.current.intensity)*lerp;
     if (floorLight.current) floorLight.current.intensity += ((sceneFlags.extraLights ? Math.min(2.5,directed(cue.floor) * lightScale * showGain) : 0) - floorLight.current.intensity) * lerp;
     if (beam.current) {
-      beam.current.intensity += ((sceneFlags.extraLights ? (theme === "minimal" ? .2 : Math.min(3.0,directed(cue.beam) * (1 + smartCue.sweep * .12) * showBeam * lightingV462.beamGain * lightingV542.beamGain * lightingV551.beamGain * lightingV608.beam * concertGenreV610.beam * concertContinuityV611.beam * cinematicBeamV497)) * lightScale : 0) - beam.current.intensity) * lerp;
+      beam.current.intensity += ((sceneFlags.extraLights ? (theme === "minimal" ? .2 : Math.min(3.0,directed(cue.beam) * (1 + smartCue.sweep * .12) * showBeam * lightingV462.beamGain * lightingV542.beamGain * lightingV551.beamGain * lightingV608.beam * concertGenreV610.beam * lightingV621.beam * concertContinuityV611.beam * cinematicBeamV497)) * lightScale : 0) - beam.current.intensity) * lerp;
       beam.current.position.x = sceneFlags.beamSweep && cue.sweep && !reducedMotion && tier === "high"
-        ? Math.sin(state.clock.elapsedTime * .65) * (1.2 + cue.sweep + director.sweep + predictive.anticipation * .15 + smartCue.sweep * .24) * lightingV462.sweepGain * lightingV542.sweepGain * lightingV551.sweepGain * lightingV608.sweep * concertGenreV610.sweep * concertContinuityV611.sweep : 0;
+        ? Math.sin(state.clock.elapsedTime * .65) * (1.2 + cue.sweep + director.sweep + predictive.anticipation * .15 + smartCue.sweep * .24) * lightingV462.sweepGain * lightingV542.sweepGain * lightingV551.sweepGain * lightingV608.sweep * concertGenreV610.sweep * lightingV621.sweep * concertContinuityV611.sweep : 0;
       // V497 may focus the existing beam even when V386 concert lighting is disabled.
       // Never steer a user-authored lighting timeline or a deliberate blackout.
       const lightFocusV497=cinematicBeamV497>1?cinematicCueV497?.focusSlot:null;
@@ -406,12 +511,22 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     <ambientLight intensity={theme === "minimal" ? 1.2 : 0.9}/>
     <ConcertAtmosphereRendererV308 cameraSectionV608={cameraSectionV608} cameraNarrativeV605={cameraNarrativeV605} concertSceneV551={concertLipSyncV386?.cinematicSceneV528} genreV462={genre} lyricsProtectedV542={lyricsProtectedV542} groupCountV542={groupCountV542} vocalFocusV542={vocalFocusV542} audio={audio} isPlaying={isPlaying} reducedMotion={reducedMotion} reactive={reactive} theme={theme} musicPalette={musicPalette} showCue={showCue} timelineGainRef={atmosphereTimelineGain} sectionRef={atmosphereSection} concertShowCueV387={concertShowAtmosphereV387?concertShowCueV387:undefined} festivalShowCueV394={festivalShowAtmosphereV394?festivalShowCueV394:undefined} festivalShowLasersV394={festivalShowLasersV394}
       authoredLightingV387={timeline.current.cues.length>0||timelineGainV354!==1||showCue?.lightingEnabled===true||showCue?.lightingEnabled===false}/>
+    {/* V635: back-wall LED pattern is one low-cost mesh behind the cast.
+        When disabled its draw call is gated; it cannot cover a singer/lyrics. */}
+    <mesh ref={ledWallV635} visible={false} position={[0,0.05,-3.8]} renderOrder={-1}>
+      <planeGeometry args={[6.2,3.35]}/>
+      <shaderMaterial ref={ledMaterialV635} transparent depthWrite={false}
+        vertexShader={LED_WALL_VERTEX_V635} fragmentShader={LED_WALL_FRAGMENT_V647}
+        uniforms={{uOpacity:{value:0},uPattern:{value:0},uPhase:{value:0},uSpeed:{value:0},
+          uSceneStyle:{value:0},uVariation:{value:0},uArchitecture:{value:0},uDepth:{value:0},uMotion:{value:0},
+          uPrimary:{value:new Color(palette.primary)},uSecondary:{value:new Color(palette.secondary)}}}/>
+    </mesh>
     <pointLight ref={key} color={palette.primary} position={[-2.3, 2.4, 2.2]} intensity={1.1} distance={11}/>
     <pointLight ref={fill} color={palette.secondary} position={[2.4, 1.5, 1.8]} intensity={0.65} distance={10}/>
     <pointLight ref={floorLight} color={palette.primary} position={[0, -1.6, 0.4]} intensity={0.45} distance={7}/>
     <spotLight ref={beam} color={palette.secondary} position={[0, 3.0, 1.4]} angle={0.5} penumbra={0.9} intensity={0.7} distance={9}/>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.95, 0]}>
-      <circleGeometry args={[3.2, 48]}/><meshStandardMaterial color={palette.floor} roughness={0.7} metalness={0.18}/>
+      <circleGeometry args={[3.2, 48]}/><meshStandardMaterial ref={floorMaterialV622} color={palette.floor} roughness={0.7} metalness={0.18}/>
     </mesh>
     {theme !== "minimal" && <group position={[0, -1.94, 0]} rotation={[-Math.PI/2, 0, 0]}>
       {sceneFlags.rings && [1.15, 2.05, 2.85].map(radius => <mesh key={radius}>

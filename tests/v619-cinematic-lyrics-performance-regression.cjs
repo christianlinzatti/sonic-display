@@ -1,0 +1,60 @@
+"use strict";
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const { load } = require('./helpers/ts-loader-v404.cjs');
+const {planCinematicLyricsPerformanceV619:plan,cinematicLyricWordAccentV619:wordAccent} = load('components/visualizer/cinematicLyricsPerformanceV619');
+const {planBeautifulLyricsExperienceV598:visual} = load('components/visualizer/beautifulLyricsExperienceV598');
+const {planConcertLyricsHarmonyV606:harmony} = load('components/visualizer/concertLyricsPerformerHarmonyV606');
+const {planLyricReadabilityV578:readability} = load('components/visualizer/beautifulLyricsV578');
+const {planCinematicWordV541} = load('components/visualizer/cinematicLyricsExperienceV541');
+const {lyricPlaybackFractionV477} = load('components/visualizer/beautifulLyricsV477');
+let checks=0; const test=(name,fn)=>{try{fn();checks++;}catch(e){e.message=`V619 ${name}: ${e.message}`;throw e;}};
+const words=[{text:'Wir',startMs:1000,endMs:1180},{text:'sind',startMs:1180,endMs:1350},{text:'die',startMs:1350,endMs:1510},{text:'Crew',startMs:1510,endMs:1900}];
+const line={text:'Wir sind die Crew',startMs:1000,endMs:1950,words};
+const cue={active:true,source:'verified-v600',chapter:'payoff',transition:.85,motif:'wide',act:1,repetition:0};
+const scene={active:true,trackId:'song',count:2,focus:'handoff',leadSlot:1,singingSlots:[0,1],handoffFrom:0,cueStartMs:1000,cueEndMs:1950,strength:.7};
+const base={line,nextLineStart:2000,progressMs:1580,playing:true,synchronized:true,reducedMotion:false,immersive:true,avatarCount:2,wordHighlight:true,intensity:.8,sectionCue:'verse',cue:null,scene:null};
+function prepare(extra={}) {
+ const x={...base,...extra};
+ return {line:x.line,nextLineStart:x.nextLineStart,progressMs:x.progressMs,playing:x.playing,synchronized:x.synchronized,reducedMotion:x.reducedMotion,immersive:x.immersive,avatarCount:x.avatarCount,wordHighlight:x.wordHighlight,intensity:x.intensity,
+ visual:visual({...x,sectionCue:x.sectionCue}),
+ harmony:harmony({line:x.line,nextLineStart:x.nextLineStart,progressMs:x.progressMs,playing:x.playing,synchronized:x.synchronized,reducedMotion:x.reducedMotion,immersive:x.immersive,cast:x.avatarCount,trackId:'song',scene:x.scene,cue:x.cue,hookSection:x.sectionCue==='hook',wordHighlight:x.wordHighlight}),
+ readability:readability({line:x.line,immersive:x.immersive,playing:x.playing,reducedMotion:x.reducedMotion,avatarCount:x.avatarCount})};
+}
+const make=(change={})=>plan(prepare(change));
+const accent=(p,ms,index=3,l=line,extra={})=>wordAccent({plan:p,line:l,nextLineStart:2000,wordIndex:index,progressMs:ms,playing:true,reducedMotion:false,...extra});
+test('active verse accepts only existing sync',()=>{const p=make();assert(p.active&&p.mode==='verse'&&p.verifiedWords&&p.wordGain>0);});
+test('authenticated hook receives subtle highlight',()=>{const p=make({sectionCue:'hook',cue});assert.equal(p.mode,'hook');assert(p.hookUnderline>0&&p.hookUnderline<=.22);});
+test('requested hook without verified narrative cue is not a hook',()=>{for(const cueValue of [null,{...cue,source:'unverified'},{...cue,transition:0},{...cue,chapter:'rising'}]){const p=make({sectionCue:'hook',cue:cueValue});assert.equal(p.mode,'verse');assert.equal(p.hookUnderline,0);}});
+test('word content cannot invent hook',()=>{const p=make({line:{...line,text:'HOOK DROP HOOK'}});assert.equal(p.mode,'verse');});
+test('duet emphasis requires matching singer scene',()=>{const p=make({scene});assert.equal(p.mode,'duet');assert(p.hookUnderline>0);assert.equal(make({scene:{...scene,trackId:'other'}}).mode,'verse');});
+test('singer scene does not change lyrics or singing assignment',()=>{const frozen=Object.freeze({...scene,singingSlots:Object.freeze([0,1])});const before=JSON.stringify(frozen);make({scene:frozen});assert.equal(JSON.stringify(frozen),before);});
+test('stopped and unsynced lyrics stay quiet',()=>{for(const x of [{playing:false},{synchronized:false},{progressMs:NaN},{progressMs:999},{progressMs:1950},{line:null},{line:{...line,text:''}}]){const p=make(x);assert(!p.active&&p.wordGain===0&&p.hookUnderline===0);}});
+test('verified synchronization required for word accents',()=>{for(const x of [{wordHighlight:false},{line:{...line,words:null}},{line:{...line,words:[words[1],words[0]]}},{line:{...line,words:[{...words[0],endMs:1800},...words.slice(1)]}},{synchronized:false}]){const p=make(x);assert.equal(p.verifiedWords,false);assert.equal(p.wordGain,0);}});
+test('line synchronization without word timestamps still retains contrast plate',()=>{const p=make({line:{...line,words:undefined}});assert(p.active&&!p.verifiedWords&&p.plateOpacity>0&&p.maxWidthCh>0);});
+test('paused lyrics retain legibility',()=>{const run=make({playing:false});assert(run.plateOpacity>0&&run.maxWidthCh>0);});
+test('prefers-reduced-motion disables decorative effects only',()=>{const p=make({reducedMotion:true,sectionCue:'hook',cue});assert(p.active&&p.mode==='hook'&&p.wordGain===0&&p.hookUnderline===0&&p.plateOpacity>0);assert.equal(accent(p,1580),0);});
+test('zero intensity disables all V619 accents',()=>{const p=make({intensity:0,sectionCue:'hook',cue});assert(p.active&&p.wordGain===0&&p.hookUnderline===0);});
+test('NaN/infinite intensity never enables glow',()=>{for(const intensity of [NaN,Infinity,-Infinity]){const p=make({intensity,sectionCue:'hook',cue});assert(p.wordGain===0&&p.hookUnderline===0);}});
+test('visual strength monotonically bounded',()=>{const a=make({intensity:.25}).wordGain,b=make({intensity:1}).wordGain;assert(a>0&&a<b&&b<=.17);});
+test('crowded stage further suppresses word accent',()=>{const a=make({avatarCount:4});const b=make({avatarCount:1});assert(a.calm&&a.wordGain<b.wordGain);assert(a.maxWidthCh<=b.maxWidthCh);assert(a.plateOpacity>=b.plateOpacity);});
+test('very long line is visually calmer',()=>{const l={...line,text:'Schnelle Reime '.repeat(12)};const p=make({line:l});assert(p.calm&&p.wordGain<=.065);});
+test('explicit cast cast and width remain in bounded range',()=>{for(const cast of [1,2,3,4]){const p=make({avatarCount:cast});assert(p.maxWidthCh>=28&&p.maxWidthCh<=60);assert(p.plateOpacity>=0&&p.plateOpacity<=.95);}});
+test('weakest of V578/V598/V606 widths never widens captions',()=>{const i=prepare({avatarCount:4});const p=plan(i);assert(p.maxWidthCh<=i.visual.widthCh&&p.maxWidthCh<=i.harmony.widthCh&&p.maxWidthCh<=i.readability.maxWidthCh);});
+test('contrast plate never weakens existing backdrop',()=>{const i=prepare();const p=plan(i);assert(p.plateOpacity>=i.visual.plateOpacity&&p.plateOpacity>=i.readability.plateOpacity);});
+test('current word accent peaks only inside current original word',()=>{const p=make();assert.equal(accent(p,1509),0);assert(accent(p,1650)>0);assert.equal(accent(p,1900),0);});
+test('word envelope has smooth fade-in and fade-out',()=>{const p=make();assert(accent(p,1511)<accent(p,1600));assert(accent(p,1899)<accent(p,1800));});
+test('no other word gets a glow',()=>{const p=make();assert.equal(accent(p,1250),0);assert.equal(accent(p,1550,0),0);});
+test('out-of-range word index and invalid time yield zero',()=>{const p=make();for(const index of [-1,4,100,NaN,.5])assert.equal(accent(p,1580,index),0);for(const ms of [NaN,Infinity,-Infinity])assert.equal(accent(p,ms),0);});
+test('unknown last word endpoint yields no fabricated accent',()=>{const l={text:'Solo',startMs:1000,endMs:null,words:[{text:'Solo',startMs:1000,endMs:null}]};const p=make({line:l,nextLineStart:undefined,progressMs:1100});assert(p.active&&p.verifiedWords);assert.equal(accent(p,1100,0,l,{nextLineStart:undefined}),0);});
+test('word accent cannot move when paused or reduced motion',()=>{const p=make();assert.equal(accent(p,1700,3,line,{playing:false}),0);assert.equal(accent(p,1700,3,line,{reducedMotion:true}),0);});
+test('karaoke fill stays identical to V477 for all sampled timestamps',()=>{const p=make();for(let t=900;t<2100;t+=13){const original=lyricPlaybackFractionV477(t,words[3].startMs,words[3].endMs);accent(p,t);assert.equal(lyricPlaybackFractionV477(t,words[3].startMs,words[3].endMs),original);}});
+test('existing V541 word fill is not changed by new decorative planner',()=>{const p=make();const oldPlan={verifiedWords:true,wordMotionGain:1,density:'normal',lineContrast:.8,max3DWordMeshes:12,readingScale:1,backdropOpacity:.8};for(let t=1000;t<1950;t+=31){const original=planCinematicWordV541({line,nextLineStart:2000,wordIndex:3,progressMs:t,playing:true,reducedMotion:false,plan:oldPlan});accent(p,t);const after=planCinematicWordV541({line,nextLineStart:2000,wordIndex:3,progressMs:t,playing:true,reducedMotion:false,plan:oldPlan});assert.deepEqual(after,original);}});
+test('same source and timestamp produce identical result even after seek backwards',()=>{const p=make({sectionCue:'hook',cue});for(const ms of [1800,1020,1530,1900,1400,1700,1100]){const x=accent(p,ms);assert.equal(x,accent(p,ms));}});
+test('20,000 simulated samples strictly bounded and finite',()=>{const p=make({sectionCue:'hook',cue,intensity:1});for(let i=0;i<20000;i++){const ms=700+(i*139)%1800;const a=accent(p,ms,i%4);assert(Number.isFinite(a)&&a>=0&&a<=p.wordGain&&a<=.17);}});
+test('original timestamp / word / lyric data never mutated',()=>{const l=JSON.stringify(line),w=JSON.stringify(words);const p=make();accent(p,1700);assert.equal(JSON.stringify(line),l);assert.equal(JSON.stringify(words),w);});
+test('logic does not allocate audio, timers, animations or browser measurements',()=>{const src=fs.readFileSync('components/visualizer/cinematicLyricsPerformanceV619.ts','utf8');for(const token of ['setTimeout(', 'setInterval(', 'requestAnimationFrame(', 'useFrame(', 'new Audio(', 'navigator.', 'window.', 'document.', 'Math.random(', 'localStorage', 'fetch(', 'innerHTML'])assert(!src.includes(token),token);});
+test('actual DOM lyric output uses shared plan without changing karaoke fill',()=>{const src=fs.readFileSync('components/KineticLyrics.tsx','utf8');assert(src.includes('planCinematicLyricsPerformanceV619('));assert(src.includes('cinematicLyricWordAccentV619('));assert(src.includes('v619-cinematic-lyrics'));assert(src.includes('--v619-word-accent'));assert(src.includes('"--word-fill": `${(shownAmountV382 * 100).toFixed(1)}%`'));});
+test('both immersive and regular DOM output share same component',()=>{const s=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');assert(s.includes('<KineticLyrics'));assert(s.includes('immersive/>'));const code=fs.readFileSync('components/KineticLyrics.tsx','utf8');assert(code.includes('immersive,avatarCount:avatarCountV477'));});
+test('CSS protects 10-inch layouts, reduced motion, existing karaoke fill',()=>{const css=fs.readFileSync('app/globals.css','utf8');for(const token of ['.lyrics.v619-cinematic-lyrics .v619-active-line','--v619-hook-underline','--v619-word-accent','--v619-width-ch','overflow-wrap:anywhere','@media (max-width:1024px)','@media (prefers-reduced-motion:reduce)','text-shadow:none!important'])assert(css.includes(token),token);assert(!css.slice(css.indexOf('/* V619 –')).includes('--word-fill:'));});
+console.log(`PASS V619: ${checks} regression groups, 20,000 bounded lyric word samples and DOM accessibility guards`);

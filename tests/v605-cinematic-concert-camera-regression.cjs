@@ -50,7 +50,7 @@ test('invisible performer cannot be cropped or guessed',()=>assert.strictEqual(f
 test('out-of-bounds performer denied',()=>assert.strictEqual(f(52000,{},pose,[{...actors[0],x:NaN},actors[1]],scene),pose));
 test('manual and audio word timestamps remain outside camera module',()=>{const s=fs.readFileSync('components/visualizer/cinematicFullSongCameraV605.ts','utf8');assert.doesNotMatch(s,/\bwindow\.|\bdocument\.|requestAnimationFrame|Math\.random|setInterval|setTimeout|localStorage|\bfetch\(/)});
 test('typed from single existing R3F camera, protected by last V351 guard',()=>{
- const s=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');assert(s.includes('composeFullSongCameraV605(duetFramedV585'));assert(s.indexOf('composeFullSongCameraV605(duetFramedV585')<s.indexOf('guardAutomaticCameraV351(genreFramedV610,composition)'));assert(s.includes('authored:authoredCameraV528||cameraNarrativeV605?.manualCamera===true'));});
+ const s=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');assert(s.includes('composeFullSongCameraV605(duetFramedV585'));assert(s.indexOf('composeFullSongCameraV605(duetFramedV585')<s.indexOf('guardAutomaticCameraV351(composedV620,composition)'));assert(s.includes('authored:authoredCameraV528||cameraNarrativeV605?.manualCamera===true'));});
 test('camera receives verified V604 plan/cue through actual 3D renderer',()=>{
  for(const [path,token] of [['components/visualizer/VisualizerStage.tsx','cameraNarrativeV605={{plan:fullSongPlanV604,cue:fullSongCueV604,manualCamera:'],['components/visualizer/ThreeAvatar.tsx','cameraNarrativeV605={props.cameraNarrativeV605}']])assert(fs.readFileSync(path,'utf8').includes(token));});
 let samples=0,modified=0;

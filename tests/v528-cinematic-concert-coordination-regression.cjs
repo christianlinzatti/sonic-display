@@ -75,7 +75,7 @@ assert(!authored({...timed,manualEnabled:false,timeEnabled:false,duetEnabled:fal
 assert(!authored({...timed,trackId:''}).active);
 for(const [file,tokens] of [
  ['components/visualizer/VisualizerStage.tsx',['resolveAuthoredConcertSceneV528','cinematicSceneV528,','lipSync={{cinematicSceneV528']],
- ['components/visualizer/StageCameraDirectorV289.tsx',['composeConcertSceneCameraV528','authoredCameraV528','composeConcertCameraV540(sceneFramedV528,sceneV528','composeCinematicConcertCameraV550(concertFramedV540,sceneV528','guardAutomaticCameraV351(genreFramedV610','duetAnchorSampleV377.current.anchors']],
+ ['components/visualizer/StageCameraDirectorV289.tsx',['composeConcertSceneCameraV528','authoredCameraV528','composeConcertCameraV540(sceneFramedV528,sceneV528','composeCinematicConcertCameraV550(concertFramedV540,sceneV528','guardAutomaticCameraV351(composedV620','duetAnchorSampleV377.current.anchors']],
  ['components/visualizer/Lyrics3DScene.tsx',['concertLyricDirectionV528','visualV526.wordMotionGain*lyricsDirectionV528.motionGain']],
  ['components/KineticLyrics.tsx',['concertLyricDirectionV528','v526.wordMotionGain*lyricsDirectionV528.motionGain']],
  ['components/visualizer/cinematicMultiAvatarV527.ts',['cinematicFocusV527(scene)']]]){
@@ -83,7 +83,7 @@ for(const [file,tokens] of [
 }
 const cameraWiringV585=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');
 assert(cameraWiringV585.indexOf('composeCinematicConcertCameraV550(')<cameraWiringV585.indexOf('composeCinematicDuetInteractionV585(concertFramedV550,sceneV528'));
-assert(cameraWiringV585.indexOf('composeCinematicDuetInteractionV585(concertFramedV550,sceneV528')<cameraWiringV585.indexOf('guardAutomaticCameraV351(genreFramedV610,composition)'));
+assert(cameraWiringV585.indexOf('composeCinematicDuetInteractionV585(concertFramedV550,sceneV528')<cameraWiringV585.indexOf('guardAutomaticCameraV351(composedV620,composition)'));
 const src=fs.readFileSync('components/visualizer/cinematicConcertCoordinationV528.ts','utf8');
 for(const symbol of ['requestAnimationFrame(', 'setInterval(','new Audio(','window.','localStorage','Math.random('])assert(!src.includes(symbol));
 const pkg=require('../package.json');

@@ -5,14 +5,14 @@ export type MotionPresetCandidateV493={
   actionName:string; presetId:string; baseName:string; region:'arms'|'upper';
   genre:'all'|'rap'|'hard'; weight:number;
 };
-export type PresetDirectorStateV493={trackId:string;selectedId:string|null;lastSwitchMs:number;lastPositionMs:number;lastPhrase:string};
+export type PresetDirectorStateV493={trackId:string;selectedId:string|null;lastSwitchMs:number;lastPositionMs:number;lastPhrase:string;recent:readonly string[]};
 export type PresetDirectorInputV493={
   candidates:readonly MotionPresetCandidateV493[];selectedBase:string|null|undefined;
   trackId:string|null|undefined;positionMs:number;section:string|null|undefined;
   energy:number|null|undefined;bpm:number|null|undefined;slot:number;
   playing:boolean;reducedMotion:boolean;manualPriority:boolean;quality:'low'|'medium'|'high'|string;
 };
-export const newPresetDirectorStateV493=():PresetDirectorStateV493=>({trackId:'',selectedId:null,lastSwitchMs:-Infinity,lastPositionMs:0,lastPhrase:''});
+export const newPresetDirectorStateV493=():PresetDirectorStateV493=>({trackId:'',selectedId:null,lastSwitchMs:-Infinity,lastPositionMs:0,lastPhrase:'',recent:[]});
 const bounded=(x:number|null|undefined,min:number,max:number,fallback:number)=>
   typeof x==='number'&&Number.isFinite(x)?Math.max(min,Math.min(max,x)):fallback;
 const stableHash=(text:string)=>{let hash=2166136261;for(let i=0;i<text.length;i++){hash=Math.imul(hash^text.charCodeAt(i),16777619);}return hash>>>0;};
@@ -50,13 +50,19 @@ export function stepMotionPresetDirectorV493(previous:PresetDirectorStateV493,in
     if(phase==='verse'&&candidate.genre==='rap')score+=.18;
     if(phase==='drop'&&candidate.genre==='hard')score+=.22;
     // Different dancers get a stable but distinct choice when several presets fit.
+    // V615: gesture overlays use a short per-song history; no invented vocal cues.
+    const recentAt=state.recent.lastIndexOf(candidate.actionName);
+    if(recentAt>=0)score-=recentAt===state.recent.length-1?.65:.36;
     score+=(stableHash(`${trackId}:${phrase}:${slot}:${candidate.presetId}`)%997)/997*.23;
     return {candidate,score};
   }).sort((a,b)=>b.score-a.score||a.candidate.presetId.localeCompare(b.candidate.presetId));
-  const winner=scored[0]?.candidate.actionName??null;
+  const first=scored[0];
+  const fresh=scored.find(x=>x.candidate.actionName!==state.selectedId&&
+    !state.recent.slice(-2).includes(x.candidate.actionName)&&x.score>=first.score-.32);
+  const winner=(first?.candidate.actionName===state.selectedId?fresh??first:first)?.candidate.actionName??null;
   const stillValid=candidates.some(candidate=>candidate.actionName===state.selectedId);
-  if(!state.selectedId||!stillValid)return {...blank,selectedId:winner,lastSwitchMs:time,lastPhrase:phrase};
+  if(!state.selectedId||!stillValid)return {...blank,selectedId:winner,lastSwitchMs:time,lastPhrase:phrase,recent:[...state.recent,winner].slice(-4)};
   if(winner!==state.selectedId&&phrase!==state.lastPhrase&&time-state.lastSwitchMs>=10_000)
-    return {...blank,selectedId:winner,lastSwitchMs:time,lastPhrase:phrase};
+    return {...blank,selectedId:winner,lastSwitchMs:time,lastPhrase:phrase,recent:[...state.recent,winner].slice(-4)};
   return {...blank,selectedId:state.selectedId,lastPhrase:phrase};
 }

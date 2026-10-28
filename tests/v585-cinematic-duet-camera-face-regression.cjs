@@ -32,7 +32,7 @@ test('correct camera integration order, no second camera/renderer',()=>{
  const src=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');
  assert.match(src,/composeCinematicDuetInteractionV585\(concertFramedV550,sceneV528,/);
  assert.match(src,/composeConcertHarmonyCameraV606\(framedV605,/);
- assert.match(src,/guardAutomaticCameraV351\(genreFramedV610,composition\)/);
+ assert.match(src,/guardAutomaticCameraV351\(composedV620,composition\)/);
  const duet=fs.readFileSync('components/visualizer/duetResponseV575.ts','utf8');
  assert.match(duet,/refineCinematicDuetFaceV585\(refineNaturalDuetStageV584\(/);
  const code=fs.readFileSync('components/visualizer/cinematicDuetInteractionV585.ts','utf8');

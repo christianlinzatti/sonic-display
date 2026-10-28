@@ -1,0 +1,5 @@
+{
+  "extends":"./tsconfig.v635-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../components/visualizer/professionalLightingShowV636.ts","../components/visualizer/advancedStageLightingV621.ts","../components/visualizer/advancedConcertStageFxV601.ts","v414-music-types.d.ts"]
+}

@@ -9,6 +9,7 @@ import { planCinematicLyricsExperienceV501, lyricWordAccentV501 } from "./cinema
 import { planCinematicLyricsExperienceV525 } from "./cinematicLyricsExperienceV525";
 import { planCinematicLyricsV541, planCinematicWordV541 } from "./cinematicLyricsExperienceV541";
 import { planCinematicLyricsV549, planCinematicWordV549 } from "./cinematicLyricsExperienceV549";
+import {planBeautifulLyricsV634,beautifulLyricWordAccentV634} from "./beautifulLyricsV634";
 import {planLyricReadabilityV578} from "./beautifulLyricsV578";
 import {concertLyricDirectionV528} from "./cinematicConcertCoordinationV528";
 import {coordinateConcertLyricsV526} from "./unifiedConcertPerformanceV526";
@@ -106,6 +107,16 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
     playing:scene.playing,enabled:!!(scene.kineticDropsV382??true)&&!reducedMotion});
   const concertAccentV502=scene.playing&&!reducedMotion&&tier!=="low" ? clamp(scene.concertLyricAccentV502??0,0,.12) : 0;
   const lyricsDirectionV528=concertLyricDirectionV528(scene.cinematicSceneV528,scene.playing,reducedMotion);
+  const activeStageLyricV634=planBeautifulLyricsV634({
+    line:lines[index],nextLineStart:lines[index+1]?.startMs,
+    progressMs:scene.progressMs,synchronized:scene.lyrics.synced,
+    playing:scene.playing,reducedMotion,immersive:true,
+    avatarCount:scene.avatarCountV477??1,wordHighlight:scene.wordHighlight,
+    vocalSceneActive:scene.cinematicSceneV528?.active===true,
+    existingPlateOpacity:Math.max(activeCaptionV549?.plateOpacity??0,
+      activeCaptionV541?.backdropOpacity??0,activeCaptionV477?.backdropOpacity??.72),
+    existing3DWidth:activeCaptionV525?.max3DWidth??2.7,intensity,
+  });
   const baseSize = .135 * clamp(scene.fontScale / 100, .6, 1.8);
   useFrame(({ clock }, dt) => {
     if (!root.current) return;
@@ -121,7 +132,7 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
     {/* V367: stage-space translucent caption plate for legibility over lighting/fog. */}
     <mesh position={[(right ? 1 : -1) * (1.22 + depth * .20) + (composition?.lyricsOffsetX ?? 0), 0, -.96 - depth * .65]} renderOrder={8}>
       <planeGeometry args={[activeCaptionV501?.cast===4 ? 2.42 : 2.7, tier === "low" ? .53 : 1.16]} />
-      <meshBasicMaterial color="#091022" transparent opacity={clamp(Math.max(activeCaptionV549?.plateOpacity??activeCaptionV541?.backdropOpacity??activeCaptionV525?.plateOpacity??activeCaptionV501?.plateOpacity??.74,activeCaptionV477?.backdropOpacity??.72,.64+plateStrengthV378*.25)+concertAccentV502*.32+lyricsDirectionV528.plateBoost)} depthWrite={false} depthTest={false} />
+      <meshBasicMaterial color="#091022" transparent opacity={clamp(Math.max(activeCaptionV549?.plateOpacity??activeCaptionV541?.backdropOpacity??activeCaptionV525?.plateOpacity??activeCaptionV501?.plateOpacity??.74,activeCaptionV477?.backdropOpacity??.72,activeStageLyricV634.plateOpacity,.64+plateStrengthV378*.25)+concertAccentV502*.32+lyricsDirectionV528.plateBoost)} depthWrite={false} depthTest={false} />
     </mesh>
     {visible.map(i => {
       const line = lines[i];
@@ -161,6 +172,17 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
       // Existing timed-word karaoke, glyphs and cue ordering stay authoritative.
       const readabilityV578=planLyricReadabilityV578({line,immersive:true,
         reducedMotion,playing:scene.playing,avatarCount:scene.avatarCountV477??1});
+      const lyricPolishV634=planBeautifulLyricsV634({
+        line,nextLineStart:lines[i+1]?.startMs,progressMs:scene.progressMs,
+        synchronized:scene.lyrics.synced,playing:scene.playing,reducedMotion,
+        immersive:true,avatarCount:scene.avatarCountV477??1,
+        wordHighlight:scene.wordHighlight,
+        vocalSceneActive:current&&scene.cinematicSceneV528?.active===true,
+        existingWidthCh:readabilityV578.maxWidthCh,
+        existingPlateOpacity:Math.max(visualV549.plateOpacity,visualV525.plateOpacity),
+        existing3DWidth:visualV525.max3DWidth,
+        intensity,
+      });
       const size = (readabilityV578.mode==='very-dense'?.91:1) * baseSize * (current ? 1.18 : .88) * visualV461.fontScale * visualV477.fontScale * visualV501.fontScale * visualV525.readingBoost * visualV541.readingScale * visualV549.readingScale * (current?lyricsDirectionV528.readingBoost:1);
       // A full line costs one GPU text mesh. Limit glyph/mesh pressure on slower devices
       // without truncating lyrics. High quality keeps per-word karaoke on normal lines.
@@ -168,11 +190,11 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
       const useWordMeshes = current && visualV461.allowWordMeshes && visualV477.allowWordMeshes &&
         tokens.length <= wordLimit;
       const positions = useWordMeshes ? layoutWords(tokens, size,
-        readabilityV578.mode==='very-dense'?Math.min(2.3,visualV525.max3DWidth):visualV525.max3DWidth) : [];
+        lyricPolishV634.max3DWidth) : [];
       const shouldHighlight = scene.wordHighlight && visualV477.timingMode === "verified-word" && current;
       return <group key={`${i}-${line.startMs}`} position={[x, y + (current ? -visualV501.lineOffsetPx * .001 : 0), z]}>
         {!useWordMeshes && <WordText text={line.text || "♪"} size={size} color={current ? from : "#8b93ad"}
-          opacity={current ? visualV501.reveal : visualV477.focusOpacity} maxWidth={readabilityV578.mode==='very-dense'?Math.min(2.3,visualV477.max3DWidth):visualV477.max3DWidth} outline={tier === "low" ? 0 : current ? .002+plateStrengthV378*.002+concertAccentV502*.006 : 0} outlineColor={to} />}
+          opacity={current ? visualV501.reveal : visualV477.focusOpacity} maxWidth={Math.min(visualV477.max3DWidth,lyricPolishV634.max3DWidth)} outline={tier === "low" ? 0 : current ? .002+plateStrengthV378*.002+concertAccentV502*.006 : 0} outlineColor={to} />}
         {positions.map((token, wi) => {
           const timed = line.words?.[wi];
           const next = line.words?.[wi + 1];
@@ -192,6 +214,11 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
           const wordAccentV567=wordTimelineV567?wordKaraokeAccentV567(wordTimelineV567,{
             lineIndex:i,wordIndex:wi,enabled:!!cueV382,highTier:tier==='high'&&!reducedMotion,
           }):{scale:0,outline:0};
+          const wordAccentV634=timed&&current ? beautifulLyricWordAccentV634({
+            line,nextLineStart:lines[i+1]?.startMs,wordIndex:wi,
+            progressMs:scene.progressMs,playing:scene.playing,reducedMotion,
+            plan:lyricPolishV634,
+          }) : 0;
           const wordProgress=wordV549?.fill??wordV541?.fill??(cueV382?cueV382.fill:progress);
           const accentV501 = timed ? lyricWordAccentV501({progressMs:scene.progressMs,
             startMs:timed.startMs,endMs:wordEnd,verifiedWordTiming:shouldHighlight,
@@ -202,7 +229,7 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
           const color=cueV382?blendKineticColorV382(from,to,wordProgress):(lit ? to : current ? from : "#8b93ad");
           return <group key={`${wi}-${token.text}`} position={[token.x, token.y, 0]} scale={scale}>
             <WordText text={token.text} size={size} color={color}
-              opacity={current ? visualV501.reveal : visualV477.focusOpacity} outline={tier === "low" ? 0 : current ? .003 + plateStrengthV378*.002 + clamp(scene.glow / 100) * (lit ? .012 : .004) * (tier === "balanced" ? .5 : 1) + (cueV382?.glow??0)*.008*visualV549.wordMotionGain + wordAccentV567.outline + (wordV549?.glow??wordV541?.glow??0)*.004 : 0}
+              opacity={current ? visualV501.reveal : visualV477.focusOpacity} outline={tier === "low" ? 0 : current ? .003 + plateStrengthV378*.002 + clamp(scene.glow / 100) * (lit ? .012 : .004) * (tier === "balanced" ? .5 : 1) + (cueV382?.glow??0)*.008*visualV549.wordMotionGain + wordAccentV567.outline + wordAccentV634*.035*lyricPolishV634.wordGlow/.115 + (wordV549?.glow??wordV541?.glow??0)*.004 : 0}
               outlineColor={lit ? from : to} />
           </group>;
         })}

@@ -1,0 +1,5 @@
+{
+ "extends":"./tsconfig.v643-core.json",
+ "compilerOptions":{"incremental":false},
+ "files":["../components/visualizer/phonemeLipSyncV644.ts","v414-music-types.d.ts"]
+}

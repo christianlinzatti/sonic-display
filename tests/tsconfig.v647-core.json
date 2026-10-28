@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.v646-core.json",
+  "compilerOptions": {"incremental": false},
+  "files": ["../components/visualizer/cinematicStageEnvironmentsV647.ts", "v414-music-types.d.ts"]
+}

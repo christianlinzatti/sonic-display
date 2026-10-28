@@ -1,3 +1,162 @@
+**V651 – Smart Preset Automation:** Touchmodus → Steuerzentrale → Profile: Profilwahl Aus (Standard), nur Vorschläge oder automatische Anwendung bei hoher Heuristik-Sicherheit und ausschließlich am Songbeginn. Pro Titel maximal ein automatischer Wechsel; manuelle Einstellungen, Korrekturen und Rückgängig haben Vorrang. Details: `V651-SMART-PRESET-AUTOMATION.md`, Tests `npm run verify:v651`.
+
+**V650 – Smart Concert Presets:** Die Touch-„Steuerzentrale“ hat jetzt einen Tab **„Profile“** mit sechs Vorlagen (Deutschrap, Hardtekk, Hardstyle, Rock, Pop, 10-Zoll-Lyrics), bis zu 12 lokal gespeicherten eigenen Profilen, sicherem JSON-Import/-Export und Rückgängig nach Anwendung. Profile ändern ausschließlich V649-Regler und V648-Ansicht/Lesbarkeit sowie optional das V388-Displayprofil, nicht Spotify oder manuelle Sängerregie. Siehe `V650-SMART-CONCERT-PRESETS.md` und `V650-VERIFICATION.md`.
+
+**V649 – Interactive Concert Control Center:** Touch-only Live-Steuerzentrale für Bühne, Kamera, Lyrics, Avatare und Licht. Die vorhandenen UI-Einstellungen bleiben alleinige Quelle, jede letzte Änderung kann zurückgenommen werden. Details: `V649-INTERACTIVE-CONCERT-CONTROL-CENTER.md`.
+
+## V648 – Ultimate 10-Inch Display Experience
+
+Aktiviere den vorhandenen **Touchmodus**. Mit `Aa · Klar/Groß/Normal` stellst du die Darstellungsgröße ein. Eine kompakte 10-Zoll-Querformatansicht und das Hochformat passen sich dem tatsächlich gemessenen Browserfenster an. Nach dem automatischen Verbergen der Leiste bleibt eine 52×52-Taste zum Wiederöffnen sichtbar. Einstellungen werden lokal gespeichert. Keine zusätzlichen GLB-Assets oder GPU-Render-Pässe.
+
+## V647 – Cinematic Stage Environments 2.0
+
+Neu sind sechs stilisierte, genreabhängige LED-Bühnenkulissen innerhalb der **bestehenden V635-Rückwand**: Concrete Warehouse (Deutschrap), Festival Truss (Hardstyle), Rave Tunnel (Hardtekk), Amplifier Wall (Rock), Prism Studio (Pop) und Neon Vault (Electronic). Bestätigte Songabschnitte steuern die Akzente und sorgen für unterschiedliche Hook-Varianten. Die bereits ausgewählten Bühnen-Themes, Lyrics, Sängerporträts sowie manuell gesetzte Licht- und Showregie haben Vorrang. Es werden keine 3D-Modelle/Bühnen nachgeladen und keine Draw Calls hinzugefügt; die längere Shaderberechnung muss auf der späteren Zielhardware getestet werden.
+
+**Prüfen:** `npm run test:v647`, `npm run test:v647:types`, `npm run verify:v647`, danach lokal `npm install && npm run build`. Siehe `V647-CINEMATIC-STAGE-ENVIRONMENTS-2.md` und `V647-VERIFICATION.md`.
+
+## V646 – Intelligent Concert Timeline
+
+**Neu:** ein standardmäßig geschlossener, über „Regie-Zeitplan“ in der Avatar-Bühne erreichbarer Mehrspur-Überblick mit validierter Songstruktur, als *Planung* gekennzeichneten Kamera-, Formations- und Lichtmotiven, expliziten Sängerzeitmarken und manuell aktiven Show-Clips. Aktposition per Spotify-Uhr, unanalysierte Zeitfenster sichtbar, JSON-Export nur lokal und read-only. Keine behaupteten tatsächlichen Kameraschnitte oder Vocal-Erkennung. Details: `V646-INTELLIGENT-CONCERT-TIMELINE.md`.
+
+## V645 – Expressive Artist Performance
+
+Bestätigte Deutschrap-Wörter steuern jetzt eine kleine zusätzliche,
+phraseweise wechselnde Ausdrucksschicht (Augenbrauen, Wangen, Kopf, Blick).
+Armakzente erfordern von V618 bestätigten sicheren Fußkontakt. Manuelle
+Animationsspuren, Lippenversiegelung und V644-Visem-Timeline werden nicht
+überschrieben. Keine automatische Emotionserkennung oder Phonemerkennung.
+
+Details: `V645-EXPRESSIVE-ARTIST-PERFORMANCE.md` · Nachweise:
+`V645-VERIFICATION.md` · Tests: `npm run verify:v645`.
+
+## V644 – Advanced Phoneme Lip-Sync (manuell ausgerichtete Viseme)
+
+Im Avatar-/Vocal-Einstellungsbereich gibt es eine **freiwillige, lokale**
+Visem-Timeline mit vier Avatar-Slots, Markierungen für typische Mundformen
+und JSON-Import/-Export. Im Livebetrieb werden nur manuell markierte Zeitfenster
+für denselben Song zur kontrollierten Artikulation herangezogen. Es gibt eine
+kurze, auf echte Ereignisgrenzen beschränkte Coartikulation. Für unmarkierte
+Passagen bleibt die bisherige automatische Regie erhalten.
+
+**Keine automatische Phonemerkennung:** V643-Stem-Merkmale sind nur Audio-
+indikatoren, keine Phonem- oder Silbenzeitstempel. Ohne extern oder manuell
+ausgerichtete Daten kann V644 keine nachgewiesen phonetisch korrekten
+Lippenbewegungen erzeugen. Weder Spotify-Audio noch Audiodateien werden
+hochgeladen. Siehe [`V644-ADVANCED-PHONEME-LIP-SYNC.md`](V644-ADVANCED-PHONEME-LIP-SYNC.md).
+Tests: `npm run test:smoke:v644`, `npm run verify:v644`.
+
+## V643 – Real Vocal Stem Analysis (lokales Vocal-Labor)
+
+Im Einstellungsbereich für Vocal-/Avatar-Performance kann man jetzt **bereits
+isolierte** Vocal-Dateien für bis zu vier manuell benannte Performer analysieren.
+Alle Dateien werden nur lokal im Browser dekodiert, Merkmale für Lautstärke,
+Einsatz und Periodizität mit 80-ms-Schritten berechnet und als JSON exportiert.
+Mit der Songlänge und Track-ID wird verhindert, dass ein fremdes Analyseformat
+versehentlich als passender Song geladen wird. Die Merkmale sind **keine
+Phoneme, keine Sprechererkennung** und beweisen keine echte Stem-Isolation.
+Spotify-PCM wird nicht gelesen; der laufende Lip-Sync und V423 bleiben unberührt. Die bisherigen Artikulationsregeln aus
+[`V384-NATURAL-VOCAL-ARTICULATION.md`](V384-NATURAL-VOCAL-ARTICULATION.md)
+bleiben ebenso bestehen.
+
+Details: [`V643-REAL-VOCAL-STEM-ANALYSIS.md`](V643-REAL-VOCAL-STEM-ANALYSIS.md).
+Tests: `npm run test:smoke:v643`, `npm run verify:v643`, `npm run build`.
+
+## V642 – Sonic Display Concert Edition
+
+Der **V642-Coordinator** harmonisiert die vorhandene automatische Konzertregie
+(V604/V623/V628/V629): bestätigte Hook-Wiederholungen variieren den Schwerpunkt
+zwischen Tanz/Kamera/Licht; Lyrics und autorisierte Sängerrollen gewinnen gegen
+Dekoration. Im bestehenden V641-QA-Panel erscheinen jetzt konkrete, nicht
+automatisch angewandte Vorschläge zur Nachprüfung. Details:
+[`V642-SONIC-DISPLAY-CONCERT-EDITION.md`](V642-SONIC-DISPLAY-CONCERT-EDITION.md).
+
+Tests: `npm run test:smoke:v642`, `npm run verify:v642`, `npm run build`.
+
+# Sonic Display V641 – Full Concert Quality Validation
+
+**Neu:** Manuell gestarteter lokaler Vollsong-Qualitätsrekorder im bestehenden QA-Panel. Misst tatsächliche Songabdeckung und vorhandene Browser-QA-Messwerte; Export ohne Audio-/Lyrics-Texte. Siehe `V641-FULL-CONCERT-QUALITY-VALIDATION.md`.
+
+## V640 – Adaptive Performance Optimization
+
+V640 ergänzt die automatische Konzert-Performance-Regie: Messfenster mit
+FPS, P95-Framezeit, Draw Calls und Dreiecken reduzieren zuerst **optionale**
+LED-Wände, Gobos und Nebel/Lichtkegel. Erst danach darf der vorhandene
+Adaptive-DPR-Controller stärker herunterregeln. Die vorhandenen Renderpfade und
+manuelle Einstellungen bleiben erhalten. Tests: `npm run verify:v640` und
+`npm run test:smoke:v640`. Siehe `V640-ADAPTIVE-PERFORMANCE-OPTIMIZATION.md`.
+
+> **V639 – Intelligent Motion Library (27.10.2026):** Erweiterte, qualitätsbewusste Auswahl bereits geladener GLB-Motions nach V536/V588/V615. Die automatische Song-Rotation balanciert musikalische Eignung, bisherige Nutzung, Wiederholung, Clipdauer und verifizierbare Metadaten. Mindestens 10 s zwischen neuen Clipwechseln; keine künstliche 20-/64-Clip-Grenze. Manuelle GLB-, Timeline-, Loop- und Preset-Steuerung bleibt unangetastet. Tests: `npm run test:smoke:v639`, `npm run verify:v639`; Details: `V639-INTELLIGENT-MOTION-LIBRARY.md` und `V639-VERIFICATION.md`.
+
+> **V638 – Advanced Ensemble Choreography:** automatisches, genresensibles Ensemble-Counterpoint mit unterschiedlichen Lead-/Support-Gesten, trackgebundenem Duett-Antwortspiel und kleinen fußkontaktgeprüften Z-Tiefenformationen für automatische 3/4-Avatar-Gruppen. Manuelle Choreografien, GLB-Animationen, Sängerzuweisungen, Fuß-IK und X-Abstände bleiben unverändert. Tests: `npm run verify:v638`, Details: `V638-ADVANCED-ENSEMBLE-CHOREOGRAPHY.md`.
+
+> **V637 – Genre Performance Intelligence:** Abstimmung der fünf Konzertgenres im vorhandenen V610/V624/V625-Tanz-, Kamera- und Lichtpfad, ausschließlich aus verifizierten Songabschnitten. Tests: `npm run verify:v637`. Details: `V637-GENRE-PERFORMANCE-INTELLIGENCE.md`.
+
+> **V636 – Professional Lighting Show:** bestehende V308-Moving-Heads und V555-Gobo-Projektion verwenden eine bestätigte, lyrics-sichere V604-Songregie. Tests: `npm run verify:v636`. Details: `V636-PROFESSIONAL-LIGHTING-SHOW.md`.
+
+## V635 – Dynamic Concert Stages
+
+Die V604-bestätigte Konzertdramaturgie steuert eine einfache rückwärtige LED-Pixelwand, sanfte Hintergrund- und Bodenfarbe sowie begrenzte Nebelabnahme. Die bestehenden V622/V621- und V634-Schutzbedingungen gelten weiterhin. Neue Tests: `npm run test:v635`, `npm run test:smoke:v635`, `npm run verify:v635`. Browser- und echter 10-Zoll-Sichttest noch offen.
+
+## V634 – Beautiful Lyrics 2.0 (27.10.2026)
+
+V634 verfeinert die bestehenden regulären und 3D-Konzertlyrics: schmalere, adaptive Captionbreite für 10-Zoll-Ansichten, längere Zeilenabstände bei sehr dichten Rap-Lyrics, nie schwächere Backdrop-Kontraste und einen sanften **ausschließlich auf echten Wortzeitstempeln** beruhenden Glühakzent. Schnelle Rap-Zeilen, mehrere Avatare und bestätigte Duette wirken absichtlich ruhiger. V477/V541/V549-Karaoke-Füllung, eigene Schriftgrößen, Lyrics-Positionen und Sängerrollen bleiben unverändert. Keine zusätzliche Szene oder Renderloop. Tests: `npm run test:smoke:v634`, `npm run verify:v634`. Details: `V634-BEAUTIFUL-LYRICS-2.md`.
+
+## V633 – Cinematic Camera 2.0 (27.10.2026)
+
+V633 verbessert die bereits vorhandene **automatische** R3F-Kameraregie: trackgebundene, manuell zugewiesene Sänger (V528/V632) können ausgewogene Porträts, bestätigte Übergaben mit langsamem Schwenk, echte Duette und sichere Ensemblebilder auslösen. Die verifizierte V604-Songstruktur allein berechtigt ausschließlich zu einer dezenten Bühnentotale, nicht zu erfundenen Künstler-Soloshots. Bestehende V550 Kopf-/Fußprojektionen und V540 Lyrics-Schutzzonen werden vor **jeder** finalen Kamerakorrektur kontrolliert, V351 bleibt die letzte Sicherheitsinstanz; manuelle Editor- und Keyframe-Vorgaben bleiben unangetastet. Kein neuer Canvas, Shader oder zusätzlicher Animationsloop. Tests: `npm run test:smoke:v633`, `npm run verify:v633`. Details: `V633-CINEMATIC-CAMERA-2.md`.
+
+## V632 – Multi-Artist Vocal Director (27.10.2026)
+
+V632 verbessert die Sängerrollen für zwei bis vier Avatare. Ein gemeinsamer, **editorial bestätigter** V385/V416/V496-Cue steuert nun auch die automatischen Jaw-/Wide-/Round-Mundziele des echten GLB-Morph-Renderers und des prozeduralen Fallbacks. Solo/Antwort: nur zugewiesener Sänger artikuliert. Duett/Hook: gemeinsame, aber unterschiedlich gewichtete Performance. Authored Adlibs: dezenter zusätzliche Gesangsslot. Handovers: ein leicht abgeschwächter Anfang für den neuen Lead, ohne die Mundverschlüsse zu verzögern. Es werden keine Sänger aus Audio, Künstlernamen oder Lyrics geraten. V420, V423, manuelle Animationen und Vorschau haben Vorrang. Tests `npm run test:smoke:v632` und `npm run verify:v632`. **Keine echte Audio-Diarisierung/Phonem-Erkennung.** Details: `V632-MULTI-ARTIST-VOCAL-DIRECTOR.md`.
+
+## V631 – Advanced Vocal Lip-Sync (27.10.2026)
+
+V631 erweitert die existierende V384→V415→V546→V597→V612→V617-Pipeline um **wortgebundene Kontinuität der tatsächlich berechneten Mundbewegungen**. Schnelle, eng benachbarte und eindeutig synchronisierte Deutschrap-Wörter beeinflussen ausschließlich die exponentiellen Attack-/Release-Raten vorhandener Jaw-/Wide-/Round-Morphs (maximal Faktor 0,85–1,15); kleine Artikulationswechsel reagieren etwas schneller, große Sprünge nahe Wortgrenzen werden leicht beruhigt. B/P/M-Verschlüsse, manuelle Sänger- und Silbeneditoren, gültige V423-Audio-Tracks, V562-Kalibrierung, Preview, Low-Tier und Reduced Motion behalten vollen Vorrang. Sowohl `VocalRigV368.tsx` (echte GLB-Morphs) als auch `ProceduralDancerAvatarV492.tsx` nutzen dieselbe pure Policy. **Wortzeiten liefern keine echten Phoneme oder Silbenzeiten**; visuell bestätigter Lip-Sync ist deshalb weiterhin offen. Kein zusätzlicher Renderloop, kein neues Modell oder GPU-Asset. Tests: `npm run test:smoke:v631` / `npm run verify:v631`; Details `V631-ADVANCED-VOCAL-LIP-SYNC.md`.
+
+## V630 – Natural Dance Performance (27.10.2026)
+
+V630 ergänzt die vorhandene automatische V537/V565/V614-GLB-Crossfade-Pipeline um eine echte **Lower-Body-Keyframe-Kontinuitätsprüfung**. Bei ausreichend belegter Hüft-/Bein-Pose-Diskrepanz werden Überblendzeiten im bestehenden Mixer sanft verlängert; Fußkontakt und aufeinanderfolgende automatische Wechsel erhalten zusätzliche Vorsicht. Bereits gematchte Entry-Times, manuelle Choreografien, gezielte Clip-Auswahl, Lip-Sync und IK bleiben vollständig in den zuständigen Modulen. V536 vermeidet schon zuvor wiederholte Clips; V630 verbessert die Übergänge, erfindet aber keine Animationen. Keine neuen Renderloops oder GPU-Assets. `npm run test:smoke:v630`, `npm run verify:v630`. Details `V630-NATURAL-DANCE-PERFORMANCE.md`.
+
+## V629 – Intelligent Song Dramaturgy (27.10.2026)
+
+V629 ergänzt V628 um eine nachgewiesene **Ganzsong-Abfolge** mit voneinander unterscheidbaren ersten, zweiten und dritten Refrains, gezielten Ruhephasen nach Höhepunkten und einem nur bei belegter Ende-Evidenz zulässigen Finale. Die vorhandenen Tanz-, Kamera-, Lyrics- und Lichtverbraucher erhalten nach wie vor **nur einen** gemeinsamen V623-Cue, nun nach V628 plus einem kleinen, an Segmentgrenzen ausgeblendeten V629-Finishing. Keine neuen GLB-Clips, GPU-Ressourcen, Renderloops, Sänger- oder Songstruktur-Erkennungen. `npm run test:smoke:v629`, `npm run verify:v629`; Details `V629-INTELLIGENT-SONG-DRAMATURGY.md`.
+
+## V628 – Concert Experience 2.0 (27.10.2026)
+
+V628 gibt der bestehenden, geprüften Konzertregie eine zusätzliche, sehr begrenzte gemeinsame Kompositionsebene. Die bereits aus V600/V604 belegten Motive für Portrait, Dialog, Ensemble, Panorama, Atempausen und Crescendo werden einheitlich an die existierenden V623-Kanäle für Tanz, Kamera, Licht und Lyrics durchgereicht. Die wiederholten Hooks wechseln ihren Schwerpunkt ohne neue Bühnenmodelle, Renderloops, Audioannahmen oder Sängerrollen. Manuelle Vorgaben und Schutzbereiche behalten Vorrang. Tests: `npm run test:smoke:v628`, `npm run verify:v628`; weitere Details in `V628-CONCERT-EXPERIENCE-2.md`.
+
+## V625 – Rock & Pop Live Performance
+
+V625 verbindet Rock- und Pop-Dramaturgie mit der V600/V604/V610-Regie. Siehe `V625-ROCK-POP-LIVE-PERFORMANCE.md`.
+
+**Früher: V624 – Hardstyle & Hardtekk Performance Director**. Siehe `V624-HARDSTYLE-HARDTEKK-PERFORMANCE-DIRECTOR.md`.
+
+**Vorversion: V623 – Ultimate Concert Dramaturgy**. Siehe `V623-ULTIMATE-CONCERT-DRAMATURGY.md`.
+
+## V622 – Dynamic Stage Transformation
+
+V622 verändert bei bestätigten Songabschnitten automatisch, aber sehr zurückhaltend, die bestehende Bühnenfarbigkeit, LED/Gobo-Tönung und die Nebelstimmung. Manuelle Vorgaben und Lyrics-Schutz behalten Vorrang. Details: `V622-DYNAMIC-STAGE-TRANSFORMATION.md`.
+
+# Sonic Display V621 – Advanced Stage Lighting Director
+
+V621 integriert eine evidenzbasierte, begrenzte Lichtregie über vorhandene Moving-Beam-/Spotlight-, LED-Pixelwand-, Gobo- und Nebel-Renderer. Release Notes: `V621-ADVANCED-STAGE-LIGHTING-DIRECTOR.md`. Prüfungen: `npm run test:smoke:v621`, `npm run verify:v621`, danach `npx tsc --noEmit` und `npm run build` auf dem Entwicklungsrechner.
+
+## Neu: V620 – Intelligent Concert Camera Composition
+
+V620 verbessert das automatische Framing für **bestätigte** Solo-Rapper, Duette und Gruppen auf der bestehenden R3F-Kamera. Die schon vorhandenen Bühnenpositionen, V528-Sängerrollen und V604-Songabschnitte liefern die Grundlage; Kameraänderungen werden nur übernommen, wenn die V550-/V540-Sicherheitsprüfungen für die ganze Besetzung keine stärkere Kopf-, Fuß- oder Seitenabschneidung feststellen. Manuelle Einstellungen, Lyrics, V613-Kamera-Holds, V619-Lyrics, V618-Gesicht/Körper und Low-/Reduced-Motion bleiben geschützt. Lokal prüfen: `npm run test:smoke:v620`, `npx tsc --noEmit`, `npm run build`. Details `V620-INTELLIGENT-CAMERA-COMPOSITION.md`.
+
+## Neu: V619 – Cinematic Lyrics Performance
+
+V619 ergänzt eine gemeinsame, rein dekorative Lyrics-Regie: sanftere Highlights auf exakt verifizierten Wortzeiten, dezente Hook- und Duett-Unterstreichungen nur bei bestätigten V606/V604-Cues sowie ruhigere, kontrastreiche Zeilen bei sehr schnellem Deutschrap und mehreren Tänzern. Die vorhandenen Karaoke-Zeitstempel, Sängerrollen und userdefinierte Layouts bleiben maßgeblich. Prüfen: `npm run test:smoke:v619`, `npx tsc --noEmit`, `npm run build`. Details `V619-CINEMATIC-LYRICS-PERFORMANCE.md`.
+
+## Neu: V618 – Full-Body Performance Coordination
+
+V618 koppelt die **bereits bestätigte V582-Rap-Oberkörpergeste** mit der **passenden V617-Gesichtsanimation** und den **tatsächlich gemessenen V492-Fußkontakten**. Ein sicherer Stand erlaubt nur minimale, körperlich abgestützte Brustkorb-/Schulter- und Oberarm-Bewegungen; beim Einbeinstand wird die zusätzliche Bewegung gedämpft. Fehlende IK-Messungen, unbekannte Avatar-Bones, manuelle Choreografien oder nicht verifizierte Wort-Cues deaktivieren diese Zusätze. Vorhandene GLB-Keyframes, Füße, Hüfte, Kopf-/Augensteuerung und Lippenanimationen bleiben unter der Kontrolle ihrer bisherigen Systeme. Kein zusätzlicher Renderloop. `npm run test:smoke:v618`, `npx tsc --noEmit`, `npm run build`. Details: `V618-FULL-BODY-PERFORMANCE-COORDINATION.md` und `V618-VERIFICATION.md`. Echte visuelle GLB-Sichtprüfung bleibt erforderlich.
+
+## Neu: V617 – Advanced Vocal & Facial Realism
+
+V617 ergänzt die bestehende wortzeitgebundene Deutschrap-Gesichtsanimation um kleinere, gleichmäßigere Bewegungsreaktionen und eine abgesicherte Augen-/Kopfgeste, **ausschließlich auf bestätigte Sänger-/Wort-/Blick-Cues**. B/P/M-Verschlüsse, manuelle Morphs, Audio-Mouth, echte GLB-Keyframes und V562-Kalibrierung gewinnen. Keine erfundene Phonemerkennung und keine zusätzlichen Renderloops. Die bisherige prozedurale Ersatzfigur verwendet die gleiche Mimik- und Ratenlogik, aber keine künstlichen Augen-Bones. Prüfen: `npm run test:smoke:v617`, `npx tsc --noEmit`, `npm run build`. Details `V617-ADVANCED-VOCAL-FACIAL-REALISM.md`.
+
 ## Neu: V612 – Expressive Vocal & Facial Performance 7.0
 
 V612 ergänzt `components/visualizer/expressiveVocalFaceV612.ts` als kleine **nachweislich wortzeitgebundene** Erweiterung der bereits existierenden Deutschrap-Lip-Sync- und Facial-Rig-Pipeline: bessere, konservativ modulierte Kiefer-/Vokalübergänge, dezente Brauen-/Wangenreaktionen und bei echter V581-Head-Bone-Erkennung winzige zusätzliche Kopfakzente. Die bestehende V384-B/P/M-Lippenschließung, V420-Editor, V423-Audio-Mouth, V562-Mundkalibrierung, Preview und manuelle Animationen haben Vorrang. Der prozedurale Ersatzavatar verwendet dieselbe Expressionskurve. Unbekannte Silben, phonemgenaue Timings oder Sprecher werden **nicht erfunden**. Keine neuen Renderer, GLB-Animationsclips, Shader oder Renderloops.
@@ -271,7 +430,7 @@ Neue Fußkontakte führen unmittelbar zur Reduktion additiver Fußrotationen. De
 `services/show/liveConcertComparisonV544.ts` ergänzt eine reine A/B-Projektionsanalyse auf der bereits opt-in etwa sekündlich messenden V466-WebGL-Qualitätsprobe. `components/visualizer/ConcertVisualCompareV544.tsx` ist unter dem bestehenden QA-Knopf erreichbar und speichert maximal zwei manuell aufgenommene Momentaufnahmen (A/B) im React-UI-Zustand; die Schemabilder verwenden echte normalisierte Kopf- und Lyrics-Rechtecke und zeigen die vorhandenen FPS an, **keine Pixel/Fotos und keine optische Gesichts-/Tanzprüfung**. Der Anwender markiert Fußarbeit, Gesicht/Lip-Sync und Lyrics getrennt; `createComparisonReportV544` exportiert auf Klick einen JSON-Bericht, keine Auto-Freigabe. Bildrand-/Lyrics-Nähe werden heuristisch beurteilt, nicht über Objekt-Okklusion. Original-Bühnenkamera, Motion, Beleuchtung, GLBs, FPS-Messintervall und QA-Gating bleiben unangetastet. `tests/v544-visual-quality-regression.cjs`, `tests/tsconfig.v544-core.json`. Der Next.js-Build braucht vollständig installierte Abhängigkeiten.
 
 
-> **Dokumentationsstand:** V583 (25.10.2026)
+> **Dokumentationsstand:** V643 (27.10.2026)
 
 ## V539 – Multi-Avatar Concert Interaction 5.0
 
@@ -796,3 +955,15 @@ Weniger JavaScript-Objektallokationen pro GLB-Renderframe, kein unnötiger LOD-P
 ## V598 – Beautiful Lyrics Experience 10.0
 
 Die bestehenden Wort-/Zeilenzeitstempel steuern weiterhin Karaoke. Neu sind dezente, timestamp-sichere Wort-Akzente, ein auf 10-Zoll-Bildschirme abgestimmtes Layout für dichte Lyrics sowie Hook-Akzente aus vorhandenen Bühnen-Cues (keine neu erfundene Hook-Erkennung). Optionen, Pausen und reduzierte Animation bleiben geschützt. Details: [`V598-BEAUTIFUL-LYRICS-EXPERIENCE-10.md`](V598-BEAUTIFUL-LYRICS-EXPERIENCE-10.md). Prüfen: `npm run test:smoke:v598`, `npm run verify:v598`.
+
+
+## V614 – Natural Motion Flow
+
+V614 integriert einen genre- und abschnittsabhängigen, sicheren GLB-Animations-Crossfade in die bestehenden V492/V537/V565-Übergänge. Manuelle Choreografien und V612-Lipsync bleiben unangetastet. Tests: `npm run test:smoke:v614`; optional alle individuellen Skripte: `npm run test:all`. Details in `V614-NATURAL-MOTION-FLOW.md`.
+
+
+### V626 – 3D Concert Benchmark & Hardware-Baseline
+Unter der vorhandenen V518/V522-Benchmarkoberfläche gibt es nun einen Bericht für je drei gemessene Läufe mit 2, 3 und 4 GLB-Avataren samt tatsächlicher Hauptcanvas-Renderauflösung und Export (`V626-ADAPTIVE-3D-CONCERT-BENCHMARKING.md`). Raspberry-Pi-Auswahl erst mit Messungen auf echter Kandidatenhardware; Windows-Ergebnisse sind keine Pi-Prognose.
+
+### V627 – Automated Concert Quality Inspector
+In der bestehenden V522/V626-Benchmarkoberfläche analysiert V627 vorhandene **echte** WebGL-Messläufe, V543-Bedienerbewertungen und optional lokal eingelesene **V593-JSON**-Bildhinweise zu Kamera, Lyrics und Aufstellung. Die Ergebnisliste erklärt jeden Befund und schlägt nur manuelle Prüf- und Optimierungsschritte vor. JSON-Export möglich. Keine neuen Aufnahme- oder Renderloops, kein automatisch bestandener Lip-Sync oder Gesamt-Song, keine Hardwarefreigabe. Mehr in `V627-AUTOMATED-CONCERT-QUALITY-INSPECTOR.md`.

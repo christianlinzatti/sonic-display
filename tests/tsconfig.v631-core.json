@@ -1,0 +1,12 @@
+{
+  "extends":"./tsconfig.v617-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/advancedVocalLipSyncV631.ts",
+    "../components/visualizer/advancedVocalFacialRealismV617.ts",
+    "../components/visualizer/expressiveVocalFaceV612.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v569-react-types.d.ts"
+  ]
+}

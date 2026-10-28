@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v644-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/expressiveArtistPerformanceV645.ts",
+    "v414-music-types.d.ts"
+  ]
+}

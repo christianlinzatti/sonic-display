@@ -6,10 +6,12 @@ import {refineNaturalDuetStageV584} from './naturalDuetStageInteractionV584';
 import {refineCinematicDuetFaceV585} from './cinematicDuetInteractionV585';
 import {refineFeatureDuetPerformanceV599} from './featureDuetPerformanceV599';
 import {refineNaturalMultiArtistV607} from './naturalMultiArtistInteractionV607';
+import {refineNaturalPerformerDuetV616} from './naturalMultiPerformerInteractionV616';
 const clamp=(n:number,min:number,max:number)=>Math.max(min,Math.min(max,n));
 const smooth=(n:number)=>{const t=clamp(n,0,1);return t*t*(3-2*t);};
 const finishV585=(base:RapDuetPlanV500,input:RapDuetInputV500)=>
-  refineNaturalMultiArtistV607(refineFeatureDuetPerformanceV599(refineCinematicDuetFaceV585(refineNaturalDuetStageV584(base,input),input),input),input);
+  refineNaturalPerformerDuetV616(
+    refineNaturalMultiArtistV607(refineFeatureDuetPerformanceV599(refineCinematicDuetFaceV585(refineNaturalDuetStageV584(base,input),input),input),input),input);
 export function refineDuetResponseV575(base:RapDuetPlanV500,input:RapDuetInputV500):RapDuetPlanV500{
  const {cue}=input;
  if(!base.active||input.manualPriority||input.reducedMotion||input.tier==='low'||

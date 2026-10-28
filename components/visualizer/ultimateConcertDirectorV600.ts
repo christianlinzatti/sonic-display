@@ -23,7 +23,7 @@ const formationFor=(shot:ConcertShotV600,section:SongSectionV318):GroupFormation
   section==='break'?'line':section==='hook'||section==='drop'?'wide':shot==='lead'?'stagger':shot==='side'?'arc':shot==='ensemble'?'wide':'line';
 function selectShot(genre:ConcertGenreV502,section:SongSectionV318,index:number,previous:ConcertShotV600|null):ConcertShotV600{
   const start=section==='break'?0:section==='verse'?1:section==='hook'?3:section==='build'?2:3;
-  const bias=genre==='hardtekk'?2:genre==='hardstyle'?1:0;
+  const bias=genre==='hardtekk'?2:genre==='hardstyle'?1:genre==='rock'?3:genre==='pop'?1:0;
   let shot:ConcertShotV600=titles[(start+index+bias)%titles.length];
   if(shot===previous)shot=titles[(titles.indexOf(shot)+1)%titles.length];
   return shot;
@@ -33,7 +33,7 @@ export function planUltimateConcertV600(input:{trackId:string;durationMs:number;
  analysis:TrackAnalysisV318|null|undefined}):ConcertArcV600{
   const durationMs=valid(input.durationMs)&&input.durationMs>0&&input.durationMs<=7200000?Math.round(input.durationMs):0;
   const base:ConcertArcV600={trackId:input.trackId,durationMs,genre:input.genre,source:'playback-only',acts:[]};
-  if(!input.trackId.trim()||!durationMs||!['deutschrap','hardstyle','hardtekk'].includes(input.genre))return base;
+  if(!input.trackId.trim()||!durationMs||!['deutschrap','hardstyle','hardtekk','rock','pop'].includes(input.genre))return base;
   const analysis=input.analysis;
   if(!analysis||analysis.trackId!==input.trackId||analysis.schema!=='sonic-track-analysis-v318'||!Array.isArray(analysis.sections))return base;
   const labeled=analysis.sections.slice(0,160).filter(s=>valid(s.startMs)&&s.startMs>=0&&s.startMs<durationMs&&

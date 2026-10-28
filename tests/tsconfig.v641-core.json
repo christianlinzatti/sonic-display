@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v640-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/fullConcertQualityAuditV641.ts",
+    "v414-music-types.d.ts"
+  ]
+}

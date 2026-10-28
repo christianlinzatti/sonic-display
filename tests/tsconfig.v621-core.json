@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.v620-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/advancedStageLightingV621.ts",
+    "../components/visualizer/advancedConcertStageFxV601.ts",
+    "../components/visualizer/fullSongConcertDramaturgyV604.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v508-three-types.d.ts"
+  ]
+}

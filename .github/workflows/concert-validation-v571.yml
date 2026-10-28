@@ -25,10 +25,8 @@ jobs:
             Write-Warning 'package-lock.json is missing! CI bootstrap is not reproducible until the generated lockfile is committed.'
             npm install --no-audit --no-fund
           }
-      - name: V571 fast regression suite
-        run: npm run test:smoke:v571
-      - name: Full application typecheck
-        run: npm run typecheck
+      - name: Latest V651 smoke and full release gate (case, ambient types, application TypeScript)
+        run: npm run test:smoke:v651 && npm run check:release
       - name: Real Next.js production build
         run: npm run build
       - name: Report local dependency and lock state

@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.v633-core.json",
+  "compilerOptions": {"incremental": false},
+  "files": [
+    "../components/visualizer/beautifulLyricsV634.ts",
+    "../components/visualizer/beautifulLyricsV477.ts",
+    "../components/visualizer/cinematicLyricsPerformanceV619.ts",
+    "../components/visualizer/beautifulLyricsExperienceV598.ts",
+    "../components/visualizer/cinematicLyricsExperienceV541.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v508-three-types.d.ts"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "extends":"./tsconfig.v623-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/festivalPerformanceDirectorV624.ts",
+    "../components/visualizer/genreConcertExperienceV610.ts",
+    "../components/visualizer/ultimateConcertDramaturgyV623.ts",
+    "../components/visualizer/fullSongConcertDramaturgyV604.ts",
+    "v414-music-types.d.ts","stubs/v415-three-types.d.ts","stubs/v508-three-types.d.ts"
+  ]
+}

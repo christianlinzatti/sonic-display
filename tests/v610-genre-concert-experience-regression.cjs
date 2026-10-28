@@ -26,7 +26,7 @@ const gains=['dance','cameraDrift','cameraRate','key','fill','beam','spot','haze
 test('German rap normalized',()=>{for(const g of ['deutschrap','Deutsch-Rap','German Rap','German hip hop'])assert.equal(resolve(g),'deutschrap')});
 test('Hardstyle includes rawstyle',()=>{for(const g of ['Hardstyle','Rawstyle','hard-style'])assert.equal(resolve(g),'hardstyle')});
 test('Hardtekk includes hardtekno',()=>{for(const g of ['hardtekk','Hard Tekk','HardTekno'])assert.equal(resolve(g),'hardtekk')});
-test('No generic rap or techno inference',()=>{for(const g of ['rap','pop','techno','unknown','',null,undefined,123])assert.equal(resolve(g),null)});
+test('No generic rap or techno inference',()=>{for(const g of ['rap','techno','unknown','',null,undefined,123])assert.equal(resolve(g),null)});
 test('Verified act activates',()=>{const x=run();assert(x.active);assert.equal(x.genre,'deutschrap');assert.equal(x.reason,'verified-genre-act')});
 test('Deutschrap verse supports faces, quieter beams',()=>{const x=run(0);assert(x.key>1&&x.fill>1);assert(x.beam<1&&x.haze<1);assert(x.dance<1);assert(x.cameraFov<0)});
 test('Deutschrap first hook has a wider camera than repeated second hook',()=>{const a=run(2),b=run(4);assert(a.cameraFov>b.cameraFov);assert(a.beam>b.beam);assert(a.spot<b.spot)});
@@ -44,7 +44,7 @@ test('Wrong duration rejects stale analysis',()=>assert.deepEqual(run(0,'deutsch
 test('Unverified source rejected',()=>assert.deepEqual(run(0,'deutschrap',{narrative:{plan:{...baseline(),source:'unavailable'},cue:cue(0)}}),neutral));
 test('Disabled cue rejected',()=>assert.deepEqual(run(0,'deutschrap',{narrative:{plan:baseline(),cue:{...cue(0),active:false}}}),neutral));
 test('Genre mismatch with confirmed plan rejected',()=>assert.deepEqual(run(0,'deutschrap',{genre:'hardstyle'}),neutral));
-test('Unknown genre rejected',()=>assert.deepEqual(run(0,'deutschrap',{genre:'pop'}),neutral));
+test('Unknown genre rejected',()=>assert.deepEqual(run(0,'deutschrap',{genre:'ambient'}),neutral));
 test('Unsupported section rejected',()=>assert.deepEqual(run(0,'deutschrap',{section:'drop'}),neutral));
 test('Adjacent act time is not borrowed',()=>assert.deepEqual(run(0,'deutschrap',{positionMs:acts[1].startMs}),neutral));
 test('Unmatched motif, chapter and repetition rejected',()=>{for(const change of [{chapter:'payoff'},{motif:'crescendo'},{repetition:5}])assert.deepEqual(run(0,'deutschrap',{narrative:{plan:baseline(),cue:{...cue(0),...change}}}),neutral)});
@@ -63,7 +63,7 @@ test('Balanced tier limits effect compared with high',()=>{for(const g of ['deut
 test('No extra beat generator or render loop',()=>{const source=fs.readFileSync('components/visualizer/genreConcertExperienceV610.ts','utf8');assert.doesNotMatch(source,/useFrame\(|fetch\(|requestAnimationFrame\(|new SpotLight|new ShaderMaterial|setInterval\(|Date\.now\(/)});
 test('Real DynamicStage multiplies bounded key and beam after V608',()=>{const src=fs.readFileSync('components/visualizer/DynamicStage.tsx','utf8');assert(src.includes('planGenreConcertV610({'));assert(src.includes('lightingV608.beam * concertGenreV610.beam'));assert(src.includes('lightingV608.key*concertGenreV610.key'))});
 test('Real atmosphere shader rig uses V610 beam, haze, spots and sweep',()=>{const src=fs.readFileSync('components/visualizer/ConcertAtmosphereRendererV308.tsx','utf8');for(const part of ['concertGenreV610.beam','concertGenreV610.haze','concertGenreV610.spot','concertGenreV610.sweep'])assert(src.includes(part))});
-test('Camera applies before last V351 lyrics guard',()=>{const src=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');const a=src.indexOf('const genreFramedV610='),b=src.indexOf('guardAutomaticCameraV351(genreFramedV610');assert(a>0&&b>a);assert(src.includes('sceneBlendV609.cameraRate*concertGenreV610.cameraRate'))});
+test('Camera applies before last V351 lyrics guard',()=>{const src=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');const a=src.indexOf('const genreFramedV610='),b=src.indexOf('guardAutomaticCameraV351(composedV620');assert(a>0&&b>a);assert(src.includes('sceneBlendV609.cameraRate*concertGenreV610.cameraRate'))});
 test('No interference with authored camera cuts',()=>{const src=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');assert(src.includes('editingPose||cutToCameraCueV400 ? 1'));assert(src.includes('manualCamera:!!(authoredCameraV528'))});
 test('Real V610 dance feeds existing automatic motion, no manual choreography',()=>{const src=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');assert(src.includes('motionEnergy*concertGenreV610.dance'));assert(src.includes('motionStore.automatic?concertGenreV610.dance:1'));assert(src.includes('preferences.avatarMotionMode===\'choreography\''))});
 test('Dance, camera and light share V604/V600 story evidence',()=>{for(const f of ['VisualizerStage.tsx','DynamicStage.tsx','ConcertAtmosphereRendererV308.tsx','StageCameraDirectorV289.tsx'])assert(fs.readFileSync('components/visualizer/'+f,'utf8').includes('narrative:'))});

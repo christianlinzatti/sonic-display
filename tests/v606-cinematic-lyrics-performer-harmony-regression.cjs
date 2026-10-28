@@ -77,13 +77,14 @@ test('source protects clocks and never fetches/creates camera',()=>{
 test('actual R3F camera pass is after V605 before V351 safety',()=>{
   const s=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');
   assert(s.indexOf('composeFullSongCameraV605(duetFramedV585')<s.indexOf('composeConcertHarmonyCameraV606(framedV605'));
-  assert(s.indexOf('composeConcertHarmonyCameraV606(framedV605')<s.indexOf('guardAutomaticCameraV351(genreFramedV610,composition)'));
+  assert(s.indexOf('composeConcertHarmonyCameraV606(framedV605')<s.indexOf('guardAutomaticCameraV351(composedV620,composition)'));
   assert(s.includes('authored:authoredCameraV528||cameraNarrativeV605?.manualCamera===true'));
 });
 test('active DOM lyric line shares planner and V604 cue',()=>{
   const s=fs.readFileSync('components/KineticLyrics.tsx','utf8'),stage=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');
   assert(s.includes('planConcertLyricsHarmonyV606'));assert(s.includes('lyricHarmonyWordAccentV606'));
-  assert(stage.includes('fullSongCueV604={fullSongCueV604} immersive'));
+  assert(stage.includes('fullSongCueV604={fullSongCueV604}'));
+  assert(stage.includes('concertDramaturgyV623={concertDramaturgyV623} immersive'));
   assert(s.includes('"--word-fill": `${(shownAmountV382 * 100).toFixed(1)}%`'));
 });
 let checks=0,accepted=0;
@@ -100,5 +101,5 @@ for(let ms=260;ms<11700;ms+=87)for(const quality of ['high','balanced'])for(cons
 }
 test('screen-safe deterministic samples',()=>assert(checks>500&&accepted>20,`${checks} ${accepted}`));
 const pkg=require('../package.json');
-test('release scripts and version',()=>{assert.match(pkg.version,/^0\.1\.0-v(?:60[6-9]|6[1-9][0-9])$/);assert(pkg.scripts['build:preflight'].includes('test:smoke:v606'));assert(pkg.scripts['test:smoke:v606'].includes('test:v605'));});
+test('release scripts and version',()=>{assert.match(pkg.version,/^0\.1\.0-v(?:60[6-9]|6[1-9][0-9])$/);assert(pkg.scripts['build:preflight'].includes('test:smoke:v642') && pkg.scripts['test:smoke:v642'].includes('test:smoke:v641') && pkg.scripts['test:smoke:v607'].includes('test:v606'));assert(pkg.scripts['test:smoke:v606'].includes('test:v605'));});
 console.log(`PASS V606: ${n} test groups; ${checks} sampled camera frames; ${accepted} guarded refinements.`);

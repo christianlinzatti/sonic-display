@@ -11,6 +11,6 @@ assert.match(policy,/pressureWindows >= 3/);
 assert.match(policy,/recoveryWindows >= 10/);
 assert.match(adaptive,/advanceRenderBudget\(renderBudget\.current/);
 assert.match(adaptive,/setDpr\(dpr\)/);
-assert.match(adaptive,/if \(mode !== "auto" \|\| isPiQualityTransitionV463\(Date\.now\(\)\)\) return/);
+assert.match(adaptive,/if \(mode !== "auto" \|\| transitioningV640\) return/);
 assert.match(scene,/<AdaptivePerformanceController avatarCount=/);
 console.log('V253 render budget regression passed');

@@ -1,0 +1,5 @@
+{
+ "extends":"./tsconfig.v649-core.json",
+ "compilerOptions":{"incremental":false},
+ "files":["../components/concertPresetsV650.ts","../components/concertControlPolicyV649.ts","v649-ui-preferences.d.ts"]
+}

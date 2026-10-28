@@ -29,10 +29,12 @@ import { resolveConcertCueV386 } from "./expressiveConcertDirectorV386";
 import { resolveManualVocalCueV385, applyManualVocalCueV385 } from "./manualVocalCastingV385";
 import { resolveRapDuetCueV416, applyRapDuetInteractionV416, toVocalCueV416 } from "./rapDuetStudioV416";
 import {resolveVocalTimeCueV496} from "./vocalTimeDirectorV496";
+import {planMultiArtistVocalV632} from "./multiArtistVocalDirectorV632";
 import {planIntelligentRapDuetV500} from "./intelligentRapDuetPerformanceV500";
 import {planNaturalMultiAvatarStageV504} from "./naturalMultiAvatarStageInteractionV504";
 import {planNaturalEnsembleV509,safeEnsembleTravelV509} from "./naturalEnsembleChoreographyV509";
 import {planAdvancedGroupV517} from "./advancedGroupPerformanceV517";
+import {planAdvancedEnsembleV638,safeEnsembleDepthV638} from "./advancedEnsembleChoreographyV638";
 import {planCinematicMultiAvatarV527} from "./cinematicMultiAvatarV527";
 import {planCrewConcertInteractionV539} from "./crewConcertInteractionV539";
 import {planCrewChoreographyV548} from "./crewChoreographyV548";
@@ -96,6 +98,7 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
  const interactionCueRefV376=useRef<ReturnType<typeof resolveDuetInteractionV376>|null>(null);
   const concertCueRefV386=useRef<ReturnType<typeof resolveConcertCueV386>|null>(null);
  const manualVocalCueRefV385=useRef<ReturnType<typeof resolveManualVocalCueV385>|null>(null);
+ const multiArtistVocalRefV632=useRef<ReturnType<typeof planMultiArtistVocalV632>|null>(null);
  const time=useRef(0);
  const contact=useRef(readFootLockV322());
  const [motionSyncV328,setMotionSyncV328]=useState<MotionSyncV328>(readMotionSyncV328);
@@ -221,6 +224,19 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
   const rapDuetCueV416=timeCueV496.active?timeCueV496:legacyDuetCueV416;
   const liveSingerCueV416=rapDuetCueV416.active?toVocalCueV416(rapDuetCueV416):manualCueV385;
   manualVocalCueRefV385.current=liveSingerCueV416;
+  // V632: one coherent vocal ownership snapshot for all existing avatar mouths.
+  // Explicit singer timelines win; no inference from track credits, lyrics or energy.
+  multiArtistVocalRefV632.current=planMultiArtistVocalV632({
+    trackId:props.track?.id??'',cueTrackId:timeCueV496.active?props.lipSync?.vocalTimeTrackIdV496??'':
+      legacyDuetCueV416.active?props.lipSync?.rapDuetTrackIdV416??'':props.lipSync?.manualVocalTrackIdV385??'',
+    timeMs:props.lipSync?.progressMs??-1,playing:props.isPlaying&&props.lipSync?.playing!==false,
+    enabled:props.lipSync?.enabled===true,reducedMotion:props.reducedMotion,
+    manualStage:!!settings.trackId,count:settings.count,cue:liveSingerCueV416,
+    scene:timeCueV496.active?(timeCueV496.singingSlots.length>1&&timeCueV496.style==='solo'?'adlib':
+      timeCueV496.style==='hook'?'hook':timeCueV496.style==='duet'?'duet':'solo'):
+      legacyDuetCueV416.active?(legacyDuetCueV416.style??'manual'):
+      manualCueV385.active?(manualCueV385.role==='hook'?'hook':'manual'):'manual',
+  });
   const finalDuetV385=applyRapDuetInteractionV416(
     applyManualVocalCueV385(duetV376,manualCueV385,props.reducedMotion),rapDuetCueV416);
   interactionCueRefV376.current=finalDuetV385;
@@ -743,6 +759,35 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
       if(Number.isFinite(audio.kickAccentIntensity))audio.kickAccentIntensity=Math.min(1,Math.max(0,(audio.kickAccentIntensity??0)*slot.grooveGain));
     }
   }
+  // V638: coherent counterpoint and shallow stage arcs for 3/4-person
+  // automatic groups. The V517 role source remains authoritative: visually
+  // chosen leaders never become singers. Imported clips / X lanes untouched.
+  const ensembleV638=planAdvancedEnsembleV638({
+    base:groupV517,formation:formationV495,
+    trackId:props.track?.id,
+    cueTrackId:rapDuetCueV416.active?
+      (timeCueV496.active?props.lipSync?.vocalTimeTrackIdV496:props.lipSync?.rapDuetTrackIdV416):
+      props.lipSync?.manualVocalTrackIdV385,
+    count:settings.count,seconds,progressMs:groupV517.source==='authored-singer'?
+      (props.lipSync?.progressMs??-1):Math.max(0,seconds*1000),
+    bpm:analysis?.tempo??props.audio.bpm,positions:pose.positions,
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,
+    manualPriority:!!settings.trackId||settings!==props.autoMultiArtistGroupV442||
+      props.avatarMotionMode==='choreography'||
+      props.artistBubblePlanV441?.source==='manual-stage'||
+      (!selectedSingerV444&&(displayPerformanceV375.enabled||finalDuetV385.enabled)),
+    tier:getActivePerformanceTier(),beat:props.audio.beatStrength??0,
+    energy:props.audio.energyEnvelope??0,footLocked:footLock,
+    genre:props.genre,risks:collisionSlotsV508,
+  });
+  if(ensembleV638.active){
+    for(let i=0;i<settings.count;i++){
+      Object.assign(looksV444.current[i].current,combineCrewLooksV452(
+        looksV444.current[i].current,ensembleV638.slots[i].look));
+      Object.assign(gesturesV444.current[i].current,combineCrewGesturesV452(
+        gesturesV444.current[i].current,ensembleV638.slots[i].gesture));
+    }
+  }
   if(collisionV506.active||motionV508.active){
     for(let i=0;i<settings.count;i++){
       Object.assign(gesturesV444.current[i].current,
@@ -800,13 +845,16 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
    const depthV509=ensembleV509.active?
      safeEnsembleTravelV509(ensembleV509.slots[i],groundDecisionsV494[i],collisionSlotV506):0;
 
+   const depthV638=safeEnsembleDepthV638(ensembleV638,ensembleV638.slots[i],
+     groundDecisionsV494[i],collisionSlotV506);
+
    const accentScaleV506=collisionSlotV506?.accentScale??1;
    // V452 accents are stage-root translations, below 5 cm; spacing preserved
    // for hooks (all dancers receive the same lateral offset).
    g.position.x=formationApproach(g.position.x,targetX+(crewV458.slots[i]?.offsetX??0)*accentScaleV506+groundDecisionsV494[i].offsetX,delta,speed*naturalFootworkV524.slots[i].rootSpeed*(groundTravelV487[i]??1));
-   g.position.z=formationApproach(g.position.z,targetZ+(crewV458.slots[i]?.offsetZ??0)*accentScaleV506+groundDecisionsV494[i].offsetZ+roleTravelV495+finalDepthV506+depthV509,delta,speed*naturalFootworkV524.slots[i].rootSpeed*(groundTravelV487[i]??1));
+   g.position.z=formationApproach(g.position.z,targetZ+(crewV458.slots[i]?.offsetZ??0)*accentScaleV506+groundDecisionsV494[i].offsetZ+roleTravelV495+finalDepthV506+depthV509+depthV638,delta,speed*naturalFootworkV524.slots[i].rootSpeed*(groundTravelV487[i]??1));
    g.position.y=0;
-   g.rotation.y=formationApproach(g.rotation.y,ensembleV392.yaw[i]+(spotlightV443.slots[i]?.turnY??0)+(crewV458.slots[i]?.turnY??0)+(formationV495.slots[i]?.turnY??0)*(spatialV505.slots[i]?.turnFactor??1)*accentScaleV506+(ensembleV509.slots[i]?.turnY??0)+(groupV517.slots[i]?.turnY??0)+(cinematicV527.slots[i]?.turnY??0),delta,props.reducedMotion?20:3.1);
+   g.rotation.y=formationApproach(g.rotation.y,ensembleV392.yaw[i]+(spotlightV443.slots[i]?.turnY??0)+(crewV458.slots[i]?.turnY??0)+(formationV495.slots[i]?.turnY??0)*(spatialV505.slots[i]?.turnFactor??1)*accentScaleV506+(ensembleV509.slots[i]?.turnY??0)+(groupV517.slots[i]?.turnY??0)+(ensembleV638.slots[i]?.turnY??0)+(cinematicV527.slots[i]?.turnY??0),delta,props.reducedMotion?20:3.1);
    const desiredScale=present?1:.001;
    const scaled=formationApproach(g.scale.x,desiredScale,delta,props.reducedMotion?20:3.2);
    g.scale.setScalar(Math.max(.001,scaled));
@@ -820,7 +868,7 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
   const animationUrl=chosen?('animationUrl' in chosen?chosen.animationUrl:undefined):(usingPartner?props.secondaryAvatarAnimationUrl:props.avatarAnimationUrl);
   const sharedMotionUrl=chosen?chosen.sharedMotionUrl:(usingPartner?props.secondaryAvatarSharedMotionUrlV531:props.avatarSharedMotionUrlV531);
   const modelId=chosen?.id??(usingPartner?props.secondaryAvatarModelId:props.avatarModelId);
-  const groupProps:VisualizerProps={...props,lipSync:props.lipSync?{...props.lipSync,ensembleCountV374:settings.count,performanceCueRefV375,interactionCueRefV376,manualVocalCueRefV385,concertCueRefV386}:undefined,audio:groupAudio.current[i],multiAvatarMode:'sync',avatarModelUrl:modelUrl,avatarAnimationUrl:animationUrl,avatarSharedMotionUrlV531:sharedMotionUrl,avatarModelId:modelId,preferredMotionUrlV440:props.multiArtistMotionsV442?.[i]??(usingPartner?props.secondaryPreferredMotionUrlV440:props.preferredMotionUrlV440),
+  const groupProps:VisualizerProps={...props,lipSync:props.lipSync?{...props.lipSync,ensembleCountV374:settings.count,performanceCueRefV375,interactionCueRefV376,manualVocalCueRefV385,multiArtistVocalRefV632,concertCueRefV386}:undefined,audio:groupAudio.current[i],multiAvatarMode:'sync',avatarModelUrl:modelUrl,avatarAnimationUrl:animationUrl,avatarSharedMotionUrlV531:sharedMotionUrl,avatarModelId:modelId,preferredMotionUrlV440:props.multiArtistMotionsV442?.[i]??(usingPartner?props.secondaryPreferredMotionUrlV440:props.preferredMotionUrlV440),
    avatarDancePreset:usingPartner?props.secondaryDancePreset??props.avatarDancePreset:props.avatarDancePreset,
    danceVariation:Math.min(1,(props.danceVariation??.5)+(i>1?.07:0))};
   return <group key={i} name={`v377-vocal-stage-slot-${i}`} ref={node=>{refs.current[i]=node;}} position={[(-settings.count+1)/2*1.4+i*1.4,0,0]}>

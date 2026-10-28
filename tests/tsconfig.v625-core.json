@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.v624-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/rockPopPerformanceDirectorV625.ts",
+    "../components/visualizer/genreConcertExperienceV610.ts",
+    "../components/visualizer/smartConcertDynamicsV502.ts",
+    "../components/visualizer/ultimateConcertDirectorV600.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v508-three-types.d.ts"
+  ]
+}

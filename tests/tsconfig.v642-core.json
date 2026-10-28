@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.v641-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/concertEditionV642.ts",
+    "../components/visualizer/concertEditionReviewV642.ts",
+    "v414-music-types.d.ts"
+  ]
+}

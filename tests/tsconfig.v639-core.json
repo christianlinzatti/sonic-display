@@ -1,0 +1,11 @@
+{
+  "extends":"./tsconfig.v615-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/intelligentMotionLibraryV639.ts",
+    "../components/visualizer/intelligentChoreographyVarietyV615.ts",
+    "../components/visualizer/genreAwareMotionDirectorV536.ts",
+    "../components/visualizer/longFormChoreographyV588.ts",
+    "v414-music-types.d.ts"
+  ]
+}

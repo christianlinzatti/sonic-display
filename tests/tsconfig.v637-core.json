@@ -1,0 +1,5 @@
+{
+  "extends":"./tsconfig.v636-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../components/visualizer/genrePerformanceIntelligenceV637.ts","../components/visualizer/genreConcertExperienceV610.ts","v414-music-types.d.ts"]
+}

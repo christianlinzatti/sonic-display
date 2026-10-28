@@ -1,0 +1,12 @@
+{
+ "extends":"./tsconfig.v622-core.json",
+ "compilerOptions":{"incremental":false},
+ "files":[
+  "../components/visualizer/ultimateConcertDramaturgyV623.ts",
+  "../components/visualizer/cinematicLyricsPerformanceV619.ts",
+  "../components/visualizer/intelligentCameraCompositionV620.ts",
+  "../components/visualizer/advancedStageLightingV621.ts",
+  "../components/visualizer/fullSongConcertDramaturgyV604.ts",
+  "v414-music-types.d.ts","stubs/v415-three-types.d.ts","stubs/v508-three-types.d.ts"
+ ]
+}

@@ -29,6 +29,11 @@ assert.deepEqual(check(files),[],`Ambiguous module names (case/extension):\n${ch
 // Guard against regressions in this test's ability to catch the exact original defect.
 assert.equal(check(['components/visualizer/CinematicCameraTimelineV400.tsx','components/visualizer/cinematicCameraTimelineV400.ts']).length,1);
 assert.equal(check(['components/visualizer/CameraPerformanceStudioV398.tsx','components/visualizer/cameraPerformanceStudioV398.ts']).length,1);
+assert.equal(check(['components/visualizer/FullConcertQualityAuditV641.tsx','components/visualizer/fullConcertQualityAuditV641.ts']).length,1);
+assert.equal(check(['components/visualizer/IntelligentConcertTimelineV646.tsx','components/visualizer/intelligentConcertTimelineV646.ts']).length,1);
+for(const name of ['FullConcertQualityAuditPanelV641.tsx','ConcertTimelineOverlayV646.tsx']){
+ assert(fs.existsSync(path.join(root,'components/visualizer',name)),`Missing renamed view: ${name}`);
+}
 const settings=fs.readFileSync(path.join(root,'components/SettingsPanel.tsx'),'utf8');
 assert(settings.includes('visualizer/CinematicCameraTimelinePanelV400'));
 assert(settings.includes('visualizer/CameraPerformanceStudioPanelV398'));

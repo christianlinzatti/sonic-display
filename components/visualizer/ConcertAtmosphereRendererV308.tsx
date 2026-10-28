@@ -4,6 +4,11 @@ import {planConcertLightingV462} from "./concertLightingDirectorV462";
 import {refineConcertLightingV542} from "./intelligentConcertLightingV542";
 import {planStageAtmosphereV551} from "./intelligentStageAtmosphereV551";
 import {planDynamicConcertLightingV608} from "./dynamicConcertLightingV608";
+import {planUltimateConcertDramaturgyV623,composeConcertLightingV623} from "./ultimateConcertDramaturgyV623";
+import {planAdvancedStageLightingV621} from "./advancedStageLightingV621";
+import {planDynamicStageTransformationV622} from "./dynamicStageTransformationV622";
+import {planDynamicConcertStagesV635} from "./dynamicConcertStagesV635";
+import {planProfessionalLightingV636} from "./professionalLightingShowV636";
 import {planGenreConcertV610} from "./genreConcertExperienceV610";
 import {planContinuousConcertV611} from "./continuousConcertExperienceV611";
 import {planSeamlessConcertTransitionV609} from "./seamlessConcertTransitionsV609";
@@ -19,6 +24,7 @@ import type { ShowCue } from "./ultimateShowDirectorV306";
 import type { StageSection } from "./stageDirectorV287";
 import type { StageEnvironmentId } from "./stages";
 import { getActivePerformanceTier } from "./adaptivePerformance";
+import {getVisualFactorsV640} from "./adaptiveVisualBudgetV640";
 import {readPiConcertBudgetV479} from "./piConcertRuntimeV479";
 import {shouldDrawTransparentV552,needsSpotTargetMatrixV552} from "./piConcertDrawBudgetV552";
 import { getLightingPlayback } from "./lightingPlayback";
@@ -77,6 +83,10 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
   const ownedFogV551=useRef<Fog|null>(null);
   const desiredPrimary=useRef(new Color());
   const desiredSecondary=useRef(new Color());
+  const warmTintV622=useRef(new Color('#ffc487'));
+  const coolTintV622=useRef(new Color('#77caff'));
+  const ambientTargetV622=useRef(new Color());
+  const fogTargetV622=useRef(new Color());
   const ambientBase = theme === "white" || theme === "minimal" ? "#b2bfd1" : theme === "festival" ? "#351a48" : theme === "rock" ? "#261a18" : "#10102b";
   const showLightingAllowed=!(settings.syncToShow && showCue?.enabled && !showCue.lightingEnabled);
   // Fog must be attached to the THREE.Scene (a fog child of a group has no effect).
@@ -133,6 +143,55 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
       authored:authoredLightingV387||!showLightingAllowed,
       blackout:timelineGainRef.current<.001,lyricsProtected:lyricsProtectedV542,
     });
+    const lightingV621=composeConcertLightingV623(planAdvancedStageLightingV621({narrative:cameraNarrativeV605,
+      trackId:playback.trackId,durationMs:playback.durationMs,positionMs:playback.positionMs,
+      section:cameraSectionV608??sectionRef.current,genre:genreV462,
+      energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,
+      playing:isPlaying&&playback.playing,reactive,reducedMotion,tier:nowTier,
+      authored:authoredLightingV387||!showLightingAllowed||!reactive,
+      blackout:timelineGainRef.current<.001,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+     }),planUltimateConcertDramaturgyV623({
+      narrative:cameraNarrativeV605,trackId:playback.trackId,durationMs:playback.durationMs,positionMs:playback.positionMs,
+      section:cameraSectionV608??sectionRef.current,playing:isPlaying&&playback.playing,reducedMotion,tier:nowTier,
+      energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      manualLighting:authoredLightingV387||!showLightingAllowed,
+    }));
+    // V622 uses the identical confirmed act/clock as the key rig. The fog
+    // color belongs exclusively to the V308-created scene Fog object.
+    const transformationV622=planDynamicStageTransformationV622({
+      narrative:cameraNarrativeV605,trackId:playback.trackId,positionMs:playback.positionMs,
+      durationMs:playback.durationMs,section:cameraSectionV608??sectionRef.current,genre:genreV462,
+      playing:isPlaying&&playback.playing,reactive,reducedMotion,tier:nowTier,
+      authored:authoredLightingV387||!showLightingAllowed||!reactive,
+      blackout:timelineGainRef.current<.001,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+    });
+    // V635 respects V308-owned fog and the same verified song arc as V622.
+    const stageVisualV635=planDynamicConcertStagesV635({
+      narrative:cameraNarrativeV605,trackId:playback.trackId,positionMs:playback.positionMs,
+      durationMs:playback.durationMs,section:cameraSectionV608??sectionRef.current,
+      genre:genreV462,playing:isPlaying&&playback.playing,reactive,reducedMotion,tier:nowTier,
+      authored:authoredLightingV387||!showLightingAllowed||!reactive,
+      blackout:timelineGainRef.current<.001,lyricsProtected:lyricsProtectedV542,
+      vocalFocus:vocalFocusV542,groupCount:Math.max(1,Math.min(4,Math.round(groupCountV542)||1)),
+      visualsEnabled:settings.enabled,energy:Math.max(0,Math.min(1,audio.energyEnvelope??audio.bass??0)),
+      kick:Math.max(0,Math.min(1,audio.kickAccentIntensity??0)),foundation:transformationV622,
+    });
+    // V636: editorial modulation of EXISTING V308 shafts and two moving heads.
+    // All gains remain downstream of user settings, budget tiers and blackout.
+    const professionalLightV636=planProfessionalLightingV636({
+      narrative:cameraNarrativeV605,trackId:playback.trackId,
+      positionMs:playback.positionMs,durationMs:playback.durationMs,
+      section:cameraSectionV608??sectionRef.current,genre:genreV462,
+      energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,
+      playing:isPlaying&&playback.playing,reactive,reducedMotion,tier:nowTier,
+      authored:authoredLightingV387||!showLightingAllowed||!reactive,
+      blackout:timelineGainRef.current<.001,enabled:settings.enabled,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      groupCount:Math.max(1,Math.min(4,Math.round(groupCountV542)||1)),
+    });
+    ambientTargetV622.current.copy(coolTintV622.current).lerp(warmTintV622.current,(transformationV622.tone+1)/2);
     // V610: only verified section + genre, bounded by the V551/V542 light caps.
     const concertGenreV610=planGenreConcertV610({
       narrative:cameraNarrativeV605,trackId:playback.trackId,
@@ -179,28 +238,41 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
       const fogAlpha=1-Math.exp(-Math.min(.1,Math.max(0,delta))*2.5*lightingBlendV609.lightingRate);
       fog.near+=(10+(1-density)*12+lightingV551.fogNearOffset+lightingV608.fogOffset-fog.near)*fogAlpha;
       fog.far+=(27+(1-density)*27+lightingV551.fogFarOffset+lightingV608.fogOffset*1.2-fog.far)*fogAlpha;
+      // Shift *existing* haze toward the same song-section mood; neither
+      // fog density nor its visibility is amplified during lyric-heavy sections.
+      fogTargetV622.current.set(ambientBase).lerp(ambientTargetV622.current,transformationV622.background*.70);
+      fog.color.lerp(fogTargetV622.current,fogAlpha);
+      const shift=Math.max(-.4,Math.min(.9,transformationV622.fog-stageVisualV635.fogTrim));
+      fog.far+=(Math.max(fog.near+6,27+(1-density)*27+lightingV551.fogFarOffset+lightingV608.fogOffset*1.2+shift)-fog.far)*fogAlpha;
     }
+    // V640 only scales nonessential auto decoration; manual spotlights and
+    // confirmed singer portrait illumination are never throttled here.
+    const decorationV640=authoredLightingV387?{led:1,gobo:1,haze:1,beams:1}:getVisualFactorsV640();
     // Two thin additive fan bars – no extra GPU lights, shadow maps, shaders or strobes.
     const lasersOn=lightingV542.allowLasers && festivalShowLasersV394 && reactive && isPlaying && !reducedMotion && settings.enabled && settings.beams &&
       tier==="high" && nowTier==="high" && sceneFlags.beamSweep && showLightingAllowed &&
       timelineGainRef.current>.001 && !authoredLightingV387 && festivalShowCueV394?.active;
-    const laserOpacity=lasersOn?Math.min(.17,(festivalShowCueV394?.laserGain??0)*.20):0;
+    const laserOpacity=lasersOn?Math.min(.17,(festivalShowCueV394?.laserGain??0)*.20)*decorationV640.beams:0;
     if(laserMaterialV394.current) laserMaterialV394.current.opacity+=(laserOpacity-laserMaterialV394.current.opacity)*Math.min(.25,Math.max(0,delta)*5);
     if(laserMaterialRightV394.current) laserMaterialRightV394.current.opacity+=(laserOpacity-laserMaterialRightV394.current.opacity)*Math.min(.25,Math.max(0,delta)*5);
     if(laserFanV394.current) laserFanV394.current.rotation.y=Math.sin(state.clock.elapsedTime*.44)*Math.min(.17,(festivalShowCueV394?.sweepGain??1)-1);
 
     desiredPrimary.current.set(musicPalette?.primary ?? (theme === "rock" ? "#ff8f40" : "#58cfff"));
     desiredSecondary.current.set(musicPalette?.secondary ?? (theme === "festival" ? "#f5b24e" : "#e674ff"));
+    if(transformationV622.active){
+      desiredPrimary.current.lerp(ambientTargetV622.current,transformationV622.accent*.14);
+      desiredSecondary.current.lerp(ambientTargetV622.current,transformationV622.accent*.17);
+    }
     const move=(material:ShaderMaterial|null,opacity:number,color:Color)=>{
       if(!material)return;
       const o=material.uniforms.uOpacity;
       o.value+=(opacity-o.value)*alpha;
       (material.uniforms.uColor.value as Color).lerp(color,alpha);
     };
-    move(leftBeam.current,Math.min(.3,frame.leftOpacity*beamGainV387*lightingV462.beamGain*lightingV542.beamGain*lightingV551.beamGain*lightingV608.beam*concertGenreV610.beam*concertContinuityV611.beam),desiredPrimary.current);
-    move(rightBeam.current,Math.min(.3,frame.rightOpacity*beamGainV387*lightingV462.beamGain*lightingV542.beamGain*lightingV551.beamGain*lightingV608.beam*concertGenreV610.beam*concertContinuityV611.beam),desiredSecondary.current);
-    move(floorHaze.current,Math.min(.15,frame.floorHaze*hazeGainV387*lightingV462.hazeGain*lightingV542.hazeGain*lightingV551.hazeGain*lightingV608.haze*concertGenreV610.haze*concertContinuityV611.haze),desiredPrimary.current);
-    move(backHaze.current,Math.min(.15,frame.backHaze*hazeGainV387*lightingV462.hazeGain*lightingV542.hazeGain*lightingV551.hazeGain*lightingV608.haze*concertGenreV610.haze*concertContinuityV611.haze),desiredSecondary.current);
+    move(leftBeam.current,Math.min(.3,frame.leftOpacity*decorationV640.beams*beamGainV387*lightingV462.beamGain*lightingV542.beamGain*lightingV551.beamGain*lightingV608.beam*lightingV621.beam*concertGenreV610.beam*concertContinuityV611.beam*professionalLightV636.beam),desiredPrimary.current);
+    move(rightBeam.current,Math.min(.3,frame.rightOpacity*decorationV640.beams*beamGainV387*lightingV462.beamGain*lightingV542.beamGain*lightingV551.beamGain*lightingV608.beam*lightingV621.beam*concertGenreV610.beam*concertContinuityV611.beam*professionalLightV636.beam),desiredSecondary.current);
+    move(floorHaze.current,Math.min(.15,frame.floorHaze*decorationV640.haze*hazeGainV387*lightingV462.hazeGain*lightingV542.hazeGain*lightingV551.hazeGain*lightingV608.haze*lightingV621.haze*concertGenreV610.haze*concertContinuityV611.haze*professionalLightV636.haze),desiredPrimary.current);
+    move(backHaze.current,Math.min(.15,frame.backHaze*decorationV640.haze*hazeGainV387*lightingV462.hazeGain*lightingV542.hazeGain*lightingV551.hazeGain*lightingV608.haze*lightingV621.haze*concertGenreV610.haze*concertContinuityV611.haze*professionalLightV636.haze),desiredSecondary.current);
     // V552: transparent objects consume GPU draw calls even at zero alpha.
     // Hide them in the existing frame callback, without unmount/remount,
     // changing materials, or delaying synchronized karaoke/beat updates.
@@ -230,9 +302,9 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
       return fallback+(x-fallback)*Math.min(.75,lightingV551.focusStrength+lightingV608.focusBoost);
     };
     const leftAimV551=spotlightAimV551(lightingV551.leftSingerSlot,
-      Math.max(-3,Math.min(3,(-.65+(frame.targetLeftX+.65)*lightingV462.sweepGain*lightingV542.sweepGain*lightingV551.sweepGain*lightingV608.sweep*concertGenreV610.sweep*concertContinuityV611.sweep)*sweepGainV387)));
+      Math.max(-3,Math.min(3,(-.65+(frame.targetLeftX+.65)*lightingV462.sweepGain*lightingV542.sweepGain*lightingV551.sweepGain*lightingV608.sweep*lightingV621.sweep*concertGenreV610.sweep*concertContinuityV611.sweep*professionalLightV636.sweep)*sweepGainV387+(lightingV551.leftSingerSlot===null?professionalLightV636.aimOffset:0))));
     const rightAimV551=spotlightAimV551(lightingV551.rightSingerSlot,
-      Math.max(-3,Math.min(3,(.65+(frame.targetRightX-.65)*lightingV462.sweepGain*lightingV542.sweepGain*lightingV551.sweepGain*lightingV608.sweep*concertGenreV610.sweep*concertContinuityV611.sweep)*sweepGainV387)));
+      Math.max(-3,Math.min(3,(.65+(frame.targetRightX-.65)*lightingV462.sweepGain*lightingV542.sweepGain*lightingV551.sweepGain*lightingV608.sweep*lightingV621.sweep*concertGenreV610.sweep*concertContinuityV611.sweep*professionalLightV636.sweep)*sweepGainV387-(lightingV551.rightSingerSlot===null?professionalLightV636.aimOffset:0))));
     if(leftGroup.current){
       leftDirection.current.set(leftAimV551-(-2.55),-1.72-3.15,.25-(-1.25)).normalize();
       leftGroup.current.quaternion.setFromUnitVectors(DOWN,leftDirection.current);
@@ -252,8 +324,8 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
         previousX.current=targetX;
       }
     };
-    setSpot(leftSpot.current,Math.min(3,frame.leftLight*beamGainV387*lightingV462.spotGain*lightingV542.spotGain*lightingV551.spotGain*lightingV608.spot*concertGenreV610.spot*concertContinuityV611.spot),desiredPrimary.current,leftAimV551);
-    setSpot(rightSpot.current,Math.min(3,frame.rightLight*beamGainV387*lightingV462.spotGain*lightingV542.spotGain*lightingV551.spotGain*lightingV608.spot*concertGenreV610.spot*concertContinuityV611.spot),desiredSecondary.current,rightAimV551);
+    setSpot(leftSpot.current,Math.min(3,frame.leftLight*beamGainV387*lightingV462.spotGain*lightingV542.spotGain*lightingV551.spotGain*lightingV608.spot*lightingV621.spot*concertGenreV610.spot*concertContinuityV611.spot*professionalLightV636.spot),desiredPrimary.current,leftAimV551);
+    setSpot(rightSpot.current,Math.min(3,frame.rightLight*beamGainV387*lightingV462.spotGain*lightingV542.spotGain*lightingV551.spotGain*lightingV608.spot*lightingV621.spot*concertGenreV610.spot*concertContinuityV611.spot*professionalLightV636.spot),desiredSecondary.current,rightAimV551);
   });
   const beamVisible=settings.enabled&&settings.beams&&tier!=="low"&&sceneFlags.beamSweep;
   const hazeVisible=settings.enabled&&settings.haze&&tier!=="low";

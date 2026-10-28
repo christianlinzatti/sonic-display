@@ -1032,6 +1032,8 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     avatarMotionMode,activeLoop,autoUpperGestureV490,activeLiveBlendV492,
     avatarCrossfadeSeconds:genreMotionV536===selectedClip?Math.max(avatarCrossfadeSeconds,genreCrossfadeSecondsV536({section:showCue?.enabled?showCue.section:cameraDirectorSection,energy:audio.energyEnvelope})):embeddedMotionV530===selectedClip?Math.max(.55,avatarCrossfadeSeconds):avatarCrossfadeSeconds,
     footIK,beatFlowData,musicSectionV565:showCue?.enabled?showCue.section:cameraDirectorSection,
+    trackIdV614:track?.id,progressMsV614:cameraDirectorProgressMs??propsLipSyncV367?.progressMs,
+    energyV614:audio.energyEnvelope,
     manualSelectionV565:!!clipChoiceV328||!!phraseChoiceV329||!!animationUrl||
       !!groupClockV328?.settings.enabled||!!groupPhraseV329?.settings.enabled});
   // V129: read the still-running outgoing LOD before falling back to the
@@ -1315,7 +1317,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     modelUrl:url,assetUrl,avatarScale,isPlaying,reducedMotion,castCount:propsLipSyncV367?.ensembleCountV374??1});
   return <group ref={root} userData={{sonicV592GlbActor:true}} scale={avatarScale} position={[0, avatarOffsetY, 0]}><primitive object={model} /><GlbMaterialQualityV560 session={materialSessionV560}
     enabled={groovePreferences.concertGlbMaterialQualityV560??true}
-    strength={groovePreferences.concertGlbMaterialStrengthV560??65}/><VocalRigV368 model={model} trackId={track?.id??""} sectionV503={showCue?.enabled?showCue.section:null} authoredPriorityV499={avatarMotionMode==="choreography"||!!stableLibraryClip} lipSync={propsLipSyncV367} audio={audio} genre={genre} reducedMotion={reducedMotion} avatarSlot={workloadSlot} profileV370={propsLipSyncV367?.profilesV370?.[avatarModelId??""]}/><AvatarSmartLOD model={model} /></group>;
+    strength={groovePreferences.concertGlbMaterialStrengthV560??65}/><VocalRigV368 model={model} trackId={track?.id??""} sectionV503={showCue?.enabled?showCue.section:null} authoredPriorityV499={avatarMotionMode==="choreography"||!!stableLibraryClip} footIKV618={footIK} footIKEnabledV618={avatarFootIKEnabled} lipSync={propsLipSyncV367} audio={audio} genre={genre} reducedMotion={reducedMotion} avatarSlot={workloadSlot} profileV370={propsLipSyncV367?.profilesV370?.[avatarModelId??""]}/><AvatarSmartLOD model={model} /></group>;
 }
 
 /** Each dancer receives its own animation mixer and cloned GLB scene. */

@@ -4,7 +4,7 @@
  */
 import type {SongSectionV318} from '../../services/musicAnalysis/trackAnalysisV318';
 
-export type ConcertGenreV502='deutschrap'|'hardstyle'|'hardtekk'|'other';
+export type ConcertGenreV502='deutschrap'|'hardstyle'|'hardtekk'|'rock'|'pop'|'other';
 export type ConcertTierV502='low'|'balanced'|'high';
 export interface ConcertDynamicsV502 {
   active:boolean;
@@ -49,12 +49,16 @@ export function classifyConcertGenreV502(genre:string|null|undefined):ConcertGen
   if(/hardtekk|hardtek|tekk|hardtekno/.test(normalized))return 'hardtekk';
   if(/hardstyle|rawstyle|hardcore|uptempo/.test(normalized))return 'hardstyle';
   if(/deutschrap|germanrap|hiphop|rap|trap|drill|grime|boombap/.test(normalized))return 'deutschrap';
+  if(/rock|punk|metal|grunge|alternative/.test(normalized))return 'rock';
+  if(/pop|synthpop|electropop|dancepop|kpop/.test(normalized))return 'pop';
   return 'other';
 }
 const sections:Record<ConcertGenreV502,Record<SongSectionV318,number>>={
   deutschrap:{verse:.50,hook:.88,build:.65,drop:.83,break:.16},
   hardstyle:{verse:.42,hook:.76,build:.68,drop:1,break:.09},
   hardtekk:{verse:.64,hook:.80,build:.73,drop:.96,break:.12},
+  rock:{verse:.52,hook:.89,build:.69,drop:.81,break:.16},
+  pop:{verse:.49,hook:.84,build:.63,drop:.76,break:.20},
   other:{verse:.5,hook:.5,build:.5,drop:.5,break:.5},
 };
 export function planSmartConcertDynamicsV502(input:ConcertDynamicsInputV502):ConcertDynamicsV502 {

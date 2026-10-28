@@ -55,11 +55,11 @@ assert.strictEqual(compose({...pose,x:20},s,avatars,opts).x,20,'side shot falls 
 assert.strictEqual(compose(pose,s,avatars,opts).z,compose(pose,s,avatars,opts).z,'pure repeatability');
 const source=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');
 assert(source.indexOf('composeCinematicConcertCameraV550(')<source.indexOf('composeCinematicDuetInteractionV585(concertFramedV550,sceneV528'));
-assert(source.indexOf('composeCinematicDuetInteractionV585(concertFramedV550,sceneV528')<source.indexOf('guardAutomaticCameraV351(genreFramedV610,composition)'));
+assert(source.indexOf('composeCinematicDuetInteractionV585(concertFramedV550,sceneV528')<source.indexOf('guardAutomaticCameraV351(composedV620,composition)'));
 for(const token of ['composeConcertCameraV540','sceneFramedV528,sceneV528','aspect:camera.aspect',
-  'authored:authoredCameraV528','composeCinematicConcertCameraV550(concertFramedV540,sceneV528','guardAutomaticCameraV351(genreFramedV610,composition)',
+  'authored:authoredCameraV528','composeCinematicConcertCameraV550(concertFramedV540,sceneV528','guardAutomaticCameraV351(composedV620,composition)',
   'lyricsSide:lipSync?.cinematicLyricsVisibleV378'])assert(source.includes(token),`missing camera integration: ${token}`);
-const boundary=source.indexOf('composeConcertCameraV540('),safety=source.indexOf('guardAutomaticCameraV351(genreFramedV610');
+const boundary=source.indexOf('composeConcertCameraV540('),safety=source.indexOf('guardAutomaticCameraV351(composedV620');
 assert(safety>boundary,'V351 must remain last');
 for(const banned of ['requestAnimationFrame(', 'setInterval(','Math.random(','window.', 'localStorage','new Audio('])
   assert(!fs.readFileSync('components/visualizer/cinematicCameraCompositionV540.ts','utf8').includes(banned));

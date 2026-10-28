@@ -8,6 +8,8 @@ export type PiStudioReadingV518 = Readonly<{
   at:number;fps:number;p95FrameMs:number;slowPercent:number;drawCalls:number;triangles:number;
   /** V522: optional observed per-window P99 and WebGL resource counts. */
   p99FrameMs?:number;geometries?:number;textures?:number;
+  /** Observed drawing-buffer resolution of the running main WebGL canvas. */
+  renderWidthPx?:number;renderHeightPx?:number;
   avatarCount:number;tier:'low'|'balanced'|'high';dpr:number;
   piProfile:string;piLevel:string;features:PiStudioFeaturesV518;heapMb:number|null;
 }>;
@@ -28,7 +30,8 @@ export const PI_STUDIO_MIN_WINDOWS_V518=6;
 export const PI_STUDIO_MAX_WINDOWS_V518=20;
 export function studioConfigurationV518(r:PiStudioReadingV518):string{
   const {features:f}=r;
-  return `${r.avatarCount}|${r.tier}|${r.dpr.toFixed(2)}|${r.piProfile}|${r.piLevel}|${+f.lyrics}${+f.lipSync}${+f.reactiveLighting}`;
+  const size=r.renderWidthPx!==undefined&&r.renderHeightPx!==undefined?`|${r.renderWidthPx}x${r.renderHeightPx}`:'';
+  return `${r.avatarCount}|${r.tier}|${r.dpr.toFixed(2)}|${r.piProfile}|${r.piLevel}|${+f.lyrics}${+f.lipSync}${+f.reactiveLighting}${size}`;
 }
 export function validStudioReadingV518(r:PiStudioReadingV518):boolean{
   return valid(r.at,1,Number.MAX_SAFE_INTEGER)&&valid(r.avatarCount,2,4)&&
@@ -38,6 +41,9 @@ export function validStudioReadingV518(r:PiStudioReadingV518):boolean{
     (r.geometries===undefined||valid(r.geometries,0,1_000_000))&&
     (r.textures===undefined||valid(r.textures,0,1_000_000))&&
     valid(r.triangles,0,1_000_000_000)&&valid(r.dpr,.25,4)&&
+    (r.renderWidthPx===undefined||Number.isInteger(r.renderWidthPx)&&valid(r.renderWidthPx,1,16384))&&
+    (r.renderHeightPx===undefined||Number.isInteger(r.renderHeightPx)&&valid(r.renderHeightPx,1,16384))&&
+    ((r.renderWidthPx===undefined)===(r.renderHeightPx===undefined))&&
     (r.heapMb===null||valid(r.heapMb,0,1_000_000))&&
     ['high','balanced','low'].includes(r.tier)&&
     r.piProfile.length>0&&r.piLevel.length>0&&

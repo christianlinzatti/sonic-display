@@ -13,6 +13,7 @@ import { currentDeviceFingerprint } from "./deviceCalibrationProfiles";
 import { capCalibratedTier, chooseDeviceRenderTier, readDeviceRenderCalibration, writeDeviceRenderCalibration, clearDeviceRenderCalibration, type CalibrationSample, type CalibratedTier } from "./deviceRenderCalibrationV254";
 import { advanceRenderBudget, initialRenderBudget, limitDpr, renderPressure } from "./gpuRenderBudgetV253";
 import { initialPerformanceDecision, advancePerformanceDecision } from "./performancePolicy";
+import {initialVisualBudgetV640,stepVisualBudgetV640,measuredPressureV640,setVisualLevelV640,getVisualLevelV640} from "./adaptiveVisualBudgetV640";
 import { useAudioWorkerTelemetry } from "./audioWorkerTelemetry";
 import { recordQualityDecision } from "./qualityDecisionHistoryV255";
 
@@ -62,6 +63,7 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
   const stabilitySettingsV355=useStabilitySettingsV355();
   const decision = useRef(initialPerformanceDecision());
   const renderBudget = useRef(initialRenderBudget());
+  const visualBudgetV640 = useRef(initialVisualBudgetV640());
   const tier = useRef<QualityState["tier"]>("high");
   const deviceDpr = useRef(1);
   const deviceFingerprint = useRef("");
@@ -99,6 +101,8 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
   useEffect(() => {
     decision.current = initialPerformanceDecision(mode === "auto" ? "high" : mode);
     renderBudget.current = initialRenderBudget();
+    visualBudgetV640.current=initialVisualBudgetV640();
+    setVisualLevelV640("full");
     tier.current = mode === "auto" ? deviceCap.current : mode;
     const requestedDprV602=limitDisplayDprV388(dprFor(tier.current, deviceDpr.current),displayBudgetV388);
     const dpr=capPiConcertDprV602(requestedDprV602,planPiConcertVisualQualityV602({budget:readPiConcertBudgetV479(),avatarCount,autoQuality:mode==='auto',manualLighting:false,reactive:true}),mode==='auto');
@@ -156,9 +160,28 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
     recordPiStudioV518({at:nowV518,fps,p95FrameMs,p99FrameMs:p99FrameMsV522,
       geometries:info.memory.geometries,textures:info.memory.textures,slowPercent:100*slowRatio,
       drawCalls:info.render.calls,triangles:info.render.triangles,avatarCount,tier:current.tier,
-      dpr:current.dpr,piProfile:piV518.profile,piLevel:piV518.level,heapMb:heapMbV518},playing,true);
+      dpr:current.dpr,piProfile:piV518.profile,piLevel:piV518.level,heapMb:heapMbV518,
+      renderWidthPx:gl.domElement.width,renderHeightPx:gl.domElement.height},playing,true);
 
-    if (mode !== "auto" || isPiQualityTransitionV463(Date.now())) return;
+    // V640: consume THIS measured window only, never a parallel RAF/timer. A paused,
+    // hidden or scene-transition frame cannot be counted as performance evidence.
+    // Manual modes always bypass automatic decorative throttling.
+    const transitioningV640=isPiQualityTransitionV463(nowV518);
+    const visualWindowV640={fps,p95FrameMs,slowRatio,elapsed,
+      drawCalls:info.render.calls,triangles:info.render.triangles,
+      playing,visible:true,transitioning:transitioningV640};
+    const previousVisualLevelV640=visualBudgetV640.current.level;
+    if(mode==='auto'){
+      visualBudgetV640.current=stepVisualBudgetV640(visualBudgetV640.current,visualWindowV640);
+      setVisualLevelV640(visualBudgetV640.current.level);
+      if(previousVisualLevelV640!==visualBudgetV640.current.level){
+        update({...current,reason:`V640 decorative visuals: ${visualBudgetV640.current.level} (measured frame pressure)`});
+      }
+    }else if(getVisualLevelV640()!=='full'){
+      visualBudgetV640.current=initialVisualBudgetV640();
+      setVisualLevelV640('full');
+    }
+    if (mode !== "auto" || transitioningV640) return;
     // V254: passive calibration from real scene load. Collect once, then reuse the
     // validated device-scoped profile for 14 days. Manual modes never get capped.
     if (!calibrated.current && info.render.calls > 0 && info.render.triangles > 0) {
@@ -178,9 +201,14 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
     // Never touch beat transport or the animation clock.
     const oldTier = tier.current;
     const oldBudget = renderBudget.current.tier;
-    decision.current = advancePerformanceDecision(decision.current, { fps, slowRatio, elapsed, p95FrameMs });
-    const workloadHigh = renderPressure(info.render.calls, info.render.triangles);
-    renderBudget.current = advanceRenderBudget(renderBudget.current, workloadHigh && (fps < 57 || slowRatio > 0.12));
+    // Prioritize reducing optional decoration before lowering avatar resolution.
+    // If decorative work is already minimal, V253/V254 retain normal authority.
+    const decorFirstV640=measuredPressureV640(visualWindowV640)&&visualBudgetV640.current.level!=='minimal';
+    if(!decorFirstV640){
+      decision.current = advancePerformanceDecision(decision.current, { fps, slowRatio, elapsed, p95FrameMs });
+      const workloadHigh = renderPressure(info.render.calls, info.render.triangles);
+      renderBudget.current = advanceRenderBudget(renderBudget.current, workloadHigh && (fps < 57 || slowRatio > 0.12));
+    }
     const baseTier = decision.current.tier;
     const rank = { low: 0, balanced: 1, high: 2 } as const;
     const budgetTier = rank[baseTier] < rank[renderBudget.current.tier] ? baseTier : renderBudget.current.tier;
@@ -207,6 +235,7 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
 export function AdaptivePerformanceSettings() {
   const { mode, tier, dpr, reason } = useAdaptivePerformance();
   const audio = useAudioWorkerTelemetry();
+  const decorationV640=getVisualLevelV640();
   return <div className="settings-field">
     <label htmlFor="performance-mode">3D render quality</label>
     <select id="performance-mode" value={mode} onChange={event => setPerformanceMode(event.target.value as QualityMode)}>
@@ -218,6 +247,7 @@ export function AdaptivePerformanceSettings() {
     <p className="settings-note">Audio Worker: {audio.mode} · Last response {audio.latencyMs.toFixed(1)} ms · P95 {audio.p95Ms.toFixed(1)} ms ({audio.samples} samples).</p>
     <p className="settings-note">V254: Automatic quality calibrates against the real scene and remembers a device-specific cap for up to 14 days. Manual modes bypass the cap. <button type="button" onClick={() => { clearDeviceRenderCalibration(); window.location.reload(); }}>Recalibrate device</button></p>
     <p className="settings-note">Active: {tier} · pixel ratio {dpr.toFixed(2)} · {reason}. Auto lowers resolution after sustained slow frames and raises it only after a longer stable period. This does not change dance timing or microphone analysis.</p>
+    <p className="settings-note">V640: Optional stage decoration {decorationV640}. Reduces LED/Gobo/Haze and nonessential beams before legacy DPR downshift, using measured FPS/P95 and draw-call/triangle proxies. Manual quality bypasses this guard; lip-sync, lyrics, dance and camera clocks stay intact.</p>
     <p className="settings-note">V552: invisible light shafts/haze do not consume transparent GPU draw calls; inactive dance effects stop updating their mesh pool. Existing Pi concert presets and measured FPS/P95/P99 still control adaptive quality. No changes to lyric, lip-sync, camera or dance timing.</p>
   </div>;
 }

@@ -19,6 +19,6 @@ assert.ok(validateDeviceRenderCalibration(p,'device',now));
 assert.equal(validateDeviceRenderCalibration(p,'other',now),null);
 assert.equal(validateDeviceRenderCalibration({...p,collectedAt:now-15*86400000},'device',now),null);
 const controller=fs.readFileSync(path.join(root,'components/visualizer/adaptivePerformance.tsx'),'utf8');
-assert.match(controller,/mode !== "auto" \|\| isPiQualityTransitionV463\(Date\.now\(\)\)\) return/);
+assert.match(controller,/mode !== "auto" \|\| transitioningV640\) return/);
 assert.match(controller,/capCalibratedTier\(budgetTier, deviceCap.current\)/);
 console.log('V254 device calibration regression: PASS');

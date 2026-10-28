@@ -63,12 +63,12 @@ assert.match(stage,/evaluateTimelineV354/);assert.match(stage,/timelineCue=\{tim
 assert.match(stage,/timelineGainV354=/);assert.match(stage,/StageContentScreensV333/);
 assert.match(stage,/VisualFxCueV353|visualFxCueV353/);assert.match(stage,/compositionV354/);
 assert.match(read('components/visualizer/StageCameraDirectorV289.tsx'),/automaticShot&&timelineCue/);
-assert.match(read('components/visualizer/StageCameraDirectorV289.tsx'),/guardAutomaticCameraV351\(vocalFramedV401,composition\)/);
+assert.match(read('components/visualizer/StageCameraDirectorV289.tsx'),/guardAutomaticCameraV351\(composedV633,composition\)/);
 assert.match(read('components/visualizer/SmartStageCameraV236.tsx'),/directCameraV354/);
 assert.match(read('components/visualizer/DynamicStage.tsx'),/timelineGainV354/);
 const editor=read('components/visualizer/ShowTimelineEditorV354.tsx');
 for(const property of ['importieren','exportieren','saveTimelineV354','addTimelineClipV354','deleteTimelineClipV354','type="range"'])assert(editor.includes(property));
 assert.match(read('components/visualizer/GalleryPreviewEditorV343.tsx'),/ShowTimelineEditorV354/);
-const pkg=require('../package.json');assert(['0.1.0-v354','0.1.0-v355','0.1.0-v356','0.1.0-v357','0.1.0-v358','0.1.0-v359','0.1.0-v360','0.1.0-v361','0.1.0-v362','0.1.0-v363','0.1.0-v364','0.1.0-v365','0.1.0-v366','0.1.0-v367','0.1.0-v368','0.1.0-v369','0.1.0-v370','0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387','0.1.0-v390','0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v390','0.1.0-v391','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416','0.1.0-v417','0.1.0-v418','0.1.0-v419','0.1.0-v420','0.1.0-v422','0.1.0-v424','0.1.0-v425','0.1.0-v426'].includes(pkg.version));
+const pkg=require('../package.json');assert(Number(pkg.version.match(/-v(\d+)/)?.[1])>=354,'V354 retained by modern releases');
 assert(pkg.scripts['verify:offline'].includes('test:v354'));
 console.log('PASS V354 clips, timeline playback boundaries, overlap priority, track scoping, pause/reduced-motion, safety, JSON sanitization, UI and live integration');

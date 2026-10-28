@@ -4,7 +4,10 @@
  * No timers, shaders, new lights or GPU allocations.
  */
 import type {NarrativeCueV604,NarrativePlanV604} from './fullSongConcertDramaturgyV604';
-export type GenreConcertV610='deutschrap'|'hardstyle'|'hardtekk';
+import {planFestivalPerformanceV624,composeFestivalPerformanceV624} from './festivalPerformanceDirectorV624';
+import {planRockPopPerformanceV625,composeRockPopPerformanceV625} from './rockPopPerformanceDirectorV625';
+import {planGenrePerformanceV637,composeGenrePerformanceV637} from './genrePerformanceIntelligenceV637';
+export type GenreConcertV610='deutschrap'|'hardstyle'|'hardtekk'|'rock'|'pop';
 export type GenreConcertInputV610={
  narrative?:{plan:NarrativePlanV604;cue:NarrativeCueV604}|null;
  trackId:string;durationMs:number;positionMs:number;section:string;genre?:string|null;
@@ -26,6 +29,8 @@ export function resolveConcertGenreV610(value?:string|null):GenreConcertV610|nul
  if(/hard\s?tekk|hard\s?tekno|\btekk\b|\bhardtek\b/.test(g))return 'hardtekk';
  if(/hard\s?style|rawstyle|rawphoric/.test(g))return 'hardstyle';
  if(/deutsch\s?rap|german\s?rap|german\s?hip\s?hop/.test(g))return 'deutschrap';
+ if(/rock|punk|metal|grunge|alternative/.test(g))return 'rock';
+ if(/pop|synth\s?pop|electro\s?pop|dance\s?pop|k\s?pop/.test(g))return 'pop';
  return null;
 }
 export function planGenreConcertV610(input:GenreConcertInputV610):GenreConcertCueV610{
@@ -91,7 +96,7 @@ export function planGenreConcertV610(input:GenreConcertInputV610):GenreConcertCu
  // No automatic lane can override an explicitly authored camera, dance or light cue.
  if(act.section==='drop'&&!supportedDrop){dance=0;drift=0;fov=0;rate=0;key=0;fill=0;beam=0;spot=0;haze=0;sweep=0;}
  const light=(v:number,lo:number,hi:number)=>round(clamp(1+v*power,lo,hi));
- return {active:true,genre,section:act.section,reason:'verified-genre-act',
+ const genreCueV610:GenreConcertCueV610={active:true,genre,section:act.section,reason:'verified-genre-act',
    dance:input.manualDance?1:light(dance,.88,1.14),
    cameraDrift:input.manualCamera?1:light(drift,.96,1.10),
    cameraFov:input.manualCamera?0:round(clamp(fov*power,-.4,.8)),
@@ -99,4 +104,9 @@ export function planGenreConcertV610(input:GenreConcertInputV610):GenreConcertCu
    key:input.manualLighting?1:light(key,.98,1.04),fill:input.manualLighting?1:light(fill,.98,1.04),
    beam:input.manualLighting?1:light(beam,.88,1.12),spot:input.manualLighting?1:light(spot,.92,1.10),
    haze:input.manualLighting?1:light(haze,.85,1),sweep:input.manualLighting?1:light(sweep,.84,1.12)};
+ // V624 uses this exact verified act; all consumers (dance, camera and two
+ // existing light rigs) receive the same bounded festival direction.
+ const festivalCueV624=composeFestivalPerformanceV624(genreCueV610,planFestivalPerformanceV624(input,genre));
+ const rockPopCueV625=composeRockPopPerformanceV625(festivalCueV624,planRockPopPerformanceV625(input,genre));
+ return composeGenrePerformanceV637(rockPopCueV625,planGenrePerformanceV637(input,genre));
 }

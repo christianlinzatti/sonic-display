@@ -7,6 +7,10 @@ import {planConcertLyricsHarmonyV606,composeConcertHarmonyCameraV606,activeLyric
 import {composeFullSongCameraV605} from "./cinematicFullSongCameraV605";
 import {planGenreConcertV610} from "./genreConcertExperienceV610";
 import {planContinuousConcertV611} from "./continuousConcertExperienceV611";
+import {composeConcertShotPacingV613} from "./concertShotPacingV613";
+import {planUltimateConcertDramaturgyV623} from "./ultimateConcertDramaturgyV623";
+import {composeIntelligentCameraV620} from "./intelligentCameraCompositionV620";
+import {planCinematicCameraV633,composeCinematicCameraV633,type DirectorOptionsV633} from "./cinematicCameraDirectorV633";
 import {planSeamlessConcertTransitionV609} from "./seamlessConcertTransitionsV609";
 import type {NarrativePlanV604,NarrativeCueV604} from "./fullSongConcertDramaturgyV604";
 import {composeCinematicDuetInteractionV585} from "./cinematicDuetInteractionV585";
@@ -554,12 +558,72 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
         !automaticShot||timelineCue?.active||authoredCueV400||editingPose||
         lipSync?.cameraManualStagePriorityV377),
     });
+    // V613: deliberate multi-second shot holds inside *verified* V604 acts;
+    // only automatic, screen-safe camera poses. V351 still guards last.
+    // V606 singer/lyrics focus stays authoritative; no lyric or mouth changes.
+    const framedV613=composeConcertShotPacingV613(framedV606,
+      cameraNarrativeV605?.plan,cameraNarrativeV605?.cue,
+      duetAnchorSampleV377.current.anchors,sceneV528,{
+      trackId:lipSync?.manualVocalTrackIdV385??"",progressMs:lipSync?.progressMs??-1,
+      playing:playing&&!!lipSync?.playing,reducedMotion,automatic:automaticShot,
+      authored:!!(authoredCameraV528||cameraNarrativeV605?.manualCamera||
+        timelineCue?.active||authoredCueV400||editingPose||
+        lipSync?.cameraManualStagePriorityV377),
+      quality:lipSync?.visualDirectorTierV397??"balanced",aspect:camera.aspect,
+      energy:lipSync?.concertEnergyV610??0,kick:lipSync?.rapCameraKickV433??0,
+      lyricsProtected:!!composition?.protectLyrics||!!lyricsPlanV378.active,
+      lyricsSide:lipSync?.cinematicLyricsVisibleV378?lipSync?.cinematicLyricsSideV378:null,
+    });
     const genreFramedV610=concertGenreV610.active&&
       (concertGenreV610.cameraDrift!==1||concertGenreV610.cameraFov!==0||concertContinuityV611.cameraDrift!==1||concertContinuityV611.cameraFov!==0)
-      ?{...framedV606,x:framedV606.x*concertGenreV610.cameraDrift*concertContinuityV611.cameraDrift,
-        fov:framedV606.fov+concertGenreV610.cameraFov+concertContinuityV611.cameraFov}:framedV606;
+      ?{...framedV613,x:framedV613.x*concertGenreV610.cameraDrift*concertContinuityV611.cameraDrift,
+        fov:framedV613.fov+concertGenreV610.cameraFov+concertContinuityV611.cameraFov}:framedV613;
+    // V620: evidence-bound portrait/duet/group composition. The full visible
+    // cast and head/foot bounds may never crop worse; no voice inference.
+    // After V613 and the genre cue; V351 remains the LAST lyrics safety gate.
+    const dramaturgyV623=planUltimateConcertDramaturgyV623({
+      narrative:cameraNarrativeV605,trackId:lipSync?.manualVocalTrackIdV385??'',
+      durationMs:cameraNarrativeV605?.plan.durationMs??0,positionMs:lipSync?.progressMs??-1,
+      playing:playing&&!!lipSync?.playing,reducedMotion,tier:lipSync?.visualDirectorTierV397??'balanced',
+      energy:lipSync?.concertEnergyV610??0,kick:lipSync?.rapCameraKickV433??0,
+      lyricsProtected:!!composition?.protectLyrics||!!lyricsPlanV378.active,
+      manualCamera:!automaticShot||!!authoredCameraV528||!!cameraNarrativeV605?.manualCamera,
+    });
+    const composedV620=composeIntelligentCameraV620(genreFramedV610,sceneV528,
+      duetAnchorSampleV377.current.anchors,cameraNarrativeV605?.plan,cameraNarrativeV605?.cue,{
+      trackId:lipSync?.manualVocalTrackIdV385??"",progressMs:lipSync?.progressMs??-1,
+      playing:playing&&!!lipSync?.playing,reducedMotion,automatic:automaticShot,
+      authored:!!(authoredCameraV528||cameraNarrativeV605?.manualCamera||
+        timelineCue?.active||authoredCueV400||editingPose||
+        lipSync?.cameraManualStagePriorityV377),
+      quality:lipSync?.visualDirectorTierV397??"balanced",aspect:camera.aspect,
+      lyricsProtected:!!composition?.protectLyrics||!!lyricsPlanV378.active,
+      lyricsSide:lipSync?.cinematicLyricsVisibleV378?lipSync?.cinematicLyricsSideV378:null,
+      faceY:faceSampleV369.current.value,paceV623:dramaturgyV623.camera,
+    });
+    // V633: final evidence-bound filmic handoff/portrait and repeated-act refinement.
+    // Retain V351 before and after: no new cue can bypass established lyric safety.
+    const priorLyricsSafeV620=automaticShot
+      ?guardAutomaticCameraV351(composedV620,composition):to;
+    const cinematicOptionsV633:DirectorOptionsV633={
+      trackId:lipSync?.manualVocalTrackIdV385??"",progressMs:lipSync?.progressMs??-1,
+      playing:playing&&!!lipSync?.playing,reducedMotion,automatic:automaticShot,
+      authored:!!(authoredCameraV528||cameraNarrativeV605?.manualCamera||
+        timelineCue?.active||authoredCueV400||editingPose||
+        lipSync?.cameraManualStagePriorityV377),
+      quality:lipSync?.visualDirectorTierV397??"balanced",aspect:camera.aspect,
+      lyricsProtected:!!composition?.protectLyrics||!!lyricsPlanV378.active,
+      lyricsSide:lipSync?.cinematicLyricsVisibleV378?lipSync?.cinematicLyricsSideV378:null,
+      faceY:faceSampleV369.current.value,
+    };
+    const cinematicIntentV633=planCinematicCameraV633(sceneV528,
+      duetAnchorSampleV377.current.anchors,cameraNarrativeV605?.plan,
+      cameraNarrativeV605?.cue,cinematicOptionsV633);
+    const composedV633=composeCinematicCameraV633(priorLyricsSafeV620,sceneV528,
+      duetAnchorSampleV377.current.anchors,cameraNarrativeV605?.plan,
+      cameraNarrativeV605?.cue,cinematicOptionsV633);
     const stageFramed=automaticShot
-      ?guardAutomaticCameraV351(genreFramedV610,composition):to;
+      ?guardAutomaticCameraV351(composedV633,composition):to;
     // Explicit edits must exactly match the pose that will be saved; no smoothing while editing.
     const liveCueV400=authoredCueV400&&cameraTimelineFramedV400!==festivalFramedV394?authoredCueV400:null;
     const cameraCueKeyV400=liveCueV400?`${liveCueV400.trackId}:${liveCueV400.cue.id}`:"";
@@ -577,7 +641,8 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
     });
     const alpha = editingPose||cutToCameraCueV400 ? 1 : liveCueV400
       ?1-Math.exp(-Math.min(.1,Math.max(0,dt))*4000/liveCueV400.cue.transitionMs)
-      :1-Math.exp(-Math.min(.1,Math.max(0,dt))*(framedV606!==framedV605?1.65:framedV605!==duetFramedV585?1.75:duetFramedV585!==concertFramedV550?1.85:concertFramedV550!==concertFramedV540?(sceneV528?.focus==='handoff'?1.85:1.6):concertFramedV540!==sceneFramedV528?1.5:sceneFramedV528!==concertFramedV497?1.65:concertHeldV454.active?2.15:2.8)*sceneBlendV609.cameraRate*concertGenreV610.cameraRate*concertContinuityV611.cameraRate);
+      :1-Math.exp(-Math.min(.1,Math.max(0,dt))*(framedV606!==framedV605?1.65:framedV605!==duetFramedV585?1.75:duetFramedV585!==concertFramedV550?1.85:concertFramedV550!==concertFramedV540?(sceneV528?.focus==='handoff'?1.85:1.6):concertFramedV540!==sceneFramedV528?1.5:sceneFramedV528!==concertFramedV497?1.65:concertHeldV454.active?2.15:2.8)*sceneBlendV609.cameraRate*concertGenreV610.cameraRate*concertContinuityV611.cameraRate*
+        (cinematicIntentV633.active?cinematicIntentV633.cameraRate:1));
     camera.position.x += (stageFramed.x-camera.position.x)*alpha;
     camera.position.y += (stageFramed.y-camera.position.y)*alpha;
     camera.position.z += (stageFramed.z-camera.position.z)*alpha;

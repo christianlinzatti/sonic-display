@@ -54,6 +54,7 @@ for(const f of ['types/music.ts','context/UiPreferencesContext.tsx','components/
 assert.match(read('context/UiPreferencesContext.tsx'),/avatarLyricsCameraModeV378:"off"/);
 assert.ok(read('app/globals.css').includes('v378-lyrics-contrast'));
 const pkg=JSON.parse(read('package.json'));
-assert.ok(['0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387','0.1.0-v390','0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v390','0.1.0-v391','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416'].includes(pkg.version));
+// Future releases must retain this feature; do not cap the valid package version at V416.
+assert.match(pkg.version,/^0\.1\.0-v(?:3(?:7[8-9]|[8-9][0-9])|[4-9][0-9]{2}|[1-9][0-9]{3,})$/);
 assert.match(pkg.scripts['verify:offline'],/test:v378/);
 console.log('PASS V378 lyrics-safe cinematic camera, phrase-end word gating, hook/duet priorities, pause, manual override, safe areas, immersive styling, inspector & settings');

@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.v625-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../services/monitoring/hardwareSizingBenchmarkV626.ts",
+    "../services/monitoring/concertBenchmarkValidationV522.ts",
+    "../services/monitoring/piConcertPerformanceStudioV518.ts"
+  ]
+}

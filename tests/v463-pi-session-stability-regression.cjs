@@ -63,7 +63,7 @@ p.resetPiSessionGuardV463();assert(!p.isPiQualityTransitionV463(15000));
 const quality=fs.readFileSync('components/visualizer/adaptivePerformance.tsx','utf8');
 const longRun=fs.readFileSync('components/visualizer/LongRunStabilityV355.tsx','utf8');
 const stage=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
-assert(quality.includes('isPiQualityTransitionV463(Date.now())'));
+assert(quality.includes('isPiQualityTransitionV463(nowV518)'));
 assert(quality.includes('publishRenderMetrics({'),'keep publishing FPS even during grace');
 assert(quality.includes('(mode === "auto" && stabilitySettingsV355.enabled)'),'manual quality must never be capped by the V355 guard');
 assert(longRun.includes('acceptPiSessionMetricsV463('));

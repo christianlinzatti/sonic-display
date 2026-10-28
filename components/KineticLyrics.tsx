@@ -1,5 +1,8 @@
 "use client";
 import type { CSSProperties } from "react";
+import {planBeautifulLyricsV634,beautifulLyricWordAccentV634} from "./visualizer/beautifulLyricsV634";
+import {composeConcertLyricsV623,type ConcertDramaturgyCueV623} from "./visualizer/ultimateConcertDramaturgyV623";
+import {planCinematicLyricsPerformanceV619,cinematicLyricWordAccentV619} from "./visualizer/cinematicLyricsPerformanceV619";
 import {planConcertLyricsHarmonyV606,lyricHarmonyWordAccentV606} from "./visualizer/concertLyricsPerformerHarmonyV606";
 import type {NarrativeCueV604} from "./visualizer/fullSongConcertDramaturgyV604";
 import {planLyricReadabilityV578} from "./visualizer/beautifulLyricsV578";
@@ -20,10 +23,10 @@ import { planCinematicLyricsV461 } from "@/components/visualizer/cinematicLyrics
 import { planBeautifulLyricsV477, lyricPlaybackFractionV477 } from "@/components/visualizer/beautifulLyricsV477";
 import {resolveKineticStyleV382,resolveKineticWordV382,kineticDropCueV382} from "@/components/visualizer/kineticLyricsV382";
 
-type Props = { lyrics: Lyrics | null; progressMs: number; activeIndex: number; playing: boolean; genre?: string; immersive?: boolean; avatarCountV477?: number; concertLyricAccentV502?: number; cinematicSceneV528?: ConcertSceneV528; sectionCueV598?: BeautifulLyricsSectionV598; fullSongCueV604?: NarrativeCueV604 };
+type Props = { lyrics: Lyrics | null; progressMs: number; activeIndex: number; playing: boolean; genre?: string; immersive?: boolean; avatarCountV477?: number; concertLyricAccentV502?: number; cinematicSceneV528?: ConcertSceneV528; sectionCueV598?: BeautifulLyricsSectionV598; fullSongCueV604?: NarrativeCueV604; concertDramaturgyV623?: ConcertDramaturgyCueV623 };
 
 /** Text animation driven by the existing playback clock; does not create timers or audio listeners. */
-export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre = "", immersive = false, avatarCountV477 = 1, concertLyricAccentV502 = 0, cinematicSceneV528, sectionCueV598, fullSongCueV604 }: Props) {
+export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre = "", immersive = false, avatarCountV477 = 1, concertLyricAccentV502 = 0, cinematicSceneV528, sectionCueV598, fullSongCueV604, concertDramaturgyV623 }: Props) {
   const { preferences } = useUiPreferences();
   const lyricsDirectionV528=concertLyricDirectionV528(cinematicSceneV528,playing,preferences.reducedMotion);
   const { metrics, active: microphoneActive } = useAudioAnalysis();
@@ -104,6 +107,21 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
     reducedMotion:reduced,immersive,cast:avatarCountV477,trackId:cinematicSceneV528?.trackId,
     scene:cinematicSceneV528,cue:fullSongCueV604,
     hookSection:sectionCueV598==='hook',wordHighlight:preferences.lyricsWordHighlight??true});
+  const concertLyricsV619=composeConcertLyricsV623(planCinematicLyricsPerformanceV619({
+    line:activeLine,nextLineStart:lines[activeIndex+1]?.startMs,
+    progressMs,playing,synchronized,reducedMotion:reduced,immersive,
+    avatarCount:avatarCountV477,wordHighlight:preferences.lyricsWordHighlight??true,
+    intensity,visual:activePlanV598,harmony:harmonyV606,readability:readabilityV578,
+  }),concertDramaturgyV623??{active:false} as ConcertDramaturgyCueV623);
+  const lyricPolishV634=planBeautifulLyricsV634({line:activeLine,
+    nextLineStart:lines[activeIndex+1]?.startMs,progressMs,synchronized,playing,
+    reducedMotion:reduced,immersive,avatarCount:avatarCountV477,
+    wordHighlight:preferences.lyricsWordHighlight??true,
+    vocalSceneActive:cinematicSceneV528?.active===true,
+    existingWidthCh:concertLyricsV619.maxWidthCh,
+    existingPlateOpacity:concertLyricsV619.plateOpacity,
+    intensity,
+  });
   const nextActiveStart = lines[activeIndex+1]?.startMs;
   const activeLineEnd = activeLine ? Math.min(
     activeLine.endMs != null && activeLine.endMs > activeLine.startMs ? activeLine.endMs : Infinity,
@@ -126,7 +144,7 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
   const wordsEnabled = (kinetic || cinematic || neon) && (preferences.lyricsWordHighlight ?? true) && synchronized;
 
   if (!lines.length) return <section className="lyrics"><p className="empty">Keine Lyrics für diesen Titel gefunden.</p></section>;
-  return <section className={`lyrics v461-cinematic-lyrics v477-beautiful-lyrics v501-cinematic-lyrics v502-concert-lyrics v525-cinematic-lyrics v525-${activePlanV525?.textClass??"standard"} v541-cinematic-lyrics v549-cinematic-lyrics v578-lyrics-readable v578-${readabilityV578.mode} v598-beautiful-lyrics v598-${activePlanV598.mode} v598-${activePlanV598.density} v606-harmony v606-${harmonyV606.mode} v501-cast-${activePlanV501?.cast??1} ${immersive ? "v461-stage-lyrics" : ""} ${focus ? "lyrics-focus-v367" : ""} lyrics-studio-position-${preferences.lyricsPosition ?? "center"} ${kinetic ? "lyrics-kinetic" : cinematic ? "lyrics-cinematic" : neon ? "lyrics-neon" : "lyrics-classic"} ${kineticStyleV382?"v382-kinetic-active v382-preset-"+kineticStyleV382:""}`} aria-label="Songtext" style={{ "--v606-width-ch":Math.min(activePlanV598.widthCh,harmonyV606.widthCh),"--v606-plate-boost":harmonyV606.plateBoost,"--v606-hook-accent":harmonyV606.hookAccent,"--v598-width-ch":activePlanV598.widthCh,"--v598-plate":activePlanV598.plateOpacity,
+  return <section className={`lyrics v461-cinematic-lyrics v477-beautiful-lyrics v501-cinematic-lyrics v502-concert-lyrics v525-cinematic-lyrics v525-${activePlanV525?.textClass??"standard"} v541-cinematic-lyrics v549-cinematic-lyrics v578-lyrics-readable v578-${readabilityV578.mode} v598-beautiful-lyrics v598-${activePlanV598.mode} v598-${activePlanV598.density} v606-harmony v606-${harmonyV606.mode} v619-cinematic-lyrics v619-${concertLyricsV619.mode} v634-beautiful-lyrics v634-${lyricPolishV634.mood} v501-cast-${activePlanV501?.cast??1} ${immersive ? "v461-stage-lyrics" : ""} ${focus ? "lyrics-focus-v367" : ""} lyrics-studio-position-${preferences.lyricsPosition ?? "center"} ${kinetic ? "lyrics-kinetic" : cinematic ? "lyrics-cinematic" : neon ? "lyrics-neon" : "lyrics-classic"} ${kineticStyleV382?"v382-kinetic-active v382-preset-"+kineticStyleV382:""}`} aria-label="Songtext" style={{ "--v634-width-ch":lyricPolishV634.widthCh,"--v634-plate":lyricPolishV634.plateOpacity,"--v634-line-height":lyricPolishV634.lineHeight,"--v634-transition-ms":`${lyricPolishV634.wordTransitionMs}ms`,"--v619-width-ch":concertLyricsV619.maxWidthCh,"--v619-plate":concertLyricsV619.plateOpacity,"--v619-hook-underline":concertLyricsV619.hookUnderline,"--v606-width-ch":Math.min(activePlanV598.widthCh,harmonyV606.widthCh),"--v606-plate-boost":harmonyV606.plateBoost,"--v606-hook-accent":harmonyV606.hookAccent,"--v598-width-ch":activePlanV598.widthCh,"--v598-plate":activePlanV598.plateOpacity,
     "--v598-line-height":activePlanV598.lineHeight,"--v598-contrast":activePlanV598.contrast,
     "--v598-hook-accent":activePlanV598.hookAccent,"--v578-width-ch": readabilityV578.maxWidthCh, "--v578-plate": readabilityV578.plateOpacity, "--v578-glow-gain": readabilityV578.glowGain, "--studio-font-family": family, "--studio-font-scale": fontSize, "--studio-glow": glow, "--v502-concert-accent": !reduced && playing ? Math.max(0,Math.min(.12,concertLyricAccentV502)) : 0, "--studio-speed": 1 / speed, "--studio-color-from": gradientFrom, "--studio-color-to": gradientTo, "--reactive-kick": kick, "--reactive-bass": bass, "--reactive-drop": drop } as CSSProperties}>
     <p className="lyrics-source">{lyrics?.provider}{synchronized ? " · zeilensynchronisiert" : " · ohne Zeitmarken"}{wordsEnabled ? hasTrueWordTiming ? " · echte Wort-Zeitstempel" : " · Zeilenfortschritt (keine Wort-Zeitstempel)" : ""}</p>
@@ -173,7 +191,7 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
         const wordTimed = v477.timingMode === "verified-word";
         const words = wordTimed ? line.words!.map(word => word.text) : [];
         const elapsedWords = active && wordsEnabled ? ratio * words.length : 0;
-        return <p key={`${line.startMs}-${lineIndex}`} className={`lyric v455-lyric-line v461-lyric-line v455-${v455.density} v461-${v461.density} v477-${v477.density} v501-${v501.density} ${active ? "v501-active-line v525-active-line v541-active-line v549-active-line" : ""} v541-${v541.density} v549-${v549.singerCue} ${active ? "v598-active-line v606-active-line" : ""} ${active ? "active" : near ? "near" : ""} ${lineIndex < activeIndex ? "past-v367" : "upcoming-v367"}`} style={{ "--v455-font-scale": v455.fontScale*v461.fontScale*v477.fontScale*v501.fontScale*v525.readingBoost*v541.readingScale*v549.readingScale*(active?lyricsDirectionV528.readingBoost:1), "--v477-line-height":v477.lineHeight, "--v477-motion-scale":v477.motionScale, "--v477-backdrop-opacity":v477.backdropOpacity, "--v477-context-opacity":v477.focusOpacity, "--v477-line-progress":`${(ratio*100).toFixed(1)}%`, "--v501-reveal":active?v501.reveal:1,
+        return <p key={`${line.startMs}-${lineIndex}`} className={`lyric v455-lyric-line v461-lyric-line v455-${v455.density} v461-${v461.density} v477-${v477.density} v501-${v501.density} ${active ? "v501-active-line v525-active-line v541-active-line v549-active-line" : ""} v541-${v541.density} v549-${v549.singerCue} ${active ? "v598-active-line v606-active-line v619-active-line v634-active-line" : ""} ${active ? "active" : near ? "near" : ""} ${lineIndex < activeIndex ? "past-v367" : "upcoming-v367"}`} style={{ "--v455-font-scale": v455.fontScale*v461.fontScale*v477.fontScale*v501.fontScale*v525.readingBoost*v541.readingScale*v549.readingScale*(active?lyricsDirectionV528.readingBoost:1), "--v477-line-height":v477.lineHeight, "--v477-motion-scale":v477.motionScale, "--v477-backdrop-opacity":v477.backdropOpacity, "--v477-context-opacity":v477.focusOpacity, "--v477-line-progress":`${(ratio*100).toFixed(1)}%`, "--v501-reveal":active?v501.reveal:1,
           "--v501-glow":active?v501.glow:0,
           "--v501-offset":active?`${v501.lineOffsetPx.toFixed(2)}px`:"0px",
           "--v501-plate":Math.min(1,v525.plateOpacity+lyricsDirectionV528.plateBoost),
@@ -205,12 +223,19 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
             const wordV598=active && wordTimed ? planBeautifulLyricsWordV598({
               line,nextLineStart:nextStart,wordIndex:wi,progressMs,playing,reducedMotion:reduced,plan:v598,
             }) : null;
+            const wordAccentV619=active && wordTimed ? cinematicLyricWordAccentV619({
+              line,nextLineStart:nextStart,wordIndex:wi,progressMs,playing,reducedMotion:reduced,plan:concertLyricsV619,
+            }) : 0;
+            const wordAccentV634=active&&wordTimed ? beautifulLyricWordAccentV634({
+              line,nextLineStart:nextStart,wordIndex:wi,progressMs,playing,
+              reducedMotion:reduced,plan:lyricPolishV634,
+            }) : 0;
             const shownAmountV382=wordV549?.fill??wordV541?.fill??(cueV382?cueV382.fill:amount);
             const rhymeV555=active&&detailV555.rhymeColor&&
               word.trim().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu,'').toLocaleLowerCase('de')===detailV555.rhymeWord;
             return <span key={wi} className={`kinetic-word ${rhymeV555 ? "v555-rhyme" : ""} ${active ? "kinetic-word-active" : ""} ${active && amount > 0 && amount < 1 ? "v367-speaking" : ""}`} style={{ ...(rhymeV555 ? {"--v555-rhyme-color":detailV555.rhymeColor} : {}), "--v501-word-accent":wordAccentV501,"--v541-word-focus":wordV541?.focus??0,
               "--v541-word-glow":wordV549?.glow??wordV541?.glow??0,
-              "--v549-word-motion":wordV549?.motion??0,"--v598-word-accent":wordV598?.accent??0,"--v606-word-accent":active?lyricHarmonyWordAccentV606(line,wi,progressMs,harmonyV606):0,"--word-fill": `${(shownAmountV382 * 100).toFixed(1)}%`, "--word-order": wi,
+              "--v549-word-motion":wordV549?.motion??0,"--v619-word-accent":wordAccentV619,"--v634-word-accent":wordAccentV634,"--v598-word-accent":wordV598?.accent??0,"--v606-word-accent":active?lyricHarmonyWordAccentV606(line,wi,progressMs,harmonyV606):0,"--word-fill": `${(shownAmountV382 * 100).toFixed(1)}%`, "--word-order": wi,
               "--v382-word-scale":1+((cueV382?.scale??1)-1)*v455.motionScale*v461.motionScale*v526.wordMotionGain*lyricsDirectionV528.motionGain*v549.wordMotionGain,"--v382-word-lift":`${-(cueV382?.lift??0)*v455.motionScale*v461.motionScale*v526.wordMotionGain*lyricsDirectionV528.motionGain*v541.wordMotionGain}px`,
               "--v382-word-glow":(cueV382?.glow??0)*v455.motionScale*v461.motionScale*v526.wordMotionGain*lyricsDirectionV528.motionGain*v541.wordMotionGain } as CSSProperties}>{wordLabel}</span>;
           }) : <span className={wordsEnabled && v477.timingMode === "line-progress" ? "kinetic-whole-line v477-line-progress-text" : "kinetic-whole-line"}>

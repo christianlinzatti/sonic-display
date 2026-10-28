@@ -1,0 +1,125 @@
+"use strict";
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const {load}=require('./helpers/ts-loader-v404.cjs');
+const {isTouchReadabilityV648:valid,nextTouchReadabilityV648:next,
+ resolveTouchViewportV648:layout,resolveImmersiveLyricFontV648:font,
+ TOUCH_READABILITY_ORDER_V648:order}=load('components/touchDisplayPolicyV648');
+const get=f=>fs.readFileSync(f,'utf8');
+const css=get('app/globals.css'),kiosk=get('components/TouchKioskControls.tsx');
+const screen=get('components/SonicDisplay.tsx'),stage=get('components/visualizer/VisualizerStage.tsx');
+const pkg=JSON.parse(get('package.json'));
+let groups=0,positions=0;
+function test(name,fn){try{fn();groups++;}catch(e){e.message=`V648 ${name}: ${e.message}`;throw e;}}
+const L=(more={})=>layout({enabled:true,width:1280,height:800,view:'split',readability:'clear',...more});
+const has=(source,token)=>assert(source.includes(token),`Expected source to include ${token}`);
+const lacks=(source,token)=>assert(!source.includes(token),`Expected source not to include ${token}`);
+// Presentation semantics and valid input handling.
+test('exactly three accessible readability choices',()=>assert.deepEqual(order,['standard','clear','large']));
+test('valid standard',()=>assert(valid('standard')));
+test('valid clear',()=>assert(valid('clear')));
+test('valid large',()=>assert(valid('large')));
+test('reject unknown readability',()=>assert(!valid('huge')));
+test('reject null readability',()=>assert(!valid(null)));
+test('reject prototype-like values',()=>{for(const x of [{},[],0,Infinity,'__proto__'])assert(!valid(x));});
+test('standard cycles to clear',()=>assert.equal(next('standard'),'clear'));
+test('clear cycles to large',()=>assert.equal(next('clear'),'large'));
+test('large cycles to standard',()=>assert.equal(next('large'),'standard'));
+test('cycle returns to start after three changes',()=>{for(const v of order)assert.equal(next(next(next(v))),v);});
+test('default kiosk active',()=>assert.equal(L().layout,'split'));
+test('kiosk disabled forces standard readability',()=>assert.equal(L({enabled:false,readability:'large'}).readability,'standard'));
+test('kiosk disabled does not apply mobile layout',()=>assert(!L({enabled:false}).compact));
+test('no lyric layer in stage view',()=>assert(!L({view:'stage'}).lyricsPriority));
+test('lyric view is prioritized',()=>assert(L({view:'lyrics'}).lyricsPriority));
+test('split view is prioritized',()=>assert(L({view:'split'}).lyricsPriority));
+test('lyrics not prioritized outside kiosk',()=>assert(!L({enabled:false,view:'lyrics'}).lyricsPriority));
+test('stage mode does not create overlay',()=>assert(!L({view:'stage'}).showLyricOverlay));
+test('kiosk passes explicit readability',()=>assert.equal(L({readability:'large'}).readability,'large'));
+test('disabled kiosk has standard layout',()=>assert.equal(L({enabled:false}).layout,'standard'));
+// Kiosk viewport formats including unavailable or invalid browser metrics.
+test('1024x600 uses compact landscape',()=>assert(L({width:1024,height:600}).compact));
+test('1280x800 uses compact landscape',()=>assert(L({width:1280,height:800}).compact));
+test('1366x768 uses compact landscape',()=>assert(L({width:1366,height:768}).compact));
+test('1440x820 fits compact threshold',()=>assert(L({width:1440,height:820}).compact));
+test('1920x1080 avoids 10-inch compact styling',()=>assert(!L({width:1920,height:1080}).compact));
+test('landscape height above 820 is not compact',()=>assert(!L({width:1300,height:900}).compact));
+test('wide desktop avoids compact',()=>assert(!L({width:1600,height:600}).compact));
+test('portrait phone not mistaken for landscape',()=>{const x=L({width:390,height:844});assert(x.portrait&&!x.compact)});
+test('portrait tablet recognized',()=>{const x=L({width:800,height:1280});assert(x.portrait&&!x.compact)});
+test('square display counts as portrait layout',()=>assert(L({width:800,height:800}).portrait));
+test('disabled portrait styling never active',()=>assert(!L({enabled:false,width:390,height:844}).portrait));
+test('zero viewport does not guess screen size',()=>assert(!L({width:0,height:0}).compact&&!L({width:0,height:0}).portrait));
+test('invalid width does not guess screen size',()=>assert(!L({width:NaN}).compact));
+test('invalid height does not guess screen size',()=>assert(!L({height:Infinity}).portrait));
+test('negative viewport does not guess size',()=>assert(!L({width:-1,height:800}).compact));
+// The opt-in never overwrites persistent source lyrics font and never decreases normal values.
+test('standard immersive font unchanged',()=>assert.equal(font(100,true,'standard'),100));
+test('clear immersive text enlarged',()=>assert.equal(font(100,true,'clear'),110));
+test('large immersive text enlarged',()=>assert.equal(font(100,true,'large'),120));
+test('fractional user font setting handled',()=>assert.equal(font(105.5,true,'clear'),116.05));
+test('font cap protects tiny canvas',()=>assert.equal(font(240,true,'large'),240));
+test('max clamp for absurd font',()=>assert.equal(font(500,true,'clear'),240));
+test('min cap in kiosk mode',()=>assert.equal(font(10,true,'clear'),44));
+test('disabled kiosk preserves manual setting',()=>assert.equal(font(310,false,'large'),310));
+test('non-finite font value falls back',()=>{for(const v of [NaN,Infinity,-Infinity])assert.equal(font(v,true,'large'),100)});
+test('font scaling never decreases valid kiosk font',()=>{for(let i=40;i<=240;i++)assert(font(i,true,'large')>=i)});
+test('font scaling monotone in settings',()=>{for(let i=40;i<=240;i++){assert(font(i,true,'standard')<=font(i,true,'clear'));assert(font(i,true,'clear')<=font(i,true,'large'));}});
+// UI integration, accessibility, and touch ergonomics.
+test('V648 persisted state has independent key',()=>has(kiosk,'sonic-display:v648:readability'));
+test('invalid stored options cannot be trusted',()=>has(kiosk,'isTouchReadabilityV648(v)?v:"clear"'));
+test('touch picker cycles on click',()=>has(kiosk,'nextTouchReadabilityV648(kiosk.readabilityV648)'));
+test('accessible touch picker label',()=>has(kiosk,'aria-label={`Lyrics-Lesbarkeit:'));
+test('touch controls preserved without removal',()=>{for(const x of ['V389 · Kalibrieren','V403 · Produktionsdiagnose','Mehr · Display','Touchmodus','Vollbild'])has(kiosk,x)});
+test('minimum accessible button height in kiosk',()=>has(css,'.touch-v648 .kiosk-toolbar button,'));
+test('focus keyboard shows touch bar',()=>has(kiosk,'onFocusCapture={kiosk.show}'));
+test('wake affordance condition only when hidden',()=>has(kiosk,'kiosk.enabled && !kiosk.visible && !expandedV388'));
+test('wake affordance contains explanatory accessible label',()=>has(kiosk,'aria-label="Touch-Bedienelemente anzeigen"'));
+test('wake button has explicit size 52',()=>has(css,'width:52px;height:52px'));
+test('wake button visibly contrasts stage',()=>has(css,'background:#101820e8'));
+test('navigation does not collapse when settings expanded',()=>has(kiosk,'!expandedV388 && !calibrationOpenV389'));
+test('settings diagnose buttons kept',()=>{for(const x of ['productionOpenV403','productionOpenV395','calibrationOpenV389'])has(kiosk,x)});
+test('no repeated frame-level screen measurement',()=>{lacks(kiosk,'requestAnimationFrame(');has(kiosk,"addEventListener('resize',measure")});
+test('removed viewport listener for cleanup',()=>has(kiosk,"removeEventListener('resize',measure)"));
+test('settings local storage errors caught',()=>has(kiosk,'localStorage.setItem(READABILITY_KEY_V648,readabilityV648)'));
+test('root classes conditional on enabled mode',()=>has(screen,'const touchClassV648=kiosk.enabled?'));
+test('root has responsive compact class',()=>has(screen,'touch-v648-compact'));
+test('root has portrait class',()=>has(screen,'touch-v648-portrait'));
+test('root readability class uses current preference',()=>has(screen,'touch-v648-${kiosk.readabilityV648}'));
+test('root passes kiosk reading setting to stage',()=>has(screen,'kioskReadabilityV648={kiosk.enabled?kiosk.readabilityV648:undefined}'));
+test('immersive font policy is passed only in rendering',()=>has(stage,'fontScale: resolveImmersiveLyricFontV648('));
+test('user font size remains source-of-truth',()=>has(stage,'preferences.lyricsFontSize ?? 100'));
+test('protected stage manual cameras remain present',()=>has(stage,'cameraNarrativeV605='));
+test('non-kiosk original music UI remains',()=>{has(screen,'<KineticLyrics lyrics={lyrics}');has(screen,'kiosk.enabled ? displayView !== "stage"')});
+test('extra controls are hidden until expanded',()=>has(kiosk,'hidden={!expandedV388}'));
+test('touch toolbar clips scroll instead of overflowing',()=>has(css,'overscroll-behavior:contain;scrollbar-width:thin'));
+test('high contrast keyboard focus ring',()=>has(css,'outline:3px solid #c1ff72'));
+test('safe-area insets for portrait navigation',()=>has(css,'var(--v648-safe-bottom)'));
+test('CSS gated on V648 specific kiosk mode',()=>has(css,'.touch-v648{'));
+test('distinct responsive 10-inch CSS class',()=>has(css,'.touch-v648-compact .layout'));
+test('portrait adaptation does not create second stage',()=>has(css,'.touch-v648.touch-v648-portrait .layout'));
+test('no new GLB assets',()=>lacks(get('components/touchDisplayPolicyV648.ts'),'new GLTFLoader'));
+test('reduced motion remains respected',()=>has(css,'@media (prefers-reduced-motion:reduce)'));
+test('CSS honors forced wrap without offscreen lyrics',()=>has(css,'overflow-wrap:anywhere'));
+test('active lyrics explicitly brighter than inactive',()=>has(css,'.layout>.lyrics .lyric.active{color:#fff'));
+test('existing manual lyrics font scale contributes to touch text',()=>has(css,'var(--studio-font-scale,1)'));
+test('V646 timeline moved away from Stage-mode album corner',()=>has(css,'[data-v646-timeline]{left:auto!important;right:'));
+test('V646 timeline has minimum touch-height toggle',()=>has(css,'[data-v646-timeline]>button{min-height:48px'));
+test('V646 expanded timeline constrained on small displays',()=>has(css,'#sonic-concert-timeline-v646{max-height:48dvh!important'));
+test('compact text prevents active line being shifted out of view',()=>has(css,'.touch-v648-compact .layout>.lyrics .lyric.active{transform:none!important}'));
+test('no hard-coded data loss/clear from UI',()=>lacks(kiosk,'localStorage.clear('));
+test('version and entrypoints updated',()=>{assert(/^0\.1\.0-v\d+$/.test(pkg.version) && Number(pkg.version.split('-v')[1])>=648);for(const t of ['test:v648','test:v648:types','test:smoke:v648','verify:v648'])assert(pkg.scripts[t]);});
+test('navigation never silently disables manual lyrics',()=>lacks(kiosk,'setLyricsVisible('));
+test('no locale service request',()=>{const s=get('components/touchDisplayPolicyV648.ts');for(const x of ['fetch(', 'XMLHttpRequest','navigator.geolocation','Math.random(', 'Date.now('])lacks(s,x)});
+// Deterministic responsive output over a dense sample of scaled 10-inch layouts.
+test('12,000 synthetic window states finite and deterministic',()=>{
+ for(let i=0;i<12000;i++){
+   const width=320+(i%1400),height=480+((i*19)%700),enabled=i%7!==0;
+   const view=['stage','split','lyrics'][i%3],readability=order[i%3];
+   const input={enabled,width,height,view,readability};const out=layout(input);
+   assert.deepEqual(out,layout({...input}));assert(typeof out.compact==='boolean');
+   assert(typeof out.portrait==='boolean');assert(!(out.compact&&out.portrait));
+   assert(out.readability===readability||out.readability==='standard');
+   const f=font(90+(i%130),enabled,readability);assert(Number.isFinite(f)&&f>0);
+   positions++;
+ }
+});
+console.log(`PASS V648: ${groups} regression groups; ${positions} simulated viewport states; touch readability, compact/portrait, safe-area and GLB lyric protection.`);

@@ -68,15 +68,15 @@ assert.strictEqual(measure(pose,all,NaN),null);
 assert.strictEqual(measure(pose,all.map(a=>({...a,visible:false})),16/9),null);
 const src=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');
 assert(src.indexOf('composeCinematicConcertCameraV550(')<src.indexOf('composeCinematicDuetInteractionV585(concertFramedV550,sceneV528'));
-assert(src.indexOf('composeCinematicDuetInteractionV585(concertFramedV550,sceneV528')<src.indexOf('guardAutomaticCameraV351(genreFramedV610,composition)'));
+assert(src.indexOf('composeCinematicDuetInteractionV585(concertFramedV550,sceneV528')<src.indexOf('guardAutomaticCameraV351(composedV620,composition)'));
 for(const token of ['composeConcertCameraV540(sceneFramedV528,sceneV528',
  'composeCinematicConcertCameraV550(concertFramedV540,sceneV528',
- 'guardAutomaticCameraV351(genreFramedV610,composition)',
+ 'guardAutomaticCameraV351(composedV620,composition)',
  'authored:authoredCameraV528','aspect:camera.aspect','duetAnchorSampleV377.current.anchors',
  'faceY:faceSampleV369.current.value', "sceneV528?.focus==='handoff'?"])
  assert(src.includes(token),'missing camera wiring '+token);
 assert(src.indexOf('composeConcertCameraV540(')<src.indexOf('composeCinematicConcertCameraV550('));
-assert(src.indexOf('composeCinematicConcertCameraV550(')<src.indexOf('guardAutomaticCameraV351(genreFramedV610'));
+assert(src.indexOf('composeCinematicConcertCameraV550(')<src.indexOf('guardAutomaticCameraV351(composedV620'));
 const moduleSource=fs.readFileSync('components/visualizer/cinematicConcertCameraV550.ts','utf8');
 for(const illegal of ['window.', 'document.', 'Math.random(', 'requestAnimationFrame(', 'setInterval(', 'setTimeout(', 'new Audio('])assert(!moduleSource.includes(illegal));
 const pkg=require('../package.json');assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]||0)>=550);

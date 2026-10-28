@@ -70,13 +70,13 @@ test('too-short word does not permit timing enhancement',()=>{const w=[{...words
 test('long word does not permit timing enhancement',()=>{const w=[{...words[0],endMs:1600},{...words[1],startMs:1610,endMs:1840},...words.slice(2).map((x,i)=>({...x,startMs:x.startMs+500,endMs:x.endMs+500}))];const a={...lyrics,lines:[{...lyrics.lines[0],endMs:3300,words:w}]};assert.equal(sample({lyrics:a,effectiveTimeMs:1100}).active,false);});
 const rig=source('components/visualizer/VocalRigV368.tsx');
 test('GLB pipeline samples cadence after previous V546 refinement',()=>assert.ok(rig.indexOf('const mouthDynamicsV572=')>rig.indexOf('const lipV546=')));
-test('GLB pipeline applies pace to exponential smoothing',()=>assert.match(rig,/Math\.exp\(-cadenceSpeedV572\*expressiveVocalRateV612\(expressiveVocalV612,c,attackingV581\)\*delta\)/));
+test('GLB pipeline preserves V572/V612/V617 rates and appends only bounded V631 mouth continuity',()=>{assert.match(rig,/Math\.exp\(-cadenceSpeedV572\*expressiveVocalRateV612\(expressiveVocalV612,c,attackingV581\)\*vocalFacialRateV617\(facialRealismV617,c,attackingV581\)\*\s*vocalMouthRateV631\(mouthContinuityV631,c,attackingV581,current\.current\[c\],finalMouthTargetV644\)\*delta\)/);});
 test('GLB overlays mouth only, not torso movement',()=>assert.doesNotMatch(source('components/visualizer/rapMouthDynamicsV572.ts'),/Bone|Object3D|AnimationMixer|requestAnimationFrame|setInterval|fetch\(/));
 test('low Pi tier suppresses extra cadence',()=>assert.match(rig,/getActivePerformanceTier\(\)===\'low\'\?null:planRapMouthDynamicsV572/));
 test('live-song manual preview stays separately protected',()=>assert.match(rig,/demoV370!=="off"\|\|!!previewPoseV370\|\|!!previewTargetV383/));
 test('existing morph overlay cleanup retained',()=>assert.match(rig,/target\.delta=0/));
 test('project version is at least V572',()=>assert.ok(Number(require('../package.json').version.match(/-v(\d+)$/)?.[1])>=572));
-test('fast prebuild points to latest smoke tests',()=>assert.match(require('../package.json').scripts.prebuild,/^npm run test:smoke:v\d+$/));
+test('prebuild points to latest verified chain through the preflight',()=>{const scripts=require('../package.json').scripts;assert.equal(scripts.prebuild,'npm run build:preflight');assert(scripts['build:preflight'].includes('npm run verify:v646'));});
 test('full release regression retained',()=>assert.match(require('../package.json').scripts['verify:v572'],/verify:v571/));
 let frames=0;for(let i=0;i<16000;i++){
  const time=930+(i*37)%3300;

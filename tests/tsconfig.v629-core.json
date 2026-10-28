@@ -1,0 +1,13 @@
+{
+ "extends":"./tsconfig.v628-core.json",
+ "compilerOptions":{"incremental":false},
+ "files":[
+  "../components/visualizer/intelligentSongDramaturgyV629.ts",
+  "../components/visualizer/concertExperienceV628.ts",
+  "../components/visualizer/ultimateConcertDramaturgyV623.ts",
+  "../components/visualizer/fullSongConcertDramaturgyV604.ts",
+  "v414-music-types.d.ts",
+  "stubs/v415-three-types.d.ts",
+  "stubs/v508-three-types.d.ts"
+ ]
+}

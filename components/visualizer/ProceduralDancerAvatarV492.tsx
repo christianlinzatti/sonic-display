@@ -26,6 +26,9 @@ import {refineDeutschrapFaceV538} from "./deutschrapVocalPerformanceV538";
 import {refineAdvancedRapArticulationV546} from "./advancedDeutschrapArticulationV546";
 import {refineDeutschrapLipFlowV597,rapLipFlowRateV597} from "./advancedDeutschrapLipFlowV597";
 import {refineExpressiveVocalFaceV612,expressiveVocalRateV612} from "./expressiveVocalFaceV612";
+import {refineVocalFacialRealismV617,vocalFacialRateV617} from "./advancedVocalFacialRealismV617";
+import {planAdvancedVocalLipSyncV631,vocalMouthRateV631} from "./advancedVocalLipSyncV631";
+import {multiArtistMouthTargetV632} from "./multiArtistVocalDirectorV632";
 import {coordinateRapFaceV526,coordinateRapDanceV526} from "./unifiedConcertPerformanceV526";
 import {sampleWordConcertV567,coordinateWordFaceV567,coordinateWordDanceV567} from "./wordSyncedConcertV567";
 import {planIntelligentConcertPerformanceV503,composeConcertStageV503,composeConcertFaceV503} from "./intelligentConcertPerformanceV503";
@@ -321,6 +324,8 @@ export function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genre
     const lipV546=refineAdvancedRapArticulationV546(lipV538.frame,optionsV538);
     const lipV597=refineDeutschrapLipFlowV597(lipV546.frame,optionsV538,getActivePerformanceTier());
     const expressiveVocalV612=refineExpressiveVocalFaceV612(lipV597.frame,optionsV538,getActivePerformanceTier());
+    const facialRealismV617=refineVocalFacialRealismV617(expressiveVocalV612.frame,optionsV538,getActivePerformanceTier());
+    const mouthContinuityV631=planAdvancedVocalLipSyncV631(facialRealismV617.frame,optionsV538,getActivePerformanceTier());
     const rapBodyV453=addAdvancedVocalHeadV459(addExpressiveHeadV453(rapBodyV510,lipV453),unifiedLipV526.activeV523?{...lipV510,headPitchExtra:unifiedLipV526.headPitchExtra,headYawExtra:unifiedLipV526.headYawExtra}:lipV510);
     if (mouth.current) {
       const mouthFaceV499=lipV510.face;
@@ -328,15 +333,28 @@ export function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genre
       const mouthFaceV546=lipV546.active?lipV546.frame.face:mouthFaceV538;
       const mouthFaceV597=lipV597.active?lipV597.frame.face:mouthFaceV546;
       const mouthFaceV612=expressiveVocalV612.active?expressiveVocalV612.frame.face:mouthFaceV597;
+      const mouthFaceV617=facialRealismV617.active?facialRealismV617.frame.face:mouthFaceV612;
+      const vocalSceneCandidateV632=lipSync?.multiArtistVocalRefV632?.current;
+      const vocalSceneV632=vocalSceneCandidateV632?.trackId===track?.id?vocalSceneCandidateV632:null;
+      const protectMouthV632=avatarMotionMode==='choreography'||
+        !!lipSync?.rapSyllableEditsEnabledV420&&!!lipSync?.rapSyllableDocumentV420?.edits?.length||
+        !!lipSync?.rapAudioEnabledV423&&!!lipSync?.rapAudioDocumentV423&&
+          lipSync.rapAudioTrackIdV423===lipSync.rapAudioDocumentV423.trackId;
+      const directedMouthV632={...mouthFaceV612,
+        jaw:multiArtistMouthTargetV632(vocalSceneV632,workloadSlot,'jaw',mouthFaceV612.jaw,protectMouthV632),
+        wide:multiArtistMouthTargetV632(vocalSceneV632,workloadSlot,'wide',mouthFaceV612.wide,protectMouthV632),
+        round:multiArtistMouthTargetV632(vocalSceneV632,workloadSlot,'round',mouthFaceV612.round,protectMouthV632)};
       const face=composeRapFaceV406(synchronizedV372.face,synchronizedV372,{
         playing:isPlaying,reducedMotion,
         enabled:lipSync?.enabled!==false&&lipSync?.coordinationEnabledV372!==false,
         energy:audio.mids,strength:lipSync?.expression,slot:workloadSlot,
       });
-      mouth.current.scale.y += ((.32 + mouthFaceV612.jaw * 1.9 - mouthFaceV612.lipsClosed*.16) - mouth.current.scale.y) * Math.min(1,delta*(lipV459.rapid?27:18)*rapLipFlowRateV597(lipV597,'jaw',true)*expressiveVocalRateV612(expressiveVocalV612,'jaw',true));
-      mouth.current.scale.x += ((1 + mouthFaceV612.wide*.34 - mouthFaceV612.round*.50 - mouthFaceV612.lipsClosed*.25) - mouth.current.scale.x) * Math.min(1,delta*(lipV459.rapid?22:14)*rapLipFlowRateV597(lipV597,'wide',true)*expressiveVocalRateV612(expressiveVocalV612,'wide',true));
+      mouth.current.scale.y += ((.32 + directedMouthV632.jaw * 1.9 - mouthFaceV612.lipsClosed*.16) - mouth.current.scale.y) * Math.min(1,delta*(lipV459.rapid?27:18)*rapLipFlowRateV597(lipV597,'jaw',true)*expressiveVocalRateV612(expressiveVocalV612,'jaw',true)*vocalFacialRateV617(facialRealismV617,'jaw',true)*
+        vocalMouthRateV631(mouthContinuityV631,'jaw',directedMouthV632.jaw>(mouth.current.scale.y-.32)/1.9,Math.max(0,Math.min(1,(mouth.current.scale.y-.32)/1.9)),directedMouthV632.jaw));
+      mouth.current.scale.x += ((1 + directedMouthV632.wide*.34 - directedMouthV632.round*.50 - mouthFaceV612.lipsClosed*.25) - mouth.current.scale.x) * Math.min(1,delta*(lipV459.rapid?22:14)*rapLipFlowRateV597(lipV597,'wide',true)*expressiveVocalRateV612(expressiveVocalV612,'wide',true)*vocalFacialRateV617(facialRealismV617,'wide',true)*
+        vocalMouthRateV631(mouthContinuityV631,'wide',directedMouthV632.wide>(mouth.current.scale.x-1)/.34,Math.max(0,Math.min(1,(mouth.current.scale.x-1)/.34)),directedMouthV632.wide));
       if (eyes.current) { eyes.current.scale.y += ((1-face.blink*.88-mouthFaceV499.squint*.30)-eyes.current.scale.y)*Math.min(1,delta*30); eyes.current.rotation.y += (rapBodyV503.eyeYaw-eyes.current.rotation.y)*Math.min(1,delta*12); }
-      if (browsV406.current) browsV406.current.position.y += ((.78 + Math.max(face.brow,mouthFaceV612.brow)*.10)-browsV406.current.position.y)*Math.min(1,delta*16);
+      if (browsV406.current) browsV406.current.position.y += ((.78 + Math.max(face.brow,mouthFaceV612.brow,mouthFaceV617.brow)*.10)-browsV406.current.position.y)*Math.min(1,delta*16);
     }
     // Matching bounded vocal gestures for the procedural fallback avatar.
     const variationV474=resolveNaturalRapGestureV474(enhanceRapAccentV473(resolveVocalDanceAccentV472({lyrics:lipSync?.lyrics,progressMs:lipSync?.progressMs,

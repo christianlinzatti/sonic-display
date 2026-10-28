@@ -1,0 +1,5 @@
+{
+  "extends":"./tsconfig.v634-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../components/visualizer/dynamicConcertStagesV635.ts", "../components/visualizer/dynamicStageTransformationV622.ts"]
+}

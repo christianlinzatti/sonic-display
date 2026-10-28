@@ -1,3 +1,103 @@
+## V651 – Smart Preset Automation (28.10.2026)
+
+`components/smartPresetAutomationV651.ts` ordnet ausschließlich sicher erkannte, gemeldete Track-/Künstler-Genres V650-Werksprofilen zu (0–100 heuristische Vertrauensskala, Track ≥80 / Künstler ≥88). Unklare, unbekannte und manuell korrigierte Genres werden nicht automatisch angewendet. `components/useSmartPresetAutomationV651.ts` bleibt in `components/TouchKioskControls.tsx` auch bei geschlossener Steuerzentrale montiert. Betriebsarten Off (Standard), Vorschlag und Auto werden in einem separaten lokalen Storage-Key gehalten. Auto wartet 900 ms auf stabile Angaben und funktioniert nur zu Beginn eines neuen, gerade abgespielten Songs (≤12 s); das erstmalige Einschalten darf den aktuellen Song nicht ändern. Manuelle Änderungen sperren automatische Änderungen für diesen Titel; pro Titel höchstens eine Anwendung. Sicherheitsfreigabe über V650-Validator und V649-Allowlist. Rückgängig stellt nur betroffene Settings und V648-Anzeigewerte für denselben Track wieder her. Weder Spotify-Daten/-Playback noch Sänger-/Kamera-/Show-Timelines, Viseme, Audio, WebGL-Schleifen oder GLB-Dateien werden modifiziert. Genre-Score ist keine wissenschaftlich kalibrierte Wahrscheinlichkeit. Tests: `tests/v651-smart-preset-automation-regression.cjs`, `tests/tsconfig.v651-core.json`; Doku `V651-SMART-PRESET-AUTOMATION.md`, `V651-VERIFICATION.md`.
+
+## V650 – Smart Concert Presets (28.10.2026)
+
+`components/concertPresetsV650.ts` erlaubt ausschließlich eine strikte, versionierte Teilmenge der V649-Steuerfelder für lokale Presets. Sechs vordefinierte Genres/Touchprofile, maximal zwölf eigene Profile, validierter JSON-Import/Export ohne Überschreiben vorhandener IDs/Namen. `components/ConcertPresetManagerV650.tsx` liest und schreibt allein die eigene lokale Profilliste, nicht die `UiPreferences`. Im vorhandenen Touch-Control-Center `components/ConcertControlCenterV649.tsx` werden Presets atomar auf vorhandene UI-Preferences plus V648-Ansicht/Lesbarkeit und optional vorhandenes V388-Displayprofil angewandt und selektiv rückgängig gemacht. Auth, V496-Sängerzeiten, V644-Viseme und manuelle Show-/Kamera-Timelines werden nicht serialisiert. Keine neuen GPU-Objekte/Renderloops. Tests `tests/v650-smart-concert-presets-regression.cjs`, `tests/tsconfig.v650-core.json`. Doku `V650-SMART-CONCERT-PRESETS.md`; Nachweis `V650-VERIFICATION.md`.
+
+## V647 – Cinematic Stage Environments 2.0 (27.10.2026)
+
+`components/visualizer/cinematicStageEnvironmentsV647.ts` ergänzt die in V635 vorhandene, **eine** LED-Rückwand mit sechs shaderbasierten Architekturmotiven (Deutschrap-Industriehallen-Pfeiler, Hardstyle-Festivaltraverse, Hardtekk-Tunnel, Rock-Verstärkerwand, Pop-Prismen, Electronic-Neon-Gewölbe). Die neue pure Regie folgt ausschließlich `verified-v600`-Akt, bestehendem V622-Transform und V635-Fade sowie demselben Spotify-Zeitsignal. In `components/visualizer/DynamicStage.tsx` ersetzt sie nur den bestehenden Plane-Fragment-Shader und belegt fünf neue Uniforms; es entstehen keine neuen Meshes, Draw Calls, Stage-GLBs, Lichter, WebGL-Schleifen oder Texturen. Nutzer-Theme, Songposition, manuelle Lichtprogramme, Blackouts, Lyrics-/Vocal-Zonen, Reduced Motion, Low-Tier und V640-Grafikbudget behalten Vorrang. Zusätzliche Architekturmuster liegen überwiegend am Bildrand. Keine behauptete reale 3D-Geometrie oder optische Leistungsverbesserung; Browser-/GLB-Benchmark bleibt offen. `npm run test:v647`, `npm run test:v647:types`, `npm run verify:v647`. Dokumentation `V647-CINEMATIC-STAGE-ENVIRONMENTS-2.md` und `V647-VERIFICATION.md`.
+
+## V646: Read-only Intelligent Concert Timeline
+
+`components/visualizer/intelligentConcertTimelineV646.ts` validates the **same track/duration/act boundaries** for V600 `ConcertArc` and V604 `NarrativePlan` (no fabricated sections), and adds only opt-in V354 manual clips and V496/V547 *explicitly authored* vocal slots. `components/visualizer/ConcertTimelineOverlayV646.tsx` is a collapsed HTML overlay inside `components/visualizer/VisualizerStage.tsx`, relying on the **existing** Spotify progress, arc and V354 event; no R3F callback, new clock, audio interception, storage mutation or auto camera/light commands. All camera/formation/light labels are planning, not physically recorded changes. Read-only local JSON export. Docs: `V646-INTELLIGENT-CONCERT-TIMELINE.md`; tests: `tests/v646-intelligent-concert-timeline-regression.cjs`, `tests/tsconfig.v646-core.json`. Browser/GLB validation and Next.js build remain open.
+
+## V641: Opt-in Vollsong-QA
+
+`fullConcertQualityAuditV641.ts` wertet ausschließlich gemessene V466-Snapshots und vorhandene V604/V478/V568-Bühnenmetadaten aus. Der opt-in Rekorder `FullConcertQualityAuditV641.tsx` hängt im bestehenden QA-Panel und liest `data-v641-*` des Stage-Wrappers. Keine Motion-/Lyrics-/Stage-/GPU-Steuerung durch den Auditor; keine automatische Qualitätsfreigabe.
+
+> **V639 – Intelligent Motion Library (27.10.2026):** `components/visualizer/intelligentMotionLibraryV639.ts` ergänzt nach V536/V588/V615 die vorhandene automatische GLB-Auswahl im bestehenden `components/visualizer/useGenreAwareMotionDirectorV536.ts`. Eine pro Song und Avatar geführte, auf acht Einträge begrenzte Historie, frequenzabhängige Nutzungsgewichte und kleine Metadatenhinweise fördern Vielfalt ausschließlich innerhalb der bereits genre-/abschnittskompatiblen Kandidaten. V639 bezieht sich nur auf geladene Clips, mit mindestens 10 s Cooldown, Pending-Auswahl ohne fortlaufendes Neuranking und Reset bei Song, Modell, Pause, Seek, Reduced Motion oder manueller Regie. Es gibt weder Clip-Downloads noch einen Mixer-/Renderloop, keine Vocal-Raterei oder GLB-Änderung. V492 bleibt Transition- und Fußkontakt-Eigentümer. Tests `npm run test:v639`, `npm run test:smoke:v639`, `npm run verify:v639`; docs `V639-INTELLIGENT-MOTION-LIBRARY.md`, `V639-VERIFICATION.md`. Browser/GLB und vollständiger Next.js-Build weiterhin gesondert erforderlich.
+
+> **V638 – Advanced Ensemble Choreography (27.10.2026):** `components/visualizer/advancedEnsembleChoreographyV638.ts` adds deterministic role-aware, staggered gestures and V494-contact-gated shallow Z formation arcs to the **already-authorised** V517/V495 automatic 3/4-person group. In the existing `components/visualizer/GroupDancersV326SceneV492.tsx` frame loop, V638 is applied after V548, before the existing collision attenuation and before the existing root interpolation. Two-performer authored vocal duets use the same gesture planning in `components/visualizer/DanceFormationActorsV492.tsx`, but **never** receive V638 root travel. V517/V496 manually verified cast roles are respected; no visual lead is promoted to singer, and no speaker diarization is added. Existing imported GLB clips, V494 foot IK, V506/V508 risk and fixed X-lanes remain authoritative. All source gates (track/clock, manual, pause, reduced motion, low tier) fail closed. No new renderloop or GPU assets. Checks: `npm run test:v638`, `npm run test:smoke:v638`, `npm run verify:v638`; docs: `V638-ADVANCED-ENSEMBLE-CHOREOGRAPHY.md` / `V638-VERIFICATION.md`. Real GLB visual quality and the full Next.js production build still need local verification.
+
+> **V637:** Genre Performance Intelligence (`genrePerformanceIntelligenceV637.ts`) komponiert nach V610/V624/V625 auf den bestehenden 4 automatischen Consumers; kein neuer Renderer, keine erfundene Vocal-/Instrument-/Drop-Erkennung, manuelle und Lyrics-Grenzen bleiben bestehen.
+
+## V635: Dynamic Concert Stages – verifizierte LED-Bühnenmotive
+
+`dynamicConcertStagesV635.ts` prüft die gleiche `verified-v600`-V604-Aktidentität wie V622 inklusive `trackId`, Dauer, Position, Abschnitt, Kapitel, Wiederholungsindex und Playback. Ein einzelnes rückwärtiges LED-Plane-Mesh in `DynamicStage.tsx` zeigt drei zurückhaltende Muster (Streifen, Grid, Diagonalen) sowie ein radiales Drop-Motiv, ohne Bilddateien, Partikel, neue Lichtquellen oder Renderloops. Der Shader ändert nur vorbereitete Uniforms in der bestehenden `useFrame`-Schleife; im Low-Tier, bei pausierter Wiedergabe, manuell authorisierten Licht-Cues, Blackout und Reduced Motion bleibt das Mesh verborgen. Motivwechsel werden an bestätigten Abschnittsgrenzen nach null überblendet. Bei dichter Lyrics-Anzeige und vier Avataren sind die LED-Werte geringer. Die bestehende V622-Boden-/Hintergrundfärbung erhält kleine Zusatzwerte und die **von V308 selbst erzeugte** Nebelschicht eine begrenzte Abschwächung. Keine neuen Künstler-, Song- oder Drop-Erkennungen, keine automatischen Bühnenwechsel. `V635-DYNAMIC-CONCERT-STAGES.md`, `V635-VERIFICATION.md`, `npm run verify:v635`. Sichtbarkeit/Ästhetik und Next.js-Produktionsbuild lokal prüfen.
+
+## V634: Beautiful Lyrics 2.0 – ruhige und überprüfbare Wortbetonung
+
+`components/visualizer/beautifulLyricsV634.ts` komponiert die bereits vorhandenen V477/V541/V549/V578/V598/V606/V619-Lyrics-Leitplanken. `components/KineticLyrics.tsx` verwendet sie im normalen und immersiven DOM-Lyrics-Renderer; `components/visualizer/Lyrics3DScene.tsx` in der bestehenden Troika-Textbühne. Die Ausgabebreite wird **nur verengt**, eine bereits gesetzte Backdrop-Deckkraft nie reduziert, lange Rap-Zeilen erhalten mehr Zeilenabstand. Der zusätzliche Glühakzent entsteht **nur aus vollständig geprüften Wortzeitstempeln**, beginnt nie vor dem aktuellen Wort und endet rechtzeitig; besonders schnelle Wortabfolgen bekommen schwächere, kürzere Übergänge. Manuelle Fonts/Positionen, Synchronisation, Karaoke-Füllung, V528-Cast-Rollen, V351-Kamera-/Lyric-Schutzzonen und Reduced Motion bleiben maßgeblich. Keine zusätzlichen GLB-Meshes, Canvas, Animationstimer, Audioanalyse oder neue Show-Cues. Prüfungen: `tests/v634-beautiful-lyrics-2-regression.cjs`, `tests/tsconfig.v634-core.json`, `npm run verify:v634`. Die echte Lesbarkeit auf dem geplanten 10-Zoll-Display bedarf weiterhin einer Browser- und Geräteprüfung.
+
+## V633: Cinematic Camera 2.0 (verified stage and singer cinematography)
+
+`cinematicCameraDirectorV633.ts` is a **pure, stateless** planner and conservative camera composition finisher. Inside the existing `StageCameraDirectorV289.tsx` `useFrame`, AFTER V613/V620 and BEFORE the final V351 lyrics safety gate, it uses the same `V528` editorially assigned artist scene, sampled V377 actual stage anchors, and optionally verified V604 full-song act/cue. Active but stale or malformed vocal assignments fail closed; a verified V604 act alone can request only a **wide stage** view, never a guessed vocalist. Portrait, two-shot, handoff and chorus decisions can only originate in V528 explicit singer roles. The handoff aim is blended from the exiting to the entering vocalist within the authenticated cue, with an intentionally slower camera interpolation during the exchange.
+
+All automatic candidate poses are limited in horizontal aim (≤0.34 world units * gain), vertical aim (≤0.25 * gain), field of view (≤0.58 * gain), and distance. `measureConcertFrameV550` checks head and foot bounds for **all visible cast** and the selected singer; `measureScreenFrameV540` checks the safe viewport, including the existing lyric sidebar. A candidate is rejected unless all existing safety measurements are non-worse. Bottom lyrics disable extra horizontal camera movement. Existing V351 automatic-lyrics guard is retained as the **last** camera safety stage. Inactive playback, reduced motion, low tier, manual V299 camera mode, authored V400 camera timeline / V354 cues / presets / live editor / V430 overrides and song-ID mismatches preserve the original camera. No extra R3F camera, frame callback, separate render, external audio or API calls. Tests: `npm run test:v633`, `npm run verify:v633`.
+
+## V632: Multi-Artist Vocal Director (explicit authored roles)
+
+`multiArtistVocalDirectorV632.ts` prüft pro Frame den trackgebundenen V385-/V416-/V496-Sängercue (2–4 Sänger, Playback-Zeit und validierte Singer-Slots). Die bestehende `GroupDancersV326SceneV492` veröffentlicht genau einen gemeinsamen Ref für die vorhandenen GLB- und prozeduralen Gesichtsrenderer. `VocalRigV368` und `ProceduralDancerAvatarV492` wenden nur auf ihre **automatischen** Jaw-/Wide-/Round-Zielwerte eine rollenabhängige Reduktion an: nur der Sänger erhält den Lead-Wert, Duette/Hooks erhalten gemeinsames, schwächeres Backing, explizite Adlibs noch dezenter, nicht zugewiesene Avatare bleiben für die automatische Vocal-Mimik stumm und behalten ihre bestehenden Tanzclips. Hörbasierte Sprecheridentifikation, automatische Adlib-Zuordnung oder Vocal-Stem-Separation gibt es ausdrücklich nicht. V420 Silbenedit, V423 Audiomund, GLB-Authoring, Preview, V384 B/P/M-Lippensiegel und V562 Kalibrierung gewinnen immer; die aktive Lip-Seal-Komponente und alle Nicht-Mund-Kanäle werden nie überschrieben. Die bestehenden Kamerapläne lesen weiterhin denselben V385/V416/V496-Cue; keine neue Kamera-, GPU-, Drei.js- oder Render-Schleife.
+
+## V631: Timed-word natural vocal continuity
+
+`components/visualizer/advancedVocalLipSyncV631.ts` ist ein stateless, pure Frame-Policy-Modul über **bereits vorhandenen** V538/V546/V597/V612/V617-Gesichtszielwerten. Es prüft V415-Sync-Wortzeiten, passende Gesangsrolle, Genre Rap, authentische Manual-/Audio-/Preview-Prioritäten, Tier und den aktuellen geschlossenen Mund. Nur bestätigte eng verbundene Wörter erhalten schwache, begrenzte bestehende Jaw-/Wide-/Round-Antwortgeschwindigkeiten; große Morph-Differenzen unmittelbar an belegten Wortgrenzen werden etwas geglättet. Es werden **keine** neuen Viseme, Phoneme, Silbenzeiten, Morphwerte, Sängererkennungen, Song-Clocks oder Render-Loops erzeugt. In `components/visualizer/VocalRigV368.tsx` wird der V631-Multiplikator als letzte Korrektur der bereits bestehenden exponentiellen Morph-Antwort angewendet, bei `components/visualizer/ProceduralDancerAvatarV492.tsx` entsprechend an den vorhandenen Mundmesh-Skalen. Die V384-Lippenkontaktbegrenzung und V562-Kalibrierung bleiben hinter dem Multiplikator erhalten. Tests: `tests/v631-advanced-vocal-lip-sync-regression.cjs`, `tests/tsconfig.v631-core.json`; Doku: `V631-ADVANCED-VOCAL-LIP-SYNC.md`, `V631-VERIFICATION.md`. Tatsächliche Lippen-Audio-Synchronität nur durch realen Browser-/GLB-Test prüfbar.
+
+## V630: Natural Dance Performance – konservatives Keyframe-basiertes Übergangsblending
+
+`components/visualizer/naturalDancePerformanceV630.ts` liest **nur bei einem bestehenden GLB-Clipwechsel** die bereits geladenen Keyframe-Kurven für Hüfte, Oberschenkel, Unterschenkel und Füße. Quaternion- und Positionssamples am von V537/V492 ausgewählten Ein-/Austritt bilden ein begrenztes Pose-Mismatch-Signal; unvollständige oder ungültige Rigtracks sind Nulloperationen. Der Planner darf eine von V565/V614 genehmigte automatische Überblenddauer **nur verlängern**, nie verkürzen, Clip-Zeitpunkte ändern oder IK-Fußkontakte überschreiben. Eingriff erfordert beidseitige Beinevidenz, mindestens vier passende Tracks, laufende Wiedergabe, ausreichende Qualität und keine manuelle Priorität. Foot-Plant (V135/V494), schnelle Wechsel und BPM begrenzen den möglichen Zusatz; die Gesamtdauer bleibt musikalisch und durch die kürzere echte Clipdauer limitiert. `components/visualizer/useGltfClipTransitionsV492.ts` verwendet den Planner nach V614 und vor dem bestehenden `AnimationAction.fadeIn()/fadeOut()`; `components/visualizer/GltfDancerAvatarV492.tsx` und V530/V536 bestimmen weiterhin, **welche** Clips gespielt werden. Die V536-Auswahl berücksichtigt bereits die letzten Clips zur Wiederholungsvermeidung, V630 ersetzt sie nicht. Kein weiterer `useFrame`, Scheduler, Mixer, GLB-Asset oder GPU-Objekt. Nicht als sichtgeprüfte Tanzqualität auszugeben; die Wirkung hängt von realen GLB-Kurven und Fuß-IK ab. Tests: `tests/v630-natural-dance-performance-regression.cjs`, `tests/tsconfig.v630-core.json`; Details `V630-NATURAL-DANCE-PERFORMANCE.md`, Prüfung `V630-VERIFICATION.md`.
+
+## V629: Evidence-bound complete-song story on the single V623 lane
+
+`components/visualizer/intelligentSongDramaturgyV629.ts` compiles all confirmed V604 acts **once per V604 plan with `useMemo`**. Its verified hook counts, breaks, recovery moments and finale condition are deterministic and derive no new events. Each frame `VisualizerStage.tsx` checks the current V604 cue, current section, V628 result, track/time and manual overrides before composing a tiny, boundary-faded amendment to the existing **single** `concertDramaturgyV623` score. All downstream V619/V620/V621/V623 stage consumers remain unchanged. `data-v629-*` diagnostics only. No new GLB motion, render loops, lighting assets or GPU allocations. Stage/lyric guards and manual overrides remain authoritative.
+
+## V628: Single editorial cue over V623
+
+`components/visualizer/concertExperienceV628.ts` liest den vorhandenen bestätigten V604/V623-Akt (Track-ID, Segment, Quelle, Zeitposition, Kapitel, Motiv, Wiederholungsindex) und komponiert ausschließlich bestehende Auto-Gains. `VisualizerStage.tsx` verteilt den gemeinsamen V628/V629-komponierten V623-Cue an die bereits bestehenden 3D-Bühnen-, Kamera-, Lyrics- und Lichtverbraucher. An wirklichen Segmentgrenzen läuft die Zusatzamplitude gegen null. Inaktive, widersprüchliche oder unsichere Quellen sind Nulloperationen. Keine neuen GPU-Objekte oder Timer. Die V351-Kameraprüfung und V621-Budgets bleiben hinter dem Komponisten bestehen.
+
+## V627 – Automated Concert Quality Inspector (27.10.2026)
+
+`services/monitoring/automatedConcertQualityInspectorV627.ts` fasst die **tatsächlich gemessenen** V518/V522-Browser-Benchmarkdurchläufe (drei vergleichbare Durchläufe je bestehender V522-Szene), ausdrücklich **manuell** bestätigte V543-Sichtprüfpunkte und optional einen importierten **echten** V593-Screenshot-Hinweisbericht zusammen. Die Einbindung in `components/visualizer/PiConcertBenchmarkStudioV522.tsx` zeigt eine nach Schweregrad sortierte Maßnahmenliste mit getrennten Quellenlabels und bietet JSON-Export. V593-Dateien werden lokal auf Format, Herkunftsmetadaten, Größen und nachvollziehbare Screenshot-Belege geprüft, **nicht kryptografisch authentifiziert**. Ohne Bildimport erscheinen keine angeblich erkannten Kamera-/Lyrics-Probleme; ohne Bedienerbestätigung erscheinen keine automatisch bestandenen Lippen-/Tanztests. Die vorhandene V553-Freigabe bleibt unabhängig. Drei definierte V522-Szenen (Langzeittest maximal 3 Minuten) sind **keine lückenlose Ganzsong-Inspektion**. Keine Änderungen an Avataren, Spotify, Kamera, Lyrics, Renderloop, Qualitätseinstellungen oder Bühnenregie. Tests: `tests/v627-automated-concert-quality-inspector-regression.cjs` und `tests/tsconfig.v627-core.json`; Details in `V627-AUTOMATED-CONCERT-QUALITY-INSPECTOR.md` und `V627-VERIFICATION.md`. Echt-GLB-Ansicht und kompletter Next.js-Build müssen weiterhin auf dem Windows-PC geprüft werden.
+
+## V621 – Advanced Stage Lighting Director (27.10.2026)
+
+`components/visualizer/advancedStageLightingV621.ts` koordiniert die **bereits vorhandenen** V462/V542/V551/V608-Lichtquellen in `DynamicStage.tsx` und `ConcertAtmosphereRendererV308.tsx` und die vorhandenen V555/V601-LED-/Gobo-/Bodennebel-Projektionen in `ConcertDetailStageV555.tsx`. Es werden keine neuen Spotlights, Shader, Geometrien, Materialinstanzen, Audioquellen, WebGL-Renderloops oder Timer erzeugt. Die automatische Regie folgt **ausschließlich** einer zum aktuellen Playback passenden, im V604/V600 bestätigten Songphase und vorhandenen Energie-/Kick-Werten; die Synchronisierung ist seek-stabil und auf maximal vier Performer begrenzt. Verse betonen Lesbarkeit/Gesichter, bestätigte Hooks LED und Gruppenlicht, Builds steigen langsam an und Drops reagieren nur bei tatsächlich gemessenen Kick-Akzenten. Wiederholte Hooks erhalten andere LED-/Spotlight-Schwerpunkte. Bei Lyrics werden Beams, Gobos, LED-Ablenkung, Bodennebel und Schwenks reduziert. Die vorhandenen V556/V601/V602-Gesamtbudgets und alle Null-/Manuell-/Blackout-/Reduced-Motion-/Low-Tier-Sperren bleiben bindend. Im Dekorationszweig wird nach der bestehenden Pi-Qualitätsbremse ausschließlich ein bereits zugewiesenes Budget **umverteilt**, nicht erweitert. Tests: `tests/v621-advanced-stage-lighting-regression.cjs`, `tests/tsconfig.v621-core.json`; Dokumentation `V621-ADVANCED-STAGE-LIGHTING-DIRECTOR.md`. Die visuelle GLB-/10-Zoll-Prüfung sowie der komplette Next.js-Produktionsbuild bleiben lokal offen.
+
+## V620 – Intelligent Concert Camera Composition (27.10.2026)
+
+`components/visualizer/intelligentCameraCompositionV620.ts` ergänzt die *bestehende* R3F-Kamera-Regie durch eine begrenzte Kompositionsstufe **nach V613/V610 und vor dem abschließenden V351-Lyrics-Sicherheitsguard**. Nur zum aktuellen Song passende, ausdrücklich bestätigte V528-Vokal-Cues dürfen Porträt-, Duett- oder Ensemblebildausschnitte steuern. Liegt ausschließlich eine vollständig bestätigte V604-Songphase vor, ist allenfalls eine Gruppen-/Bühnenkomposition möglich; einzelne Sänger werden nicht geraten. Die vorhandenen real gemessenen Bühnen-Roots von V377 (maximal vier) werden auf sicheren horizontalen und vertikalen Bildbereich geprüft. Jede mögliche Kamerapose wird mit V550-Head-/Full-Body-Grenzen und V540-Screen-Grenzen gegen das unveränderte Eingangspose verglichen; bei schlechterem Zuschnitt bleibt die Kamera *exakt* unverändert. Bei Lyrics ohne Seitenpanel sind neue Seitenschwenks gesperrt. Manuelle Kamera-Cues, Keyframes, Timeline, Live-Editor, Pause, Low-Tier und Reduced Motion haben Vorrang. Keine neuen Kameras, Audio-/Sängererkennung, WebGL-Renderer oder Update-Loops. Für die tatsächliche optische Bewertung sind die echten GLB-Bühnen im Browser weiterhin erforderlich. Tests: `tests/v620-intelligent-camera-composition-regression.cjs`, `tests/tsconfig.v620-core.json`; Dokumentation `V620-INTELLIGENT-CAMERA-COMPOSITION.md`.
+
+## V619 – Cinematic Lyrics Performance (27.10.2026)
+
+`components/visualizer/cinematicLyricsPerformanceV619.ts` vereinheitlicht die dekorativen DOM-Lyrics-Akzente mit der bestätigten Songregie V606 und den Lesbarkeitsgrenzen V578/V598. Hook-Markierungen benötigen den belegten V604-Cue aus V606; Wortakzente benötigen echte, gültige V477-Zeitmarken und aktivierte Wort-Hervorhebung. Ein gemeinsamer maximaler Textbereich sowie der kräftigste der bestehenden Backdrops stabilisieren Rap-Zeilen auch bei 3–4 Performern. Bei langen Texten und dichtem Rap werden zusätzliche Akzente deutlich reduziert; bereits vorhandene V598/V606-Effekte und der unveränderte V541/V549-Karaoke-Füllstand bleiben erhalten. Pausen, Reduced Motion, manuelle Schriftgröße/Position und unbestätigte Songabschnitte werden respektiert. Diese Änderung gilt für DOM-/immersive Lyrics und verändert keine WebGL-Wortmeshes, R3F-Kamera, Sängerzuordnung, Audioanalyse oder Animationen. Tests `tests/v619-cinematic-lyrics-performance-regression.cjs` und `tests/tsconfig.v619-core.json` sowie `V619-CINEMATIC-LYRICS-PERFORMANCE.md`. Visuelle Abnahme und vollständiger Next.js-Build bleiben lokal offen.
+
+## V618 – Full-Body Performance Coordination (27.10.2026)
+
+`components/visualizer/fullBodyPerformanceCoordinationV618.ts` verknüpft das **bereits zeitlich bestätigte** V582-Körper-Cue und das **identische** V617-Gesichtscue mit den vorhandenen V492-Fußkontaktmessungen des vorherigen Animationsframes. Nur bei erkannter, ausreichend sicherer Standphase entstehen kleine stützende Brustkorb-, Schlüsselbein- und Oberarm-Zusätze (max. 0,012/0,007/0,009/0,0035 rad); bei Einbeinstand besonders gedämpft. Fehlt IK, ein echtes Wort-Cue oder eine passende GLB-Bone, bleibt die V582-Basis unverändert. Keine neuen Ganzkörper-Clips, Beat-/Sängererkennung, Schritte, Wurzelbewegungen oder eigene Renderloops. Vorhandene GLB-Keyframes werden durch additive V582-Helper nicht überschrieben; manuelle Priorität, Reduced Motion, Low-Tier sowie Pause bleiben geschützt. Nur GLB-Live-Avatar: Voransichten ohne Fuß-IK nutzen weiterhin V582 ohne V618-Zusatz. Eine visuelle Verbesserung am tatsächlichen GLB-Modell muss im Browser geprüft werden. `tests/v618-full-body-performance-coordination-regression.cjs`, `tests/tsconfig.v618-core.json`, `V618-FULL-BODY-PERFORMANCE-COORDINATION.md`.
+
+## V617 – Advanced Vocal & Facial Realism (27.10.2026)
+
+`components/visualizer/advancedVocalFacialRealismV617.ts` ergänzt die vorhandene V538→V546→V597→V612-Facial-Pipeline mit rein frame-lokaler, begrenzter **Wortgrenzen-Dynamik**, ohne neue phonemgenaue Timestamps, Audio-/Sprecherklassifikatoren oder Gesichtspose zu erzeugen. Ein echtes synchronisiertes Wort, unveränderte manuelle Sängerzuordnung, gültige Rig-Werte und die bestehenden V384/V415/V420/V423/V562-Prioritäten sind zwingend. Der Planer ändert ausschließlich kleine Brow-/Cheek-/Squint-Morph-Ausdruckswerte (≤ 0,009 pro Frame) sowie die Attack-/Release-Rate bereits bestehender offener Kiefer-/Vokalzielwerte (Faktor 1 bis 1,055). Bei B/P/M-Wörtern, kommenden B/P/M-Lippenschlüssen oder geschlossenen Lippen bleiben die Raten neutral. Vorhandene V581/V574-Bone-Cues erlauben nur winzige zusätzliche Kopf- bzw. Augenbewegungen (maximal 0,004/0,003 rad), nie erfundene Blickrichtungen oder eigene Tracking-Ziele. Die existierenden maximalen GLB-Rotationsgrenzen, GLB-Keyframes, additive Bone-Releases und Kalibrierungen bleiben erhalten. Der prozedurale Avatar erhält dieselbe Mimik und Wort-Ratenregel, keine künstliche Bone-Blickbewegung. Pause, Seek, anderes Lied, falscher Sänger, Low-Tier, Reduced Motion, Demo/Preview und manuelle Audiospuren bleiben geschützt. **Eine objektiv bessere reale Lippensynchronität ist damit nicht nachgewiesen**; reale Spotify-/GLB-Sichtprüfungen bleiben erforderlich. Tests `tests/v617-advanced-vocal-facial-realism-regression.cjs`, `tests/tsconfig.v617-core.json`, Doku `V617-ADVANCED-VOCAL-FACIAL-REALISM.md`.
+
+## V616 – Natural Multi-Performer Interaction (27.10.2026)
+
+`components/visualizer/naturalMultiPerformerInteractionV616.ts` ergänzt **die bereits vorhandenen** V500-/V607-Duettpläne und die V539-Ensembleplanung (jeweils 2–4 Performer) durch kleine, musikalisch versetzte Arm-/Schulter-Antworten. V500 wird über `components/visualizer/duetResponseV575.ts` erweitert; V539 verwendet V616 als seine letzte reine Overlay-Stufe und wird auf der Duo- sowie Gruppenbühne unverändert eingebunden. Ausgehend von **bereits editorseitig bestätigten, zum Song passenden Sängerrollen** reagiert ein zweiter Performer zeitversetzt; V416-Reply-Cues warten auf die gespeicherte 62%-Grenze, V496-Segmente folgen der tatsächlichen Segmentzeit. Kurzzeitiger Blickkontakt verstärkt ausschließlich bereits vorhandene, korrekt ausgerichtete Blick-Cues. Hooks bleiben publikumsorientiert. Support-Tänzer erhalten leicht unterschiedliche statt identische Impulse. Alle Bewegungen bleiben in den bestehenden V144/V145/V452-Grenzen; vorhandene Kollisionsrisiko-/Abstandssicherungen, manuelle Szenen, Pausen, Reduced Motion und Low-Tier haben Vorrang. Visual-only-Gruppen werden ausdrücklich **nicht** als Sänger eingestuft. Keine neuen GLB-Clips, Sängererkennung, Root-Bewegung, IK-/Mundsteuerung, Render-Loops oder neuen Effekte. Neu: `tests/v616-natural-multi-performer-interaction-regression.cjs` und `tests/tsconfig.v616-core.json`; Dokumentation: `V616-NATURAL-MULTI-PERFORMER-INTERACTION.md`. Sichtprüfung auf echter Browser-/GLB-Bühne offen.
+
+## V615 – Intelligent Choreography Variety (27.10.2026)
+
+`components/visualizer/intelligentChoreographyVarietyV615.ts` ergänzt die bereits vorhandene V536-/V588-Auswahl von **geladenen** GLB-Animationen um eine pro Song und Avatar geführte Sechs-Clip-Historie und begrenzte Nutzungsgewichte. Die eigentliche Clip- und Regieauswahl bleibt im bestehenden Hook `components/visualizer/useGenreAwareMotionDirectorV536.ts`: V615 wählt ausschließlich musikalisch ähnlich bewertete, sichere Alternativen, berücksichtigt bereits geladene Library-Clips ohne starre Obergrenze und hält mindestens neun Sekunden zwischen automatischen Clipwechseln. Bereits vorhandene V614-Crossfades bleiben verantwortlich für die Wiedergabe. `components/visualizer/intelligentMotionPresetDirectorV493.ts` verhindert zusätzlich unnötige Wiederholungen bei vorhandenen maskierten Oberkörper-Gesten (mindestens zehn Sekunden zwischen Wechseln). Pausen, manuelle Motion-/Timeline-/Loop-Steuerung, Reduced Motion, Track-/Avatarwechsel und Seeks bleiben geschützt. Keine neuen GLB-Dateien, Audio-/Sängererkennung, Renderer oder Frame-Loops. Tests: `tests/v615-choreography-variety-regression.cjs`, `tests/tsconfig.v615-core.json`; Details: `V615-INTELLIGENT-CHOREOGRAPHY-VARIETY.md`, `V615-VERIFICATION.md`. Optische Browser-/GLB-Freigabe weiterhin offen.
+
+## V614 – Natural Motion Flow (27.10.2026)
+
+`components/visualizer/naturalMotionFlowV614.ts` berechnet eine **begrenzte, rein deterministische Überblenddauer** für bereits ausgewählte automatische GLB-Animationsclips. Es integriert sich in `components/visualizer/useGltfClipTransitionsV492.ts` **nach** V537-Pose-Matching und V565-Intelligent-Transitions, aber **vor** den bestehenden Drei-/Three.js-Crossfade-Aktionen. Bestehende Songabschnitt-Hinweise, gemessene Kick-/Snare-Onsets, vorhandene Foot-IK-Kontakte, GLB-Clipdauer und ein bereits verfügbarer Songzeitstempel führen zu ruhigeren Verse-/Break-/Build-Übergängen und musikalisch kürzeren, belegten Drop-Akzenten. Kurz nacheinander vorgeschlagene automatische Wechsel erhalten zusätzliche Überlappung. **Keine** zusätzlichen Animationen, Mixers, Renderer, Timer, Frameschleifen, Sänger- oder Audio-Detektoren. Der Planer verändert weder Clip-Auswahl noch Motion-Entry-Seeking, gespeicherte Loops, Keyframe-Timelines, Bühnenpositionen, Foot-IK oder Lyrics. Manual-/Group-/Sequencer-/Blend-Prioritäten, Pause, Reduced Motion, Low-Tier und ungültige Clipdauer deaktivieren V614; bestehende Logik bleibt dann aktiv. Tests `tests/v614-natural-motion-flow-regression.cjs` und `tests/tsconfig.v614-core.json`; Details `V614-NATURAL-MOTION-FLOW.md` und `V614-VERIFICATION.md`. Visuelle Browser-/GLB-Prüfung ausstehend.
+
+## V613 – Cinematic Concert Shot Pacing (27.10.2026)
+
+`components/visualizer/concertShotPacingV613.ts` ergänzt die einzige automatische R3F-Kamera um mehrere Sekunden lange, auf bestehender Spotify-Songzeit beruhende Kamera-Haltephasen. Die verifizierten V600/V604-Akte liefern Genre, dramaturgisches Motiv und Wiederholung; ohne bestätigte Daten bleiben die alten Aufnahmen unverändert. Wiederholte Hooks unterscheiden sich in ihren Shot-Folgen; Builds, Verse und nur anhand gemessener Energie/Kick zugelassene Drops besitzen eine eigene, ruhige Framing-Grammatik. Ein echtes V528-Sänger-Cue darf vorhandene, geprüfte Performer-Marker minimal für ein Portrait verwenden, ohne neue Sängerrollen, Phonem- oder Lipsync-Zeitstempel abzuleiten. Die Ergänzung sitzt in `components/visualizer/StageCameraDirectorV289.tsx` zwischen V606 und V610 und behält die finale V351-Lyrics-Bildschirmsicherung sowie V550/V540-Frameüberlauf-Prüfungen. Manuelle Kameras und V400/V354-Keyframes, Reduce-Motion, Low-Tier und inaktive Songs haben Vorrang. Keine neuen WebGL-Objekte, Timer, Frameschleifen, Motion-Clips oder Audioanalysen. Tests: `tests/v613-concert-shot-pacing-regression.cjs`, `tests/tsconfig.v613-core.json`; Details `V613-CINEMATIC-SHOT-PACING.md`. Offener Punkt: visuelle Browser-/GLB-/FPS-Abnahme. `npm run test:all` führt optional alle 642 aktuell registrierten atomaren npm-Tests einzeln aus, damit Fehler gesammelt werden können.
+
 ## V612 – Expressive Vocal & Facial Performance 7.0 (27.10.2026)
 
 `components/visualizer/expressiveVocalFaceV612.ts` ergänzt die vorhandene V538→V546→V597→V581-/V582-Mund-/Mimikpipeline um **sehr kleine, deterministische und wortzeitgebundene** Ausdruckshinweise. In `components/visualizer/VocalRigV368.tsx` werden vorhandene (optional gescannte) Augenbrauen-/Wangen-/Squint-Morphs, bereits gültige Vokal-/Kieferwerte und vorhandene GLB-Head-Bones konservativ ergänzt: maximal ca. 0,012 zusätzlicher Vokalgewichtswert, maximal 0,009 rad zusätzlicher Kopfneigung, mit dem bestehenden V581-Kopfoverlay zu maximal 0,030 rad gedeckelt. Der Schutz für B/P/M, Manual/V420-Edits, V423-Audio, V562-Mundkalibrierung und V383-Vorschau bleibt unverändert; kein zusätzlicher Skeleton-Scan, GLB-Clip, Frame-Loop oder Renderobjekt. `components/visualizer/ProceduralDancerAvatarV492.tsx` nutzt dieselbe V612-Wortverfeinerung für Mund-/Brauen-Projektion. **Keine echten Silbenzeitstempel oder Phoneme werden detektiert**, kein Stimm- oder Emotionsklassifikator. Die neue Ausdrucksebene ist bei Pause, unsynchronisierten Lyrics, falschem Sänger, Seek ohne gültiges Wort, Reduced Motion, Low-Tier und manueller Priorität inaktiv. Zum optischen Qualitätsnachweis fehlen echte WebGL-/GLB-/Spotify-Vergleichsaufnahmen. Tests: `tests/v612-expressive-vocal-facial-performance-regression.cjs` und `tests/tsconfig.v612-core.json`, vollständiger Bericht `V612-VERIFICATION.md`.
@@ -270,7 +370,7 @@ Neue Fußkontakte führen unmittelbar zur Reduktion additiver Fußrotationen. De
 `services/show/liveConcertComparisonV544.ts` ergänzt eine reine A/B-Projektionsanalyse auf der bereits opt-in etwa sekündlich messenden V466-WebGL-Qualitätsprobe. `components/visualizer/ConcertVisualCompareV544.tsx` ist unter dem bestehenden QA-Knopf erreichbar und speichert maximal zwei manuell aufgenommene Momentaufnahmen (A/B) im React-UI-Zustand; die Schemabilder verwenden echte normalisierte Kopf- und Lyrics-Rechtecke und zeigen die vorhandenen FPS an, **keine Pixel/Fotos und keine optische Gesichts-/Tanzprüfung**. Der Anwender markiert Fußarbeit, Gesicht/Lip-Sync und Lyrics getrennt; `createComparisonReportV544` exportiert auf Klick einen JSON-Bericht, keine Auto-Freigabe. Bildrand-/Lyrics-Nähe werden heuristisch beurteilt, nicht über Objekt-Okklusion. Original-Bühnenkamera, Motion, Beleuchtung, GLBs, FPS-Messintervall und QA-Gating bleiben unangetastet. `tests/v544-visual-quality-regression.cjs`, `tests/tsconfig.v544-core.json`. Der Next.js-Build braucht vollständig installierte Abhängigkeiten.
 
 
-> **Dokumentationsstand:** V612 (27.10.2026)
+> **Dokumentationsstand:** V651 (27.10.2026)
 
 ## V539 – Multi-Avatar Concert Interaction 5.0
 
@@ -810,3 +910,118 @@ Im existierenden V500→V575→V584-Duettplan erhält bei ausdrücklich bestäti
 ## V598 – Beautiful Lyrics Experience 10.0
 
 `beautifulLyricsExperienceV598.ts` erstellt reine, deterministische Sichtbarkeits- und Wort-Akzentpläne. Die gemeinsame DOM-Lyrics-Komponente `KineticLyrics.tsx` verwendet sie sowohl für reguläre als auch für immersive Bühnen-Lyrics; ein bereits vorhandener Bühnen-Hook-Cue darf die Hervorhebung beeinflussen. Quelle, Wortzeitstempel, Sängerrollen, manuelle Einstellungen, GLB-Geometrie und Kameraposition bleiben unverändert. Details: `V598-BEAUTIFUL-LYRICS-EXPERIENCE-10.md`.
+
+### V622 – Dynamic Stage Transformation
+
+Der reine, verifizierte Song-Abschnittsplaner `components/visualizer/dynamicStageTransformationV622.ts` ändert ausschließlich dezente Farbziele vorhandener Bühnenmaterialien. `components/visualizer/DynamicStage.tsx`, `components/visualizer/ConcertAtmosphereRendererV308.tsx` und `components/visualizer/ConcertDetailStageV555.tsx` verwenden denselben V604-Takt, grenzen manuelle Lichtregie/Blackouts ab und morphen kontinuierlich über benachbarte Abschnittsgrenzen. Kein Renderloop, Bühnenmodell, GLB-Import oder Lichtkörper wird hinzugefügt. Test: `tests/v622-dynamic-stage-transformation-regression.cjs` und `tests/tsconfig.v622-core.json`.
+
+### V623 – Ultimate Concert Dramaturgy
+Die gemeinsame, deterministische Prioritätswertung in `components/visualizer/ultimateConcertDramaturgyV623.ts` wertet ausschließlich die bereits bestätigten V604/V600-Songabschnitte aus. Die bisherige Kamera V620, die Karaoke-Regie V619, die automatic dance intensity und das bestehende V621-Lichtbudget verwenden diese Wertung, ohne eigene Sektionen, Sänger, Beats oder zusätzliche Renderloops zu erzeugen. Autorschaft, Lyrics-Lesbarkeit, GLB-Schutz und der abschließende Kamera-Guard V351 behalten Vorrang.
+
+
+### V624 – Hardstyle & Hardtekk Performance Director
+
+Die zustandslose Regie `components/visualizer/festivalPerformanceDirectorV624.ts` ergänzt das schon vorhandene, quellgebundene V610-Genreprogramm: Der V610-Plan wird nur bei bestätigten V600/V604-Abschnitten nachbearbeitet; Tanz, Kamera und Scheinwerfer erhalten denselben begrenzten Cue. Gemessene Energie und Kick bestimmen Drop-Akzente. Build-Steigerung basiert auf Aktzeit, wiederholte Hooks wechseln ihren Fokus. Manuelle Kanäle, reduzierte Bewegung und niedrige Gerätestufen bleiben unverändert; keine neuen Beleuchtungselemente, Animationsclips, Timer oder Renderloops. `tests/v624-hardstyle-hardtekk-performance-regression.cjs` und `tests/tsconfig.v624-core.json` prüfen diese Grenzen.
+
+
+## V626 – Adaptive 3D Concert Performance & Benchmarking
+
+`components/visualizer/adaptivePerformance.tsx` erfasst weiterhin nur die bereits vorhandenen einsekündigen Hauptcanvas-Renderfenster. V626 schreibt die tatsächliche Renderbuffer-Auflösung in `services/monitoring/piConcertPerformanceStudioV518.ts` und sperrt den V522-Lauf gegen Größenwechsel. `services/monitoring/hardwareSizingBenchmarkV626.ts` prüft jeweils drei echte vollständige Durchläufe für 2/3/4 Avatare bei identischen Einstellungen. `components/visualizer/PiConcertBenchmarkStudioV522.tsx` bietet Vergleich und JSON-Export (keine neue Renderloop). Keine automatische Hardware-Zusage: Windows-FPS belegen keine Raspberry-Pi-FPS; GPU, VRAM, Temperatur und Geräte-RAM sind nicht gemessen.
+
+
+### V640 – Adaptive Performance Optimization
+
+`components/visualizer/adaptiveVisualBudgetV640.ts` ist eine deterministische reine
+Messfenster-Politik, die von `components/visualizer/adaptivePerformance.tsx`
+nur innerhalb der bereits bestehenden V218/V518-Frame-Messung (einmal je Sekunde)
+weitergeschaltet wird. Der `full / trimmed / minimal`-Status reduziert die
+optionalen LED-, Gobo-, Haze- und Shaft-Transparenzstufen in
+`components/visualizer/DynamicStage.tsx`,
+`components/visualizer/ConcertDetailStageV555.tsx` und
+`components/visualizer/ConcertAtmosphereRendererV308.tsx`.
+
+Der vorhandene V552-Visibility-Guard spart bei verschwindender Transparenz Draw Calls.
+Vor der V253/DPR-Qualitätsabsenkung steht ein stufenweiser Abbau freiwilliger
+Dekoration. Nach der Minimalstufe bleiben die bisherigen V253/254/355/602-Regeln
+unverändert zuständig. Eigene Lichtprogramme, manuelle Qualitätsmodi, Blackouts,
+Songtransport, Lyrics, Vocal-/GLB-Animationen und Kamerauhr bleiben unangetastet.
+`tests/v640-adaptive-performance-optimization-regression.cjs` enthält die
+Regressionen für Framevalidierung, Hysterese, Erholung und Renderer-Schutzzonen.
+**Messgrenze:** P95/P99 stammen aus R3F-Frame-Deltas. Draw Calls und Dreiecke
+sind GPU-Lastindikatoren und **keine** direkten GPU-Zeitmessungen.
+
+## V642 – gemeinsamer Konzert-Feinschliff
+
+`concertEditionV642.ts` hängt als ein einziger, an bestätigte V604-Abschnitte
+gebundener automatischer Coordinator **hinter** dem V629-Songbogen und **vor**
+dem gemeinsamen V623-Score. Damit bleiben vorhandene Render-/Kamera-/Lyrics-
+Verbraucher sowie ihre manuellen und Performance-Grenzen unverändert. Die
+kleinen V642-Multiplikatoren laufen an Abschnittsgrenzen aus, bevorzugen
+Vocal-/Lyrics-Schutz und verteilen Hook-Schwerpunkte. Die V641-QA-Ergebnisse
+werden ausschließlich über `concertEditionReviewV642.ts` als read-only Hinweise
+angezeigt und beeinflussen die laufende Show nicht.
+
+
+## V643 – isolierte Vocal-Dateien lokal analysieren (opt-in)
+
+`vocalStemAnalysisV643.ts` verarbeitet ausschließlich lokal vom Nutzer ausgewählte,
+**zuvor isolierte** Gesangsdateien. Das im `SettingsPanel.tsx` eingebundene
+`VocalStemLabV643.tsx` verwaltet höchstens vier manuelle Performer-Slots,
+verlangt zeitlich zum aktuellen Song passende vollständige Dateien und dekodiert
+sie nur bei aktivem Benutzeraufruf über `AudioContext.decodeAudioData`.
+
+Die deterministische Analyse erzeugt 80-ms-Merkmale (normalisierte RMS-Energie,
+Einsatz, Periodizitätsproxy) und grobe Phrasenbereiche; ihre Quellenbezeichnung
+`user-declared-isolated-vocal` ist eine Benutzerangabe und **kein Nachweis**
+einer wirklich isolierten Stimme. Export/Import als validierte JSON-Merkmale ist
+lokal und trackgebunden. Es findet keine automatische Spotify-Audioextraktion,
+Netzwerkübertragung, Sänger- oder Phonemerkennung, Stem-Separation, persistente
+Speicherung oder Änderung am bestehenden V423/V632-Live-Lip-Sync statt.
+
+Das vorbereitete, versionierte Merkmalformat kann bei V644 nach expliziter
+Prüfung für weiterführende Artikulationsmodelle genutzt werden. Audiofiles,
+Lyrics und Künstleridentitäten sind nicht Teil der gespeicherten Merkmaldaten.
+
+## V644: Manuell ausgerichtete Visem-Spur (opt-in)
+
+Die visuelle Lippenregie `VocalRigV368` konsumiert bei explizit aktiviertem lokalen
+V644-Dokument ausschließlich dessen **manuell gesetzte** Zeitintervalle für
+Jaw/Wide/Round/LipsClosed. Die V643-Energiemerkmale enthalten keine erkannten
+Phoneme; V644 ist keine automatische Stimm-/Sprecher-/Phonemerkennung.
+
+Der reine Validator und Sampler (`phonemeLipSyncV644.ts`) bindet jeden Track und
+Avatar-Slot an eine höchstens zwölfminütige, validierte Zeitspur. Der einmalig
+aufgebaute Slot-Index gestattet binäre Suche im **vorhandenen** `useFrame` der
+Gesichtsregie; keine zusätzlichen Audio-/GLB-Render-Schleifen und keine Persistenz.
+Nicht markierte Zeitbereiche und deaktivierter Modus nutzen die bisherige Pipeline.
+V370/V383-Vorschau, bereits authored Animations und manuelle V420-/V423-Korrekturen
+haben Vorrang; die reguläre V562-Kalibrierung, Morph-Priorität und additive GLB-Overlays
+bleiben erhalten.
+
+## V645 – Expressive Artist Performance
+
+`expressiveArtistPerformanceV645.ts` verwendet ausschließlich schon bestätigte
+V581-Rap-Wort-/Sängercues, die trackgebundenen V574-Blickrollen und die bestehende
+V618-Fußkontaktbestätigung. Das Modul variiert über jeweils sieben Sekunden
+kleine Augenbrauen-, Wangen-, Augen- und Kopfakzente; Hand-/Armakzente werden
+nur an die bereits fußkontaktfreigegebene V618-Armpose angehängt. Kein neues
+Emotionsmodell, keine Phonemerkennung, keine automatischen Künstlerrollen, keine
+zusätzlichen GLB-Clips, Render-Loops oder Three.js-Ressourcen. Jedes Signal
+wird bei Pause, Reduced Motion, Low Tier, unpassender Sängerrolle, fehlendem
+Wortbeleg oder handautorisierten Einstellungen deaktiviert. In
+`VocalRigV368.tsx` bleiben Bilabialkontakt, V644-Mundformen, V562-Kalibrierung,
+V631-Mundraten und alle Keyframes in den bisherigen Besitzbereichen. Tests:
+`npm run test:v645`, `npm run test:v645:types`, `npm run verify:v645`.
+
+## V648 – Ultimate 10-inch Display Experience
+
+- `components/touchDisplayPolicyV648.ts` is the pure 10-inch, landscape/portrait/readability policy.
+- `TouchKioskControls.tsx` persists voluntary readability settings and detects viewport changes at resize only, not on animation frames. Touch wake affordance remains visible when toolbar hidden, 48×48+ buttons support touch and keyboard users.
+- `SonicDisplay.tsx` scopes `touch-v648-*` classes exclusively to enabled kiosk mode; `app/globals.css` adds compact landscape and portrait layouts, measured text sizes and safe-area-aware controls.
+- `VisualizerStage.tsx` optionally scales immersive WebGL lyric text without modifying user preference storage; screen-only changes do not alter stage render DPR, Spotify controls, camera or choreography.
+- Stage theme, manually edited lyrics, lyrics timing, real/estimated word alignment, and low-tier rendering remain owned by predecessors.
+
+## V649 – Interactive Concert Control Center
+- Kiosk-only Sidecar in `TouchKioskControls.tsx`: lazy loaded `ConcertControlCenterV649.tsx`, keyboard Escape and accessible tab interface. Touch readibility and stage/lyrics/split views remain driven by `useTouchKiosk` (V648).
+- Existing settings source of truth via `useUiPreferences().updatePreferences()`. `concertControlPolicyV649.ts` validates an explicit allowlist and builds a one-change undo snapshot; no second settings cache, audio capture, or new 3D stage.
+- Manual authored camera/vocal assignments remain untouched. Live interaction can alter renderer modes; it is not a benchmark and does not claim gap-free GPU reconfiguration.

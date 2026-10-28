@@ -19,6 +19,8 @@ let recentV467:ConcertQualityObservationV467[]=[];
 const listeners=new Set<()=>void>();
 const subscribe=(listener:()=>void)=>{listeners.add(listener);return()=>{listeners.delete(listener);};};
 export function useConcertQualityV466(){return useSyncExternalStore(subscribe,()=>snapshot,()=>empty);}
+/** V641: read-only snapshot for an explicitly started, local full-song audit. */
+export function getConcertQualitySnapshotV641():ConcertQualitySnapshotV466{return snapshot;}
 export function publishConcertQualityV466(next:ConcertQualitySnapshotV466){
   if(next.at<=0){recentV467=[];}
   else {

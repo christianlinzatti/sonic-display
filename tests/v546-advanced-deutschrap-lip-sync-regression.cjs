@@ -91,5 +91,7 @@ for(const basename of ['sonic-performer-v3','sonic-pulsebot-v1','sonic-nova-v1',
  models++;clips+=json.animations.length;
 }
 const p=require('../package.json');assert(Number(p.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=546);
-assert(p.scripts['build:preflight'].includes('npm run test:v546 && npm run test:v546:types'));
+// V645 preflight selects the newest verified release chain which includes V546.
+assert(p.scripts['build:preflight'].includes('npm run verify:v646'));
+assert(p.scripts['verify:v546'].includes('npm run test:v546 && npm run test:v546:types'));
 console.log(`PASS V546: ${frames} sampled word-times, bilabial/bridge/punctuation safeguards, ${models} GLB fixtures (${clips} clips), GLB/procedural integration`);

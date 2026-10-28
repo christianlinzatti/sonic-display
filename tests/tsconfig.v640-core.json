@@ -1,0 +1,5 @@
+{
+  "extends":"./tsconfig.v639-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":["../components/visualizer/adaptiveVisualBudgetV640.ts","v414-music-types.d.ts"]
+}

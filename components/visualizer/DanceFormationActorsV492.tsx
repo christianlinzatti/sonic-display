@@ -39,6 +39,7 @@ import {planIntelligentRapDuetV500} from "./intelligentRapDuetPerformanceV500";
 import {planNaturalMultiAvatarStageV504} from "./naturalMultiAvatarStageInteractionV504";
 import {planNaturalEnsembleV509} from "./naturalEnsembleChoreographyV509";
 import {planAdvancedGroupV517} from "./advancedGroupPerformanceV517";
+import {planAdvancedEnsembleV638} from "./advancedEnsembleChoreographyV638";
 import {planCinematicMultiAvatarV527} from "./cinematicMultiAvatarV527";
 import {planCrewConcertInteractionV539} from "./crewConcertInteractionV539";
 import {planCrewChoreographyV548} from "./crewChoreographyV548";
@@ -549,6 +550,31 @@ export function FormationDancers({props, mode, choreography}: {props: Visualizer
       partnerLook.current=combineCrewLooksV452(partnerLook.current,groupDuoV517.slots[1].look);
       leadGesture.current=combineCrewGesturesV452(leadGesture.current,groupDuoV517.slots[0].gesture);
       partnerGesture.current=combineCrewGesturesV452(partnerGesture.current,groupDuoV517.slots[1].gesture);
+    }
+    // V638: track-authored duet call/response. Add only sparse upper-body
+    // counterpoint; never move either root or replace individual vocal roles.
+    const duoEnsembleV638=planAdvancedEnsembleV638({
+      base:groupDuoV517,trackId:props.track?.id,
+      cueTrackId:rapDuetCueV416.active?
+        (timeCueV496.active?props.lipSync?.vocalTimeTrackIdV496:props.lipSync?.rapDuetTrackIdV416):
+        props.lipSync?.manualVocalTrackIdV385,
+      count:2,seconds:(props.lipSync?.progressMs??-1)/1000,
+      progressMs:props.lipSync?.progressMs??-1,bpm:props.audio.bpm,
+      positions:[[a.x,a.y,a.z],[b.x,b.y,b.z]],
+      playing:props.isPlaying,reducedMotion:props.reducedMotion,
+      manualPriority:!!manualPose||!!manualActive||!!choreography||
+        props.showCue?.formationsEnabled===true||mode==='solo'||
+        props.avatarMotionMode==='choreography',
+      tier:getActivePerformanceTier(),beat:props.audio.beatStrength??0,
+      energy:props.audio.energyEnvelope??0,footLocked:true,genre:props.genre,
+      risks:[mergeAnimatedSlotV508(collisionDuoV506.slots[0],motionDuoV508.slots[0]),
+        mergeAnimatedSlotV508(collisionDuoV506.slots[1],motionDuoV508.slots[1])],
+    });
+    if(duoEnsembleV638.active){
+      leadLook.current=combineCrewLooksV452(leadLook.current,duoEnsembleV638.slots[0].look);
+      partnerLook.current=combineCrewLooksV452(partnerLook.current,duoEnsembleV638.slots[1].look);
+      leadGesture.current=combineCrewGesturesV452(leadGesture.current,duoEnsembleV638.slots[0].gesture);
+      partnerGesture.current=combineCrewGesturesV452(partnerGesture.current,duoEnsembleV638.slots[1].gesture);
     }
     // V527 – no extra root rotation for authored duets. Small glance/gesture
     // replies are layered after the verified V517 singer-role plan.

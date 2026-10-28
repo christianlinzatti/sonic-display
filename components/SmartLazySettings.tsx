@@ -1,5 +1,7 @@
 "use client";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useMusic } from "@/context/MusicContext";
+import {clearVisemeOnTrackChangeV644} from "@/components/visualizer/phonemeLipSyncV644";
 import dynamic from "next/dynamic";
 import { recordLoadMetric } from "@/services/loading/loadingMetrics";
 
@@ -22,6 +24,10 @@ const LazySettingsPanel = dynamic(() => preloadSettings().then(module => module.
 
 /** Keep the heavy settings UI unmounted until the first open. Hover/focus warms its chunk. */
 export function SmartLazySettings() {
+  const {track}=useMusic();
+  const trackId=track?.id??'';
+  // This lightweight shell stays mounted while its heavy popover is closed.
+  useEffect(()=>{clearVisemeOnTrackChangeV644(trackId);},[trackId]);
   const [requested, setRequested] = useState(false);
   const warm = useCallback(() => { void preloadSettings().catch(() => undefined); }, []);
   if (requested) return <LazySettingsPanel initiallyOpen />;

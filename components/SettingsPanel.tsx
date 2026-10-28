@@ -38,6 +38,8 @@ const MultiVocalPerformanceStudioV385 = dynamic(() => import("@/components/visua
 const ExpressiveRapDirectorPanelV425 = dynamic(() => import("@/components/visualizer/ExpressiveRapDirectorPanelV425").then(m=>m.ExpressiveRapDirectorPanelV425),{ssr:false});
 const RapDuetStudioV416 = dynamic(() => import("@/components/visualizer/RapDuetStudioPanelV416").then(m => m.RapDuetStudioV416), {ssr:false});
 const VocalSyncInspectorV373 = dynamic(() => import("@/components/visualizer/VocalSyncInspectorV373").then(m => m.VocalSyncInspectorV373), { ssr:false });
+const VocalStemLabV643 = dynamic(() => import("@/components/visualizer/VocalStemLabV643").then(m => m.VocalStemLabV643), {ssr:false});
+const PhonemeTimelineLabV644 = dynamic(() => import("@/components/visualizer/PhonemeTimelineLabV644").then(m=>m.PhonemeTimelineLabV644),{ssr:false});
 const RapPerformanceEditorV408 = dynamic(() => import("@/components/visualizer/RapPerformanceEditorPanelV408").then(m => m.RapPerformanceEditorV408), {ssr:false});
 const AvatarPreview3D = dynamic(() => import("@/components/visualizer/AvatarPreview3D").then(module => module.AvatarPreview3D), { ssr: false });
 const MotionTimelineStudio = dynamic(() => import("@/components/visualizer/MotionTimelineStudio").then(module => module.MotionTimelineStudio), { ssr: false });
@@ -647,6 +649,8 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
             <small>Folgt erkannten Verse-, Hook-, Break-, Build- und Drop-Abschnitten. Keine künstliche Drop-Erkennung. Gespeicherte Kamera-/Licht-Timelines bleiben vorrangig. Keine zusätzlichen Spotlights, WebGL-Canvas oder Shadow-Maps; reduzierte Bewegung deaktiviert die Zusatzregie.</small>
           </fieldset>
           {vocalSyncInspectorOpenV373&&<VocalSyncInspectorV373/>}
+          <VocalStemLabV643/>
+          <PhonemeTimelineLabV644/>
           <small>Mundformen, Akzente und Kameranahaufnahmen werden aus getaktetem Text geschätzt, nicht aus isolierten Vocals. Automatik erkennt Rap anhand Genre und Texttempo (keine Stimmanalyse). Bei Zeilen-Timing ist die Annäherung weniger präzise. Lippenverschluss, Blinzeln und Mimik setzen passende Rig-Morphs voraus. Instrumentalpausen und angehaltene Wiedergabe öffnen den Mund nicht. Spotify-Audio wird nicht isoliert oder phonetisch transkribiert.</small>
           <button type="button" className="v370-open" aria-expanded={facialStudioOpen} onClick={()=>setFacialStudioOpen(v=>!v)}>{facialStudioOpen?"▾ Gesichtsanimation-Studio schließen":"▸ V370 · Gesichtsanimation-Studio öffnen"}</button>
           {facialStudioOpen && <FacialAnimationStudioV370 models={[...avatarModels.map(m=>defaultOverrides.find(o=>o.id===m.id)??m),...localModels]} initialAvatarId={preferences.avatarModelId}/>}

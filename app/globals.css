@@ -2150,3 +2150,223 @@
  .lyrics.v606-harmony .v606-active-line .kinetic-word {text-shadow:none!important;animation:none!important;transition:none!important;}
  .lyrics.v606-hook .v606-active-line {border-bottom:none;box-shadow:none;}
 }
+
+
+/* V619 – Cinematic Lyrics Performance. Shared safe width and contrast for a
+   real 10-inch screen. The existing word-fill and user font/position win. */
+.lyrics.v619-cinematic-lyrics .v619-active-line {
+  max-width:min(100%,calc(var(--v619-width-ch,48) * 1ch));
+  margin-inline:auto;
+  text-wrap:balance;
+  overflow-wrap:anywhere;
+  font-kerning:normal;
+}
+.lyrics.v619-cinematic-lyrics .v619-active-line::before {
+  opacity:min(1,max(var(--v541-plate,.82),var(--v619-plate,.1),calc(var(--v598-plate,.1) + var(--v606-plate-boost,0))));
+}
+.lyrics.v619-cinematic-lyrics.v619-hook .v619-active-line,
+.lyrics.v619-cinematic-lyrics.v619-duet .v619-active-line {
+  /* A single existing caption underline, not a second flashing overlay. */
+  box-shadow:inset 0 -2px 0 rgba(142,237,255,var(--v619-hook-underline,0));
+}
+.lyrics.v619-cinematic-lyrics .v619-active-line .kinetic-word {
+  /* Aggregate existing visual-only accents; do not alter --word-fill. */
+  text-shadow:
+    0 0 calc(3px * var(--v549-word-motion,0)) var(--studio-color-from,#79f7ff),
+    0 0 calc(6px * var(--v598-word-accent,0)) var(--studio-color-from,#79f7ff),
+    0 0 calc(5px * var(--v606-word-accent,0)) var(--studio-color-to,#d789ff),
+    0 0 calc(2px + 18px * var(--v619-word-accent,0)) color-mix(in srgb, var(--studio-color-to,#d789ff) calc(var(--v619-word-accent,0) * 100%), transparent);
+}
+@media (max-width:1024px) {
+  .immersive-lyrics-overlay .lyrics.v619-cinematic-lyrics .v619-active-line {
+    max-width:min(100%,calc(var(--v619-width-ch,48) * 1ch));
+    text-wrap:pretty;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .lyrics.v619-cinematic-lyrics .v619-active-line .kinetic-word {
+    text-shadow:none!important;transition:none!important;animation:none!important;
+  }
+  .lyrics.v619-cinematic-lyrics .v619-active-line {box-shadow:none!important;}
+}
+
+/* V634 – Beautiful Lyrics 2.0. Refine the EXISTING caption, never place a
+   second overlay above faces or replace V477/V541/V549 synchronized word fill.
+   Constrained widths/quiet highlights fit a compact 10-inch concert display. */
+.lyrics.v634-beautiful-lyrics .v634-active-line {
+  max-width:min(100%,calc(var(--v634-width-ch,48) * 1ch));
+  margin-inline:auto;
+  line-height:max(var(--v598-line-height,1.3),var(--v634-line-height,1.33));
+  text-wrap:balance;
+  overflow-wrap:anywhere;
+  font-kerning:normal;
+  isolation:isolate;
+}
+.lyrics.v634-beautiful-lyrics .v634-active-line::before {
+  opacity:min(1,max(var(--v541-plate,.82),var(--v619-plate,.1),var(--v634-plate,.1)));
+}
+/* Preserve all existing concert word accents, add only a faint timed halo.
+   Never assign --word-fill, font-size, transform or animation here. */
+.lyrics.v634-beautiful-lyrics .v634-active-line .kinetic-word {
+  text-shadow:
+    0 0 calc(3px * var(--v549-word-motion,0)) var(--studio-color-from,#79f7ff),
+    0 0 calc(6px * var(--v598-word-accent,0)) var(--studio-color-from,#79f7ff),
+    0 0 calc(5px * var(--v606-word-accent,0)) var(--studio-color-to,#d789ff),
+    0 0 calc(2px + 18px * var(--v619-word-accent,0)) color-mix(in srgb,var(--studio-color-to,#d789ff) calc(var(--v619-word-accent,0) * 100%),transparent),
+    0 0 calc(24px * var(--v634-word-accent,0)) color-mix(in srgb,var(--studio-color-from,#79f7ff) 45%,transparent);
+  transition: text-shadow var(--v634-transition-ms,0ms) ease-out;
+}
+@media (max-width:1024px) {
+  .lyrics.v634-beautiful-lyrics .v634-active-line {
+    max-width:min(100%,calc(var(--v634-width-ch,48) * 1ch));
+    text-wrap:pretty;
+    overflow-wrap:anywhere;
+  }
+  .immersive-lyrics-overlay .lyrics.v634-beautiful-lyrics .v634-active-line {
+    line-height:max(1.3,var(--v634-line-height,1.33));
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .lyrics.v634-beautiful-lyrics .v634-active-line .kinetic-word {
+    transition:none!important;animation:none!important;text-shadow:none!important;
+  }
+}
+
+
+/* V648 – Ultimate 10-inch touch experience. Only explicit kiosk mode; never changes
+   desktop controls, user's actual lyrics settings, Spotify, or Three.js render scale. */
+.touch-v648{--v648-text-multiplier:1.1;--v648-safe-bottom:env(safe-area-inset-bottom,0px);
+  --v648-safe-top:env(safe-area-inset-top,0px)}
+.touch-v648-standard{--v648-text-multiplier:1}
+.touch-v648-clear{--v648-text-multiplier:1.1}
+.touch-v648-large{--v648-text-multiplier:1.2}
+.touch-v648 .kiosk-toolbar{max-width:calc(100vw - 24px);max-height:min(75dvh,560px);overflow-x:auto;overflow-y:auto;
+  overscroll-behavior:contain;scrollbar-width:thin;flex-wrap:wrap;touch-action:pan-x pan-y}
+.touch-v648 .kiosk-toolbar button,
+.touch-v648 .kiosk-toolbar select,
+.touch-v648 .settings-trigger{min-width:48px;min-height:48px;touch-action:manipulation}
+.touch-v648 .kiosk-toolbar :is(button,select):focus-visible,
+.touch-v648 .kiosk-wake:focus-visible{outline:3px solid #c1ff72;outline-offset:3px}
+.touch-v648 .kiosk-wake{display:flex;align-items:center;justify-content:center;top:calc(8px + var(--v648-safe-top));
+  left:auto;right:max(12px,env(safe-area-inset-right,0px));width:52px;height:52px;z-index:84;
+  border:1px solid #bafc8b;border-radius:16px;background:#101820e8;color:#e8ffe6;
+  box-shadow:0 4px 20px #000b;font-size:25px;touch-action:manipulation}
+.touch-v648 .layout{min-height:0;min-width:0}
+.touch-v648 .track{min-width:0;overflow-wrap:anywhere}
+.touch-v648 .layout>.lyrics{min-width:0;max-height:calc(100dvh - 110px);
+  padding:8px 8px 10px;overflow:hidden}
+.touch-v648 .layout>.lyrics .lyrics-window{min-height:0;min-width:0;max-width:100%;overflow:hidden}
+.touch-v648 .layout>.lyrics .lyric{max-width:100%;overflow-wrap:anywhere;
+  font-size:clamp(1.1rem,calc(2.35vw * var(--v648-text-multiplier) * var(--studio-font-scale,1)),2.55rem)!important;
+  line-height:1.24!important;text-wrap:pretty}
+.touch-v648 .layout>.lyrics .lyric.active{color:#fff;
+  font-size:clamp(1.35rem,calc(2.65vw * var(--v648-text-multiplier) * var(--studio-font-scale,1)),2.85rem)!important;
+  line-height:1.25!important;overflow-wrap:anywhere}
+.touch-v648 .layout>.lyrics .lyric:not(.active){opacity:.68}
+.touch-v648 .layout>.lyrics .lyrics-source{font-size:clamp(.7rem,1.2vw,.92rem)}
+.touch-v648.touch-kiosk-stage .layout{padding-bottom:max(20px,calc(12px + var(--v648-safe-bottom)))}
+/* Small 10-inch landscape panels (1024×600 / 1280×800 / 1366×768). */
+.touch-v648-compact .kiosk-toolbar{gap:6px;padding:6px 9px;max-width:calc(100vw - 18px)}
+.touch-v648-compact .kiosk-toolbar button{padding:6px 11px;font-size:clamp(12px,1.12vw,15px)}
+.touch-v648-compact .layout{grid-template-columns:minmax(145px,26%) minmax(0,1fr);
+  gap:2.5vw;padding-top:clamp(58px,9dvh,78px);padding-bottom:14px}
+.touch-v648-compact .track h1{font-size:clamp(1.15rem,2.3vw,1.9rem);line-height:1.12}
+.touch-v648-compact .cover{width:min(19dvh,150px)}
+.touch-v648-compact .layout>.lyrics{height:min(72dvh,570px);max-height:calc(100dvh - 90px)}
+.touch-v648-compact .layout>.lyrics .lyric.active{
+  font-size:clamp(1.3rem,calc(2.65vw * var(--v648-text-multiplier) * var(--studio-font-scale,1)),2.7rem)!important}
+.touch-v648-compact.touch-kiosk-stage .layout{padding:12px 22px max(14px,var(--v648-safe-bottom));
+  max-width:100%;background:linear-gradient(0deg,#05060bef 0%,#05060bde 42%,transparent 100%)}
+.touch-v648-compact.touch-kiosk-stage .track{max-width:min(650px,82vw)}
+.touch-v648-compact.touch-kiosk-stage .cover{width:clamp(60px,10dvh,95px)}
+/* The V646 timeline and editorial cards never steal the lyric reading area in kiosk mode.
+   Their existing explicit toggles remain available. */
+/* V646's compact toggle normally sits bottom left, where the Stage-mode album
+   information also appears. In touch mode put the timeline on the opposite side. */
+.touch-v648 [data-v646-timeline]{left:auto!important;right:max(12px,env(safe-area-inset-right,0px))!important;
+  bottom:max(12px,var(--v648-safe-bottom))!important;max-width:min(56vw,620px)!important}
+.touch-v648 [data-v646-timeline]>button{min-height:48px;min-width:48px;touch-action:manipulation}
+.touch-v648 [data-v646-timeline="open"]{width:min(56vw,620px)!important}
+.touch-v648 [data-v646-timeline="open"] #sonic-concert-timeline-v646{max-height:48dvh!important;
+  overscroll-behavior:contain}
+.touch-v648-compact .layout>.lyrics .lyric.active{transform:none!important}
+.touch-v648.touch-kiosk-lyrics .layout{background:linear-gradient(90deg,#080a10ed,#080a10e3)}
+.touch-v648.touch-kiosk-lyrics .layout>.lyrics .lyric.active{text-shadow:0 2px 12px #000}
+/* Portrait still exposes a reachable navigation bar; avoid iOS/Android gesture region. */
+@media (orientation:portrait) and (max-width:820px){
+ .touch-v648.touch-v648-portrait .kiosk-toolbar{top:auto;bottom:calc(8px + var(--v648-safe-bottom));
+   left:50%;right:auto;transform:translateX(-50%);border-radius:18px;
+   max-height:42dvh;width:calc(100vw - 18px);justify-content:center}
+ .touch-v648.touch-v648-portrait .kiosk-toolbar-hidden{transform:translate(-50%,125%)}
+ .touch-v648.touch-v648-portrait .kiosk-wake{top:auto;bottom:calc(12px + var(--v648-safe-bottom))}
+ .touch-v648.touch-v648-portrait .layout{grid-template-columns:minmax(0,1fr);
+   grid-template-rows:auto minmax(0,1fr);padding:12px 16px calc(90px + var(--v648-safe-bottom))}
+ .touch-v648.touch-v648-portrait .layout>.lyrics{height:min(53dvh,650px);max-height:56dvh}
+ .touch-v648.touch-v648-portrait .layout>.lyrics .lyric.active{font-size:clamp(1.45rem,calc(4vw * var(--v648-text-multiplier) * var(--studio-font-scale,1)),2.6rem)!important}
+}
+@media (prefers-reduced-motion:reduce){
+ .touch-v648 .kiosk-toolbar,.touch-v648 .kiosk-wake{transition:none!important}
+ .touch-v648 .layout>.lyrics .lyric.active{transform:none!important}
+}
+
+/* V649 – sidecar control center, rendered only in kiosk mode. Does not cover the whole stage. */
+.touch-kiosk .v649-control-panel{position:fixed;z-index:93;top:calc(76px + env(safe-area-inset-top,0px));right:max(10px,env(safe-area-inset-right,0px));
+ width:min(520px,55vw);max-height:calc(100dvh - 91px);display:flex;flex-direction:column;overflow:hidden;
+ background:#0c1320f5;color:#f7f9ff;border:1px solid #8b9cb080;border-radius:18px;
+ box-shadow:0 16px 55px #000c;font-size:14px;touch-action:pan-y}
+.v649-control-panel .v649-heading{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;gap:10px;border-bottom:1px solid #ffffff30}
+.v649-heading strong{font-size:1.07rem}.v649-heading small{display:block;color:#c8d0dc;font-size:.8rem;margin-top:1px}
+.v649-heading button,.v649-footer button,.v649-choices button,.v649-tabs button{font:inherit;color:inherit;cursor:pointer;background:#263248;border:1px solid #657086;border-radius:10px;min-height:48px;min-width:48px;padding:8px 12px;touch-action:manipulation}
+.v649-control-panel :is(button,input):focus-visible{outline:3px solid #baff74;outline-offset:2px}
+.v649-control-panel button[aria-pressed=true],.v649-tabs button[aria-selected=true]{background:#baff74;border-color:#baff74;color:#101b15;font-weight:750}
+.v649-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:8px 10px;border-bottom:1px solid #ffffff23}
+.v649-tabs button{min-width:0;padding:8px 4px;font-size:clamp(.7rem,1.3vw,.85rem)}
+.v649-panel-body{padding:10px 14px 16px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.v649-panel-body h3{font-size:1.07rem;margin:0 0 5px}.v649-panel-body h4{font-size:.9rem;margin:15px 0 8px}
+.v649-panel-body p{font-size:.83rem;line-height:1.35;color:#cad5e5;margin:0 0 11px}
+.v649-choices{display:flex;gap:7px;flex-wrap:wrap}.v649-choices button{flex:0 1 auto;font-size:.83rem}
+.v649-toggle,.v649-range{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #ffffff18;align-items:center}
+.v649-toggle span{display:flex;flex-direction:column;gap:3px}.v649-toggle small{color:#bfcfe2;font-size:.75rem;line-height:1.3}
+.v649-toggle input[type=checkbox]{height:25px;width:25px;min-width:25px;accent-color:#baff74;cursor:pointer}
+.v649-range{flex-direction:column;align-items:stretch}.v649-range span{display:flex;justify-content:space-between}.v649-range input[type=range]{width:100%;min-height:38px;accent-color:#baff74;cursor:pointer}
+.v649-footer{display:flex;justify-content:space-between;gap:10px;padding:9px 14px;border-top:1px solid #ffffff30}
+.v649-footer button:disabled{opacity:.38;cursor:default}.v649-footer button:last-child{background:#baff74;color:#121d17}
+@media(max-height:730px) and (orientation:landscape){.touch-kiosk .v649-control-panel{top:67px;max-height:calc(100dvh - 73px);width:min(530px,57vw)}.v649-panel-body{padding:7px 13px}.v649-choices{gap:5px}}
+@media(max-width:720px) and (orientation:portrait){.touch-kiosk .v649-control-panel{top:8px;bottom:calc(74px + env(safe-area-inset-bottom,0px));right:8px;left:8px;width:auto;max-height:none}.v649-tabs{gap:2px;padding:6px}.v649-tabs button{font-size:.73rem}}
+@media(prefers-reduced-motion:reduce){.v649-control-panel *{scroll-behavior:auto}}
+
+/* V650 – touch-friendly Concert Presets, scoped to the already gated V649 sidecar. */
+.touch-kiosk .v649-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+.v650-presets h4{margin:14px 0 8px;font-size:.92rem}
+.v650-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.v650-profile{background:#202c3f;border:1px solid #52627d;border-radius:12px;padding:10px;min-width:0}
+.v650-profile-head{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
+.v650-profile-head strong{font-size:.86rem;overflow-wrap:anywhere}
+.v650-profile-head small{color:#b8f4ba}
+.v650-profile p{font-size:.76rem;margin:6px 0 10px;line-height:1.35;color:#cad5e5}
+.v650-profile-actions{display:flex;flex-wrap:wrap;gap:5px}
+.v650-presets :is(button,input[type=text],input[type=file]){font:inherit}
+.v650-presets button{background:#334763;color:#fff;border:1px solid #71839a;border-radius:9px;min-height:48px;min-width:48px;padding:7px 10px;cursor:pointer;touch-action:manipulation}
+.v650-presets button:disabled{opacity:.45;cursor:default}
+.v650-presets .v650-profile-actions button:first-child{background:#baff74;color:#12201b;border-color:#baff74;font-weight:700}
+.v650-presets .v650-delete{background:#422735;border-color:#885364}
+.v650-name-label{display:block;margin-bottom:6px}
+.v650-save-row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.v650-save-row input{flex:1;min-width:0;background:#1b293c;color:#fff;border:1px solid #71839a;border-radius:8px;min-height:48px;padding:8px}
+.v650-transfer{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.v650-transfer label{display:flex;flex-direction:column;gap:5px;max-width:100%;font-size:.8rem}
+.v650-transfer input{max-width:100%;font-size:.74rem}
+.v650-message{padding:10px;border:1px solid #8097b2;border-radius:9px;overflow-wrap:anywhere}
+@media(max-height:730px) and (orientation:landscape){.v650-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:490px){.v650-grid{grid-template-columns:1fr}}
+
+/* V651 – small touch-safe, accessible automation controls (only inside the existing V649 dialog). */
+.v651-automation{border:1px solid rgba(156,180,224,.26);border-radius:12px;padding:12px;display:grid;gap:10px;margin:12px 0;background:rgba(8,16,34,.28)}
+.v651-automation h4,.v651-automation p{margin:0}
+.v651-modes{display:grid;gap:8px;border:0;padding:0;margin:0;min-width:0}
+.v651-modes legend{font-weight:650;margin-bottom:8px}
+.v651-modes label{display:flex;align-items:center;gap:10px;min-height:48px;cursor:pointer}
+.v651-modes input{width:22px;height:22px;accent-color:#87dafe;flex:none}
+.v651-suggestion{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.v651-automation button{min-height:48px;min-width:48px;padding:10px 14px}
+.v651-evidence{font-size:.9em;line-height:1.4;overflow-wrap:anywhere}

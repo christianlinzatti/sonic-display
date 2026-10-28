@@ -8,6 +8,7 @@ import type {GroupPlanV517,GroupRiskV517,VerifiedVocalCueV517} from './advancedG
 import type {MultiAvatarPlanV527} from './cinematicMultiAvatarV527';
 import type {LookAtCue} from './partnerLookAtEngine';
 import type {PartnerGestureCue} from './partnerGestureEngine';
+import {refineNaturalPerformerCrewV616} from './naturalMultiPerformerInteractionV616';
 export type CrewMomentV539='off'|'handoff'|'duet'|'hook'|'call-response'|'visual-hook';
 export type CrewSlotV539={slot:number;role:'lead'|'partner'|'outgoing'|'listener'|'chorus'|'visual';
   target:number|null;look:LookAtCue;gesture:PartnerGestureCue;strength:number};
@@ -97,5 +98,5 @@ export function planCrewConcertInteractionV539(base:GroupPlanV517,cinematic:Mult
       intensity:clamp(amount*.035,0,.030),
     }};
   });
-  return {active:true,moment,source:authored?'authored-singer':'visual-only',slots};
+  return refineNaturalPerformerCrewV616({active:true,moment,source:authored?'authored-singer':'visual-only',slots},input);
 }
