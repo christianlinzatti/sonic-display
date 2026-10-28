@@ -967,3 +967,12 @@ Unter der vorhandenen V518/V522-Benchmarkoberfläche gibt es nun einen Bericht f
 
 ### V627 – Automated Concert Quality Inspector
 In der bestehenden V522/V626-Benchmarkoberfläche analysiert V627 vorhandene **echte** WebGL-Messläufe, V543-Bedienerbewertungen und optional lokal eingelesene **V593-JSON**-Bildhinweise zu Kamera, Lyrics und Aufstellung. Die Ergebnisliste erklärt jeden Befund und schlägt nur manuelle Prüf- und Optimierungsschritte vor. JSON-Export möglich. Keine neuen Aufnahme- oder Renderloops, kein automatisch bestandener Lip-Sync oder Gesamt-Song, keine Hardwarefreigabe. Mehr in `V627-AUTOMATED-CONCERT-QUALITY-INSPECTOR.md`.
+
+
+### Historische Feature-Dokumentation
+
+- [V315-VISUAL-DANCE-IMPROVEMENT.md](./V315-VISUAL-DANCE-IMPROVEMENT.md)
+- [V379-VISUAL-LYRICS-STUDIO.md](./V379-VISUAL-LYRICS-STUDIO.md)
+- [V380-REAL-3D-LYRICS-STUDIO.md](./V380-REAL-3D-LYRICS-STUDIO.md)
+- [V381-VISUAL-3D-LYRICS-EDITOR.md](./V381-VISUAL-3D-LYRICS-EDITOR.md)
+- [V382-ADVANCED-KINETIC-LYRICS.md](./V382-ADVANCED-KINETIC-LYRICS.md)

@@ -49,5 +49,5 @@ for(const [file,parts] of Object.entries({
  'app/globals.css':['.camera-performance-studio-v398'],
  'V398-CAMERA-PERFORMANCE-STUDIO.md':['V398']
  }))for(const part of parts)assert.ok(read(file).includes(part),file+': '+part);
-const pkg=JSON.parse(read('package.json'));assert.ok(['0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416','0.1.0-v417','0.1.0-v418','0.1.0-v419','0.1.0-v420','0.1.0-v422','0.1.0-v424','0.1.0-v425','0.1.0-v426'].includes(pkg.version));assert.ok(pkg.scripts['verify:offline'].includes('test:v398'));
+const pkg=JSON.parse(read('package.json'));require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(398);assert.ok(pkg.scripts['verify:offline'].includes('test:v398'));
 console.log('PASS V398 – validated section shots, no false speakers, orbit preview, bounded pose, lyrics protection and wiring');

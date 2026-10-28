@@ -52,5 +52,5 @@ for(const [f,strings] of Object.entries({
  'components/SettingsPanel.tsx':['V396 · Intelligent Performance Experience','avatarExperienceStrengthV396','v396-performance-experience-settings'],
  'V396-INTELLIGENT-PERFORMANCE-EXPERIENCE.md':['V396']
 }))for(const needle of strings)assert.ok(read(f).includes(needle),f+': '+needle);
-const pkg=JSON.parse(read('package.json'));assert.ok(['0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416','0.1.0-v417','0.1.0-v418','0.1.0-v419','0.1.0-v420','0.1.0-v422','0.1.0-v424','0.1.0-v425','0.1.0-v426'].includes(pkg.version));assert.ok(pkg.scripts['verify:offline'].includes('test:v396'));
+const pkg=JSON.parse(read('package.json'));require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(396);assert.ok(pkg.scripts['verify:offline'].includes('test:v396'));
 console.log('PASS V396 – synchronized show/ensemble/vocals, user priority, seek and pause safety, device budget');

@@ -79,5 +79,5 @@ assert.match(stage,/coordinationOffsetMsV372:preferences\.avatarVocalCoordinatio
 const settings=fs.readFileSync(path.join(root,'components/SettingsPanel.tsx'),'utf8');
 assert.match(settings,/V372 · Unified Vocal Performance Director/);
 assert.match(fs.readFileSync(path.join(root,'context/UiPreferencesContext.tsx'),'utf8'),/avatarVocalCoordinationEnabledV372:true/);
-assert.ok(['0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387','0.1.0-v390','0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416','0.1.0-v417','0.1.0-v418','0.1.0-v419','0.1.0-v420','0.1.0-v422','0.1.0-v424','0.1.0-v425','0.1.0-v426'].includes(JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version));
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(372);
 console.log('PASS V372: shared vocal clock, focus, rap/singing, shift, multi-avatar, legacy, reduced motion, pause, lyric gaps, IK/partner priority, settings and stage');

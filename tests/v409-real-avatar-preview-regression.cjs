@@ -36,7 +36,7 @@ assert(real.includes('playing&&!reducedMotion'),'pause and reduced motion must g
 assert(real.includes('dispose={null}'),'shared GLTF geometry/materials must not be disposed');
 assert(!real.includes('fetch('),'no live network traffic other than GLTF resource loading');
 const p=require('../package.json');
-assert.ok((Number(String(p.version).match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 409));
-assert(p.scripts['build:preflight'].includes('test:v409'));
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(409);
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v409');
 assert(p.scripts['verify:offline'].includes('test:v409'));
 console.log('PASS V409: real installed avatar selection, isolated GLTF skinned model, facial morph/rig motion, fallback, safety, no changes to live avatar');

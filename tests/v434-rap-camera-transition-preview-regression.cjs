@@ -60,6 +60,6 @@ assert(!stage.includes('V434'),'V434 must never insert a second live camera path
 assert(stage.indexOf('advanceRapCameraTransitionV433(')<stage.indexOf('composeRapCameraKeyframeV432('));
 const pkg=require('../package.json');
 assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=434);
-assert(pkg.scripts['build:preflight'].includes('test:v434'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v434');
 assert(pkg.scripts['verify:offline:fast'].includes('test:v434'));
 console.log('PASS V434: A/B independent deterministic sampling, BPM delay, saved-only-on-click, safe preview and V432 priority');

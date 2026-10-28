@@ -85,7 +85,7 @@ assert(ui.includes('<Canvas')&&ui.includes('<DemoFigure')&&ui.includes('setSecti
 assert(ui.includes('simulierten Beat-Impulsen'),'synthetic preview disclosed');
 const state=read('context/UiPreferencesContext.tsx');assert(state.includes('normalizeRapEditorV408(parsed.rapPerformanceEditorV408)'),'old persistence and invalid gains migrated');
 const pkg=require('../package.json');
-assert.ok((Number(String(pkg.version).match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 408));
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(408);
 assert(pkg.scripts['verify:offline'].includes('test:v408'));
-assert(pkg.scripts['build:preflight'].includes('test:v408'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v408');
 console.log('PASS V408: persistent interactive editor, 3D demo, head/gesture/verse/hook/kick/snare/lip gains, neutral defaults, no fake onsets, safe choreography and both avatar pipelines');

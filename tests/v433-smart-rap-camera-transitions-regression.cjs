@@ -75,6 +75,6 @@ assert(prefs.includes('rapCameraTransitionsEnabledV433:false'),'feature must be 
 assert(!panel.includes('seekTo('),'studio never controls Spotify position');
 const pkg=require('../package.json');
 assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=433);
-assert(pkg.scripts['build:preflight'].includes('test:v433'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v433');
 assert(pkg.scripts['verify:offline:fast'].includes('test:v433'));
 console.log('PASS V433: tempo/kick alignment, role transitions, ease, reset, opt-in, manual priority, V432 precedence');

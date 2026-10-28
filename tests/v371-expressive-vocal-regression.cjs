@@ -60,9 +60,9 @@ for(let i=0;i<90;i++)applyVocalStageOverlayV371(targets,NEUTRAL_VOCAL_STAGE_V371
 assert.ok(Math.abs(targets.head.rotation.x)<Math.abs(before)*.001,'pause/seek releases additive bones');
 const noBones={};applyVocalStageOverlayV371(noBones,a,1/60,createVocalStageOverlayV371());
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
-assert.match(read('components/visualizer/ThreeAvatar.tsx'),/applyVocalStageOverlayV371\(/);
+assert.match(read('components/visualizer/gltfVocalPerformanceV492.ts'),/applyVocalStageOverlayV371\(/);
 assert.match(read('components/visualizer/ThreeAvatar.tsx'),/rapBodyV453\.headPitch/);
-assert.match(read('components/visualizer/VisualizerStage.tsx'),/bodyStrengthV371:preferences\.avatarVocalBodyStrengthV371/);
+assert.match(read('components/visualizer/VisualizerStage.tsx'),/bodyStrengthV371:rapPerformanceValuesV437\.gesture/);
 assert.match(read('components/SettingsPanel.tsx'),/V371 · Expressive Vocal Performance/);
 assert.match(read('context/UiPreferencesContext.tsx'),/avatarVocalBodyEnabledV371: true/);
 assert.ok(Number(String(JSON.parse(read('package.json')).version).match(/v(\d+)$/)?.[1])>=371);

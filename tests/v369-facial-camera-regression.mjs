@@ -60,5 +60,5 @@ assert.match(manual,/const automaticShot=!editingPose && manual==='auto' && !use
 assert.match(manual,/automaticShot[\s\S]*composeVocalCameraV369/);
 assert.match(readFileSync('components/SettingsPanel.tsx','utf8'),/avatarVocalCameraStrengthV369/);
 assert.match(readFileSync('components/visualizer/vocalPerformanceDirectorV372.ts','utf8'),/resolveFacialPoseV369/);
-assert.match(readFileSync('package.json','utf8'),/0\.1\.0-v(?:369|370|371|372|373|374|375|376|377|378|379|380|381|382|383|384|385|386|387|388|389|390|391|392|393|394|395|396|397|398|399|400|401|402|403|404|405|406|407|408|409|410|411|412|413|414|415|416|417)/);
+assert.ok(/^0\.1\.0-v(\d+)$/.test(JSON.parse(readFileSync('package.json','utf8')).version) && Number(JSON.parse(readFileSync('package.json','utf8')).version.match(/v(\d+)$/)?.[1])>=369);
 console.log('PASS V369 facial coordination, performance close-ups, lyrics protection, holds and wiring');

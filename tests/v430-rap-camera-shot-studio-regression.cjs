@@ -79,6 +79,6 @@ assert(prefs.includes('rapCameraOverridesV430:{}'));
 assert(prefs.includes('normalizeRapCameraLibraryV430(parsed.rapCameraOverridesV430)'));
 const pkg=require('../package.json');
 assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 430);
-assert(pkg.scripts['build:preflight'].includes('test:v430'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v430');
 assert(pkg.scripts['verify:offline:fast'].includes('test:v430'));
 console.log('PASS V430 per-line camera edits, safety gates, track isolation, saved JSON normalization, manual save/reset UI and camera integration');

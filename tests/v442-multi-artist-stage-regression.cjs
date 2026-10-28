@@ -58,7 +58,7 @@ const ui=fs.readFileSync('components/visualizer/AutoMotionIntelligencePanelV438.
 for(const [src,txt] of [[renderer,'autoGroupOnV442'],[renderer,'effectiveGroupSettingsV442'],
   [renderer,'multiArtistMotionsV442?.[i]'],[renderer,'<ArtistNameBubbleV441 plan={props.artistBubblePlanV441} slot={i}'],
   [stage,'planMultiArtistCastV442'],[stage,'multiArtistCastCountV442'],
-  [stage,'featureCameraAssignmentsV442'],[stage,'autoMultiArtistGroupV442={multiArtistGroupV442}'],
+  [stage,'featureCameraAssignmentsV442'],[stage,'autoMultiArtistGroupV442={concertGroupV609}'],[stage,'refineAutomaticConcertGroupV600(multiArtistGroupV442'],[stage,'refineAutomaticGroupV604(concertGroupV600'],[stage,'refineAutoGroupTransitionsV609(concertGroupV604'],
   [ui,'V442 · Multi-Artist Stage Director'],[ui,'rapMultiArtistEnabledV442'],[ui,'V442 Avatar ${index+3} Modell'],
   [fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8'),'frameMultiArtistCameraV442'],
   [fs.readFileSync('types/music.ts','utf8'),'rapMultiArtistMaxV442?:2|3|4'],

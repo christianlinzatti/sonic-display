@@ -51,6 +51,6 @@ assert(!panel.includes('seekTo(')&&!panel.includes('setProgressMs('));
 assert(!stage.includes('V435'),'V435 must not introduce a second live camera');
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/v(\d+)$/)?.[1])>=435);
-assert(pkg.scripts['build:preflight'].includes('test:v435'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v435');
 assert(pkg.scripts['verify:offline:fast'].includes('test:v435'));
 console.log('PASS V435: deterministic bounded inspection, short-line remediation, manual-only draft and camera isolation');

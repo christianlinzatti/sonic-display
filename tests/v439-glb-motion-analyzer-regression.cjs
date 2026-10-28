@@ -64,5 +64,5 @@ for(const [text,token] of [[stage,'scanMotionLibraryV439'],[stage,'motionProfile
  [panel,'analyzedCount'],[scanner,'GLTFLoader'],[scanner,'parseAsync'],[scanner,'MAX_BYTES'],
  [scanner,'controller.abort()']])assert(text.includes(token),`V439 integration missing: ${token}`);
 const pkg=require('../package.json');assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]??0)>=439);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v439'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v439');
 console.log('PASS V439: measured GLB keyframes, humanoid activity, invalid tracks, loopability, cache safety, user preference, live integration');

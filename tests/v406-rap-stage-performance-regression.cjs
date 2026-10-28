@@ -72,9 +72,9 @@ for(const ms of [1000,1008,1100,1190,1310,1420,1650,1750,1980,2430,3350]){
  assert(f.jaw+f.lipsClosed*.985<=1+1e-9,'bilabial safety never regresses');
 }
 // Integration checks protect both R3F pipelines and facial preview isolation.
-const three=fs.readFileSync(path.resolve(__dirname,'../components/visualizer/ThreeAvatar.tsx'),'utf8');
+const three=fs.readFileSync(path.resolve(__dirname,'../components/visualizer/gltfVocalPerformanceV492.ts'),'utf8')+'\n'+fs.readFileSync(path.resolve(__dirname,'../components/visualizer/ProceduralDancerAvatarV492.tsx'),'utf8');
 assert(three.includes('const rapBodyV406=composeRapStageV406')&&
-  /applyVocalStageOverlayV371\(rigTargets.current,\s*addAdvancedVocalHeadV459\(addExpressiveHeadV453\(rapBodyV407/.test(three),
+  /applyVocalStageOverlayV371\(rigTargets.current,\s*addAdvancedVocalHeadV459\(addExpressiveHeadV453\(rapBodyV510/.test(three),
   'GLTF stage must apply the shared accent');
 assert(three.includes('expressiveBodyV393.eyeYaw')===false,'procedural avatar must use final accented cue');
 assert(three.includes('const face=composeRapFaceV406(synchronizedV372.face,synchronizedV372')&&

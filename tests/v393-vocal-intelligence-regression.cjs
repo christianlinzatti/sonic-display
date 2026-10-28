@@ -39,9 +39,9 @@ assert.ok(Math.abs(sealed.headPitch-body.headPitch)<Math.abs(lead.headPitch-body
 const invalid=compose(body,{...vocal,face:{jaw:Infinity,lipsClosed:NaN}},on,input);
 for(const ch of ['headPitch','headYaw','headTilt','eyeYaw','chestLean','leftArm','rightArm'])assert.ok(Number.isFinite(invalid[ch]));
 for(const p of ['components/visualizer/registry.tsx','components/visualizer/VisualizerStage.tsx','components/SettingsPanel.tsx','types/music.ts','context/UiPreferencesContext.tsx']) assert.match(read(p),/V393/);
-const renderer=read('components/visualizer/ThreeAvatar.tsx');
+const renderer=read('components/visualizer/ProceduralDancerAvatarV492.tsx')+'\n'+read('components/visualizer/gltfVocalPerformanceV492.ts');
 assert.equal((renderer.match(/composeVocalBodyV393\(expressiveBodyV386,synchronizedV372/g)||[]).length,2,'both procedural and GLB');
-assert.match(renderer,/applyVocalStageOverlayV371\(rigTargets.current,\s*addAdvancedVocalHeadV459\(addExpressiveHeadV453\(rapBodyV407/);
+assert.match(renderer,/applyVocalStageOverlayV371\(rigTargets.current,\s*addAdvancedVocalHeadV459\(addExpressiveHeadV453\(rapBodyV510/);
 assert.match(renderer,/authoredPriority:avatarMotionMode==="choreography"\|\|!!stableLibraryClip/);
 const pkg=JSON.parse(read('package.json'));
 assert.ok(Number(String(pkg.version).match(/v(\d+)$/)?.[1])>=393);assert.ok(pkg.scripts['verify:offline'].includes('test:v393'));

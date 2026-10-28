@@ -75,7 +75,7 @@ const types=fs.readFileSync('types/music.ts','utf8');
 for(const [source,required] of [
   [stage,'planAutomaticRapPerformanceV437'],[stage,'sampleAutomaticRapPerformanceV437'],
   [stage,'applyAutomaticRapPerformanceV437'],[stage,'danceAggression={rapPerformanceValuesV437.aggression}'],
-  [stage,'avatarAnimationIntensity={rapPerformanceValuesV437.intensity}'],
+  [stage,'avatarAnimationIntensity={concertDynamicsPercentV502(rapPerformanceValuesV437.intensity,directedDynamicsV604.dance)'],
   [stage,'rapLipEnabledV415:rapPerformanceValuesV437.rapLip'],
   [stage,'!preferences.avatarTimelineEnabled'],[stage,'!preferences.avatarManualVocalEnabledV385'],
   [stage,'detectedSection:rapMotionHookV437?"hook":directedSection'],[stage,'eventSlot:rapMotionHookV437'],
@@ -85,6 +85,6 @@ for(const [source,required] of [
 assert(!panel.includes('seekTo(')&&!panel.includes('setProgressMs('));
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]??0)>=437);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v437'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v437');
 assert(pkg.scripts['verify:offline:fast'].includes('npm run test:v437'));
 console.log('PASS V437: automatic song planning, verse/hook/role and karaoke cues, dance/face/gesture/lip orchestration, disabled/manual priority, bounded scan');

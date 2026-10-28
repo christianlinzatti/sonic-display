@@ -40,7 +40,20 @@ assert(karaoke.includes('v461.motionScale')&&karaoke.includes('v461.fontScale'))
 assert(karaoke.includes('windowSize === 1 ? 0'));
 assert(karaoke.includes('"--word-fill"')&&karaoke.includes('progressMs'));
 assert(scene.includes('planCinematicLyricsV461('));
-assert(scene.includes('maxWidth={visualV477.max3DWidth}'), 'V477 must preserve or tighten the V461 caption width');
+// V634 adds another cap. Verify the combined 3D width, not the old JSX spelling.
+const {planBeautifulLyricsV477}=load('components/visualizer/beautifulLyricsV477');
+for (const layout of ['standard','immersive','stage-3d']) {
+ for (const avatarCount of [1,2,3,4]) {
+  for (const args of [base,long]) {
+   const v461=plan({...args,layout});
+   const v477=planBeautifulLyricsV477({...args,layout,avatarCount});
+   assert(Number.isFinite(v477.max3DWidth) && v477.max3DWidth>0 && v477.max3DWidth<=v461.max3DWidth,
+     `V477 must not expand V461 caption width (${layout}, avatars=${avatarCount})`);
+  }
+ }
+}
+assert(/maxWidth=\{Math\.min\(\s*visualV477\.max3DWidth\s*,\s*lyricPolishV634\.max3DWidth\s*\)\}/.test(scene),
+ '3D text must use the stricter V477/V634 width cap');
 assert(scene.includes('visualV461.allowWordMeshes'));
 assert(scene.includes('activeCaptionV461?.visibleLineCount === 1'));
 assert(karaoke.includes('const wordTimed = v477.timingMode === "verified-word";'), 'word karaoke requires verified timings');

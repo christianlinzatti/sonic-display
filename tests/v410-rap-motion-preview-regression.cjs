@@ -47,7 +47,7 @@ assert(rig.includes('obj.quaternion.copy(quat)')&&rig.includes('obj.rotation.x+=
 assert(rig.includes('mixer.update(active&&clip?')&&rig.includes('playing&&!reducedMotion'),'pause/reduce-motion guard must also apply to mixer');
 assert(rig.includes('external?.error')&&rig.includes('onMotionInfo'),'incompatible clip handled without hiding avatar');
 assert(rig.includes('mixer.uncacheRoot(clone)')&&rig.includes('dispose={null}'),'cleanup mixer, do not dispose shared GLTF materials');
-assert((Number(String(pkg.version).match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 410));
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(410);
 assert(pkg.scripts['verify:offline'].includes('test:v410'));
-assert(pkg.scripts['build:preflight'].includes('test:v410'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v410');
 console.log('PASS V410: installed+embedded motion options, per-avatar filtering, isolated retargeted mixer, reversible rap overlays, error/reduced-motion safeguards');

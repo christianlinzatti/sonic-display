@@ -52,7 +52,7 @@ assert.ok(read('components/visualizer/registry.tsx').includes('spatialLayoutV381
 assert.ok(read('context/UiPreferencesContext.tsx').includes('lyricsSpatialLayoutV381:{x:0'));
 assert.ok(read('types/music.ts').includes('lyricsSpatialLayoutV381?:'));
 assert.ok(read('app/globals.css').includes('v381-face-zone'));
-assert.ok(['0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387','0.1.0-v390','0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416','0.1.0-v417','0.1.0-v418','0.1.0-v419','0.1.0-v420','0.1.0-v422','0.1.0-v424','0.1.0-v425','0.1.0-v426'].includes(JSON.parse(read('package.json')).version));
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(381);
 assert.ok(JSON.parse(read('package.json')).scripts['verify:offline'].includes('test:v381'));
 assert.ok(read('README.md').includes('V381-VISUAL-3D-LYRICS-EDITOR.md'));
 console.log('PASS V381 spatial drag, scale, limits, projected collision math, auto-layout, persistent presets and shared 3D stage wiring');

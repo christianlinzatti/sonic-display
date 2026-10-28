@@ -70,13 +70,13 @@ for(const sec of ['verse','hook','build','drop','break',null]){
   for(const key of ['headYaw','eyeYaw','emphasis','confidence','mode'])assert.equal(r[key],b[key],'existing vocal/partner cue protected');
  }
 }
-const three=fs.readFileSync(path.resolve(__dirname,'../components/visualizer/ThreeAvatar.tsx'),'utf8');
+const three=fs.readFileSync(path.resolve(__dirname,'../components/visualizer/gltfVocalPerformanceV492.ts'),'utf8')+'\n'+fs.readFileSync(path.resolve(__dirname,'../components/visualizer/ProceduralDancerAvatarV492.tsx'),'utf8');
 assert.equal((three.match(/composeRapRhythmStageV407\(/g)||[]).length,2,'both avatar pipelines must be wired');
-assert(/applyVocalStageOverlayV371\(rigTargets.current,\s*addAdvancedVocalHeadV459\(addExpressiveHeadV453\(rapBodyV407/.test(three),'GLTF overlay uses the final cue');
-assert(three.includes('rapBodyV453.headPitch')&&three.includes('rapBodyV407.chestLean'),'procedural avatar uses the final cue');
+assert(/applyVocalStageOverlayV371\(rigTargets.current,\s*addAdvancedVocalHeadV459\(addExpressiveHeadV453\(rapBodyV510/.test(three),'GLTF overlay uses the final cue');
+assert(three.includes('rapBodyV453.headPitch')&&three.includes('composeConcertStageV503(rapBodyV407,concertV503)'),'procedural avatar uses the final cue');
 const pkg=require('../package.json');
-assert.ok((Number(String(pkg.version).match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 407));
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(407);
 assert(pkg.scripts['verify:offline'].includes('test:v407'));
-assert(pkg.scripts['build:preflight'].includes('test:v407'));
-assert.equal(pkg.scripts.prebuild,'npm run build:preflight','npm run build must run preflight automatically');
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v407');
+assert(pkg.scripts.prebuild.includes('npm run verify:offline:fast'),'npm run build must execute the legacy suite automatically');
 console.log('PASS V407: measured kick->chest, snare->head, verse/hook gestures, no synthetic-onset claims, vocal roles, bounded poses, pause/seek guards and both avatar pipelines');

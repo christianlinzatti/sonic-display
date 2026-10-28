@@ -92,6 +92,6 @@ const reqPost = (artistId, follow)=>({headers:{get(name){return name==='origin'?
   result=await routes.POST({headers:{get:()=> 'https://malicious.example'},json:async()=>({artistId:A,follow:true})});
   assert.equal(result.status,403);assert.equal(result.body.code,'invalid_origin');
   delete global.fetch;
-  assert(['0.1.0-v359','0.1.0-v360','0.1.0-v361','0.1.0-v362','0.1.0-v363','0.1.0-v364','0.1.0-v365','0.1.0-v366','0.1.0-v367','0.1.0-v368','0.1.0-v369','0.1.0-v370','0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387','0.1.0-v390','0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416','0.1.0-v417','0.1.0-v418','0.1.0-v419','0.1.0-v420','0.1.0-v422','0.1.0-v424','0.1.0-v425','0.1.0-v426'].includes(require('../package.json').version));
+  require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(359);
   console.log('PASS V359 Spotify library API /contains, PUT, DELETE, URI encoding, confirmation, auth, rate/error-safe flow, UI integration');
 })().catch(e=>{delete global.fetch;console.error(e);process.exitCode=1;});

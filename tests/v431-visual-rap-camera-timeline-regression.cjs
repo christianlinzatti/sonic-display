@@ -85,6 +85,6 @@ const camera=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx'
 assert(camera.includes('applyRapCameraShotV430')&&camera.includes('advanceRapCameraHoldV429'));
 const pkg=require('../package.json');
 assert(/^0\.1\.0-v(?:43[1-9]|4[4-9]\d|[5-9]\d\d)$/.test(pkg.version),'V431 persists in future releases');
-assert(pkg.scripts['build:preflight'].includes('test:v431'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v431');
 assert(pkg.scripts['verify:offline:fast'].includes('test:v431'));
 console.log('PASS V431 visual rap-camera timeline: authored scene projection, overrides, safe preview, bounded window, track isolation, UI integration');

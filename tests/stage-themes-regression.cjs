@@ -11,7 +11,7 @@ const checks=[
 ["reuses point lights",files.lights.includes("key.current.color.lerp")&&files.lights.includes("fill.current.color.lerp")],
 ["reuses spot light",files.lights.includes("beam.current.color.lerp")],
 ["no shadow maps",files.avatar.includes("shadows={false}")],
-["bounded transition",files.lights.includes("Math.min(Math.max(delta, 0), .1)")],
+["bounded transition",/Math\.min\(\s*Math\.max\(\s*delta\s*,\s*0\s*\)\s*,\s*\.1\s*\)/.test(files.lights)],
 ["respects reduced motion",files.lights.includes("reducedMotion ? 1")],
 ["retains old theme",files.lights.includes("musicPalette?.primary ?? palette.primary")],
 ["retains beat cues",files.lights.includes("advanceStageCue")],

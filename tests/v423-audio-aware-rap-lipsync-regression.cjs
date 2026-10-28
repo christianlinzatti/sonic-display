@@ -51,5 +51,5 @@ for(const file of ["components/visualizer/ThreeAvatar.tsx","components/visualize
  assert(read(file).includes("rapAudioEnabledV423")||read(file).includes("applyRapAudioV423"),`live bridge ${file}`);
 assert(stage.includes("rapAudioDocumentV423"));
 assert(read("components/visualizer/RapPerformanceEditorPanelV408.tsx").includes("<RapAudioAwarePanelV423/>"));
-const pkg=JSON.parse(read("package.json"));assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 425);assert(pkg.scripts["build:preflight"].includes("test:v423"));
+const pkg=JSON.parse(read("package.json"));require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(423);require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v423');
 console.log("PASS V423: explicit local audio analysis, bounded feature-only storage, track/duration validation, playback/role/manual keyframe guards, 3D pipeline, no Spotify audio interception");

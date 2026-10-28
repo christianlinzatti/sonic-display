@@ -97,6 +97,6 @@ assert(!ui.includes('seekTo(')&&!ui.includes('setProgressMs('));
 assert(!camera.includes('V436'),'no duplicate renderer or second live camera');
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]??0)>=436,'requires V436 or later');
-assert(pkg.scripts['build:preflight'].includes('test:v436'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v436');
 assert(pkg.scripts['verify:offline:fast'].includes('test:v436'));
 console.log('PASS V436: automatic song planning, short-cut fixes, hook/keyframe/manual priority, bounds, purity, no live camera duplication');

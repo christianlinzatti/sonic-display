@@ -1,4 +1,4 @@
-name: Sonic Display V417 production quality
+name: Sonic Display release quality
 on:
   push:
   pull_request:
@@ -10,14 +10,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-24.04, windows-latest]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      # This project does not yet include package-lock.json; use npm install, not npm ci.
       - name: Install project dependencies
-        run: npm install --no-audit --no-fund
+        shell: pwsh
+        run: |
+          if (Test-Path package-lock.json) {
+            npm ci --no-audit --no-fund
+          } else {
+            npm install --no-audit --no-fund
+          }
       - name: Full verification (regression suite, typecheck and production build)
         run: npm run verify

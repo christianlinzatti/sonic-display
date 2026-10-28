@@ -66,6 +66,6 @@ assert(files.stage.indexOf('composeRapCameraKeyframeV432(')<files.stage.indexOf(
 assert(files.stage.includes('rapCameraBlockedV429')&&files.stage.includes('applyRapCameraShotV430'));
 const pkg=require('../package.json');
 assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=432);
-assert(pkg.scripts['build:preflight'].includes('test:v432'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v432');
 assert(pkg.scripts['verify:offline:fast'].includes('test:v432'));
 console.log('PASS V432: local keyframes, safety gates, interpolation, preview integration, per-track isolation, no Spotify seek');

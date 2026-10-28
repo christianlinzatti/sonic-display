@@ -66,5 +66,5 @@ for(const [source,token] of [[stage,'nextAutomaticRapShowV438'],[stage,'manualPr
  [panel,'saveCharacterMotionStore'],[panel,'CHARACTER_MOTION_CHANGE_EVENT']])assert(source.includes(token),`missing integration: ${token}`);
 assert(!panel.includes('seekTo(')&&!panel.includes('setProgressMs('));
 const pkg=require('../package.json');
-assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]??0)>=438);assert(pkg.scripts['build:preflight'].includes('npm run test:v438'));
+assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]??0)>=438);require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v438');
 console.log('PASS V438: offline clip profiles, manual precedence, deterministic energy-aware motion selection, phrase stability, protected modes and stage integration');

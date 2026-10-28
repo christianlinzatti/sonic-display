@@ -40,11 +40,11 @@ assert.ok(Number.isFinite(v(1600,{mids:Infinity}).jaw),'invalid audio values cla
 assert.equal(v(1520,{style:'singing',expression:60}).confidence,'word');
 for (const name of ['components/visualizer/VocalRigV368.tsx','components/visualizer/ThreeAvatar.tsx','components/KineticLyrics.tsx','components/SettingsPanel.tsx','components/visualizer/VisualizerStage.tsx'])assert.ok(readFileSync(name,'utf8').length>100,name);
 const stage=readFileSync('components/visualizer/VisualizerStage.tsx','utf8');
-const dancers=readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
+const dancers=readFileSync('components/visualizer/GltfDancerAvatarV492.tsx','utf8');
 const rig=readFileSync('components/visualizer/VocalRigV368.tsx','utf8');
-assert.match(stage,/style:preferences\.avatarVocalStyleV368/);
+assert.match(stage,/style:rapPerformanceCueV437\.active.*avatarVocalStyleV368/);
 assert.match(dancers,/VocalRigV368 model=\{model\}/);
-assert.match(dancers,/resolveVocalPerformanceQualityV374/);
+assert.match(rig,/resolveVocalPerformanceQualityV374/);
 assert.match(readFileSync('components/visualizer/vocalPerformanceDirectorV372.ts','utf8'),/resolveVocalPerformanceV368/);
 for (const target of ['lipsClosed','smile','brow','blink'])assert.ok(rig.includes(target),'extra face channel '+target);
 assert.match(rig,/inf\[morph.index\]-morph.delta/,'source morph preserved');

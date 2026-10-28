@@ -54,6 +54,6 @@ for(const term of ['Timeline-Position','Motion-Timeline V411','Überblendung','R
 assert(editor.includes('setTimelineAvatarLoaded')&&editor.includes('timelineAvatarLoaded!=='),'per-avatar localStorage guard');
 assert(editor.includes('timelineEnabled?null:selectedMotion'),'legacy V410 single-clip mode remains independent');
 const pkg=require('../package.json');
-assert.ok((Number(String(pkg.version).match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 411));
-for(const s of ['verify:offline','build:preflight'])assert(pkg.scripts[s].includes('test:v411'),`V411 missing from ${s}`);
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(411);
+assert(pkg.scripts['verify:offline'].includes('test:v411'));require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v411');
 console.log('PASS V411: multi-clip timeline, deterministic transitions, crossfades, seek+loop, Verse/Hook timing, safe per-avatar persistence, protected isolated mixer');

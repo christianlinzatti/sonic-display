@@ -63,7 +63,7 @@ values.set(v.NATURAL_DANCE_KEY_V320,'not-json');assert.equal(v.refreshNaturalDan
 delete global.window;delete global.Event;
 const avatar=read('components/visualizer/ThreeAvatar.tsx');
 assert.equal((avatar.match(/refineNaturalDanceV320\(/g)||[]).length,2,'both procedural and GLB dancers');
-for(const part of ['motion:performanceV391','filterMotionDebugLayers(performanceV323','authoredClipPriority:avatarMotionMode===','plantedLeft:footIK.current.left'])assert.ok(avatar.includes(part),part);
+for(const part of ['motion:performanceV391','filterMotionDebugLayers(refinedFootworkV596.motion','authoredClipPriority:avatarMotionMode===','plantedLeft:footIK.current.left'])assert.ok((avatar+read('components/visualizer/GltfDancerAvatarV492.tsx')).includes(part),part);
 const controls=read('components/visualizer/NaturalDanceControlsV320.tsx');
 for(const part of ['Gewichtsverlagerung','Nachschwingen','Fußkontakt-Schutz','Reduced Motion'])assert.ok(controls.includes(part),part);
 assert.ok(read('components/visualizer/StageDirectorControlsV287.tsx').includes('<NaturalDanceControlsV320 />'));
@@ -72,6 +72,6 @@ for(const p of presets.BUILTIN_SHOW_PRESETS)assert.equal(p.naturalV320.enabled,t
 const legacy=presets.normalizeSavedShowPreset({id:'custom-legacy',name:'Saved',ui:{},show:{},dance:{},atmosphere:{},director:{}});
 assert.equal(legacy.naturalV320.enabled,false,'old custom shows stay visually unchanged');
 assert.ok(read('components/visualizer/ShowPresetStudioV309.tsx').includes('writeNaturalDanceV320(settings.naturalV320)'));
-assert.ok(['0.1.0-v320','0.1.0-v321','0.1.0-v322','0.1.0-v324','0.1.0-v325','0.1.0-v326','0.1.0-v329','0.1.0-v330','0.1.0-v331','0.1.0-v332','0.1.0-v333','0.1.0-v334','0.1.0-v335','0.1.0-v336','0.1.0-v337','0.1.0-v338','0.1.0-v339','0.1.0-v340','0.1.0-v341','0.1.0-v342','0.1.0-v343','0.1.0-v346','0.1.0-v347','0.1.0-v349','0.1.0-v350','0.1.0-v351','0.1.0-v352','0.1.0-v353','0.1.0-v354','0.1.0-v355','0.1.0-v356','0.1.0-v357','0.1.0-v358','0.1.0-v359','0.1.0-v360','0.1.0-v361','0.1.0-v362','0.1.0-v363','0.1.0-v364','0.1.0-v365','0.1.0-v366','0.1.0-v367','0.1.0-v368','0.1.0-v369','0.1.0-v370','0.1.0-v371','0.1.0-v372','0.1.0-v373','0.1.0-v374','0.1.0-v375','0.1.0-v376','0.1.0-v377','0.1.0-v378','0.1.0-v379','0.1.0-v380','0.1.0-v381','0.1.0-v382','0.1.0-v383','0.1.0-v384','0.1.0-v385','0.1.0-v386','0.1.0-v387','0.1.0-v390','0.1.0-v391','0.1.0-v392','0.1.0-v393','0.1.0-v394','0.1.0-v395','0.1.0-v396','0.1.0-v397','0.1.0-v391','0.1.0-v398','0.1.0-v399','0.1.0-v400','0.1.0-v401', '0.1.0-v402','0.1.0-v403','0.1.0-v404','0.1.0-v405','0.1.0-v406','0.1.0-v407','0.1.0-v408','0.1.0-v409','0.1.0-v411','0.1.0-v412','0.1.0-v413','0.1.0-v414','0.1.0-v415','0.1.0-v416','0.1.0-v417','0.1.0-v418','0.1.0-v419','0.1.0-v420','0.1.0-v422','0.1.0-v424','0.1.0-v425','0.1.0-v426'].includes(require('../package.json').version));
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(320);
 assert.ok(require('../package.json').scripts['verify:offline'].includes('test:v320'));
 console.log('PASS V320: genre-aware groove, follow through, planted feet, clip priority, seek/pause/reduced motion, presets, both avatars and settings');

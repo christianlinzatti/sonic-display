@@ -41,5 +41,5 @@ for(const token of ['A · Aktuelle Einstellungen','B · Vorschlag','Diesen Vorsc
 const editor=fs.readFileSync('components/visualizer/RapPerformanceEditorPanelV408.tsx','utf8');
 assert(editor.includes('<RapPerformanceInspectorPanelV426 avatarId={current?.id??""}'));
 assert(editor.includes('<RapPerformanceQualityInspectorV418'));
-const pkg=require('../package.json');assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 426);assert(pkg.scripts['build:preflight'].includes('test:v426'));
+const pkg=require('../package.json');assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 426);require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v426');
 console.log('PASS V426 unified timing lanes, authored/estimated sources, diagnostics, track isolation, manual precedence, A/B preview and wiring');

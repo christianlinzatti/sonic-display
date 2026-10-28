@@ -40,5 +40,5 @@ for(const s of ['measureFacialMotionV424','planFacialCalibrationV424','applyFaci
 assert(editor.includes('preferences.avatarFacialProfilesV370'),'persisted by established per-avatar profile system');
 const rig=fs.readFileSync('components/visualizer/VocalRigV368.tsx','utf8');
 assert(rig.includes('facialGainV370(profileV370,morph.channel)')&&rig.includes('profileV370?.mapping?.jaw!=="none"'),'live rig respects saved per-avatar calibrations');
-const pkg=require('../package.json');assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 424);assert(pkg.scripts['build:preflight'].includes('test:v424'));
+const pkg=require('../package.json');require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(424);require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v424');
 console.log('PASS V424 geometric morph sampling, safe planning, confidence checks, manual precedence, per-avatar persistence, live GLB use');
