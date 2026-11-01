@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(796);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
@@ -86,7 +87,7 @@ for(const text of ['sampleDeutschrapPerformanceV796','applyDeutschrapPerformance
  'rapPerformanceValuesV796.gesture','rapPerformanceValuesV437.rapLip'])
  assert(stage.includes(text),`missing stage integration: ${text}`);
 const pkg=require('../package.json');
-assert(['0.1.0-v796','0.1.0-v797','0.1.0-v798','0.1.0-v799','0.1.0-v800','0.1.0-v801','0.1.0-v802','0.1.0-v803','0.1.0-v804','0.1.0-v805','0.1.0-v806','0.1.0-v808','0.1.0-v809','0.1.0-v807'].includes(pkg.version));
+assert(/^0\.1\.0-v\d+$/.test(pkg.version));
 assert(pkg.scripts['test:v796']?.includes('v796-deutschrap-performance-regression.cjs'));
 for(const name of ['build:preflight','check:fast','check:release'])
  assert(pkg.scripts[name].includes('npm run test:v796 && npm run test:v796:types && npm run test:v795'),name);

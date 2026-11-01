@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(794);
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),Module=require('node:module');
 const ts=require('./typescript-loader.cjs'),root=path.resolve(__dirname,'..');
@@ -91,7 +92,7 @@ for(const [file,phrases] of [
  const body=fs.readFileSync(path.join(root,file),'utf8');
  for(const phrase of phrases)assert(body.includes(phrase),`${file} lacks ${phrase}`);
 }
-const pkg=require('../package.json');assert(['0.1.0-v794','0.1.0-v795','0.1.0-v796','0.1.0-v797','0.1.0-v798','0.1.0-v799','0.1.0-v800','0.1.0-v801','0.1.0-v802','0.1.0-v803','0.1.0-v804','0.1.0-v805','0.1.0-v806','0.1.0-v808','0.1.0-v809','0.1.0-v807'].includes(pkg.version));
+const pkg=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));
 for(const k of ['build:preflight','check:fast','check:release'])
  assert(pkg.scripts[k].includes('npm run test:v794 && npm run test:v794:types && npm run test:v793'),k);
 console.log('PASS V794: verified builds/hooks/drops, safety envelopes, scene/seek checks, manual/lyrics/quality limits, stage wiring');

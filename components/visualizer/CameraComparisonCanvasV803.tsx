@@ -140,7 +140,7 @@ function FrozenGlb({url,progressMs,actorName="v804-glb-performer",offsetX=0}:
     invalidate(); // Also probe newly loaded GLBs with no embedded animation.
     return()=>{mixer?.stopAllAction();mixer?.uncacheRoot(model);};
   },[gltf.animations,model,progressMs,invalidate]);
-  useEffect(()=>()=>disposeClonedAvatarSkeletonsV654(model),[model]);
+  useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(model);},[model]);
   return <group name={actorName} position={[offsetX,0,0]}><primitive object={model} dispose={null}/></group>;
 }
 class GlbFallbackV803 extends Component<{children:ReactNode;offsetX?:number;name?:string},{failed:boolean}>{

@@ -98,7 +98,7 @@ function DemoHumanoid(){
 function ModelHumanoid({url,onReady}:{url:string;onReady:(targets:AvatarRigTargets)=>void}){
   const {scene}=useGLTF(url);
   const clone=useMemo(()=>cloneSkinnedScene(scene),[scene]);
-  useEffect(()=>()=>disposeClonedAvatarSkeletonsV654(clone),[clone]);
+  useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(clone);},[clone]);
   const transform=useMemo(()=>{
     const box=new Box3().setFromObject(clone);const size=new Vector3(),center=new Vector3();
     box.getSize(size);box.getCenter(center);

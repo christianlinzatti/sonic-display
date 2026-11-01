@@ -11,6 +11,7 @@ import {createFootIKState, initializeFootIK, updateFootIK} from './avatarFootIK'
 import {blendHipDanceV735, normalizeHipDanceV735, type HipDanceModeV735} from './hipDanceV735';
 import {createHipStudioStateV738,resetHipStudioV738,sampleHipStudioV738,type HipStudioSettingsV738} from './hipMotionStudioV738';
 import {createDanceVarietyStateV759,stepDanceVarietyV759,type DanceVarietySettingsV759} from './intelligentDanceVarietyV759';
+import {createNaturalDanceStateV758,directNaturalDanceV758,type NaturalDanceSettingsV758} from './naturalDanceMotionV758';
 import {directGenreHipV742, type GenreHipSettingsV742} from './genreHipIntelligenceV742';
 import {createSmartHipStateV744,directSmartHipV744,type SmartHipSettingsV744} from './smartHipChoreographyV744';
 import {createEnsembleHipStateV745,directEnsembleHipV745,type EnsembleHipSettingsV745} from './multiAvatarHipSyncV745';

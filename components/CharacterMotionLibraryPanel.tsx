@@ -8,7 +8,8 @@ import {VisualChoreographyTimelineEditor} from "@/components/visualizer/VisualCh
 import { SmartChoreographyEvolutionPanel } from "@/components/visualizer/SmartChoreographyEvolutionPanel";
 import { ChoreographyLearningDashboard } from "@/components/visualizer/ChoreographyLearningDashboard";
 import {useEffect,useState} from "react";
-import {readGLB,fingerprintInstalledMotionV535} from "@/components/visualizer/motionClipInspector";
+import {fingerprintInstalledMotionV535} from "@/components/visualizer/motionClipInspector";
+import {withPrivateGltfV769} from "@/components/visualizer/privateGltfLifecycleV769";
 import {MOTION_CATEGORIES_V535,MOTION_CATEGORY_LABELS_V535,filterMotionsV535,countKnownDuplicatesV535,duplicateInAvatarV535,suggestMotionCategoryV535,validMotionCategoryV535,type MotionCategoryV535} from "@/components/visualizer/motionLibraryIntelligenceV535";
 import { AdaptiveChoreographyTimeline } from "@/components/visualizer/AdaptiveChoreographyTimeline";
 import { MusicStructureTimelineDirector } from "@/components/visualizer/MusicStructureTimelineDirector";
@@ -66,9 +67,12 @@ export function CharacterMotionLibraryPanel({models,preferences,admin}:{models:A
   if(!model?.url||embeddedBusyV535)return;
   setEmbeddedBusyV535(true);setMessage("");
   try{
-   const gltf=await readGLB(model.sharedMotionUrl||model.url);
-   setEmbeddedClipsV535(gltf.animations.slice(0,64).map((clip,index)=>({index,name:clip.name||`Clip ${index+1}`,duration:clip.duration})));
-   if(gltf.animations.length>64)setMessage("Erste 64 eingebettete Clips angezeigt. Das GLB selbst bleibt vollständig erhalten.");
+   const inventory=await withPrivateGltfV769(model.sharedMotionUrl||model.url,gltf=>({
+    clips:gltf.animations.slice(0,64).map((clip,index)=>({index,name:clip.name||`Clip ${index+1}`,duration:clip.duration})),
+    total:gltf.animations.length,
+   }));
+   setEmbeddedClipsV535(inventory.clips);
+   if(inventory.total>64)setMessage("Erste 64 eingebettete Clips angezeigt. Das GLB selbst bleibt vollständig erhalten.");
   }catch(error){setMessage(error instanceof Error?error.message:"Eingebettete Motions konnten nicht gelesen werden");}
   finally{setEmbeddedBusyV535(false);}
  }
@@ -84,8 +88,8 @@ export function CharacterMotionLibraryPanel({models,preferences,admin}:{models:A
  }
  function change(fn:(s:CharacterMotionStore)=>CharacterMotionStore){setStore(old=>saveCharacterMotionStore(fn(old)));}
  async function verifyMotionFileV739(url:string){
-  const file=await readGLB(url);
-  if(!file.animations.length)throw new Error("Die ausgewählte GLB enthält keine Animationsclips. Es wurde nichts aktiviert.");
+  const clipCount=await withPrivateGltfV769(url,gltf=>gltf.animations.length);
+  if(!clipCount)throw new Error("Die ausgewählte GLB enthält keine Animationsclips. Es wurde nichts aktiviert.");
  }
  async function previewMotionV739(url:string){
   if(busy)return;setBusy(true);setWarningV739("");

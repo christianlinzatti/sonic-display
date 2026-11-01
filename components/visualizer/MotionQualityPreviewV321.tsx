@@ -4,13 +4,17 @@
 import {Suspense,useEffect,useMemo,type ReactNode,Component} from 'react';
 import {Canvas,useFrame} from '@react-three/fiber';
 import {OrbitControls,useGLTF} from '@react-three/drei';
-import {AnimationMixer,Box3,Vector3,type AnimationClip,type Group} from 'three';
+import {AnimationMixer,Box3,Vector3,type AnimationClip} from 'three';
 import {clone as cloneSkinnedScene} from 'three/examples/jsm/utils/SkeletonUtils.js';
 import {retargetHumanoidClips,readRetargetCalibration} from './avatarAnimationRetarget';
+import {usePreviewGltfCacheV654} from './usePreviewGltfCacheV654';
 import {polishMotionClipV321,type MotionQualitySettingsV321} from './advancedMotionQualityV321';
 
-function MotionStage({modelUrl,sourceScene,sourceClips,index,settings,seconds,corrected}:{modelUrl:string;sourceScene:Group;sourceClips:AnimationClip[];
+function MotionStage({modelUrl,motionUrl,sourceClips,index,settings,seconds,corrected}:{modelUrl:string;motionUrl:string;sourceClips:AnimationClip[];
   index:number;settings:MotionQualitySettingsV321;seconds:number;corrected:boolean}){
+ usePreviewGltfCacheV654(modelUrl);
+ usePreviewGltfCacheV654(motionUrl);
+ const sourceScene=useGLTF(motionUrl).scene;
  const gltf=useGLTF(modelUrl);
  const clone=useMemo(()=>cloneSkinnedScene(gltf.scene),[gltf.scene]);
  const clips=useMemo(()=>retargetHumanoidClips(sourceClips,sourceScene,clone,readRetargetCalibration(modelUrl)).clips,[sourceClips,sourceScene,clone,modelUrl]);
@@ -41,7 +45,7 @@ class StageErrorBoundary extends Component<{children:ReactNode},{error:boolean}>
  state={error:false};static getDerivedStateFromError(){return {error:true};}
  render(){return this.state.error?<p style={{padding:12}}>3D-Avatar kann nicht geladen werden.</p>:this.props.children;}
 }
-export function MotionQualityPreviewV321({modelUrl,sourceScene,sourceClips,index,settings,seconds}:{modelUrl:string;sourceScene:Group;
+export function MotionQualityPreviewV321({modelUrl,motionUrl,sourceClips,index,settings,seconds}:{modelUrl:string;motionUrl:string;
  sourceClips:AnimationClip[];index:number;settings:MotionQualitySettingsV321;seconds:number}){
  return <div className="motion-quality-compare-v321" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(205px,1fr))',gap:12}}>
   {[false,true].map(corrected=><section key={String(corrected)} style={{minWidth:0}}>
@@ -49,7 +53,7 @@ export function MotionQualityPreviewV321({modelUrl,sourceScene,sourceClips,index
     <div style={{height:265,background:'#131b2b',borderRadius:10,overflow:'hidden'}}>
       <StageErrorBoundary><Canvas camera={{position:[0,1.45,4.3],fov:43}} dpr={[1,1.4]}>
         <ambientLight intensity={1.2}/><directionalLight position={[3,5,4]} intensity={2}/>
-        <Suspense fallback={null}><MotionStage modelUrl={modelUrl} sourceScene={sourceScene} sourceClips={sourceClips} index={index} settings={settings} seconds={seconds} corrected={corrected}/></Suspense>
+        <Suspense fallback={null}><MotionStage modelUrl={modelUrl} motionUrl={motionUrl} sourceClips={sourceClips} index={index} settings={settings} seconds={seconds} corrected={corrected}/></Suspense>
         <OrbitControls enablePan={false} minDistance={2} maxDistance={7}/><gridHelper args={[7,10,'#45556e','#293147']} position={[0,-.02,0]}/>
       </Canvas></StageErrorBoundary>
     </div>

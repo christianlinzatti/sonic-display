@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(809);
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const {load}=require('./helpers/ts-loader-v404.cjs');
 const {reviewCinematicPerformerHarmonyV809:review,composeCinematicPerformerHarmonyV809:compose}=
@@ -143,7 +144,7 @@ test('no GPU resources, extra loops, writes, inferred lyrics or fake anchors',()
  assert(!/useFrame\s*\(|requestAnimationFrame\s*\(|new PerspectiveCamera\s*\(|localStorage|setInterval\s*\(/.test(s));
 });
 test('release gates start with V809 and preserve V808',()=>{
- const pkg=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|(?:809|81[0-9]|82[0-9]|83[0-9]))$/.test(pkg.version));
+ const pkg=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));
  for(const name of ['build:preflight','check:fast','check:release'])assert(pkg.scripts[name].includes(
   'npm run test:v809 && npm run test:v809:types && npm run test:v808 && npm run test:v808:types'),name);
 });

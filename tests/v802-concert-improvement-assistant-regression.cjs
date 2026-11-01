@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(802);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {load}=require('./helpers/ts-loader-v404.cjs');
@@ -146,7 +147,7 @@ check('V801 inspector remains read-only stage branch',()=>{
 });
 const pkg=require('../package.json');
 check('version and all three mandatory release gates',()=>{
- assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|(?:80[0-9]|81[0-9]|82[0-9]|83[0-9]))$/.test(pkg.version));
+ assert(/^0\.1\.0-v\d+$/.test(pkg.version));
  for(const key of ['build:preflight','check:fast','check:release'])
   assert(pkg.scripts[key].includes('npm run test:v802 && npm run test:v802:types && npm run test:v801'),key);
 });

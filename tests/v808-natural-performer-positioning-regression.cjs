@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(808);
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const {load}=require('./helpers/ts-loader-v404.cjs');
 const {planNaturalPerformerPositioningV808:plan,canRepositionWithGroundV808:groundSafe,canRepositionWithObservationV808:obsSafe}=
@@ -136,7 +137,7 @@ test('does not create a renderer, mixer, camera, timer, storage, server side eff
  assert(!/\buseFrame\s*\(|new AnimationMixer\s*\(|new PerspectiveCamera\s*\(|requestAnimationFrame\s*\(|localStorage|setInterval\s*\(/.test(src));
 });
 test('V808 release gates prepend V807',()=>{
- const pkg=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|(?:80[0-9]|81[0-9]|82[0-9]|83[0-9]))$/.test(pkg.version));
+ const pkg=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));
  for(const key of ['build:preflight','check:fast','check:release'])
   assert(pkg.scripts[key].includes('npm run test:v808 && npm run test:v808:types && npm run test:v807 && npm run test:v807:types'),key);
 });

@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(835);
 const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');
 const {load}=require('./helpers/ts-loader-v404.cjs');
 const p=load('components/visualizer/displayStudioV835');
@@ -74,5 +75,5 @@ check('status shows estimates not VRAM',()=>{const s=source('components/visualiz
 check('integration in existing settings',()=>assert(source('components/visualizer/adaptivePerformance.tsx').includes('<DisplayPerformanceStudioV835 />')));
 check('persist config safely',()=>assert(source('components/visualizer/displayStudioStoreV835.ts').includes('localStorage.setItem')));
 check('no extra RAF or renderer',()=>{const s=source('components/visualizer/displayStudioV835.ts');for(const bad of ['requestAnimationFrame(','new WebGLRenderer','new Mesh(','setTimeout('])assert(!s.includes(bad),bad)});
-check('production scripts include V835',()=>{const pkg=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|83[5-9])$/.test(pkg.version));for(const name of ['check:fast','check:release','build:preflight'])assert(pkg.scripts[name].includes('npm run test:v835 && npm run test:v835:types &&'),name)});
+check('production scripts include V835',()=>{const pkg=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));for(const name of ['check:fast','check:release','build:preflight'])assert(pkg.scripts[name].includes('npm run test:v835 && npm run test:v835:types &&'),name)});
 console.log(`PASS V835 Display Performance Studio: ${total} test groups`);

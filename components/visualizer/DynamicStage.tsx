@@ -511,7 +511,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     const currentActV810=verifiedActV810?.active?cameraNarrativeV605?.plan.acts[verifiedActV810.act]:undefined;
     const currentSectionV810=currentActV810?.section;
     const fxCueV810=planConcertFxV810({settings:concertFxV810,genre,
-      section:(currentSectionV810==='intro'||currentSectionV810==='verse'||currentSectionV810==='hook'||currentSectionV810==='build'||currentSectionV810==='drop'||currentSectionV810==='break'||currentSectionV810==='finale'?currentSectionV810:'verse') as ConcertFxSectionV810,
+      section:(currentSectionV810==='verse'||currentSectionV810==='hook'||currentSectionV810==='build'||currentSectionV810==='drop'||currentSectionV810==='break'?currentSectionV810:'verse') as ConcertFxSectionV810,
       progressMs:playback.positionMs,startMs:currentActV810?.startMs??0,endMs:currentActV810?.endMs??0,
       active:stageVisualV635.active&&theme!=='minimal'&&sceneFlags.extraLights,
       verified:cameraNarrativeV605?.plan.source==='verified-v600'&&verifiedActV810?.source==='verified-v600'&&

@@ -104,7 +104,7 @@ export function SmartConcertTimelineAutomationV764(){
        <div><small>{reason}</small></div>
        <label>Vorgeschlagene Aktion: {' '}
         {choices[clip.lane]?<select value={String(edits[clip.id]??clip.value)}
-         onChange={(e:{target:{checked:boolean;value:string}})=>setEdits(prev=>({...prev,[clip.id]:e.target.value}))}>
+         onChange={e=>setEdits(prev=>({...prev,[clip.id]:e.target.value}))}>
           {choices[clip.lane].map(([v,label])=><option value={v} key={v}>{label}</option>)}
          </select>:<input type="number" min="0.25" max="1.8" step="0.05" value={Number(edits[clip.id]??clip.value)}
          onChange={(e:{target:{checked:boolean;value:string}})=>{const n=Number(e.target.value);if(Number.isFinite(n))setEdits(prev=>({...prev,[clip.id]:n}));}}/>}

@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(828);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');const path=require('node:path');
 const {load}=require('./helpers/ts-loader-v404.cjs');
@@ -76,7 +77,7 @@ check('no duplicate render stage components',()=>assert(stage.includes('led.unif
 check('V828 leaves camera commands unchanged',()=>{let core=read('components/visualizer/concertExperienceDirectorV828.ts');for(let token of ['camera.position','setInterval(','requestAnimationFrame(','new WebGLRenderer','new InstancedMesh','Math.random'])assert(!core.includes(token),token)});
 check('UI provides three styles and safe preview',()=>{for(let token of ['experienceStyleV828','experienceIntensityV828','concertExperienceV828','planConcertExperienceV828','Simulierte'])assert(ui.includes(token),token)});
 check('settings are normalized and persisted',()=>{let s=read('components/visualizer/concertFxStudioV810.ts');for(let token of ['experienceIntensityV828:finite','concertExperienceV828:typeof','experienceStyleV828:raw'])assert(s.includes(token))});
-check('version and required release checks',()=>{let p=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|(?:82[89]|83[0-9]))$/.test(p.version));for(let k of ['check:fast','check:release','build:preflight'])assert(p.scripts[k].includes('npm run test:v828 && npm run test:v828:types &&'),k)});
+check('version and required release checks',()=>{let p=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(p.version));for(let k of ['check:fast','check:release','build:preflight'])assert(p.scripts[k].includes('npm run test:v828 && npm run test:v828:types &&'),k)});
 check('stage crown opt-out',()=>assert.equal(plan('drop',{settings:{concertCrownV828:false}}).crownCount,0));
 check('stage crown must respect disabled LED wall',()=>assert.equal(plan('drop',{settings:{ledWall:false}}).crownCount,0));
 check('authored LED cue disables crown',()=>assert.equal(plan('drop',{authored:author([cue('led','mute')])}).crownCount,0));

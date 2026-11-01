@@ -1051,10 +1051,10 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     const hipTorsoGainV735=debugSettingsV735.layers.torso?(debugSettingsV735.weights?.torso??1):0;
     const hipLegGainV735=debugSettingsV735.layers.legs?(debugSettingsV735.weights?.legs??1):0;
     const adjustedHipV735={...hipDanceV735,
-      hipPitch:hipDanceV735.hipPitch*hipTorsoGainV735,
-      hipRoll:hipDanceV735.hipRoll*hipTorsoGainV735,
-      hipLateral:hipDanceV735.hipLateral*hipTorsoGainV735,
-      hipVertical:hipDanceV735.hipVertical*hipTorsoGainV735,
+      hipPitch:(hipDanceV735.hipPitch??0)*hipTorsoGainV735,
+      hipRoll:(hipDanceV735.hipRoll??0)*hipTorsoGainV735,
+      hipLateral:(hipDanceV735.hipLateral??0)*hipTorsoGainV735,
+      hipVertical:(hipDanceV735.hipVertical??0)*hipTorsoGainV735,
       spineCounter:hipDanceV735.spineCounter*hipTorsoGainV735,
       kneeCounter:hipDanceV735.kneeCounter*hipLegGainV735,
       ankleCounter:hipDanceV735.ankleCounter*hipLegGainV735};
@@ -1105,7 +1105,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,
         progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
       delta,playing:isPlaying,reducedMotion,genre,section:performance.section,
-      manualPriority:hipManualPriorityV735||avatarMotionMode==='choreography'||!!stableLibraryClip||
+      manualPriority:hipManualPriorityV735||!!stableLibraryClip||
         !!activeSequence||!!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride||
         !!clipChoiceV328||!!phraseChoiceV329||!!rapLiveEnabledV412||!!lowClipV481&&selectedClip===lowClipV481,
       quality:getActivePerformanceTier(),footIKEnabled:avatarFootIKEnabled,

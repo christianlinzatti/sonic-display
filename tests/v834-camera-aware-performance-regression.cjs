@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(834);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
@@ -68,5 +69,5 @@ test('manual camera gate connected',()=>assert(source('components/visualizer/Dyn
 test('V823 authored lanes connected',()=>assert(source('components/visualizer/DynamicStage.tsx').includes('authoredFxV823[lane].boost>.001||authoredFxV823[lane].mute>.001')));
 test('live dashboard reflects actual relative cost',()=>assert(source('components/visualizer/ConcertQualityDashboardV826.tsx').includes('cameraAwareSavingsV834')));
 test('UI has controls and honest simulation label',()=>{const s=source('components/visualizer/ConcertFxStudioPanelV810.tsx');for(const v of ['cameraAwareV834','cameraStrengthV834','Simulierte Porträtansicht','keine echte Sichtbarkeitsmessung'])assert(s.includes(v),v)});
-test('production scripts prepend V834 gates',()=>{const p=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|83[4-9])$/.test(p.version));for(const k of ['check:fast','check:release','build:preflight'])assert(p.scripts[k].includes('npm run test:v834 && npm run test:v834:types &&'),k)});
+test('production scripts prepend V834 gates',()=>{const p=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(p.version));for(const k of ['check:fast','check:release','build:preflight'])assert(p.scripts[k].includes('npm run test:v834 && npm run test:v834:types &&'),k)});
 console.log(`PASS V834 camera-aware FX: ${count} test groups`);

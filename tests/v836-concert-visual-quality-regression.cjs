@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(836);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
@@ -75,5 +76,5 @@ check('render UI hooked to existing dashboard',()=>assert(read('components/visua
 check('UI never modifies camera or lighting',()=>{const s=read('components/visualizer/ConcertVisualQualityInspectorV836.tsx');for(const bad of ['setCamera(','setLighting(','setLyrics('])assert(!s.includes(bad));});
 check('visual QA only opt-in',()=>assert(read('components/visualizer/ConcertVisualQualityInspectorV836.tsx').includes('V751_OPEN_RENDER_QA_EVENT')));
 check('UI clarifies false confidence risk',()=>assert(read('components/visualizer/ConcertVisualQualityInspectorV836.tsx').includes('kein')));
-check('production scripts run V836 first',()=>{const pkg=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|83[6-9])$/.test(pkg.version));for(const key of ['build:preflight','check:fast','check:release'])assert(pkg.scripts[key].includes('npm run test:v836 && npm run test:v836:types &&'),key);});
+check('production scripts run V836 first',()=>{const pkg=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));for(const key of ['build:preflight','check:fast','check:release'])assert(pkg.scripts[key].includes('npm run test:v836 && npm run test:v836:types &&'),key);});
 console.log(`PASS V836 Concert Visual Quality Inspector: ${tests} test groups`);

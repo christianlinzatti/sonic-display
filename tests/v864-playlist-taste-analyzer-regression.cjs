@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(864);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const ts=require('./typescript-loader.cjs');
@@ -52,7 +53,7 @@ assert(!/fetch\s*\(|indexedDB|localStorage|sessionStorage/.test(code),'Pure core
 assert(parent.includes('<SpotifyPlaylistTasteAnalyzerV864 key={selected.id} playlistId={selected.id}'),'Scoped per selection; no stale results');
 assert(parent.includes('<SpotifyMiniPlayerV853/>'),'Mini-player retained');
 for(const phrase of ['.sonic-taste-v864','.sonic-taste-metrics-v864','@media(max-width:740px)','@media(prefers-reduced-motion:reduce)']) assert(css.includes(phrase),phrase);
-const pkg=require('../package.json'),lock=require('../package-lock.json');assert(/^0\.1\.0-v(?:864|86[5-9]|8[7-9]\d|9\d\d)$/.test(pkg.version));assert.equal(lock.version,pkg.version);assert.equal(lock.packages[''].version,pkg.version);
+const pkg=require('../package.json'),lock=require('../package-lock.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));assert.equal(lock.version,pkg.version);assert.equal(lock.packages[''].version,pkg.version);
 for(const script of ['test:v864','test:v864:types','test:v864:ui-types'])assert(pkg.scripts[script],script);
 for(const script of ['build:preflight','prebuild','check:fast','check:release'])assert(pkg.scripts[script].includes('npm run test:v864 && npm run test:v864:types && npm run test:v864:ui-types &&'),script);
 console.log('PASS V864: exact identity, remix protection, feature normalization, duplicates, archive presence/absence, bounded loading, immutable input, UI opt-in, account-bound local reading, release integration');

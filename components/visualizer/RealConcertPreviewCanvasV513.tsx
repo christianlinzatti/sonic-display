@@ -54,7 +54,7 @@ function RigV513({index,url,motionUrl,clock,tier,pi,count,onSample,qualityEnable
   }
   return copy;
  },[scene]);
- useEffect(()=>()=>disposeClonedAvatarSkeletonsV654(clone),[clone]);
+ useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(clone);},[clone]);
  const mixer=useMemo(()=>new AnimationMixer(clone),[clone]);
  const bones=useMemo(()=>findAnimatedBonesV508(clone),[clone]);
  const profile=useMemo(()=>measureGlbBodyV507(clone,1),[clone]);

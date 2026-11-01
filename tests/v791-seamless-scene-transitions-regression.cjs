@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(791);
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),Module=require('node:module');
 const ts=require('./typescript-loader.cjs'),root=path.resolve(__dirname,'..');
@@ -65,11 +66,11 @@ for(const ms of [10100,10700,11200,11800]){
 for(const [file,required] of [
  ['components/visualizer/VisualizerStage.tsx',['sampleSeamlessSceneTransitionV791','cinematicTransitionV791={seamlessSceneV791}','data-v791-kind']],
  ['components/visualizer/registry.tsx',['cinematicTransitionV791?:']],
- ['components/visualizer/ThreeAvatar.tsx',['transitionV791={props.cinematicTransitionV791}']],
+ ['components/visualizer/ThreeAvatar.tsx',['seam:props.cinematicTransitionV791','transitionV791={coordinatedTransitionV849.seam??undefined}']],
  ['components/visualizer/DynamicStage.tsx',['Math.min(lightingBlendV609.lightingRate','transitionV791={transitionV791?.active']],
  ['components/visualizer/ConcertAtmosphereRendererV308.tsx',['Math.min(lightingBlendV609.lightingRate','transitionV791?:']],
  ['components/visualizer/StageCameraDirectorV289.tsx',['Math.min(sceneBlendV609.cameraRate','transitionV791?.active']],
 ]){const content=fs.readFileSync(path.join(root,file),'utf8');for(const r of required)assert(content.includes(r),`${file} missing ${r}`)}
-const pkg=require('../package.json');assert(['0.1.0-v791','0.1.0-v792','0.1.0-v793','0.1.0-v794','0.1.0-v795','0.1.0-v796','0.1.0-v797','0.1.0-v798','0.1.0-v799','0.1.0-v800','0.1.0-v801','0.1.0-v802','0.1.0-v803','0.1.0-v804','0.1.0-v805','0.1.0-v806','0.1.0-v808','0.1.0-v809','0.1.0-v807'].includes(pkg.version));
+const pkg=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));
 for(const k of ['check:fast','build:preflight','check:release'])assert(pkg.scripts[k].includes('npm run test:v791 && npm run test:v791:types && npm run test:v790'),k);
 console.log('PASS V791: scene/act seams, continuous curves, authored priority, tier/lyrics safety, fail-closed evidence, camera/light wiring');

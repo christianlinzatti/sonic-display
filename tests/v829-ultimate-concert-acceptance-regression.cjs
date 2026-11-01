@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(829);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');const path=require('node:path');
 const {load}=require('./helpers/ts-loader-v404.cjs');
@@ -81,5 +82,5 @@ check('real scene instrumentation invokes acceptance after completed quality sam
 check('no new R3F meshes are created by acceptance panel',()=>{const ui=read('components/visualizer/ConcertAcceptancePanelV829.tsx');assert(!ui.includes('<instancedMesh'));assert(!ui.includes('useFrame('))});
 check('capture is transient and has no fake GLB mesh evidence',()=>{const core=read('components/visualizer/concertAcceptanceV829.ts');assert(!core.includes('localStorage'));assert(!core.includes('setInterval('));assert(core.includes('konfigurierten')===false)});
 check('review report downloadable as JSON',()=>{const ui=read('components/visualizer/ConcertAcceptancePanelV829.tsx');assert(ui.includes('JSON.stringify(')&&ui.includes('URL.revokeObjectURL('));});
-check('version + mandatory release scripts',()=>{const p=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|(?:829|83[0-9]))$/.test(p.version));for(const k of ['check:fast','check:release','build:preflight'])assert(p.scripts[k].includes('npm run test:v829 && npm run test:v829:types &&'));});
+check('version + mandatory release scripts',()=>{const p=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(p.version));for(const k of ['check:fast','check:release','build:preflight'])assert(p.scripts[k].includes('npm run test:v829 && npm run test:v829:types &&'));});
 console.log(`PASS V829 Ultimate Concert Acceptance: ${groups} test groups`);

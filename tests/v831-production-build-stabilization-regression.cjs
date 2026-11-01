@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(831);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const os=require('node:os');
@@ -16,7 +17,7 @@ const fixturePkg={name:'sonic-display',version:'0.1.0-v831',dependencies:{react:
 const fixtureLock=()=>({name:fixturePkg.name,version:fixturePkg.version,lockfileVersion:3,packages:{'':{version:fixturePkg.version,dependencies:{...fixturePkg.dependencies},devDependencies:{...fixturePkg.devDependencies}}}});
 try{
  put('package.json',fixturePkg);put('package-lock.json',fixtureLock());put('tsconfig.json',{});
- check('V831 project version',()=>assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|83[1-9])$/.test(pkg.version)));
+ check('V831 project version',()=>assert(/^0\.1\.0-v\d+$/.test(pkg.version)));
  check('root lockfile version',()=>assert.equal(rootLock.version,pkg.version));
  check('root package dependency exactness',()=>assert.deepEqual(rootLock.packages[''].dependencies,pkg.dependencies));
  check('root devdependency exactness',()=>assert.deepEqual(rootLock.packages[''].devDependencies,pkg.devDependencies));
@@ -42,6 +43,28 @@ try{
  check('fake tsc binary alone cannot satisfy installed dependency',()=>{fs.mkdirSync(path.join(fixture,'node_modules/typescript/bin'),{recursive:true});fs.writeFileSync(path.join(fixture,'node_modules/typescript/bin/tsc'),'');assert.equal(doctor.inspectBuildV831(fixture).dependencies.typescript,false)});
  check('both package and executable are required',()=>{put('node_modules/next/package.json',{});put('node_modules/typescript/package.json',{});fs.mkdirSync(path.join(fixture,'node_modules/next/dist/bin'),{recursive:true});fs.writeFileSync(path.join(fixture,'node_modules/next/dist/bin/next'),'');assert.equal(doctor.inspectBuildV831(fixture).readyForBuild,true)});
  check('ready-to-test does not mean released',()=>{const r=doctor.inspectBuildV831(fixture);assert.equal(r.status,'ready-to-test');assert.equal(r.productionReleased,false)});
+ check('ready fixture audit returns code zero without approval or release stages',()=>{
+  const r=gate.executeV831({root:fixture,auditOnly:true});
+  assert.equal(r.code,0);
+  assert.equal(r.report.status,'ready-to-test');
+  assert.equal(r.report.productionReleased,false);
+  assert.deepEqual(r.report.stages,[]);
+  assert.equal(gate.evaluateTechnicalGateV831(r.report),false);
+ });
+ check('ready fixture CLI audit exits zero but does not release',()=>{
+  const scriptsDir=path.join(fixture,'scripts');
+  fs.mkdirSync(scriptsDir,{recursive:true});
+  for(const name of ['v831-production-gate.cjs','v831-build-readiness.cjs'])
+   fs.copyFileSync(path.join(root,'scripts',name),path.join(scriptsDir,name));
+  const result=spawnSync(process.execPath,[path.join(scriptsDir,'v831-production-gate.cjs'),'--audit'],
+   {encoding:'utf8',timeout:10000});
+  assert.equal(result.error,undefined);
+  assert.equal(result.status,0,'ready-to-test audit must not be treated as error');
+  const report=JSON.parse(fs.readFileSync(path.join(fixture,'v831-production-gate-result.json'),'utf8'));
+  assert.equal(report.status,'ready-to-test');
+  assert.equal(report.productionReleased,false);
+  assert.deepEqual(report.stages,[]);
+ });
  check('missing mandatory script blocks readiness',()=>{delete fixturePkg.scripts.typecheck;put('package.json',fixturePkg);assert.equal(doctor.inspectBuildV831(fixture).readyForBuild,false);fixturePkg.scripts.typecheck='echo typecheck';put('package.json',fixturePkg)});
  const good=doctor.inspectBuildV831(fixture);
  check('gate accepts exactly three passed stages',()=>assert.equal(gate.evaluateTechnicalGateV831({readiness:good,stages:['check:release','typecheck','next-build'].map(name=>({name,status:'passed'}))}),true));
@@ -52,13 +75,24 @@ try{
  check('blocked fixture gate does not run any stage',()=>{fs.rmSync(path.join(fixture,'node_modules/next/dist/bin/next'));const r=gate.executeV831({root:fixture});assert.equal(r.code,1);assert.equal(r.report.stages[0].name,'dependencies');assert.equal(r.report.productionReleased,false)});
  check('gate always writes report',()=>assert(fs.existsSync(path.join(fixture,'v831-production-gate-result.json'))));
  check('no bypass flags accepted by CLI',()=>{const r=spawnSync(process.execPath,[path.join(root,'scripts/v831-production-gate.cjs'),'--skip'],{encoding:'utf8',timeout:6000});assert.notEqual(r.status,0);assert.match(r.stderr,/Ungueltiges Argument/)});
- check('audit status never passes production gate',()=>{const r=spawnSync(process.execPath,[path.join(root,'scripts/v831-production-gate.cjs'),'--audit'],{encoding:'utf8',timeout:10000});assert.notEqual(r.status,0)});
+ check('audit CLI checks readiness but never grants production release',()=>{
+  const r=spawnSync(process.execPath,[path.join(root,'scripts/v831-production-gate.cjs'),'--audit'],{encoding:'utf8',timeout:10000});
+  assert.equal(r.error,undefined,'audit process must not time out or fail to launch');
+  assert.equal(r.signal,null,'audit process must exit normally');
+  const report=JSON.parse(fs.readFileSync(path.join(root,'v831-production-gate-result.json'),'utf8'));
+  assert.equal(report.productionReleased,false,'audit must never approve production');
+  assert.deepEqual(report.stages.filter(x=>['check:release','typecheck','next-build'].includes(x.name)),[],
+   'audit must not silently pretend to run full release stages');
+  assert(['ready-to-test','blocked'].includes(report.status),'audit must only report readiness');
+  assert.equal(r.status,report.status==='ready-to-test'?0:1,
+   'exit code must reflect readiness, not production approval');
+ });
  check('project case collisions absent',()=>assert.deepEqual(doctor.scanCaseCollisions(root),[]));
  check('production gate always uses full release suite',()=>assert(fs.readFileSync(path.join(root,'scripts/v831-production-gate.cjs'),'utf8').includes("['run','check:release']")));
  check('production gate always does full typecheck',()=>assert(fs.readFileSync(path.join(root,'scripts/v831-production-gate.cjs'),'utf8').includes("['run','typecheck']")));
  check('production gate launches actual local Next CLI',()=>assert(fs.readFileSync(path.join(root,'scripts/v831-production-gate.cjs'),'utf8').includes("'node_modules','next','dist','bin','next'")));
  check('production gate does not perform npm run build and repeat prebuild',()=>assert(!fs.readFileSync(path.join(root,'scripts/v831-production-gate.cjs'),'utf8').includes("['run','build']")));
- check('prebuild remains protected',()=>assert.equal(pkg.scripts.prebuild,'npm run check:fast'));
+ check('prebuild remains protected',()=>assert(pkg.scripts.prebuild.endsWith('npm run check:fast') && pkg.scripts.prebuild.includes('npm run test:v865 && npm run test:v865:types &&'), 'prebuild muss neue Versions- und check:fast-Pruefungen beibehalten'));
  check('old V830 release gate retained',()=>assert(pkg.scripts['verify:production:v830'].includes('v830-production-gate.cjs')));
  check('V831 checks first in release, fast and preflight chains',()=>{for(const key of ['check:fast','check:release','build:preflight'])assert(pkg.scripts[key].includes('npm run test:v831 && npm run test:v831:types &&'),key)});
  check('on-demand CI is not duplicated on every push',()=>{const txt=fs.readFileSync(path.join(root,'.github/workflows/v831-production-on-demand.yml'),'utf8');assert.match(txt,/workflow_dispatch:/);assert(!txt.includes('  push:'));assert(txt.includes('npm ci --no-audit --no-fund'));assert(txt.includes('npm run verify:production:v831'));assert(txt.includes('windows-latest'));assert(txt.includes('ubuntu-24.04'))});

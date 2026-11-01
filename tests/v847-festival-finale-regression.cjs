@@ -132,6 +132,6 @@ test('no shadows',()=>assert.equal((renderer.match(/castShadow=\{false\}/g)||[])
 test('package and lock agree',()=>assert.equal(require('../package.json').version,require('../package-lock.json').version));
 test('release chain preserves V846',()=>{const scripts=require('../package.json').scripts;
  for(const key of ['check:fast','check:release','build:preflight'])
-  assert(scripts[key].startsWith('npm run test:v850 && npm run test:v850:types && npm run test:v849 && npm run test:v849:types && npm run test:v848 && npm run test:v848:types && npm run test:v847 && npm run test:v847:types && npm run test:v846 && npm run test:v846:types &&'));
+  assert(scripts[key].includes('npm run test:v850 && npm run test:v850:types && npm run test:v849 && npm run test:v849:types && npm run test:v848 && npm run test:v848:types && npm run test:v847 && npm run test:v847:types && npm run test:v846 && npm run test:v846:types &&'));
 });
 console.log(`PASS V847: ${count} festival finale test groups`);

@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(837);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
@@ -71,5 +72,5 @@ check('integrated in existing V368 renderer',()=>{const s=read('components/visua
 check('existing viseme / stem guarded',()=>{const s=read('components/visualizer/VocalRigV368.tsx');assert(s.includes('!!protectedMouthV686||!!manualVisemeV644'));});
 check('legacy V686 timing remains',()=>assert(read('components/visualizer/VocalRigV368.tsx').includes('vocalTimingRateV686(')));
 check('legacy V597 flow remains',()=>assert(read('components/visualizer/VocalRigV368.tsx').includes('rapLipFlowRateV597(')));
-check('production scripts updated',()=>{const p=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|83[7-9])$/.test(p.version));for(const k of ['build:preflight','check:fast','check:release'])assert(p.scripts[k].includes('npm run test:v837 && npm run test:v837:types &&'));});
+check('production scripts updated',()=>{const p=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(p.version));for(const k of ['build:preflight','check:fast','check:release'])assert(p.scripts[k].includes('npm run test:v837 && npm run test:v837:types &&'));});
 console.log(`PASS V837 Advanced Deutschrap Lip-Sync: ${total} test groups`);

@@ -1,10 +1,10 @@
 const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
 const source=p=>fs.readFileSync(path.join(__dirname,"..",p),"utf8");
-const theme=source("components/MusicAwareThemes.tsx"),main=source("components/SonicDisplay.tsx"),toolbar=source("components/TouchKioskControls.tsx"),ambient=source("components/SmartAmbientMode.tsx"),css=source("app/globals.css"),pkg=require("../package.json");
+const registry=source("config/musicGenres.ts"),theme=source("components/MusicAwareThemes.tsx"),main=source("components/SonicDisplay.tsx"),toolbar=source("components/TouchKioskControls.tsx"),ambient=source("components/SmartAmbientMode.tsx"),css=source("app/globals.css"),pkg=require("../package.json");
 const checks=[
-["version",["0.1.0-v248","0.1.0-v248"].includes(pkg.version)],
-["genre palette",theme.includes('Record<MusicGenre, AmbientPalette>')],
-["all music genres",["hardstyle","techno","hiphop","rock","ambient","pop"].every(v=>theme.includes(v+':'))],
+["version",Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1]??0)>=248],
+["genre palette",theme.includes('genrePalette(genre: MusicGenre | null)') && theme.includes('MUSIC_GENRES[genre]')],
+["all music genres",["hardstyle","techno","hiphop","rock","ambient","pop"].every(v=>registry.includes(v+':'))],
 ["persist opt in",theme.includes('localStorage.setItem(THEME_KEY')],
 ["default disabled",theme.includes('useState(false)')],
 ["cover sampling",theme.includes('getImageData(0,0,24,24)')],

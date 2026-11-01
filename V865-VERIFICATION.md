@@ -1,5 +1,7 @@
 # V865 – Verifikationsbericht (01.11.2026)
 
+> **Nachtrag V865.1 (01.11.2026):** V844–V848-Hotfix geprüft. Alle Einzeltests V844–V850, V865, Syntax, Architektur, Lockfile und Dateinamencheck bestanden. Die vollständige TypeScript-Prüfung und Next.js-Produktion bleiben **offen/blockiert**. Details in `V865.1-REGRESSION-HOTFIX.md`.
+
 ## Getestet / bestanden
 
 - `npm run test:v865`: bestanden. 30/90/365-Tage-Zeiträume, UTC/DST-Grenzen, Tagesaggregation, vermeintliche Paare, exklusive Ereignisse, Archivgrenzen, leere Archive, Unveränderlichkeit und Integration.

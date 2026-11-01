@@ -1,3 +1,4 @@
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(257);
 const fs=require('node:fs');const assert=require('node:assert/strict');
 const source=fs.readFileSync('components/visualizer/avatarFrameProfiler.ts','utf8');
 const panel=fs.readFileSync('components/AvatarFrameProfilerPanel.tsx','utf8');
@@ -10,5 +11,5 @@ assert.match(source,/activeInstances:/);
 assert.match(source,/modelEntries.clear\(\)/);
 assert.match(panel,/V257 Avatar-Leistungsvergleich/);
 assert.match(panel,/resetAvatarModelComparison/);
-assert.match(require('../package.json').version,/^0\.1\.0-v(25[7-9]|260)$/);
+assert.match(require('../package.json').version,/^0\.1\.0-v\d+$/);
 console.log('V257 avatar comparison regression passed (10 assertions)');

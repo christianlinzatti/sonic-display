@@ -64,7 +64,7 @@ for(const [file,needles] of Object.entries(required)){
  for(const needle of needles)assert(text.includes(needle),`${file}: ${needle}`);
 }
 const pkg=require('../package.json');
-const compatibleVersion=Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1]);assert(compatibleVersion>=793&&compatibleVersion<=845);
+const compatibleVersion=Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1]);assert(Number.isInteger(compatibleVersion)&&compatibleVersion>=793,`V793 requires project version >=793, found ${pkg.version}`);
 for(const script of ['build:preflight','check:fast','check:release'])
  assert(pkg.scripts[script].includes('npm run test:v793 && npm run test:v793:types && npm run test:v792'),script);
 console.log('PASS V793: verified acts, genre/section patterns, actual kick gating, low tier, manual/lyrics/blackout protection, stage wiring');

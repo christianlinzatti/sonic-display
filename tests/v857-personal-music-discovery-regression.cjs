@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(857);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const ts=require('./typescript-loader.cjs');
@@ -52,6 +53,6 @@ assert(ui.includes('Math.min(3,work.length)')&&content.includes('slice(0,36)'),'
 assert(parent.includes('<div key={`discovery-v857-${user}`}><LastFmPersonalDiscoveryV857 events={archive.events}'),'Account-scoped archive');
 assert(!/\bfetch\s*\(|localStorage|indexedDB|sessionStorage/.test(content),'Core read only');
 for(const required of ['.lastfm-discovery-v857','.lastfm-discovery-genre-row-v857','@media(max-width:720px)','@media(prefers-reduced-motion:reduce)'])assert(css.includes(required));
-const pkg=require('../package.json'),lock=require('../package-lock.json');assert(/^0\.1\.0-v(85[7-9]|8[6-9]\d|9\d\d)$/.test(pkg.version));assert.equal(pkg.version,lock.version);assert.equal(pkg.version,lock.packages[''].version);
+const pkg=require('../package.json'),lock=require('../package-lock.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));assert.equal(pkg.version,lock.version);assert.equal(pkg.version,lock.packages[''].version);
 for(const name of ['prebuild','build:preflight','check:fast','check:release'])assert(pkg.scripts[name].includes('npm run test:v857 && npm run test:v857:types && npm run test:v857:ui-types && npm run test:v856 &&'),name);
 console.log('PASS V857: monthly artist momentum, novel artists, six-month metadata sampling, timezone, safe genre coverage, on-demand requests, touch UI, account isolation, package gates');

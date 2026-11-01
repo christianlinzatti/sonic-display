@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(833);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
@@ -44,5 +45,5 @@ check('diagnostic screen warns not VRAM',()=>assert(source('components/visualize
 check('diagnostic export includes owned cleanup statistics',()=>assert(source('components/visualizer/PerformanceMemoryDashboardV770.tsx').includes('cleanupOperationsV833:getCleanupSnapshotV833()')));
 check('no automatic idle cache trim in rendering loop',()=>assert(!source('components/visualizer/DynamicStage.tsx').includes('trimInactivePreviewGltfCacheV833')));
 check('previous renderer telemetry remains intact',()=>assert(source('components/visualizer/PerformanceMemoryDashboardV770.tsx').includes('assessResourceTrendV770(history.samples)')));
-check('project release scripts include V833 first',()=>{const p=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|83[3-9])$/.test(p.version));for(const name of ['check:fast','check:release','build:preflight'])assert(p.scripts[name].includes('npm run test:v833 && npm run test:v833:types &&'),name);});
+check('project release scripts include V833 first',()=>{const p=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(p.version));for(const name of ['check:fast','check:release','build:preflight'])assert(p.scripts[name].includes('npm run test:v833 && npm run test:v833:types &&'),name);});
 console.log(`PASS V833 GPU resource cleanup: ${checks} test groups`);

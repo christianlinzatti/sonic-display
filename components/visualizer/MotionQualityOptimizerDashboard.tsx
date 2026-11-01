@@ -39,7 +39,7 @@ export function MotionQualityOptimizerDashboard({avatarId,motions,modelUrl}:{ava
  useEffect(()=>{if(!playing||!selected)return;const interval=window.setInterval(()=>setSeconds(t=>(t+0.05)%duration),50);return()=>window.clearInterval(interval);},[playing,selected,duration]);
  function inspect(){if(!current)return;const req=++request.current;setBusy(true);setError("");setResult(null);setPlaying(false);setShow3D(false);
   setVisualReportV589(null);setVisualBusyV589(false);
-  void withPrivateGltfV769(current.url,gltf=>({reports:analyzeGLBMotionClips(gltf.animations),clips:gltf.animations}))
+  void withPrivateGltfV769(current.url,gltf=>({reports:analyzeGLBMotionClips(gltf.animations),clips:gltf.animations.map(clip=>clip.clone())}))
     .then(data=>{if(req!==request.current)return;
       setResult({url:current.url,...data});setIndex(0);setSecond(-1);setSeconds(0);setBusy(false);
     }).catch(e=>{if(req!==request.current)return;setError(e instanceof Error?e.message:"GLB konnte nicht geladen werden.");setBusy(false);});
@@ -90,7 +90,7 @@ export function MotionQualityOptimizerDashboard({avatarId,motions,modelUrl}:{ava
       {show3D&&<div style={{marginTop:10}}>
         <label>Zeit {seconds.toFixed(2)} / {duration.toFixed(2)} s<input type="range" min="0" max={duration} step="0.01" value={Math.min(seconds,duration)} onChange={e=>{setSeconds(Number(e.target.value));setPlaying(false);}}/></label>
         <button type="button" onClick={()=>setPlaying(v=>!v)}>{playing?'Pause':'Wiedergabe'}</button> <button type="button" onClick={()=>{setSeconds(0);setPlaying(false);}}>Anfang</button>
-        <MotionQualityPreviewV321 modelUrl={modelUrl} sourceScene={result!.scene} sourceClips={clips} index={index} settings={settings} seconds={seconds}/>
+        <MotionQualityPreviewV321 modelUrl={modelUrl} motionUrl={result!.url} sourceClips={clips} index={index} settings={settings} seconds={seconds}/>
       </div>}</>}
     </>}
   </>}

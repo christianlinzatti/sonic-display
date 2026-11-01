@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(830);
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const {load}=require('./helpers/ts-loader-v404.cjs');
@@ -83,5 +84,5 @@ check('UI shows rig proof',()=>assert(ui.includes('V830 · Produktionsnachweis d
 check('UI export includes production proof',()=>assert(ui.includes('productionV830:production')));
 check('UI reset removes proof on restart',()=>assert(ui.includes('resetCastV830(acceptanceKeyV829(genre,count))')));
 check('V830 release gate cannot skip checks',()=>assert(!read('scripts/v830-production-gate.cjs').includes('--skip')));
-check('package and technical gates',()=>{let p=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|83[0-9])$/.test(p.version));assert(p.scripts['verify:production:v830'].includes('v830-production-gate.cjs'));for(let k of ['check:fast','check:release','build:preflight'])assert(p.scripts[k].includes('npm run test:v830 && npm run test:v830:types &&'),k)});
+check('package and technical gates',()=>{let p=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(p.version));assert(p.scripts['verify:production:v830'].includes('v830-production-gate.cjs'));for(let k of ['check:fast','check:release','build:preflight'])assert(p.scripts[k].includes('npm run test:v830 && npm run test:v830:types &&'),k)});
 console.log(`PASS V830 Production Readiness: ${groups} test groups`);

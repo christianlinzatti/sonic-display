@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(805);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {load}=require('./helpers/ts-loader-v404.cjs');
@@ -87,7 +88,7 @@ test('only selected models are rendered, max three',()=>{
  assert(s.includes('.slice(0,3)')&&s.includes('reviewModels.map')&&s.includes('modelSignature'));
 });
 test('new release first in gates',()=>{
- const j=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|(?:80[5-9]|81[0-9]|82[0-9]|83[0-9]))$/.test(j.version));
+ const j=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(j.version));
  for(const k of ['build:preflight','check:fast','check:release'])assert(j.scripts[k].includes('npm run test:v805 && npm run test:v805:types && npm run test:v804'),k);
 });
 console.log(`PASS V805: ${count} groups, ${probes} deterministische Gruppenproben`);

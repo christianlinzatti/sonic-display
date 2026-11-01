@@ -108,7 +108,7 @@ export function InteractiveConcertTimelineStudioV763(){
      <label>Dauer in Sekunden<input type="number" min="0.25" max={duration/1000} step="0.25" value={clip.durationMs/1000}
       onChange={(e:{target:{value:string;checked:boolean}})=>{const n=Number(e.target.value);if(Number.isFinite(n))changeClip({durationMs:Math.round(bound(n*1000,250,duration))});}}/></label>
      {clip.lane==='camera'||clip.lane==='dance'||clip.lane==='lyrics'?<label>Aktion
-      <select value={String(clip.value)} onChange={(e:{target:{value:string;checked:boolean}})=>changeClip({value:e.target.value})}>
+      <select value={String(clip.value)} onChange={e=>changeClip({value:e.target.value})}>
        {values[clip.lane].map(([v,name])=><option value={v} key={v}>{name}</option>)}
       </select></label>:<label>{clip.lane==='lighting'?'Lichtfaktor':clip.lane==='effects'?'FX-Faktor':'Foto-Deckkraft'}
        <input type="range" min={clip.lane==='lighting'?.25:0} max={clip.lane==='photos'?1:1.8} step="0.05"

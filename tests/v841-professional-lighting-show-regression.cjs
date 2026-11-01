@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(841);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');const path=require('node:path');
 const {load}=require('./helpers/ts-loader-v404.cjs');
@@ -93,8 +94,8 @@ test('shader has fan spread',()=>assert(read('components/visualizer/laserMatrixS
 test('no new frame loop in planner',()=>{const a=read('components/visualizer/professionalLightingExperienceV841.ts');for(const forbidden of ['useFrame(','setInterval(','setTimeout(','WebGLRenderer(','localStorage','fetch('])assert(!a.includes(forbidden),forbidden)});
 test('studio settings',()=>assert(read('components/visualizer/ConcertFxStudioPanelV810.tsx').includes('Professional Lighting Show 5.0')));
 test('backup included through existing fx settings',()=>assert(read('services/settings/unifiedBackup.ts').includes('sonic-display-ui-preferences-v1')));
-test('version',()=>assert(/^0\.1\.0-v(?:841|842|843|844(?:\.1)?|845|845|846|847|848|849|850)$/.test(require('../package.json').version)));
-test('package lock',()=>assert(/^0\.1\.0-v(?:841|842|843|844(?:\.1)?|845|845|846|847|848|849|850)$/.test(require('../package-lock.json').version)));
+test('version',()=>assert(/^0\.1\.0-v\d+$/.test(require('../package.json').version)));
+test('package lock',()=>assert(/^0\.1\.0-v\d+$/.test(require('../package-lock.json').version)));
 test('release prefix',()=>{const p=require('../package.json');for(const key of ['check:fast','check:release','build:preflight'])assert(p.scripts[key].includes('npm run test:v841 && npm run test:v841:types &&'))});
 test('automation retained',()=>assert(fs.existsSync(path.join(root,'.github/workflows/v832-continuous-validation.yml'))));
 console.log(`PASS: V841 Professional Lighting Show – ${tests} test groups`);

@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(800);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {load}=require('./helpers/ts-loader-v404.cjs');
@@ -92,5 +93,5 @@ for(let t=0;t<1600;t++){
 test('1600 full-song probes including all scene boundaries',()=>assert.equal(checks,1600));
 test('no new renderer, wall clock, random or GLB writes',()=>{const s=fs.readFileSync('components/visualizer/concertExperienceMilestoneV800.ts','utf8');assert(!/requestAnimationFrame\s*\(|useFrame\s*\(|Date\.now\s*\(|Math\.random\s*\(|new AnimationMixer\s*\(/.test(s))});
 test('V670 guard remains after V800 composition',()=>{const s=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');const a=s.indexOf('const concertExperienceV800='),b=s.indexOf('const showQualityV670='),c=s.indexOf('const directedDynamicsV670=');assert(a>0&&a<b&&b<c);assert(s.includes('base:directedDynamicsV800'));assert(s.includes('directedDynamicsV800,showQualityV670'));for(const k of ['data-v800-moment','data-v800-coverage','data-v800-issues'])assert(s.includes(k))});
-const pkg=require('../package.json');test('version and release gates',()=>{assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|(?:80[0-9]|81[0-9]|82[0-9]|83[0-9]))$/.test(pkg.version));for(const k of ['build:preflight','check:fast','check:release'])assert(pkg.scripts[k].includes('npm run test:v800 && npm run test:v800:types && npm run test:v799'),k)});
+const pkg=require('../package.json');test('version and release gates',()=>{assert(/^0\.1\.0-v\d+$/.test(pkg.version));for(const k of ['build:preflight','check:fast','check:release'])assert(pkg.scripts[k].includes('npm run test:v800 && npm run test:v800:types && npm run test:v799'),k)});
 console.log(`PASS V800: ${passed} regression groups, ${checks} deterministic full-song playback probes`);

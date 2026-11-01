@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(807);
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const {load}=require('./helpers/ts-loader-v404.cjs');
 const {planNaturalMultiArtistStageV807:plan}=load('components/visualizer/naturalMultiArtistStageInteractionV807');
@@ -107,7 +108,7 @@ test('no extra GLB, mixer, three scene, timer, storage or WebGL loop',()=>{
  assert(!/\buseFrame\s*\(|new AnimationMixer\s*\(|new PerspectiveCamera\s*\(|requestAnimationFrame\s*\(|localStorage|setInterval\s*\(/.test(s));
 });
 test('V807 first in all mandatory release gates',()=>{
- const pkg=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|(?:80[0-9]|81[0-9]|82[0-9]|83[0-9]))$/.test(pkg.version));
+ const pkg=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));
  for(const k of ['build:preflight','check:fast','check:release'])assert(pkg.scripts[k].includes('npm run test:v807 && npm run test:v807:types && npm run test:v806 && npm run test:v806:types'),k);
 });
 console.log(`PASS V807: ${tests} tests, ${probes} deterministische multi-artist samples`);

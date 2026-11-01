@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(843);
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {load}=require('./helpers/ts-loader-v404.cjs');
 const {normalizeConcertFxV810:normalize,planConcertFxV810:planFX,DEFAULT_CONCERT_FX_V810:defaults}=load('components/visualizer/concertFxStudioV810');
@@ -82,7 +83,7 @@ test('renderer excludes fake physical hardware',()=>assert(!renderer.includes('<
 test('studio contains settings and truthful preview',()=>{for(const x of ['V843 · Foam Cannon Experience 2.0','foamRealismV843','foamLandingV843','foamExperienceV843','foamStyleV843','foamMotionPreviewV843'])assert(studio.includes(x),x)});
 test('backup persists concert FX settings',()=>assert(fs.readFileSync('services/settings/unifiedBackup.ts','utf8').includes('sonic-display-ui-preferences-v1')));
 test('V817 seed bounds retained',()=>assert.equal(caps.bubbles+caps.mist,288));
-test('package/lock version',()=>{const version=require('../package.json').version;assert.equal(require('../package-lock.json').version,version);assert(/^0\.1\.0-v(?:84[3-9]|850)$/.test(version));});
+test('package/lock version',()=>{const version=require('../package.json').version;assert.equal(require('../package-lock.json').version,version);assert(/^0\.1\.0-v\d+$/.test(version));});
 test('gates require V843 both',()=>{let p=require('../package.json');for(const g of ['check:fast','check:release','build:preflight'])assert(p.scripts[g].includes('npm run test:v843 && npm run test:v843:types &&'))});
 test('CI pipeline retained',()=>assert(fs.existsSync('.github/workflows/v832-continuous-validation.yml')));
 console.log(`PASS V843: ${passed} foam-cannon experience test groups`);

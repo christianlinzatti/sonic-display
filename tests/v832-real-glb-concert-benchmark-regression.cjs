@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(832);
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {load}=require('./helpers/ts-loader-v404.cjs');
 const b=load('components/visualizer/realGlbConcertBenchmarkV832');
@@ -66,5 +67,5 @@ check('new live code integrated into stage',()=>{const src=read('components/visu
 check('UI includes actual rig benchmark',()=>{const src=read('components/visualizer/ConcertFxStudioPanelV810.tsx');assert(src.includes('<RealGlbBenchmarkPanelV832 enabled={s.qualityDashboardV826}/>'))});
 check('UI has JSON export',()=>assert(read('components/visualizer/RealGlbBenchmarkPanelV832.tsx').includes('sonic-display-v832-real-glb-benchmark.json')));
 check('CI checks Linux & Windows on PR/push',()=>{const src=read('.github/workflows/v832-continuous-validation.yml');assert(src.includes('pull_request:'));assert(src.includes('push:'));assert(src.includes('windows-latest'));assert(src.includes('ubuntu-24.04'));assert(src.includes('npm run verify:production:v831'))});
-check('V832 tests in all main gates',()=>{const p=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|83[2-9])$/.test(p.version));for(let k of ['check:fast','check:release','build:preflight'])assert(p.scripts[k].includes('npm run test:v832 && npm run test:v832:types &&'),k)});
+check('V832 tests in all main gates',()=>{const p=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(p.version));for(let k of ['check:fast','check:release','build:preflight'])assert(p.scripts[k].includes('npm run test:v832 && npm run test:v832:types &&'),k)});
 console.log(`PASS V832 real GLB concert benchmark: ${n} test groups`);

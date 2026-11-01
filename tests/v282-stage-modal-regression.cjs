@@ -1,3 +1,4 @@
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(282);
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -44,6 +45,6 @@ assert.match(css,/stage-theme-tile/);
 assert.match(settings,/frei drehen, zoomen und die Lichteffekte ausprobieren/);
 
 const pkg = JSON.parse(read('package.json'));
-assert.match(pkg.version,/^0\.1\.0-v(?:28[2-9]|29[0-9]|[3-9][0-9]{2,}|324|325|326|327|328|329|330|331|332|333|334|335|336|337|338|339|340|341|342|343|344|345|346|347|348|349|350|351|352)$/);
+assert.match(pkg.version,/^0\.1\.0-v\d+$/);
 assert.ok(pkg.scripts['verify:offline'].includes('test:v282'));
 console.log('PASS V282 orbitable stage preview modal');

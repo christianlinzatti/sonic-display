@@ -60,6 +60,13 @@ assert.doesNotThrow(()=>new Function(worker),'Service worker must parse as JavaS
 for(const text of ["addEventListener('push'","showNotification(","addEventListener('notificationclick'",'clients.openWindow','sonic-release-'])assert(worker.includes(text),`SW missing ${text}`);
 assert(!worker.includes('caches.open(')&&!worker.includes('Authorization: Bearer'));
 const pkg=require('../package.json');assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=365, 'version must not precede V365');assert(pkg.scripts['verify:offline'].includes('test:v365'));
-assert.equal(require('../vercel.json').crons[0].schedule,'0 * * * *');
+// V865.6: Vercel Hobby cron jobs may run at most once per day (UTC).
+const cronConfig=require('../vercel.json');
+assert.deepEqual(cronConfig.crons,[{path:'/api/cron/release-push',schedule:'0 8 * * *'}]);
+for(const {schedule} of cronConfig.crons){
+ const match=/^(\d{1,2}) (\d{1,2}) \* \* \*$/.exec(schedule);
+ assert(match,`Vercel Hobby cron must use one fixed UTC minute and hour per day: ${schedule}`);
+ assert(Number(match[1])<=59 && Number(match[2])<=23,`Invalid daily cron time: ${schedule}`);
+}
 assert(fs.existsSync('public/sonic-icon-192.png'));assert(fs.existsSync('public/sonic-icon-512.png'));
 console.log('V365 Web Push regression passed (boundaries, crypto, push security, consent UI, cron, SW, config)');

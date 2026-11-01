@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(856);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const ts=require('./typescript-loader.cjs');
@@ -43,6 +44,6 @@ for(const required of ['calculateMonthlyInsightsV856','availableInsightMonthsV85
 assert(parent.includes('<div key={`monthly-v856-${user}`}><LastFmMonthlyInsightsV856 events={archive.events}'),'Connected to account-scoped long-term archive');
 assert(!/\bfetch\s*\(|localStorage|indexedDB|sessionStorage|window\./.test(ui+src),'V856 adds no fetch or persistent writes');
 for(const required of ['.lastfm-monthly-v856','.lastfm-monthly-comebacks-v856','@media(max-width:720px)','@media(prefers-reduced-motion:reduce)'])assert(css.includes(required));
-const pkg=require('../package.json'),lock=require('../package-lock.json');assert(/^0\.1\.0-v(85[6-9]|8[6-9]\d|9\d\d)$/.test(pkg.version));assert.equal(lock.version,pkg.version);assert.equal(lock.packages[''].version,pkg.version);
+const pkg=require('../package.json'),lock=require('../package-lock.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));assert.equal(lock.version,pkg.version);assert.equal(lock.packages[''].version,pkg.version);
 for(const gate of ['build:preflight','check:fast','check:release','prebuild'])assert(pkg.scripts[gate].includes('npm run test:v856 && npm run test:v856:types && npm run test:v856:ui-types && npm run test:v855 &&'),`${gate} must run V856+V855`);
 console.log('PASS V856: monthly data, normalized artists, missing months, UTC/Vienna, 90-day track rediscoveries, no writes/API calls, responsive UI, version/gates');

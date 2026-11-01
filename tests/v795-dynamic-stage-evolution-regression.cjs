@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(795);
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),Module=require('node:module');
 const ts=require('./typescript-loader.cjs'),root=path.resolve(__dirname,'..');
@@ -75,7 +76,7 @@ for(const [file,phrases] of [
  ['components/visualizer/DynamicStage.tsx',['evolutionAllowedV795','!manualLightingV763','!authoredLightsV386','playback.positionMs<evolveV795.sceneEndMs','evolutionRefV795={evolutionRefV795}']],
  ['components/visualizer/ConcertArchitectureV789.tsx',['positionStageEvolutionBarV795','mesh.current.setMatrixAt(i,transform.matrix)','matrixElapsedV795.current>=.05','computeBoundingSphere()']],
  ]){const source=fs.readFileSync(path.join(root,file),'utf8');for(const x of phrases)assert(source.includes(x),`${file} missing ${x}`);}
-const pkg=require('../package.json');assert(['0.1.0-v795','0.1.0-v796','0.1.0-v797','0.1.0-v798','0.1.0-v799','0.1.0-v800','0.1.0-v801','0.1.0-v802','0.1.0-v803','0.1.0-v804','0.1.0-v805','0.1.0-v806','0.1.0-v808','0.1.0-v809','0.1.0-v807'].includes(pkg.version));
+const pkg=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));
 for(const key of ['build:preflight','check:fast','check:release'])
  assert(pkg.scripts[key].includes('npm run test:v795 && npm run test:v795:types && npm run test:v794'),key);
 console.log('PASS V795: stage geometry evolution, verified timing, no invented scenes, bounded transforms, 4-avatar/lyrics/low-tier controls, renderer integration');

@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(790);
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),Module=require('node:module');
 const ts=require('./typescript-loader.cjs'),root=path.resolve(__dirname,'..');
@@ -100,6 +101,6 @@ for(const ms of [1000,24000,48000,60000,72000,87000,103000,125000]){
 const stage=fs.readFileSync(path.join(root,'components/visualizer/VisualizerStage.tsx'),'utf8');
 for(const needle of ['planCinematicShowV790','sampleCinematicShowV790','base:directedDynamicsV790',
  'directedDynamicsV800,showQualityV670','data-v790-moment','data-v790-peak'])assert(stage.includes(needle),needle);
-const pkg=require('../package.json');assert(['0.1.0-v790','0.1.0-v791','0.1.0-v792','0.1.0-v793','0.1.0-v794','0.1.0-v795','0.1.0-v796','0.1.0-v797','0.1.0-v798','0.1.0-v799','0.1.0-v800','0.1.0-v801','0.1.0-v802','0.1.0-v803','0.1.0-v804','0.1.0-v805','0.1.0-v806','0.1.0-v808','0.1.0-v809','0.1.0-v807'].includes(pkg.version));
+const pkg=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));
 for(const k of ['build:preflight','check:fast','check:release'])assert(pkg.scripts[k].includes('npm run test:v790 && npm run test:v790:types && npm run test:v789'),k);
 console.log('PASS V790: verified storyboard + single peak, anticipation/breath, manual protection, seek-safe fades, quality gate');

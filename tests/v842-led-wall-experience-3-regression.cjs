@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(842);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');const path=require('node:path');
 const {load}=require('./helpers/ts-loader-v404.cjs');
@@ -83,8 +84,8 @@ test('legacy V821 still planned',()=>assert(stage.includes('planLedWallExperienc
 test('no extra frame hook',()=>assert(!read('components/visualizer/ledWallExperiencePlannerV842.ts').includes('useFrame(')));
 test('studio toggles V842',()=>assert(read('components/visualizer/ConcertFxStudioPanelV810.tsx').includes('V842 · LED Wall Experience 3.0')));
 test('settings backed up with V810 object',()=>assert(read('services/settings/unifiedBackup.ts').includes('sonic-display-ui-preferences-v1')));
-test('package version',()=>assert(/^0\.1\.0-v(?:842|843|844(?:\.1)?|845|846|847|848|849|850)$/.test(require('../package.json').version)));
-test('lock version',()=>assert(/^0\.1\.0-v(?:842|843|844(?:\.1)?|845|846|847|848|849|850)$/.test(require('../package-lock.json').version)));
+test('package version',()=>assert(/^0\.1\.0-v\d+$/.test(require('../package.json').version)));
+test('lock version',()=>assert(/^0\.1\.0-v\d+$/.test(require('../package-lock.json').version)));
 test('new tests in release gates',()=>{const p=require('../package.json');for(const k of ['check:fast','check:release','build:preflight'])assert(p.scripts[k].includes('npm run test:v842 && npm run test:v842:types &&'))});
 test('CI retained',()=>assert(fs.existsSync(path.join(root,'.github/workflows/v832-continuous-validation.yml'))));
 test('v842 off sentinel',()=>assert.deepEqual({...LED_WALL_OFF_V842},{active:false,reason:'disabled',mode:0,power:0,depth:0,geometry:0,tunnel:0,phase:0,flow:0,lightLink:0}));

@@ -1,3 +1,4 @@
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(248);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');const path=require('node:path');
 const root=path.join(__dirname,'..');
@@ -14,5 +15,5 @@ assert.ok(dashboard.includes('performanceBenchmarkMetrics'));
 for(const symbol of ['finishBenchmark','BENCHMARK_MIN_SAMPLES','appendBenchmark','benchmarkDelta']){
  assert.ok(read('components/visualizer/performanceBenchmarkMetrics.ts').includes(symbol),symbol);
 }
-assert.match(require('../package.json').version,/^0\.1\.0-v(?:24[8-9]|2[5-9]\d|[3-9]\d\d|324|325|326|327|328|329|330|331|332|333|334|335|336|337|338|339|340|341|342|343|344|345|346|347|348|349|350|351|352)$/);
+assert.match(require('../package.json').version,/^0\.1\.0-v\d+$/);
 console.log('V244 build stability checks passed');

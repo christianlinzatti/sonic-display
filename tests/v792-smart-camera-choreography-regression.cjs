@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(792);
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const ts=require('./typescript-loader.cjs');
 require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{
@@ -84,13 +85,13 @@ const requires={
  'components/visualizer/VisualizerStage.tsx':['sampleSmartCameraChoreographyV792','smartCameraChoreographyV792={smartCameraV792}','data-v792-move'],
  'components/visualizer/registry.tsx':['smartCameraChoreographyV792?:'],
  'components/visualizer/ThreeAvatar.tsx':['choreographyV792={props.smartCameraChoreographyV792}'],
- 'components/visualizer/StageCameraDirectorV289.tsx':['composeSmartCameraChoreographyV792','const framedV792=','guardAutomaticCameraV351(framedV809','!studioProfileV398.enabled','!lipSync?.rapCameraOverridesV430?.length'],
+ 'components/visualizer/StageCameraDirectorV289.tsx':['composeSmartCameraChoreographyV792','const framedV792=','guardAutomaticCameraV351(framedV848','!studioProfileV398.enabled','!lipSync?.rapCameraOverridesV430?.length'],
 };
 for(const [file,words] of Object.entries(requires)){
  const content=fs.readFileSync(path.join(root,file),'utf8');
  for(const word of words)assert(content.includes(word),`${file} missing ${word}`);
 }
-const pkg=require('../package.json');assert(['0.1.0-v792','0.1.0-v793','0.1.0-v794','0.1.0-v795','0.1.0-v796','0.1.0-v797','0.1.0-v798','0.1.0-v799','0.1.0-v800','0.1.0-v801','0.1.0-v802','0.1.0-v803','0.1.0-v804','0.1.0-v805','0.1.0-v806','0.1.0-v808','0.1.0-v809','0.1.0-v807'].includes(pkg.version));
+const pkg=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));
 for(const k of ['build:preflight','check:fast','check:release'])
  assert(pkg.scripts[k].includes('npm run test:v792 && npm run test:v792:types && npm run test:v791'),k);
 console.log('PASS V792: deterministic verified shots, motion curves and fades, manual/lyrics/tier safeguards, real measured frame protection and wiring');

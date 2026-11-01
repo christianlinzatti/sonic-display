@@ -162,6 +162,6 @@ test('no extra camera frame loop',()=>assert.equal((stage.match(/useFrame\(/g)||
 test('no randomized motion',()=>{const source=fs.readFileSync('components/visualizer/cinematicCameraDirectorV848.ts','utf8');assert(!source.includes('Math.random(')&&!source.includes('setTimeout(')&&!source.includes('setInterval('));});
 test('V848 registered in build gates',()=>{
  const p=require('../package.json');for(const k of ['build:preflight','check:fast','check:release'])
-  assert(p.scripts[k].startsWith('npm run test:v850 && npm run test:v850:types && npm run test:v849 && npm run test:v849:types && npm run test:v848 && npm run test:v848:types && npm run test:v847'));
+  assert(p.scripts[k].includes('npm run test:v850 && npm run test:v850:types && npm run test:v849 && npm run test:v849:types && npm run test:v848 && npm run test:v848:types && npm run test:v847'));
 });
 console.log(`PASS V848: ${count} cinematic-camera test groups`);

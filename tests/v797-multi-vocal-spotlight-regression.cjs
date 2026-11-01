@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(797);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
@@ -67,15 +68,15 @@ assert.deepEqual(compose(pose,solo,anchors,opts).x,pose.x,'do not move aim or in
 const stage=fs.readFileSync(path.join(root,'components/visualizer/ThreeAvatar.tsx'),'utf8');
 const cam=fs.readFileSync(path.join(root,'components/visualizer/StageCameraDirectorV289.tsx'),'utf8');
 const light=fs.readFileSync(path.join(root,'components/visualizer/DynamicStage.tsx'),'utf8');
-for(const v of ['planMultiVocalSpotlightV797','scene:props.lipSync?.cinematicSceneV528','vocalSpotlightV797={vocalSpotlightV797}'])
+for(const v of ['planMultiVocalSpotlightV797','scene:props.lipSync?.cinematicSceneV528','vocalSpotlightV797={directedSpotlightV838}'])
  assert(stage.includes(v),'ThreeAvatar missing '+v);
-for(const v of ['composeMultiVocalSpotlightCameraV797','guardAutomaticCameraV351(framedV809,composition)','authored:authoredCameraV528'])
+for(const v of ['composeMultiVocalSpotlightCameraV797','guardAutomaticCameraV351(framedV848,composition)','authored:authoredCameraV528'])
  assert(cam.includes(v),'camera missing '+v);
 for(const v of ['vocalSafeV797','!authoredLightsV386','timelineCue.blackout<=0','vocalKeyV797','vocalFillV797',
  'followPerformerLightV557(state.scene,(vocalSafeV797?'])
  assert(light.includes(v),'light missing '+v);
 const pkg=require('../package.json');
-assert(['0.1.0-v797','0.1.0-v798','0.1.0-v799','0.1.0-v800','0.1.0-v801','0.1.0-v802','0.1.0-v803','0.1.0-v804','0.1.0-v805','0.1.0-v806','0.1.0-v808','0.1.0-v809','0.1.0-v807'].includes(pkg.version));
+assert(/^0\.1\.0-v\d+$/.test(pkg.version));
 for(const name of ['build:preflight','check:fast','check:release'])
  assert(pkg.scripts[name].includes('npm run test:v797 && npm run test:v797:types && npm run test:v796'),name);
 console.log('PASS V797: verified editorial singer cast, solo/duet/handoff/ensemble, stale seeks, lyric/manual/tier/blackout guards, camera anchors and shared stage integration');

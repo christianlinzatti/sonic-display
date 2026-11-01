@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(798);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
@@ -91,7 +92,7 @@ check('invalid V798 import rejected',()=>{const raw={format:'sonic-facial-rig-v3
 check('numerical overflow gets clamped when imported',()=>{const raw={format:'sonic-facial-rig-v383',version:1,rapMouthPrecisionV798:{enabled:true,intensity:9999}};assert.equal(portable.importFacialProfileV383(JSON.stringify(raw),[]).profile.rapMouthPrecisionV798.intensity,100)});
 const pkg=require('../package.json');
 check('version, scripts, release gates',()=>{
- assert(['0.1.0-v798','0.1.0-v799','0.1.0-v800','0.1.0-v801','0.1.0-v802','0.1.0-v803','0.1.0-v804','0.1.0-v805','0.1.0-v806','0.1.0-v808','0.1.0-v809','0.1.0-v807'].includes(pkg.version));
+ assert(/^0\.1\.0-v\d+$/.test(pkg.version));
  for(const k of ['build:preflight','check:fast','check:release']) {
    assert(pkg.scripts[k].includes('npm run test:v798 && npm run test:v798:types && npm run test:v797'),k);
    if(pkg.version==='0.1.0-v799')assert(pkg.scripts[k].startsWith('npm run test:v799 && npm run test:v799:types && npm run test:v798'),k);

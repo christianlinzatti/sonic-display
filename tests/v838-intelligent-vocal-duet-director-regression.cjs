@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(838);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
@@ -107,5 +108,5 @@ test('camera uses V838 after V809',()=>assert(stage.includes('const framedV838=v
 test('group uses V838 AFTER V807',()=>assert(group.includes('const directedInteractionV838=vocalDuetV838?refineIntelligentDuetLooksV838(')));
 test('no resource allocation in planner',()=>{const src=read('components/visualizer/intelligentVocalDuetDirectorV838.ts');for(const forbidden of ['new WebGL','new THREE.','setInterval(','setTimeout(','dispatchEvent(','fetch(','localStorage'])assert(!src.includes(forbidden),forbidden)});
 test('git automation preserved',()=>assert(fs.existsSync(path.join(dir,'.github/workflows/v832-continuous-validation.yml'))));
-test('new release mandatory gates',()=>{const p=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|83[89])$/.test(p.version));for(const k of ['check:fast','check:release','build:preflight'])assert(p.scripts[k].includes('npm run test:v840 && npm run test:v840:types && npm run test:v839 && npm run test:v839:types && npm run test:v838 && npm run test:v838:types &&'),k)});
+test('new release mandatory gates',()=>{const p=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(p.version));for(const k of ['check:fast','check:release','build:preflight'])assert(p.scripts[k].includes('npm run test:v840 && npm run test:v840:types && npm run test:v839 && npm run test:v839:types && npm run test:v838 && npm run test:v838:types &&'),k)});
 console.log(`PASS: V838 Intelligent Vocal & Duet Director 3.0 – ${total} Testgruppen.`);

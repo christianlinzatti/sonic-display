@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(804);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {load}=require('./helpers/ts-loader-v404.cjs');
@@ -82,7 +83,7 @@ test('V803 comparison still accessible via the V802 proposal panel',()=>{
 });
 test('CSS overlay is noninteractive',()=>assert(read('app/globals.css').includes('.v804-overlays{position:absolute;inset:0;')&&read('app/globals.css').includes('pointer-events:none')));
 test('version and required release gates',()=>{
- const pkg=require('../package.json');assert(/^0\.1\.0-v(?:850|849|848|847|846|845|844(?:\.1)?|843|842|841|840|(?:80[0-9]|81[0-9]|82[0-9]|83[0-9]))$/.test(pkg.version));
+ const pkg=require('../package.json');assert(/^0\.1\.0-v\d+$/.test(pkg.version));
  for(const gate of ['build:preflight','check:fast','check:release'])
   assert(pkg.scripts[gate].includes('npm run test:v804 && npm run test:v804:types && npm run test:v803'),gate);
 });

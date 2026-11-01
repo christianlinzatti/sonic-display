@@ -1,4 +1,5 @@
 'use strict';
+require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(855);
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const ts=require('./typescript-loader.cjs');
@@ -40,6 +41,6 @@ assert(parent.includes('{archive&&<ListeningHistoryExplorerV855 events={archive.
 for(const expected of ['.history-studio-v855','.history-studio-filters-v855','.history-studio-timeline-v855','@media(max-width:570px)'])assert(source('app/globals.css').includes(expected));
 assert(!ui.includes('fetch('),'History Studio must not fetch or poll Spotify');
 assert(!ui.includes('localStorage'),'History Studio must not re-write history');
-const pkg=require('../package.json'),lock=require('../package-lock.json');assert.match(pkg.version,/^0\.1\.0-v(?:855|85[6-9]|8[6-9]\d|9\d\d)$/);assert.equal(lock.version,pkg.version);assert.equal(lock.packages[''].version,pkg.version);
+const pkg=require('../package.json'),lock=require('../package-lock.json');assert.match(pkg.version,/^0\.1\.0-v\d+$/);assert.equal(lock.version,pkg.version);assert.equal(lock.packages[''].version,pkg.version);
 for(const gate of ['build:preflight','check:fast','check:release','prebuild'])assert(pkg.scripts[gate].includes('npm run test:v855 && npm run test:v855:types && '),`${gate} must run V855 first`);
 console.log('PASS V855: history search/date/repeats/order, local date, stable pagination, CSV safety, component integration, release gates');
