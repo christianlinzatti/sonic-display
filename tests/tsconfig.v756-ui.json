@@ -1,0 +1,13 @@
+{
+ "compilerOptions":{
+  "target":"ES2022","module":"ESNext","moduleResolution":"Bundler","strict":true,"skipLibCheck":true,
+  "jsx":"preserve","noEmit":true,"types":[],"lib":["ES2022","DOM"],"baseUrl":"..",
+  "paths":{
+   "@/context/MusicContext":["tests/stubs/v756-music-context.ts"],
+   "@/context/UiPreferencesContext":["tests/stubs/v756-preferences-context.ts"],
+   "@/types/music":["tests/stubs/v756-music-types.ts"]
+  }
+ },
+ "files":["../components/visualizer/AdvancedVocalReviewPanelV756.tsx","stubs/v701-react-jsx.d.ts"],
+ "include":[],"exclude":[]
+}

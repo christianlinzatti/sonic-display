@@ -41,7 +41,7 @@ export function profileMotionV438(m:InstalledCharacterMotion,measured?:MotionFea
 }
 export function catalogAutoMotionsV438(store:CharacterMotionStore,avatarId:string,
   measured?:Record<string,MotionFeaturesV439>):MotionProfileV438[]{
-  return store.motions.filter(m=>m.avatarId===avatarId).slice(0,250).map(m=>profileMotionV438(m,measured?.[m.id]));
+  return store.motions.filter(m=>m.avatarId===avatarId).map(m=>profileMotionV438(m,measured?.[m.id]));
 }
 const normalizeScene=(scene:MotionSceneV438):DanceSection=>
   scene==="reply"||scene==="duet"?"verse":scene;

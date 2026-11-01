@@ -22,9 +22,7 @@ export function saveImageSelectionV340(value:ImageSelectionSettingsV340):ImageSe
 const clamp=(n:number)=>Math.max(0,Math.min(1,n));
 /** Provider URLs often differ only by resizing parameters; use their canonical path for duplicate detection. */
 export function imageIdentityV340(raw:string):string {
- try {const url=new URL(raw);let p=decodeURIComponent(url.pathname).toLowerCase();
- p=p.replace(/\/\d{2,5}x\d{2,5}\//g,'/').replace(/\b(width|height|resize|w|h)[=_-]\d{2,5}/g,'');
- return url.hostname.toLowerCase()+p.replace(/__+/g,'_');}catch{return raw.split('?')[0].toLowerCase();}
+ try {const url=new URL(raw);url.hash='';return url.href;}catch{return raw;}
 }
 export function imageScoreV340(candidate:ImageCandidateV340,targetRatio:number,settings:ImageSelectionSettingsV340):number {
  const w=candidate.width||0,h=candidate.height||0;

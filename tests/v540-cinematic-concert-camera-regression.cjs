@@ -73,7 +73,8 @@ for(const name of ['sonic-performer-v3.glb','sonic-pulsebot-v1.glb','sonic-nova-
   assert(gltf.animations.length>=20);assert(gltf.nodes.length>0);
 }
 const pkg=require('../package.json');assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]||0)>=540,'V540 camera regression remains active after V540');
-assert(pkg.scripts['build:preflight'].includes('npm run test:v540 && npm run test:v540:types'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v540');
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v540:types');
 console.log(`PASS V540: ${trials} viewport/cast/lyric scenarios (${improved} bounded refinements), manual/identity safeguards, 5 GLB fixtures and camera wiring`);
 
 assert(require("node:fs").readFileSync("components/visualizer/StageCameraDirectorV289.tsx","utf8").indexOf("composeCinematicDuetInteractionV585(concertFramedV550,sceneV528")<require("node:fs").readFileSync("components/visualizer/StageCameraDirectorV289.tsx","utf8").indexOf("composeFullSongCameraV605(duetFramedV585"),"V585 must precede V605");

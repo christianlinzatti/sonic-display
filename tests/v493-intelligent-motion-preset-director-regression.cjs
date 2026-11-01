@@ -42,7 +42,10 @@ for(const token of ['useGltfMotionPresetDirectorV493','intelligentMotionPresetDi
  'manualPriority:!liveBlendAllowedV492','const activeLiveBlendV492=liveBlendAllowedV492?directorBlendV493:null',
  'const presetWeightsV493=useRef<Map<string,number>>(new Map())','weights.delete(name)','action.stop()',
  'action.setEffectiveWeight(weight)',
- '!name.startsWith(\'GlbPresetV492:\')','useAnimations(playbackClips, root)'])assert(source.includes(token),`missing V493 wiring: ${token}`);
+ '!name.startsWith(\'GlbPresetV492:\')'])assert(source.includes(token),`missing V493 wiring: ${token}`);
+const mixer=read('components/visualizer/useGltfAnimationMixerV492.ts');
+assert(mixer.includes('new AnimationMixer(')&&mixer.includes('groupMixerV328.clipAction('));
+assert(mixer.includes('disposeMixerClipsV654('),'V654 animation mixer cleanup must be retained');
 const stage=read('components/visualizer/VisualizerStage.tsx');
 assert.match(stage,/detectedSection:rapMotionHookV437\?"hook":directedSection/);
 assert.match(read('tests/v273-dance-intelligence-regression.cjs'),/rapMotionHookV437/);

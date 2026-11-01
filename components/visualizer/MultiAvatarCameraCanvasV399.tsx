@@ -1,9 +1,11 @@
 "use client";
+import {usePreviewGltfCacheV654} from './usePreviewGltfCacheV654';
 import {Canvas,useFrame,useThree} from "@react-three/fiber";
 import {OrbitControls,useGLTF} from "@react-three/drei";
 import {Component,Suspense,useEffect,useMemo,useRef,type ReactNode} from "react";
 import {Box3,PerspectiveCamera,Vector3} from "three";
 import {clone as cloneSkinnedScene} from "three/examples/jsm/utils/SkeletonUtils.js";
+import {disposeClonedAvatarSkeletonsV654} from "./disposeClonedAvatarSkeletonsV654";
 import type {OrbitControls as OrbitControlsImpl} from "three-stdlib";
 import type {CameraPose} from "./stageCameraPoseHelpersV289";
 import type {GroupPointV326} from "./multiAvatarStageDirectorV326";
@@ -23,6 +25,7 @@ function DemoFigure({index}:{index:number}){
 }
 function AvatarClone({url}:{url:string}){
  const {scene}=useGLTF(url);
+ usePreviewGltfCacheV654(url);
  const copy=useMemo(()=>{
   const cloned=cloneSkinnedScene(scene);
   const box=new Box3().setFromObject(cloned);
@@ -35,6 +38,7 @@ function AvatarClone({url}:{url:string}){
   }
   return cloned;
  },[scene]);
+ useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(copy);},[copy]);
  return <primitive object={copy} dispose={null}/>;
 }
 class AvatarErrorV399 extends Component<{children:ReactNode;fallback:ReactNode},{failed:boolean}>{

@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.v686-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/advancedDeutschrapLipSyncV837.ts",
+    "../components/visualizer/vocalTimingPrecisionV686.ts",
+    "../components/visualizer/advancedDeutschrapLipFlowV597.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v569-react-types.d.ts",
+    "stubs/v508-three-types.d.ts",
+    "stubs/v837-rig-three-types.d.ts"
+  ]
+}

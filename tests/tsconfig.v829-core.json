@@ -1,0 +1,4 @@
+{
+ "compilerOptions":{"strict":true,"noEmit":true,"skipLibCheck":true,"target":"ES2022","module":"ESNext","moduleResolution":"node","baseUrl":"..","paths":{"@/*":["./*"]},"typeRoots":["./v789-empty-types"]},
+ "files":["../components/visualizer/concertAcceptanceV829.ts"]
+}

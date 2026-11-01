@@ -1,4 +1,5 @@
 "use client";
+import {getNaturalDuetModeV664} from "./naturalDuetFeatureInteractionV664";
 // Extracted unchanged from ThreeAvatar.tsx (V492 modular refactor).
 // --- Extracted dependencies (V492 refactor) ---
 import { resolveEnsembleSettingsV396 } from "./performanceExperienceV396";
@@ -17,6 +18,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArtistNameBubbleV441 } from "./ArtistNameBubbleV441";
 import { planArtistSpotlightV443 } from "./artistSpotlightV443";
 import { planMultiArtistInteractionV444 } from "./multiArtistInteractionV444";
+import {planNaturalMultiArtistStageV807} from "./naturalMultiArtistStageInteractionV807";
+import {refineIntelligentDuetLooksV838,type VocalDuetPlanV838} from "./intelligentVocalDuetDirectorV838";
+import {planNaturalPerformerPositioningV808,canRepositionWithGroundV808,canRepositionWithObservationV808} from "./naturalPerformerPositioningV808";
+import {createStageBlockingStateV840,refineDynamicStageBlockingV840,readStageBlockingV840} from "./dynamicPerformerStageBlockingV840";
 import { planCrewAccentsV452, combineCrewGesturesV452, combineCrewLooksV452 } from "./advancedMultiAvatarPerformanceV452";
 import { refineNaturalCrewV458 } from "./naturalStageInteractionV458";
 import { VOCAL_CHANGE_EVENT_V445, advanceVocalEvidenceV445, emptyVocalEvidenceV445, vocalHintPulseV445 } from "./vocalChangeEvidenceV445";
@@ -35,8 +40,10 @@ import {planNaturalMultiAvatarStageV504} from "./naturalMultiAvatarStageInteract
 import {planNaturalEnsembleV509,safeEnsembleTravelV509} from "./naturalEnsembleChoreographyV509";
 import {planAdvancedGroupV517} from "./advancedGroupPerformanceV517";
 import {planAdvancedEnsembleV638,safeEnsembleDepthV638} from "./advancedEnsembleChoreographyV638";
+import {readEnsembleV760,ENSEMBLE_EVENT_V760,planAdvancedEnsembleV760,safeEnsembleDepthV760} from "./advancedEnsembleDirectorV760";
 import {planCinematicMultiAvatarV527} from "./cinematicMultiAvatarV527";
 import {planCrewConcertInteractionV539} from "./crewConcertInteractionV539";
+import {planFeatureDuetPerformanceV687} from "./featureDuetPerformanceV687";
 import {planCrewChoreographyV548} from "./crewChoreographyV548";
 import {planStageSpatialInteractionV505,safeStageDepthV505} from "./stageSpatialInteractionV505";
 import {planMultiAvatarCollisionV506,safeCollisionDepthV506,softenCollisionGestureV506} from "./multiAvatarCollisionAvoidanceV506";
@@ -50,8 +57,10 @@ import { newLowInteractionStateV483, stepLowInteractionV483 } from "./naturalLow
 import { planExpressiveLowPoseV484 } from "./expressiveLowPosePerformanceV484";
 import { planNaturalDanceMotionV485, type NaturalDanceSlotV485 } from "./naturalDanceMotionStudioV485";
 import { planAdvancedDanceFootworkV486, type FootSupportV486, type FootworkSlotV486 } from "./advancedDanceFootworkV486";
+import {refineGroupFootworkV684} from "./naturalDanceEvolutionV684";
 import {newNaturalFullBodyStateV524,stepNaturalFullBodyV524} from "./naturalFullBodyDanceV524";
 import {newGroupFootworkQualityStateV596} from "./naturalFootworkQualityV596";
+import {createGroupFootworkClockV839,refineGroupFootworkV839,readNaturalFootworkV839} from "./naturalDanceFootworkV839";
 import { buildGroundContactReportV487, emptyGroundObservationV487, GROUND_CONTACT_REPORT_EVENT_V487 } from './groundContactStudioV487';
 import {stepGlbGroundingV494,newGlbGroundStateV494,readGlbGroundCalibrationsV494,normalizeGlbGroundModelIdV494,DEFAULT_GLB_GROUND_CALIBRATION_V494,GLB_GROUND_REPORT_EVENT_V494,GLB_GROUND_CALIBRATION_EVENT_V494,type GlbGroundStateV494,type GlbGroundCalibrationsV494} from './realisticGlbFootContactV494';
 import { readFootLockV322, FOOT_LOCK_EVENT_V322 } from "./intelligentFootLockV322";
@@ -60,7 +69,7 @@ import { stepMultiAvatarFormationV495, newFormationStateV495, safeFormationTrave
 import { Dancer } from './DanceFormationActorsV492';
 import { GroupDanceMotionContextV485, GroupFootSupportContextV486, GroupFootworkContextV486, GroupGroundObservationContextV487, GroupLowPoseContextV481, GroupMotionClockContextV328, GroupPhraseContextV329, PartnerCalibrationContext, PartnerGestureContext, PartnerLookContext, AvatarBodyContextV507, AnimatedBodyContextV508 } from './ThreeAvatarContextsV492';
 
-export function GroupDancersV326({props,settings}:{props:VisualizerProps;settings:GroupStudioV326}){
+export function GroupDancersV326({props,settings,vocalDuetV838}:{props:VisualizerProps;settings:GroupStudioV326;vocalDuetV838?:VocalDuetPlanV838}){
  const refs=useRef<(Group|null)[]>([null,null,null,null]);
  const bodyRegistryV507=useRef(createBodyRegistryV507());
  const animatedRegistryV508=useRef(createAnimatedBodyRegistryV508());
@@ -78,6 +87,9 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
  // V524 runs in this existing frame callback: no independent render loop.
  const naturalBodyStateV524=useRef(newNaturalFullBodyStateV524());
  const qualityStateV596=useRef(newGroupFootworkQualityStateV596());
+ const footworkStateV839=useRef(createGroupFootworkClockV839());
+ const stageBlockingV840=useRef(createStageBlockingStateV840());
+ useEffect(()=>{stageBlockingV840.current=createStageBlockingStateV840();},[props.track?.id]);
  const groundingV494=useRef<GlbGroundStateV494[]>(Array.from({length:4},newGlbGroundStateV494));
  const calibrationsV494=useRef<GlbGroundCalibrationsV494>({});
  useEffect(()=>{
@@ -94,6 +106,8 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
  const lastPublishedV445=useRef("");
  const ensembleStateV392=useRef(initialEnsembleV392());
  const formationStateV495=useRef(newFormationStateV495());
+ const [ensembleSettingsV760,setEnsembleSettingsV760]=useState(readEnsembleV760);
+ useEffect(()=>{const refresh=()=>setEnsembleSettingsV760(readEnsembleV760());window.addEventListener(ENSEMBLE_EVENT_V760,refresh);return()=>window.removeEventListener(ENSEMBLE_EVENT_V760,refresh);},[]);
  const performanceCueRefV375=useRef<ReturnType<typeof resolveAdaptiveVocalPerformanceV375>|null>(null);
  const interactionCueRefV376=useRef<ReturnType<typeof resolveDuetInteractionV376>|null>(null);
   const concertCueRefV386=useRef<ReturnType<typeof resolveConcertCueV386>|null>(null);
@@ -383,6 +397,7 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
       props.avatarMotionMode==='choreography',
     beat:props.audio.beatStrength??0,
     strength:props.artistInteractionStrengthV444??65,tier:getActivePerformanceTier(),
+      interactionModeV664:getNaturalDuetModeV664(props.track?.id??""),
   });
   if(duetAccentV500.active){
     for(let i=0;i<settings.count;i++){
@@ -550,9 +565,35 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
   });
   naturalBodyStateV524.current=stabilizedBodyV524.state;
   qualityStateV596.current=stabilizedBodyV524.qualityStateV596??newGroupFootworkQualityStateV596();
-  const naturalFootworkV524=stabilizedBodyV524.footwork;
+  // V684: long-form phrase variety ONLY on the existing generated automatic
+  // swing targets. No new contacts or stage translations are introduced.
+  const naturalFootworkV524=refineGroupFootworkV684(stabilizedBodyV524.footwork,{
+    trackId:props.track?.id,seconds,genre:props.genre,
+    section:props.showCue?.enabled?props.showCue.section:props.cameraDirectorSection,
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,
+    manualPriority:!!selectedSingerV444||!!settings.trackId||displayPerformanceV375.enabled||
+      finalDuetV385.enabled||props.avatarMotionMode==='choreography'||
+      props.lipSync?.manualVocalEnabledV385===true||
+      (props.lipSync?.rapDuetEnabledV416===true&&!!props.lipSync.rapDuetAssignmentsV416?.length),
+    automaticGroup:settings===props.autoMultiArtistGroupV442,
+    quality:getActivePerformanceTier(),support:supportV486.current.map(ref=>ref.current),
+  });
+  // V839: conserve planted feet; smooth only existing automatic group lifts.
+  const footworkResultV839=refineGroupFootworkV839(footworkStateV839.current,naturalFootworkV524,{
+    settings:readNaturalFootworkV839(),trackId:props.track?.id,seconds,delta,
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,genre:props.genre,
+    section:props.showCue?.enabled?props.showCue.section:props.cameraDirectorSection,
+    manualPriority:!!selectedSingerV444||!!settings.trackId||displayPerformanceV375.enabled||
+      finalDuetV385.enabled||props.avatarMotionMode==='choreography'||
+      props.lipSync?.manualVocalEnabledV385===true||
+      (props.lipSync?.rapDuetEnabledV416===true&&!!props.lipSync.rapDuetAssignmentsV416?.length),
+    automaticGroup:settings===props.autoMultiArtistGroupV442,footLocked:footLock,
+    quality:getActivePerformanceTier(),support:supportV486.current.map(ref=>ref.current),
+  });
+  footworkStateV839.current=footworkResultV839.state;
+  const finalFootworkV839=footworkResultV839.footwork;
   const contactReportV487=buildGroundContactReportV487(
-    groundV487.current.map(item=>item.current),naturalFootworkV524.slots,settings.count,
+    groundV487.current.map(item=>item.current),finalFootworkV839.slots,settings.count,
     props.isPlaying&&!props.reducedMotion);
   const automaticGroundingV494=settings===props.autoMultiArtistGroupV442;
   const manualGroundingV494=!!selectedSingerV444||
@@ -563,7 +604,7 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
   const groundDecisionsV494=Array.from({length:settings.count},(_,i)=>{
     const modelId=normalizeGlbGroundModelIdV494(urls[i]?.id??(i%2===1?props.secondaryAvatarModelId:props.avatarModelId));
     const result=stepGlbGroundingV494({state:groundingV494.current[i],modelId,
-      trackId:props.track?.id??'',seconds,delta,footwork:naturalFootworkV524.slots[i],
+      trackId:props.track?.id??'',seconds,delta,footwork:finalFootworkV839.slots[i],
       observation:groundV487.current[i].current,pose:lowInteractionPlanV483.plan.slots[i],
       playing:props.isPlaying,reducedMotion:props.reducedMotion,
       manualPriority:manualGroundingV494,automaticGroup:automaticGroundingV494,
@@ -788,6 +829,142 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
         gesturesV444.current[i].current,ensembleV638.slots[i].gesture));
     }
   }
+  // V760: strictly optional visual-group director AFTER V638's role gestures.
+  // No singer identity can come from a rotated visual leader. X lanes, manual
+  // formations, foot IK and imported motion clips keep ownership.
+  const ensembleV760=planAdvancedEnsembleV760({
+    settings:ensembleSettingsV760,base:groupV517,formation:formationV495,
+    count:settings.count,trackId:props.track?.id,seconds,
+    bpm:analysis?.tempo??props.audio.bpm,positions:pose.positions,
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,
+    manualPriority:settings!==props.autoMultiArtistGroupV442||!!settings.trackId||
+      props.avatarMotionMode==='choreography'||!!selectedSingerV444||
+      !!manualCueV385.active||displayPerformanceV375.enabled||finalDuetV385.enabled||
+      props.lipSync?.manualVocalEnabledV385===true||
+      (props.lipSync?.rapDuetEnabledV416===true&&!!props.lipSync?.rapDuetAssignmentsV416?.length),
+    tier:getActivePerformanceTier(),footLocked:footLock,risks:collisionSlotsV508,
+    section:props.cameraDirectorSection??groupV517.scene,beat:props.audio.beatStrength??0,
+    energy:props.audio.energyEnvelope??0,
+  });
+  if(ensembleV760.active){
+    for(let i=0;i<settings.count;i++){
+      Object.assign(looksV444.current[i].current,combineCrewLooksV452(
+        looksV444.current[i].current,ensembleV760.slots[i].look));
+      Object.assign(gesturesV444.current[i].current,combineCrewGesturesV452(
+        gesturesV444.current[i].current,ensembleV760.slots[i].gesture));
+    }
+  }
+  // V687: verified feature/duet micro-glances and handoff acknowledgements.
+  // Existing singer identity, stages, lyrics and imported clips are authoritative.
+  // Applied AFTER V638 and BEFORE the V506/V508 collision safety pass.
+  const duetPerformanceV687=planFeatureDuetPerformanceV687(groupV517,{
+    trackId:props.track?.id,
+    cueTrackId:rapDuetCueV416.active?
+      (timeCueV496.active?props.lipSync?.vocalTimeTrackIdV496:props.lipSync?.rapDuetTrackIdV416):
+      props.lipSync?.manualVocalTrackIdV385,
+    cue:selectedSingerV444,count:settings.count,
+    progressMs:props.lipSync?.progressMs??-1,
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,
+    manualPriority:!!settings.trackId||settings!==props.autoMultiArtistGroupV442||
+      props.avatarMotionMode==='choreography'||
+      props.artistBubblePlanV441?.source==='manual-stage'||
+      (!selectedSingerV444&&(displayPerformanceV375.enabled||finalDuetV385.enabled)),
+    tier:getActivePerformanceTier(),strength:props.artistInteractionStrengthV444??65,
+    footLocked:footLock,positions:pose.positions,risks:collisionSlotsV508,
+  });
+  if(duetPerformanceV687.active){
+    for(let i=0;i<settings.count;i++){
+      Object.assign(looksV444.current[i].current,combineCrewLooksV452(
+        looksV444.current[i].current,duetPerformanceV687.slots[i].look));
+      Object.assign(gesturesV444.current[i].current,combineCrewGesturesV452(
+        gesturesV444.current[i].current,duetPerformanceV687.slots[i].gesture));
+    }
+  }
+  // V807: a verified song-bound V416/V496 cast may add a small shared
+  // phrase-response layer. The existing V506/V508 collision attenuation runs
+  // AFTER this, and manual choreography/GLB clips/IK remain authoritative.
+  const stageInteractionV807=planNaturalMultiArtistStageV807({
+    trackId:props.track?.id,
+    cueTrackId:timeCueV496.active?props.lipSync?.vocalTimeTrackIdV496:props.lipSync?.rapDuetTrackIdV416,
+    cue:rapDuetCueV416,count:settings.count,
+    // Observe existing live group roots instead of only the formation plan.
+    // Missing roots fail closed; never invent a performer position.
+    positions:refs.current.slice(0,settings.count).map(ref=>
+      ref?[ref.position.x,ref.position.y,ref.position.z] as [number,number,number]
+        :[NaN,NaN,NaN] as [number,number,number]),
+    progressMs:props.lipSync?.progressMs??-1,playing:props.isPlaying,
+    reducedMotion:props.reducedMotion,
+    manualPriority:!!settings.trackId||settings!==props.autoMultiArtistGroupV442||
+      !!manualCueV385.active||props.avatarMotionMode==='choreography'||
+      props.artistBubblePlanV441?.source==='manual-stage',
+    beat:props.audio.beatStrength??0,
+    strength:props.artistInteractionStrengthV444??65,
+    tier:getActivePerformanceTier(),
+  });
+  const directedInteractionV838=vocalDuetV838?refineIntelligentDuetLooksV838(
+    stageInteractionV807,vocalDuetV838,
+    refs.current.slice(0,settings.count).map(ref=>ref?
+      [ref.position.x,ref.position.y,ref.position.z] as [number,number,number]:
+      [NaN,NaN,NaN] as [number,number,number]),
+    !!settings.trackId||!!manualCueV385.active||props.avatarMotionMode==='choreography',
+    multiArtistVocalRefV632.current
+  ):stageInteractionV807;
+  if(directedInteractionV838.active){
+    for(let i=0;i<settings.count;i++){
+      const accent=directedInteractionV838.slots[i];
+      Object.assign(looksV444.current[i].current,
+        combineCrewLooksV452(looksV444.current[i].current,accent.look));
+      Object.assign(gesturesV444.current[i].current,
+        combineCrewGesturesV452(gesturesV444.current[i].current,accent.gesture));
+    }
+  }
+  // V808: optional phrase-limited depth shifts for explicitly assigned duet,
+  // reply and hook singers. X lanes and the existing V494/V506/V508 safety
+  // remain authoritative; the group camera V806 observes these actual roots.
+  const stagePositionV808=planNaturalPerformerPositioningV808({
+    trackId:props.track?.id,
+    cueTrackId:timeCueV496.active?props.lipSync?.vocalTimeTrackIdV496:props.lipSync?.rapDuetTrackIdV416,
+    cue:rapDuetCueV416,count:settings.count,
+    positions:refs.current.slice(0,settings.count).map(ref=>ref?
+      [ref.position.x,ref.position.y,ref.position.z] as [number,number,number]:
+      [NaN,NaN,NaN] as [number,number,number]),
+    progressMs:props.lipSync?.progressMs??-1,playing:props.isPlaying,
+    reducedMotion:props.reducedMotion,
+    manualPriority:!!settings.trackId||settings!==props.autoMultiArtistGroupV442||
+      !!manualCueV385.active||props.avatarMotionMode==='choreography'||
+      props.artistBubblePlanV441?.source==='manual-stage'||
+      props.showCue?.formationsEnabled===true,
+    tier:getActivePerformanceTier(),strength:props.artistInteractionStrengthV444??65,
+    footReady:groundDecisionsV494.map((g,i)=>canRepositionWithGroundV808(g,footLock)||
+      canRepositionWithObservationV808(groundV487.current[i]?.current,footLock,
+        (lowInteractionPlanV483.plan.slots[i]?.depth??0)>.08)),
+    risks:collisionSlotsV508.map(s=>s?.risk??1),
+  });
+  // V840: strictly refines already-verified V808 depth cues in the existing
+  // frame. Root X lanes, IK, collisions, singer cast, manual shows stay owned
+  // by V326/V487/V494/V506/V508/V808. No extra loop or React updates.
+  const blockingFootReadyV840=groundDecisionsV494.map((g,i)=>
+    canRepositionWithGroundV808(g,footLock)||
+    canRepositionWithObservationV808(groundV487.current[i]?.current,footLock,
+      (lowInteractionPlanV483.plan.slots[i]?.depth??0)>.08));
+  const stageBlockingResultV840=refineDynamicStageBlockingV840(stageBlockingV840.current,{
+    settings:readStageBlockingV840(),trackId:props.track?.id,
+    seconds:props.lipSync?.progressMs!==undefined?(props.lipSync.progressMs/1000):-1,
+    delta,count:settings.count,lineIndex:rapDuetCueV416.lineIndex,
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,
+    manualPriority:!!settings.trackId||settings!==props.autoMultiArtistGroupV442||
+      !!manualCueV385.active||props.avatarMotionMode==='choreography'||
+      props.artistBubblePlanV441?.source==='manual-stage'||
+      props.showCue?.formationsEnabled===true,
+    quality:getActivePerformanceTier(),footReady:blockingFootReadyV840,
+    risks:collisionSlotsV508.map(s=>s?.risk??1),
+    positions:refs.current.slice(0,settings.count).map(ref=>ref?
+      [ref.position.x,ref.position.y,ref.position.z] as [number,number,number]:
+      [NaN,NaN,NaN] as [number,number,number]),
+    base:stagePositionV808,
+    minSpacing:Math.max(1.5,settings.minSpacing),
+  });
+  stageBlockingV840.current=stageBlockingResultV840.state;
   if(collisionV506.active||motionV508.active){
     for(let i=0;i<settings.count;i++){
       Object.assign(gesturesV444.current[i].current,
@@ -804,7 +981,7 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
     lastGroundReportV487.current=seconds-0.5; // seek backwards
   }
   for(let i=0;i<settings.count;i++){
-    Object.assign(footworkV486.current[i].current,naturalFootworkV524.slots[i]);
+    Object.assign(footworkV486.current[i].current,finalFootworkV839.slots[i]);
     Object.assign(danceMotionV485.current[i].current,naturalMotionV485.slots[i]);
     // Add only small expressive upper-body compensation to existing clamps.
     if(naturalMotionV485.active){
@@ -848,13 +1025,14 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
    const depthV638=safeEnsembleDepthV638(ensembleV638,ensembleV638.slots[i],
      groundDecisionsV494[i],collisionSlotV506);
 
+   const depthV760=safeEnsembleDepthV760(ensembleV760,ensembleV760.slots[i],groundDecisionsV494[i],collisionSlotV506);
    const accentScaleV506=collisionSlotV506?.accentScale??1;
    // V452 accents are stage-root translations, below 5 cm; spacing preserved
    // for hooks (all dancers receive the same lateral offset).
-   g.position.x=formationApproach(g.position.x,targetX+(crewV458.slots[i]?.offsetX??0)*accentScaleV506+groundDecisionsV494[i].offsetX,delta,speed*naturalFootworkV524.slots[i].rootSpeed*(groundTravelV487[i]??1));
-   g.position.z=formationApproach(g.position.z,targetZ+(crewV458.slots[i]?.offsetZ??0)*accentScaleV506+groundDecisionsV494[i].offsetZ+roleTravelV495+finalDepthV506+depthV509+depthV638,delta,speed*naturalFootworkV524.slots[i].rootSpeed*(groundTravelV487[i]??1));
+   g.position.x=formationApproach(g.position.x,targetX+(crewV458.slots[i]?.offsetX??0)*accentScaleV506+groundDecisionsV494[i].offsetX,delta,speed*finalFootworkV839.slots[i].rootSpeed*(groundTravelV487[i]??1));
+   g.position.z=formationApproach(g.position.z,targetZ+(crewV458.slots[i]?.offsetZ??0)*accentScaleV506+groundDecisionsV494[i].offsetZ+roleTravelV495+finalDepthV506+depthV509+depthV638+depthV760+(stageBlockingResultV840.active?stageBlockingResultV840.offsets[i]:(stageBlockingResultV840.reason==='existing-v808'?stageBlockingResultV840.offsets[i]:0)),delta,speed*finalFootworkV839.slots[i].rootSpeed*(groundTravelV487[i]??1));
    g.position.y=0;
-   g.rotation.y=formationApproach(g.rotation.y,ensembleV392.yaw[i]+(spotlightV443.slots[i]?.turnY??0)+(crewV458.slots[i]?.turnY??0)+(formationV495.slots[i]?.turnY??0)*(spatialV505.slots[i]?.turnFactor??1)*accentScaleV506+(ensembleV509.slots[i]?.turnY??0)+(groupV517.slots[i]?.turnY??0)+(ensembleV638.slots[i]?.turnY??0)+(cinematicV527.slots[i]?.turnY??0),delta,props.reducedMotion?20:3.1);
+   g.rotation.y=formationApproach(g.rotation.y,ensembleV392.yaw[i]+(spotlightV443.slots[i]?.turnY??0)+(crewV458.slots[i]?.turnY??0)+(formationV495.slots[i]?.turnY??0)*(spatialV505.slots[i]?.turnFactor??1)*accentScaleV506+(ensembleV509.slots[i]?.turnY??0)+(groupV517.slots[i]?.turnY??0)+(ensembleV638.slots[i]?.turnY??0)+(ensembleV760.slots[i]?.turnY??0)+(cinematicV527.slots[i]?.turnY??0),delta,props.reducedMotion?20:3.1);
    const desiredScale=present?1:.001;
    const scaled=formationApproach(g.scale.x,desiredScale,delta,props.reducedMotion?20:3.2);
    g.scale.setScalar(Math.max(.001,scaled));
@@ -868,7 +1046,7 @@ export function GroupDancersV326({props,settings}:{props:VisualizerProps;setting
   const animationUrl=chosen?('animationUrl' in chosen?chosen.animationUrl:undefined):(usingPartner?props.secondaryAvatarAnimationUrl:props.avatarAnimationUrl);
   const sharedMotionUrl=chosen?chosen.sharedMotionUrl:(usingPartner?props.secondaryAvatarSharedMotionUrlV531:props.avatarSharedMotionUrlV531);
   const modelId=chosen?.id??(usingPartner?props.secondaryAvatarModelId:props.avatarModelId);
-  const groupProps:VisualizerProps={...props,lipSync:props.lipSync?{...props.lipSync,ensembleCountV374:settings.count,performanceCueRefV375,interactionCueRefV376,manualVocalCueRefV385,multiArtistVocalRefV632,concertCueRefV386}:undefined,audio:groupAudio.current[i],multiAvatarMode:'sync',avatarModelUrl:modelUrl,avatarAnimationUrl:animationUrl,avatarSharedMotionUrlV531:sharedMotionUrl,avatarModelId:modelId,preferredMotionUrlV440:props.multiArtistMotionsV442?.[i]??(usingPartner?props.secondaryPreferredMotionUrlV440:props.preferredMotionUrlV440),
+  const groupProps:VisualizerProps={...props,ensembleCountV745:settings.count,lipSync:props.lipSync?{...props.lipSync,ensembleCountV374:settings.count,performanceCueRefV375,interactionCueRefV376,manualVocalCueRefV385,multiArtistVocalRefV632,concertCueRefV386}:undefined,audio:groupAudio.current[i],multiAvatarMode:'sync',avatarModelUrl:modelUrl,avatarAnimationUrl:animationUrl,avatarSharedMotionUrlV531:sharedMotionUrl,avatarModelId:modelId,preferredMotionUrlV440:props.multiArtistMotionsV442?.[i]??(usingPartner?props.secondaryPreferredMotionUrlV440:props.preferredMotionUrlV440),
    avatarDancePreset:usingPartner?props.secondaryDancePreset??props.avatarDancePreset:props.avatarDancePreset,
    danceVariation:Math.min(1,(props.danceVariation??.5)+(i>1?.07:0))};
   return <group key={i} name={`v377-vocal-stage-slot-${i}`} ref={node=>{refs.current[i]=node;}} position={[(-settings.count+1)/2*1.4+i*1.4,0,0]}>

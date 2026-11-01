@@ -1,5 +1,8 @@
 "use client";
 import type { CSSProperties } from "react";
+import type {LyricsPerformanceSettingsV748} from "./visualizer/lyricsPerformanceStudioV748";
+import {planLyricsPerformanceV748,lyricWordAccentV748} from "./visualizer/lyricsPerformanceStudioV748";
+import {planCinematicLyricsV688,cinematicLyricWordAccentV688} from "./visualizer/cinematicLyricsV688";
 import {planBeautifulLyricsV634,beautifulLyricWordAccentV634} from "./visualizer/beautifulLyricsV634";
 import {composeConcertLyricsV623,type ConcertDramaturgyCueV623} from "./visualizer/ultimateConcertDramaturgyV623";
 import {planCinematicLyricsPerformanceV619,cinematicLyricWordAccentV619} from "./visualizer/cinematicLyricsPerformanceV619";
@@ -23,10 +26,10 @@ import { planCinematicLyricsV461 } from "@/components/visualizer/cinematicLyrics
 import { planBeautifulLyricsV477, lyricPlaybackFractionV477 } from "@/components/visualizer/beautifulLyricsV477";
 import {resolveKineticStyleV382,resolveKineticWordV382,kineticDropCueV382} from "@/components/visualizer/kineticLyricsV382";
 
-type Props = { lyrics: Lyrics | null; progressMs: number; activeIndex: number; playing: boolean; genre?: string; immersive?: boolean; avatarCountV477?: number; concertLyricAccentV502?: number; cinematicSceneV528?: ConcertSceneV528; sectionCueV598?: BeautifulLyricsSectionV598; fullSongCueV604?: NarrativeCueV604; concertDramaturgyV623?: ConcertDramaturgyCueV623 };
+type Props = { performanceSettingsV750?:LyricsPerformanceSettingsV748; lyrics: Lyrics | null; progressMs: number; activeIndex: number; playing: boolean; genre?: string; immersive?: boolean; avatarCountV477?: number; concertLyricAccentV502?: number; cinematicSceneV528?: ConcertSceneV528; sectionCueV598?: BeautifulLyricsSectionV598; fullSongCueV604?: NarrativeCueV604; concertDramaturgyV623?: ConcertDramaturgyCueV623 };
 
 /** Text animation driven by the existing playback clock; does not create timers or audio listeners. */
-export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre = "", immersive = false, avatarCountV477 = 1, concertLyricAccentV502 = 0, cinematicSceneV528, sectionCueV598, fullSongCueV604, concertDramaturgyV623 }: Props) {
+export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre = "", immersive = false, avatarCountV477 = 1, concertLyricAccentV502 = 0, cinematicSceneV528, sectionCueV598, fullSongCueV604, concertDramaturgyV623,performanceSettingsV750 }: Props) {
   const { preferences } = useUiPreferences();
   const lyricsDirectionV528=concertLyricDirectionV528(cinematicSceneV528,playing,preferences.reducedMotion);
   const { metrics, active: microphoneActive } = useAudioAnalysis();
@@ -122,6 +125,15 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
     existingPlateOpacity:concertLyricsV619.plateOpacity,
     intensity,
   });
+  // V688: refine only the existing caption; no change to user-selected location
+  // or real V477/V541/V549 karaoke fill.
+  const lyricCinemaV688=planCinematicLyricsV688({line:activeLine,
+    nextLineStart:lines[activeIndex+1]?.startMs,progressMs,playing,
+    synchronized,reducedMotion:reduced,wordHighlight:preferences.lyricsWordHighlight??true,
+    immersive,avatarCount:avatarCountV477,hookConfirmed:sectionCueV598==='hook',
+    existingWidthCh:lyricPolishV634.widthCh,existing3DWidth:lyricPolishV634.max3DWidth,
+    existingPlateOpacity:lyricPolishV634.plateOpacity,intensity,
+  });
   const nextActiveStart = lines[activeIndex+1]?.startMs;
   const activeLineEnd = activeLine ? Math.min(
     activeLine.endMs != null && activeLine.endMs > activeLine.startMs ? activeLine.endMs : Infinity,
@@ -137,6 +149,11 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
   const activePlanV549 = activeForPlanV461 && activePlanV541 ? planCinematicLyricsV549({
     base:activePlanV541,line:activeForPlanV461,progressMs,playing,reducedMotion:reduced,
     avatarCount:avatarCountV477,tier:"high",scene:cinematicSceneV528}) : null;
+  const studioV748=planLyricsPerformanceV748({line:activeLine,nextLineStart:lines[activeIndex+1]?.startMs,
+    progressMs,playing,synchronized,reducedMotion:reduced,wordHighlight:preferences.lyricsWordHighlight??true,
+    immersive,avatarCount:avatarCountV477,section:sectionCueV598,cameraFocus:cinematicSceneV528?.active===true,
+    existingPlateOpacity:lyricPolishV634.plateOpacity,existingWidthCh:lyricPolishV634.widthCh,
+    settings:performanceSettingsV750??preferences.lyricsPerformanceV748});
   const detailV555=planConcertDetailsV555({lyrics,activeIndex,progressMs,playing,reducedMotion:reduced,
     scene:cinematicSceneV528,settings:{enabled:preferences.concertDetailEnabledV555??true,
       adlibEcho:preferences.concertAdlibEchoV555??true,rhymeAccent:preferences.concertRhymeAccentV555??true,
@@ -144,8 +161,8 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
   const wordsEnabled = (kinetic || cinematic || neon) && (preferences.lyricsWordHighlight ?? true) && synchronized;
 
   if (!lines.length) return <section className="lyrics"><p className="empty">Keine Lyrics für diesen Titel gefunden.</p></section>;
-  return <section className={`lyrics v461-cinematic-lyrics v477-beautiful-lyrics v501-cinematic-lyrics v502-concert-lyrics v525-cinematic-lyrics v525-${activePlanV525?.textClass??"standard"} v541-cinematic-lyrics v549-cinematic-lyrics v578-lyrics-readable v578-${readabilityV578.mode} v598-beautiful-lyrics v598-${activePlanV598.mode} v598-${activePlanV598.density} v606-harmony v606-${harmonyV606.mode} v619-cinematic-lyrics v619-${concertLyricsV619.mode} v634-beautiful-lyrics v634-${lyricPolishV634.mood} v501-cast-${activePlanV501?.cast??1} ${immersive ? "v461-stage-lyrics" : ""} ${focus ? "lyrics-focus-v367" : ""} lyrics-studio-position-${preferences.lyricsPosition ?? "center"} ${kinetic ? "lyrics-kinetic" : cinematic ? "lyrics-cinematic" : neon ? "lyrics-neon" : "lyrics-classic"} ${kineticStyleV382?"v382-kinetic-active v382-preset-"+kineticStyleV382:""}`} aria-label="Songtext" style={{ "--v634-width-ch":lyricPolishV634.widthCh,"--v634-plate":lyricPolishV634.plateOpacity,"--v634-line-height":lyricPolishV634.lineHeight,"--v634-transition-ms":`${lyricPolishV634.wordTransitionMs}ms`,"--v619-width-ch":concertLyricsV619.maxWidthCh,"--v619-plate":concertLyricsV619.plateOpacity,"--v619-hook-underline":concertLyricsV619.hookUnderline,"--v606-width-ch":Math.min(activePlanV598.widthCh,harmonyV606.widthCh),"--v606-plate-boost":harmonyV606.plateBoost,"--v606-hook-accent":harmonyV606.hookAccent,"--v598-width-ch":activePlanV598.widthCh,"--v598-plate":activePlanV598.plateOpacity,
-    "--v598-line-height":activePlanV598.lineHeight,"--v598-contrast":activePlanV598.contrast,
+  return <section className={`lyrics v461-cinematic-lyrics v477-beautiful-lyrics v501-cinematic-lyrics v502-concert-lyrics v525-cinematic-lyrics v525-${activePlanV525?.textClass??"standard"} v541-cinematic-lyrics v549-cinematic-lyrics v578-lyrics-readable v578-${readabilityV578.mode} ${studioV748.enabled?`v748-performance-studio v748-${studioV748.safety}`:""} v598-beautiful-lyrics v598-${activePlanV598.mode} v598-${activePlanV598.density} v606-harmony v606-${harmonyV606.mode} v619-cinematic-lyrics v619-${concertLyricsV619.mode} v634-beautiful-lyrics v634-${lyricPolishV634.mood} v688-cinematic-lyrics v688-${lyricCinemaV688.mode} v501-cast-${activePlanV501?.cast??1} ${immersive ? "v461-stage-lyrics" : ""} ${focus ? "lyrics-focus-v367" : ""} lyrics-studio-position-${preferences.lyricsPosition ?? "center"} ${kinetic ? "lyrics-kinetic" : cinematic ? "lyrics-cinematic" : neon ? "lyrics-neon" : "lyrics-classic"} ${kineticStyleV382?"v382-kinetic-active v382-preset-"+kineticStyleV382:""}`} aria-label="Songtext" style={{ "--v688-width-ch":lyricCinemaV688.widthCh,"--v688-plate":lyricCinemaV688.plateOpacity,"--v688-line-height":lyricCinemaV688.lineHeight,"--v688-transition-ms":`${lyricCinemaV688.transitionMs}ms`,"--v634-width-ch":lyricPolishV634.widthCh,"--v634-plate":lyricPolishV634.plateOpacity,"--v634-line-height":lyricPolishV634.lineHeight,"--v634-transition-ms":`${lyricPolishV634.wordTransitionMs}ms`,"--v619-width-ch":concertLyricsV619.maxWidthCh,"--v619-plate":concertLyricsV619.plateOpacity,"--v619-hook-underline":concertLyricsV619.hookUnderline,"--v606-width-ch":Math.min(activePlanV598.widthCh,harmonyV606.widthCh),"--v606-plate-boost":harmonyV606.plateBoost,"--v606-hook-accent":harmonyV606.hookAccent,"--v598-width-ch":activePlanV598.widthCh,"--v598-plate":activePlanV598.plateOpacity,
+    "--v748-plate":studioV748.plateOpacity,"--v748-max-width":`${studioV748.maxWidthCh}ch`,"--v748-hook-glow":studioV748.hookGlow,"--v748-hook-shadow":`${studioV748.hookGlow*44}px`,"--v748-outline":studioV748.outlineBonus,"--v748-word-glow":studioV748.wordGlow,"--v598-line-height":activePlanV598.lineHeight,"--v598-contrast":activePlanV598.contrast,
     "--v598-hook-accent":activePlanV598.hookAccent,"--v578-width-ch": readabilityV578.maxWidthCh, "--v578-plate": readabilityV578.plateOpacity, "--v578-glow-gain": readabilityV578.glowGain, "--studio-font-family": family, "--studio-font-scale": fontSize, "--studio-glow": glow, "--v502-concert-accent": !reduced && playing ? Math.max(0,Math.min(.12,concertLyricAccentV502)) : 0, "--studio-speed": 1 / speed, "--studio-color-from": gradientFrom, "--studio-color-to": gradientTo, "--reactive-kick": kick, "--reactive-bass": bass, "--reactive-drop": drop } as CSSProperties}>
     <p className="lyrics-source">{lyrics?.provider}{synchronized ? " · zeilensynchronisiert" : " · ohne Zeitmarken"}{wordsEnabled ? hasTrueWordTiming ? " · echte Wort-Zeitstempel" : " · Zeilenfortschritt (keine Wort-Zeitstempel)" : ""}</p>
     {activePlanV549?.singerLabel && <div className="v549-vocal-caption" aria-label="Manuell bestätigte Sängerzuordnung">
@@ -235,7 +252,11 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
               word.trim().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu,'').toLocaleLowerCase('de')===detailV555.rhymeWord;
             return <span key={wi} className={`kinetic-word ${rhymeV555 ? "v555-rhyme" : ""} ${active ? "kinetic-word-active" : ""} ${active && amount > 0 && amount < 1 ? "v367-speaking" : ""}`} style={{ ...(rhymeV555 ? {"--v555-rhyme-color":detailV555.rhymeColor} : {}), "--v501-word-accent":wordAccentV501,"--v541-word-focus":wordV541?.focus??0,
               "--v541-word-glow":wordV549?.glow??wordV541?.glow??0,
-              "--v549-word-motion":wordV549?.motion??0,"--v619-word-accent":wordAccentV619,"--v634-word-accent":wordAccentV634,"--v598-word-accent":wordV598?.accent??0,"--v606-word-accent":active?lyricHarmonyWordAccentV606(line,wi,progressMs,harmonyV606):0,"--word-fill": `${(shownAmountV382 * 100).toFixed(1)}%`, "--word-order": wi,
+              "--v549-word-motion":wordV549?.motion??0,"--v619-word-accent":wordAccentV619,"--v634-word-accent":wordAccentV634,"--v748-shadow":`${(active&&wordTimed?lyricWordAccentV748({line,nextLineStart:nextStart,wordIndex:wi,progressMs,playing,reducedMotion:reduced,plan:studioV748}):0)*studioV748.wordGlow*22}px`,
+              "--v688-word-accent":active&&wordTimed?cinematicLyricWordAccentV688({
+                line,nextLineStart:nextStart,wordIndex:wi,progressMs,playing,
+                reducedMotion:reduced,plan:lyricCinemaV688,
+              }):0,"--v598-word-accent":wordV598?.accent??0,"--v606-word-accent":active?lyricHarmonyWordAccentV606(line,wi,progressMs,harmonyV606):0,"--word-fill": `${(shownAmountV382 * 100).toFixed(1)}%`, "--word-order": wi,
               "--v382-word-scale":1+((cueV382?.scale??1)-1)*v455.motionScale*v461.motionScale*v526.wordMotionGain*lyricsDirectionV528.motionGain*v549.wordMotionGain,"--v382-word-lift":`${-(cueV382?.lift??0)*v455.motionScale*v461.motionScale*v526.wordMotionGain*lyricsDirectionV528.motionGain*v541.wordMotionGain}px`,
               "--v382-word-glow":(cueV382?.glow??0)*v455.motionScale*v461.motionScale*v526.wordMotionGain*lyricsDirectionV528.motionGain*v541.wordMotionGain } as CSSProperties}>{wordLabel}</span>;
           }) : <span className={wordsEnabled && v477.timingMode === "line-progress" ? "kinetic-whole-line v477-line-progress-text" : "kinetic-whole-line"}>

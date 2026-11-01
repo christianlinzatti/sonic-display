@@ -85,5 +85,5 @@ assert(source('VocalTimeEditorV496.tsx').includes('Die Vorschau verändert die S
 assert(fs.readFileSync('types/music.ts','utf8').includes('vocalTimeSegmentsV496?'));
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=496,'V496 and later release versions preserve singer time-cue contract');
-assert(pkg.scripts['build:preflight'].includes('npm run test:v496 && npm run test:v496:types && npm run test:v495'));
+assert(pkg.scripts['test:smoke:v660'].includes('npm run test:v496 && npm run test:v496:types &&'), 'Current release smoke must exercise V496 singer timeline');
 console.log('PASS V496: manual timestamp singer timeline, duet/hook lip masks, seek, validation, integration, 30-minute simulation');

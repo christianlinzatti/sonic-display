@@ -21,7 +21,7 @@ export function useStageContentV330(track:{id:string;title:string;artist:string;
     const abort=new AbortController();
     setSlides([]);setIndex(0);
     if(!settings.enabled||!trackId)return()=>abort.abort();
-    void loadStageSlidesV330({id:trackId,title,artist,albumCoverUrl:coverUrl},settings,abort.signal)
+    void loadStageSlidesV330({id:trackId,title,artist,albumCoverUrl:coverUrl},settings,abort.signal,data=>{if(!abort.signal.aborted)setSlides(data);})
       .then(data=>{if(!abort.signal.aborted)setSlides(data);});
     return()=>abort.abort();
   },[settings,trackId,title,artist,coverUrl]);
@@ -43,15 +43,29 @@ export function useStageContentV330(track:{id:string;title:string;artist:string;
     let realtime:AblyRealtimeClientV389|null=null;
     let disposed=false;
     let timeout:ReturnType<typeof setTimeout>|undefined;
+    let reconnectTimer:ReturnType<typeof setTimeout>|undefined;
+    let attempt=0;
+    let connecting=false;
+    const configAbort=new AbortController();
+    type Message={id:string;title?:string;text:string;durationSeconds?:number;receivedAt?:number;priority?:string};
+    let current:Message|null=null;const queue:Message[]=[];const seen=new Set<string>();
+    const pump=()=>{
+      if(disposed||current)return;
+      const next=queue.shift();if(!next){setLivePush(null);return;}
+      current=next;const expires=Date.now()+Math.max(3,Math.min(120,next.durationSeconds??15))*1000;
+      setLivePush({id:next.id,item:{source:'text',kind:'text',title:String(next.title||'Nachricht').slice(0,90),text:next.text.slice(0,1600)},expires});
+      timeout=setTimeout(()=>{current=null;pump();},expires-Date.now());
+    };
     const show=(raw:unknown)=>{
-      if(!raw||typeof raw!=="object")return;
-      const msg=raw as {id?:string;title?:string;text?:string;durationSeconds?:number;receivedAt?:number};
-      if(!msg.id||typeof msg.text!=="string"||!msg.text.trim())return;
-      const expires=(msg.receivedAt??Date.now())+Math.max(3,Math.min(120,msg.durationSeconds??15))*1000;
-      if(expires<=Date.now())return;
-      if(timeout)clearTimeout(timeout);
-      setLivePush({id:msg.id,item:{source:"text",kind:"text",title:String(msg.title||"Nachricht").slice(0,90),text:msg.text.slice(0,1600)},expires});
-      timeout=setTimeout(()=>setLivePush(current=>current?.id===msg.id?null:current),expires-Date.now());
+      if(disposed||!raw||typeof raw!=='object')return;const msg=raw as Message;
+      if(typeof msg.id!=='string'||typeof msg.text!=='string'||!msg.text.trim()||seen.has(msg.id))return;
+      if(typeof msg.receivedAt==='number'&&Date.now()-msg.receivedAt>300000)return;
+      seen.add(msg.id);if(seen.size>200)seen.delete(seen.values().next().value!);
+      if(msg.priority==='high'){
+        if(current&&current.priority!=='high'){if(timeout)clearTimeout(timeout);queue.unshift(current);current=null;}
+        const firstNormal=queue.findIndex(m=>m.priority!=='high');queue.splice(firstNormal<0?queue.length:firstNormal,0,msg);
+      }else queue.push(msg);
+      if(queue.length>30)queue.pop();pump();
     };
     const local=()=>{
       if(disposed)return;
@@ -60,12 +74,15 @@ export function useStageContentV330(track:{id:string;title:string;artist:string;
         try{show(JSON.parse((event as MessageEvent).data));}catch{/* malformed payload */}
       });
     };
-    void (async()=>{
+    const connect=async()=>{
+      if(disposed||stream||realtime||connecting)return;
+      connecting=true;
       try{
-        const result=await fetch("/api/stage-content/realtime-config",{cache:"no-store"});
+        const result=await fetch("/api/stage-content/realtime-config",{cache:"no-store",signal:configAbort.signal});
         if(disposed)return;
-        if(!result.ok){local();return;}
+        if(!result.ok)throw new Error("Konfiguration vorübergehend nicht verfügbar");
         const config=await result.json() as {enabled:boolean;channel:string};
+        if(disposed)return;
         if(!config.enabled){local();return;}
         const {Realtime}=await loadAblyBrowserV389();
         if(disposed)return;
@@ -73,12 +90,19 @@ export function useStageContentV330(track:{id:string;title:string;artist:string;
         realtime=client;
         const channel=client.channels.get(config.channel);
         await channel.subscribe("stage-message",message=>{if(!disposed)show(message.data);});
+        attempt=0;
       }catch{
-        // Never use instance-local SSE as a fake cross-instance fallback if Ably is configured.
-        // Browser SDK reconnects on transient transport failures.
-      }
-    })();
-    return()=>{disposed=true;if(timeout)clearTimeout(timeout);stream?.close();realtime?.close();};
+        if(disposed)return;
+        if(realtime){realtime.close();realtime=null;}
+        // Do not silently switch to instance-local SSE when Ably may be configured.
+        // Retry the configuration endpoint, even after an initial network failure.
+        reconnectTimer=setTimeout(()=>{reconnectTimer=undefined;void connect();},Math.min(30000,1000*2**Math.min(attempt++,5)));
+      }finally{connecting=false;}
+    };
+    const onOnline=()=>{if(reconnectTimer)clearTimeout(reconnectTimer);reconnectTimer=undefined;void connect();};
+    window.addEventListener("online",onOnline);
+    void connect();
+    return()=>{disposed=true;window.removeEventListener("online",onOnline);if(timeout)clearTimeout(timeout);if(reconnectTimer)clearTimeout(reconnectTimer);configAbort.abort();stream?.close();realtime?.close();};
   },[settings.enabled]);
   const item=useMemo(()=>settings.enabled?(livePush&&livePush.expires>Date.now()?livePush.item:selectStageSlidesV330(slides,index)):null,[settings.enabled,slides,index,livePush]);
   const musicPalette=settings.accentFromCover&&coverUrl===palette?.url?palette.value:null;

@@ -19,7 +19,7 @@ export function PerformanceOptimizationAssistantV264(){
  const [experiments,setExperiments]=useState<PerformanceExperiment[]>([]);
  const [loaded,setLoaded]=useState(false);
  const [restorePreview,setRestorePreview]=useState<PerformanceExperiment|null>(null);
- useEffect(()=>{try{setExperiments(decodeExperiments(window.localStorage.getItem(EXPERIMENT_KEY)));}catch{}setLoaded(true);},[]);
+ useEffect(()=>{try{const raw=window.localStorage.getItem(EXPERIMENT_KEY);const clean=decodeExperiments(raw);setExperiments(clean);if(raw&&Array.isArray(JSON.parse(raw))&&JSON.parse(raw).length>clean.length)setMessage("Beschädigte Messdaten wurden übersprungen.");}catch{}setLoaded(true);},[]);
  useEffect(()=>{const update=()=>setTick(v=>v+1);window.addEventListener(SESSION_METRICS_EVENT,update);window.addEventListener("sonic:v260-director",update);return()=>{window.removeEventListener(SESSION_METRICS_EVENT,update);window.removeEventListener("sonic:v260-director",update);};},[]);
  const findings=detectBottlenecks(getAnalysisSamples());
  const director=readMultiAvatarDirectorEnabled();

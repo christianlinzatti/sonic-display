@@ -106,8 +106,8 @@ test('pure policy no browser API',()=>{const s=rd('components/concertPresetsV650
 test('new profile grid touch targets',()=>{has(css,'.v650-grid');has(css,'min-height:48px;min-width:48px')});
 test('no GLB assets or WebGL render loop',()=>{for(const s of [panel,manager])for(const x of ['useFrame(', 'GLTFLoader', 'new PointLight', 'new Canvas']) assert(!s.includes(x))});
 test('release scripts registered',()=>{for(const t of ['test:v650','test:v650:types','test:smoke:v650','verify:v650'])assert(pkg.scripts[t],t)});
-test('version updated',()=>assert.equal(pkg.version,'0.1.0-v651'));
-test('architecture current version',()=>has(rd('ARCHITECTURE.md'),'**Dokumentationsstand:** V651'));
+test('version updated',()=>assert(Number(pkg.version.match(/-v(\d+)$/)?.[1])>=651,'release must be V651 or newer'));
+test('architecture current version',()=>has(rd('ARCHITECTURE.md'),`**Dokumentationsstand:** V${pkg.version.match(/-v(\d+)$/)?.[1]}`));
 test('documentation available',()=>has(rd('V650-SMART-CONCERT-PRESETS.md'),'# V650'));
 let seed=650;function rand(){seed=(Math.imul(1664525,seed)+1013904223)>>>0;return seed/2**32;}
 test('12k simulated profile captures, import roundtrip and undo',()=>{

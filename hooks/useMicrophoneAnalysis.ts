@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import {releaseMicrophoneResourcesV654} from "./microphoneResourceCleanupV654";
 import { publishAudioWorkerTelemetry } from "@/components/visualizer/audioWorkerTelemetry";
 import type { AudioMetrics, BeatEvent } from "@/types/audio";
 import { BeatTempoTracker } from "@/hooks/beatTempoTracker";
@@ -26,6 +27,15 @@ export function useMicrophoneAnalysis(enabled: boolean, calibration: { sensitivi
     const WORKER_STALL_MS = 1500;
     let sequence = 0;
     const workerRequests = new Map<number, number>();
+    let cancelled = false;
+    const cleanup = () => {
+      if(cancelled)return;
+      cancelled=true;
+      workerRequests.clear();pendingSnapshot=false;pendingSince=0;
+      publishAudioWorkerTelemetry(null,"off");
+      releaseMicrophoneResourcesV654({frame:raf,cancelFrame:cancelAnimationFrame,stream,context,worker});
+      worker=null;stream=undefined;context=undefined;
+    };
     let latestSequence = -1;
     let latestAudio: AudioMetrics = zero;
     let latestAdvanced: Partial<AudioMetrics> = {};
@@ -49,7 +59,6 @@ export function useMicrophoneAnalysis(enabled: boolean, calibration: { sensitivi
         worker.onerror = () => { worker?.terminate(); worker = null; pendingSnapshot = false; pendingSince = 0; workerRequests.clear(); latestAdvanced = {}; publishAudioWorkerTelemetry(null, "fallback"); };
       }
     } catch { worker = null; }
-    let cancelled = false;
     let lastUpdate = 0;
     let previousBass = 0;
     let bassFloor = 0.08;
@@ -69,6 +78,7 @@ export function useMicrophoneAnalysis(enabled: boolean, calibration: { sensitivi
         if (cancelled) { stream.getTracks().forEach(t => t.stop()); return; }
         context = new AudioContext();
         if (context.state === "suspended") await context.resume();
+        if (cancelled) return;
         const analyser = context.createAnalyser(); analyser.fftSize = 2048; analyser.smoothingTimeConstant = 0.72;
         context.createMediaStreamSource(stream).connect(analyser);
         const bins = new Uint8Array(analyser.frequencyBinCount);
@@ -143,10 +153,17 @@ export function useMicrophoneAnalysis(enabled: boolean, calibration: { sensitivi
           raf = requestAnimationFrame(tick);
         };
         raf = requestAnimationFrame(tick);
-      } catch (e) { setActive(false); setError(e instanceof Error ? e.message : "Mikrofon konnte nicht gestartet werden."); }
+      } catch (e) {
+        const wasCancelled=cancelled;
+        cleanup();
+        if (!wasCancelled) {
+          setActive(false);setMetrics(zero);setBeatEvents([]);
+          setError(e instanceof Error ? e.message : "Mikrofon konnte nicht gestartet werden.");
+        }
+      }
     };
     void start();
-    return () => { cancelled = true; workerRequests.clear(); publishAudioWorkerTelemetry(null, "off"); worker?.terminate(); cancelAnimationFrame(raf); stream?.getTracks().forEach(t => t.stop()); if (context && context.state !== "closed") void context.close(); };
+    return cleanup;
   }, [enabled, calibration.sensitivity, calibration.cooldownMs]);
   return { metrics, active, error, beatEvents };
 }

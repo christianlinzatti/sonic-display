@@ -218,6 +218,32 @@ export interface UiPreferences {
   avatarCrossfadeSeconds: number;
   avatarArmResponse: number;
   avatarLegResponse: number;
+  /** V735 procedurally synthesized hip movements on the humanoid rig. */
+  avatarHipDanceModeV735?: import("@/components/visualizer/hipDanceV735").HipDanceModeV735;
+  avatarHipDanceStrengthV735?: number;
+  avatarHipDanceSpeedV735?: number;
+  /** V738 per-motion intensities, beat subdivision and smooth handoffs. */
+  avatarHipStudioV738?: import("@/components/visualizer/hipMotionStudioV738").HipStudioSettingsV738;
+  avatarNaturalBodyV740?: import("@/components/visualizer/naturalBodyDynamicsV740").NaturalBodySettingsV740;
+  avatarNaturalDanceV758?: import("@/components/visualizer/naturalDanceMotionV758").NaturalDanceSettingsV758;
+  avatarDanceVarietyV759?: import("@/components/visualizer/intelligentDanceVarietyV759").DanceVarietySettingsV759;
+  /** V741: optional glute bone / morph deformation; off until mesh support confirmed. */
+  avatarGluteRigV741?: import("@/components/visualizer/advancedGluteRigV741").GluteSettingsV741;
+  /** V742: genre and song-section aware procedural hip choreography. */
+  avatarGenreHipV742?: import("@/components/visualizer/genreHipIntelligenceV742").GenreHipSettingsV742;
+  avatarBeatBassV743?: import("@/components/visualizer/beatBassHipMotionV743").BeatBassSettingsV743;
+  avatarSmartHipV744?: import("@/components/visualizer/smartHipChoreographyV744").SmartHipSettingsV744;
+  avatarEnsembleHipV745?: import("@/components/visualizer/multiAvatarHipSyncV745").EnsembleHipSettingsV745;
+  concertFxV810?: import("@/components/visualizer/concertFxStudioV810").ConcertFxSettingsV810;
+  scenicLightingV762?: import("@/components/visualizer/cinematicScenicLightingV762").DynamicStageLightingSettingsV762;
+  cinematicScenicLightingV762?: import("@/components/visualizer/cinematicScenicLightingV762").StageLightingSettingsV762;
+  cinematicConcertV761?: import("@/components/visualizer/cinematicConcertDirectorV761").CinematicConcertSettingsV761;
+  concertQualityV750?: import("@/components/visualizer/integratedConcertQualityV750").ConcertQualitySettingsV750;
+  lyricsPerformanceV748?: import("@/components/visualizer/lyricsPerformanceStudioV748").LyricsPerformanceSettingsV748;
+  avatarPerformanceLightingV749?: import("@/components/visualizer/performanceLightingDirectorV749").PerformanceLightingSettingsV749;
+  avatarPerformanceCameraV747?: import("@/components/visualizer/performanceCameraDirectorV747").PerformanceCameraSettingsV747;
+  avatarVocalPerformanceV746?: import("@/components/visualizer/vocalPerformanceDirectorV746").VocalPerformanceSettingsV746;
+  avatarVocalBodySyncV757?: import("@/components/visualizer/vocalBodySyncV757").VocalBodySyncSettingsV757;
   avatarFootIKEnabled: boolean;
   avatarFootIKStrength: number;
   avatarFootIKContact: number;
@@ -241,6 +267,10 @@ export interface UiPreferences {
   avatarRigProfile: "auto" | "humanoid" | "mixamo" | "ready-player-me" | "robot";
   avatarDancePreset: "auto" | "hardstyle" | "techno" | "rock-metal" | "robot" | "ambient" | "freestyle";
   autoAvatarByGenre: boolean;
+  smartLookAutoV677?: boolean;
+  liveMoodEnabledV678?: boolean;
+  liveMoodStrengthV678?: number;
+  liveMoodDanceV678?: boolean;
   beatSensitivity: number;
   beatCooldownMs: number;
   beatSyncMode: "off" | "auto" | "manual";
@@ -254,6 +284,7 @@ export interface GenreState {
   detectedGenre: MusicGenre | null;
   genreFusion: import("@/services/genre/genreIntelligence").GenreFusion|null;
   genreStatus: GenreDetectionStatus;
+  genreTrackId: string | null;
   genreSource: "track" | "artist" | "manual" | null;
   genreMatchedTag: string | null;
   genreError: string | null;

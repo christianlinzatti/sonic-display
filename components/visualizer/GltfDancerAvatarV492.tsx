@@ -1,4 +1,6 @@
 "use client";
+import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
+import {planMotionPlaybackV659,keepCurrentMotionWhileLoadingV659} from "./motionPlaybackWindowV659";
 import {applyGltfVocalPerformanceV492} from "./gltfVocalPerformanceV492";
 import {useGltfFootContactV492} from "./useGltfFootContactV492";
 import {useGltfVocalMotionV492} from "./useGltfVocalMotionV492";
@@ -54,7 +56,12 @@ import { createAdvancedDanceStateV311, refineDancePerformanceV311, readDancePerf
 import { createDanceFlowStateV391, refineDanceFlowV391, readDanceFlowV391 } from "./naturalDanceIntelligenceV391";
 import { createDanceMotionStateV545, refineNaturalDanceMotionV545, readNaturalDanceMotionV545 } from "./naturalDanceMotionV545";
 import {refineExpressiveRigV587} from "./expressiveDanceFootworkV587";
+import {refineNaturalDanceRigV684} from "./naturalDanceEvolutionV684";
+import {refineAdvancedRapRigV685, rapGenreV685} from "./advancedRapPerformanceV685";
 import {newGlbFootworkQualityStateV596,stepGlbFootworkQualityV596} from "./naturalFootworkQualityV596";
+import {createNaturalFootworkClockV839,refineNaturalFootworkRigV839,readNaturalFootworkV839} from "./naturalDanceFootworkV839";
+import {newGroundingStateV665,stepRealisticGroundingV665,readGroundingSettingsV665} from "./realisticDanceGroundingV665";
+import {newGenreDanceStateV666,stepGenreDanceV666,readGenreDanceSettingsV666} from "./genreDancePerformanceV666";
 import { createNaturalDanceStateV320, refineNaturalDanceV320, readNaturalDanceV320 } from "./naturalDanceIntelligenceV320";
 import { MOTION_QUALITY_EVENT_V321, readMotionQualityV321, polishMotionClipV321 } from "./advancedMotionQualityV321";
 import { computeNaturalDanceCoordination } from "./naturalDanceCoordination";
@@ -64,7 +71,7 @@ import { createPhraseMotionState, updatePhraseMotion } from "./musicalPhraseInte
 import { composeUnifiedMotion, createUnifiedMotionState } from "./unifiedDanceEngine";
 import { createMomentumState, updateMomentumState } from "./danceMomentumEngine";
 import { useUiPreferences } from "@/context/UiPreferencesContext";
-import { sanitizeTimeline, timelineWeights, timelinePosition } from "./motionTimelineEngine";
+import { advanceTimelineClockV733,sanitizeTimeline, timelineWeights, timelinePosition } from "./motionTimelineEngine";
 import { timelineSongSecondsV319 } from "./musicMotionTimelineV319";
 import { useFrame } from "@react-three/fiber";
 import { phaseForClipV328 } from "./groupMotionSynchronizationV328";
@@ -79,7 +86,7 @@ import {AvatarBodyContextV507} from "./ThreeAvatarContextsV492";
 import {useAnimatedCollisionSamplingV508} from "./useAnimatedCollisionSamplingV508";
 import { useId, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useGLTF } from "@react-three/drei";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import {loadMotionAssetV734,disposeMotionAssetV734} from "./loadMotionAssetV734";
 import { readMotionTransitionSettings, MOTION_TRANSITION_CHANGE_EVENT } from "./motionTransitionStudioSettings";
 import { shouldSwitchLiveMotion } from "./liveMotionTransitionDirector";
 import { publishTimelineObservation, explainTimelineDecision, normalizeTimelineEvidence, type TimelinePhase } from "./musicStructureTimeline";
@@ -88,6 +95,7 @@ import { initialStructureState, advanceStructureState, structureEvidence, choreo
 import { CHARACTER_MOTION_CHANGE_EVENT, loadCharacterMotionStore, chooseCharacterMotion } from "./characterMotionLibrary";
 import { AnimationClip, type Group } from "three";
 import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUtils.js";
+import {disposeClonedAvatarSkeletonsV654} from "./disposeClonedAvatarSkeletonsV654";
 import type { VisualizerProps } from "./registry";
 import { VocalRigV368 } from "./VocalRigV368";
 import { normalizeRapPresetV412, sampleRapLiveV412, liveRapClipNameV412, type RapLiveSampleV412 } from "./rapChoreographyPresetsV412";
@@ -107,6 +115,16 @@ import { createFullBodyBalanceStateV323, refineFullBodyBalanceV323, readFullBody
 import { sampleStanceV323 } from "./avatarFootIK";
 import { getAvatarAnimationState } from "./avatarAnimationEngine";
 import { applyAvatarRigMotion, type AvatarRigTargets } from "./avatarRigController";
+import {blendHipDanceV735, normalizeHipDanceV735} from "./hipDanceV735";
+import {createHipStudioStateV738,sampleHipStudioV738} from "./hipMotionStudioV738";
+import {createBeatBassStateV743,sampleBeatBassV743} from "./beatBassHipMotionV743";
+import {directGenreHipV742} from "./genreHipIntelligenceV742";
+import {createSmartHipStateV744,directSmartHipV744} from "./smartHipChoreographyV744";
+import {createEnsembleHipStateV745,directEnsembleHipV745} from "./multiAvatarHipSyncV745";
+import {createNaturalDanceStateV758,directNaturalDanceV758} from "./naturalDanceMotionV758";
+import {createDanceVarietyStateV759,stepDanceVarietyV759} from "./intelligentDanceVarietyV759";
+import {sampleNaturalBodyV740,blendNaturalBodyV740} from "./naturalBodyDynamicsV740";
+import {collectGluteRigV741,createGluteOverlayV741,sampleGluteV741,applyGluteRigV741} from "./advancedGluteRigV741";
 import { getAvatarRigProfile, type AvatarRigProfileId } from "./avatarRigProfiles";
 import { getAvatarDancePreset } from "./avatarDancePresets";
 import { createDanceIntelligenceState, getDanceIntelligenceMultipliers, updateDanceIntelligence } from "./danceIntelligence";
@@ -133,6 +151,7 @@ export function propsGenreKey(genre?: string | null) { return genre?.toLowerCase
 
 export function ImportedAnimationAvatar(props: VisualizerProps & { workloadSlot?: number; url: string; assetUrl?: string; animationUrl: string }) {
   const animationGltf = useGLTF(props.animationUrl);
+  usePreviewGltfCacheV654(props.animationUrl);
   return <GltfAvatar {...props} importedClips={animationGltf.animations} importedAnimationScene={animationGltf.scene} animationUrl={props.animationUrl} />;
 }
 
@@ -142,10 +161,11 @@ export function ImportedAnimationAvatar(props: VisualizerProps & { workloadSlot?
  */
 export function SharedEmbeddedAvatarV531(props: VisualizerProps & {workloadSlot?:number;url:string;assetUrl?:string;sharedMotionUrlV531:string}) {
   const source = useGLTF(props.sharedMotionUrlV531);
+  usePreviewGltfCacheV654(props.sharedMotionUrlV531);
   return <GltfAvatar {...props} importedClips={source.animations} importedAnimationScene={source.scene} sharedMotionV531 />;
 }
 
-export function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, sharedMotionV531=false, url, assetUrl, audio, isPlaying, reducedMotion, genre, genreFusion, stagePalette, wardrobeModeV468, wardrobeColorV468, wardrobePatternV468, wardrobeGlowV468, audioMotionEnabledV468, audioMotionStrengthV468, avatarModelId, avatarScale = 1, avatarOffsetY = 0, avatarAnimationIntensity = 1, avatarRigProfile = "auto", preferredMotionUrlV440, avatarDancePreset = "auto", danceAggression = 0.5, danceVariation = 0.5, danceMotionStyle = "balanced", avatarMotionMode = "hybrid", smartDanceEnabled = false, smartDanceOverride = "", avatarClipSpeed = 1, avatarBlendEnabled = false, avatarBlendClip = "", avatarBlendWeight = 0.3, avatarBlendSpeed = 1, avatarBlendAutoEnergy = false, avatarBlendBpmSync = false, avatarBlendReferenceBpm = 120, avatarBlendSmoothing = 0.28, avatarBlendCurve = "smooth", avatarBlendMask = "full", avatarCrossfadeSeconds = 0.35, avatarArmResponse = 1, avatarLegResponse = 1, avatarFootIKEnabled = true, avatarFootIKStrength = 70, avatarFootIKContact = 50, avatarFootIKLock = 50, cameraDirectorSection, cameraDirectorProgressMs, track, autonomousShowPhraseV356, showCue, lipSync: propsLipSyncV367, workloadSlot = 0 }: VisualizerProps & { url: string; assetUrl?: string; importedClips?: AnimationClip[]; importedAnimationScene?: Group; animationUrl?: string; sharedMotionV531?:boolean; avatarRigProfile?: AvatarRigProfileId; workloadSlot?: number }) {
+export function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, sharedMotionV531=false, url, assetUrl, audio, isPlaying, reducedMotion, genre, genreFusion, stagePalette, wardrobeModeV468, wardrobeColorV468, wardrobePatternV468, wardrobeGlowV468, audioMotionEnabledV468, audioMotionStrengthV468, avatarModelId, avatarScale = 1, avatarOffsetY = 0, avatarAnimationIntensity = 1, avatarRigProfile = "auto", preferredMotionUrlV440, avatarDancePreset = "auto", danceAggression = 0.5, danceVariation = 0.5, danceMotionStyle = "balanced", avatarMotionMode = "hybrid", smartDanceEnabled = false, smartDanceOverride = "", avatarClipSpeed = 1, avatarBlendEnabled = false, avatarBlendClip = "", avatarBlendWeight = 0.3, avatarBlendSpeed = 1, avatarBlendAutoEnergy = false, avatarBlendBpmSync = false, avatarBlendReferenceBpm = 120, avatarBlendSmoothing = 0.28, avatarBlendCurve = "smooth", avatarBlendMask = "full", avatarCrossfadeSeconds = 0.35, avatarArmResponse = 1, avatarLegResponse = 1, avatarFootIKEnabled = true, avatarFootIKStrength = 70, avatarFootIKContact = 50, avatarFootIKLock = 50, cameraDirectorSection, cameraDirectorProgressMs, track, autonomousShowPhraseV356, showCue, lipSync: propsLipSyncV367, ensembleCountV745, workloadSlot = 0 }: VisualizerProps & { url: string; assetUrl?: string; importedClips?: AnimationClip[]; importedAnimationScene?: Group; animationUrl?: string; sharedMotionV531?:boolean; avatarRigProfile?: AvatarRigProfileId; workloadSlot?: number }) {
   const schedulerInstance = useId();
   useEffect(() => () => releaseAvatarFrame(schedulerInstance), [schedulerInstance]);
   useEffect(() => () => releaseScheduledInstance(schedulerInstance), [schedulerInstance]);
@@ -179,6 +199,8 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   const rapLiveCandidateV412=rapLivePresetV412?.avatarId===avatarModelId&&!timelineEnabled&&workloadSlot===0;
   const timeline = useMemo(() => sanitizeTimeline(timelinePrefs.avatarTimeline), [timelinePrefs.avatarTimeline]);
   const timelineStarted = useRef<number | null>(null);
+  const timelinePause=useRef<number|null>(null);
+  const timelineTrack=useRef<string|undefined>(undefined);
   const clockElapsed = useRef(0);
   const timelineWasActive = useRef(false);
   useFrame(state => { clockElapsed.current = state.clock.elapsedTime; });
@@ -221,6 +243,15 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   const danceFlowV391 = useRef(createDanceFlowStateV391());
   const danceMotionV545=useRef(createDanceMotionStateV545());
   const footworkQualityV596=useRef(newGlbFootworkQualityStateV596());
+  const naturalFootworkV839=useRef(createNaturalFootworkClockV839());
+  const danceNaturalStateV758=useRef(createNaturalDanceStateV758());
+  const groundingV665=useRef(newGroundingStateV665());
+  const genreDanceV666=useRef(newGenreDanceStateV666());
+  const varietyStateV759=useRef(createDanceVarietyStateV759());
+  const hipStudioV738=useRef(createHipStudioStateV738());
+  const beatBassV743=useRef(createBeatBassStateV743());
+  const smartHipV744=useRef(createSmartHipStateV744());
+  const ensembleHipV745=useRef(createEnsembleHipStateV745());
   const reviewCadenceV314=useRef(0);
   const danceSongClockV307 = useRef(createDanceSongClock());
   const ikQualitySampler = useRef(createIKQualitySampler());
@@ -235,6 +266,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   const phraseVariationV241 = useRef(createPhraseMotionVariation());
   const phraseMotionState = useRef(createPhraseMotionState());
   const { scene, animations } = useGLTF(assetUrl ?? url);
+ usePreviewGltfCacheV654(assetUrl ?? url);
   // V507: rest-pose analysis only when a decoded GLB/scale changes; no frame tax.
   // Stage-local registry is keyed by dancer slot and cleaned on asset switch.
   const bodyRegistryV507=useContext(AvatarBodyContextV507);
@@ -255,6 +287,9 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     });
     return instance;
   }, [scene]);
+  useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(model);},[model]);
+  const gluteRigV741=useMemo(()=>collectGluteRigV741(model),[model]);
+  const gluteOverlayV741=useMemo(()=>createGluteOverlayV741(),[model]);
   // V560: one private set of PBR material copies per GLB instance. Never edit
   // shared useGLTF materials, animation morph targets, textures, or geometry.
   const materialSessionV560=useMemo(()=>preparePortraitMaterialsV560(model),[model]);
@@ -276,7 +311,8 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     return () => {window.removeEventListener(CHARACTER_MOTION_CHANGE_EVENT, refresh);window.removeEventListener("storage", refresh);};
   }, []);
   const library = useMemo(() => loadCharacterMotionStore(), [libraryRevision]);
-  const installed = useMemo(() => library.motions.filter(m => m.avatarId === avatarModelId).slice(-24), [library, avatarModelId]);
+  // V659: never truncate the *catalog*; decoded clips are instead capped by the working-set cache.
+  const installed = useMemo(() => library.motions.filter(m => m.avatarId === avatarModelId), [library, avatarModelId]);
   const libraryKey = installed.map(m => m.id + ":" + m.url).join("|");
   const [styleRevision,setStyleRevision]=useState(0);
   useEffect(()=>{const refresh=()=>setStyleRevision(v=>v+1);window.addEventListener(STYLE_EVENT,refresh);window.addEventListener("storage",refresh);return()=>{window.removeEventListener(STYLE_EVENT,refresh);window.removeEventListener("storage",refresh);};},[]);
@@ -295,8 +331,11 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   const lastObservedClip=useRef('');
 
   const [prefetchTargets,setPrefetchTargets]=useState<{id:string;url:string}[]>([]);
+  const [requestedMotionIdV659,setRequestedMotionIdV659]=useState("");
+  const [authoredCueIdsV659,setAuthoredCueIdsV659]=useState<string[]>([]);
+  const authoredCueKeyV659=useRef("");
   const prefetchedCache=useRef(new Map<string,AnimationClip[]>());
-  const prefetchInFlight=useRef(new Set<string>());
+  const prefetchInFlight=useRef(new Map<string,symbol>());
   const prefetchFailures=useRef(new Set<string>());
   const activeLibraryIdRef=useRef('');
   const prefetchGeneration=useRef(0);
@@ -315,99 +354,68 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   }, []);
   // Invalidate old retargets when avatar or calibration/style changes.
   useEffect(()=>{prefetchGeneration.current++;prefetchedCache.current.clear();prefetchInFlight.current.clear();prefetchFailures.current.clear();prefetchPlanKey.current='';memoryLedger.current={};memoryTick.current=0;lastObservedClip.current='';setLibraryClips([]);},[model,url,calibrationVersion,motionStyle,styleRest,libraryKey]);
-  useEffect(() => {
-    let cancelled = false;
-    if (prefetchActive) return;
-    setLibraryClips([]);
-    if (!installed.length) return;
-    // V249: Limit simultaneous GLB decoding/retargeting for non-prefetch libraries.
-    // Keep source order deterministic and stop starting work after unmount/model changes.
-    // Decoded GLTF scenes are not retained in an allSettled results array.
-    const orderedClips: AnimationClip[][] = Array.from({length: installed.length}, () => []);
-    let cursor = 0;
-    const loadNext = async () => {
-      const loader = new GLTFLoader();
-      while (!cancelled && cursor < installed.length) {
-        const index = cursor++;
-        const entry = installed[index];
-        try {
-          const gltf = await loader.loadAsync(entry.url);
-          if (cancelled) return;
-          const conversion = retargetHumanoidClips(gltf.animations, gltf.scene, model, readRetargetCalibration(url));
-          orderedClips[index] = adaptMotionStyle(conversion.clips, motionStyle, styleRest).map((clip, clipIndex) => {
-            const renamed = clip.clone();
-            renamed.name = `Library:${entry.id}:${clipIndex}`;
-            return renamed;
-          });
-        } catch {
-          // Preserve previous allSettled behavior: skip corrupt or unavailable clips.
-        }
-      }
-    };
-    const concurrency = Math.min(installed.length, 2);
-    void Promise.all(Array.from({length: concurrency}, () => loadNext())).then(() => {
-      if (!cancelled) setLibraryClips(orderedClips.flat());
-    });
-    return () => {cancelled = true;};
-  }, [libraryKey, model, url, calibrationVersion, motionStyle, styleRest, prefetchActive]);
-  // V212: fetch only current + future timeline clips, bounded concurrency and LRU-like eviction.
+  // V659: a single bounded loader serves *both* normal and predictive mode.
+  // Only the selected motion and a small set of upcoming motions are decoded.
+  // Keeping all library metadata in `installed` makes even entry 25/250 eligible.
   useEffect(()=>{
-    if(!prefetchActive)return;
-    let disposed=false;
+    if(!installed.length){setLibraryClips([]);return;}
+    let disposed=false;const controller=new AbortController();const owner=Symbol();
     const generation=prefetchGeneration.current;
-    const pinned=new Set([...prefetchTargets.map(t=>t.id),activeLibraryIdRef.current]);
     const pool=prefetchedCache.current;
+    const budget=memorySettings.enabled
+      ?resolveMotionMemoryLimit(memorySettings,memoryHardware,2)
+      :prefetchSettings.cacheSize;
+    // Explicitly authored rap-duet cues take precedence over automatic choices.
+    const manualTargets=authoredCueIdsV659.map(id=>installed.find(m=>m.id===id)).filter((m):m is NonNullable<typeof m>=>!!m);
+    const requested=manualTargets[0]?.id??requestedMotionIdV659;
+    const plan=planMotionPlaybackV659(installed,requested,
+      [...manualTargets.slice(1),...(prefetchActive?prefetchTargets:[])],activeLibraryIdRef.current,budget);
+    const pinned=plan.pinned;
     const publish=()=>{
       if(disposed||generation!==prefetchGeneration.current)return;
-      const clips=Array.from(pool.values()).flat();
-      setLibraryClips(clips);
+      setLibraryClips(Array.from(pool.values()).flat());
     };
-    const pending=prefetchTargets.filter(t=>!pool.has(t.id)&&!prefetchInFlight.current.has(t.id)&&!prefetchFailures.current.has(t.id));
+    const trim=()=>{
+      const cap=memorySettings.enabled
+        ?resolveMotionMemoryLimit(memorySettings,memoryHardware,pinned.length)
+        :prefetchSettings.cacheSize;
+      const old=memorySettings.enabled
+        ?chooseAdaptiveMotionEvictions(Array.from(pool.keys()),pinned,cap,memoryLedger.current,memorySettings.favorFrequentlyUsed)
+        :choosePrefetchEvictions(Array.from(pool.keys()),pinned,cap);
+      old.forEach(id=>pool.delete(id));
+      memoryLedger.current=pruneMotionLedger(memoryLedger.current,Array.from(pool.keys()));
+    };
+    trim();publish();
+    const pending=plan.targets.filter(t=>!pool.has(t.id)&&!prefetchInFlight.current.has(t.id)&&!prefetchFailures.current.has(t.id));
     let cursor=0;
     const worker=async()=>{
-      const loader=new GLTFLoader();
-      while(!disposed && cursor<pending.length){
+      while(!disposed&&cursor<pending.length){
         const target=pending[cursor++];
-        if(!target||prefetchInFlight.current.has(target.id))continue;
-        prefetchInFlight.current.add(target.id);
+        prefetchInFlight.current.set(target.id,owner);
         try{
-          const gltf=await loader.loadAsync(target.url);
+          const gltf=await loadMotionAssetV734(target.url,controller.signal);
+          try {
           if(disposed||generation!==prefetchGeneration.current)continue;
           const converted=retargetHumanoidClips(gltf.animations,gltf.scene,model,readRetargetCalibration(url));
           const clips=adaptMotionStyle(converted.clips,motionStyle,styleRest).map((clip,index)=>{
             const named=clip.clone();named.name=`Library:${target.id}:${index}`;return named;
           });
           pool.delete(target.id);pool.set(target.id,clips);
-          // Preserve currently selected and upcoming motions when trimming the cache.
-          const keep=[...pinned];
-          const cap=memorySettings.enabled?resolveMotionMemoryLimit(memorySettings,memoryHardware,keep.length):prefetchSettings.cacheSize;
-          const old=memorySettings.enabled?chooseAdaptiveMotionEvictions(Array.from(pool.keys()),keep,cap,memoryLedger.current,memorySettings.favorFrequentlyUsed):choosePrefetchEvictions(Array.from(pool.keys()),keep,cap);
-          old.forEach(id=>pool.delete(id));
-          memoryLedger.current=pruneMotionLedger(memoryLedger.current,Array.from(pool.keys()));
-          publish();
+          trim();publish();
+          }finally{disposeMotionAssetV734(gltf);}
         }catch{
-          // Do not retry a missing/corrupt asset on every animation frame.
-          if(generation===prefetchGeneration.current)prefetchFailures.current.add(target.id);
+          // Bad assets cannot trigger a retry storm on every animation frame.
+          if(!disposed&&generation===prefetchGeneration.current)prefetchFailures.current.add(target.id);
         }finally{
-          prefetchInFlight.current.delete(target.id);
-          // A previous plan may have been superseded while loading. Reschedule once
-          // the old request settles so a shared in-flight ID cannot block the new plan.
-          if(disposed && generation===prefetchGeneration.current){
-            setPrefetchTargets(latest=>latest.some(t=>t.id===target.id)?[...latest]:latest);
-          }
+          if(prefetchInFlight.current.get(target.id)===owner)prefetchInFlight.current.delete(target.id);
         }
       }
     };
-    const workers=Array.from({length:Math.min(prefetchSettings.concurrency,pending.length)},()=>worker());
-    void Promise.allSettled(workers);
-    // Trim old clips also when the planned sequence changes without another fetch.
-    const limit=memorySettings.enabled?resolveMotionMemoryLimit(memorySettings,memoryHardware,pinned.size):prefetchSettings.cacheSize;
-    const evictions=memorySettings.enabled?chooseAdaptiveMotionEvictions(Array.from(pool.keys()),[...pinned],limit,memoryLedger.current,memorySettings.favorFrequentlyUsed):choosePrefetchEvictions(Array.from(pool.keys()),[...pinned],limit);
-    evictions.forEach(id=>pool.delete(id));
-    memoryLedger.current=pruneMotionLedger(memoryLedger.current,Array.from(pool.keys()));
-    publish();
-    return()=>{disposed=true;};
-  },[prefetchActive,prefetchTargets,prefetchSettings.cacheSize,prefetchSettings.concurrency,memorySettings,memoryHardware,model,url,motionStyle,styleRest]);
+    void Promise.allSettled(Array.from({length:Math.min(prefetchActive?prefetchSettings.concurrency:2,pending.length)},()=>worker()));
+    return()=>{disposed=true;controller.abort();for(const [id,requestOwner] of prefetchInFlight.current)if(requestOwner===owner)prefetchInFlight.current.delete(id);};
+  },[installed,libraryKey,requestedMotionIdV659,authoredCueIdsV659,
+    prefetchActive,prefetchTargets,prefetchSettings.cacheSize,prefetchSettings.concurrency,
+    memorySettings,memoryHardware,model,url,motionStyle,styleRest]);
   // V194: use a stateful, hysteretic build/drop estimate rather than a single-frame kick threshold.
   const stableLibraryClipRef = useRef("");
   const lastTimelineSample = useRef(-Infinity);
@@ -514,9 +522,12 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   });
   const evolutionMotion=useMemo(()=>selectEvolutionByBeat(evolution,avatarModelId??"",predictedPhase,installed,phaseBeat,4),[evolution,avatarModelId,predictedPhase,installed,phaseBeat]);
   const sequenceCrossfade = useMemo(()=>evolutionMotion ? resolveEvolutionCrossfade(evolution,avatarModelId??"",predictedPhase,evolutionMotion.id,phaseBeat,4) : undefined,[evolution,avatarModelId,predictedPhase,evolutionMotion,phaseBeat]);
-  const libraryMotion = useMemo(() => evolutionMotion?.url ?? adaptiveMotion?.url ?? (library.automatic && installed.some(m=>m.url===preferredMotionUrlV440)?preferredMotionUrlV440:undefined) ?? chooseCharacterMotion(library, avatarModelId ?? "", genre ?? "", audio.bpm ?? undefined,
+  const libraryMotion = useMemo(() => evolutionMotion?.url ?? adaptiveMotion?.url ?? (library.automatic && installed.some(m=>m.url===preferredMotionUrlV440)?preferredMotionUrlV440:undefined) ?? chooseCharacterMotion({...library,motions:installed}, avatarModelId ?? "", genre ?? "", audio.bpm ?? undefined,
     predictedPhase, undefined),
     [library, avatarModelId, genre, audio.bpm, predictedPhase, adaptiveMotion, evolutionMotion, installed, preferredMotionUrlV440]);
+  const selectedEntryV659=installed.find(m=>m.url===libraryMotion);
+  const requestedIdV659=selectedEntryV659?.id??"";
+  useEffect(()=>{setRequestedMotionIdV659(requestedIdV659);},[requestedIdV659]);
   const selectedLibraryClip = useMemo(() => {
     if ((!library.automatic && !adaptiveMotion && !evolutionMotion) || !isPlaying || reducedMotion || !libraryMotion) return undefined;
     const selected = installed.find(m => m.url === libraryMotion);
@@ -555,6 +566,10 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       if(selectedLibraryClip===stableLibraryClip)return;
       if(queuedPredictiveCue.current)return;
     }
+    // A candidate selected from any part of the catalog can take a moment to
+    // decode. Hold the existing action instead of clearing it mid-song.
+    if(keepCurrentMotionWhileLoadingV659(requestedIdV659,
+      libraryClips.filter(c=>c.name.startsWith("Library:")).map(c=>c.name.split(":")[1])))return;
     if (selectedLibraryClip === stableLibraryClip) return;
     const now = clock.elapsedTime;
     const kick = Math.max(0, audio.kickAccentIntensity ?? 0);
@@ -580,38 +595,19 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     window.addEventListener(MOTION_QUALITY_EVENT_V321,refresh);window.addEventListener('storage',refresh);
     return()=>{window.removeEventListener(MOTION_QUALITY_EVENT_V321,refresh);window.removeEventListener('storage',refresh);};
   },[]);
-  // V412: Predictive prefetch can omit manually authored preset motions.
-  // Load only referenced installed clips, with cancellation on avatar/preset changes.
-  const [rapLiveExtraClipsV412,setRapLiveExtraClipsV412]=useState<AnimationClip[]>([]);
-  useEffect(()=>{
-    let cancelled=false;
-    setRapLiveExtraClipsV412([]);
-    if(!rapLiveCandidateV412||!prefetchActive||!rapLivePresetV412)return;
-    const ids=Array.from(new Set(rapLivePresetV412.items.filter(s=>s.motionId.startsWith('installed:')).map(s=>s.motionId.slice(10))));
-    const entries=ids.map(id=>installed.find(m=>m.id===id&&m.avatarId===avatarModelId)).filter((m):m is NonNullable<typeof m>=>!!m);
-    if(!entries.length)return;
-    let cursor=0;
-    const output:AnimationClip[][]=Array.from({length:entries.length},()=>[]);
-    const worker=async()=>{const loader=new GLTFLoader();while(!cancelled&&cursor<entries.length){const i=cursor++;try{
-      const gltf=await loader.loadAsync(entries[i].url);
-      if(cancelled)return;
-      const converted=retargetHumanoidClips(gltf.animations,gltf.scene,model,readRetargetCalibration(url));
-      output[i]=adaptMotionStyle(converted.clips,motionStyle,styleRest).map((clip,j)=>{const named=clip.clone();named.name=`Library:${entries[i].id}:${j}`;return named;});
-    }catch{/* retain fallback and do not break live stage */}}};
-    void Promise.all(Array.from({length:Math.min(2,entries.length)},()=>worker())).then(()=>{if(!cancelled)setRapLiveExtraClipsV412(output.flat());});
-    return()=>{cancelled=true;};
-  },[rapLiveCandidateV412,rapLivePresetV412,prefetchActive,installed,model,url,avatarModelId,motionStyle,styleRest]);
+  // V659: authored installed:ID cues are requested at their playback position;
+  // the same bounded loader used by automatic motion owns these resources.
   const clips = useMemo(() => {
     const base=[...animations, ...retargeted.clips.map(clip => {
       const renamed=clip.clone();renamed.name=`${sharedMotionV531?"SharedV531:":"Imported: "}${clip.name}`;return renamed;
-    }), ...libraryClips, ...rapLiveExtraClipsV412];
+    }), ...libraryClips];
     const source=Array.from(new Map(base.map(clip=>[clip.name,clip])).values());
     const quality=readMotionQualityV321();
     if(!quality.enabled)return source;
     // Only use cloned clips, never change shared useGLTF cache or installed GLBs.
     return source.map(clip => quality.protectAuthored && !/^(Imported:|Library:|SharedV531:)/.test(clip.name)
       ?clip:polishMotionClipV321(clip,quality));
-  }, [animations, libraryClips, rapLiveExtraClipsV412, retargeted.clips,qualityRevisionV321,sharedMotionV531]);
+  }, [animations, libraryClips, retargeted.clips,qualityRevisionV321,sharedMotionV531]);
   const {preparedBlendsV492,maskedOverlay,autoUpperGestureV490,playbackClips}=useGltfBlendSetupV492({
     clips,url,animationUrl,genre,avatarBlendMask,avatarBlendClip});
   const {groupClockV328,groupPhraseV329,actions,names,groupMixerV328}=useGltfAnimationMixerV492({
@@ -901,9 +897,232 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       plantedRight:footIK.current.right?.contact.phase==='planted',
     });
     footworkQualityV596.current=refinedFootworkV596.state;
-    const debugMotion = filterMotionDebugLayers(refinedFootworkV596.motion, getRuntimeMotionSettings());
-    sampleMotionQuality(motionQualitySampler.current, debugMotion, delta, isPlaying && !reducedMotion);
-    measureProfilerPhase("rigging", () => applyAvatarRigMotion(rigTargets.current, debugMotion, delta * (danceMotionStyle === "sharp" ? 1.8 : danceMotionStyle === "smooth" ? 0.55 : 1)));
+    // V665: optional contact/pose-transition damping, after V596 and before the
+    // existing rig overlay + SINGLE authoritative V492 Foot-IK call.
+    const groundingV665Result=stepRealisticGroundingV665(groundingV665.current,refinedFootworkV596.motion,{
+      settings:readGroundingSettingsV665(),trackId:track?.id,modelId:avatarModelId??url,
+      seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,
+        progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
+      delta,playing:isPlaying,reducedMotion,
+      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+        !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride,
+      quality:getActivePerformanceTier(),footIKEnabled:avatarFootIKEnabled,
+      contactKnown:!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+      poseDepth:groupLowPoseV481?.current?.depth??0,
+      poseClipActive:!!lowClipV481&&selectedClip===lowClipV481&&!!actions[lowClipV481],
+    });
+    groundingV665.current=groundingV665Result.state;
+    // V666 adjusts only bounded existing expressive overlays; V665 contact damping,
+    // authored GLB clips and the authoritative V492 Foot-IK are untouched.
+    const genreV666Result=stepGenreDanceV666(genreDanceV666.current,groundingV665Result.motion,{
+      settings:readGenreDanceSettingsV666(),trackId:track?.id,modelId:avatarModelId??url,
+      seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,
+        progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
+      delta,playing:isPlaying,reducedMotion,genre,section:performance.section,
+      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+        !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride,
+      quality:getActivePerformanceTier(),energy:audio.energyEnvelope,
+      kick:audio.kickAccentIntensity,snare:audio.snare,
+      footContactKnown:!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+    });
+    genreDanceV666.current=genreV666Result.state;
+    // V759 varies only EXISTING expressive rig scalars at musical phrase boundaries.
+    // It never replaces GLB clips or touches feet, hips, root, lip sync or IK.
+    const varietyV759=stepDanceVarietyV759(varietyStateV759.current,genreV666Result.motion,{
+      settings:groovePreferences.avatarDanceVarietyV759,trackId:track?.id,modelId:avatarModelId??url,
+      seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,
+        progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
+      delta,bpm:audio.bpm,genre,section:showCue?.enabled?showCue.section:performance.section,
+      slot:workloadSlot,playing:isPlaying,reducedMotion,
+      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+        !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride||!!clipChoiceV328||!!phraseChoiceV329||
+        !!rapLiveEnabledV412|| (!!lowClipV481&&selectedClip===lowClipV481),
+      quality:getActivePerformanceTier(),qualityGain:propsLipSyncV367?.qualityDanceGainV750??1,
+    });
+    varietyStateV759.current=varietyV759.state;
+    // V684: slow, phrase-based variety on existing, already-grounded additive
+    // rig scalars. Authored clips, IK contact, facial/vocal and root paths win.
+    const evolvedMotionV684=refineNaturalDanceRigV684(varietyV759.motion,{
+      trackId:track?.id,
+      seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,
+        progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
+      playing:isPlaying,reducedMotion,genre,section:performance.section,
+      slot:Math.max(0,Math.min(3,workloadSlot??0)),quality:getActivePerformanceTier(),
+      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+        !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride,
+      footContactKnown:avatarFootIKEnabled&&!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+    });
+    // V685: final bounded RAP ONLY pass; do not reassign vocalist, lips, clips
+    // or foot contacts. Verified synced lyric timing may emphasize *existing*
+    // gestures, while manually-authored rap presets and choreography take priority.
+    const rapCueV685 = rapGenreV685(genre) && propsLipSyncV367?.enabled===true &&
+      propsLipSyncV367?.playing===true && Number.isFinite(propsLipSyncV367.progressMs) &&
+      typeof cameraDirectorProgressMs==='number' && Number.isFinite(cameraDirectorProgressMs) &&
+      Math.abs(propsLipSyncV367.progressMs-cameraDirectorProgressMs)<1800
+      ? sampleRapLyricsCueV413(propsLipSyncV367.lyrics,propsLipSyncV367.progressMs,
+          isPlaying,reducedMotion,propsLipSyncV367.coordinationOffsetMsV372??0)
+      : null;
+    const advancedRapV685=refineAdvancedRapRigV685(evolvedMotionV684,{
+      trackId:track?.id,seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,
+        progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
+      playing:isPlaying,reducedMotion,genre,section:performance.section,
+      slot:Math.max(0,Math.min(3,workloadSlot??0)),quality:getActivePerformanceTier(),
+      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+        !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride||!!rapLiveEnabledV412,
+      footContactKnown:avatarFootIKEnabled&&!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+      lyricCue:rapCueV685,
+    });
+    // V735: if the imported model already plays an authored Hip_* clip, do not
+    // stack a duplicate synthesized move over that authored performance.
+    const authoredHipClipV735=['Hip_Sway','Hip_Circle','Hip_Bounce'].some(name=>{
+      const action=actions[name];
+      return !!action?.isRunning() && action.getEffectiveWeight()>.02;
+    });
+    // Conservative additive pelvis dance; existing GLB clips and the
+    // end-of-frame V492 IK remain authoritative. Never override manual shows.
+    const hipSettingsV735=normalizeHipDanceV735({mode:groovePreferences.avatarHipDanceModeV735,
+      strength:(groovePreferences.avatarHipDanceStrengthV735??45)*(propsLipSyncV367?.qualityDanceGainV750??1),speed:groovePreferences.avatarHipDanceSpeedV735});
+    const hipManualPriorityV735=authoredHipClipV735||avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+      !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride||!!rapLiveEnabledV412;
+    // V742 selects a genre/section phrase only for AUTO hips. Authored clips,
+    // manual timelines and explicit movement choices are never overridden.
+    const genreHipV742=directGenreHipV742({config:groovePreferences.avatarGenreHipV742,
+      hip:hipSettingsV735,studio:groovePreferences.avatarHipStudioV738,
+      genre,section:performance.section,
+      seconds:typeof cameraDirectorProgressMs==='number'&&Number.isFinite(cameraDirectorProgressMs)
+        ?Math.max(0,cameraDirectorProgressMs/1000):state.clock.elapsedTime,
+      bpm:audio.bpm,playing:isPlaying,reducedMotion,manualPriority:hipManualPriorityV735});
+    // V744 adds non-repeating musical phrases only after V742 has confirmed
+    // the genre auto-selection. The existing V738 mixer smooths transitions.
+    const smartHipPlanV744=directSmartHipV744(smartHipV744.current,{
+      settings:groovePreferences.avatarSmartHipV744,plan:genreHipV742,
+      originalHip:hipSettingsV735,trackId:track?.id,
+      seconds:typeof cameraDirectorProgressMs==='number'&&Number.isFinite(cameraDirectorProgressMs)
+        ?Math.max(0,cameraDirectorProgressMs/1000):state.clock.elapsedTime,
+      bpm:audio.bpm,section:performance.section,playing:isPlaying,reducedMotion,
+      manualPriority:hipManualPriorityV735});
+    // V745 arranges the same V744 phrases across GLB performers. This layer
+    // cannot override authored GLB motions, timelines, reduced motion, or IK.
+    const ensembleHipPlanV745=directEnsembleHipV745(ensembleHipV745.current,{
+      settings:groovePreferences.avatarEnsembleHipV745,plan:smartHipPlanV744,
+      slot:workloadSlot,count:ensembleCountV745??Math.max(workloadSlot+1,propsLipSyncV367?.ensembleCountV374??1),
+      trackId:track?.id,
+      seconds:typeof cameraDirectorProgressMs==='number'&&Number.isFinite(cameraDirectorProgressMs)
+        ?Math.max(0,cameraDirectorProgressMs/1000):state.clock.elapsedTime,
+      bpm:audio.bpm,playing:isPlaying,reducedMotion,manualPriority:hipManualPriorityV735,delta,
+    });
+    // V738 samples V735 mode poses (sampleHipDanceV735) with shared C1 crossfades.
+    const hipStudioFrameV738 = sampleHipStudioV738(hipStudioV738.current,{
+      settings:ensembleHipPlanV745.hip,
+      seconds:ensembleHipPlanV745.seconds,
+      bpm:audio.bpm, genre, section:performance.section,
+      playing:isPlaying,reducedMotion,
+      manualPriority:hipManualPriorityV735,
+      beat:audio.beatStrength,energy:audio.energyEnvelope,
+      footIKEnabled:avatarFootIKEnabled,contactKnown:!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+      studio:ensembleHipPlanV745.studio,delta,trackId:track?.id,
+    });
+    // V743 uses genuine kick/bass/attack analysis; no phantom metronome.
+    // The pre-existing V738 foot-contact and manual/GLB priority rules remain.
+    const beatBassFrameV743=sampleBeatBassV743(beatBassV743.current,{
+      pose:hipStudioFrameV738.pose,mode:hipStudioFrameV738.mode,poseStrength:hipStudioFrameV738.effectiveStrength,
+      settings:groovePreferences.avatarBeatBassV743,
+      seconds:typeof cameraDirectorProgressMs==='number'&&Number.isFinite(cameraDirectorProgressMs)
+        ?Math.max(0,cameraDirectorProgressMs/1000):state.clock.elapsedTime,
+      delta,trackId:track?.id,bpm:audio.bpm,genre,section:performance.section,
+      kick:audio.kickAccentIntensity,beat:audio.beatStrength,bass:audio.bass,attack:audio.attack,
+      playing:isPlaying,reducedMotion,manualPriority:hipManualPriorityV735,
+      footIKEnabled:avatarFootIKEnabled,contactKnown:!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+    });
+    const hipDanceV735=beatBassFrameV743.pose;
+    const debugSettingsV735=getRuntimeMotionSettings();
+    const hipTorsoGainV735=debugSettingsV735.layers.torso?(debugSettingsV735.weights?.torso??1):0;
+    const hipLegGainV735=debugSettingsV735.layers.legs?(debugSettingsV735.weights?.legs??1):0;
+    const adjustedHipV735={...hipDanceV735,
+      hipPitch:hipDanceV735.hipPitch*hipTorsoGainV735,
+      hipRoll:hipDanceV735.hipRoll*hipTorsoGainV735,
+      hipLateral:hipDanceV735.hipLateral*hipTorsoGainV735,
+      hipVertical:hipDanceV735.hipVertical*hipTorsoGainV735,
+      spineCounter:hipDanceV735.spineCounter*hipTorsoGainV735,
+      kneeCounter:hipDanceV735.kneeCounter*hipLegGainV735,
+      ankleCounter:hipDanceV735.ankleCounter*hipLegGainV735};
+    // V740: body counter-motion follows the *blended* hips from V738, and
+    // never changes grounded ankles or manually authored choreography.
+    const naturalBodyV740 = sampleNaturalBodyV740({
+      pose:adjustedHipV735,mode:hipStudioFrameV738.mode,
+      seconds:typeof cameraDirectorProgressMs==='number'&&Number.isFinite(cameraDirectorProgressMs)
+        ?Math.max(0,cameraDirectorProgressMs/1000):state.clock.elapsedTime,
+      playing:isPlaying,reducedMotion,manualPriority:hipManualPriorityV735,
+      footIKEnabled:avatarFootIKEnabled,contactKnown:!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+      settings:groovePreferences.avatarNaturalBodyV740,
+    });
+    // V758: smooth, contact-aware weight transfer and upper-body follow-through;
+    // the original GLB motion, manual cues, pelvis translations and final IK win.
+    const naturalDanceV758=directNaturalDanceV758(danceNaturalStateV758.current,{
+      settings:groovePreferences.avatarNaturalDanceV758,
+      hip:adjustedHipV735,body:naturalBodyV740,mode:hipStudioFrameV738.mode,
+      trackId:track?.id,seconds:typeof cameraDirectorProgressMs==='number'&&Number.isFinite(cameraDirectorProgressMs)
+        ?Math.max(0,cameraDirectorProgressMs/1000):state.clock.elapsedTime,
+      delta,playing:isPlaying,reducedMotion,manualPriority:hipManualPriorityV735,
+      footIKEnabled:avatarFootIKEnabled,contactKnown:!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+      qualityGain:propsLipSyncV367?.qualityDanceGainV750??1,
+    });
+    const debugMotion = blendNaturalBodyV740(
+      blendHipDanceV735(filterMotionDebugLayers(advancedRapV685, debugSettingsV735), naturalDanceV758.hip),
+      {...naturalDanceV758.body,
+        headTilt:debugSettingsV735.layers.head?naturalDanceV758.body.headTilt:0,
+        chestRoll:naturalDanceV758.body.chestRoll*hipTorsoGainV735,
+        chestTwist:naturalDanceV758.body.chestTwist*hipTorsoGainV735,
+        leftArm:debugSettingsV735.layers.arms?naturalDanceV758.body.leftArm*(debugSettingsV735.weights?.arms??1):0,
+        rightArm:debugSettingsV735.layers.arms?naturalDanceV758.body.rightArm*(debugSettingsV735.weights?.arms??1):0,
+        leftForearm:debugSettingsV735.layers.arms?naturalDanceV758.body.leftForearm*(debugSettingsV735.weights?.arms??1):0,
+        rightForearm:debugSettingsV735.layers.arms?naturalDanceV758.body.rightForearm*(debugSettingsV735.weights?.arms??1):0,
+        leftLeg:naturalDanceV758.body.leftLeg*hipLegGainV735,
+        rightLeg:naturalDanceV758.body.rightLeg*hipLegGainV735,
+        leftAnkle:naturalDanceV758.body.leftAnkle*hipLegGainV735,
+        rightAnkle:naturalDanceV758.body.rightAnkle*hipLegGainV735,
+      });
+    // V839 is an additive-only, contact-evidenced FINAL dance guard. It never
+    // edits source GLB clips, IK anchors, root motion, lips or manual cues.
+    const footworkV839=refineNaturalFootworkRigV839(naturalFootworkV839.current,debugMotion,{
+      settings:readNaturalFootworkV839(),trackId:track?.id,modelId:avatarModelId??url,
+      seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,
+        progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
+      delta,playing:isPlaying,reducedMotion,genre,section:performance.section,
+      manualPriority:hipManualPriorityV735||avatarMotionMode==='choreography'||!!stableLibraryClip||
+        !!activeSequence||!!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride||
+        !!clipChoiceV328||!!phraseChoiceV329||!!rapLiveEnabledV412||!!lowClipV481&&selectedClip===lowClipV481,
+      quality:getActivePerformanceTier(),footIKEnabled:avatarFootIKEnabled,
+      contactKnown:!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+    });
+    naturalFootworkV839.current=footworkV839.state;
+    // V741: optional mesh deformation, distinct from pelvis/Foot-IK pose.
+    // Disabled or unsupported rigs receive zero; no new skin weights are invented.
+    const glutePoseV741=sampleGluteV741({pose:adjustedHipV735,mode:hipStudioFrameV738.mode,
+      playing:isPlaying,reducedMotion,manualPriority:hipManualPriorityV735,
+      settings:groovePreferences.avatarGluteRigV741});
+    applyGluteRigV741(gluteRigV741,gluteOverlayV741,glutePoseV741,
+      groovePreferences.avatarGluteRigV741,delta);
+    sampleMotionQuality(motionQualitySampler.current, footworkV839.motion, delta, isPlaying && !reducedMotion);
+    measureProfilerPhase("rigging", () => applyAvatarRigMotion(rigTargets.current, footworkV839.motion, delta * (danceMotionStyle === "sharp" ? 1.8 : danceMotionStyle === "smooth" ? 0.55 : 1)));
     applyPartnerLook(rigTargets.current, partnerLook?.current ?? NEUTRAL_LOOK, delta, lastPartnerLook.current);
     applyPartnerGesture(rigTargets.current, partnerGesture?.current ?? NEUTRAL_GESTURE, delta, lastPartnerGesture.current);
     applyGltfVocalPerformanceV492({propsLipSyncV367,trackId:track?.id??"",audio,genre,showCue,reducedMotion,isPlaying,
@@ -925,7 +1144,11 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       playing:isPlaying,reducedMotion,enabled:avatarFootIKEnabled,strength:avatarFootIKStrength,
       contact:avatarFootIKContact,lock:avatarFootIKLock,trackId:track?.id??"",
       progressMs:cameraDirectorProgressMs,rigTargets,constraints:ikConstraints,
-      avatarKey:avatarModelId??url,ikQualitySampler,handIK,activeHandCue});
+      avatarKey:avatarModelId??url,ikQualitySampler,handIK,activeHandCue,
+      hipFootLockV737:{enabled:!hipManualPriorityV735&&isPlaying&&!reducedMotion&&
+        hipTorsoGainV735>0&&hipSettingsV735.mode!=='off'&&hipSettingsV735.strength>0&&hipStudioFrameV738.effectiveStrength>0,
+        
+        intensity:hipStudioFrameV738.effectiveStrength}});
     } finally {
       if (v251StartedAt >= 0) recordAvatarFrame(schedulerInstance, `GLTF: ${avatarModelId ?? url.split("/").pop() ?? "Avatar"}`, performance.now() - v251StartedAt, performance.now());
     }
@@ -1145,6 +1368,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   useEffect(()=>{if(!rapLiveEnabledV412)return;return()=>{Object.values(actions).forEach(a=>a?.stop());};},[actions,rapLiveEnabledV412]);
   useFrame((_,delta)=>{
     if(!rapLiveEnabledV412||!rapLivePresetV412||!isPlaying||reducedMotion){
+      if(authoredCueKeyV659.current){authoredCueKeyV659.current="";setAuthoredCueIdsV659([]);}
       rapLiveFrameV412.current={section:"verse",active:[]};rapLyricsFrameV414.current={head:1,arms:1,motionId:"",motionBlend:0,motionSec:0,active:false};return;
     }
     rapLiveElapsedV412.current+=Math.max(0,Math.min(.12,Number.isFinite(delta)?delta:0));
@@ -1165,6 +1389,9 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       (propsLipSyncV367?.coordinationOffsetMsV372??0)+effectiveRapTimingOffsetV418(!!groovePreferences.rapTimingLiveEnabledV418,groovePreferences.rapTimingOffsetsV418?.gestureMs??0),rapLivePresetV412.items.map(i=>i.motionId));
     rapLyricsFrameV414.current=manualGestureV414;
     const liveActiveV414=applyRapGestureMotionV414(sample.active,manualGestureV414);
+    const cueIds=Array.from(new Set(liveActiveV414.filter(i=>i.motionId.startsWith('installed:')).map(i=>i.motionId.slice(10))));
+    const cueKey=cueIds.join('|');
+    if(cueKey!==authoredCueKeyV659.current){authoredCueKeyV659.current=cueKey;setAuthoredCueIdsV659(cueIds);}
     rapLiveFrameV412.current={...sample,active:liveActiveV414.map(item=>({...item,rapGain:lyricsRapGainV413(item.rapGain,lyricsCueV413)}))};
     const weights=new Map<string,{weight:number;localSec:number}>();
     for(const item of liveActiveV414){
@@ -1189,12 +1416,13 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   useFrame((state) => {
     const songSeconds=timelineSongSecondsV319(0,timeline.trackId,track?.id,cameraDirectorProgressMs,timeline.songSync===true);
     const active = timelineEnabled && timeline.segments.length > 0 && isPlaying && !reducedMotion && songSeconds!==null;
-    if (!active) { timelineStarted.current = null; if(timelineWasActive.current){timelineWasActive.current=false;Object.values(actions).forEach(a=>a?.stop());} return; }
+    const localClock=advanceTimelineClockV733(timelineStarted.current,timelinePause.current,timelineTrack.current,track?.id,active,timelineEnabled,state.clock.elapsedTime);
+    timelineStarted.current=localClock.started;timelinePause.current=localClock.paused;timelineTrack.current=track?.id;
+    if(!active){if(timelineWasActive.current){timelineWasActive.current=false;Object.values(actions).forEach(a=>a?.stop());}return;}
     timelineWasActive.current=true;
-    if (timelineStarted.current===null) timelineStarted.current=state.clock.elapsedTime;
     // Legacy V105 timelines keep their local clock; V319 opt-in timelines use
     // absolute Spotify playback seconds so seeks and track-specific markers stay aligned.
-    const elapsed=timeline.songSync===true ? songSeconds! : state.clock.elapsedTime-timelineStarted.current;
+    const elapsed=timeline.songSync===true ? songSeconds! : state.clock.elapsedTime-timelineStarted.current!;
     const pos=timelinePosition(timeline,elapsed);
     const weights=timelineWeights(timeline,elapsed);
     for (const [name,action] of Object.entries(actions)) {

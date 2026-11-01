@@ -23,7 +23,7 @@ export function makeMotionGridV319(trackId:string,analysis:TrackAnalysisV318|nul
    ?providedBeats.filter((_,i)=>i%meter===0)
    :Array.from({length:Math.min(1400,Math.ceil(limit*bpm/60/meter)+1)},(_,i)=>round(i*60/bpm*meter));
  const sections=ok?analysis!.sections.slice(0,160).filter(s=>finite(s.startMs)&&s.startMs>=0).map((s:AnalysisSectionV318)=>({at:s.startMs/1000,label:s.confidence>=.5?s.label:undefined})):[];
- return {source:providedBeats.length||providedBars.length?'imported':'bpm',beatSource:providedBeats.length?'imported':'bpm',barSource:providedBars.length?'imported':'bpm',trackId,tempo:bpm,timeSignature:meter,beats,bars,sections};
+ return {source:providedBeats.length||providedBars.length?'imported':'bpm',beatSource:providedBeats.length?'imported':'bpm',barSource:providedBars.length||providedBeats.length?'imported':'bpm',trackId,tempo:bpm,timeSignature:meter,beats,bars,sections};
 }
 /** Binary-search nearest marker. Never snap far beyond the last known imported marker. */
 export function snapMotionSecondV319(seconds:number,grid:MotionGridV319,mode:SnapModeV319):number{

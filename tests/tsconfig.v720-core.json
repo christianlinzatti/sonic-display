@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": [],
+    "noEmit": true
+  },
+  "files": [
+    "../lib/lastfm-discovery-timeline-v720.ts"
+  ],
+  "include": [],
+  "exclude": []
+}

@@ -62,5 +62,5 @@ assert.equal((haze.match(/<spotLight /g)||[]).length,2);
 const code=fs.readFileSync('components/visualizer/intelligentConcertLightingV542.ts','utf8');
 for(const forbidden of ['requestAnimationFrame(', 'setTimeout(', 'Math.random(', 'localStorage', 'new SpotLight(', 'new Mesh(', 'new Audio('])assert(!code.includes(forbidden));
 const pkg=require('../package.json');assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]||0)>=542);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v542 && npm run test:v542:types'));
+assert(pkg.scripts['check:release'].includes('npm run test:v542 && npm run test:v542:types') || pkg.scripts['build:preflight'].includes('npm run test:v542 && npm run test:v542:types'));
 console.log(`PASS V542: ${n} mood/section/cast/tier/lyrics scenarios, disabled/manual/blackout/laser safeguards, V462 reuse`);

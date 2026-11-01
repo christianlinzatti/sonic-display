@@ -1,0 +1,10 @@
+{
+  "extends":"./tsconfig.v596-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/realisticDanceGroundingV665.ts",
+    "../components/visualizer/avatarRigController.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

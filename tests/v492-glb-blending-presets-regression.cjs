@@ -53,15 +53,21 @@ for(const variants of [
 assert(p.matchesBlendGenreV492('hard','Hardtekk'));assert(p.matchesBlendGenreV492('rap','Hip-Hop'));assert(!p.matchesBlendGenreV492('rap','Hardstyle'));
 assert(p.matchesBlendGenreV492('all','jazz'));
 // The automatic mixer must not take over manually authored choreography, timeline or IK channels.
-const stage=read('components/visualizer/ThreeAvatar.tsx');
-for(const fragment of ['preparedBlendsV492=useMemo','chooseLiveBlendPresetV492([preset],clips','new AnimationClip(actionName,match.overlay.duration,safe)',
- 'name !== activeLiveBlendV492?.actionName','const activeLiveBlendV492=','!activeSequence&&!activeLoop&&!avatarBlendEnabled',
- '!groupClockV328?.settings.enabled','!activeLiveBlendV492','action.setEffectiveWeight(weight)',
- 'footIK.current.left?.contact.phase',"window.addEventListener(GLB_BLEND_CHANGE_V492,refresh)",
- '...preparedBlendsV492.map(p=>p.clip)'])assert(stage.includes(fragment),`missing live wiring: ${fragment}`);
-assert(stage.indexOf('preparedBlendsV492=useMemo')<stage.indexOf('useAnimations(playbackClips, root)'));
-assert(/import\s*\{\s*AnimationClip\s*,[^}]*\}\s*from\s*["']three["']/.test(stage),'AnimationClip must be a runtime import for constructing masked clips');
-assert(/import\s*\{[^}]*\bVector3\b[^}]*\}\s*from\s*["']three["']/.test(stage),'Vector3 must be a runtime import for GLB ground contact');
+const dancer=read('components/visualizer/GltfDancerAvatarV492.tsx');
+const setup=read('components/visualizer/useGltfBlendSetupV492.ts');
+const playback=read('components/visualizer/useGltfBlendPlaybackV492.ts');
+const transitions=read('components/visualizer/useGltfClipTransitionsV492.ts');
+const mixer=read('components/visualizer/useGltfAnimationMixerV492.ts');
+for(const fragment of ['preparedBlendsV492=useMemo','chooseLiveBlendPresetV492([preset],clips',
+ 'new AnimationClip(actionName,match.overlay.duration,safe)',
+ "window.addEventListener(GLB_BLEND_CHANGE_V492,refresh)",
+ '...preparedBlendsV492.map(p=>p.clip)'])assert(setup.includes(fragment),`missing blending setup: ${fragment}`);
+for(const fragment of ['!activeSequence&&!activeLoop','!activeLiveBlendV492','action.setEffectiveWeight(weight)'])
+ assert(playback.includes(fragment),`missing protected blend playback: ${fragment}`);
+assert(transitions.includes('name !== activeLiveBlendV492?.actionName'),'blend action must not replace the base dance clip');
+assert(dancer.includes('footIK.current.left?.contact.phase'),'foot contact must be protected');
+assert(dancer.includes('useGltfBlendSetupV492(')&&dancer.includes('useGltfAnimationMixerV492('),'live integration must use modular blend setup and owned mixer');
+assert(mixer.includes('disposeMixerClipsV654'),'mixer must clean up AnimationClips, not Actions');
 const preview=read('components/visualizer/AvatarPreview3D.tsx');
 for(const fragment of ['GLB Blending Preset Studio · V492','readBlendPresetsV492()', 'writeBlendPresetsV492(updated)',
  'parseBlendPresetsV492(await file.text())','mergeBlendPresetsV492','serializeBlendPresetsV492',

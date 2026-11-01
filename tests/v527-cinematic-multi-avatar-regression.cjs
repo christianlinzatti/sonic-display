@@ -53,7 +53,7 @@ for(const [file,tokens] of [
 const src=fs.readFileSync('components/visualizer/cinematicMultiAvatarV527.ts','utf8');
 for(const x of ['requestAnimationFrame(','setInterval(','new Audio(','localStorage','navigator.mediaDevices'])assert(!src.includes(x));
 const pkg=require('../package.json');assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]||0)>=527);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v527 && npm run test:v527:types'));
+assert(pkg.scripts['check:release'].includes('npm run test:legacy:interaction') && pkg.scripts['test:legacy:interaction'].includes('npm run test:v527'), 'V527 is part of the historical release gate');
 let cases=0;
 for(const count of [2,3,4])for(const moment of ['verse','feature','handoff','hook','drop']){
  for(let i=0;i<820;i++){

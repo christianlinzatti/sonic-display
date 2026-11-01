@@ -1,8 +1,10 @@
+import {withDeadlineV734} from '@/lib/requestDeadlineV734';
 import type { CurrentTrackResponse } from "@/types/music";
 
 /** Browser-side boundary to the server-owned Spotify session. Never handles tokens. */
 export async function fetchCurrentTrack(signal?: AbortSignal): Promise<CurrentTrackResponse> {
-  const response = await fetch("/api/spotify/current", { cache: "no-store", signal });
+  return withDeadlineV734(async bounded => {
+  const response = await fetch("/api/spotify/current", { cache: "no-store", signal:bounded });
   if (!response.ok) {
     const retryAfter = Number(response.headers.get("Retry-After"));
     const error = new Error(`Spotify vorübergehend nicht erreichbar (${response.status})`) as Error & { status:number; retryAfter:number };
@@ -11,6 +13,7 @@ export async function fetchCurrentTrack(signal?: AbortSignal): Promise<CurrentTr
     throw error;
   }
   return response.json() as Promise<CurrentTrackResponse>;
+  },15000,signal);
 }
 
 export async function disconnectSpotify(): Promise<void> {

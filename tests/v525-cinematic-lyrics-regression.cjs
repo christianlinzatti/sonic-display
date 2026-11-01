@@ -41,7 +41,7 @@ assert(css.includes('v525-cinematic-lyrics')&&css.includes('max-width:calc(47% -
 assert(!fs.readFileSync('components/visualizer/cinematicLyricsExperienceV525.ts','utf8').includes('setInterval'));
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]||0)>=525);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v525 && npm run test:v525:types')); 
+assert(pkg.scripts['check:release'].includes('npm run test:v525 && npm run test:v525:types')); 
 let checked=0;
 for(const genre of ['Deutschrap','Hardstyle','Hardtekk','Alternative Rap','Pop']) {
  for(let i=0;i<6000;i++) {

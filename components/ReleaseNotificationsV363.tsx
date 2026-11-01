@@ -94,7 +94,14 @@ export function ReleaseNotificationsV363() {
       if (ac.signal.aborted) return;
       const result = applyReleaseScanV363(stateRef.current, gathered, Date.now(), readRadarSeen(), cursor, hadPartial);
       commit(result.state); setPartial(hadPartial);
-      if (result.added > 0) setToast(result.added);
+      if (result.added > 0) {
+        setToast(result.added);
+        try{if(typeof Notification!=="undefined"&&Notification.permission==="granted"&&localStorage.getItem("sonic.v364.foreground-alerts")==="true"){
+          const options={body:`${result.added} neue Veröffentlichungen in deinem Release-Radar.`,tag:"sonic-foreground-release"};
+          const registration=await navigator.serviceWorker?.getRegistration();
+          if(registration)await registration.showNotification("Neue Musik",options);else new Notification("Neue Musik",options);
+        }}catch{setError("Neue Releases gefunden; die Browserbenachrichtigung konnte nicht angezeigt werden.");}
+      }
     } catch (e) {
       if (!ac.signal.aborted) setError(e instanceof Error ? e.message : "Release-Prüfung fehlgeschlagen.");
     } finally {

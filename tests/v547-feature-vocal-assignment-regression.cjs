@@ -70,5 +70,5 @@ for(const file of ['DanceFormationActorsV492.tsx','GroupDancersV326SceneV492.tsx
  assert(text.includes('resolveVocalTimeCueV496('));assert(text.includes('timeCueV496.active?timeCueV496:legacyDuetCueV416'));
 }
 const pkg=require('../package.json');assert(Number(pkg.version.split('-v')[1])>=547);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v547 && npm run test:v547:types &&'));
+assert(pkg.scripts['test:smoke:v660'].includes('npm run test:v547 && npm run test:v547:types &&'), 'Current release smoke must exercise V547 vocal timeline');
 console.log('PASS V547: 12800 timeline ticks, tracks, adlibs, selective hooks, old data, priority, visual editor and stage wiring');

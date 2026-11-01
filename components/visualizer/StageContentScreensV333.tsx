@@ -1,5 +1,6 @@
 'use client';
 import type {GenreVisualCueV352} from "@/services/stageContent/genreVisualDirectorV352";
+import type {ConcertFlowCueV654} from "./intelligentConcertFlowV654";
 import type {VisualFxCueV353} from "@/services/stageContent/visualEffectsStudioV353";
 import {useEffect,useRef,useState} from 'react';
 import type {ContentScreenV333} from '@/services/stageContent/layoutV333';
@@ -9,9 +10,9 @@ import {composeStagePanelsV351,type SmartStageCueV351} from '@/services/stageCon
 import {StageContentScreenV330} from './StageContentScreenV330';
 import {useSchedulerV334} from "@/services/stageContent/useSchedulerV334";
 import {chooseScheduledV334,type SectionV334} from "@/services/stageContent/schedulerV334";
-export function StageContentScreensV333({screens,slides,push,index,settings,playing,reducedMotion,albumCoverUrl,section,beatAccent,genre,lyricsActive=false,lyricsSide=null,composition,genreCue,fxCue}:{
+export function StageContentScreensV333({screens,slides,push,index,settings,playing,reducedMotion,albumCoverUrl,section,beatAccent,genre,lyricsActive=false,lyricsSide=null,composition,genreCue,fxCue,lipSyncActive=false,concertFlowV654}:{
  screens:ContentScreenV333[];slides:StageContentV330[];push:StageContentV330|null;index:number;
- settings:StageContentSettingsV330;playing:boolean;reducedMotion:boolean;albumCoverUrl:string|null;section?:string;beatAccent?:number;genre?:string;lyricsActive?:boolean;lyricsSide?:'left'|'right'|null;composition?:SmartStageCueV351;genreCue?:GenreVisualCueV352;fxCue?:VisualFxCueV353;
+ settings:StageContentSettingsV330;playing:boolean;reducedMotion:boolean;albumCoverUrl:string|null;section?:string;beatAccent?:number;genre?:string;lyricsActive?:boolean;lyricsSide?:'left'|'right'|null;composition?:SmartStageCueV351;genreCue?:GenreVisualCueV352;fxCue?:VisualFxCueV353;lipSyncActive?:boolean;concertFlowV654?:ConcertFlowCueV654;
 }){
  const [rotationSerial,setRotationSerial]=useState(0);
  const scheduler=useSchedulerV334();
@@ -34,5 +35,5 @@ export function StageContentScreensV333({screens,slides,push,index,settings,play
   if(scheduler.enabled)return chooseScheduledV334(screen,slides,scheduler,(section==='hook'||section==='drop'||section==='build'||section==='break'?section:'verse'),seconds);
   return pickScreenSlideV333(screen,slides,index,push,rotationSerial,pushSerial.current);
  })()} settings={settings}
-  playing={playing} reducedMotion={reducedMotion} albumCoverUrl={albumCoverUrl} section={section} beatAccent={beatAccent} genre={genre} lyricsActive={lyricsActive} lyricsSide={lyricsSide} composition={composition} genreCue={genreCue} fxCue={fxCue}/>)}</>;
+  playing={playing} reducedMotion={reducedMotion} albumCoverUrl={albumCoverUrl} section={section} beatAccent={beatAccent} genre={genre} lyricsActive={lyricsActive} lyricsSide={lyricsSide} composition={composition} genreCue={genreCue} fxCue={fxCue} lipSyncActive={lipSyncActive} concertFlowV654={concertFlowV654}/>)}</>;
 }

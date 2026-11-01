@@ -1,0 +1,4 @@
+{
+ "extends":"./tsconfig.v825-core.json",
+ "files":["../components/visualizer/cameraAwarePerformanceV834.ts","../components/visualizer/concertFxPerformanceOptimizerV825.ts","../components/visualizer/concertFxStudioV810.ts"]
+}

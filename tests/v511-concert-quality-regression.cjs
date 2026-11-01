@@ -72,6 +72,6 @@ assert(hook.includes('readPiConcertBudgetV479()')&&hook.includes('if(tier===\'lo
 const source=fs.readFileSync('components/visualizer/ConcertStageQualityPanelV511.tsx','utf8');
 assert(source.includes('Nicht prüfbar')&&source.includes('Geprüfte Avatar-Paare'));
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
-assert(/^0\.1\.0-v5(?:1[1-9]|[2-9][0-9])$/.test(pkg.version),'V511+ package version');
+assert(/^0\.1\.0-v(?:5(?:1[1-9]|[2-9][0-9])|[6-9][0-9]{2,})$/.test(pkg.version),'V511+ package version');
 assert(pkg.scripts['build:preflight'].includes('npm run test:v511 && npm run test:v511:types && npm run test:v510'));
 console.log(`PASS V511 Concert Quality: ${tested} deterministic ensemble windows, explicit measurement coverage, Pi opt-in cadence, duo/group/GLB/diagnostics wiring`);

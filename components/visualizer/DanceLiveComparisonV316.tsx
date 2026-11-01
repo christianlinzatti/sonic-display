@@ -8,7 +8,8 @@ import {Canvas,useFrame} from '@react-three/fiber';
 import {useGLTF} from '@react-three/drei';
 import {clone as cloneSkinnedScene} from 'three/examples/jsm/utils/SkeletonUtils.js';
 import {AnimationMixer,Box3,Vector3,type AnimationClip,type Group,type MeshBasicMaterial,type PointLight,type Object3D} from 'three';
-import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {withPrivateGltfV769} from './privateGltfLifecycleV769';
+import {disposeClonedAvatarSkeletonsV654} from './disposeClonedAvatarSkeletonsV654';
 import {retargetHumanoidClips,readRetargetCalibration} from './avatarAnimationRetarget';
 import {loadCharacterMotionStore,CHARACTER_MOTION_CHANGE_EVENT,type InstalledCharacterMotion} from './characterMotionLibrary';
 import {clipBlendV317,comparisonMotionSourcesV317,fadeSecondsV317,plantedFootV317,validComparisonClipsV317,type MotionClipInfoV317} from './realMotionComparisonV317';
@@ -97,6 +98,7 @@ function DemoHumanoid(){
 function ModelHumanoid({url,onReady}:{url:string;onReady:(targets:AvatarRigTargets)=>void}){
   const {scene}=useGLTF(url);
   const clone=useMemo(()=>cloneSkinnedScene(scene),[scene]);
+  useEffect(()=>()=>disposeClonedAvatarSkeletonsV654(clone),[clone]);
   const transform=useMemo(()=>{
     const box=new Box3().setFromObject(clone);const size=new Vector3(),center=new Vector3();
     box.getSize(size);box.getCenter(center);
@@ -124,11 +126,8 @@ function RealGLBMotionV317({url,motionUrl,clipId,secondClipId,onReady,onCatalog}
   const [imported,setImported]=useState<AnimationClip[]>([]);
   useEffect(()=>{
     let current=true;setImported([]);
-    if(motionUrl)new GLTFLoader().loadAsync(motionUrl).then(gltf=>{
-      if(!current)return;
-      const result=retargetHumanoidClips(gltf.animations,gltf.scene,cloned,readRetargetCalibration(url));
-      setImported(result.clips);
-    }).catch(()=>{if(current)setImported([]);});
+    if(motionUrl)withPrivateGltfV769(motionUrl,gltf=>retargetHumanoidClips(gltf.animations,gltf.scene,cloned,readRetargetCalibration(url)).clips)
+      .then(clips=>{if(current)setImported(clips);}).catch(()=>{if(current)setImported([]);});
     return()=>{current=false};
   },[motionUrl,cloned,url]);
   const all=useMemo(()=>motionUrl?imported.map((clip,index)=>({id:`external:${index}`,clip})):
@@ -176,7 +175,7 @@ function RealGLBMotionV317({url,motionUrl,clipId,secondClipId,onReady,onCatalog}
     callbackRef.current.onReady({rig:targets,sample});
     return()=>{callbackRef.current.onReady(null);a.stop();if(b)b.stop();mixer.stopAllAction();};
   },[mixer,cloned,targets,selection?.clip,secondary?.clip,usable]);
-  useEffect(()=>()=>{mixer.stopAllAction();mixer.uncacheRoot(cloned);},[mixer,cloned]);
+  useEffect(()=>()=>{mixer.stopAllAction();mixer.uncacheRoot(cloned);disposeClonedAvatarSkeletonsV654(cloned);},[mixer,cloned]);
   if(!usable)return <DemoHumanoid/>;
   return <group scale={box.scale} position={box.translation}><primitive object={cloned} dispose={null}/></group>;
 }

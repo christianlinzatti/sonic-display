@@ -1,9 +1,17 @@
 "use client";
-import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
 import type { Group } from "three";
 import type { AudioFeatures } from "@/types/audio";
-import { getActivePerformanceTier } from "../adaptivePerformance";
+import { getActivePerformanceTier, useAdaptivePerformance } from "../adaptivePerformance";
+import {getVisualLevelV640} from "../adaptiveVisualBudgetV640";
+import {resolveLightingBudgetV772} from "../adaptiveLightingBudgetV772";
+import type {SpotLight} from "three";
+import { createGalaxyStarfieldV766 } from "./galaxyStarfieldV766";
+import {StageStaticBatchV775} from "./StageStaticBatchV775";
+import {VAPORWAVE_BARS_V775, VAPORWAVE_PALM_TRUNKS_V775, VAPORWAVE_PALM_LEAVES_V775,
+  ROCK_AMP_PANELS_V775, ROCK_TRUSS_POSTS_V775, ROCK_TRUSS_HOUSINGS_V775,
+  CYBERPUNK_TOWER_LEDS_V775, CYBERPUNK_SIDE_NEONS_V775} from "./stageInstancePlansV775";
 
 export type StageEnvironmentDefinition = {
   id: string;
@@ -56,29 +64,109 @@ function ResponsiveGroup({ children, audio, isPlaying, reducedMotion, reactive =
 }
 
 function Tower({ x, color }: { x: number; color: string }) {
-  return <group position={[x, -.15, -1.9]}><mesh><boxGeometry args={[.2, 3.6, .22]} /><meshStandardMaterial color="#171923" metalness={.8} roughness={.35} /></mesh>{[0, .8, 1.6].map(y => <mesh key={y} position={[0, y - 1, .15]}><boxGeometry args={[.28, .06, .09]} /><meshBasicMaterial color={color} /></mesh>)}</group>;
+  return <group position={[x, -.15, -1.9]}>
+    <mesh><boxGeometry args={[.2, 3.6, .22]}/><meshStandardMaterial color="#171923" metalness={.8} roughness={.35}/></mesh>
+    <StageStaticBatchV775 name="v775-cyberpunk-tower-leds" instances={CYBERPUNK_TOWER_LEDS_V775} geometry="box" color={color}/>
+  </group>;
 }
 
 function CyberpunkStage(p: Props) {
-  return <ResponsiveGroup {...p}><mesh position={[0, -1.99, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[16, 16]} /><meshStandardMaterial color="#090d1c" metalness={.78} roughness={.19} /></mesh>{[-3, 3].map(x => <Tower key={x} x={x} color={x < 0 ? "#00f0ff" : "#fa38d7"} />)}{[-2.5, 2.5].map(x => <mesh key={x} position={[x, .2, -2.65]}><boxGeometry args={[.065, 4.1, .1]} /><meshBasicMaterial color="#e933e9" /></mesh>)}<mesh position={[0, 1.25, -3.2]}><boxGeometry args={[6, .035, .08]} /><meshBasicMaterial color="#00f0ff" /></mesh></ResponsiveGroup>;
+  return <ResponsiveGroup {...p}>
+    <mesh position={[0, -1.99, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[16, 16]}/><meshStandardMaterial color="#090d1c" metalness={.78} roughness={.19}/></mesh>
+    {[-3, 3].map(x => <Tower key={x} x={x} color={x < 0 ? "#00f0ff" : "#fa38d7"}/>)}
+    <StageStaticBatchV775 name="v775-cyberpunk-neon-columns" instances={CYBERPUNK_SIDE_NEONS_V775} geometry="box" color="#e933e9"/>
+    <mesh position={[0, 1.25, -3.2]}><boxGeometry args={[6, .035, .08]}/><meshBasicMaterial color="#00f0ff"/></mesh>
+  </ResponsiveGroup>;
 }
 
 function VaporwaveStage(p: Props) {
-  return <ResponsiveGroup {...p}><mesh position={[0, .95, -7]}><circleGeometry args={[2.35, 64]} /><meshBasicMaterial color="#ff7cae" toneMapped={false} /></mesh>{Array.from({ length: 9 }, (_, i) => <mesh key={i} position={[0, -.9 + i * .24, -6.9]}><boxGeometry args={[5, .05, .06]} /><meshBasicMaterial color="#4b174e" /></mesh>)}<gridHelper args={[22, 22, "#f65fcd", "#633caf"]} position={[0, -1.93, 0]} /><mesh position={[0, -1.97, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[22, 22]} /><meshBasicMaterial color="#1b1036" /></mesh>{[-4, 4].map(x => <group key={x} position={[x, -1.8, -3]}><mesh position={[0, .95, 0]}><cylinderGeometry args={[.055, .1, 2.1, 8]} /><meshBasicMaterial color="#572779" /></mesh>{[-.5, 0, .5].map((a, i) => <mesh key={i} position={[a, 2.15, -.15]} rotation={[0, 0, -a * .65]}><coneGeometry args={[.54, 1.2, 4]} /><meshBasicMaterial color="#39daa8" /></mesh>)}</group>)}</ResponsiveGroup>;
+  return <ResponsiveGroup {...p}>
+    <mesh position={[0, .95, -7]}><circleGeometry args={[2.35, 64]}/><meshBasicMaterial color="#ff7cae" toneMapped={false}/></mesh>
+    <StageStaticBatchV775 name="v775-vaporwave-sunset-bars" instances={VAPORWAVE_BARS_V775} geometry="box" color="#4b174e"/>
+    <gridHelper args={[22, 22, "#f65fcd", "#633caf"]} position={[0, -1.93, 0]}/>
+    <mesh position={[0, -1.97, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[22, 22]}/><meshBasicMaterial color="#1b1036"/></mesh>
+    <StageStaticBatchV775 name="v775-vaporwave-palm-trunks" instances={VAPORWAVE_PALM_TRUNKS_V775} geometry="palmTrunk" color="#572779"/>
+    <StageStaticBatchV775 name="v775-vaporwave-palm-leaves" instances={VAPORWAVE_PALM_LEAVES_V775} geometry="palmLeaf" color="#39daa8"/>
+  </ResponsiveGroup>;
+}
+
+/** V766: One GPU point cloud / one draw call; tier changes recreate only the buffer. */
+function GalaxyStarfieldV766() {
+  const { tier } = useAdaptivePerformance();
+  const count = tier === "low" ? 75 : 210;
+  const geometry = useMemo(() => createGalaxyStarfieldV766(count), [count]);
+  const screenHeight = useThree(state => state.size.height * state.viewport.dpr);
+  const uniforms = useMemo(() => ({ uScreenHeight: { value: screenHeight } }), []);
+  uniforms.uScreenHeight.value = screenHeight;
+  // An explicitly created geometry must be disposed when its quality tier changes
+  // or when the Galaxy stage / its WebGL canvas unmounts.
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return <points geometry={geometry} frustumCulled name="GalaxyStarfieldV766">
+    <shaderMaterial
+      uniforms={uniforms}
+      transparent depthWrite={false} depthTest={true} toneMapped={false}
+      vertexShader={`attribute vec3 color;
+        attribute float starSize;
+        uniform float uScreenHeight;
+        varying vec3 vStarColor;
+        void main() {
+          vStarColor = color;
+          vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+          gl_Position = projectionMatrix * viewPosition;
+          gl_PointSize = clamp(starSize * uScreenHeight * projectionMatrix[1][1] / max(0.1, -viewPosition.z), 1.0, 24.0);
+        }`}
+      fragmentShader={`varying vec3 vStarColor;
+        void main() {
+          float r2 = dot(gl_PointCoord * 2.0 - 1.0, gl_PointCoord * 2.0 - 1.0);
+          if (r2 > 1.0) discard;
+          float opacity = 1.0 - smoothstep(0.6, 1.0, r2);
+          gl_FragColor = vec4(vStarColor, opacity);
+          #include <colorspace_fragment>
+        }`}
+    />
+  </points>;
 }
 
 function GalaxyStage(p: Props) {
-  const low = getActivePerformanceTier() === "low";
-  const count = low ? 75 : 210;
-  return <ResponsiveGroup {...p}><mesh position={[0, -2.04, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[2.45, 48]} /><meshStandardMaterial color="#15102c" metalness={.5} roughness={.3} /></mesh>{Array.from({ length: count }, (_, i) => { const t = i * 2.399963, r = 2.5 + Math.sqrt(i / count) * 11; return <mesh key={i} position={[Math.cos(t) * r, Math.sin(i * 19.17) * 5, Math.sin(t) * r - 5]}><sphereGeometry args={[i % 9 === 0 ? .045 : .02, 4, 4]} /><meshBasicMaterial color={i % 3 === 0 ? "#86b6ff" : i % 3 === 1 ? "#f9d1ff" : "#ffffff"} /></mesh>; })}<mesh position={[0, 1, -7]}><sphereGeometry args={[1.8, 28, 18]} /><meshBasicMaterial color="#342569" transparent opacity={.3} depthWrite={false} /></mesh></ResponsiveGroup>;
+  return <ResponsiveGroup {...p}>
+    <mesh position={[0, -2.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <circleGeometry args={[2.45, 48]} />
+      <meshStandardMaterial color="#15102c" metalness={.5} roughness={.3} />
+    </mesh>
+    <GalaxyStarfieldV766 />
+    <mesh position={[0, 1, -7]}>
+      <sphereGeometry args={[1.8, 28, 18]} />
+      <meshBasicMaterial color="#342569" transparent opacity={.3} depthWrite={false} />
+    </mesh>
+  </ResponsiveGroup>;
 }
 
 function WhiteStudioStage(p: Props) {
   return <ResponsiveGroup {...p}><mesh position={[0, -2.02, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[4.1, 64]} /><meshStandardMaterial color="#e6e8ed" metalness={.22} roughness={.28} /></mesh><mesh position={[0, 1.2, -3.3]}><planeGeometry args={[12, 8]} /><meshBasicMaterial color="#e9edf4" /></mesh>{[-3.4, 3.4].map(x => <mesh key={x} position={[x, 2.3, -1]} rotation={[0, x < 0 ? .25 : -.25, 0]}><planeGeometry args={[1.8, 2.7]} /><meshBasicMaterial color="#ffffff" side={2} /></mesh>)}<mesh position={[0, -1.92, 0]}><cylinderGeometry args={[2.1, 2.2, .18, 64]} /><meshStandardMaterial color="#b9c4d4" metalness={.68} roughness={.26} /></mesh></ResponsiveGroup>;
 }
 
+/** V772: a single real truss spotlight, shared with the concert light budget.
+ * Outer fixtures are still rendered as emissive stage props, not extra lights.
+ */
+function RockTrussSpotV772(){
+  const ref=useRef<SpotLight>(null);
+  useFrame(()=>{
+    if(ref.current)ref.current.visible=resolveLightingBudgetV772(
+      getActivePerformanceTier(),getVisualLevelV640(),'rock').rockSpot;
+  });
+  return <spotLight ref={ref} position={[0,2.5,-1.7]} color="#ff952e"
+    intensity={.85} distance={8} angle={.54} penumbra={.85} castShadow={false}/>;
+}
 function RockStage(p: Props) {
-  return <ResponsiveGroup {...p}><mesh position={[0, -2.03, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[14, 10]} /><meshStandardMaterial color="#28272a" roughness={.93} /></mesh><mesh position={[0, 1, -3.6]}><boxGeometry args={[12, 7, .3]} /><meshStandardMaterial color="#25262b" roughness={.9} /></mesh>{[-3.7, 3.7].map(x => <group key={x}><mesh position={[x, .7, -2]}><boxGeometry args={[.22, 5.2, .22]} /><meshStandardMaterial color="#626368" metalness={.75} /></mesh>{[-1.3, .3, 1.9].map(y => <mesh key={y} position={[x, y, -1.8]}><boxGeometry args={[1, .7, .25]} /><meshStandardMaterial color="#121315" /></mesh>)}</group>)}<mesh position={[0, 3.05, -2]}><boxGeometry args={[8, .17, .17]} /><meshStandardMaterial color="#777a80" metalness={.8} /></mesh>{[-2.6, 0, 2.6].map(x => <group key={x}><mesh position={[x, 2.72, -1.8]}><cylinderGeometry args={[.18, .22, .4, 12]} /><meshStandardMaterial color="#454545" metalness={.8} /></mesh><spotLight position={[x, 2.5, -1.7]} color="#ff952e" intensity={.85} distance={8} angle={.54} penumbra={.85} /></group>)}</ResponsiveGroup>;
+  return <ResponsiveGroup {...p}>
+    <mesh position={[0, -2.03, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[14,10]}/><meshStandardMaterial color="#28272a" roughness={.93}/></mesh>
+    <mesh position={[0, 1, -3.6]}><boxGeometry args={[12,7,.3]}/><meshStandardMaterial color="#25262b" roughness={.9}/></mesh>
+    <StageStaticBatchV775 name="v775-rock-truss-posts" instances={ROCK_TRUSS_POSTS_V775} geometry="box" color="#626368" material="standard" metalness={.75}/>
+    <StageStaticBatchV775 name="v775-rock-amp-panels" instances={ROCK_AMP_PANELS_V775} geometry="box" color="#121315" material="standard"/>
+    <mesh position={[0,3.05,-2]}><boxGeometry args={[8,.17,.17]}/><meshStandardMaterial color="#777a80" metalness={.8}/></mesh>
+    <StageStaticBatchV775 name="v775-rock-truss-housings" instances={ROCK_TRUSS_HOUSINGS_V775} geometry="trussHousing" color="#454545" material="standard" metalness={.8} emissive="#ee6d20" emissiveIntensity={.3}/>
+    <RockTrussSpotV772/>
+  </ResponsiveGroup>;
 }
 
 export function StageEnvironment({ theme, ...props }: Props & { theme: StageEnvironmentId }) {

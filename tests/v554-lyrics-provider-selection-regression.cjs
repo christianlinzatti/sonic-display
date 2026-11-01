@@ -41,6 +41,9 @@ function mockedServer(mocks){
     '@/services/lyrics/providers/genius':{lookupGeniusLyrics:mocks.genius},
     '@/services/lyrics/providers/spotifyColorLyrics':{lookupSpotifyColorLyrics:mocks.spotify},
     '@/services/lyrics/selectionV554':{chooseBestLyricsV554:choose},
+    // Deadline behavior has its own V654 real-time regression; this historical
+    // test isolates provider selection and controls when each request settles.
+    '@/services/lyrics/providerDeadlineV654':{withProviderDeadlineV654:promise=>promise},
   };
   new Function('module','exports','require',out)(mod,mod.exports,(name)=>{
     assert(name in entries,`Unexpected server dependency: ${name}`);return entries[name];

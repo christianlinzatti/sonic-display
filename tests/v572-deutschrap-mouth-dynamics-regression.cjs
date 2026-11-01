@@ -76,7 +76,7 @@ test('low Pi tier suppresses extra cadence',()=>assert.match(rig,/getActivePerfo
 test('live-song manual preview stays separately protected',()=>assert.match(rig,/demoV370!=="off"\|\|!!previewPoseV370\|\|!!previewTargetV383/));
 test('existing morph overlay cleanup retained',()=>assert.match(rig,/target\.delta=0/));
 test('project version is at least V572',()=>assert.ok(Number(require('../package.json').version.match(/-v(\d+)$/)?.[1])>=572));
-test('prebuild points to latest verified chain through the preflight',()=>{const scripts=require('../package.json').scripts;assert.equal(scripts.prebuild,'npm run build:preflight');assert(scripts['build:preflight'].includes('npm run verify:v646'));});
+test('prebuild points to latest verified chain through the release gate',()=>{const scripts=require('../package.json').scripts;const {isInReleaseGate}=require('./helpers/release-coverage-v651.cjs');assert(isInReleaseGate('test:smoke:v656'));assert(scripts['verify:historical'].includes('npm run verify:offline:fast'));});
 test('full release regression retained',()=>assert.match(require('../package.json').scripts['verify:v572'],/verify:v571/));
 let frames=0;for(let i=0;i<16000;i++){
  const time=930+(i*37)%3300;

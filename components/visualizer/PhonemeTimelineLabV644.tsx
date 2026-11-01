@@ -1,6 +1,8 @@
 "use client";
 import {useEffect,useRef,useState} from "react";
 import {useMusic} from "@/context/MusicContext";
+import {clearAdvancedVisemeModeV662,getAdvancedVisemeModeV662,setAdvancedVisemeModeV662,type AdvancedVisemeModeV662} from "./advancedPhonemeLipSyncV662";
+import {clearDeutschrapPerformanceModeV663,getDeutschrapPerformanceModeV663,setDeutschrapPerformanceModeV663,type DeutschrapPerformanceModeV663} from "./expressiveDeutschrapPerformanceV663";
 import {VISEMES_V644,createVisemeDocumentV644,normalizeVisemeDocumentV644,setLiveVisemeV644,clearLiveVisemeV644,
   getLiveVisemeV644,type VisemeMarkV644,type VisemeV644} from "./phonemeLipSyncV644";
 
@@ -19,12 +21,16 @@ export function PhonemeTimelineLabV644(){
  const [marks,setMarks]=useState<VisemeMarkV644[]>([]),[slot,setSlot]=useState<0|1|2|3>(0);
  const [viseme,setViseme]=useState<VisemeV644>('AA'),[start,setStart]=useState(0),[length,setLength]=useState(160);
  const [message,setMessage]=useState('');
+ const [advancedModeV662,setAdvancedModeV662]=useState<AdvancedVisemeModeV662>('off');
+ const [rapPerformanceModeV663,setRapPerformanceModeV663]=useState<DeutschrapPerformanceModeV663>('off');
  // No old song's facial data survives a change of track or unmount.
  useEffect(()=>{
   const saved=getLiveVisemeV644();
   if(saved&&saved.document.trackId===id&&Math.abs(saved.document.durationMs-durationMs)<=3500){
    setMarks(saved.document.marks);setEnabled(saved.enabled);
-  }else{clearLiveVisemeV644();setMarks([]);setEnabled(false);}
+   setAdvancedModeV662(getAdvancedVisemeModeV662(id));
+   setRapPerformanceModeV663(getDeutschrapPerformanceModeV663(id));
+  }else{clearLiveVisemeV644();clearAdvancedVisemeModeV662();setMarks([]);setEnabled(false);setAdvancedModeV662('off');clearDeutschrapPerformanceModeV663();setRapPerformanceModeV663('off');}
   setStart(0);setMessage('');
   // Do not clear on dialog close: the live performance must continue.
   // SmartLazySettings clears after an actual track change.
@@ -75,9 +81,34 @@ export function PhonemeTimelineLabV644(){
     <button type="button" disabled={!track} onClick={add}>Zeitmarke hinzufügen</button>
    </div>
    <label><input type="checkbox" checked={enabled} disabled={!marks.length} onChange={e=>activate(e.target.checked)}/> Manuelle Visemspur aktivieren (Opt-in)</label>
+   <label>V662 · Natürliche Lautübergänge
+    <select value={advancedModeV662} disabled={!track||!marks.length} onChange={e=>{
+      const mode=e.target.value as AdvancedVisemeModeV662;
+      if(setAdvancedVisemeModeV662(id,mode)){setAdvancedModeV662(mode);setMessage(mode==='off'?'V644-Originalübergänge aktiv.':'V662-Profil für diesen Song aktiviert – nur innerhalb markierter Visemintervalle.');}
+    }}>
+     <option value="off">Aus · Original V644</option>
+     <option value="rap">Deutschrap · präzise Konsonanten</option>
+     <option value="singing">Gesang · weichere Übergänge</option>
+    </select>
+   </label>
+   <label>V663 · Expressive Deutschrap Performance
+    <select disabled={!track} value={rapPerformanceModeV663} onChange={e=>{
+      const mode=e.target.value as DeutschrapPerformanceModeV663;
+      if(setDeutschrapPerformanceModeV663(id,mode)){
+        setRapPerformanceModeV663(mode);
+        setMessage(mode==='off'?'V663 deaktiviert.':'V663 nur für diesen Song aktiviert – bestätigte Rap-Wörter und Sängerrollen erforderlich.');
+      }
+    }}>
+     <option value="off">Aus · bisherige Bühnenregie</option>
+     <option value="subtle">Natürlich · ruhige Rap-Gesten</option>
+     <option value="stage">Live-Bühne · deutlichere Hooks</option>
+    </select>
+   </label>
+   <small>V663 koordiniert Kopf, bestätigte Blickrichtung, Schultern und IK-gestützte Arme mit bereits verifizierten Rap-Wörtern. Keine automatische Sänger- oder Emotionserkennung. Manuelle Bewegungen, GLB-Animationen, reduzierte Bewegung und die bisherigen Mundformen behalten Vorrang. Für die Performance sind keine V644-Visemmarkierungen erforderlich.</small>
+   <small>V662 verändert nur die Übergangskurve zwischen direkt angrenzenden, manuell gesetzten Mundformen. Keine Phonemerkennung, keine künstlichen Silben. Verschlüsse und manuelle Zeitmarken bleiben maßgeblich; die Wiedergabe muss oben separat aktiviert sein.</small>
    <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
     <button type="button" disabled={!marks.length} onClick={exportJson}>Visem-Zeitmarken als JSON exportieren</button>
-    <button type="button" disabled={!marks.length} onClick={()=>{clearLiveVisemeV644();setMarks([]);setEnabled(false);setMessage('Spur gelöscht.');}}>Alle Markierungen löschen</button>
+    <button type="button" disabled={!marks.length} onClick={()=>{clearLiveVisemeV644();clearAdvancedVisemeModeV662();setAdvancedModeV662('off');setMarks([]);setEnabled(false);setMessage('Spur gelöscht.');}}>Alle Markierungen löschen</button>
    </div>
    <label>Manuell ausgerichtete Spur importieren (JSON) <input type="file" accept=".json,application/json" disabled={!track} onChange={e=>{void importJson(e.target.files?.[0]??null);e.target.value='';}}/></label>
    {message&&<small role="status">{message}</small>}

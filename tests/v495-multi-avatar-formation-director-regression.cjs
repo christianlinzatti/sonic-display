@@ -110,5 +110,5 @@ assert(!/new AnimationMixer|\.getWorldPosition/.test(fs.readFileSync('components
  'pure director must not own mixer or foot measurements');
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=495);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v495 && npm run test:v495:types && npm run test:v494'));
+assert(pkg.scripts['check:fast'].includes('npm run test:v495 && npm run test:v495:types && npm run test:v494'), 'current prebuild must gate V495 and V494 instead of trusting old unused preflight');
 console.log('PASS V495: phase-stable ensemble roles, manual priority, contact-safe choreography, seek resets, 30-minute simulation');

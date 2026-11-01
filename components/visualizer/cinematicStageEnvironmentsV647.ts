@@ -73,7 +73,7 @@ export function planCinematicStageEnvironmentV647(input:ConcertEnvironmentInputV
 export const LED_WALL_FRAGMENT_V647=`uniform vec3 uPrimary;uniform vec3 uSecondary;
 uniform float uOpacity;uniform float uPattern;uniform float uPhase;uniform float uSpeed;
 uniform float uSceneStyle;uniform float uVariation;uniform float uArchitecture;
-uniform float uDepth;uniform float uMotion;
+uniform float uDepth;uniform float uMotion;uniform float uStageMorph;
 varying vec2 vUv;
 float band(float x,float w){return 1.0-smoothstep(w,w+0.018,abs(x));}
 void main(){
@@ -86,7 +86,9 @@ void main(){
   float radial=0.45+0.30*cos(length(vUv-vec2(0.5))*23.0-t);
   float signal=uPattern<0.5?stripe:uPattern<1.5?grid:uPattern<2.5?diagonal:radial;
   // Floor-to-ceiling architecture stays at the stage perimeter, never the singer's face.
-  vec2 p=(vUv-vec2(.5))*2.0;
+  // V690: continuously open the existing perimeter geometry (no scene swap).
+  float stageExpansion=clamp(uStageMorph,0.0,0.75);
+  vec2 p=(vUv-vec2(.5))*2.0/(1.0+stageExpansion*.23);
   float rim=max(smoothstep(.22,.9,abs(p.x)),smoothstep(.34,.96,abs(p.y)));
   float architectural=0.0;
   float shift=uVariation*.16+uMotion*sin(t*.38)*.12;

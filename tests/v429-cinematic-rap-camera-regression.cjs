@@ -61,7 +61,7 @@ const view=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');
 const dancer=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
 const panel=fs.readFileSync('components/visualizer/ExpressiveRapDirectorPanelV425.tsx','utf8');
 for(const token of ['rapCameraBlockedV429','authoredCueV400','timelineCue?.active','shotV377.active',
-  'showCue?.cameraEnabled','studioProfileV398.enabled','rapCameraHoldV429','composeRapCameraV429','guardAutomaticCameraV351(composedV633'])
+  'showCue?.cameraEnabled','studioProfileV398.enabled','rapCameraHoldV429','composeRapCameraV429','guardAutomaticCameraV351(naturalFramedV655'])
   assert(stage.includes(token),`camera precedence: ${token}`);
 for(const token of ['rapCameraCueV429','rapCameraEnabledV429','rapCameraStrengthV429'])assert(view.includes(token));
 assert(dancer.includes('props.lipSync?.rapCameraArmedV429===true'));

@@ -79,6 +79,6 @@ const filenames=['sonic-performer-v3.glb' ,'sonic-pulsebot-v1.glb','sonic-nova-v
  assert(editor.includes('sharedMotionUrlV531={currentAvatar.sharedMotionUrl}'),'Settings preview must show shared clips');
  assert(dancer.includes('sharedMotionV531\n    ? { clips: importedClips, report: null }'),'exact matching clips must NOT be changed by retargeting');
  const config=fs.readFileSync(path.join(root,'app/api/avatars/config/route.ts'),'utf8');
- assert(config.includes('previous.sharedMotionUrl'),'normal settings edits must retain the source reference');
+ assert(config.includes('updateAvatarMetadata(filename,') && !config.includes('sharedMotionUrl:sharedMotionUrl===undefined?'),'normal settings edits must retain source reference through partial-merge persistence');
  console.log('PASS V531 exact motion identity, unchanged meshes/morph/skins/materials, preview and stage integration');
 })().catch(e=>{console.error(e);process.exitCode=1;});

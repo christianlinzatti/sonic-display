@@ -1,4 +1,5 @@
 "use client";
+import {invalidateAvatarCatalogV733} from "@/services/avatarCatalogV733";
 import {RhythmIntelligenceDashboard} from "./visualizer/RhythmIntelligenceDashboard";
 import {MotionQualityOptimizerDashboard} from "./visualizer/MotionQualityOptimizerDashboard";
 import {ExpressiveDanceStudio} from "./visualizer/ExpressiveDanceStudio";
@@ -18,8 +19,8 @@ import type {UiPreferences} from "@/types/music";
 import {CHARACTER_MOTION_CHANGE_EVENT,loadCharacterMotionStore,saveCharacterMotionStore,type CharacterMotionStore} from "@/components/visualizer/characterMotionLibrary";
 const genres=["","deutschrap","hardtekk","hardstyle","techno","hip-hop","rock","ambient","pop","other"];
 export function CharacterMotionLibraryPanel({models,preferences,admin}:{models:AvatarModel[];preferences:UiPreferences;admin:boolean}){
- const [store,setStore]=useState<CharacterMotionStore>({version:1,motions:[],automatic:false});
- const [avatar,setAvatar]=useState("");const [preview,setPreview]=useState("");const [message,setMessage]=useState("");const [busy,setBusy]=useState(false);
+ const [store,setStore]=useState<CharacterMotionStore>({version:1,motions:[],automatic:true});
+ const [avatar,setAvatar]=useState("");const [preview,setPreview]=useState("");const [message,setMessage]=useState("");const [warningV739,setWarningV739]=useState("");const [busy,setBusy]=useState(false);
  const [searchV535,setSearchV535]=useState("");const [categoryV535,setCategoryV535]=useState<MotionCategoryV535|"all">("all");
  const [favoritesOnlyV535,setFavoritesOnlyV535]=useState(false);
  const [scanBusyV535,setScanBusyV535]=useState(false);const [scanCursorV535,setScanCursorV535]=useState(0);
@@ -82,11 +83,21 @@ export function CharacterMotionLibraryPanel({models,preferences,admin}:{models:A
   catch{/* Browsers with disabled storage keep session preferences only. */}
  }
  function change(fn:(s:CharacterMotionStore)=>CharacterMotionStore){setStore(old=>saveCharacterMotionStore(fn(old)));}
- async function activate(url:string){if(!admin||!model)return;setBusy(true);setMessage("");try{const r=await fetch("/api/avatars/animations/install",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({modelId:avatar.startsWith("local:")?avatar:`default:${avatar}`,animationUrl:url})});if(!r.ok){const d=await r.json();throw Error(d.error||"Aktivieren fehlgeschlagen");}setMessage("Motion aktiviert. Aktualisiere die Bühne, falls sie noch die vorige Motion anzeigt.");}catch(e){setMessage(e instanceof Error?e.message:"Fehler");}finally{setBusy(false);}}
+ async function verifyMotionFileV739(url:string){
+  const file=await readGLB(url);
+  if(!file.animations.length)throw new Error("Die ausgewählte GLB enthält keine Animationsclips. Es wurde nichts aktiviert.");
+ }
+ async function previewMotionV739(url:string){
+  if(busy)return;setBusy(true);setWarningV739("");
+  try{await verifyMotionFileV739(url);setEmbeddedPreviewIndexV535(undefined);setPreview(url);}
+  catch(e){setPreview("");setWarningV739(`⚠ Motion nicht vorhanden oder nicht lesbar: ${e instanceof Error?e.message:'Laden fehlgeschlagen'}`);}
+  finally{setBusy(false);}
+ }
+ async function activate(url:string){if(!admin||!model)return;setBusy(true);setMessage("");setWarningV739("");try{await verifyMotionFileV739(url);const r=await fetch("/api/avatars/animations/install",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({modelId:avatar.startsWith("local:")?avatar:`default:${avatar}`,animationUrl:url})});if(!r.ok){const d=await r.json();throw Error(d.error||"Aktivieren fehlgeschlagen");}invalidateAvatarCatalogV733();setMessage("Motion aktiviert. Die Bühne übernimmt die neue Zuordnung automatisch.");}catch(e){setWarningV739(`⚠ Motion nicht vorhanden oder nicht verwendbar: ${e instanceof Error?e.message:"Fehler"}`);}finally{setBusy(false);}}
  return <section className="avatar-metadata-editor" aria-label="Multi-Motion Character Library">
  <h3>Intelligent Motion Library · V535</h3><p>Deine Motion-Sammlung mit Suche, Kategorien, Favoriten und vorsichtiger Dublettenerkennung nach tatsächlichen Animationskurven. Bestehende Choreografien bleiben unverändert.</p>
- <label>Charakter<select value={avatar} onChange={e=>{setAvatar(e.target.value);setPreview("");setSearchV535("");setCategoryV535("all");setEmbeddedClipsV535([]);setEmbeddedPreviewIndexV535(undefined);setScanCursorV535(0);}}><option value="">Charakter auswählen</option>{models.filter(m=>m.url).map(m=><option key={m.id} value={m.id}>{m.label}</option>)}</select></label>
- <label className="setting-check"><input type="checkbox" checked={store.automatic} onChange={e=>change(s=>({...s,automatic:e.target.checked}))}/> Automatische Motion-Auswahl anhand Genre und Songabschnitt (experimentell)</label>
+ <label>Charakter<select value={avatar} onChange={e=>{setAvatar(e.target.value);setPreview("");setWarningV739("");setSearchV535("");setCategoryV535("all");setEmbeddedClipsV535([]);setEmbeddedPreviewIndexV535(undefined);setScanCursorV535(0);}}><option value="">Charakter auswählen</option>{models.filter(m=>m.url).map(m=><option key={m.id} value={m.id}>{m.label}</option>)}</select></label>
+ <label className="setting-check"><input type="checkbox" checked={store.automatic} onChange={e=>change(s=>({...s,automatic:e.target.checked}))}/> Automatische Motion-Auswahl anhand Genre und Songabschnitt (standardmäßig aktiv)</label>
  {model&&<>
  <div className="avatar-metadata-editor" aria-label="V535 Motion Library Filter">
   <strong>V535 · Motion-Bibliothek durchsuchen</strong>
@@ -126,7 +137,7 @@ export function CharacterMotionLibraryPanel({models,preferences,admin}:{models:A
  <label>Bewegungsart<select value={m.category??suggestMotionCategoryV535(m.name)} onChange={e=>change(s=>({...s,motions:s.motions.map(x=>x.id===m.id?{...x,category:e.target.value as MotionCategoryV535}:x)}))}>{MOTION_CATEGORIES_V535.map(c=><option value={c} key={c}>{MOTION_CATEGORY_LABELS_V535[c]}</option>)}</select></label><label>Genre<select value={m.genre} onChange={e=>change(s=>({...s,motions:s.motions.map(x=>x.id===m.id?{...x,genre:e.target.value}:x)}))}>{genres.map(g=><option value={g} key={g}>{g||"Jedes Genre"}</option>)}</select></label>
  <label>Songabschnitt<select value={m.section} onChange={e=>change(s=>({...s,motions:s.motions.map(x=>x.id===m.id?{...x,section:e.target.value as typeof x.section}:x)}))}>{["any","build","drop","verse","hook"].map(x=><option key={x} value={x}>{x}</option>)}</select></label>
  <label>BPM min<input type="number" min="0" max="300" value={m.bpmMin} onChange={e=>change(s=>({...s,motions:s.motions.map(x=>x.id===m.id?{...x,bpmMin:Number(e.target.value)}:x)}))}/></label><label>BPM max<input type="number" min="0" max="300" value={m.bpmMax} onChange={e=>change(s=>({...s,motions:s.motions.map(x=>x.id===m.id?{...x,bpmMax:Number(e.target.value)}:x)}))}/></label>
- <button type="button" onClick={()=>{setEmbeddedPreviewIndexV535(undefined);setPreview(m.url);}}>Vorschau</button> <button type="button" disabled={!admin||busy} onClick={()=>void activate(m.url)}>Als aktive Motion festlegen</button> <button type="button" onClick={()=>{change(s=>({...s,motions:s.motions.filter(x=>x.id!==m.id)}));if(preview===m.url)setPreview("");}}>Aus Bibliothek entfernen</button></div>)}
+ <button type="button" onClick={()=>void previewMotionV739(m.url)}>Vorschau prüfen</button> <button type="button" disabled={!admin||busy} onClick={()=>void activate(m.url)}>Als aktive Motion festlegen</button> <button type="button" onClick={()=>{change(s=>({...s,motions:s.motions.filter(x=>x.id!==m.id)}));if(preview===m.url)setPreview("");}}>Aus Bibliothek entfernen</button></div>)}
  {motions.length>=2&&<MotionTransitionStudio model={model} motions={motions}/>}
  <MotionQualityOptimizerDashboard avatarId={avatar} motions={motions} modelUrl={model.url ?? undefined}/>
  <MotionStylePanel avatarId={avatar}/>
@@ -138,6 +149,7 @@ export function CharacterMotionLibraryPanel({models,preferences,admin}:{models:A
  <SmartChoreographyEvolutionPanel avatarId={avatar} motions={motions}/>
  <VisualChoreographyTimelineEditor avatarId={avatar} model={model} motions={motions} preferences={preferences}/>
  {(preview||embeddedPreviewIndexV535!==undefined)&&<div style={{minHeight:260}}><AvatarPreview3D key={`${model.url}:${preview}:${embeddedPreviewIndexV535??""}`} modelUrl={model.url} animationUrl={preview||undefined} sharedMotionUrlV531={model.sharedMotionUrl} selectedEmbeddedClipIndex={embeddedPreviewIndexV535} studio preferences={preferences}/></div>}</>}
+ {warningV739&&<p role="alert">{warningV739}</p>}
  {message&&<p role="status">{message}</p>}
  <small>V535: Filter, Favoriten und Fingerabdrücke bleiben im bestehenden lokalen Speicher. Die Dublettenerkennung ist optional und entfernt keine Dateien. Die Bibliothek wird lokal im Browser gespeichert. „Aus Bibliothek entfernen“ löscht keine GLB-Dateien vom Server. Automatik wählt eine Datei pro Songabschnitt; Crossfades werden seit V191 unterstützt.</small>
  </section>;

@@ -5,6 +5,7 @@ import { applyIKJointSafety } from "./ikJointSafety";
 import type { JointConstraintMap } from "./jointConstraintCalibration";
 import { Object3D, Quaternion, Vector3 } from "three";
 import type { AvatarRigTargets } from "./avatarRigController";
+import {createHipFootLockStateV737,resetHipFootLockV737,detectHipFootDiscontinuityV737,stepHipFootLockV737,type HipFootLockStateV737} from "./hipFootLockV737";
 import { createFootContactTracker, updateGroundContact, type FootContactTracker } from "./groundContactEngine";
 import { createBalanceState, updateBalanceAnchor, boundedFootTarget, resolveSupport, updateLanding, type BalanceState } from "./advancedFootworkBalance";
 
@@ -23,7 +24,7 @@ type Leg = {
   weight: number;
   contact: FootContactTracker;
 };
-export type FootIKState = { left: Leg | null; right: Leg | null; floorY: number; initialized: boolean; balance:BalanceState; groundV322:GroundLockStateV322 };
+export type FootIKState = { left: Leg | null; right: Leg | null; floorY: number; initialized: boolean; balance:BalanceState; groundV322:GroundLockStateV322; hipLockV737:HipFootLockStateV737 };
 const tmpA = new Vector3();
 const tmpB = new Vector3();
 const tmpC = new Vector3();
@@ -67,7 +68,7 @@ function buildLeg(hip: Object3D | undefined, ankle: Object3D | undefined, side: 
 }
 
 export function createFootIKState(): FootIKState {
-  return { left: null, right: null, floorY: 0, initialized: false, balance:createBalanceState(),groundV322:createGroundLockStateV322() };
+  return { left: null, right: null, floorY: 0, initialized: false, balance:createBalanceState(),groundV322:createGroundLockStateV322(),hipLockV737:createHipFootLockStateV737() };
 }
 export function initializeFootIK(root: Object3D, targets: AvatarRigTargets): FootIKState {
   root.updateWorldMatrix(true, true);
@@ -76,7 +77,7 @@ export function initializeFootIK(root: Object3D, targets: AvatarRigTargets): Foo
     right: buildLeg(targets.rightLeg, targets.rightFoot, "right"),
     initialized: false,
     floorY: 0,
-    balance:createBalanceState(),groundV322:createGroundLockStateV322(),
+    balance:createBalanceState(),groundV322:createGroundLockStateV322(),hipLockV737:createHipFootLockStateV737(),
   };
 }
 
@@ -128,17 +129,29 @@ function solveLeg(leg: Leg, target: Vector3, weight: number, constraints?: Joint
 
 export function updateFootIK(
   state: FootIKState, root: Object3D, delta: number, active: boolean, strength = 0.7, contactSensitivity = 0.5, lockStrength = 0.5, constraints?: JointConstraintMap, cue?: BeatFootworkCue, optionsV322?:FootLockSettingsV322, contextV322?:{trackId?:string;playheadMs?:number},
+  hipAssistV737?:{enabled:boolean;intensity:number},
 ): boolean {
   const legs = [state.left, state.right].filter((leg): leg is Leg => leg !== null);
   if (!legs.length) return false;
   root.updateWorldMatrix(true, true);
-  if (!active) { for (const leg of legs) { leg.weight = 0; leg.contact = createFootContactTracker(); } state.balance=createBalanceState(); resetGroundLockV322(state.groundV322); state.initialized = false; return true; }
+  if (!active) { for (const leg of legs) { leg.weight = 0; leg.contact = createFootContactTracker(); } state.balance=createBalanceState(); resetGroundLockV322(state.groundV322); resetHipFootLockV737(state.hipLockV737); state.initialized = false; return true; }
   if(optionsV322?.enabled && isFootLockDiscontinuityV322(state.groundV322,contextV322?.trackId??'',
     typeof contextV322?.playheadMs==='number'&&Number.isFinite(contextV322.playheadMs)?contextV322.playheadMs:null)){
     resetGroundLockV322(state.groundV322);
     state.initialized=false;
   }
   if(!optionsV322?.enabled && (state.groundV322.lastMs!==null || state.groundV322.floorY!==null || state.groundV322.left.active || state.groundV322.right.active)) resetGroundLockV322(state.groundV322);
+  // V737 operates only for automatic V735 hip motion, and never competes with
+  // the explicit V322 foot-lock option or manually authored choreography.
+  const hipActiveV737=!!hipAssistV737?.enabled && !optionsV322?.enabled &&
+    Number.isFinite(hipAssistV737.intensity) && hipAssistV737.intensity>0;
+  if(!hipActiveV737)resetHipFootLockV737(state.hipLockV737);
+  else if(detectHipFootDiscontinuityV737(state.hipLockV737,contextV322?.trackId??'',
+    typeof contextV322?.playheadMs==='number'?contextV322.playheadMs:null)){
+    // Old planted contacts must not survive a track switch or seek.
+    for(const leg of legs){leg.contact=createFootContactTracker();leg.weight=0;}
+    state.balance=createBalanceState();state.initialized=false;
+  }
   const positions = legs.map(leg => leg.ankle.getWorldPosition(new Vector3()));
   if (!state.initialized) {
     state.floorY = Math.min(...positions.map(p => p.y));
@@ -174,6 +187,22 @@ export function updateFootIK(
           step.weight*Math.max(0,Math.min(1,strength))*(leg===state.left?(cue?.leftStrength??1):(cue?.rightStrength??1)),constraints);
       }
       continue;
+    }
+    if(hipActiveV737){
+      const targetV737=stepHipFootLockV737(leg===state.left?state.hipLockV737.left:state.hipLockV737.right,{
+        position:{x:pos.x,y:pos.y,z:pos.z},phase:leg.contact.phase,
+        confidence:leg.contact.confidence,floorY:state.floorY,verticalSpeed,
+        legLength:leg.upperLength+leg.lowerLength,delta:dt,intensity:hipAssistV737!.intensity,
+      });
+      if(targetV737.locked&&targetV737.weight>.02){
+        const footStrength=Math.max(0,Math.min(1,strength))*(leg===state.left?(cue?.leftStrength??1):(cue?.rightStrength??1));
+        const target=new Vector3(targetV737.x,targetV737.y,targetV737.z);
+        // Two bounded passes: the second re-evaluates after the hip/knee solver
+        // rather than adding a second independent IK controller.
+        solveLeg(leg,target,targetV737.weight*footStrength,constraints);
+        solveLeg(leg,target,targetV737.weight*footStrength*.65,constraints);
+        continue;
+      }
     }
     if (leg.weight < 0.02) continue;
     // Clamp correction relative to leg length so unusual rigs cannot snap violently.

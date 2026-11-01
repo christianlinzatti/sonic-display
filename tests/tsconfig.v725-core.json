@@ -1,0 +1,1 @@
+{"extends":"../tsconfig.json","compilerOptions":{"incremental":false,"plugins":[],"noEmit":true},"files":["../services/system/connectedServicesV725.ts","../services/system/configurationStatusV667.ts"],"include":[],"exclude":[]}

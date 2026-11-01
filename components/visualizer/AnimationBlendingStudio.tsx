@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { withPrivateGltfV769 } from "./privateGltfLifecycleV769";
 import { useUiPreferences } from "@/context/UiPreferencesContext";
 
 export function AnimationBlendingStudio({ modelUrl, animationUrl }: { modelUrl: string | null; animationUrl?: string }) {
@@ -9,17 +9,15 @@ export function AnimationBlendingStudio({ modelUrl, animationUrl }: { modelUrl: 
   const [error, setError] = useState("");
   useEffect(() => {
     let cancelled = false;
-    const loader = new GLTFLoader();
+
     setNames([]); setError("");
     if (!modelUrl) return;
     // Keep the exact naming scheme used by GltfAvatar: embedded first, then imported.
-    Promise.all([
-      loader.loadAsync(modelUrl),
-      animationUrl ? loader.loadAsync(animationUrl) : Promise.resolve(null),
-    ]).then(([model, imported]) => {
-      if (cancelled) return;
-      setNames([...model.animations.map(c => c.name), ...(imported?.animations ?? []).map(c => `Imported: ${c.name}`)]);
-    }).catch(() => { if (!cancelled) setError("Clips konnten nicht geladen werden. Prüfe Modell-URL und CORS."); });
+    withPrivateGltfV769(modelUrl, model => model.animations.map(c => c.name))
+      .then(async embedded => [...embedded, ...(animationUrl
+        ? await withPrivateGltfV769(animationUrl, imported => imported.animations.map(c => `Imported: ${c.name}`))
+        : [])])
+      .then(names => { if (!cancelled) setNames(names); }).catch(() => { if (!cancelled) setError("Clips konnten nicht geladen werden. Prüfe Modell-URL und CORS."); });
     return () => { cancelled = true; };
   }, [modelUrl, animationUrl]);
   const enabled = preferences.avatarBlendEnabled ?? false;

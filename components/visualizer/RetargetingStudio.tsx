@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { withPrivateGltfV769 } from "./privateGltfLifecycleV769";
 import { aliases, defaultCalibration, humanoidBoneNames, readRetargetCalibration, saveRetargetCalibration, type RetargetCalibration } from "./avatarAnimationRetarget";
 
 export function RetargetingStudio({ modelUrl }: { modelUrl: string | null }) {
@@ -14,9 +14,9 @@ export function RetargetingStudio({ modelUrl }: { modelUrl: string | null }) {
     if (!modelUrl) return;
     let cancelled = false;
     setLoading(true);
-    new GLTFLoader().load(modelUrl, gltf => {
-      if (!cancelled) { setBones(humanoidBoneNames(gltf.scene)); setLoading(false); }
-    }, undefined, err => { if (!cancelled) { setError(String(err)); setLoading(false); } });
+    void withPrivateGltfV769(modelUrl, gltf => humanoidBoneNames(gltf.scene))
+      .then(names => { if (!cancelled) { setBones(names); setLoading(false); } })
+      .catch(err => { if (!cancelled) { setError(String(err)); setLoading(false); } });
     return () => { cancelled = true; };
   }, [modelUrl]);
   const save = (next: RetargetCalibration) => { if (!modelUrl) return; try { saveRetargetCalibration(modelUrl, next); setConfig(next); setStatus("Kalibrierung lokal gespeichert und auf Live-Avatar und Vorschau angewendet."); } catch(e) { setError(String(e)); } };

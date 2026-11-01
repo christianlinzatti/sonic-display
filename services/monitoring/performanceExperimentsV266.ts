@@ -5,10 +5,11 @@ export type PerformanceExperiment=Readonly<{id:string;at:number;actions:Optimiza
 export const EXPERIMENT_KEY="sonic:v266:performance-experiments";
 const MAX_EXPERIMENTS=20;
 const validMode=(value:unknown):value is ExperimentConfig["mode"]=>["auto","high","balanced","low"].includes(String(value));
+const metricValid=(v:unknown)=>{if(!v||typeof v!=='object')return false;const m=v as Record<string,unknown>;return (m.better===null||typeof m.better==='boolean')&&['before','after','difference','percent'].every(k=>m[k]===null||(typeof m[k]==='number'&&Number.isFinite(m[k])));};
 export function isExperiment(value:unknown):value is PerformanceExperiment{
  if(!value||typeof value!=="object")return false;
  const v=value as Partial<PerformanceExperiment>;
- return typeof v.id==="string"&&v.id.length>0&&Number.isFinite(v.at)&&Array.isArray(v.actions)&&v.actions.every(a=>["render-low","render-balanced","multi-avatar-director"].includes(a))&&!!v.before&&validMode(v.before.mode)&&typeof v.before.director==="boolean"&&!!v.after&&validMode(v.after.mode)&&typeof v.after.director==="boolean"&&!!v.baseline&&Number.isFinite(v.baseline.to)&&v.impact?.status==="ready"&&typeof v.impact.metrics?.fps?.difference!=="undefined";
+ return typeof v.id==="string"&&v.id.length>0&&Number.isFinite(v.at)&&Array.isArray(v.actions)&&v.actions.every(a=>["render-low","render-balanced","multi-avatar-director"].includes(a))&&!!v.before&&validMode(v.before.mode)&&typeof v.before.director==="boolean"&&!!v.after&&validMode(v.after.mode)&&typeof v.after.director==="boolean"&&!!v.baseline&&['count','from','to'].every(k=>typeof (v.baseline as unknown as Record<string,unknown>)[k]==='number'&&Number.isFinite((v.baseline as unknown as Record<string,number>)[k]))&&['fps','p95FrameMs','slowPercent','avatarCallbackMeanMs','activeAvatars'].every(k=>(v.baseline as unknown as Record<string,unknown>)[k]===null||(typeof (v.baseline as unknown as Record<string,unknown>)[k]==='number'&&Number.isFinite((v.baseline as unknown as Record<string,number>)[k])))&&v.impact?.status==="ready"&&['fps','p95FrameMs','slowPercent','avatarCallbackMeanMs'].every(k=>metricValid((v.impact?.metrics as unknown as Record<string,unknown>)?.[k]));
 }
 export function decodeExperiments(json:string|null):PerformanceExperiment[]{
  if(!json)return [];
@@ -19,6 +20,7 @@ export function addExperiment(existing:readonly PerformanceExperiment[],next:Per
 }
 export function scoreExperiment(e:PerformanceExperiment):number|null{
  // Higher frame-rate, lower P95 and fewer slow frames. Null when there is no comparable FPS.
+ if(!isExperiment(e))return null;
  const fps=e.impact.metrics.fps;
  if(fps.before===null||fps.after===null||fps.after<=0||!Number.isFinite(fps.after))return null;
  const p95=e.impact.metrics.p95FrameMs.after;

@@ -15,3 +15,7 @@ out
 /public/avatars/*.bin
 
 /public/animations/*.glb
+
+# V831 local status reports (never a source-controlled certification)
+v831-build-readiness-result.json
+v831-production-gate-result.json

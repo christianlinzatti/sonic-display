@@ -37,6 +37,6 @@ assert.equal(m.checkRapPresetMotionsV412(m.normalizeRapPresetV412({...preset,ite
 const ui=read('components/visualizer/RapPerformanceEditorPanelV408.tsx');
 for(const token of ['Als neues Preset speichern','Für Live-Show aktivieren','Live-Preset deaktivieren','In Vorschau laden','Preset löschen','presetMissingV412','avatarTimelineEnabled','preferences.avatarModelId!==preset.avatarId','rapLivePresetV412:preset'])assert(ui.includes(token),`V412 UI: ${token}`);
 const live=read('components/visualizer/ThreeAvatar.tsx');
-for(const token of ['sampleRapLiveV412','rapLiveEnabledV412','!activeSequence&&!activeLoop&&!avatarBlendEnabled','liveRapClipNameV412','rapLiveExtraClipsV412','setEffectiveWeight(weight)','rapLiveElapsedV412','!isPlaying||reducedMotion'])assert(live.includes(token),`V412 runtime: ${token}`);
+for(const token of ['sampleRapLiveV412','rapLiveEnabledV412','!activeSequence&&!activeLoop&&!avatarBlendEnabled','liveRapClipNameV412','authoredCueIdsV659','setEffectiveWeight(weight)','rapLiveElapsedV412','!isPlaying||reducedMotion'])assert(live.includes(token),`V412 runtime: ${token}`);
 const pref=read('context/UiPreferencesContext.tsx');assert(pref.includes('normalizeRapPresetV412(parsed.rapLivePresetV412)'));
 console.log('PASS V412: preset library, validation, multi-avatar safety, deterministic verse/hook crossfades, missing-motion guard, live manual precedence');

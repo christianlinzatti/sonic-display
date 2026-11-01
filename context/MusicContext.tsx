@@ -9,7 +9,7 @@ import type { GenreMemory } from "@/services/genre/genreCorrectionMemory";
 import { disconnectSpotify } from "@/services/spotify/client";
 const Context=createContext<MusicContextValue|null>(null);
 export function MusicProvider({children}:{children:React.ReactNode}) {
- const {state,setState,refresh,trackId}=usePlaybackPolling();
+ const {state,refresh,invalidateSession}=usePlaybackPolling();
  const detected=useGenreDetection(state.track);
  const [memory,setMemory]=useState(readGenreMemory);
  const [temporaryOverride,setTemporaryOverride]=useState<{trackId:string;genre:MusicGenre}|null>(null);
@@ -25,10 +25,11 @@ export function MusicProvider({children}:{children:React.ReactNode}) {
  },[memory,track]);
  const replaceGenreMemory=useCallback((next:GenreMemory)=>{if(writeGenreMemory(next)){setMemory(next);setTemporaryOverride(null);return true;}return false;},[]);
  const clearGenreMemory=useCallback(()=>{const next={version:1 as const,corrections:[]};if(writeGenreMemory(next)){setMemory(next);setTemporaryOverride(null);}},[]);
- const disconnect=useCallback(async()=>{await disconnectSpotify();trackId.current=null;setTemporaryOverride(null);setState({connected:false,connectionStatus:"disconnected",loading:false,error:null,track:null,progressMs:0,isPlaying:false,fetchedAt:0,lyrics:null});},[setState,trackId]);
+ const disconnect=useCallback(async()=>{invalidateSession();setTemporaryOverride(null);await disconnectSpotify();},[invalidateSession]);
  const genre=genreOverride??detected.detectedGenre;
  const genreFusion=genreOverride?null:detected.detectedFusion;
- const value=useMemo<MusicContextValue>(()=>({...state,refresh,disconnect,genre,...detected,genreFusion,genreSource:genreOverride?"manual":detected.genreSource,genreOverride,setGenreOverride,artistSuggestion,genreMemoryCount:memory.corrections.length,genreMemory:memory,replaceGenreMemory,clearGenreMemory}),[state,refresh,disconnect,genre,genreFusion,detected,genreOverride,setGenreOverride,artistSuggestion,memory,replaceGenreMemory,clearGenreMemory]);
+ const genreTrackId=genreOverride?track?.id??null:detected.detectedForTrackId;
+ const value=useMemo<MusicContextValue>(()=>({...state,refresh,disconnect,genre,...detected,genreFusion,genreTrackId,genreSource:genreOverride?"manual":detected.genreSource,genreOverride,setGenreOverride,artistSuggestion,genreMemoryCount:memory.corrections.length,genreMemory:memory,replaceGenreMemory,clearGenreMemory}),[state,refresh,disconnect,genre,genreFusion,genreTrackId,detected,genreOverride,setGenreOverride,artistSuggestion,memory,replaceGenreMemory,clearGenreMemory]);
  return <Context.Provider value={value}>{children}</Context.Provider>;
 }
 export function useMusic(){const value=useContext(Context);if(!value)throw new Error("useMusic must be used within MusicProvider");return value;}

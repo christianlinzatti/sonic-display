@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": [],
+    "noEmit": true
+  },
+  "files": [
+    "../lib/lastfm-history-v706.ts",
+    "../lib/lastfm-intelligence-v711.ts",
+    "../lib/lastfm-wrapped-v712.ts"
+  ],
+  "include": [],
+  "exclude": []
+}

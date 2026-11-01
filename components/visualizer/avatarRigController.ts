@@ -1,4 +1,4 @@
-import type { Group, Object3D } from "three";
+import { Vector3, type Group, type Object3D } from "three";
 import { getAvatarRigProfile, type AvatarRigProfileId } from "./avatarRigProfiles";
 
 export type AvatarRigTargets = {
@@ -71,6 +71,23 @@ export type AvatarRigMotion = {
   torsoTwist?: number;
   counterArm?: number;
   hipCounter?: number;
+  /** V740: additive natural counter motion; optional bones degrade gracefully. */
+  naturalChestRoll?: number;
+  naturalChestTwist?: number;
+  naturalLeftArm?: number;
+  naturalRightArm?: number;
+  naturalLeftForearm?: number;
+  naturalRightForearm?: number;
+  naturalLeftLeg?: number;
+  naturalRightLeg?: number;
+  naturalLeftAnkle?: number;
+  naturalRightAnkle?: number;
+  naturalHeadTilt?: number;
+  /** V735: additive, bounded pelvis channels (translations as fractions of leg length). */
+  hipPitch?: number;
+  hipRoll?: number;
+  hipLateral?: number;
+  hipVertical?: number;
   headCounter?: number;
   kneeFollow?: number;
   headNod: number;
@@ -105,13 +122,55 @@ export function applyAvatarRigMotion(
   const state = overlayState.get(targets) ?? {};
   overlayState.set(targets, state);
 
+  const translate = (slot: keyof AvatarRigTargets, axis: "x" | "y", fraction: number) => {
+    const node = targets[slot];
+    if (!node) return;
+    const key = `${slot}.position.${axis}`;
+    const previous = state[key] ?? 0;
+    // Capture length once per rig; all movement remains relative to its anatomy.
+    let length = state["hipLegLength"];
+    if (length === undefined) {
+      if (!targets.hips || !targets.leftFoot || !targets.rightFoot) return;
+      const a = targets.hips.getWorldPosition(new Vector3());
+      const b = targets.leftFoot.getWorldPosition(new Vector3());
+      const c = targets.rightFoot.getWorldPosition(new Vector3());
+      length = (a.distanceTo(b) + a.distanceTo(c)) / 2;
+      if (!Number.isFinite(length) || length < 0.15 || length > 6) return;
+      state["hipLegLength"] = length;
+    }
+    const target = Math.max(-0.024, Math.min(0.024, Number.isFinite(fraction) ? fraction : 0)) * length;
+    const next = previous + (target - previous) * smoothing;
+    // An animation mixer may have restored the authored position since our last
+    // frame. Reapply the full bounded overlay in that case; otherwise use a
+    // delta so a static rig cannot accumulate translation indefinitely.
+    const writtenKey = `${key}.written`;
+    const lastWritten = state[writtenKey];
+    const overwritten = lastWritten !== undefined && Math.abs(node.position[axis] - lastWritten) > 1e-6;
+    node.position[axis] += overwritten ? next : next - previous;
+    state[writtenKey] = node.position[axis];
+    state[key] = next;
+  };
+
   const rotate = (slot: keyof AvatarRigTargets, axis: "x" | "y" | "z", target: number) => {
     const node = targets[slot];
     if (!node) return;
     const key = `${slot}.${axis}`;
     const previous = state[key] ?? 0;
     const next = previous + (target - previous) * smoothing;
-    node.rotation[axis] += next - previous;
+    // New pelvis axes can be overwritten on every frame by GLB quaternion
+    // tracks. Detect that reset without modifying the clip's authored pose.
+    const authoredAxis = (slot === "hips" && (axis === "x" || axis === "z")) ||
+      (slot === "chest" && (axis === "z" || axis === "y")) ||
+      ((slot === "leftForearm" || slot === "rightForearm" ||
+        slot === "leftArm" || slot === "rightArm" || slot === "head") && axis === "z") ||
+      ((slot === "leftLeg" || slot === "rightLeg" ||
+        slot === "leftFoot" || slot === "rightFoot") && axis === "x");
+    const writtenKey = `${key}.written`;
+    const lastWritten = state[writtenKey];
+    const overwritten = authoredAxis && lastWritten !== undefined &&
+      Math.abs(node.rotation[axis] - lastWritten) > 1e-6;
+    node.rotation[axis] += overwritten ? next : next - previous;
+    if (authoredAxis) state[writtenKey] = node.rotation[axis];
     state[key] = next;
   };
 
@@ -122,18 +181,25 @@ export function applyAvatarRigMotion(
   rotate("spine", "z", motion.spineSway + motion.shoulderRoll * 0.35);
   rotate("hips", "y", motion.hipSway + (motion.hipCounter ?? 0));
   rotate("spine", "y", motion.torsoTwist ?? 0);
-  rotate("hips", "z", motion.weightShift * 0.08);
+  rotate("hips", "z", motion.weightShift * 0.08 + (motion.hipRoll ?? 0));
+  rotate("hips", "x", motion.hipPitch ?? 0);
+  translate("hips", "x", motion.hipLateral ?? 0);
+  translate("hips", "y", motion.hipVertical ?? 0);
   rotate("chest", "x", motion.chestPulse);
-  rotate("leftArm", "z", motion.armSwing + motion.followThrough + (motion.counterArm ?? 0) + (motion.leftArmAccent ?? 0));
-  rotate("rightArm", "z", -motion.armSwing - motion.followThrough * 0.85 - (motion.counterArm ?? 0) + (motion.rightArmAccent ?? 0));
-  rotate("leftLeg", "x", motion.legGroove + motion.weightShift * 0.12 + (motion.kneeFollow ?? 0));
-  rotate("rightLeg", "x", motion.legGroove - motion.weightShift * 0.12 - (motion.kneeFollow ?? 0));
-  rotate("leftFoot", "x", motion.footStep);
-  rotate("rightFoot", "x", -motion.footStep);
+  rotate("chest", "z", motion.naturalChestRoll ?? 0);
+  rotate("chest", "y", motion.naturalChestTwist ?? 0);
+  rotate("leftArm", "z", motion.armSwing + motion.followThrough + (motion.counterArm ?? 0) + (motion.leftArmAccent ?? 0) + (motion.naturalLeftArm ?? 0));
+  rotate("rightArm", "z", -motion.armSwing - motion.followThrough * 0.85 - (motion.counterArm ?? 0) + (motion.rightArmAccent ?? 0) + (motion.naturalRightArm ?? 0));
+  rotate("leftForearm", "z", motion.naturalLeftForearm ?? 0);
+  rotate("rightForearm", "z", motion.naturalRightForearm ?? 0);
+  rotate("leftLeg", "x", motion.legGroove + motion.weightShift * 0.12 + (motion.kneeFollow ?? 0) + (motion.naturalLeftLeg ?? 0));
+  rotate("rightLeg", "x", motion.legGroove - motion.weightShift * 0.12 - (motion.kneeFollow ?? 0) + (motion.naturalRightLeg ?? 0));
+  rotate("leftFoot", "x", motion.footStep + (motion.naturalLeftAnkle ?? 0));
+  rotate("rightFoot", "x", -motion.footStep + (motion.naturalRightAnkle ?? 0));
   rotate("jaw", "x", motion.expressionJaw);
   rotate("leftEye", "x", motion.expressionEyeNarrow);
   rotate("rightEye", "x", motion.expressionEyeNarrow);
-  rotate("head", "z", motion.expressionHeadTilt);
+  rotate("head", "z", motion.expressionHeadTilt + (motion.naturalHeadTilt ?? 0));
 }
 
 const overlayState = new WeakMap<AvatarRigTargets, Record<string, number>>();

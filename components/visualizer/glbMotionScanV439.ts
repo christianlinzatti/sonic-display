@@ -1,5 +1,6 @@
 "use client";
 import {analyzeMotionClipsV439} from "./glbMotionAnalyzerV439";
+import {disposePrivateGltfV769} from "./privateGltfLifecycleV769";
 import {readMotionCacheV439,writeMotionCacheEntryV439} from "./glbMotionCacheV439";
 import type {InstalledCharacterMotion} from "./characterMotionLibrary";
 
@@ -48,9 +49,11 @@ export async function scanGlbMotionV439(m:InstalledCharacterMotion,signal?:Abort
     const {GLTFLoader}=await import("three/examples/jsm/loaders/GLTFLoader.js");
     if(controller.signal.aborted)return;
     const gltf=await new GLTFLoader().parseAsync(bytes,m.url.substring(0,m.url.lastIndexOf("/")+1));
-    if(controller.signal.aborted)return;
-    const features=analyzeMotionClipsV439(gltf.animations);
-    writeMotionCacheEntryV439(m.id,{url:m.url,at:Date.now(),status:features?"ok":"unsupported",...(features?{features}:{})});
+    try {
+      if(controller.signal.aborted)return;
+      const features=analyzeMotionClipsV439(gltf.animations);
+      writeMotionCacheEntryV439(m.id,{url:m.url,at:Date.now(),status:features?"ok":"unsupported",...(features?{features}:{})});
+    } finally { disposePrivateGltfV769(gltf); }
   }catch{
     if(!controller.signal.aborted)writeMotionCacheEntryV439(m.id,{url:m.url,at:Date.now(),status:"error"});
   }finally{

@@ -1,0 +1,9 @@
+# Sonic Display V664 – Natural Duet & Feature Interaction
+
+V664 ergänzt den bestehenden V500/V575/V616-Duettplaner um sanfte, optionale Partnerinteraktionen, **ohne einen zusätzlichen Renderer oder Audio-Listener**. Der Schalter im `RapDuetStudioPanelV416.tsx` bietet **Aus** (Standard), **Natürlich** und **Live-Bühne**. Der Modus gilt nur für den aktuellen Song und wird auch bei geschlossener Einstellungsansicht beim Songwechsel gelöscht.
+
+Der neue reine Planer `components/visualizer/naturalDuetFeatureInteractionV664.ts` arbeitet ausschließlich mit ausdrücklich gespeicherten V416-Lyrics-Sängerrollen oder manuell editierten V496-Zeitsegmenten. Er erhält die Rollen von V500: keine Sprecheridentifikation, keine erfundenen Sänger, Phoneme oder Beat-Daten. In den beiden vorhandenen 2- und 3/4-Avatar-Bühnen werden der bestehende Blick und die bestehenden Oberkörpergesten leicht verfeinert: kurze, abwechselnde Partnerblicke im Duett, kurze Reaktion beim Sängerwechsel und gestaffelte Hook-Akzente. Das Blickziel selbst wird nicht neu gesetzt. Bei Hooks bleiben die Avatare zum Publikum ausgerichtet.
+
+Sicherheitsgrenzen: Kein Eingriff in Mund-, Gesichtsmorph-, Fuß-IK-, Root-, GLB-Motion- oder Kamerapfade. Manuelle Bühnenregie, reduzierte Bewegung, niedriger Leistungstier, fehlende oder veraltete Songzuordnung und zu dicht/zu weit voneinander entfernte Performer sperren die Erweiterung. Kein Storage, Netzwerk, Timer oder neuer WebGL-Loop. Die V416-Call-and-Response-Regie reagiert auf den dokumentierten Übergang bei 62 % der Zeile; die explizite V496-Zeitachsen-Regie ab Segmentbeginn.
+
+Prüfen mit `npm run test:v664`, `npm run test:v664:types` und `npm run verify`. Die endgültige Produktionsfreigabe braucht einen vollständigen TypeScript-Projektcheck, Next.js-Produktionsbuild und Windows/Linux-CI.

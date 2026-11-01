@@ -1,12 +1,14 @@
 import type { Lyrics, LyricLine } from "@/types/music";
 import type { LyricsQuery } from "@/services/lyrics/server";
+import {withProviderDeadlineV654} from "@/services/lyrics/providerDeadlineV654";
 
 /** Server-only adapter. genius-lyrics-api searches Genius and extracts the page lyrics. */
 export async function lookupGeniusLyrics(query: LyricsQuery): Promise<Lyrics | null> {
   const apiKey = process.env.GENIUS_ACCESS_TOKEN;
   if (!apiKey) return null; // optional provider: do not break other providers when unconfigured
   const { getLyrics } = await import("genius-lyrics-api");
-  const raw = await getLyrics({ apiKey, title: query.title, artist: query.artist, optimizeQuery: true });
+  const raw = await withProviderDeadlineV654(
+    getLyrics({ apiKey, title: query.title, artist: query.artist, optimizeQuery: true }), 5_000);
   if (!raw || !raw.trim()) return null;
   const lines: LyricLine[] = raw.split(/\r?\n/).map((text: string) => text.trim()).filter(Boolean)
     .map((text: string) => ({ startMs: 0, endMs: null, text }));

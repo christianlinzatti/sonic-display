@@ -1,0 +1,57 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const ts=require('./typescript-loader.cjs');
+const content=fs.readFileSync('lib/lastfm-personal-discovery-v857.ts','utf8');
+const transpiled=ts.transpileModule(content,{fileName:'lastfm-personal-discovery-v857.ts',compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS},reportDiagnostics:true});
+assert.equal(transpiled.diagnostics.filter(d=>d.category===ts.DiagnosticCategory.Error).length,0);
+const moduleExports={};new Function('exports','require',transpiled.outputText)(moduleExports,()=>{throw Error('V857 core is type-only imports');});
+const {personalDiscoveryV857:analyze,genreTrendsV857:trends,validateGenreResponseV857:validate,v857TrackKey:key}=moduleExports;
+const now=new Date('2026-11-20T00:00:00.000Z');
+const event=(a,t,month,count=1,day=10)=>Array.from({length:count},(_,i)=>({artist:a,title:t,album:'Album',playedAt:`${month}-${String(day).padStart(2,'0')}T${String(11+Math.floor(i/60)).padStart(2,'0')}:${String(i%60).padStart(2,'0')}:00.000Z`,url:null,cover:null}));
+let history=[...event('A','Beat','2026-08',4),...event('B','Track','2026-08',14),...event('A','Beat','2026-11',8),...event('B','Track','2026-11',2),...event('C','New','2026-11',3)];
+let res=analyze(history,'2026-11',now,'UTC');
+assert.equal(res.months.join(','),'2026-06,2026-07,2026-08,2026-09,2026-10,2026-11');
+assert.equal(res.currentPlays,13);assert.equal(res.baselinePlays,18);
+assert.equal(res.artists[0].artist,'A');assert(res.artists[0].changePoints>0);
+assert.equal(res.newArtists[0].artist,'C');assert.equal(res.newArtists[0].plays,3);
+assert(res.samples.length===3);assert.equal(res.uniqueTracks,3);
+assert.equal(key('Ａ','  Beat  '),key('a','beat'));
+const metadata=new Map([
+ [key('A','Beat'),{genre:'deutschrap',matchedTag:'german rap',source:'track',confidence:83}],
+ [key('B','Track'),{genre:'hardstyle',matchedTag:'hardstyle',source:'artist',confidence:45}],
+ [key('C','New'),{genre:'hardtekk',matchedTag:'Titel/Interpret',source:'track',confidence:90}],
+]);
+let report=trends(history,res.months,metadata,now,'UTC');
+assert.equal(report.find(x=>x.month==='2026-11').total,13);
+assert.equal(report.find(x=>x.month==='2026-11').covered,10,'Exclude title-derived genre');
+assert.equal(report.find(x=>x.month==='2026-11').genres.find(g=>g.genre==='deutschrap').plays,8);
+assert.equal(report.find(x=>x.month==='2026-11').genres.find(g=>g.genre==='hardstyle').plays,2);
+assert.equal(report.find(x=>x.month==='2026-07').total,0);
+assert.equal(validate({genre:'hardtekk',source:'track',matchedTag:'Hardtekk',confidence:79}).genre,'hardtekk');
+assert.equal(validate({genre:'hardtekk',source:'track',matchedTag:'Titel/Interpret',confidence:78}),null);
+assert.equal(validate({genre:'rap',source:'track',matchedTag:'BPM-Hinweis',confidence:91}),null);
+assert.equal(validate({genre:'rap',source:'artist',matchedTag:'rap',confidence:20}),null);
+assert.equal(validate({genre:'../hack',source:'track',matchedTag:'hardstyle',confidence:80}),null);
+assert.equal(validate({genre:null,error:'Last.fm API key is not configured'}),null,'Do not cache configuration errors as unknown genre');
+assert.deepEqual(validate({genre:null,matchedTag:null,confidence:0}),{genre:null,source:null,matchedTag:null,confidence:0});
+const differentTimezone=[...event('A','One','2026-10',1,31)];differentTimezone[0].playedAt='2026-10-31T23:30:00.000Z';
+assert.equal(analyze(differentTimezone,'2026-11',now,'Europe/Vienna').currentPlays,1);
+assert.equal(analyze(differentTimezone,'2026-11',now,'UTC').currentPlays,0);
+const many=Array.from({length:70},(_,i)=>event('Artist'+i,'Track'+i,'2026-11')[0]);
+assert.equal(analyze(many,'2026-11',now,'UTC').samples.length,6,'At most six per month');
+const large=[];for(let i=0;i<6;i++)large.push(...Array.from({length:20},(_,j)=>event('A'+i,'Track'+j,`2026-${String(i+6).padStart(2,'0')}`)[0]));
+assert(analyze(large,'2026-11',now,'UTC').samples.length<=36);
+const frozen=Object.freeze(history.map(x=>Object.freeze({...x})));const old=JSON.stringify(frozen);analyze(frozen,'2026-11',now,'UTC');trends(frozen,res.months,metadata,now,'UTC');assert.equal(JSON.stringify(frozen),old);
+assert.equal(analyze([null,{},...event('A','Future','2026-11',1,30)],'2026-11',now,'UTC').currentPlays,0);
+const ui=fs.readFileSync('components/LastFmPersonalDiscoveryV857.tsx','utf8');
+const parent=fs.readFileSync('components/LastFmHistoryPanelV706.tsx','utf8'),css=fs.readFileSync('app/globals.css','utf8');
+for(const file of ['components/LastFmPersonalDiscoveryV857.tsx','components/LastFmHistoryPanelV706.tsx'])assert.equal(ts.createSourceFile(file,fs.readFileSync(file,'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX).parseDiagnostics.length,0);
+assert(ui.includes('async function loadGenres()')&&ui.includes('onClick={()=>{void loadGenres();}}'),'Enrichment only after click');
+assert(ui.includes('Math.min(3,work.length)')&&content.includes('slice(0,36)'),'Bounded metadata loads');
+assert(parent.includes('<div key={`discovery-v857-${user}`}><LastFmPersonalDiscoveryV857 events={archive.events}'),'Account-scoped archive');
+assert(!/\bfetch\s*\(|localStorage|indexedDB|sessionStorage/.test(content),'Core read only');
+for(const required of ['.lastfm-discovery-v857','.lastfm-discovery-genre-row-v857','@media(max-width:720px)','@media(prefers-reduced-motion:reduce)'])assert(css.includes(required));
+const pkg=require('../package.json'),lock=require('../package-lock.json');assert(/^0\.1\.0-v(85[7-9]|8[6-9]\d|9\d\d)$/.test(pkg.version));assert.equal(pkg.version,lock.version);assert.equal(pkg.version,lock.packages[''].version);
+for(const name of ['prebuild','build:preflight','check:fast','check:release'])assert(pkg.scripts[name].includes('npm run test:v857 && npm run test:v857:types && npm run test:v857:ui-types && npm run test:v856 &&'),name);
+console.log('PASS V857: monthly artist momentum, novel artists, six-month metadata sampling, timezone, safe genre coverage, on-demand requests, touch UI, account isolation, package gates');

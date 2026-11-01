@@ -1,0 +1,12 @@
+{
+  "extends":"./tsconfig.v665-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/genreDancePerformanceV666.ts",
+    "../components/visualizer/genreAwareMotionDirectorV536.ts",
+    "../components/visualizer/realisticDanceGroundingV665.ts",
+    "../components/visualizer/avatarRigController.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts"
+  ]
+}

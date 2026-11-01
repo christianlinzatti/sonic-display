@@ -81,7 +81,7 @@ const glb=fs.readFileSync('components/visualizer/gltfVocalPerformanceV492.ts','u
 const procedural=fs.readFileSync('components/visualizer/ProceduralDancerAvatarV492.tsx','utf8');
 const morph=fs.readFileSync('components/visualizer/VocalRigV368.tsx','utf8');
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
-assert(/^0\.1\.0-v5(?:1[0-9]|[2-9][0-9])$/.test(pkg.version),'V510+ package version');
+assert(/^0\.1\.0-v(?:5(?:1[0-9]|[2-9][0-9])|[6-9][0-9]{2,})$/.test(pkg.version),'V510+ package version');
 assert(pkg.scripts['build:preflight'].includes('npm run test:v510 && npm run test:v510:types && npm run test:v509'));
 assert(glb.includes('composeExpressiveRapStageV510(rapBodyV503,expressiveRapV510)'));
 assert(procedural.includes('composeExpressiveRapFaceV510(lipV503,expressiveRapV510)'));

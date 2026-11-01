@@ -85,5 +85,6 @@ assert(procedural.includes('const lipV538=refineDeutschrapFaceV538')&&procedural
 assert(body.includes('const refinedRapV538=refineDeutschrapGestureV538')&&(body.includes('correctAutomaticAccentV515(refinedRapV538')||(body.includes('const naturalBodyV564=refineNaturalDeutschrapBodyV564')&&body.includes('correctAutomaticAccentV515(wordDanceV567'))),'gesture limiter retained through V564');
 assert(!fs.readFileSync('components/visualizer/deutschrapVocalPerformanceV538.ts','utf8').includes('requestAnimationFrame('));
 const pkg=require('../package.json');assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]||0)>=538);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v538 && npm run test:v538:types && npm run test:v537')); 
+assert(pkg.scripts['test:v538'].includes('v538-advanced-deutschrap-vocal-regression.cjs'));
+assert(pkg.scripts['check:release'].includes('npm run test:v686'), 'V680+ explicit release checks active'); 
 console.log(`PASS V538: ${frames} seeks/frames, vocal ownership, audio/manual priority, GLB/procedural rendering, gesture limiter`);

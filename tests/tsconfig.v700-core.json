@@ -1,0 +1,6 @@
+{
+ "extends":"../tsconfig.json",
+ "compilerOptions":{"incremental":false,"plugins":[],"noEmit":true},
+ "files":["../lib/recently-played-v672.ts","../lib/recently-played-tools-v699.ts","../lib/smart-listening-history-v700.ts"],
+ "include":[],"exclude":[]
+}

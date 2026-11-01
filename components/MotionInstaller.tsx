@@ -1,4 +1,5 @@
 "use client";
+import {invalidateAvatarCatalogV733} from "@/services/avatarCatalogV733";
 
 import { useState } from "react";
 import { upload } from "@vercel/blob/client";
@@ -55,7 +56,7 @@ export function MotionInstaller({ admin, blobEnabled, models, selectedId, onInst
       setFile(null); setConfirmReplace(false);
       setStatus(`Motion installiert und mit ${model.label} verknüpft. Keine Konfigurationsdatei erforderlich.`);
     } catch (error) { setStatus(error instanceof Error ? error.message : "Installation fehlgeschlagen"); }
-    finally { setBusy(false); }
+    finally {invalidateAvatarCatalogV733(); setBusy(false); }
   }
 
   return <section className="avatar-metadata-editor" aria-label="Motion Installer">

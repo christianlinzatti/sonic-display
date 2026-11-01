@@ -57,5 +57,7 @@ assert(canvas.includes('powerPreference:\'low-power\'')&&canvas.includes('dpr={[
 assert(!canvas.includes('setInterval(')&&!canvas.includes('localStorage.setItem'));
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1])>=513,'V513 is preserved in newer releases');
-assert(pkg.scripts['build:preflight'].includes('npm run test:v513 && npm run test:v513:types && npm run test:v512')); 
+assert(pkg.scripts['test:v513'].includes('v513-real-3d-quality-regression.cjs'));
+assert(pkg.scripts['test:v513:types'].includes('tsconfig.v513-core.json'));
+assert(pkg.scripts['test:smoke:v654'].includes('npm run test:v513 && npm run test:v513:types'), 'V654 release smoke must execute the real V513 scene-quality checks'); 
 console.log(`PASS V513 Real 3D Concert Quality Preview: ${tested} sampled stages, 2–4 dancers, missing-measurement safety, lazy Canvas, cloned GLBs, embedded/external motions, Pi caps`);

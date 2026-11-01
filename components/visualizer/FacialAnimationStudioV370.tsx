@@ -12,6 +12,7 @@ import {
   type FacialChannelV370,type FacialProfileV370,
 } from "./facialRigStudioV370";
 import {measureFacialMotionV424,planFacialCalibrationV424,applyFacialCalibrationV424} from "./facialCalibrationV424";
+import {inspectMouthReadinessV798,normalizeRapMouthPrecisionV798} from "./advancedFacialStudioV798";
 import {MOUTH_CALIBRATION_PRESETS_V562,normalizeMouthCalibrationV562,mouthCalibrationCoverageV562,type MouthCalibrationV562} from "./advancedFacialCalibrationV562";
 import type { FacialPoseV369 } from "./facialPerformanceV369";
 import {diagnoseFacialRigV383,suggestSafeFacialProfileV383,exportFacialProfileV383,importFacialProfileV383} from "./advancedFacialRigV383";
@@ -33,7 +34,7 @@ class PreviewErrorV370 extends Component<{children:ReactNode},{failed:boolean}> 
   static getDerivedStateFromError(){return {failed:true};}
   render(){return this.state.failed ? <p role="alert">GLB-Vorschau konnte nicht geladen werden. Prüfe die Modell-URL und CORS-Freigabe.</p>:this.props.children;}
 }
-function PreviewGltfV370({url,pose,profile,demo,onScan,previewTargetV383}:{url:string;pose:FacialPoseV369;profile:FacialProfileV370;demo:"off"|"rap"|"singing";previewTargetV383:{id:string;weight:number}|null;onScan:(report:RigReport)=>void}) {
+function PreviewGltfV370({url,pose,profile,demo,onScan,previewTargetV383}:{url:string;pose:FacialPoseV369;profile:FacialProfileV370;demo:"off"|"rap"|"singing"|"fast-rap";previewTargetV383:{id:string;weight:number}|null;onScan:(report:RigReport)=>void}) {
   const {scene}=useGLTF(url);
   // Runtime and editor get their own model clones; previews never modify the cached GLTF asset.
   const model=useMemo(()=>cloneSkinnedScene(scene),[scene]);
@@ -70,7 +71,7 @@ export function FacialAnimationStudioV370({models,initialAvatarId}:Props) {
   const {preferences,updatePreferences}=useUiPreferences();
   const [avatarId,setAvatarId]=useState(initialAvatarId);
   const [pose,setPose]=useState<FacialPoseV369>({...EMPTY_POSE});
-  const [demo,setDemo]=useState<"off"|"rap"|"singing">("off");
+  const [demo,setDemo]=useState<"off"|"rap"|"singing"|"fast-rap">("off");
   const [report,setReport]=useState<RigReport|null>(null);
   const [previewMorphV383,setPreviewMorphV383]=useState("");
   const [previewWeightV383,setPreviewWeightV383]=useState(.85);
@@ -98,6 +99,8 @@ export function FacialAnimationStudioV370({models,initialAvatarId}:Props) {
   const detected=visibleTargets.filter(t=>t.suggestion);
   const planV424=useMemo(()=>planFacialCalibrationV424(visibleTargets,profile,overwriteV424),[visibleTargets,profile,overwriteV424]);
   const mouthCalibrationV562=normalizeMouthCalibrationV562(profile.mouthCalibrationV562);
+  const rapPrecisionV798=normalizeRapMouthPrecisionV798(profile.rapMouthPrecisionV798);
+  const mouthReadinessV798=useMemo(()=>report?inspectMouthReadinessV798(report.targets,report.jawBone,profile):null,[report,profile]);
   const coverageV562=mouthCalibrationCoverageV562(visibleTargets.flatMap(t=>{
     const selected=FACIAL_CHANNELS_V370.find(c=>profile.mapping?.[c]===t.id);
     if(selected)return [selected];
@@ -139,8 +142,9 @@ export function FacialAnimationStudioV370({models,initialAvatarId}:Props) {
         <div className="v370-samples">
           <button type="button" disabled={preferences.reducedMotion} aria-pressed={demo==="rap"} onClick={()=>{setPreviewMorphV383("");setDemo(v=>v==="rap"?"off":"rap");}}>{demo==="rap"?"■ Rap stoppen":"▶ Rap-Demo"}</button>
           <button type="button" disabled={preferences.reducedMotion} aria-pressed={demo==="singing"} onClick={()=>{setPreviewMorphV383("");setDemo(v=>v==="singing"?"off":"singing");}}>{demo==="singing"?"■ Gesang stoppen":"▶ Gesang-Demo"}</button>
+          <button type="button" disabled={preferences.reducedMotion} aria-pressed={demo==="fast-rap"} onClick={()=>{setPreviewMorphV383("");setDemo(v=>v==="fast-rap"?"off":"fast-rap");}}>{demo==="fast-rap"?"■ Schnellrap-Probe stoppen":"▶ V798 Schnellrap-Probe"}</button>
         </div>
-        <p className="v370-info">Demos verwenden ein simuliertes Sprechtempo, keine echte Spracherkennung. Die Probe animiert die echten Morphs über denselben Controller wie die Show. Änderungen an diesem Profil wirken sofort auf den zugehörigen Avatar.</p>
+        <p className="v370-info">Demos verwenden ein simuliertes Sprechtempo, keine echte Spracherkennung. Die Probe animiert die echten Morphs über denselben Controller wie die Show. Die V798-Schnellrap-Probe wechselt synthetische A/E/O- und M/B/P-Formen in kurzen Intervallen. Änderungen an diesem Profil wirken sofort auf den zugehörigen Avatar.</p>
       </div>
       <div className="v370-calibration">
         {isProcedural ? <p>Prozeduraler Avatar: Die Demo zeigt Mund- und Augenbewegungen. Individuelle GLB-Morph-Zuordnung ist nur für importierte Modelle verfügbar.</p> : <>
@@ -217,6 +221,30 @@ export function FacialAnimationStudioV370({models,initialAvatarId}:Props) {
             </label>)}
             <button type="button" onClick={()=>patchProfile({mouthCalibrationV562:{...mouthCalibrationV562,enabled:false}})}>V562 deaktivieren (bisherige Animation)</button>
             <p className="v370-info">Aktivierung und Presets sind bewusst manuell. Gespeicherte Morph-Zuordnungen, V424-Geometrie-Kalibrierung und andere Gesichtskanäle bleiben erhalten. Zum Vergleich V561-GLB-Nahaufnahme verwenden.</p>
+          </section>
+          <section className="v383-rig-panel" aria-label="V798 Advanced Facial & Lip-Sync Studio">
+            <h4>V798 · Advanced Facial &amp; Lip-Sync Studio</h4>
+            <p>GLB-Mundformen prüfen und optionale Rap-Artikulationsgeschwindigkeit kalibrieren. Es werden keine Phoneme oder Sänger aus Audio erraten.</p>
+            {!report?<p role="status">{isProcedural?"Für den prozeduralen Avatar liegt kein prüfbarer GLB-Rig-Scan vor.":"GLB-Rig wird untersucht …"}</p>:
+              <div role="status">
+                <p><strong>Rig-Diagnose: {mouthReadinessV798?.covered} / 4 Mundkanäle</strong> · {mouthReadinessV798?.status==='ready'?"vollständig erkannt":mouthReadinessV798?.status==='limited'?"teilweise erkannt":"keine verwendbaren Mundkanäle"}</p>
+                <ul>{([['jaw','Kiefer / A'],['wide','Lippenbreite / E-I'],['round','Lippenrundung / O-U'],['lipsClosed','Lippenschluss / M-B-P']] as const).map(([id,label])=>
+                  <li key={id}>{label}: {mouthReadinessV798?.channels[id]==='ready'?"automatisch":mouthReadinessV798?.channels[id]==='manual'?"manuell zugeordnet":mouthReadinessV798?.channels[id]==='bone'?"Kieferknochen":mouthReadinessV798?.channels[id]==='disabled'?"deaktiviert":mouthReadinessV798?.channels[id]==='stale'?"Zuordnung fehlt":mouthReadinessV798?.channels[id]==='conflict'?"Konflikt mit anderem Kanal":"nicht erkannt"}</li>)}</ul>
+                {mouthReadinessV798?.warnings.map((warning,i)=><p key={i} className="v370-warning">{warning}</p>)}
+              </div>}
+            <label><input type="checkbox" checked={rapPrecisionV798.enabled}
+              disabled={!mouthReadinessV798?.precisionSupported}
+              onChange={e=>patchProfile({rapMouthPrecisionV798:{...rapPrecisionV798,enabled:e.target.checked}})}/>
+              Schnellere Mundreaktion bei bestätigten Deutschrap-Wörtern aktivieren</label>
+            <label>Artikulations-Präzision: {Math.round(rapPrecisionV798.intensity)} %
+              <input type="range" min="0" max="100" step="5" value={rapPrecisionV798.intensity}
+                disabled={!mouthReadinessV798?.precisionSupported}
+                onChange={e=>patchProfile({rapMouthPrecisionV798:{...rapPrecisionV798,intensity:Number(e.target.value)}})}/>
+            </label>
+            <div className="v370-samples"><button type="button" disabled={!mouthReadinessV798?.precisionSupported||preferences.reducedMotion}
+              onClick={()=>{setPreviewMorphV383("");setDemo("rap");}}>Rap-Simulation vergleichen</button>
+              <button type="button" onClick={()=>patchProfile({rapMouthPrecisionV798:{...rapPrecisionV798,enabled:false}})}>V798 deaktivieren</button></div>
+            <p className="v370-info">Die Präzision verändert ausschließlich die Ein-/Ausschwinggeschwindigkeit bereits vorhandener Mundkanäle. Manuelle Viseme, Vocal-Stems, Morph-Einzeltests, deaktivierte Kanäle und animierte Originaldaten haben Vorrang. Der Rig-Scan kontrolliert Namen und Geometrie, nicht die echte Lippen-Synchronität zu einem Lied.</p>
           </section>
           {FACIAL_CHANNELS_V370.map(channel=><div className="v370-channel" key={channel}>
             <label>{FACIAL_LABELS_V370[channel]}

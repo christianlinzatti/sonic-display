@@ -88,5 +88,5 @@ for(const forbidden of ['useFrame(', 'setInterval(', 'requestAnimationFrame(', '
  assert(!src.includes(forbidden),'pure bounded planner without render or persistence side effects');
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1])>=506,'V506 remains available on later versions');
-assert(pkg.scripts['build:preflight'].includes('npm run test:v506 && npm run test:v506:types && npm run test:v505'), 'retain the V506/V505 preflight order');
+assert(pkg.scripts['check:release'].includes('npm run test:legacy:interaction') && pkg.scripts['test:legacy:interaction'].includes('npm run test:v506') && !!pkg.scripts['test:v505'], 'keep V506/V505 in the full historical validation; V680 intentionally shortened prebuild');
 console.log('PASS V506: 28,000 deterministic frames, '+actorSamples+' actor samples, '+plannedCrossings+' forecast close pairs, swept crossing, gesture and foot guards, 2-4 actors');

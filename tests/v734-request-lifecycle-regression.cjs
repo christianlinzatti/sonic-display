@@ -1,0 +1,29 @@
+const assert=require('node:assert/strict'),loader=require('./helpers/loader-v733.cjs'),React=require('react'),{act,create}=require('react-test-renderer');
+globalThis.IS_REACT_ACT_ENVIRONMENT=true;let count=0;const check=(name,fn)=>{fn();console.log('PASS '+name);count++;};const flush=async()=>{for(let i=0;i<8;i++)await Promise.resolve();};
+function clock(){let id=0;const jobs=new Map();return {jobs,setTimeout(fn,ms){jobs.set(++id,{fn,ms});return id;},clearTimeout(i){jobs.delete(i);},fire(){const [i,j]=jobs.entries().next().value;jobs.delete(i);j.fn();}};}
+async function clients(){for(const [file,method,args,ms] of [['services/spotify/client','fetchCurrentTrack',[],15000],['services/lyrics/client','fetchLyrics',[{id:'one',title:'A',artist:'B',album:'C',durationMs:1000}],20000]]){
+ const time=clock();let signal,finishBody;let hanging=true;
+ const c=loader({}, {...time,fetch:async(url,o)=>{signal=o.signal;return {ok:true,json:()=>hanging?new Promise(r=>{finishBody=r;}):Promise.resolve(null)};}})(file);
+ const pending=c[method](...args);await flush();assert.equal([...time.jobs.values()][0].ms,ms);const rejected=assert.rejects(pending,/Zeitlimit/);time.fire();await rejected;
+ check(method+' times out body and aborts request',()=>assert(signal.aborted));finishBody(null);await flush();hanging=false;await c[method](...args);check(method+' allows next request and clears timer',()=>assert.equal(time.jobs.size,0));
+ }
+ const time=clock();let late=0,resolve;const d=loader({},time)('lib/requestDeadlineV734');const parent=new AbortController();const task=d.withDeadlineV734(()=>new Promise(r=>resolve=r),100,parent.signal,()=>late++);await flush();const rejection=assert.rejects(task);parent.abort();await rejection;resolve({});await flush();check('cancelled decode is disposed when it arrives late',()=>{assert.equal(late,1);assert.equal(time.jobs.size,0);});
+ const already=new AbortController();already.abort();let started=false;await assert.rejects(d.withDeadlineV734(async()=>{started=true;},100,already.signal));check('already cancelled operation does not start',()=>assert(!started));
+}
+async function photos(){const time=clock(),images=[];class Image{constructor(){images.push(this);}set src(v){this.url=v;}}
+ const h=loader({}, {...time,Image})('services/stageContent/usePhotoDimensionsV349');let view;function Host(){h.usePhotoDimensionsV349(['a','b','c','d','e'],true);return null;}
+ await act(async()=>{view=create(React.createElement(Host));});assert.equal(images.length,4);await act(async()=>time.fire());check('timed out image frees slot for fifth image',()=>{assert.equal(images.length,5);assert.equal(images[0].url,'');});await act(async()=>view.unmount());check('unmount cancels all image probes and timers',()=>{assert(images.every(i=>i.url===''));assert.equal(time.jobs.size,0);});}
+async function push(){const seen=new Set();let rotation=0;const users=Array.from({length:101},(_,i)=>i.toString(16).padStart(64,'0')).reverse();
+ const storage={pushConfigured:()=>true,pushKeys:{users:'users',rotation:'rotation',cronLock:'lock'},pushSecrets:()=>({}),redis:async(cmd)=>cmd==='SET'?'OK':cmd==='SMEMBERS'?users:cmd==='INCR'?++rotation:1,readPushAccount:async id=>{seen.add(id);return null;}};
+ const route=loader({'next/server':{NextResponse:{json:(body)=>body}},'web-push':{setVapidDetails(){}},'@/lib/push-storage-v365':storage,'@/lib/push-v365':{isSafeCronSecret:()=>true,normalizeStoredAccount:x=>x}})('app/api/cron/release-push/route');
+ for(let i=0;i<51;i++){users.reverse();await route.GET({headers:new Headers()});}check('101 accounts covered despite changing Redis set order',()=>assert.equal(seen.size,101));}
+async function assets(){let geometries=0,materials=0,textures=0,images=0,skeletons=0;const texture={isTexture:true,source:{data:{close(){images++;}}},dispose(){textures++;}},material={map:texture,normalMap:texture,dispose(){materials++;}},mesh={geometry:{dispose(){geometries++;}},material:[material,material],skeleton:{dispose(){skeletons++;}}};const scene={traverse(fn){fn(mesh);fn(mesh);}};
+ const api=loader({'three/examples/jsm/loaders/GLTFLoader.js':{GLTFLoader:class{}}})('components/visualizer/loadMotionAssetV734');api.disposeMotionAssetV734({scene,scenes:[scene,scene]});check('private asset resources disposed once including image bitmap',()=>assert.deepEqual([geometries,materials,textures,images,skeletons],[1,1,1,1,1]));
+ const time=clock();let signal;const load=loader({'three/examples/jsm/loaders/GLTFLoader.js':{GLTFLoader:class{}}},{...time,fetch:(_url,o)=>{signal=o.signal;return new Promise(()=>{});}})('components/visualizer/loadMotionAssetV734');const p=load.loadMotionAssetV734('/motion.glb',new AbortController().signal);await flush();const failed=assert.rejects(p);time.fire();await failed;check('motion download timeout aborts fetch',()=>assert(signal.aborted));
+ const decodeTime=clock();let decoded,managerAborts=0,freed=0;
+ const lateScene={traverse(fn){fn({geometry:{dispose(){freed++;}}});}};
+ const decode=loader({'three':{LoadingManager:class{abort(){managerAborts++;}}},'three/examples/jsm/loaders/GLTFLoader.js':{GLTFLoader:class{parseAsync(){return new Promise(r=>decoded=r);}}}},{...decodeTime,window:{location:{href:'http://localhost/'}},fetch:async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(0)})})('components/visualizer/loadMotionAssetV734');
+ const parent=new AbortController();const decoding=decode.loadMotionAssetV734('/motion.glb',parent.signal);await flush();const cancelled=assert.rejects(decoding);parent.abort();await cancelled;decoded({scene:lateScene,scenes:[lateScene]});await flush();check('cancelled motion parse aborts dependencies and disposes late scene',()=>{assert.equal(managerAborts,1);assert.equal(freed,1);assert.equal(decodeTime.jobs.size,0);});
+
+}
+(async()=>{await clients();await photos();await push();await assets();console.log('PASS V734: '+count+' checks');})().catch(e=>{console.error(e);process.exitCode=1;});

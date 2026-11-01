@@ -1,5 +1,6 @@
 import {FACIAL_CHANNELS_V370,type FacialChannelV370,type FacialProfileV370} from './facialRigStudioV370';
 import {normalizeMouthCalibrationV562} from './advancedFacialCalibrationV562';
+import {normalizeRapMouthPrecisionV798} from './advancedFacialStudioV798';
 
 /** Serializable scan summary: safe to render or export, without Three.js objects or UUIDs. */
 export type FacialTargetInfoV383 = {
@@ -67,7 +68,7 @@ export function suggestSafeFacialProfileV383(targets:FacialTargetInfoV383[],prof
 
 /** Portable profile is bound to morph names/mesh IDs, not mutable Three UUIDs. */
 export function exportFacialProfileV383(profile:FacialProfileV370):string {
-  return JSON.stringify({format:'sonic-facial-rig-v383',version:1,mapping:profile.mapping??{},gains:profile.gains??{},...(profile.mouthCalibrationV562?{mouthCalibrationV562:normalizeMouthCalibrationV562(profile.mouthCalibrationV562)}:{})},null,2);
+  return JSON.stringify({format:'sonic-facial-rig-v383',version:1,mapping:profile.mapping??{},gains:profile.gains??{},...(profile.mouthCalibrationV562?{mouthCalibrationV562:normalizeMouthCalibrationV562(profile.mouthCalibrationV562)}:{}),...(profile.rapMouthPrecisionV798?{rapMouthPrecisionV798:normalizeRapMouthPrecisionV798(profile.rapMouthPrecisionV798)}:{})},null,2);
 }
 export function importFacialProfileV383(text:string,targets:FacialTargetInfoV383[]):{profile:FacialProfileV370;warnings:string[]} {
   if(typeof text!=='string'||text.length>65536)throw new Error('Profil ist zu groß.');
@@ -77,6 +78,12 @@ export function importFacialProfileV383(text:string,targets:FacialTargetInfoV383
   if(raw.mapping!==undefined&&!safeObject(raw.mapping))throw new Error('Ungültige Morph-Zuordnungen.');
   if(raw.gains!==undefined&&!safeObject(raw.gains))throw new Error('Ungültige Kanal-Intensitäten.');
   if(raw.mouthCalibrationV562!==undefined&&!safeObject(raw.mouthCalibrationV562))throw new Error('Ungültige V562-Mundkalibrierung.');
+  if(raw.rapMouthPrecisionV798!==undefined&&!safeObject(raw.rapMouthPrecisionV798))throw new Error('Ungültige V798-Rap-Präzision.');
+  const rapidRaw=raw.rapMouthPrecisionV798 as Record<string,unknown>|undefined;
+  if(rapidRaw){
+    if(typeof rapidRaw.enabled!=='boolean')throw new Error('V798 aktiviert muss boolean sein.');
+    if(typeof rapidRaw.intensity!=='number'||!Number.isFinite(rapidRaw.intensity))throw new Error('V798 Präzision: ungültiger Wert.');
+  }
   const mapping:FacialProfileV370['mapping']={};
   const gains:FacialProfileV370['gains']={};
   const warnings:string[]=[];
@@ -100,5 +107,5 @@ export function importFacialProfileV383(text:string,targets:FacialTargetInfoV383
     if(typeof mouthRaw.enabled!=='boolean')throw new Error('V562 aktiviert muss boolean sein.');
     for(const k of ['jawCeiling','lipSeal','vowelSeparation'])if(typeof mouthRaw[k]!=='number'||!Number.isFinite(mouthRaw[k]))throw new Error(`V562 ${k}: ungültiger Wert.`);
   }
-  return {profile:{mapping,gains,...(mouthRaw?{mouthCalibrationV562:normalizeMouthCalibrationV562(mouthRaw as unknown as import('./advancedFacialCalibrationV562').MouthCalibrationV562)}:{})},warnings};
+  return {profile:{mapping,gains,...(mouthRaw?{mouthCalibrationV562:normalizeMouthCalibrationV562(mouthRaw as unknown as import('./advancedFacialCalibrationV562').MouthCalibrationV562)}:{}),...(rapidRaw?{rapMouthPrecisionV798:normalizeRapMouthPrecisionV798(rapidRaw as unknown as import('./advancedFacialStudioV798').RapMouthPrecisionV798)}:{})},warnings};
 }

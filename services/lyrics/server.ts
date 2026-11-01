@@ -4,6 +4,7 @@ import { lookupLyricsOvh } from "@/services/lyrics/providers/lyricsOvh";
 import { lookupGeniusLyrics } from "@/services/lyrics/providers/genius";
 import { lookupSpotifyColorLyrics } from "@/services/lyrics/providers/spotifyColorLyrics";
 import { chooseBestLyricsV554 } from "@/services/lyrics/selectionV554";
+import {withProviderDeadlineV654} from "@/services/lyrics/providerDeadlineV654";
 
 export interface LyricsQuery {
   title: string;
@@ -29,9 +30,12 @@ export async function findLyrics(query: LyricsQuery, spotifyAccessToken?: string
   requests.push(
     lookupLrclibLyrics(query),
     lookupLyricsOvh(query.title, query.artist),
-    lookupGeniusLyrics(query),
   );
 
-  const results = await Promise.allSettled(requests);
-  return chooseBestLyricsV554(results.map(result => result.status === "fulfilled" ? result.value : null));
+  if(process.env.GENIUS_ACCESS_TOKEN)requests.push(lookupGeniusLyrics(query));
+  const results = await Promise.allSettled(
+    requests.map(request=>withProviderDeadlineV654(request,9_000)));
+  const best=chooseBestLyricsV554(results.map(result => result.status === "fulfilled" ? result.value : null));
+  if(!best&&results.some(result=>result.status==="rejected"))throw new Error("Lyrics-Anbieter vorübergehend nicht erreichbar. Bitte erneut versuchen.");
+  return best;
 }

@@ -1,0 +1,12 @@
+'use strict';const fs=require('node:fs'),assert=require('node:assert/strict');
+const p='components/visualizer/';
+const shader=fs.readFileSync(p+'laserMatrixShaderV811.ts','utf8');
+const stage=fs.readFileSync(p+'DynamicStage.tsx','utf8');
+const host=fs.readFileSync(p+'ThreeAvatar.tsx','utf8');
+for(const x of ['LASER_MATRIX_VERTEX_V811','LASER_MATRIX_FRAGMENT_V811','uRibbons','wings','uOpacity'])assert(shader.includes(x),x);
+assert(stage.includes('v811-laser-matrix'));assert(stage.includes('depthWrite={false} depthTest'));
+assert(stage.includes('laserMeshV811.current.visible=laser.uniforms.uOpacity.value>.001'));
+assert(stage.includes('getVisualFactorsV640().beams'));
+assert(host.includes('concertFxV810={props.concertFxV810}'));
+assert(!stage.includes('new Mesh('));
+console.log('PASS V811: one reused laser shader, safety/visibility gates, integrated in live stage');

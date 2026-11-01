@@ -1,0 +1,28 @@
+{
+  "version": "V844",
+  "name": "Festival Special FX 3.0 + optional strobe",
+  "technicalReleaseApproved": false,
+  "completed": {
+    "newRegressionGroups": 98,
+    "priorReleaseSuites_V800_V843": 44,
+    "isolatedTypeScript": "pass",
+    "historicalTypes_V841_V842_V843": "pass",
+    "sourceSyntax": "pass (1217 TS/TSX sources)",
+    "architecture": "pass (938 references)",
+    "moduleCase": "pass (2067 module files, no case-insensitive collisions)",
+    "focusedLightingAndFxTests": "pass (V793, V810, V816, V817, V823, V825, V829, V831, V838, V841, V843)",
+    "packageLock": "pass"
+  },
+  "blocked": {
+    "fullProjectTypeScript": "failed in dependency-free environment: missing next/react/node type packages; isolated V844 typings passed",
+    "NextJsProductionBuild": "not run: local Next and TypeScript dependencies missing; production gate blocks as designed",
+    "realBrowserAndGpu": "not run: no browser GPU acceptance performed"
+  },
+  "notes": [
+    "Strobe defaults disabled; optional <=2Hz, 45ms, floor-light only, incremental intensity cap 0.12.",
+    "Even bounded strobe remains unsafe for some people sensitive to flashing light.",
+    "One 48-instance optional CO2 plume; other bursts reuse V816 GPU instance counts.",
+    "All festival effects require a verified active music cue, measured kick and energy, and unchanged timeline and performance guards.",
+    "Changes are code-integrated and isolated-test covered, not production approved."
+  ]
+}

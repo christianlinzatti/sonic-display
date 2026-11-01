@@ -1,9 +1,10 @@
 "use client";
 import { useSyncExternalStore } from "react";
+import {recordPerformanceMemoryV770} from "./performanceMemoryHistoryV770";
 
 export type RenderMetrics = {
   fps: number; frameMs: number; p95FrameMs?: number; slowPercent: number; drawCalls: number;
-  triangles: number; geometries: number; textures: number;
+  triangles: number; geometries: number; textures: number; programs?:number|null;
   renderer: string; webgl: string; samples: number; avatarCount?: number; updatedAt: number;
 };
 const empty: RenderMetrics = { fps: 0, frameMs: 0, slowPercent: 0, drawCalls: 0, triangles: 0, geometries: 0, textures: 0, renderer: "Unbekannt", webgl: "Unbekannt", samples: 0, updatedAt: 0 };
@@ -13,6 +14,9 @@ const subscribe = (listener: () => void) => { listeners.add(listener); return ()
 export function useRenderDiagnostics() { return useSyncExternalStore(subscribe, () => snapshot, () => empty); }
 export function publishRenderMetrics(value: RenderMetrics) {
   snapshot = value;
+  // Piggy-back on the existing ~1 Hz render window; no additional RAF/timer.
+  const heap = typeof performance !== "undefined" ? (performance as Performance & {memory?:{usedJSHeapSize?:number}}).memory?.usedJSHeapSize : undefined;
+  recordPerformanceMemoryV770(value,heap);
   for (const listener of listeners) listener();
 }
 

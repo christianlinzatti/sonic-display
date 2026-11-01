@@ -158,6 +158,6 @@ test('V593 release scripts do not mutate camera, Spotify, manual choreography, o
 test('package keeps previous benchmark commands and current V593 release',()=>{
  const pkg=require('../package.json');assert(Number(pkg.version.match(/-v(\d+)$/)?.[1])>=593);
  for(const key of ['benchmark:v590:visual','benchmark:v591:concert','benchmark:v592:live','benchmark:v593:advise','test:v593','test:smoke:v593','verify:v593'])assert(pkg.scripts[key],key);
- assert(/npm run test:smoke:v(?:59[3-9]|[6-9]\d\d)/.test(pkg.scripts.prebuild));
+ assert(require('./helpers/release-coverage-v651.cjs').isInReleaseGate('test:smoke:v656'));
 });
 console.log(`V593 PASS: ${count} regression groups (offline fixtures only; no actual browser visual sign-off)`);

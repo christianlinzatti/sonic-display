@@ -1,11 +1,36 @@
 "use client";
+import {invalidateAvatarCatalogV733} from "@/services/avatarCatalogV733";
+import {DEFAULT_HIP_STUDIO_V738,normalizeHipStudioV738} from "@/components/visualizer/hipMotionStudioV738";
+import {DEFAULT_NATURAL_DANCE_V758,normalizeNaturalDanceV758} from "@/components/visualizer/naturalDanceMotionV758";
+import {DEFAULT_DANCE_VARIETY_V759,normalizeDanceVarietyV759} from "@/components/visualizer/intelligentDanceVarietyV759";
+import {DEFAULT_NATURAL_BODY_V740,normalizeNaturalBodyV740} from "@/components/visualizer/naturalBodyDynamicsV740";
+import {DEFAULT_GLUTE_V741,normalizeGluteSettingsV741} from "@/components/visualizer/advancedGluteRigV741";
+import {DEFAULT_BEAT_BASS_V743,normalizeBeatBassV743} from "@/components/visualizer/beatBassHipMotionV743";
+import {DEFAULT_SMART_HIP_V744,normalizeSmartHipV744} from "@/components/visualizer/smartHipChoreographyV744";
+import {DEFAULT_ENSEMBLE_HIP_V745,normalizeEnsembleHipV745} from "@/components/visualizer/multiAvatarHipSyncV745";
+import {DEFAULT_VOCAL_PERFORMANCE_V746,normalizeVocalPerformanceV746} from "@/components/visualizer/vocalPerformanceDirectorV746";
+import {DEFAULT_VOCAL_BODY_SYNC_V757,normalizeVocalBodySyncV757} from "@/components/visualizer/vocalBodySyncV757";
+import {normalizeConcertQualityV750} from "./visualizer/integratedConcertQualityV750";
+import {normalizeCinematicConcertV761} from "./visualizer/cinematicConcertDirectorV761";
+import {ConcertFxStudioV810} from "./visualizer/ConcertFxStudioPanelV810";
+import {ConcertBenchmarkPanelV827} from './visualizer/ConcertBenchmarkPanelV827';
+import {ConcertQualityDashboardV826} from "./visualizer/ConcertQualityDashboardV826";
+import {normalizeDynamicStageLightingV762} from "./visualizer/cinematicScenicLightingV762";
+import {ConcertQualityDashboardV751} from "./visualizer/ConcertQualityDashboardV751";
+import {normalizePerformanceLightingV749} from "./visualizer/performanceLightingDirectorV749";
+import {normalizeLyricsPerformanceV748} from "./visualizer/lyricsPerformanceStudioV748";
+import {DEFAULT_PERFORMANCE_CAMERA_V747,normalizePerformanceCameraV747} from "@/components/visualizer/performanceCameraDirectorV747";
+import {DEFAULT_GENRE_HIP_V742,normalizeGenreHipV742,GENRE_HIP_STYLES_V742} from "@/components/visualizer/genreHipIntelligenceV742";
 import { STAGE_ENVIRONMENTS, type StageEnvironmentId } from "@/components/visualizer/stages";
 import { StageThemePreviewGrid } from "@/components/visualizer/StageThemePreviewGrid";
 import { ConcertDetailPreviewLauncherV556 } from "@/components/visualizer/ConcertDetailPreviewLauncherV556";
 import { StageThemeLivePreview } from "@/components/visualizer/StageThemeLivePreview";
+const SmartConcertTimelineAutomationV764 = dynamic(() => import("@/components/visualizer/SmartConcertTimelineAutomationV764").then(m=>m.SmartConcertTimelineAutomationV764), {ssr:false});
+const InteractiveConcertTimelineStudioV763 = dynamic(() => import("@/components/visualizer/InteractiveConcertTimelineStudioV763").then(m=>m.InteractiveConcertTimelineStudioV763), {ssr:false});
 const MultiAvatarChoreographyPanel = dynamic(() => import("@/components/visualizer/MultiAvatarChoreographyPanel").then(module => module.MultiAvatarChoreographyPanel), { ssr: false });
 const CharacterMotionBatchInstaller = dynamic(() => import("@/components/CharacterMotionBatchInstaller").then(module => module.CharacterMotionBatchInstaller), { ssr: false });
 const MotionInstaller = dynamic(() => import("@/components/MotionInstaller").then(module => module.MotionInstaller), { ssr: false });
+const PortableBackupV657 = dynamic(() => import("@/components/PortableBackupV657").then(module => module.PortableBackupV657), { ssr: false });
 const BackupIntegrityDiagnostics = dynamic(() => import("@/components/BackupIntegrityDiagnostics").then(module => module.BackupIntegrityDiagnostics), { ssr: false });
 const BackupMigrationAssistant = dynamic(() => import("@/components/BackupMigrationAssistant").then(module => module.BackupMigrationAssistant), { ssr: false });
 const UnifiedSettingsBackup = dynamic(() => import("@/components/UnifiedSettingsBackup").then(module => module.UnifiedSettingsBackup), { ssr: false });
@@ -28,6 +53,7 @@ const PerformanceBenchmark = dynamic(() => import("@/components/visualizer/Perfo
 const PerformanceSessionAnalyzerV262 = dynamic(() => import("@/components/PerformanceSessionAnalyzerV262").then(m => m.PerformanceSessionAnalyzerV262), { ssr:false });
 const PerformanceControlCenterV261 = dynamic(() => import("@/components/PerformanceControlCenterV261").then(m => m.PerformanceControlCenterV261), { ssr:false });
 const RenderDiagnosticsPanel = dynamic(() => import("@/components/visualizer/RenderDiagnosticsPanel").then(module => module.RenderDiagnosticsPanel), { ssr: false });
+const PerformanceMemoryDashboardV770 = dynamic(() => import("@/components/visualizer/PerformanceMemoryDashboardV770").then(m=>m.PerformanceMemoryDashboardV770), {ssr:false});
 const BeatCalibrationAssistant = dynamic(() => import("@/components/visualizer/BeatCalibrationAssistant").then(module => module.BeatCalibrationAssistant), { ssr: false });
 import { avatarRigProfiles } from "@/components/visualizer/avatarRigProfiles";
 import { avatarDancePresets } from "@/components/visualizer/avatarDancePresets";
@@ -54,12 +80,15 @@ const StageContentPluginSettingsV330 = dynamic(() => import("@/components/visual
 const StagePresetLibraryV286 = dynamic(() => import("@/components/visualizer/StagePresetLibraryV286").then(m => m.StagePresetLibraryV286), { ssr: false });
 const RuntimePerformancePanelV285 = dynamic(() => import("@/components/RuntimePerformancePanelV285").then(m => m.RuntimePerformancePanelV285), { ssr: false });
 const AvatarFrameProfilerPanel = dynamic(() => import("@/components/AvatarFrameProfilerPanel").then(m => m.AvatarFrameProfilerPanel), { ssr:false });
+const ServiceStatusDashboardV667 = dynamic(() => import("@/components/ServiceStatusDashboardV667").then(m => m.ServiceStatusDashboardV667), {ssr:false});
 const LongRunStabilitySettingsV355 = dynamic(() => import("@/components/visualizer/LongRunStabilityV355").then(m => m.LongRunStabilitySettingsV355), { ssr:false });
 const LongSessionMonitoringPanel = dynamic(() => import("@/components/LongSessionMonitoringPanel").then(m => m.LongSessionMonitoringPanel), { ssr:false });
 import { readChoreographies, CHOREOGRAPHY_CHANGE_EVENT } from "@/components/visualizer/avatarChoreographies";
 
 export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boolean } = {}) {
   const [open, setOpen] = useState(initiallyOpen);
+  // V738: normalized persisted profile is shared by stage and 3D preview.
+
   const [directorChoreographies, setDirectorChoreographies] = useState<ReturnType<typeof readChoreographies>>([]);
   useEffect(() => { const refresh = () => setDirectorChoreographies(readChoreographies()); refresh(); window.addEventListener(CHOREOGRAPHY_CHANGE_EVENT, refresh); window.addEventListener("storage", refresh); return () => { window.removeEventListener(CHOREOGRAPHY_CHANGE_EVENT, refresh); window.removeEventListener("storage", refresh); }; }, []);
   const [admin, setAdmin] = useState(false);
@@ -95,13 +124,13 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
       setAnimationStatus("Animation hochgeladen. Klicke auf Speichern, um sie diesem Avatar zuzuweisen.");
       setAnimationFile(null);
     } catch(error) { setAnimationStatus(error instanceof Error ? error.message : "Upload fehlgeschlagen"); }
-    finally { setAnimationUploading(false); }
+    finally {invalidateAvatarCatalogV733(); setAnimationUploading(false); }
   };
   const refreshAdmin = async () => { try {const r=await fetch("/api/admin",{cache:"no-store"});const d=await r.json();setAdmin(d.authenticated===true);setAdminConfigured(d.configured===true);setBlobUploadEnabled(d.blobEnabled===true);}catch{setAdmin(false);} };
   const login = async () => {const r=await fetch("/api/admin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:adminPassword})});const d=await r.json();if(!r.ok){setAdminError(d.error||"Login fehlgeschlagen");return;}setAdmin(true);setAdminPassword("");setAdminError("");};
   const logout = async () => {await fetch("/api/admin",{method:"DELETE"});setAdmin(false);};
-  const uploadAvatar = async () => {if(!uploadFile||!admin)return;setUploading(true);setAdminError("");try {if(!/\.glb$/i.test(uploadFile.name))throw Error("Bitte GLB-Datei auswählen");const base=uploadFile.name.replace(/\.glb$/i,"").replace(/[^a-zA-Z0-9_-]/g,"-").slice(0,60)||"avatar";const name=`${base}-${crypto.randomUUID().slice(0,8)}.glb`;const result=await upload(`sonic/models/${name}`,uploadFile,{access:"public",handleUploadUrl:"/api/avatars/upload",contentType:"model/gltf-binary"});if(!result.url)throw Error("Upload fehlgeschlagen");await refreshLibrary();setUploadFile(null);setAdminError("Avatar hochgeladen: "+name);}catch(e){setAdminError(e instanceof Error?e.message:"Upload fehlgeschlagen");}finally{setUploading(false);}};
-  const uploadPreview = async () => {if(!previewFile||!admin)return;setUploading(true);try{const ext=previewFile.name.split(".").pop()?.toLowerCase();if(!ext||!["png","jpg","jpeg","webp"].includes(ext))throw Error("PNG/JPG/WebP erforderlich");const blob=await upload(`sonic/previews/${crypto.randomUUID()}.${ext}`,previewFile,{access:"public",handleUploadUrl:"/api/avatars/upload"});setAvatarDraft(v=>({...v,preview:blob.url}));setPreviewFile(null);}catch(e){setAdminError(e instanceof Error?e.message:"Vorschaubild-Upload fehlgeschlagen");}finally{setUploading(false);}};
+  const uploadAvatar = async () => {if(!uploadFile||!admin)return;setUploading(true);setAdminError("");try {if(!/\.glb$/i.test(uploadFile.name))throw Error("Bitte GLB-Datei auswählen");const base=uploadFile.name.replace(/\.glb$/i,"").replace(/[^a-zA-Z0-9_-]/g,"-").slice(0,60)||"avatar";const name=`${base}-${crypto.randomUUID().slice(0,8)}.glb`;const result=await upload(`sonic/models/${name}`,uploadFile,{access:"public",handleUploadUrl:"/api/avatars/upload",contentType:"model/gltf-binary"});if(!result.url)throw Error("Upload fehlgeschlagen");await refreshLibrary();setUploadFile(null);setAdminError("Avatar hochgeladen: "+name);}catch(e){setAdminError(e instanceof Error?e.message:"Upload fehlgeschlagen");}finally{invalidateAvatarCatalogV733();setUploading(false);}};
+  const uploadPreview = async () => {if(!previewFile||!admin)return;setUploading(true);try{const ext=previewFile.name.split(".").pop()?.toLowerCase();if(!ext||!["png","jpg","jpeg","webp"].includes(ext))throw Error("PNG/JPG/WebP erforderlich");const blob=await upload(`sonic/previews/${crypto.randomUUID()}.${ext}`,previewFile,{access:"public",handleUploadUrl:"/api/avatars/upload"});setAvatarDraft(v=>({...v,preview:blob.url}));setPreviewFile(null);}catch(e){setAdminError(e instanceof Error?e.message:"Vorschaubild-Upload fehlgeschlagen");}finally{invalidateAvatarCatalogV733();setUploading(false);}};
 
   const [search, setSearch] = useState("");
   const [localModels, setLocalModels] = useState<AvatarModel[]>([]);
@@ -111,24 +140,60 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
   const [avatarDraft, setAvatarDraft] = useState({ label: "", description: "", preview: "", genre: "", tags: "", category: "", favorite: false, defaultDancePreset: "auto", modelUrl: "", animationUrl: "" });
   const [savingAvatar, setSavingAvatar] = useState(false);
   const [avatarSaveMessage, setAvatarSaveMessage] = useState<string | null>(null);
-  const editAvatar = (model: AvatarModel) => {
-    setEditingModel(model.id);
-    setAvatarSaveMessage(null);
-    setAvatarDraft({ label: model.label, description: model.description, preview: model.preview ?? "", genre: (model.genre ?? []).join(", "), tags: (model.tags ?? []).join(", "), category: model.category ?? "Eigene Modelle", favorite: model.favorite ?? false, defaultDancePreset: model.defaultDancePreset ?? "auto", modelUrl: model.url ?? "", animationUrl: model.animationUrl ?? "" });
+  const [avatarEditLoading, setAvatarEditLoading] = useState(false);
+  const [avatarRecovery, setAvatarRecovery] = useState<{source:string;warnings:string[];journalConflicts:{filename:string}[];unsafe:boolean;backupAvailable:boolean}|null>(null);
+  const [avatarRecoveryMessage,setAvatarRecoveryMessage]=useState<string|null>(null);
+  const avatarRevisionRef=useRef<string|null>(null);
+  const avatarEditorGeneration=useRef(0);
+  const loadAvatarRecovery=async()=>{
+    try{const response=await fetch('/api/avatars/config/recovery',{cache:'no-store'});
+      if(!response.ok)throw Error('Konfiguration nicht lesbar');
+      const json=await response.json();setAvatarRecovery(json.diagnostics);
+    }catch(error){setAvatarRecoveryMessage(error instanceof Error?error.message:'Konfigurationsprüfung fehlgeschlagen');}
+  };
+  const restoreAvatarBackup=async()=>{
+    if(!window.confirm('Letzte lokale Avatar-Konfigurationssicherung wiederherstellen? Aktuelle Änderungen können verloren gehen.'))return;
+    try{
+      const response=await fetch('/api/avatars/config/recovery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'restore-local-backup',confirmed:true})});
+      const json=await response.json();if(!response.ok)throw Error(json.error||'Wiederherstellung fehlgeschlagen');
+      setAvatarRecoveryMessage('Sicherung wiederhergestellt. Avatar-Liste aktualisiert.');
+      await Promise.all([refreshLibrary(),loadAvatarRecovery()]);
+    }catch(error){setAvatarRecoveryMessage(error instanceof Error?error.message:'Wiederherstellung fehlgeschlagen');}
+  };
+  const editAvatar = async (model: AvatarModel) => {
+    const generation=++avatarEditorGeneration.current;
+    const filename=model.id.startsWith('local:')?model.id.slice(6):`default:${model.id}`;
+    setEditingModel(null);setAvatarSaveMessage(null);setAvatarEditLoading(true);
+    try {
+      // Revision and form values MUST come from the same server snapshot.
+      const response=await fetch('/api/avatars/config',{cache:'no-store'});
+      const json=await response.json();if(!response.ok)throw Error(json.error||'Konfiguration konnte nicht geladen werden');
+      if(generation!==avatarEditorGeneration.current)return;
+      const saved:Record<string,unknown>=json.metadata?.[filename]??{};
+      const original={label:model.label,description:model.description,preview:model.preview??'',genre:model.genre??[],tags:model.tags??[],category:model.category??'Eigene Modelle',favorite:model.favorite??false,defaultDancePreset:model.defaultDancePreset??'auto',modelUrl:model.url??'',animationUrl:model.animationUrl??''};
+      const data={...original,...saved};
+      const text=(key:keyof typeof original)=>typeof data[key]==='string'?data[key] as string:'';
+      const tags=(key:'genre'|'tags')=>Array.isArray(data[key])?(data[key] as unknown[]).filter((v):v is string=>typeof v==='string').join(', '):'';
+      avatarRevisionRef.current=json.revisions?.[filename]??json.emptyRevision??null;
+      if(!avatarRevisionRef.current)throw Error('Versionskennung fehlt; Bearbeitung zum Schutz vor Datenverlust abgebrochen');
+      setAvatarDraft({label:text('label'),description:text('description'),preview:text('preview'),genre:tags('genre'),tags:tags('tags'),category:text('category'),favorite:data.favorite===true,defaultDancePreset:text('defaultDancePreset')||'auto',modelUrl:text('modelUrl')||model.url||'',animationUrl:text('animationUrl')});
+      setEditingModel(model.id);
+    } catch(error){if(generation===avatarEditorGeneration.current)setAvatarSaveMessage(error instanceof Error?error.message:'Bearbeitung nicht möglich');}
+    finally{invalidateAvatarCatalogV733();if(generation===avatarEditorGeneration.current)setAvatarEditLoading(false);}
   };
   const saveAvatar = async () => {
     if (!editingModel || savingAvatar) return;
     setSavingAvatar(true);
     setAvatarSaveMessage(null);
     try {
-      const response = await fetch("/api/avatars/config", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: editingModel.startsWith("local:") ? editingModel.slice(6) : `default:${editingModel}`, metadata: { ...avatarDraft, genre: avatarDraft.genre.split(",").map(v => v.trim()).filter(Boolean), tags: avatarDraft.tags.split(",").map(v => v.trim()).filter(Boolean) } }) });
+      const response = await fetch("/api/avatars/config", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ expectedRevision:avatarRevisionRef.current, filename: editingModel.startsWith("local:") ? editingModel.slice(6) : `default:${editingModel}`, metadata: { ...avatarDraft, genre: avatarDraft.genre.split(",").map(v => v.trim()).filter(Boolean), tags: avatarDraft.tags.split(",").map(v => v.trim()).filter(Boolean) } }) });
       const data: { error?: string } = await response.json();
-      if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+      if (!response.ok) throw new Error(response.status===409?`${data.error || 'Konflikt'} Deine Eingaben bleiben erhalten. Zum Vergleich bitte die Bearbeitung erneut öffnen.`:(data.error || `HTTP ${response.status}`));
       await refreshLibrary();
-      setAvatarSaveMessage("Avatar-Einstellungen dauerhaft gespeichert.");
+      setAvatarSaveMessage('Avatar-Einstellungen dauerhaft gespeichert.');
       setEditingModel(null);
     } catch (error) { setAvatarSaveMessage(error instanceof Error ? error.message : "Speichern fehlgeschlagen"); }
-    finally { setSavingAvatar(false); }
+    finally {invalidateAvatarCatalogV733(); setSavingAvatar(false); }
   };
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [libraryLoading, setLibraryLoading] = useState(false);
@@ -147,7 +212,7 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
       setDefaultOverrides(Array.isArray(data.defaults) ? data.defaults : []);
     } catch {
       setLibraryError("Modelle konnten nicht geladen werden. Prüfe den Next.js-Server.");
-    } finally { setLibraryLoading(false); }
+    } finally {invalidateAvatarCatalogV733(); setLibraryLoading(false); }
   };
   const convertFbx = async () => {
     if (!fbxFile || converting) return;
@@ -165,13 +230,14 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
       setFbxFile(null);
     } catch (error) {
       setConversionMessage(error instanceof Error ? error.message : "Konvertierung fehlgeschlagen");
-    } finally { setConverting(false); }
+    } finally {invalidateAvatarCatalogV733(); setConverting(false); }
   };
   useEffect(() => { if (open) { void refreshLibrary(); void refreshAdmin(); } }, [open]);
   const searchRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const sections = [
+    { id: "dashboard", label: "Dienste & Status", hint: "Dashboard Status Dienste Spotify Last.fm Lyrics Konfiguration Verbindung Mikrofon Automatik Übersicht" },
     { id: "display", label: "Anzeige", hint: "Visualizer Lyrics Motion Bildschirm" },
     { id: "avatar", label: "Avatar & Tanz", hint: "Avatar GLTF Vorschau Scale Rig Dance Preset Intensität Aggression Variation Motion Studio" },
     { id: "audio", label: "Mikrofon & Beat", hint: "Audio BPM Mikrofon Sensitivity Calibration Cooldown Sync Offset" },
@@ -182,7 +248,7 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
   const [facialStudioOpen,setFacialStudioOpen]=useState(false);
   const [vocalSyncInspectorOpenV373,setVocalSyncInspectorOpenV373]=useState(false);
   const [rapEditorOpenV408,setRapEditorOpenV408]=useState(false);
-  const [tab, setTab] = useState<"display" | "avatar" | "audio" | "diagnostics">("display");
+  const [tab, setTab] = useState<"dashboard" | "display" | "avatar" | "audio" | "diagnostics">("dashboard");
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); };
@@ -198,6 +264,23 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
     if (filteredSections.length) setTab(filteredSections[0].id);
   }, [search, tab, filteredSections.map(section => section.id).join(",")]);
   const { preferences, updatePreferences } = useUiPreferences();
+  const hipStudioV738=normalizeHipStudioV738(preferences.avatarHipStudioV738);
+  const naturalBodyV740=normalizeNaturalBodyV740(preferences.avatarNaturalBodyV740);
+  const naturalDanceV758=normalizeNaturalDanceV758(preferences.avatarNaturalDanceV758);
+  const danceVarietyV759=normalizeDanceVarietyV759(preferences.avatarDanceVarietyV759);
+  const gluteV741=normalizeGluteSettingsV741(preferences.avatarGluteRigV741);
+  const genreHipV742=normalizeGenreHipV742(preferences.avatarGenreHipV742);
+  const beatBassV743=normalizeBeatBassV743(preferences.avatarBeatBassV743);
+  const smartHipV744=normalizeSmartHipV744(preferences.avatarSmartHipV744);
+  const ensembleHipV745=normalizeEnsembleHipV745(preferences.avatarEnsembleHipV745);
+  const vocalPerformanceV746=normalizeVocalPerformanceV746(preferences.avatarVocalPerformanceV746);
+  const vocalBodySyncV757=normalizeVocalBodySyncV757(preferences.avatarVocalBodySyncV757);
+  const concertQualityV750=normalizeConcertQualityV750(preferences.concertQualityV750);
+  const cinematicConcertV761=normalizeCinematicConcertV761(preferences.cinematicConcertV761);
+  const scenicLightingV762=normalizeDynamicStageLightingV762(preferences.scenicLightingV762);
+  const performanceLightingV749=normalizePerformanceLightingV749(preferences.avatarPerformanceLightingV749);
+  const lyricsPerformanceV748=normalizeLyricsPerformanceV748(preferences.lyricsPerformanceV748);
+  const performanceCameraV747=normalizePerformanceCameraV747(preferences.avatarPerformanceCameraV747);
   const [cameraStudioOpenV398,setCameraStudioOpenV398]=useState(false);
   const [cameraStudioOpenV399,setCameraStudioOpenV399]=useState(false);
   const [cameraTimelineOpenV400,setCameraTimelineOpenV400]=useState(false);
@@ -227,6 +310,8 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
         <div className="settings-sidebar-footer">Einstellungen werden auf diesem Gerät gespeichert.</div>
       </aside>
       <div className="settings-content">
+      {tab === "dashboard" && <ServiceStatusDashboardV667 onNavigate={setTab} />}
+      {tab === "diagnostics" && <fieldset><legend>V826–V827 · Live-Konzertqualität</legend><ConcertQualityDashboardV826 enabled={preferences.concertFxV810?.qualityDashboardV826!==false}/><ConcertBenchmarkPanelV827 enabled={preferences.concertFxV810?.qualityDashboardV826!==false}/></fieldset>}
       {tab === "display" && <>
       <label>Visualizer<select value={preferences.visualizerMode} onChange={e => updatePreferences({ visualizerMode: e.target.value as typeof preferences.visualizerMode })}>
         <option value="wave">Waveform</option><option value="particles">Particles</option><option value="album-glow">Album glow</option><option value="avatar">Avatar</option>
@@ -265,7 +350,17 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
           <img src={model.preview ?? "/avatars/default-preview.svg"} alt="" width="96" height="72" /><strong>{model.favorite ? "★ " : ""}{model.label}</strong>{model.category && <small>{model.category}</small>}{Boolean(model.genre?.length) && <small>Genres: {model.genre?.join(", ")}</small>}{Boolean(model.tags?.length) && <small>Tags: {model.tags?.join(", ")}</small>}{model.defaultDancePreset && <small>Dance: {model.defaultDancePreset}</small>}<small>{available ? model.description : "Modellpfad konfigurieren"}</small><span className="avatar-library-status">{!available ? "Nicht konfiguriert" : preferences.avatarModelId === model.id ? "✓ Aktiv" : model.id.startsWith("local:") ? "Lokal" : "Verfügbar"}</span>
         </button>;
       })}</div>
-        <div className="avatar-library-edit-actions">{admin && libraryModels.map(model => <button key={model.id} type="button" onClick={() => editAvatar(model)}>✎ {model.label} bearbeiten</button>)}</div>
+        <div className="avatar-library-edit-actions">{admin && libraryModels.map(model => <button key={model.id} type="button" disabled={avatarEditLoading||savingAvatar} onClick={() => void editAvatar(model)}>✎ {model.label} bearbeiten</button>)}</div>
+        {admin && <div className="avatar-metadata-editor"><h4>V658 – Konfigurationsprüfung &amp; Wiederherstellung</h4>
+          <button type="button" onClick={()=>void loadAvatarRecovery()}>Speicherzustand prüfen</button>
+          {avatarRecovery && <><p>Quelle: {avatarRecovery.source} · {avatarRecovery.unsafe?'Schreibzugriff vorsichtshalber gesperrt':'Schreibzugriff möglich'}</p>
+            {avatarRecovery.warnings.map((warning,i)=><p key={i} role="alert">{warning}</p>)}
+            {avatarRecovery.backupAvailable && avatarRecovery.source!=='empty' && !blobUploadEnabled && <button type="button" onClick={()=>void restoreAvatarBackup()}>Letzte lokale Sicherung wiederherstellen</button>}
+            {avatarRecovery.journalConflicts.length>0&&<p role="alert">{avatarRecovery.journalConflicts.length} Änderungskonflikte protokolliert. Betroffene Modelle: {[...new Set(avatarRecovery.journalConflicts.map(c=>c.filename))].join(', ')}</p>}
+          </>}
+          {avatarRecoveryMessage && <p role="status">{avatarRecoveryMessage}</p>}
+        </div>}
+        {avatarEditLoading && <p role="status">Konfigurationsversion wird geladen…</p>}
         {admin && editingModel && <form className="avatar-metadata-editor" onSubmit={event => { event.preventDefault(); void saveAvatar(); }}>
           <h3>Avatar bearbeiten: {editingModel.startsWith("local:") ? editingModel.slice(6) : editingModel}</h3>
           <label>Name<input maxLength={100} value={avatarDraft.label} onChange={e => setAvatarDraft(v => ({ ...v, label: e.target.value }))}/></label>
@@ -289,7 +384,7 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
           <label>Kategorie<input maxLength={80} value={avatarDraft.category} onChange={e => setAvatarDraft(v => ({ ...v, category: e.target.value }))}/></label>
           <label>Dance Preset<select value={avatarDraft.defaultDancePreset} onChange={e => setAvatarDraft(v => ({ ...v, defaultDancePreset: e.target.value }))}>{avatarDancePresets.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}</select></label>
           <label className="setting-check"><input type="checkbox" checked={avatarDraft.favorite} onChange={e => setAvatarDraft(v => ({ ...v, favorite: e.target.checked }))}/> Favorit</label>
-          <div className="avatar-editor-buttons"><button type="submit" disabled={savingAvatar}>{savingAvatar ? "Speichere…" : "Speichern"}</button><button type="button" onClick={() => setEditingModel(null)}>Abbrechen</button></div>
+          <div className="avatar-editor-buttons"><button type="submit" disabled={savingAvatar}>{savingAvatar ? "Speichere…" : "Speichern"}</button><button type="button" onClick={() => {avatarEditorGeneration.current++;setEditingModel(null);}}>Abbrechen</button></div>
         </form>}
         {avatarSaveMessage && <p role="status">{avatarSaveMessage}</p>}
         {libraryModels.length === 0 && <small>Keine Modelle für diesen Filter gefunden.</small>}
@@ -338,6 +433,42 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
         <small className="settings-note">Die Vorschaukarten zeigen die visuelle Richtung der Bühne direkt in den Settings. Hover oder Fokus öffnet eine kleine 3D-Vorschau; Klick oder Tippen wählt die Bühne aus. Mit „Große 3D-Vorschau öffnen“ kannst du die Bühne frei drehen, zoomen und die Lichteffekte ausprobieren.</small>
         <label className="setting-check"><input type="checkbox" checked={preferences.stageReactive ?? true} onChange={e => updatePreferences({stageReactive: e.target.checked})}/> Musikreaktive Beleuchtung</label>
         <label>Lichtreaktion ({preferences.stageLightStrength ?? 60} %)<input type="range" min="0" max="100" step="5" value={preferences.stageLightStrength ?? 60} onChange={e => updatePreferences({stageLightStrength:Number(e.target.value)})}/></label>
+        <ConcertQualityDashboardV751 avatarModelUrl={currentAvatar?.url??null} avatarChoicesV805={[...avatarModels.map(m=>defaultOverrides.find(o=>o.id===m.id)??m),...localModels].filter(m=>!!m.url).map(m=>({id:m.id,label:m.label,url:m.url!}))} stageTheme={preferences.stageTheme??"classic"}/>
+        <InteractiveConcertTimelineStudioV763/>
+        <SmartConcertTimelineAutomationV764/>
+        <ConcertFxStudioV810 value={preferences.concertFxV810} onChange={concertFxV810=>updatePreferences({concertFxV810})}/>
+        <fieldset><legend>V762 · Dynamic Stage &amp; Lighting 4.0</legend>
+          <label className="setting-check"><input type="checkbox" checked={scenicLightingV762.enabled} onChange={e=>updatePreferences({scenicLightingV762:{...scenicLightingV762,enabled:e.target.checked}})}/> Dynamische Bühnenakzente einschalten</label>
+          <label>Effektstärke ({scenicLightingV762.strength} %)<input type="range" min="0" max="100" step="5" value={scenicLightingV762.strength} onChange={e=>updatePreferences({scenicLightingV762:{...scenicLightingV762,strength:Number(e.target.value)}})}/></label>
+          {([{key:'gobos',label:'Gobo-Lichtmuster am Boden'},{key:'ledWall',label:'Variierende LED-Wand'},{key:'spotlights',label:'Bewegliche Spotlight-Akzente'},{key:'floorHaze',label:'Bestehenden Bodennebel dynamisch verfeinern'},{key:'protectLyrics',label:'Lyrics-Lesbarkeit priorisieren'}] as const).map(item=><label key={item.key} className="setting-check"><input type="checkbox" checked={scenicLightingV762[item.key]} onChange={e=>updatePreferences({scenicLightingV762:{...scenicLightingV762,[item.key]:e.target.checked}})}/>{item.label}</label>)}
+          <small>Opt-in. Nur bei verifizierter V761-/V604-Konzertszene. Gobo ist eine günstige Shader-Bodenprojektion, kein echtes Projektionslicht. Die LED-Wand, die bestehenden Scheinwerfer und der vorhandene Nebelrenderer werden wiederverwendet. Manuelle Licht-Timelines, Blackouts, Pausen, Reduced Motion und Low-Tier haben Vorrang.</small>
+        </fieldset>
+        <fieldset><legend>V761 · Cinematic Concert Director 4.0</legend>
+          <label className="setting-check"><input type="checkbox" checked={cinematicConcertV761.enabled} onChange={e=>updatePreferences({cinematicConcertV761:{...cinematicConcertV761,enabled:e.target.checked}})}/> Gemeinsamen Song-Szenenplan aktivieren</label>
+          <label>Regiestärke ({cinematicConcertV761.strength} %)<input type="range" min="0" max="100" step="5" value={cinematicConcertV761.strength} onChange={e=>updatePreferences({cinematicConcertV761:{...cinematicConcertV761,strength:Number(e.target.value)}})}/></label>
+          <label>Motivwechsel ({cinematicConcertV761.variety} %)<input type="range" min="0" max="100" step="5" value={cinematicConcertV761.variety} onChange={e=>updatePreferences({cinematicConcertV761:{...cinematicConcertV761,variety:Number(e.target.value)}})}/></label>
+          <label>Szenenübergang ({cinematicConcertV761.transitionMs} ms)<input type="range" min="400" max="3000" step="100" value={cinematicConcertV761.transitionMs} onChange={e=>updatePreferences({cinematicConcertV761:{...cinematicConcertV761,transitionMs:Number(e.target.value)}})}/></label>
+          <label className="setting-check"><input type="checkbox" checked={cinematicConcertV761.protectLyrics} onChange={e=>updatePreferences({cinematicConcertV761:{...cinematicConcertV761,protectLyrics:e.target.checked}})}/> Lesbare Lyrics vor optionalen Szeneneffekten priorisieren</label>
+          <small>V761 variiert Porträt-, Dialog-, Gruppen-, Weitwinkel-, Aufbau- und Ruhe-Motive über verifizierte Songabschnitte. Unbekannte Songstrukturen bleiben unangetastet. Kein automatisches Erkennen von Sängern, keine neue Kamera oder Lichtquelle. Manuelle Regie und bestehende Sicherheitsprüfungen haben Vorrang. Die aktive Szene wird als data-v761-scene im Bühnenstatus ausgegeben.</small>
+        </fieldset>
+        <fieldset><legend>V750 · Integrated Concert Quality &amp; Performance</legend>
+          <label className="setting-check"><input type="checkbox" checked={concertQualityV750.enabled} onChange={e=>updatePreferences({concertQualityV750:{...concertQualityV750,enabled:e.target.checked}})}/> Automatische Konzert-Qualitätsregie</label>
+          <label>Intensität der Schutzregeln ({concertQualityV750.strength} %)<input type="range" min="0" max="100" step="5" value={concertQualityV750.strength} onChange={e=>updatePreferences({concertQualityV750:{...concertQualityV750,strength:Number(e.target.value)}})}/></label>
+          <label className="setting-check"><input type="checkbox" checked={concertQualityV750.protectLyrics} onChange={e=>updatePreferences({concertQualityV750:{...concertQualityV750,protectLyrics:e.target.checked}})}/> Zusätzlichen Lyrics-Schutz priorisieren</label>
+          <label className="setting-check"><input type="checkbox" checked={concertQualityV750.protectPerformance} onChange={e=>updatePreferences({concertQualityV750:{...concertQualityV750,protectPerformance:e.target.checked}})}/> Bestätigte Sänger bei Kamerabewegungen schützen</label>
+          <label className="setting-check"><input type="checkbox" checked={concertQualityV750.adaptiveLoad} onChange={e=>updatePreferences({concertQualityV750:{...concertQualityV750,adaptiveLoad:e.target.checked}})}/> Bei großen Gruppen / niedriger Qualitätsstufe zurückhaltender inszenieren</label>
+          <small>V750 passt nur Zusatzbewegungen und -akzente von V735/V746–V749 an. Gespeicherte Szenen, manuelle Kamera- und Licht-Timelines, echte Lippenanimationen sowie Fuß-IK werden nicht verändert. Die Anzeige ist eine Planungsheuristik, keine gemessene FPS- oder GPU-Diagnose.</small>
+        </fieldset>
+        <fieldset><legend>V749 · Concert Lighting Director</legend>
+          <label className="setting-check"><input type="checkbox" checked={performanceLightingV749.enabled} onChange={e=>updatePreferences({avatarPerformanceLightingV749:{...performanceLightingV749,enabled:e.target.checked}})}/> Musik- und performanceabhängige Lichtregie</label>
+          <label>Regiestärke ({performanceLightingV749.strength} %)<input type="range" min="0" max="100" step="5" value={performanceLightingV749.strength} onChange={e=>updatePreferences({avatarPerformanceLightingV749:{...performanceLightingV749,strength:Number(e.target.value)}})}/></label>
+          <label className="setting-check"><input type="checkbox" checked={performanceLightingV749.vocalPortraits} onChange={e=>updatePreferences({avatarPerformanceLightingV749:{...performanceLightingV749,vocalPortraits:e.target.checked}})}/> Sänger-Spotlights bei bestätigten Rollen</label>
+          <label className="setting-check"><input type="checkbox" checked={performanceLightingV749.groupHooks} onChange={e=>updatePreferences({avatarPerformanceLightingV749:{...performanceLightingV749,groupHooks:e.target.checked}})}/> Gruppenbeleuchtung in Hooks</label>
+          <label className="setting-check"><input type="checkbox" checked={performanceLightingV749.dropAccents} onChange={e=>updatePreferences({avatarPerformanceLightingV749:{...performanceLightingV749,dropAccents:e.target.checked}})}/> Kick-abhängige Drop-Akzente</label>
+          <label className="setting-check"><input type="checkbox" checked={performanceLightingV749.protectLyrics} onChange={e=>updatePreferences({avatarPerformanceLightingV749:{...performanceLightingV749,protectLyrics:e.target.checked}})}/> Zusätzlicher Lyrics-Kontrastschutz</label>
+          <label>Übergang ({performanceLightingV749.transitionMs} ms)<input type="range" min="250" max="2500" step="50" value={performanceLightingV749.transitionMs} onChange={e=>updatePreferences({avatarPerformanceLightingV749:{...performanceLightingV749,transitionMs:Number(e.target.value)}})}/></label>
+          <small>Bestehende Licht-Timelines und Blackouts haben Vorrang. Sprecher-Fokus nutzt nur die geprüfte V528/V551-Zuordnung; keine automatische Sprechererkennung. Die Beleuchtung verwendet vorhandene Lichter.</small>
+        </fieldset>
         <button type="button" onClick={() => updatePreferences({stageTheme:"classic",stageReactive:true,stageLightStrength:60})}>Bühne zurücksetzen</button>
         <StageDirectorControlsV287 />
         <StagePresetLibraryV286 current={{stageTheme:preferences.stageTheme ?? "classic",stageReactive:preferences.stageReactive ?? true,stageLightStrength:preferences.stageLightStrength ?? 60}} onApply={next => updatePreferences(next)} />
@@ -445,6 +576,140 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
         <label>Überblendung ({(preferences.avatarCrossfadeSeconds ?? 0.35).toFixed(2)} s)<input type="range" min="0.1" max="1.5" step="0.05" value={preferences.avatarCrossfadeSeconds ?? 0.35} onChange={e => updatePreferences({ avatarCrossfadeSeconds: Number(e.target.value) })}/></label>
         <label>Armbewegungen ({Math.round((preferences.avatarArmResponse ?? 1) * 100)} %)<input type="range" min="0" max="2" step="0.05" value={preferences.avatarArmResponse ?? 1} onChange={e => updatePreferences({ avatarArmResponse: Number(e.target.value) })}/></label>
         <label>Beinarbeit ({Math.round((preferences.avatarLegResponse ?? 1) * 100)} %)<input type="range" min="0" max="2" step="0.05" value={preferences.avatarLegResponse ?? 1} onChange={e => updatePreferences({ avatarLegResponse: Number(e.target.value) })}/></label>
+        <fieldset><legend>Hüftbewegungen · V735</legend>
+          <p>Hip_Sway (Hüftschwingen), Hip_Circle (Beckenkreisen) und Hip_Bounce (rhythmischer Bounce) werden auf dem vorhandenen GLB-Rig erzeugt. Auto wechselt musikalisch zwischen den Bewegungen. Manuelle Choreografien haben Vorrang.</p>
+          <label>Bewegung<select value={preferences.avatarHipDanceModeV735??"auto"} onChange={e=>updatePreferences({avatarHipDanceModeV735:e.target.value as NonNullable<typeof preferences.avatarHipDanceModeV735>})}>
+            <option value="off">Aus</option><option value="auto">Auto nach Musik</option>
+            <option value="Hip_Sway">Hip_Sway – Hüftschwingen</option>
+            <option value="Hip_Circle">Hip_Circle – Beckenkreisen</option>
+            <option value="Hip_Bounce">Hip_Bounce – Hip-Bounce</option>
+          </select></label>
+          <label>Stärke ({preferences.avatarHipDanceStrengthV735??45} %)<input type="range" min="0" max="100" step="5" value={preferences.avatarHipDanceStrengthV735??45} onChange={e=>updatePreferences({avatarHipDanceStrengthV735:Number(e.target.value)})}/></label>
+          <label>Tempo ({preferences.avatarHipDanceSpeedV735??100} %)<input type="range" min="50" max="200" step="5" value={preferences.avatarHipDanceSpeedV735??100} onChange={e=>updatePreferences({avatarHipDanceSpeedV735:Number(e.target.value)})}/></label>
+          <fieldset><legend>Hip Motion Studio · V738</legend>
+            <label>Weicher Übergang ({hipStudioV738.transitionSeconds.toFixed(2)} s)<input type="range" min="0.1" max="1.5" step="0.05" value={hipStudioV738.transitionSeconds} onChange={e=>updatePreferences({avatarHipStudioV738:{...hipStudioV738,transitionSeconds:Number(e.target.value)}})}/></label>
+            <label>Hip_Sway Intensität ({hipStudioV738.swayStrength} %)<input type="range" min="0" max="150" step="5" value={hipStudioV738.swayStrength} onChange={e=>updatePreferences({avatarHipStudioV738:{...hipStudioV738,swayStrength:Number(e.target.value)}})}/></label>
+            <label>Hip_Circle Intensität ({hipStudioV738.circleStrength} %)<input type="range" min="0" max="150" step="5" value={hipStudioV738.circleStrength} onChange={e=>updatePreferences({avatarHipStudioV738:{...hipStudioV738,circleStrength:Number(e.target.value)}})}/></label>
+            <label>Hip_Bounce Intensität ({hipStudioV738.bounceStrength} %)<input type="range" min="0" max="150" step="5" value={hipStudioV738.bounceStrength} onChange={e=>updatePreferences({avatarHipStudioV738:{...hipStudioV738,bounceStrength:Number(e.target.value)}})}/></label>
+            <label>Beat-Unterteilung<select value={hipStudioV738.rhythm} onChange={e=>updatePreferences({avatarHipStudioV738:{...hipStudioV738,rhythm:e.target.value as typeof hipStudioV738.rhythm}})}>
+              <option value="half">Halftime (½)</option><option value="normal">Normal (1×)</option><option value="double">Doubletime (2×)</option>
+            </select></label>
+            <button type="button" onClick={()=>updatePreferences({avatarHipStudioV738:{...DEFAULT_HIP_STUDIO_V738}})}>V738 Motion Studio zurücksetzen</button>
+            <small>Wird auf die V735-Grundstärke aufgerechnet und bleibt innerhalb ihrer sicheren Gelenkgrenzen. Wechsel zwischen Auto-/GLB-Priorität und Track-Seeks setzen die Überblendung zurück. Das Live-Rig nutzt weiterhin nur die bestehende Foot-IK.</small>
+          </fieldset>
+          <small>Beckenverschiebungen sind nur bei erkannter Fuß-IK möglich; ohne passende Bein-Ketten bleibt es bei begrenzter Rotation. Die Verformung einzelner Gesäßhälften benötigt zusätzliche Skin-Weights und ist nicht Teil dieses Updates.</small>
+          <fieldset><legend>Natural Body Dynamics · V740</legend>
+            <label><input type="checkbox" checked={naturalBodyV740.enabled} onChange={e=>updatePreferences({avatarNaturalBodyV740:{...naturalBodyV740,enabled:e.target.checked}})}/> Natürliche Ganzkörper-Gegenbewegung</label>
+            <label>Ganzkörper-Stärke ({naturalBodyV740.strength} %)<input type="range" min="0" max="100" step="5" value={naturalBodyV740.strength} onChange={e=>updatePreferences({avatarNaturalBodyV740:{...naturalBodyV740,strength:Number(e.target.value)}})}/></label>
+            <label>Arme & Schultern ({naturalBodyV740.arms} %)<input type="range" min="0" max="100" step="5" value={naturalBodyV740.arms} onChange={e=>updatePreferences({avatarNaturalBodyV740:{...naturalBodyV740,arms:Number(e.target.value)}})}/></label>
+            <label>Beine & Knie ({naturalBodyV740.legs} %)<input type="range" min="0" max="100" step="5" value={naturalBodyV740.legs} onChange={e=>updatePreferences({avatarNaturalBodyV740:{...naturalBodyV740,legs:Number(e.target.value)}})}/></label>
+            <small>Stützbeine und Fußgelenke werden nicht zusätzlich bewegt; Foot-IK und manuelle Choreografien behalten Vorrang. Fehlende Rig-Knochen werden übersprungen.</small>
+            <button type="button" onClick={()=>updatePreferences({avatarNaturalBodyV740:{...DEFAULT_NATURAL_BODY_V740}})}>Natural Body zurücksetzen</button>
+          </fieldset>
+          <fieldset><legend>Natural Dance Motion 4.0 · V758</legend>
+            <label><input type="checkbox" checked={naturalDanceV758.enabled} onChange={e=>updatePreferences({avatarNaturalDanceV758:{...naturalDanceV758,enabled:e.target.checked}})}/> Natürliche Gewichtsverlagerung aktivieren</label>
+            {([['strength','Gesamtstärke'],['balance','Gewichtsverlagerung'],['followThrough','Oberkörper & Arme'],['transition','Weiche Übergänge']] as const).map(([key,label])=><label key={key}>{label} ({naturalDanceV758[key]} %)<input type="range" min="0" max="100" step="5" value={naturalDanceV758[key]} onChange={e=>updatePreferences({avatarNaturalDanceV758:{...naturalDanceV758,[key]:Number(e.target.value)}})}/></label>)}
+            <small>Ergänzt die vorhandene Hip- und Body-Regie; einseitige Gewichtsverlagerungen nur bei bekanntem Fußkontakt. GLB-Clips, manuelle Bewegungen und die Foot-IK bleiben maßgeblich. In der Avatar-Vorschau wird derselbe Controller verwendet.</small>
+            <button type="button" onClick={()=>updatePreferences({avatarNaturalDanceV758:{...DEFAULT_NATURAL_DANCE_V758}})}>V758 zurücksetzen</button>
+          </fieldset>
+          <fieldset><legend>Intelligent Dance Variety · V759</legend>
+            <label><input type="checkbox" checked={danceVarietyV759.enabled} onChange={e=>updatePreferences({avatarDanceVarietyV759:{...danceVarietyV759,enabled:e.target.checked}})}/> Automatische Phrasenvariationen aktivieren</label>
+            {([['strength','Gesamtstärke'],['variety','Motivwechsel'],['transition','Weiche Übergänge']] as const).map(([key,label])=><label key={key}>{label} ({danceVarietyV759[key]} %)<input type="range" min="0" max="100" step="5" value={danceVarietyV759[key]} onChange={e=>updatePreferences({avatarDanceVarietyV759:{...danceVarietyV759,[key]:Number(e.target.value)}})}/></label>)}
+            <label>Phrasenlänge <select value={danceVarietyV759.phraseBeats} onChange={e=>updatePreferences({avatarDanceVarietyV759:{...danceVarietyV759,phraseBeats:Number(e.target.value) as 4|8|16}})}><option value="4">4 Beats</option><option value="8">8 Beats</option><option value="16">16 Beats</option></select></label>
+            <small>V759 variiert nur vorhandene Bewegungen bei Verse, Hook und Drop. Kein automatisches Austauschen von GLB-Clips; manuelle Timelines, Sängersteuerung und Foot-IK bleiben geschützt. Avatar-Vorschau mit simulierten Takten.</small>
+            <button type="button" onClick={()=>updatePreferences({avatarDanceVarietyV759:{...DEFAULT_DANCE_VARIETY_V759}})}>V759 zurücksetzen</button>
+          </fieldset>
+          <fieldset><legend>Advanced Hip & Glute Rig · V741</legend>
+            <p>Optionale separate Gesäßverformung für GLB-Avatare mit benannten, tatsächlich gewichteten Glute_L/Glute_R-Knochen oder passenden Morph-Targets. Diese Einstellung erzeugt keine neuen Knochen oder Skin-Weights.</p>
+            <label><input type="checkbox" checked={gluteV741.enabled} onChange={e=>updatePreferences({avatarGluteRigV741:{...gluteV741,enabled:e.target.checked}})}/> Gesäßverformung für unterstützte Avatare aktivieren</label>
+            <label>Treiber<select value={gluteV741.driver} onChange={e=>updatePreferences({avatarGluteRigV741:{...gluteV741,driver:e.target.value as typeof gluteV741.driver}})}>
+              <option value="auto">Auto – Morph bevorzugen, sonst gewichtete Knochen</option>
+              <option value="morph">Nur vorhandene Morph-Targets</option>
+              <option value="bone">Nur gewichtete Gesäßknochen</option>
+            </select></label>
+            <label>Verformungsstärke ({gluteV741.strength} %)<input type="range" min="0" max="100" step="5" value={gluteV741.strength} onChange={e=>updatePreferences({avatarGluteRigV741:{...gluteV741,strength:Number(e.target.value)}})}/></label>
+            <label>Linke Seite ({gluteV741.left} %)<input type="range" min="0" max="100" step="5" value={gluteV741.left} onChange={e=>updatePreferences({avatarGluteRigV741:{...gluteV741,left:Number(e.target.value)}})}/></label>
+            <label>Rechte Seite ({gluteV741.right} %)<input type="range" min="0" max="100" step="5" value={gluteV741.right} onChange={e=>updatePreferences({avatarGluteRigV741:{...gluteV741,right:Number(e.target.value)}})}/></label>
+            <small>Standardmäßig deaktiviert. Nur bei laufenden prozeduralen Hüftbewegungen aktiv; bei Pause, Reduced Motion und manueller Choreografie neutral. Die Verfügbarkeit je Avatar steht in der 3D-Vorschau.</small>
+            <button type="button" onClick={()=>updatePreferences({avatarGluteRigV741:{...DEFAULT_GLUTE_V741}})}>V741 zurücksetzen</button>
+          </fieldset>
+          <fieldset><legend>Genre Dance Intelligence · V742</legend>
+            <p>Individuelle Hüftchoreografien für Deutschrap, Hardtekk, Hardstyle, Rock und Pop. Verse, Hook und Drop erhalten eigene Bewegungsfolgen. Wirkt nur bei Hüftbewegung „Auto“.</p>
+            <label><input type="checkbox" checked={genreHipV742.enabled} onChange={e=>updatePreferences({avatarGenreHipV742:{...genreHipV742,enabled:e.target.checked}})}/> Genreabhängige Hüftchoreografie aktivieren</label>
+            <label>Genre<select value={genreHipV742.style} onChange={e=>updatePreferences({avatarGenreHipV742:{...genreHipV742,style:e.target.value as typeof genreHipV742.style}})}>
+              {GENRE_HIP_STYLES_V742.map(style=><option key={style} value={style}>{style==='auto'?'Auto – erkannter Musikstil':style==='deutschrap'?'Deutschrap':style==='hardtekk'?'Hardtekk':style==='hardstyle'?'Hardstyle':style==='rock'?'Rock':'Pop'}</option>)}
+            </select></label>
+            <label>Genre-Einfluss ({genreHipV742.strength} %)<input type="range" min="0" max="100" step="5" value={genreHipV742.strength} onChange={e=>updatePreferences({avatarGenreHipV742:{...genreHipV742,strength:Number(e.target.value)}})}/></label>
+            <small>Bei unbekanntem Genre ohne manuelle Stilwahl bleibt die bisherige V735-Automatik erhalten. GLB-Clips, Fuß-IK und manuelle Choreografien haben Vorrang. Änderungen funktionieren ohne separate Animationen im GLB.</small>
+            <button type="button" onClick={()=>updatePreferences({avatarGenreHipV742:{...DEFAULT_GENRE_HIP_V742}})}>V742 zurücksetzen</button>
+          </fieldset>
+          <fieldset><legend>Beat &amp; Bass Motion · V743</legend>
+            <p>Kick-Akzente verstärken Hip_Bounce, Bass-Groove begleitet Hip_Sway und Hip_Circle. Benutzt echte Audiosignale; ohne erkennbare Signale bleibt die Bewegung unverstärkt.</p>
+            <label><input type="checkbox" checked={beatBassV743.enabled} onChange={e=>updatePreferences({avatarBeatBassV743:{...beatBassV743,enabled:e.target.checked}})}/> Musikreaktive Hüftbewegungen</label>
+            <label>Gesamtstärke ({beatBassV743.strength} %)<input type="range" min="0" max="100" step="5" value={beatBassV743.strength} onChange={e=>updatePreferences({avatarBeatBassV743:{...beatBassV743,strength:Number(e.target.value)}})}/></label>
+            <label>Kick-Reaktion ({beatBassV743.kick} %)<input type="range" min="0" max="100" step="5" value={beatBassV743.kick} onChange={e=>updatePreferences({avatarBeatBassV743:{...beatBassV743,kick:Number(e.target.value)}})}/></label>
+            <label>Bass-Groove ({beatBassV743.bass} %)<input type="range" min="0" max="100" step="5" value={beatBassV743.bass} onChange={e=>updatePreferences({avatarBeatBassV743:{...beatBassV743,bass:Number(e.target.value)}})}/></label>
+            <label>Empfindlichkeit ({beatBassV743.sensitivity} %)<input type="range" min="0" max="100" step="5" value={beatBassV743.sensitivity} onChange={e=>updatePreferences({avatarBeatBassV743:{...beatBassV743,sensitivity:Number(e.target.value)}})}/></label>
+            <small>Die Signale stammen aus der vorhandenen Audioanalyse (bei Mikrofonzugriff abhängig von Berechtigung und Eingang). Die Intensität ist begrenzt; Foot-IK, GLB-Clips und manuelle Choreografien haben Vorrang. Die 3D-Vorschau bietet eine getrennte, ausdrücklich simulierte Testquelle.</small>
+            <button type="button" onClick={()=>updatePreferences({avatarBeatBassV743:{...DEFAULT_BEAT_BASS_V743}})}>V743 zurücksetzen</button>
+          </fieldset>
+          <fieldset><legend>Smart Choreography 3.0 · V744</legend>
+            <p>Abwechslungsreiche Bewegungsphrasen für Verse, Hook, Build-up und Drop. Die Genre-V742-Automatik bleibt Voraussetzung; V738 übernimmt die weichen Übergänge.</p>
+            <label><input type="checkbox" checked={smartHipV744.enabled} onChange={e=>updatePreferences({avatarSmartHipV744:{...smartHipV744,enabled:e.target.checked}})}/> Intelligente Hüftchoreografie aktivieren</label>
+            <label>Abwechslung ({smartHipV744.variety} %)<input type="range" min="0" max="100" step="5" value={smartHipV744.variety} onChange={e=>updatePreferences({avatarSmartHipV744:{...smartHipV744,variety:Number(e.target.value)}})}/></label>
+            <label>Dynamischer Spannungsbogen ({smartHipV744.dynamics} %)<input type="range" min="0" max="100" step="5" value={smartHipV744.dynamics} onChange={e=>updatePreferences({avatarSmartHipV744:{...smartHipV744,dynamics:Number(e.target.value)}})}/></label>
+            <label>Bewegungsphrase<select value={smartHipV744.phraseBeats} onChange={e=>updatePreferences({avatarSmartHipV744:{...smartHipV744,phraseBeats:Number(e.target.value) as 8|16}})}><option value={8}>8 Beats – lebendig</option><option value={16}>16 Beats – ruhiger</option></select></label>
+            <small>Nur bei „Auto“, aktivem V742-Genre und laufender Wiedergabe. Keine Clip-Installation erforderlich. Vorhandene GLB-Motions, manuelle Timelines und Foot-IK bleiben vorrangig.</small>
+            <button type="button" onClick={()=>updatePreferences({avatarSmartHipV744:{...DEFAULT_SMART_HIP_V744}})}>V744 zurücksetzen</button>
+          </fieldset>
+          <fieldset><legend>Multi-Avatar Dance Sync · V745</legend>
+            <p>V744-Phrasen gemeinsam tanzen, gestaffelt einsetzen oder als Lead/Background abwechseln. Hook und Drop werden gemeinsam betont. Nur für prozedurale Hüftanimationen bei mindestens zwei GLB-Performern.</p>
+            <label><input type="checkbox" checked={ensembleHipV745.enabled} onChange={e=>updatePreferences({avatarEnsembleHipV745:{...ensembleHipV745,enabled:e.target.checked}})}/> Ensemble-Hüftchoreografie</label>
+            <label>Ensemble-Stil <select value={ensembleHipV745.mode} onChange={e=>updatePreferences({avatarEnsembleHipV745:{...ensembleHipV745,mode:e.target.value as typeof ensembleHipV745.mode}})}>
+              <option value="auto">Auto – passend zum Songabschnitt</option><option value="sync">Synchron</option><option value="stagger">Versetzte Einsätze</option><option value="call-response">Lead / Background im Wechsel</option>
+            </select></label>
+            <label>Lead-Avatar <select value={ensembleHipV745.leadSlot} onChange={e=>updatePreferences({avatarEnsembleHipV745:{...ensembleHipV745,leadSlot:Number(e.target.value)}})}>
+              {[0,1,2,3].map(slot=><option key={slot} value={slot}>Avatar {slot+1}</option>)}
+            </select></label>
+            <label>Versatz <select value={ensembleHipV745.delayBeats} onChange={e=>updatePreferences({avatarEnsembleHipV745:{...ensembleHipV745,delayBeats:Number(e.target.value) as 1|2|4}})}>
+              <option value={1}>1 Beat</option><option value={2}>2 Beats</option><option value={4}>4 Beats</option>
+            </select></label>
+            <label>Ensemble-Einfluss ({ensembleHipV745.strength} %)<input type="range" min="0" max="100" step="5" value={ensembleHipV745.strength} onChange={e=>updatePreferences({avatarEnsembleHipV745:{...ensembleHipV745,strength:Number(e.target.value)}})}/></label>
+            <small>Solo, Pause, reduzierte Bewegung, manuelle Choreografien und echte GLB-Clips bleiben unverändert. Der Lead gilt für Hüftbewegungen; die Gesangsrolle wird nicht geändert. Unter Avatar-Vorschau kannst du jede Rolle einzeln prüfen.</small>
+            <button type="button" onClick={()=>updatePreferences({avatarEnsembleHipV745:{...DEFAULT_ENSEMBLE_HIP_V745}})}>V745 zurücksetzen</button>
+          </fieldset>
+          <button type="button" onClick={()=>updatePreferences({avatarHipDanceModeV735:"auto",avatarHipDanceStrengthV735:45,avatarHipDanceSpeedV735:100})}>Hüftbewegungen zurücksetzen</button>
+        </fieldset>
+          <fieldset><legend>Vocal Performance 2.0 · V746</legend>
+            <p>Stimmt leichte Kopf-, Brust- und Armreaktionen auf bestätigte Wort-Zeitmarken und den bestehenden Lip-Sync ab. Keine Veränderungen der Mund- oder Face-Rig-Steuerung.</p>
+            <label><input type="checkbox" checked={vocalPerformanceV746.enabled} onChange={e=>updatePreferences({avatarVocalPerformanceV746:{...vocalPerformanceV746,enabled:e.target.checked}})}/> Zusätzliche Vocal-Performance</label>
+            <label>Gesamtstärke ({vocalPerformanceV746.strength} %)<input type="range" min="0" max="100" step="5" value={vocalPerformanceV746.strength} onChange={e=>updatePreferences({avatarVocalPerformanceV746:{...vocalPerformanceV746,strength:Number(e.target.value)}})}/></label>
+            <label>Kopfreaktion ({vocalPerformanceV746.head} %)<input type="range" min="0" max="100" step="5" value={vocalPerformanceV746.head} onChange={e=>updatePreferences({avatarVocalPerformanceV746:{...vocalPerformanceV746,head:Number(e.target.value)}})}/></label>
+            <label>Oberkörper &amp; Gestik ({vocalPerformanceV746.gestures} %)<input type="range" min="0" max="100" step="5" value={vocalPerformanceV746.gestures} onChange={e=>updatePreferences({avatarVocalPerformanceV746:{...vocalPerformanceV746,gestures:Number(e.target.value)}})}/></label>
+            <label>Deutschrap-Akzente ({vocalPerformanceV746.rapEmphasis} %)<input type="range" min="0" max="100" step="5" value={vocalPerformanceV746.rapEmphasis} onChange={e=>updatePreferences({avatarVocalPerformanceV746:{...vocalPerformanceV746,rapEmphasis:Number(e.target.value)}})}/></label>
+            <small>Bei mehreren Avataren sind ausdrückliche Sänger-Zuordnungen notwendig. Der V745-Tanz-Lead wird nicht automatisch als Sänger behandelt. Fehlen Wort-Zeitmarken, bleiben die zusätzlichen V746-Gesten aus. Manuelle Clips, Pausen und reduzierte Bewegung haben Vorrang.</small>
+            <button type="button" onClick={()=>updatePreferences({avatarVocalPerformanceV746:{...DEFAULT_VOCAL_PERFORMANCE_V746}})}>V746 zurücksetzen</button>
+          </fieldset>
+          <fieldset><legend>Vocal &amp; Body Synchronization 3.0 · V757</legend>
+            <p>Zusätzliche Kopf-, Brust- und Armakzente an echten Wortanfängen und anhand der vorhandenen Mundaktivität. Keine neue Mundsteuerung oder automatische Stimmenidentifikation.</p>
+            <label><input type="checkbox" checked={vocalBodySyncV757.enabled} onChange={e=>updatePreferences({avatarVocalBodySyncV757:{...vocalBodySyncV757,enabled:e.target.checked}})}/> Wortbasierte Vocal-Körper-Synchronisation</label>
+            <label>Gesamtstärke ({vocalBodySyncV757.strength} %)<input type="range" min="0" max="100" step="5" value={vocalBodySyncV757.strength} onChange={e=>updatePreferences({avatarVocalBodySyncV757:{...vocalBodySyncV757,strength:Number(e.target.value)}})}/></label>
+            <label>Kopfakzente ({vocalBodySyncV757.head} %)<input type="range" min="0" max="100" step="5" value={vocalBodySyncV757.head} onChange={e=>updatePreferences({avatarVocalBodySyncV757:{...vocalBodySyncV757,head:Number(e.target.value)}})}/></label>
+            <label>Oberkörper &amp; Arme ({vocalBodySyncV757.gestures} %)<input type="range" min="0" max="100" step="5" value={vocalBodySyncV757.gestures} onChange={e=>updatePreferences({avatarVocalBodySyncV757:{...vocalBodySyncV757,gestures:Number(e.target.value)}})}/></label>
+            <label>Ruhe bei schnellem Rap ({vocalBodySyncV757.rapidControl} %)<input type="range" min="0" max="100" step="5" value={vocalBodySyncV757.rapidControl} onChange={e=>updatePreferences({avatarVocalBodySyncV757:{...vocalBodySyncV757,rapidControl:Number(e.target.value)}})}/></label>
+            <small>V756-Sängerrollen gelten weiterhin. Nur bestätigte Wort-Zeitmarken lösen die zusätzlichen Akzente aus; bei Zeilen-Lyrics bleibt V757 aus. Manuelle GLB-Choreografien, Pausen, reduzierte Bewegung und die vorhandene Fuß-IK haben Vorrang.</small>
+            <button type="button" onClick={()=>updatePreferences({avatarVocalBodySyncV757:{...DEFAULT_VOCAL_BODY_SYNC_V757}})}>V757 zurücksetzen</button>
+          </fieldset>
+        <fieldset><legend>Cinematic Camera Director · V747</legend>
+          <p>Ergänzt die automatische Kameraregie um Rap-Nahaufnahmen bei bestätigter Sängerrolle sowie Gruppenbilder bei verifizierten Hooks und Drops. Vorhandene Kamerapresets und Lyrics-Schutz bleiben vorrangig.</p>
+          <label><input type="checkbox" checked={performanceCameraV747.enabled} onChange={e=>updatePreferences({avatarPerformanceCameraV747:{...performanceCameraV747,enabled:e.target.checked}})}/> Automatische Performance-Kamera</label>
+          <label><input type="checkbox" checked={performanceCameraV747.vocalFocus} onChange={e=>updatePreferences({avatarPerformanceCameraV747:{...performanceCameraV747,vocalFocus:e.target.checked}})}/> Sängerfokus bei bestätigter Rolle</label>
+          <label><input type="checkbox" checked={performanceCameraV747.groupShots} onChange={e=>updatePreferences({avatarPerformanceCameraV747:{...performanceCameraV747,groupShots:e.target.checked}})}/> Gruppenbilder bei Hook / Drop</label>
+          <label>Regie-Stärke ({performanceCameraV747.strength} %)<input type="range" min="0" max="100" step="5" value={performanceCameraV747.strength} onChange={e=>updatePreferences({avatarPerformanceCameraV747:{...performanceCameraV747,strength:Number(e.target.value)}})}/></label>
+          <label>Weiche Einblendung ({performanceCameraV747.transitionMs} ms)<input type="range" min="450" max="2500" step="50" value={performanceCameraV747.transitionMs} onChange={e=>updatePreferences({avatarPerformanceCameraV747:{...performanceCameraV747,transitionMs:Number(e.target.value)}})}/></label>
+          <small>Ohne bestätigte Sängerzuordnung keine neue Sänger-Nahaufnahme. Ohne verifizierte Songabschnitte keine neuen Hook-/Drop-Einstellungen. Manuelle Kamerafahrten, Editor, reduzierte Bewegung und geschützte Lyrics haben Vorrang. Die vollständige Besetzung bleibt im überprüften Bild.</small>
+          <button type="button" onClick={()=>updatePreferences({avatarPerformanceCameraV747:{...DEFAULT_PERFORMANCE_CAMERA_V747}})}>V747 zurücksetzen</button>
+        </fieldset>
         <fieldset><legend>Foot IK · V91</legend>
           <p>Fußstabilisierung für humanoide GLB-Avatare mit erkannten Hüft-, Knie- und Fußknochen. Die Einstellungen wirken sofort auf die 3D-Bühne.</p>
           <label className="setting-check"><input type="checkbox" checked={preferences.avatarFootIKEnabled ?? true} onChange={e => updatePreferences({ avatarFootIKEnabled: e.target.checked })}/> Foot IK aktivieren</label>
@@ -697,6 +962,14 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
         </div>
         <label className="setting-check"><input type="checkbox" checked={preferences.lyricsFocusMode ?? true} onChange={e => updatePreferences({lyricsFocusMode:e.target.checked})}/> Fokus-Karaoke mit aktueller Zeile und nächster Zeile</label>
         <label className="setting-check"><input type="checkbox" checked={preferences.lyricsWordHighlight ?? true} onChange={e => updatePreferences({ lyricsWordHighlight: e.target.checked })}/> Wörter einzeln hervorheben</label>
+        <fieldset><legend>V748 · Lyrics Performance Studio</legend>
+          <label className="setting-check"><input type="checkbox" checked={lyricsPerformanceV748.enabled} onChange={e=>updatePreferences({lyricsPerformanceV748:{...lyricsPerformanceV748,enabled:e.target.checked}})}/> Zusätzliche Lyrics-Inszenierung aktivieren</label>
+          <label>Gesamtstärke ({lyricsPerformanceV748.strength} %)<input type="range" min="0" max="100" step="5" value={lyricsPerformanceV748.strength} onChange={e=>updatePreferences({lyricsPerformanceV748:{...lyricsPerformanceV748,strength:Number(e.target.value)}})}/></label>
+          <label>Lesbarkeit / Kontrast ({lyricsPerformanceV748.readability} %)<input type="range" min="0" max="100" step="5" value={lyricsPerformanceV748.readability} onChange={e=>updatePreferences({lyricsPerformanceV748:{...lyricsPerformanceV748,readability:Number(e.target.value)}})}/></label>
+          <label>Wortakzente ({lyricsPerformanceV748.wordAccent} %)<input type="range" min="0" max="100" step="5" value={lyricsPerformanceV748.wordAccent} onChange={e=>updatePreferences({lyricsPerformanceV748:{...lyricsPerformanceV748,wordAccent:Number(e.target.value)}})}/></label>
+          <label>Hook-/Drop-Akzente ({lyricsPerformanceV748.hookAccent} %)<input type="range" min="0" max="100" step="5" value={lyricsPerformanceV748.hookAccent} onChange={e=>updatePreferences({lyricsPerformanceV748:{...lyricsPerformanceV748,hookAccent:Number(e.target.value)}})}/></label>
+          <small>Wortakzente nur mit verifizierten Wortzeiten. Hook-Akzente nur bei vorhandenen Songabschnitt-Signalen; kein erfundener Lyrics-Takt. Lesbarkeitsbegrenzungen gelten auch bei deaktivierter Bewegung.</small>
+        </fieldset>
         <small>Smart Lyrics Sync verwendet echte Wort-Zeitstempel, wenn LRCLIB sie liefert. Andernfalls werden die Wortzeiten aus der Zeilendauer geschätzt. Ohne Synchronisierung gibt es keine wortgenaue Karaoke-Anzeige. Reduzierte Bewegung deaktiviert starke Animationen.</small>
         <VisualLyricsStudioV379 />
       </fieldset>}
@@ -714,9 +987,9 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
         <BeatCalibrationAssistant />
       </fieldset>
       </>}
-      {tab === "diagnostics" && <><PerformanceControlCenterV261 /><PerformanceSessionAnalyzerV262 /><RenderDiagnosticsPanel /><LongRunStabilitySettingsV355 /><LongSessionMonitoringPanel /><AvatarFrameProfilerPanel /><LodContinuityDiagnosticsPanel /><AvatarAssetOptimizationStudio /><PerformanceBenchmark /><AudioDebugPanel /></>}
+      {tab === "diagnostics" && <><PerformanceControlCenterV261 /><PerformanceSessionAnalyzerV262 /><RenderDiagnosticsPanel /><PerformanceMemoryDashboardV770 /><LongRunStabilitySettingsV355 /><LongSessionMonitoringPanel /><AvatarFrameProfilerPanel /><LodContinuityDiagnosticsPanel /><AvatarAssetOptimizationStudio /><PerformanceBenchmark /><AudioDebugPanel /></>}
       {tab === "display" && <label className="setting-check"><input type="checkbox" checked={preferences.reducedMotion} onChange={e => updatePreferences({ reducedMotion: e.target.checked })}/> Reduce motion</label>}
-      {tab === "display" && <><UnifiedSettingsBackup /><BackupMigrationAssistant /><BackupIntegrityDiagnostics /></>}
+      {tab === "display" && <><PortableBackupV657 /><UnifiedSettingsBackup /><BackupMigrationAssistant /><BackupIntegrityDiagnostics /></>}
       {tab === "display" && <p className="settings-note">Without microphone, beat timing is synthetic and based on a genre tempo estimate, not actual Spotify beat data. With microphone, frequency analysis runs locally in your browser. Your preferences are saved on this device.</p>}
       {tab === "display" && <button className="settings-reset" onClick={() => { setMicrophone(false); updatePreferences({ rapExpressiveEnabledV425:false,rapExpressiveStrengthV425:65,rapDuetEnabledV416:false,rapDuetCameraV416:true,rapLyricsGestureEnabledV414:false,avatarRapLipEnabledV415:false,avatarRapLipPrecisionV415:70,avatarRapLipOffsetMsV415:0,avatarRapSyllableEnabledV419:false,avatarRapSyllableStrengthV419:65,avatarRapSyllableSmoothnessV419:70,rapSyllableEditsEnabledV420:false,rapAudioEnabledV423:false,rapAudioStrengthV423:45,rapAudioOffsetMsV423:0, visualizerMode: "avatar", lyricsVisible: true, avatarLipSyncEnabled: true, avatarLipSyncStrength: 90, rapPerformanceEditorV408:{enabled:false,head:100,gestures:100,verse:100,hook:100,kick:100,snare:100,lipSync:100}, avatarLipSyncMode: "lyrics", avatarVocalStyleV368:"auto", avatarFacialExpressionV368:55,avatarJawFollowV369:65,avatarFacialProfilesV370:{},avatarVocalCameraV369:"auto",avatarVocalCameraStrengthV369:55,avatarVocalBodyEnabledV371:true,avatarVocalBodyStrengthV371:60,avatarVocalEyeContactV371:true,avatarVocalGesturesV371:true, avatarVocalCoordinationEnabledV372:true,avatarVocalCoordinationStrengthV372:70,avatarVocalCoordinationOffsetMsV372:0,avatarVocalPerformanceModeV393:"off",avatarVocalPerformanceStrengthV393:55, avatarAdaptivePerformanceModeV375:"off",avatarAdaptivePerformanceStrengthV375:65,avatarVocalDuetModeV376:"off",avatarVocalDuetStrengthV376:60, avatarConcertDirectorModeV386:"off",avatarConcertDirectorStrengthV386:65,avatarConcertDirectorCameraV386:true,avatarConcertDirectorLightingV386:true,avatarVocalCameraModeV401:"off",avatarVocalCameraStrengthV401:55,avatarVisualDirectorModeV397:"off",avatarVisualDirectorStrengthV397:65,avatarCameraStudioV398:{enabled:false,holdMs:1150,scenes:{verse:{shot:"auto",distance:50,pan:0},hook:{shot:"auto",distance:50,pan:0},drop:{shot:"auto",distance:50,pan:0}}},avatarUnifiedModeV402:"off",avatarUnifiedStrengthV402:70,avatarUnifiedCameraV402:true,avatarUnifiedLightingV402:true,avatarUnifiedDanceV402:true,avatarUnifiedVocalV402:true,avatarExperienceModeV396:"off",avatarExperienceStrengthV396:65,avatarFestivalModeV394:"off",avatarFestivalStrengthV394:70,avatarFestivalCameraV394:true,avatarFestivalLightingV394:true,avatarFestivalAtmosphereV394:true,avatarFestivalLasersV394:false,avatarShowModeV387:"off",avatarShowStrengthV387:70,avatarShowCameraV387:true,avatarShowLightingV387:true,avatarShowAtmosphereV387:true,avatarManualVocalEnabledV385:false,avatarManualVocalCameraV385:true,avatarVocalAssignmentsV385:{}, avatarDuetCameraModeV377:"off",avatarDuetCameraStrengthV377:65,avatarLyricsCameraModeV378:"off",avatarLyricsCameraStrengthV378:70,avatarLyricsContrastV378:true, lyricsFocusMode: true, lyricsStyle: "kinetic", lyricsAnimationIntensity: 65, lyricsKineticPresetV382:"auto", lyricsKineticStrengthV382:65, lyricsKineticDropsV382:true, lyricsBeatReactive: true, lyricsReactiveIntensity: 60, lyricsKickReactive: true, lyricsBassReactive: true, lyricsDropReactive: true, lyricsWordHighlight: true, lyricsFontSize: 100, lyricsFontFamilyV379: "system", lyricsPosition: "center", lyricsGlow: 65, lyricsGradientFrom: "#79f7ff", lyricsGradientTo: "#d789ff", lyricsAnimationSpeed: 100, lyricsOffsetMs: 0, lyricsImmersiveEnabled: false, lyricsImmersiveSide: "right", lyricsImmersiveDepth: 45, reducedMotion: false, avatarModelId: "procedural", avatarScale: 1, avatarOffsetY: 0, avatarAnimationIntensity: 1, danceAggression: 0.5, danceVariation: 0.5, danceMotionStyle: "balanced", avatarMotionMode: "hybrid", avatarClipSpeed: 1, avatarCrossfadeSeconds: 0.35, avatarArmResponse: 1, avatarLegResponse: 1, avatarRigProfile: "auto", avatarDancePreset: "auto", autoAvatarByGenre: false, beatSensitivity: 1, beatCooldownMs: 180, beatSyncMode: "off", beatSyncOffsetMs: 0 }); }}>Reset preferences</button>}
       </div></div>

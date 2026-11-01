@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { DEFAULT_LAYER_WEIGHTS, DEFAULT_MOTION_DEBUG, readMotionDebugSettings, setMotionDebugSettings, configureMotionAutoPresets, transitionToMotionPreset, configureMotionMorphDuration, MORPH_DURATION_STORAGE_KEY, MOTION_DEBUG_EVENT, type MotionDebugLayer } from "./motionDebugControls";
 import { BUILTIN_MOTION_PRESETS, MOTION_AUTO_STORAGE_KEY, MOTION_PRESET_STORAGE_KEY, normalizePreset, parsePresetImport, type MotionLayerPreset, type PresetGenre } from "./motionLayerPresets";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { withPrivateGltfV769 } from "./privateGltfLifecycleV769";
 import { diagnoseAvatarRig, type RigDiagnosticReport } from "./avatarRigDiagnostics";
 
 export function DanceDebugger({ modelUrl, animationUrl }: { modelUrl: string | null; animationUrl?: string }) {
@@ -55,27 +55,21 @@ export function DanceDebugger({ modelUrl, animationUrl }: { modelUrl: string | n
   useEffect(() => {
     if (requested === 0 || !modelUrl) return;
     let cancelled = false;
-    const loader = new GLTFLoader();
-    const load = (url: string) => new Promise<Awaited<ReturnType<typeof loader.loadAsync>>>((resolve, reject) => loader.load(url, resolve, undefined, reject));
     setLoading(true); setError(""); setReport(null);
-    (async () => {
-      try {
-        const avatar = await load(modelUrl);
-        const imported = animationUrl ? await load(animationUrl) : null;
-        if (!cancelled) {
-          const embedded = diagnoseAvatarRig(avatar.scene, avatar.animations);
-          const external = imported ? diagnoseAvatarRig(avatar.scene, imported.animations, imported.scene) : null;
-          setReport(external ? {
-            ...embedded,
-            clips: [...embedded.clips.map(c => ({...c, name: `Eingebettet: ${c.name}`})), ...external.clips.map(c => ({...c, name: `Importiert: ${c.name}`}))],
-            findings: [...embedded.findings.filter(f => !f.title.startsWith("Keine Animationsclips") && f.title !== "Foot Sliding"),
-              ...external.findings.filter(f => !f.title.startsWith("Linkes Bein") && !f.title.startsWith("Rechtes Bein") && f.title !== "Skelett erkannt" && f.title !== "Foot Sliding") ,
-              { severity: "info" as const, title: "Foot Sliding", detail: "Nur im animierten Vorher/Nachher-Vergleich messbar; eine statische Analyse kann kein Fußgleiten bestätigen." }],
-          } : embedded);
-        }
-      } catch (e) { if (!cancelled) setError(e instanceof Error ? e.message : "GLB konnte nicht gelesen werden"); }
-      finally { if (!cancelled) setLoading(false); }
-    })();
+    void withPrivateGltfV769(modelUrl, async avatar => {
+      const embedded = diagnoseAvatarRig(avatar.scene, avatar.animations);
+      const external = animationUrl ? await withPrivateGltfV769(animationUrl, imported =>
+        diagnoseAvatarRig(avatar.scene, imported.animations, imported.scene)) : null;
+      return external ? {
+        ...embedded,
+        clips: [...embedded.clips.map(c => ({...c, name: `Eingebettet: ${c.name}`})), ...external.clips.map(c => ({...c, name: `Importiert: ${c.name}`}))],
+        findings: [...embedded.findings.filter(f => !f.title.startsWith("Keine Animationsclips") && f.title !== "Foot Sliding"),
+          ...external.findings.filter(f => !f.title.startsWith("Linkes Bein") && !f.title.startsWith("Rechtes Bein") && f.title !== "Skelett erkannt" && f.title !== "Foot Sliding"),
+          { severity: "info" as const, title: "Foot Sliding", detail: "Nur im animierten Vorher/Nachher-Vergleich messbar; eine statische Analyse kann kein Fußgleiten bestätigen." }],
+      } : embedded;
+    }).then(report => {if (!cancelled) setReport(report);})
+      .catch(e => {if (!cancelled) setError(e instanceof Error ? e.message : "GLB konnte nicht gelesen werden");})
+      .finally(() => {if (!cancelled) setLoading(false);});
     return () => { cancelled = true; };
   }, [modelUrl, animationUrl, requested]);
   return <div className="dance-debugger">

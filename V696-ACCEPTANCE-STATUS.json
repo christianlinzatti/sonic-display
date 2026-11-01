@@ -1,0 +1,732 @@
+{
+  "format": "sonic-v696-production-acceptance",
+  "schema": 1,
+  "version": "0.1.0-v696",
+  "status": "blocked",
+  "approved": false,
+  "manualSignoffRequired": true,
+  "createdAt": "2026-10-29T09:15:03.492Z",
+  "scope": "Deutschrap + Hardstyle/Hardtekk × 1/2/4 genuine GLB actors",
+  "reviewer": "",
+  "device": "",
+  "browser": "",
+  "scenarios": [
+    {
+      "id": "rap-solo",
+      "genre": "Deutschrap",
+      "actors": 1,
+      "status": "blocked",
+      "issues": [
+        "Kein V592-Livebericht vorhanden"
+      ],
+      "trackId": null,
+      "metrics": null,
+      "sceneMoments": [],
+      "screenshots": [],
+      "source": "V592 real-stage capture",
+      "manual": {
+        "genreConfirmed": false,
+        "notes": "",
+        "finished": 0,
+        "total": 12,
+        "failed": 0,
+        "checks": [
+          {
+            "id": "glb-and-rig",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "foot-contact",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "motion-transitions",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "lyrics-contrast",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "lyrics-head-separation",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "camera-framing",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "camera-variety",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "moving-heads-gobo-fog",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "performance-smoothness",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "long-song-dramaturgy",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "vocal-lip-sync",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "verse-hook-flow",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "rap-duet",
+      "genre": "Deutschrap",
+      "actors": 2,
+      "status": "blocked",
+      "issues": [
+        "Kein V592-Livebericht vorhanden"
+      ],
+      "trackId": null,
+      "metrics": null,
+      "sceneMoments": [],
+      "screenshots": [],
+      "source": "V592 real-stage capture",
+      "manual": {
+        "genreConfirmed": false,
+        "notes": "",
+        "finished": 0,
+        "total": 14,
+        "failed": 0,
+        "checks": [
+          {
+            "id": "glb-and-rig",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "foot-contact",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "motion-transitions",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "lyrics-contrast",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "lyrics-head-separation",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "camera-framing",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "camera-variety",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "moving-heads-gobo-fog",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "performance-smoothness",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "long-song-dramaturgy",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "vocal-lip-sync",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "verse-hook-flow",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "ensemble-spacing",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "performer-handoffs",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "rap-quartet",
+      "genre": "Deutschrap",
+      "actors": 4,
+      "status": "blocked",
+      "issues": [
+        "Kein V592-Livebericht vorhanden"
+      ],
+      "trackId": null,
+      "metrics": null,
+      "sceneMoments": [],
+      "screenshots": [],
+      "source": "V592 real-stage capture",
+      "manual": {
+        "genreConfirmed": false,
+        "notes": "",
+        "finished": 0,
+        "total": 15,
+        "failed": 0,
+        "checks": [
+          {
+            "id": "glb-and-rig",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "foot-contact",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "motion-transitions",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "lyrics-contrast",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "lyrics-head-separation",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "camera-framing",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "camera-variety",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "moving-heads-gobo-fog",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "performance-smoothness",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "long-song-dramaturgy",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "vocal-lip-sync",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "verse-hook-flow",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "ensemble-spacing",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "performer-handoffs",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "four-performer-legibility",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "tekk-solo",
+      "genre": "Hardstyle/Hardtekk",
+      "actors": 1,
+      "status": "blocked",
+      "issues": [
+        "Kein V592-Livebericht vorhanden"
+      ],
+      "trackId": null,
+      "metrics": null,
+      "sceneMoments": [],
+      "screenshots": [],
+      "source": "V592 real-stage capture",
+      "manual": {
+        "genreConfirmed": false,
+        "notes": "",
+        "finished": 0,
+        "total": 12,
+        "failed": 0,
+        "checks": [
+          {
+            "id": "glb-and-rig",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "foot-contact",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "motion-transitions",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "lyrics-contrast",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "lyrics-head-separation",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "camera-framing",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "camera-variety",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "moving-heads-gobo-fog",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "performance-smoothness",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "long-song-dramaturgy",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "kick-drop-choreography",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "energy-build-drop",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "tekk-duet",
+      "genre": "Hardstyle/Hardtekk",
+      "actors": 2,
+      "status": "blocked",
+      "issues": [
+        "Kein V592-Livebericht vorhanden"
+      ],
+      "trackId": null,
+      "metrics": null,
+      "sceneMoments": [],
+      "screenshots": [],
+      "source": "V592 real-stage capture",
+      "manual": {
+        "genreConfirmed": false,
+        "notes": "",
+        "finished": 0,
+        "total": 14,
+        "failed": 0,
+        "checks": [
+          {
+            "id": "glb-and-rig",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "foot-contact",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "motion-transitions",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "lyrics-contrast",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "lyrics-head-separation",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "camera-framing",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "camera-variety",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "moving-heads-gobo-fog",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "performance-smoothness",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "long-song-dramaturgy",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "kick-drop-choreography",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "energy-build-drop",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "ensemble-spacing",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "performer-handoffs",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "tekk-quartet",
+      "genre": "Hardstyle/Hardtekk",
+      "actors": 4,
+      "status": "blocked",
+      "issues": [
+        "Kein V592-Livebericht vorhanden"
+      ],
+      "trackId": null,
+      "metrics": null,
+      "sceneMoments": [],
+      "screenshots": [],
+      "source": "V592 real-stage capture",
+      "manual": {
+        "genreConfirmed": false,
+        "notes": "",
+        "finished": 0,
+        "total": 15,
+        "failed": 0,
+        "checks": [
+          {
+            "id": "glb-and-rig",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "foot-contact",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "motion-transitions",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "lyrics-contrast",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "lyrics-head-separation",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "camera-framing",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "camera-variety",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "moving-heads-gobo-fog",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "performance-smoothness",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "long-song-dramaturgy",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "kick-drop-choreography",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "energy-build-drop",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "ensemble-spacing",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "performer-handoffs",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          },
+          {
+            "id": "four-performer-legibility",
+            "status": "pending",
+            "note": "",
+            "songTimeSec": null
+          }
+        ]
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "genre": "Deutschrap",
+      "comparable": false,
+      "reason": "Für FPS-Vergleich denselben Track, dieselbe Auflösung und denselben Aufnahmemodus bei 1/2/4 Avataren verwenden.",
+      "profiles": [
+        {
+          "actors": 1,
+          "measured": false,
+          "fps": null,
+          "p95Ms": null,
+          "relativeP95ToSolo": null
+        },
+        {
+          "actors": 2,
+          "measured": false,
+          "fps": null,
+          "p95Ms": null,
+          "relativeP95ToSolo": null
+        },
+        {
+          "actors": 4,
+          "measured": false,
+          "fps": null,
+          "p95Ms": null,
+          "relativeP95ToSolo": null
+        }
+      ]
+    },
+    {
+      "genre": "Hardstyle/Hardtekk",
+      "comparable": false,
+      "reason": "Für FPS-Vergleich denselben Track, dieselbe Auflösung und denselben Aufnahmemodus bei 1/2/4 Avataren verwenden.",
+      "profiles": [
+        {
+          "actors": 1,
+          "measured": false,
+          "fps": null,
+          "p95Ms": null,
+          "relativeP95ToSolo": null
+        },
+        {
+          "actors": 2,
+          "measured": false,
+          "fps": null,
+          "p95Ms": null,
+          "relativeP95ToSolo": null
+        },
+        {
+          "actors": 4,
+          "measured": false,
+          "fps": null,
+          "p95Ms": null,
+          "relativeP95ToSolo": null
+        }
+      ]
+    }
+  ],
+  "issues": [
+    "rap-solo: Live-Capture fehlt oder wurde abgewiesen",
+    "rap-solo: Genre nicht manuell bestätigt",
+    "rap-solo: 12 Sichtprüfungen offen",
+    "rap-duet: Live-Capture fehlt oder wurde abgewiesen",
+    "rap-duet: Genre nicht manuell bestätigt",
+    "rap-duet: 14 Sichtprüfungen offen",
+    "rap-quartet: Live-Capture fehlt oder wurde abgewiesen",
+    "rap-quartet: Genre nicht manuell bestätigt",
+    "rap-quartet: 15 Sichtprüfungen offen",
+    "tekk-solo: Live-Capture fehlt oder wurde abgewiesen",
+    "tekk-solo: Genre nicht manuell bestätigt",
+    "tekk-solo: 12 Sichtprüfungen offen",
+    "tekk-duet: Live-Capture fehlt oder wurde abgewiesen",
+    "tekk-duet: Genre nicht manuell bestätigt",
+    "tekk-duet: 14 Sichtprüfungen offen",
+    "tekk-quartet: Live-Capture fehlt oder wurde abgewiesen",
+    "tekk-quartet: Genre nicht manuell bestätigt",
+    "tekk-quartet: 15 Sichtprüfungen offen",
+    "Prüfer, Gerät und Browser im Prüfblatt fehlen",
+    "Nicht alle sechs Performance-Profile sind vergleichbar",
+    "Kein manuelles Prüfblatt: npm run audit:v696:init ausführen"
+  ],
+  "limitations": [
+    "Submitted local V592 JSON/PNGs are evidence to inspect, not tamper-proof proof of authenticity.",
+    "Lyrics legibility, vocal lip sync, natural dance, rhythm alignment, fog and lighting require independent human watching.",
+    "Browser rAF metrics are not GPU frame time, audio latency, thermals, or performance on an untested Raspberry Pi.",
+    "Even a complete six-scenario checklist is not an automatic production release. V695 build/browser gate remains independent."
+  ]
+}

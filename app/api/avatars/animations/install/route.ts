@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, sameOrigin } from "@/lib/avatarAdmin";
-import { blobModels, readAvatarConfig, writeAvatarConfig, useBlob } from "@/lib/avatarBlob";
+import { blobModels, updateAvatarMetadata, useBlob } from "@/lib/avatarBlob";
 import { defaultAvatarModels } from "@/config/avatarModels.default";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
@@ -29,9 +29,7 @@ export async function POST(req: NextRequest) {
       const available = useBlob ? (await blobModels()).map(b => b.pathname.split("/").pop()) : await readdir(path.join(process.cwd(), "public", "avatars"));
       if (!available.includes(key)) return NextResponse.json({ error: "Modell nicht gefunden" }, { status: 404 });
     }
-    const config = await readAvatarConfig();
-    config[key] = { ...(config[key] ?? {}), animationUrl };
-    await writeAvatarConfig(config);
+    await updateAvatarMetadata(key,{animationUrl});
     return NextResponse.json({ ok: true, modelId, animationUrl });
   } catch (error) {
     console.error("Motion installer:", error);

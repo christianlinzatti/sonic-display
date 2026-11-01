@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { withPrivateGltfV769 } from "./privateGltfLifecycleV769";
 import { measureAvatarAnatomy, type AnatomyMeasurement } from "./avatarAnatomyCalibration";
 
 /** Read-only, model-space landmark diagnostics. Never changes or persists the source GLB. */
@@ -12,12 +12,10 @@ export function AvatarAnatomyStudio({modelUrl}: {modelUrl: string | null}) {
     let cancelled = false;
     setReport(null); setError(""); setLoading(Boolean(modelUrl));
     if (!modelUrl) return;
-    new GLTFLoader().load(modelUrl, gltf => {
-      if (cancelled) return;
-      try { setReport(measureAvatarAnatomy(gltf.scene)); }
-      catch (e) { setError(e instanceof Error ? e.message : String(e)); }
-      finally { setLoading(false); }
-    }, undefined, e => { if (!cancelled) { setError(String(e)); setLoading(false); } });
+    void withPrivateGltfV769(modelUrl, gltf => measureAvatarAnatomy(gltf.scene))
+      .then(result => { if (!cancelled) setReport(result); })
+      .catch(e => { if (!cancelled) setError(e instanceof Error ? e.message : String(e)); })
+      .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [modelUrl]);
   const fmt = (n: number | null) => n === null ? "Nicht messbar" : `${n.toFixed(3)} Modelleinheiten`;

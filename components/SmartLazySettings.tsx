@@ -1,7 +1,10 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { useMusic } from "@/context/MusicContext";
+import {clearVocalEnvelopeOnTrackChangeV661} from "@/components/visualizer/vocalAnalysisStudioV661";
 import {clearVisemeOnTrackChangeV644} from "@/components/visualizer/phonemeLipSyncV644";
+import {clearNaturalDuetOnTrackChangeV664} from "@/components/visualizer/naturalDuetFeatureInteractionV664";
+import {clearDeutschrapPerformanceOnTrackChangeV663} from "@/components/visualizer/expressiveDeutschrapPerformanceV663";
 import dynamic from "next/dynamic";
 import { recordLoadMetric } from "@/services/loading/loadingMetrics";
 
@@ -27,7 +30,7 @@ export function SmartLazySettings() {
   const {track}=useMusic();
   const trackId=track?.id??'';
   // This lightweight shell stays mounted while its heavy popover is closed.
-  useEffect(()=>{clearVisemeOnTrackChangeV644(trackId);},[trackId]);
+  useEffect(()=>{clearVisemeOnTrackChangeV644(trackId);clearVocalEnvelopeOnTrackChangeV661(trackId);clearDeutschrapPerformanceOnTrackChangeV663(trackId);clearNaturalDuetOnTrackChangeV664(trackId);},[trackId]);
   const [requested, setRequested] = useState(false);
   const warm = useCallback(() => { void preloadSettings().catch(() => undefined); }, []);
   if (requested) return <LazySettingsPanel initiallyOpen />;

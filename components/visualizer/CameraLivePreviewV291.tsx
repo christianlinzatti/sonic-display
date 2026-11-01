@@ -1,9 +1,11 @@
 "use client";
+import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { Line, OrbitControls, useGLTF } from "@react-three/drei";
 import { Component, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimationMixer, Box3, PerspectiveCamera, Vector3, type AnimationClip } from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { withPrivateGltfV769 } from "./privateGltfLifecycleV769";
+import { disposeClonedAvatarSkeletonsV654 } from "./disposeClonedAvatarSkeletonsV654";
 import { retargetHumanoidClips, readRetargetCalibration } from "./avatarAnimationRetarget";
 import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUtils.js";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -15,6 +17,7 @@ type Props = { pathPoints?: CameraPose[]; pose: CameraPose; onPoseChange: (pose:
 /** Clone the rig: preview must never mutate the live avatar or its animations. */
 function LoadedAvatar({ url, motionUrl, playing = false, speed = 1, seek, onMotionProgress }: { url: string; motionUrl?: string | null; playing?: boolean; speed?: number; seek?: MotionSeek; onMotionProgress?: (seconds: number, duration: number) => void }) {
   const { scene, animations } = useGLTF(url);
+  usePreviewGltfCacheV654(url);
   const cloned = useMemo(() => {
     const rig = cloneSkinnedScene(scene);
     // Normalize height and floor contact, preserving model orientation.
@@ -33,12 +36,8 @@ function LoadedAvatar({ url, motionUrl, playing = false, speed = 1, seek, onMoti
     let cancelled = false;
     setExternalClips([]);
     if (!motionUrl) return;
-    const loader = new GLTFLoader();
-    loader.loadAsync(motionUrl).then(gltf => {
-      if (cancelled) return;
-      const converted = retargetHumanoidClips(gltf.animations, gltf.scene, cloned, readRetargetCalibration(url));
-      setExternalClips(converted.clips);
-    }).catch(error => {if (!cancelled) console.warn("V293: Motion unavailable", error);});
+    withPrivateGltfV769(motionUrl,gltf=>retargetHumanoidClips(gltf.animations,gltf.scene,cloned,readRetargetCalibration(url)).clips)
+      .then(clips => {if(!cancelled)setExternalClips(clips);}).catch(error => {if (!cancelled) console.warn("V293: Motion unavailable", error);});
     return () => { cancelled = true; };
   }, [motionUrl, cloned, url]);
   const selectedClip = motionUrl ? externalClips[0] : animations[0];
@@ -73,7 +72,7 @@ function LoadedAvatar({ url, motionUrl, playing = false, speed = 1, seek, onMoti
       progressCallback.current?.(time, selectedClip.duration);
     }
   });
-  useEffect(() => () => { mixer.stopAllAction(); mixer.uncacheRoot(cloned); }, [mixer, cloned]);
+  useEffect(() => () => { mixer.stopAllAction(); mixer.uncacheRoot(cloned); disposeClonedAvatarSkeletonsV654(cloned); }, [mixer, cloned]);
   return <primitive object={cloned} dispose={null} />;
 }
 

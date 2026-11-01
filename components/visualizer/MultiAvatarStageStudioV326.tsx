@@ -6,6 +6,7 @@ import {GroupDanceSyncControlsV327} from './GroupDanceSyncControlsV327';
 import {LowPoseControlsV481} from './LowPoseControlsV481';
 import {GroupMotionSyncControlsV328} from './GroupMotionSyncControlsV328';
 import {GroupMotionPhraseControlsV329} from './GroupMotionPhraseControlsV329';
+import {AdvancedEnsembleControlsV760} from './AdvancedEnsembleControlsV760';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
 import {avatarModels,getAvatarModel} from './avatarModels';
 import {ANALYSIS_EVENT_V318,readTrackAnalysisV318,type TrackAnalysisV318} from '@/services/musicAnalysis/trackAnalysisV318';
@@ -84,6 +85,7 @@ export function MultiAvatarStageStudioV326(){
   <GroupDanceSyncControlsV327 seconds={seconds} count={settings.count} bpm={settings.bpm} pose={pose} analysis={analysis} playing={playing||follow&&isPlaying} trackMatches={!analysis||analysis.trackId===trackId}/>
   <GroupMotionSyncControlsV328 seconds={seconds} count={settings.count} bpm={settings.bpm} analysis={analysis} playing={playing||follow&&isPlaying} songSync={settings.songSync} />
   <GroupMotionPhraseControlsV329 />
+  <AdvancedEnsembleControlsV760 count={settings.count} seconds={seconds} bpm={analysis?.tempo??settings.bpm} section={pose?.drop?"drop":pose?.focus===-1?"hook":"verse"} />
   <div className="ensemble-studio-v325-controls">{Array.from({length:settings.count},(_,i)=><label key={i}>{labels[i]}-Modell
     <select value={i<2?'':settings.modelIds[i]} disabled={i<2} onChange={e=>put({...settings,modelIds:settings.modelIds.map((v,j)=>i===j?e.target.value:v)})}>
      {i<2?<option value="">Einstellung des aktuellen Avatars</option>:<><option value="">Aktuelles {i===2?'Lead-':'Partner-'}Modell übernehmen</option>{selectable.map(m=><option key={m.id} value={m.id}>{m.label}</option>)}</>}

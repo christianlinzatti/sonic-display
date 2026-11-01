@@ -1,0 +1,36 @@
+name: V832 Continuous Technical Validation
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-technical-gate:
+    name: Full tests TypeScript and Next / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Reproducible dependency installation
+        run: npm ci --no-audit --no-fund
+      - name: Full regressions, TypeScript, real production build
+        run: npm run verify:production:v831
+      - name: Upload technical gate output even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v832-${{ matrix.os }}-technical-report
+          path: |
+            v831-production-gate-result.json
+            v831-build-readiness-result.json
+          if-no-files-found: warn
+# Browser/WebGL/GPU and real GLB concert-playthroughs require separate observed acceptance.

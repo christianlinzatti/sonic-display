@@ -1,6 +1,7 @@
 /** V365 daily cron: encrypted server-side Spotify reauthorization and real Web Push. */
 import {NextRequest,NextResponse} from 'next/server';
 import webpush from 'web-push';
+import {randomUUID} from 'node:crypto';
 import {pushConfigured,pushSecrets,pushKeys,redis,readPushAccount,savePushAccount,listPushSubscriptions,deletePushSubscription,revokePushAccount} from '@/lib/push-storage-v365';
 import {isSafeCronSecret,pushDecrypt,pushEncrypt,normalizeStoredAccount,selectFreshPushReleases,mergePushSeen,artistMatchesPushGenres,PUSH_FRESH_DAYS_V365} from '@/lib/push-v365';
 import {normalizeRadarFollowed,normalizeRadarReleases,radarArtistAlbumsPath,radarFollowedPath,mergeRadarReleases} from '@/lib/release-radar-v362';
@@ -55,30 +56,34 @@ async function scanOne(userId:string):Promise<'baseline'|'sent'|'empty'|'failed'
   const notification={title:'Neue Musik auf Sonic Display',body:text,albumId:release.id,icon:release.coverUrl??undefined,tag:`sonic-release-${release.id}`};
   const delivery=await Promise.all(subscriptions.map(async sub=>{
    try{
+    const deliveredKey=`${pushKeys.sub(userId,sub.key)}:delivered:${release.id}`;
+    if(await redis('GET',deliveredKey))return true;
     await webpush.sendNotification(sub.subscription,JSON.stringify(notification),{TTL:86400,timeout:4000,urgency:'normal'});
+    await redis('SET',deliveredKey,'1','EX',2592000);
     return true;
    }catch(error){
     const status=typeof error==='object'&&error!==null&&'statusCode' in error?(error as {statusCode?:number}).statusCode:undefined;
-    if(status===404||status===410)await deletePushSubscription(userId,sub.key);
+    if(status===404||status===410){await deletePushSubscription(userId,sub.key);return true;}
     return false;
    }
   }));
-  good=delivery.some(Boolean);
+  good=delivery.every(Boolean);
   if(good){delivered=true;sent.push(release.id);}
  }
  account.seenIds=mergePushSeen(account.seenIds,[...oldOnly,...sent]);
- account.after=followed.hasMore?followed.cursor:null;
+ if(sent.length===newItems.length)account.after=followed.hasMore?followed.cursor:null;
  await savePushAccount(userId,account);
  return delivered?'sent':'empty';
 }
 export async function GET(req:NextRequest){
  if(!isSafeCronSecret(process.env.CRON_SECRET,req.headers.get('authorization')))return json({code:'unauthorized'},401);
  if(!pushConfigured())return json({code:'not_configured'},503);
- const lock=await redis('SET',pushKeys.cronLock,'1','EX',55,'NX');
+ const owner=randomUUID();
+ const lock=await redis('SET',pushKeys.cronLock,owner,'EX',55,'NX');
  if(lock!=='OK')return json({code:'already_running'},409);
  try{
   const usersRaw=await redis('SMEMBERS',pushKeys.users);
-  const users=Array.isArray(usersRaw)?usersRaw.filter((v):v is string=>typeof v==='string'&&/^[0-9a-f]{64}$/.test(v)).slice(0,100):[];
+  const users=Array.isArray(usersRaw)?usersRaw.filter((v):v is string=>typeof v==='string'&&/^[0-9a-f]{64}$/.test(v)).sort():[];
   if(users.length===0)return json({checked:0,baseline:0,sent:0,failed:0});
   // Round-robin across daily cron runs; do not issue an unbounded number of Spotify API requests.
   const rotation=Number(await redis('INCR',pushKeys.rotation));
@@ -93,5 +98,5 @@ export async function GET(req:NextRequest){
    stats.checked++;if(status==='baseline')stats.baseline++;else if(status==='sent')stats.sent++;else if(status==='failed')stats.failed++;
   }
   return json(stats);
- }catch{return json({code:'cron_unavailable'},503);}finally{await redis('DEL',pushKeys.cronLock).catch(()=>{});}
+ }catch{return json({code:'cron_unavailable'},503);}finally{await redis('EVAL',"if redis.call('GET',KEYS[1]) == ARGV[1] then return redis.call('DEL',KEYS[1]) else return 0 end",1,pushKeys.cronLock,owner).catch(()=>{});}
 }

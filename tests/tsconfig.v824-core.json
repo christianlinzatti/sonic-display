@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "baseUrl": "..",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "typeRoots": [
+      "./v789-empty-types"
+    ]
+  },
+  "files": [
+    "../components/visualizer/concertFxStudioV810.ts",
+    "../components/visualizer/smartFxShowDirectorV824.ts",
+    "../components/visualizer/visualFxTimelineV823.ts"
+  ]
+}

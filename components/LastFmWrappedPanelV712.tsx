@@ -1,0 +1,26 @@
+'use client';
+import {useMemo,useState} from 'react';
+import type {LastFmEventV706} from '@/lib/lastfm-history-v706';
+import {lastFmWrappedV712,lastFmWrappedYearsV712} from '@/lib/lastfm-wrapped-v712';
+import type {V711TimeZone} from '@/lib/lastfm-intelligence-v711';
+/** V712: read-only annual Wrapped, reuses already loaded and account-scoped Last.fm archive. */
+export function LastFmWrappedPanelV712({events}:{events:readonly LastFmEventV706[]}){
+ const [selected,setSelected]=useState<number|null>(null);
+ const [zone,setZone]=useState<V711TimeZone>('Europe/Vienna');
+ const years=useMemo(()=>lastFmWrappedYearsV712(events,new Date(),zone),[events,zone]);
+ const year=selected!==null&&years.includes(selected)?selected:years[0];
+ const data=useMemo(()=>lastFmWrappedV712(events,year,new Date(),zone),[events,year,zone]);
+ const max=Math.max(1,...data.months.map(x=>x.plays));
+ return <section className="lastfm-wrapped-v712" aria-label="Last.fm Musik-Jahresrückblick">
+  <header className="lastfm-wrapped-head-v712"><div><span className="recent-insight-kicker-v673">LAST.FM / PERSONAL MUSIC WRAPPED · V712</span><h4>Dein Musikjahr {data.year}</h4><p>Die Geschichte deiner lokal gespeicherten Scrobbles – kein vollständiges Last.fm-Jahr und keine Schätzung der Hörzeit.</p></div>
+   <div className="lastfm-wrapped-controls-v712"><label>Musikjahr <select value={year} onChange={(e:{target:{value:string}})=>setSelected(Number(e.target.value))}>{years.map(x=><option key={x} value={x}>{x}</option>)}</select></label><label>Zeitzone <select value={zone} onChange={(e:{target:{value:string}})=>setZone(e.target.value as V711TimeZone)}><option value="Europe/Vienna">Wien (MEZ/MESZ)</option><option value="UTC">UTC</option></select></label></div>
+  </header>
+  <div className="lastfm-wrapped-metrics-v712"><div><strong>{data.plays.toLocaleString('de-AT')}</strong><span>Scrobbles</span></div><div><strong>{data.artists.toLocaleString('de-AT')}</strong><span>Künstler</span></div><div><strong>{data.songs.toLocaleString('de-AT')}</strong><span>Unterschiedliche Songs</span></div><div><strong>{data.activeDays.toLocaleString('de-AT')}</strong><span>Aktive Tage</span></div></div>
+  {!data.plays&&<p role="status" className="lastfm-wrapped-empty-v712">Für {data.year} sind keine Scrobbles im lokalen Archiv enthalten. Du kannst ältere Last.fm-Ereignisse importieren oder ein anderes Jahr auswählen.</p>}
+  {!!data.plays&&<div className="lastfm-wrapped-highlights-v712"><article><span>Dein Top-Künstler</span><strong>{data.topArtists[0]?.artist}</strong><small>{data.topArtists[0]?.plays} erfasste Wiedergaben</small></article><article><span>Dein Repeat-Song</span><strong>{data.topSongs[0]?.title}</strong><small>{data.topSongs[0]?.artist} · {data.topSongs[0]?.plays}×</small></article><article><span>Dein aktivster Monat</span><strong>{data.mostActiveMonth?.label} {data.year}</strong><small>{data.mostActiveMonth?.plays} Scrobbles</small></article></div>}
+  <section className="lastfm-wrapped-card-v712"><h5>Dein Jahr in zwölf Monaten</h5><p>Jeder Balken zeigt erfasste Wiedergaben – Monate ohne Treffer bleiben sichtbar.</p><div className="lastfm-wrapped-months-v712" role="img" aria-label={`Monatliche Scrobbles ${data.year} in ${zone==='UTC'?'UTC':'Wiener Ortszeit'}`}>{data.months.map(m=><div key={m.month} title={`${m.label}: ${m.plays} Scrobbles, ${m.artists} Künstler, ${m.songs} Songs`}><strong>{m.plays}</strong><i style={{height:`${m.plays?Math.max(3,Math.round(100*m.plays/max)):0}px`}}/><span>{m.label}</span></div>)}</div></section>
+  <div className="lastfm-wrapped-columns-v712"><section className="lastfm-wrapped-card-v712"><h5>Top 10 Künstler</h5><ol>{data.topArtists.map(a=><li key={a.artist}><span>{a.artist}<small>{a.distinctSongs} Songs</small></span><strong>{a.plays}×</strong></li>)}</ol>{!data.topArtists.length&&<p>Keine Künstler im ausgewählten Jahr.</p>}</section><section className="lastfm-wrapped-card-v712"><h5>Top 10 Songs</h5><ol>{data.topSongs.map((s,i)=><li key={`${s.artist}:${s.title}:${i}`}><span>{s.title}<small>{s.artist}</small></span><strong>{s.plays}×</strong></li>)}</ol>{!data.topSongs.length&&<p>Keine Songs im ausgewählten Jahr.</p>}</section></div>
+  {!!data.topAlbums.length&&<section className="lastfm-wrapped-card-v712"><h5>Top-Alben</h5><ol>{data.topAlbums.map((a,i)=><li key={`${a.artist}:${a.album}:${i}`}><span>{a.album}<small>{a.artist}</small></span><strong>{a.plays}×</strong></li>)}</ol><p>Nur Einträge mit einem gültigen Albumnamen werden berücksichtigt.</p></section>}
+  <p className="lastfm-wrapped-disclaimer-v712"><strong>Hinweis zur Datenabdeckung:</strong> {data.isCurrentYear?'Das laufende Jahr ist noch nicht abgeschlossen. ':''}{data.archiveAtLimit?'Die frühere Browser-Ablage war auf 8.000 Einträge begrenzt; im IndexedDB-Langzeitarchiv gibt es diese feste Grenze nicht. Bei einer noch unvollständigen Migration oder Importhistorie könnten ältere Scrobbles fehlen. ':''}Auch bei weniger als 8.000 Einträgen können frühere oder noch nicht importierte Wiedergaben fehlen. Der Jahresvergleich {data.previousYearInArchive?`mit ${data.year-1} (${data.previousYearPlays} archivierte Scrobbles)`:'mit dem Vorjahr'} ist deshalb nicht als vollständiger Hörvergleich zu verstehen. Das Studio schreibt keine Daten und sendet keine Scrobbles an Last.fm.</p>
+ </section>;
+}

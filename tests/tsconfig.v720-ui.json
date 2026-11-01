@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": [],
+    "noEmit": true,
+    "jsx": "preserve"
+  },
+  "files": [
+    "../components/LastFmDiscoveryTimelinePanelV720.tsx",
+    "../components/LastFmHistoryPanelV706.tsx",
+    "../lib/lastfm-discovery-timeline-v720.ts",
+    "stubs/v701-react-jsx.d.ts"
+  ],
+  "include": [],
+  "exclude": []
+}

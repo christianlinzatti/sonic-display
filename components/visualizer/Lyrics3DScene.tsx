@@ -1,4 +1,5 @@
 "use client";
+import {planLyricsPerformanceV748,lyricWordAccentV748} from "./lyricsPerformanceStudioV748";
 import type {SmartStageCueV351} from "@/services/stageContent/smartStageCompositionV351";
 import { Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
@@ -9,6 +10,7 @@ import { planCinematicLyricsExperienceV501, lyricWordAccentV501 } from "./cinema
 import { planCinematicLyricsExperienceV525 } from "./cinematicLyricsExperienceV525";
 import { planCinematicLyricsV541, planCinematicWordV541 } from "./cinematicLyricsExperienceV541";
 import { planCinematicLyricsV549, planCinematicWordV549 } from "./cinematicLyricsExperienceV549";
+import {planCinematicLyricsV688,cinematicLyricWordAccentV688} from "./cinematicLyricsV688";
 import {planBeautifulLyricsV634,beautifulLyricWordAccentV634} from "./beautifulLyricsV634";
 import {planLyricReadabilityV578} from "./beautifulLyricsV578";
 import {concertLyricDirectionV528} from "./cinematicConcertCoordinationV528";
@@ -117,6 +119,22 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
       activeCaptionV541?.backdropOpacity??0,activeCaptionV477?.backdropOpacity??.72),
     existing3DWidth:activeCaptionV525?.max3DWidth??2.7,intensity,
   });
+  // V688 uses the exact same bounded planner as the existing 2D fallback.
+  const stageLyricCinemaV688=planCinematicLyricsV688({line:lines[index],
+    nextLineStart:lines[index+1]?.startMs,progressMs:scene.progressMs,
+    playing:scene.playing,synchronized:scene.lyrics.synced,reducedMotion,
+    wordHighlight:scene.wordHighlight,immersive:true,
+    avatarCount:scene.avatarCountV477??1,
+    existingWidthCh:activeStageLyricV634.widthCh,
+    existing3DWidth:activeStageLyricV634.max3DWidth,
+    existingPlateOpacity:activeStageLyricV634.plateOpacity,intensity,
+  });
+  const studioV748=planLyricsPerformanceV748({line:lines[index],nextLineStart:lines[index+1]?.startMs,
+    progressMs:scene.progressMs,playing:scene.playing,synchronized:scene.lyrics.synced,reducedMotion,
+    wordHighlight:scene.wordHighlight,immersive:true,avatarCount:scene.avatarCountV477??1,
+    section:scene.sectionV748,cameraFocus:scene.cameraFocusV748,
+    existingPlateOpacity:activeStageLyricV634.plateOpacity,
+    existing3DWidth:stageLyricCinemaV688.max3DWidth,settings:scene.performanceV748});
   const baseSize = .135 * clamp(scene.fontScale / 100, .6, 1.8);
   useFrame(({ clock }, dt) => {
     if (!root.current) return;
@@ -132,7 +150,7 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
     {/* V367: stage-space translucent caption plate for legibility over lighting/fog. */}
     <mesh position={[(right ? 1 : -1) * (1.22 + depth * .20) + (composition?.lyricsOffsetX ?? 0), 0, -.96 - depth * .65]} renderOrder={8}>
       <planeGeometry args={[activeCaptionV501?.cast===4 ? 2.42 : 2.7, tier === "low" ? .53 : 1.16]} />
-      <meshBasicMaterial color="#091022" transparent opacity={clamp(Math.max(activeCaptionV549?.plateOpacity??activeCaptionV541?.backdropOpacity??activeCaptionV525?.plateOpacity??activeCaptionV501?.plateOpacity??.74,activeCaptionV477?.backdropOpacity??.72,activeStageLyricV634.plateOpacity,.64+plateStrengthV378*.25)+concertAccentV502*.32+lyricsDirectionV528.plateBoost)} depthWrite={false} depthTest={false} />
+      <meshBasicMaterial color="#091022" transparent opacity={clamp(Math.max(activeCaptionV549?.plateOpacity??activeCaptionV541?.backdropOpacity??activeCaptionV525?.plateOpacity??activeCaptionV501?.plateOpacity??.74,activeCaptionV477?.backdropOpacity??.72,activeStageLyricV634.plateOpacity,stageLyricCinemaV688.plateOpacity,studioV748.plateOpacity,.64+plateStrengthV378*.25)+concertAccentV502*.32+lyricsDirectionV528.plateBoost)} depthWrite={false} depthTest={false} />
     </mesh>
     {visible.map(i => {
       const line = lines[i];
@@ -190,11 +208,11 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
       const useWordMeshes = current && visualV461.allowWordMeshes && visualV477.allowWordMeshes &&
         tokens.length <= wordLimit;
       const positions = useWordMeshes ? layoutWords(tokens, size,
-        lyricPolishV634.max3DWidth) : [];
+        Math.min(lyricPolishV634.max3DWidth,stageLyricCinemaV688.max3DWidth,studioV748.max3DWidth)) : [];
       const shouldHighlight = scene.wordHighlight && visualV477.timingMode === "verified-word" && current;
       return <group key={`${i}-${line.startMs}`} position={[x, y + (current ? -visualV501.lineOffsetPx * .001 : 0), z]}>
         {!useWordMeshes && <WordText text={line.text || "♪"} size={size} color={current ? from : "#8b93ad"}
-          opacity={current ? visualV501.reveal : visualV477.focusOpacity} maxWidth={Math.min(visualV477.max3DWidth,lyricPolishV634.max3DWidth)} outline={tier === "low" ? 0 : current ? .002+plateStrengthV378*.002+concertAccentV502*.006 : 0} outlineColor={to} />}
+          opacity={current ? visualV501.reveal : visualV477.focusOpacity} maxWidth={Math.min(visualV477.max3DWidth,Math.min(lyricPolishV634.max3DWidth,stageLyricCinemaV688.max3DWidth,studioV748.max3DWidth))} outline={tier === "low" ? 0 : current ? .002+plateStrengthV378*.002+concertAccentV502*.006 : 0} outlineColor={to} />}
         {positions.map((token, wi) => {
           const timed = line.words?.[wi];
           const next = line.words?.[wi + 1];
@@ -223,13 +241,21 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
           const accentV501 = timed ? lyricWordAccentV501({progressMs:scene.progressMs,
             startMs:timed.startMs,endMs:wordEnd,verifiedWordTiming:shouldHighlight,
             playing:scene.playing,reducedMotion}) * visualV501.wordMotion * visualV526.wordMotionGain*lyricsDirectionV528.motionGain : 0;
+          const studioAccentV748=timed&&current?lyricWordAccentV748({line,nextLineStart:lines[i+1]?.startMs,
+            wordIndex:wi,progressMs:scene.progressMs,playing:scene.playing,reducedMotion,plan:studioV748}):0;
           const lit = shouldHighlight && wordProgress > 0;
+          const baseScaleV748=1+(tier=== "high"&&!reducedMotion?studioAccentV748*.035*(studioV748.wordGlow/.065):0);
           const scale=cueV382&&tier==="high" ? 1+wordAccentV567.scale+(cueV382.scale-1)*visualV461.motionScale*visualV526.wordMotionGain*lyricsDirectionV528.motionGain*visualV549.wordMotionGain + accentV501*.02
             : current && lit && !reducedMotion && tier === "high" && !kineticStyleV382 ? 1 + progress * .075 * intensity * visualV526.wordMotionGain*lyricsDirectionV528.motionGain + accentV501*.02 : 1;
           const color=cueV382?blendKineticColorV382(from,to,wordProgress):(lit ? to : current ? from : "#8b93ad");
-          return <group key={`${wi}-${token.text}`} position={[token.x, token.y, 0]} scale={scale}>
+          return <group key={`${wi}-${token.text}`} position={[token.x, token.y, 0]} scale={scale*baseScaleV748}>
             <WordText text={token.text} size={size} color={color}
-              opacity={current ? visualV501.reveal : visualV477.focusOpacity} outline={tier === "low" ? 0 : current ? .003 + plateStrengthV378*.002 + clamp(scene.glow / 100) * (lit ? .012 : .004) * (tier === "balanced" ? .5 : 1) + (cueV382?.glow??0)*.008*visualV549.wordMotionGain + wordAccentV567.outline + wordAccentV634*.035*lyricPolishV634.wordGlow/.115 + (wordV549?.glow??wordV541?.glow??0)*.004 : 0}
+              opacity={current ? visualV501.reveal : visualV477.focusOpacity} outline={tier === "low" ? 0 : current ? .003 + plateStrengthV378*.002 + clamp(scene.glow / 100) * (lit ? .012 : .004) * (tier === "balanced" ? .5 : 1) + (cueV382?.glow??0)*.008*visualV549.wordMotionGain + wordAccentV567.outline + wordAccentV634*.035*lyricPolishV634.wordGlow/.115 +
+                (current&&timed?cinematicLyricWordAccentV688({
+                  line,nextLineStart:lines[i+1]?.startMs,wordIndex:wi,
+                  progressMs:scene.progressMs,playing:scene.playing,reducedMotion,
+                  plan:stageLyricCinemaV688,
+                }):0)*.028 + (wordV549?.glow??wordV541?.glow??0)*.004+studioAccentV748*studioV748.wordGlow+studioV748.outlineBonus+(current?studioV748.hookGlow:0) : 0}
               outlineColor={lit ? from : to} />
           </group>;
         })}

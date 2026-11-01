@@ -7,27 +7,34 @@ import {planDynamicConcertLightingV608} from "./dynamicConcertLightingV608";
 import {planUltimateConcertDramaturgyV623,composeConcertLightingV623} from "./ultimateConcertDramaturgyV623";
 import {planAdvancedStageLightingV621} from "./advancedStageLightingV621";
 import {planDynamicStageTransformationV622} from "./dynamicStageTransformationV622";
+import {planAdaptiveStageTransformationV690} from "./adaptiveStageTransformationV690";
+import {planMusicMoodFusionV691} from "./musicMoodFusionV691";
 import {planDynamicConcertStagesV635} from "./dynamicConcertStagesV635";
-import {planProfessionalLightingV636} from "./professionalLightingShowV636";
+import {planProfessionalLightingV636,type ProfessionalLightingInputV636} from "./professionalLightingShowV636";
+import {planProfessionalLightingDirectorV689} from "./professionalLightingDirectorV689";
 import {planGenreConcertV610} from "./genreConcertExperienceV610";
 import {planContinuousConcertV611} from "./continuousConcertExperienceV611";
 import {planSeamlessConcertTransitionV609} from "./seamlessConcertTransitionsV609";
+import type {SceneTransitionCueV791} from "./seamlessSceneTransitionsV791";
 import type {NarrativePlanV604,NarrativeCueV604} from "./fullSongConcertDramaturgyV604";
 import type {ConcertSceneV528} from "./cinematicConcertCoordinationV528";
 import type {ConcertShowCueV387} from "./concertShowDirectorV387";
 import { useEffect, useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { AdditiveBlending, Color, DoubleSide, Fog, Vector3 } from "three";
+import { AdditiveBlending, Color, Fog, Vector3 } from "three";
 import type { Group, ShaderMaterial, SpotLight, MeshBasicMaterial, Mesh } from "three";
 import type { AudioFeatures } from "@/types/audio";
 import type { ShowCue } from "./ultimateShowDirectorV306";
 import type { StageSection } from "./stageDirectorV287";
 import type { StageEnvironmentId } from "./stages";
 import { getActivePerformanceTier } from "./adaptivePerformance";
-import {getVisualFactorsV640} from "./adaptiveVisualBudgetV640";
+import {getVisualFactorsV640,getVisualLevelV640} from "./adaptiveVisualBudgetV640";
+import {resolveLightingBudgetV772} from "./adaptiveLightingBudgetV772";
+import {resolveOverdrawBudgetV773,allowOverdrawLayerV773} from "./adaptiveOverdrawBudgetV773";
 import {readPiConcertBudgetV479} from "./piConcertRuntimeV479";
 import {shouldDrawTransparentV552,needsSpotTargetMatrixV552} from "./piConcertDrawBudgetV552";
 import { getLightingPlayback } from "./lightingPlayback";
+import type {ScenicLightingCueV762} from "./cinematicScenicLightingV762";
 import { useSceneDetail, sceneDetailFlags } from "./scenePerformanceControls";
 import { CONCERT_ATMOSPHERE_EVENT, DEFAULT_CONCERT_ATMOSPHERE, evaluateConcertAtmosphereV308, readConcertAtmosphereSettings } from "./concertAtmosphereV308";
 
@@ -36,17 +43,22 @@ import { CONCERT_ATMOSPHERE_EVENT, DEFAULT_CONCERT_ATMOSPHERE, evaluateConcertAt
 const BEAM_VERTEX = `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`;
 const BEAM_FRAGMENT = `uniform vec3 uColor; uniform float uOpacity; varying vec2 vUv;
   void main(){float axial=(1.0-smoothstep(0.68,1.0,vUv.y))*smoothstep(0.0,0.16,vUv.y);
-  gl_FragColor=vec4(uColor, clamp(uOpacity*axial,0.0,0.30));}`;
+  float alpha=clamp(uOpacity*axial,0.0,0.30);
+  if(alpha<0.001) discard;
+  gl_FragColor=vec4(uColor, alpha);}`;
 const HAZE_VERTEX = BEAM_VERTEX;
 const HAZE_FRAGMENT = `uniform vec3 uColor; uniform float uOpacity; varying vec2 vUv;
   void main(){float d=length((vUv-vec2(0.5))*vec2(1.12,1.0));
+  if(d>=0.51) discard;
   float soft=1.0-smoothstep(0.04,0.51,d);
-  gl_FragColor=vec4(uColor,clamp(uOpacity*soft,0.0,0.15));}`;
+  float alpha=clamp(uOpacity*soft,0.0,0.15);
+  if(alpha<0.001) discard;
+  gl_FragColor=vec4(uColor,alpha);}`;
 const DOWN = new Vector3(0,-1,0);
 const BEAM_HEIGHT = 5.0;
 
-export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, reducedMotion, theme, musicPalette, showCue, timelineGainRef, sectionRef, genreV462, concertShowCueV387, authoredLightingV387=false,festivalShowCueV394,festivalShowLasersV394=false,lyricsProtectedV542=false,groupCountV542=1,vocalFocusV542=false,concertSceneV551,cameraNarrativeV605,cameraSectionV608 }: {
-  audio: AudioFeatures; isPlaying: boolean; reactive: boolean; reducedMotion: boolean;
+export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, reducedMotion, theme, musicPalette, showCue, timelineGainRef, sectionRef, genreV462, concertShowCueV387, authoredLightingV387=false,festivalShowCueV394,festivalShowLasersV394=false,lyricsProtectedV542=false,groupCountV542=1,vocalFocusV542=false,concertSceneV551,cameraNarrativeV605,cameraSectionV608,scenicCueRefV762,transitionV791 }: {
+  transitionV791?:SceneTransitionCueV791;scenicCueRefV762?:{current:ScenicLightingCueV762};audio: AudioFeatures; isPlaying: boolean; reactive: boolean; reducedMotion: boolean;
   theme: StageEnvironmentId; genreV462?: string | null; musicPalette?: {primary:string;secondary:string;glow:string}; showCue?: ShowCue;
   timelineGainRef: {current: number}; sectionRef: {current: StageSection};
   concertShowCueV387?:ConcertShowCueV387;authoredLightingV387?:boolean;festivalShowCueV394?:FestivalShowCueV394;festivalShowLasersV394?:boolean;lyricsProtectedV542?:boolean;groupCountV542?:number;vocalFocusV542?:boolean;concertSceneV551?:ConcertSceneV528;cameraNarrativeV605?:{plan:NarrativePlanV604;cue:NarrativeCueV604;manualCamera:boolean};cameraSectionV608?:StageSection;
@@ -102,6 +114,13 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
   },[ambientBase,scene,settings.enabled,settings.haze,settings.hazeDensity,tier,showLightingAllowed]);
   useFrame((state,delta)=>{
     const nowTier=getActivePerformanceTier();
+    // V772: a visually dimmed spot must also leave the Three.js light list.
+    // Performer focus positions and timeline blackouts remain unchanged.
+    const pressureV773=getVisualLevelV640();
+    const budgetV772=resolveLightingBudgetV772(nowTier,pressureV773,theme);
+    const overdrawV773=resolveOverdrawBudgetV773(nowTier,pressureV773,authoredLightingV387);
+    if(leftSpot.current)leftSpot.current.visible=budgetV772.atmosphereLeft&&sceneFlags.extraLights;
+    if(rightSpot.current)rightSpot.current.visible=budgetV772.atmosphereRight&&sceneFlags.extraLights;
     if (nowTier!==tier) setTier(nowTier); // only on a real device tier transition
     const playback=getLightingPlayback();
     const frame=evaluateConcertAtmosphereV308({
@@ -178,9 +197,21 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
       visualsEnabled:settings.enabled,energy:Math.max(0,Math.min(1,audio.energyEnvelope??audio.bass??0)),
       kick:Math.max(0,Math.min(1,audio.kickAccentIntensity??0)),foundation:transformationV622,
     });
+    // V690: small verified clear-sightline adjustment to the OWNED fog's far plane.
+    const stageMoodInputV691:import("./adaptiveStageTransformationV690").AdaptiveStageInputV690={
+      narrative:cameraNarrativeV605,trackId:playback.trackId,positionMs:playback.positionMs,
+      durationMs:playback.durationMs,section:cameraSectionV608??sectionRef.current,
+      genre:genreV462,playing:isPlaying&&playback.playing,reactive,reducedMotion,tier:nowTier,
+      authored:authoredLightingV387||!showLightingAllowed||!reactive,
+      blackout:timelineGainRef.current<.001,lyricsProtected:lyricsProtectedV542,
+      vocalFocus:vocalFocusV542,groupCount:Math.max(1,Math.min(4,Math.round(groupCountV542)||1)),
+      visualsEnabled:settings.enabled,foundation:transformationV622,
+    };
+    const stageScaleV690=planAdaptiveStageTransformationV690(stageMoodInputV691);
+    const musicMoodV691=planMusicMoodFusionV691(stageMoodInputV691,stageScaleV690);
     // V636: editorial modulation of EXISTING V308 shafts and two moving heads.
     // All gains remain downstream of user settings, budget tiers and blackout.
-    const professionalLightV636=planProfessionalLightingV636({
+    const professionalInputV689:ProfessionalLightingInputV636={
       narrative:cameraNarrativeV605,trackId:playback.trackId,
       positionMs:playback.positionMs,durationMs:playback.durationMs,
       section:cameraSectionV608??sectionRef.current,genre:genreV462,
@@ -190,7 +221,9 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
       blackout:timelineGainRef.current<.001,enabled:settings.enabled,
       lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
       groupCount:Math.max(1,Math.min(4,Math.round(groupCountV542)||1)),
-    });
+    };
+    const professionalLightV636=planProfessionalLightingV636(professionalInputV689);
+    const coordinatedLightV689=planProfessionalLightingDirectorV689(professionalInputV689);
     ambientTargetV622.current.copy(coolTintV622.current).lerp(warmTintV622.current,(transformationV622.tone+1)/2);
     // V610: only verified section + genre, bounded by the V551/V542 light caps.
     const concertGenreV610=planGenreConcertV610({
@@ -229,20 +262,20 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
     const beamGainV387=combinedV394.beamGain;
     const hazeGainV387=combinedV394.hazeGain;
     const sweepGainV387=combinedV394.sweepGain;
-    const alpha=1-Math.exp(-Math.min(.1,Math.max(0,delta))*5.5*lightingBlendV609.lightingRate);
+    const alpha=1-Math.exp(-Math.min(.1,Math.max(0,delta))*5.5*Math.min(lightingBlendV609.lightingRate,!(authoredLightingV387||!showLightingAllowed||!reactive||timelineGainRef.current<.001)&&transitionV791?.active?transitionV791.lightingRate:1));
     // Change only the Fog instance installed by V308, and ease toward its normal
     // density-dependent distances when V551 becomes inactive (e.g. on pause).
     const fog=ownedFogV551.current;
     if(fog && scene.fog===fog){
       const density=Math.max(0,Math.min(1,settings.hazeDensity/100));
-      const fogAlpha=1-Math.exp(-Math.min(.1,Math.max(0,delta))*2.5*lightingBlendV609.lightingRate);
+      const fogAlpha=1-Math.exp(-Math.min(.1,Math.max(0,delta))*2.5*Math.min(lightingBlendV609.lightingRate,!(authoredLightingV387||!showLightingAllowed||!reactive||timelineGainRef.current<.001)&&transitionV791?.active?transitionV791.lightingRate:1));
       fog.near+=(10+(1-density)*12+lightingV551.fogNearOffset+lightingV608.fogOffset-fog.near)*fogAlpha;
       fog.far+=(27+(1-density)*27+lightingV551.fogFarOffset+lightingV608.fogOffset*1.2-fog.far)*fogAlpha;
       // Shift *existing* haze toward the same song-section mood; neither
       // fog density nor its visibility is amplified during lyric-heavy sections.
       fogTargetV622.current.set(ambientBase).lerp(ambientTargetV622.current,transformationV622.background*.70);
       fog.color.lerp(fogTargetV622.current,fogAlpha);
-      const shift=Math.max(-.4,Math.min(.9,transformationV622.fog-stageVisualV635.fogTrim));
+      const shift=Math.max(-.4,Math.min(1.2,transformationV622.fog-stageVisualV635.fogTrim+Math.min(.4,stageScaleV690.fogClearance+musicMoodV691.fogClearance)));
       fog.far+=(Math.max(fog.near+6,27+(1-density)*27+lightingV551.fogFarOffset+lightingV608.fogOffset*1.2+shift)-fog.far)*fogAlpha;
     }
     // V640 only scales nonessential auto decoration; manual spotlights and
@@ -269,10 +302,10 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
       o.value+=(opacity-o.value)*alpha;
       (material.uniforms.uColor.value as Color).lerp(color,alpha);
     };
-    move(leftBeam.current,Math.min(.3,frame.leftOpacity*decorationV640.beams*beamGainV387*lightingV462.beamGain*lightingV542.beamGain*lightingV551.beamGain*lightingV608.beam*lightingV621.beam*concertGenreV610.beam*concertContinuityV611.beam*professionalLightV636.beam),desiredPrimary.current);
-    move(rightBeam.current,Math.min(.3,frame.rightOpacity*decorationV640.beams*beamGainV387*lightingV462.beamGain*lightingV542.beamGain*lightingV551.beamGain*lightingV608.beam*lightingV621.beam*concertGenreV610.beam*concertContinuityV611.beam*professionalLightV636.beam),desiredSecondary.current);
-    move(floorHaze.current,Math.min(.15,frame.floorHaze*decorationV640.haze*hazeGainV387*lightingV462.hazeGain*lightingV542.hazeGain*lightingV551.hazeGain*lightingV608.haze*lightingV621.haze*concertGenreV610.haze*concertContinuityV611.haze*professionalLightV636.haze),desiredPrimary.current);
-    move(backHaze.current,Math.min(.15,frame.backHaze*decorationV640.haze*hazeGainV387*lightingV462.hazeGain*lightingV542.hazeGain*lightingV551.hazeGain*lightingV608.haze*lightingV621.haze*concertGenreV610.haze*concertContinuityV611.haze*professionalLightV636.haze),desiredSecondary.current);
+    move(leftBeam.current,Math.min(.3,frame.leftOpacity*decorationV640.beams*beamGainV387*lightingV462.beamGain*lightingV542.beamGain*lightingV551.beamGain*lightingV608.beam*lightingV621.beam*concertGenreV610.beam*concertContinuityV611.beam*professionalLightV636.beam*coordinatedLightV689.beam),desiredPrimary.current);
+    move(rightBeam.current,Math.min(.3,frame.rightOpacity*decorationV640.beams*beamGainV387*lightingV462.beamGain*lightingV542.beamGain*lightingV551.beamGain*lightingV608.beam*lightingV621.beam*concertGenreV610.beam*concertContinuityV611.beam*professionalLightV636.beam*coordinatedLightV689.beam),desiredSecondary.current);
+    move(floorHaze.current,Math.min(.15,frame.floorHaze*(scenicCueRefV762?.current.hazeGain??1)*decorationV640.haze*hazeGainV387*lightingV462.hazeGain*lightingV542.hazeGain*lightingV551.hazeGain*lightingV608.haze*lightingV621.haze*concertGenreV610.haze*concertContinuityV611.haze*professionalLightV636.haze*coordinatedLightV689.haze),desiredPrimary.current);
+    move(backHaze.current,Math.min(.15,frame.backHaze*decorationV640.haze*hazeGainV387*lightingV462.hazeGain*lightingV542.hazeGain*lightingV551.hazeGain*lightingV608.haze*lightingV621.haze*concertGenreV610.haze*concertContinuityV611.haze*professionalLightV636.haze*coordinatedLightV689.haze),desiredSecondary.current);
     // V552: transparent objects consume GPU draw calls even at zero alpha.
     // Hide them in the existing frame callback, without unmount/remount,
     // changing materials, or delaying synchronized karaoke/beat updates.
@@ -287,8 +320,15 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
     gateV552(rightBeamMeshV552.current,rightBeam.current);
     gateV552(floorHazeMeshV552.current,floorHaze.current);
     gateV552(backHazeMeshV552.current,backHaze.current);
+    // V773: retain mounted shader materials/geometry; cut optional overlapping
+    // transparent surfaces only. No React state updates on frame-pressure changes.
+    if(rightBeamMeshV552.current)rightBeamMeshV552.current.visible=
+      allowOverdrawLayerV773(rightBeamMeshV552.current.visible,overdrawV773.rightBeam);
+    if(backHazeMeshV552.current)backHazeMeshV552.current.visible=
+      allowOverdrawLayerV773(backHazeMeshV552.current.visible,overdrawV773.backHaze);
+    if(floorHazeMeshV552.current)floorHazeMeshV552.current.scale.setScalar(overdrawV773.floorScale);
     // The V542 safety planner never authorizes lasers: skip their draw calls.
-    if(laserFanV394.current)laserFanV394.current.visible=lasersOn;
+    if(laserFanV394.current)laserFanV394.current.visible=lasersOn&&overdrawV773.level!=='minimal';
     // V551: steer existing shafts/spots to measured world positions of confirmed
     // vocalists. Missing/unloaded GLBs simply retain V308's original sweep.
     const spotlightAimV551=(slot:number|null,fallback:number)=>{
@@ -302,9 +342,9 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
       return fallback+(x-fallback)*Math.min(.75,lightingV551.focusStrength+lightingV608.focusBoost);
     };
     const leftAimV551=spotlightAimV551(lightingV551.leftSingerSlot,
-      Math.max(-3,Math.min(3,(-.65+(frame.targetLeftX+.65)*lightingV462.sweepGain*lightingV542.sweepGain*lightingV551.sweepGain*lightingV608.sweep*lightingV621.sweep*concertGenreV610.sweep*concertContinuityV611.sweep*professionalLightV636.sweep)*sweepGainV387+(lightingV551.leftSingerSlot===null?professionalLightV636.aimOffset:0))));
+      Math.max(-3,Math.min(3,(-.65+(frame.targetLeftX+.65)*lightingV462.sweepGain*lightingV542.sweepGain*lightingV551.sweepGain*lightingV608.sweep*lightingV621.sweep*concertGenreV610.sweep*concertContinuityV611.sweep*professionalLightV636.sweep*coordinatedLightV689.sweep)*sweepGainV387+(lightingV551.leftSingerSlot===null?professionalLightV636.aimOffset+coordinatedLightV689.aimOffset:0))));
     const rightAimV551=spotlightAimV551(lightingV551.rightSingerSlot,
-      Math.max(-3,Math.min(3,(.65+(frame.targetRightX-.65)*lightingV462.sweepGain*lightingV542.sweepGain*lightingV551.sweepGain*lightingV608.sweep*lightingV621.sweep*concertGenreV610.sweep*concertContinuityV611.sweep*professionalLightV636.sweep)*sweepGainV387-(lightingV551.rightSingerSlot===null?professionalLightV636.aimOffset:0))));
+      Math.max(-3,Math.min(3,(.65+(frame.targetRightX-.65)*lightingV462.sweepGain*lightingV542.sweepGain*lightingV551.sweepGain*lightingV608.sweep*lightingV621.sweep*concertGenreV610.sweep*concertContinuityV611.sweep*professionalLightV636.sweep*coordinatedLightV689.sweep)*sweepGainV387-(lightingV551.rightSingerSlot===null?professionalLightV636.aimOffset+coordinatedLightV689.aimOffset:0))));
     if(leftGroup.current){
       leftDirection.current.set(leftAimV551-(-2.55),-1.72-3.15,.25-(-1.25)).normalize();
       leftGroup.current.quaternion.setFromUnitVectors(DOWN,leftDirection.current);
@@ -324,8 +364,8 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
         previousX.current=targetX;
       }
     };
-    setSpot(leftSpot.current,Math.min(3,frame.leftLight*beamGainV387*lightingV462.spotGain*lightingV542.spotGain*lightingV551.spotGain*lightingV608.spot*lightingV621.spot*concertGenreV610.spot*concertContinuityV611.spot*professionalLightV636.spot),desiredPrimary.current,leftAimV551);
-    setSpot(rightSpot.current,Math.min(3,frame.rightLight*beamGainV387*lightingV462.spotGain*lightingV542.spotGain*lightingV551.spotGain*lightingV608.spot*lightingV621.spot*concertGenreV610.spot*concertContinuityV611.spot*professionalLightV636.spot),desiredSecondary.current,rightAimV551);
+    setSpot(leftSpot.current,Math.min(3,frame.leftLight*beamGainV387*lightingV462.spotGain*lightingV542.spotGain*lightingV551.spotGain*lightingV608.spot*lightingV621.spot*concertGenreV610.spot*concertContinuityV611.spot*professionalLightV636.spot*coordinatedLightV689.spot),desiredPrimary.current,leftAimV551);
+    setSpot(rightSpot.current,Math.min(3,frame.rightLight*beamGainV387*lightingV462.spotGain*lightingV542.spotGain*lightingV551.spotGain*lightingV608.spot*lightingV621.spot*concertGenreV610.spot*concertContinuityV611.spot*professionalLightV636.spot*coordinatedLightV689.spot),desiredSecondary.current,rightAimV551);
   });
   const beamVisible=settings.enabled&&settings.beams&&tier!=="low"&&sceneFlags.beamSweep;
   const hazeVisible=settings.enabled&&settings.haze&&tier!=="low";
@@ -343,26 +383,26 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
       </mesh>
     </group>}
     {beamVisible && <group ref={leftGroup} position={[-2.55,3.15,-1.25]}>
-      <mesh ref={leftBeamMeshV552} position={[0,-BEAM_HEIGHT/2,0]} frustumCulled={false}>
-        <coneGeometry args={[1.12,BEAM_HEIGHT,22,1,true]}/>
-        <shaderMaterial ref={leftBeam} vertexShader={BEAM_VERTEX} fragmentShader={BEAM_FRAGMENT} transparent depthWrite={false} side={DoubleSide} blending={AdditiveBlending} uniforms={{uOpacity:{value:0},uColor:{value:new Color("#58cfff")}}}/>
+      <mesh ref={leftBeamMeshV552} position={[0,-BEAM_HEIGHT/2,0]}>
+        <coneGeometry args={[1.12,BEAM_HEIGHT,14,1,true]}/>
+        <shaderMaterial ref={leftBeam} vertexShader={BEAM_VERTEX} fragmentShader={BEAM_FRAGMENT} transparent depthWrite={false} blending={AdditiveBlending} uniforms={{uOpacity:{value:0},uColor:{value:new Color("#58cfff")}}}/>
       </mesh>
     </group>}
     {beamVisible && tier==="high" && <group ref={rightGroup} position={[2.55,3.15,-1.25]}>
-      <mesh ref={rightBeamMeshV552} position={[0,-BEAM_HEIGHT/2,0]} frustumCulled={false}>
-        <coneGeometry args={[1.12,BEAM_HEIGHT,22,1,true]}/>
-        <shaderMaterial ref={rightBeam} vertexShader={BEAM_VERTEX} fragmentShader={BEAM_FRAGMENT} transparent depthWrite={false} side={DoubleSide} blending={AdditiveBlending} uniforms={{uOpacity:{value:0},uColor:{value:new Color("#e674ff")}}}/>
+      <mesh ref={rightBeamMeshV552} position={[0,-BEAM_HEIGHT/2,0]}>
+        <coneGeometry args={[1.12,BEAM_HEIGHT,14,1,true]}/>
+        <shaderMaterial ref={rightBeam} vertexShader={BEAM_VERTEX} fragmentShader={BEAM_FRAGMENT} transparent depthWrite={false} blending={AdditiveBlending} uniforms={{uOpacity:{value:0},uColor:{value:new Color("#e674ff")}}}/>
       </mesh>
     </group>}
     {spotVisible && <spotLight ref={leftSpot} position={[-2.55,3.15,-1.25]} angle={.30} penumbra={.97} decay={2} distance={9} castShadow={false} intensity={0}/>}
     {spotVisible && tier==="high" && <spotLight ref={rightSpot} position={[2.55,3.15,-1.25]} angle={.30} penumbra={.97} decay={2} distance={9} castShadow={false} intensity={0}/>}
     {hazeVisible && <mesh ref={floorHazeMeshV552} position={[0,-1.914,0]} rotation={[-Math.PI/2,0,0]} renderOrder={2}>
       <planeGeometry args={[9.2,7.2]}/>
-      <shaderMaterial ref={floorHaze} vertexShader={HAZE_VERTEX} fragmentShader={HAZE_FRAGMENT} transparent depthWrite={false} side={DoubleSide} blending={AdditiveBlending} uniforms={{uOpacity:{value:0},uColor:{value:new Color("#58cfff")}}}/>
+      <shaderMaterial ref={floorHaze} vertexShader={HAZE_VERTEX} fragmentShader={HAZE_FRAGMENT} transparent depthWrite={false} blending={AdditiveBlending} uniforms={{uOpacity:{value:0},uColor:{value:new Color("#58cfff")}}}/>
     </mesh>}
     {hazeVisible && tier==="high" && <mesh ref={backHazeMeshV552} position={[0,-1.88,-1.65]} rotation={[-Math.PI/2,0,0]} renderOrder={2}>
       <planeGeometry args={[7.5,5.1]}/>
-      <shaderMaterial ref={backHaze} vertexShader={HAZE_VERTEX} fragmentShader={HAZE_FRAGMENT} transparent depthWrite={false} side={DoubleSide} blending={AdditiveBlending} uniforms={{uOpacity:{value:0},uColor:{value:new Color("#e674ff")}}}/>
+      <shaderMaterial ref={backHaze} vertexShader={HAZE_VERTEX} fragmentShader={HAZE_FRAGMENT} transparent depthWrite={false} blending={AdditiveBlending} uniforms={{uOpacity:{value:0},uColor:{value:new Color("#e674ff")}}}/>
     </mesh>}
   </group>;
 }

@@ -92,5 +92,5 @@ assert(duoSrc.includes('groupDuoV517=planAdvancedGroupV517')&&
  !duoSrc.includes('safeEnsembleTravelV517'),'duet never gets extra root travel');
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]??0)>=517,'V517 is preserved in the current release');
-assert(pkg.scripts['build:preflight'].includes('npm run test:v517 && npm run test:v517:types && npm run test:v516')); 
+assert(pkg.scripts['check:release'].includes('npm run test:legacy:interaction') && pkg.scripts['test:legacy:interaction'].includes('npm run test:v517') && !!pkg.scripts['test:v516'], 'full historical group tests remain available outside V680 prebuild'); 
 console.log(`PASS V517 Advanced Group Performance Director: ${cases} ensemble/Deutschrap duet frames, manual cast evidence, chorus/front-facing, risk gating`);

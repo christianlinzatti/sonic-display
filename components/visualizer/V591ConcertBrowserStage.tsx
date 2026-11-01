@@ -1,4 +1,5 @@
 'use client';
+import {usePreviewGltfCacheV654} from './usePreviewGltfCacheV654';
 /** V591 genuine-GLB concert review fixture: independent of Spotify's production stage. */
 import {Suspense,useCallback,useEffect,useMemo,useRef,useState,type MutableRefObject} from 'react';
 import {Canvas,useFrame,useThree} from '@react-three/fiber';
@@ -21,6 +22,7 @@ const start=(cue:V591Cue|null=null):Snapshot=>({ready:false,error:null,generatio
 function ConcertRig({actor,index,count,cue,generation,snapshot,onActorReady}:{actor:V591Actor;index:number;count:number;
  cue:V591Cue;generation:number;snapshot:MutableRefObject<Snapshot>;onActorReady:()=>void}){
  const source=useGLTF(actor.model);
+ usePreviewGltfCacheV654(actor.model);
  const gltf=useMemo(()=>cloneSkinnedScene(source.scene),[source.scene]);
  const validClips=useMemo<AnimationClip[]>(()=>source.animations.filter(x=>x.tracks.length&&Number.isFinite(x.duration)&&x.duration>0),[source.animations]);
  const mixer=useMemo(()=>new AnimationMixer(gltf),[gltf]);

@@ -1,0 +1,33 @@
+{
+  "version": "V845",
+  "projectPackageVersion": "0.1.0-v845",
+  "feature": "Soap Bubbles + Optional Full-Stage-Flash",
+  "productionReleased": false,
+  "checks": {
+    "newRegressionGroups": 111,
+    "previousVersionSuitesV800toV844": 45,
+    "focusedLightingAndFX": "V793/V810/V816/V817/V823/V825/V829/V831/V838/V841/V843/V844 passed",
+    "newIsolatedTypes": "pass",
+    "v844IsolatedTypes": "pass",
+    "syntax": "pass: 1220 source files",
+    "architecture": "pass: 938 references",
+    "moduleCase": "pass: 2071 modules",
+    "packageAndLock": "pass: 0.1.0-v845"
+  },
+  "open": {
+    "fullTypeScript": "time limit reached (20 seconds; no conclusive result)",
+    "nextProductionBuild": "not run: local Next.js/React dependencies are not installed",
+    "realGpuBrowserVisualTests": "not run, real GLB and actual frame pacing not verified",
+    "githubActions": "configured; not executed or confirmed here"
+  },
+  "effects": {
+    "bubbles": "one shader-instanced mesh, max 64; defaults on; auto budget, lyrics and genre limits",
+    "fullStageFlash": "OFF by default; opt-in full WebGL stage canvas, not app UI; max alpha 0.16, max 35ms, max 2Hz",
+    "safety": "even limited pulses can affect photosensitive viewers; does not claim safe strobe",
+    "exclusivity": "when opted in, V844 floor strobe suppressed to avoid stacking"
+  },
+  "limits": [
+    "no additional GPU pass; two new optional draw calls (one bubbles when active, one overlay when flashing) rather than no extra rendering",
+    "safe use requires local visual review; full color contrast / photosensitivity safety not proven"
+  ]
+}

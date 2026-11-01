@@ -1,3 +1,470 @@
+## V865 – Smart History Fusion 2.0
+
+Der bestehende Vergleich `components/ListeningSourceDashboardV707.tsx` zeigt in der gemeinsamen Quellenansicht nun `components/SmartHistoryFusionPanelV865.tsx`. Die reine Auswertung `lib/smart-history-fusion-v865.ts` baut auf der unveränderten, heuristischen 90-Sekunden-/1:1-Paarbildung von V707 auf und vergleicht pro UTC-Tag Spotify-/Last.fm-Ereignisse, mögliche Paare, quellenexklusive Ereignisse und Tage ohne archivierten Eintrag. Nur leere Tage **zwischen** erstem und letztem Archivzeitpunkt werden als mögliche Lücken im beobachteten Zeitfenster gezählt – nicht als nachgewiesene fehlende Wiedergaben. Das Panel ist lesend und enthält weder neue API-Aufrufe noch Schreibzugriffe. Der Quellendialog kann ein vorhandenes IndexedDB-Langzeitarchiv auch dann laden, wenn kein älterer localStorage-Spiegel mehr existiert. Tests: `tests/v865-smart-history-fusion-regression.cjs`, `tests/tsconfig.v865-ui.json`. Vollständiger TypeScript-Check, Next.js-Build und Browserabnahme bleiben Freigabegates.
+
+## V838 Intelligent Vocal & Duet Director 3.0
+
+One verified V528/V797 source drives camera/light/group glances. The final
+V351 guard remains last, while V540/V550 reject camera crops that worsen
+head/body overflow. V807 remains the owner of base gaze; V838 adds bounded
+look-only accents, requiring authored V632 backing roles for adlib response.
+No second camera, vocal inference, GLB edits, IK changes or render loop.
+Production gate remains blocked until full typecheck, Next build and browser QA.
+
+## V836 Concert Visual Quality Inspector 2.0
+
+`concertVisualQualityV836.ts` bewertet ausschliesslich Projektionen aus der freiwilligen
+V466/V754-Qualitaetsprobe: Kopfpositionen, Mehrpersonenabstaende, echte Fussknochen,
+DOM-Lyrics-Schutzbereich und aufeinanderfolgende Kopfpositionen. Alle fehlenden
+Messsignale bleiben **unverified**; auch geometrisch unauffaellige Ergebnisse
+sind keine visuelle Abnahme. Ein grosser Positionssprung kann ein absichtlicher
+Kameraschnitt sein; keine automatische Kameraaenderung oder Fehlfreigabe.
+Das Panel `ConcertVisualQualityInspectorV836.tsx` ist direkt im bestehenden
+V751-Qualitaetsdashboard eingebunden. Die Historie bleibt lokal im Speicher,
+auf maximal 24 echte Messfenster beschraenkt und speichert keine Songtitel.
+Echte Bildpixel, GPU-Zeiten, Verschattung, Gesicht, Lippensynchronitaet und
+Textkontrast werden NICHT gemessen. V829/V830 bleibt Freigabeautoritaet.
+Tests: `tests/v836-concert-visual-quality-regression.cjs`,
+`tests/tsconfig.v836-core.json`.
+
+## V834 Adaptive Performance Intelligence 3.0
+
+Die neue `cameraAwarePerformanceV834.ts`-Logik wird **nach** dem bestehenden
+V825-Performance-Governor angewendet und kann nur bereits freigegebene
+Effektbudgets verringern. Bei nachgewiesener V761-Kameraabsicht fuer Portraet
+oder Dialog werden unter anhaltender Framezeitlast nur dekorative Seiten-
+Effekte (Publikum, Schaum, Partikel, Spektral und Nebel) gedaempft. Bei
+Totalen, Builds mit weiter Ansicht und grossen Drop-Kameras gilt unveraendert
+V825. V834 setzt weder neue Kamera-Cuts noch WebGL-Ressourcen voraus.
+Eine *Kameraabsicht* beweist nicht, dass einzelne Objekte tatsaechlich unsichtbar
+sind; die Reduktion ist eine konservative Heuristik, kein Occlusion-Culling.
+Manuelle Kamera, unbestaetigte Songabschnitte, abgeschalteter Optimizer sowie
+manuelle V823-Effektspuren werden respektiert. Kein Effekt wird aktiviert.
+Die V826-Diagnose zeigt den V834-Status und eine relative Kosteneinsparung,
+keine gemessene GPU-Auslastung. Einstellungen `cameraAwareV834` und
+`cameraStrengthV834` persistieren in der bestehenden FX-Konfiguration.
+Tests: `tests/v834-camera-aware-performance-regression.cjs`,
+`tests/tsconfig.v834-core.json`.
+
+## V833 GPU Memory & Resource Cleanup 2.0
+
+V833 schuetzt private GLTF-Inspektionsdaten, privat geklonte Avatar-Skelette,
+Render-Targets und Postprocessing-Paesse vor unterbrochenen Freigabeketten.
+`resourceCleanupV833.ts` gibt **ausschliesslich vom Aufrufer besessene**
+Ressourcen einmalig pro Aufraeumvorgang frei. Schlaegt eine `dispose()`-Operation
+fehl, laufen die anderen Freigaben dennoch; Fehler werden als Zaehler erfasst,
+aber niemals als Freigabeerfolg ausgegeben. Privater GLTF- und Motion-Asset-
+Abbau wird ebenso gegen Teilfehler abgesichert. Fuer private GLTF-Assets wird
+eine doppelte Freigabe verhindert. Gemeinsam genutzte `useGLTF`-Daten,
+Materialien, Geometrien und Texturen werden dabei ausdruecklich NICHT
+zwangsweise zerstoert, um aktive Performer nicht zu beschaedigen.
+
+Der bestehende V654/V768-Cache bietet `trimInactive()`: entfernt nur Eintraege
+mit `owners===0`, auch bei fehlerhaftem Cache-Clear-Callback. Ueber V770 ist
+diese Operation manuell ausloesbar; der Bericht nennt Zahl und GROSSENSCHAETZUNG
+freigegebener Dekodier-Eintraege. Dies ist keine GPU-/VRAM-Messung und
+garantiert keine tatsaechliche GPU-Speicherfreigabe. Die bestehende
+V767-Stresstestpruefung bleibt fuer langfristige Laufzeitverifikation noetig.
+Die Aufraeumtelemetrie umfasst registrierte Operationen, nicht jede WebGL-
+Ressource. Keine GPU-Benchmarks, reale Leckfreiheit oder erfolgreiche
+Produktionskompilierung ohne Tests behaupten.
+
+Tests: `tests/v833-gpu-memory-resource-cleanup-regression.cjs`,
+`tests/tsconfig.v833-core.json`, bestehende V654/V769/V768-Regressionen.
+
+## V825 – Concert FX Performance Optimizer
+
+`components/visualizer/concertFxPerformanceOptimizerV825.ts` liest in der
+bestehenden React-Three-Fiber-Schleife die Frame-Abstaende und ermittelt bei
+**dauerhafter** Verlangsamung einen langsamen Belastungsindikator. Lange
+Tab-Wakeup-Pausen, nicht-endliche Deltas und einzelne Jank-Frames werden
+ignoriert. Erholung erfolgt verzögert, um sichtbares Pumpen zu vermeiden.
+Dieser Wert ist **keine GPU-Zeitmessung**. Das Kostenmodell ist eine relative
+Heuristik mit begrenzten Prioritaeten, kein Profiling realer GPU-Millisekunden.
+
+10 bestehende Effektgruppen teilen das modellierte Budget: Schaumkanone,
+Partikel, Publikum, Spektralvisuals, Bodennebel, Laser, bewegliche LEDs,
+Szenenuebergaenge, LED-Wand und Vocal FX. Der Optimizer verringert unter Last
+zuerst dekorative Instanzzahlen, erst spaeter die wichtigen LED- und Vocal-FX.
+Manuelle V823-Cues werden bevorzugt, koennen unter kritischer Last aber
+innerhalb der harten Qualitaetsgrenzen ebenfalls reduziert werden. Nie werden
+Effekte eingeschaltet, neue Kameraschnitte erzeugt oder V810-Gates umgangen.
+Der bestehende Viewer hat unveraendert Vorfahrt fuer echte Lyrics, Performer,
+Blackouts, reduzierte Bewegung und manuelle Lichtentscheidungen.
+
+Einstellungen: `concertFxV810.perfOptimizerV825`, `perfModeV825` (balanced,
+fps, quality) und `perfSensitivityV825` (0–100), via normalisierter
+UiPreferences-Sicherung. UI: `ConcertFxStudioPanelV810.tsx`, simulierte
+Lastvorschau ausdrücklich ohne Echtzeit-GPU-Behauptungen. Keine neuen
+3D-Renderobjekte. Tests: `tests/v825-concert-fx-performance-regression.cjs`,
+`tests/tsconfig.v825-core.json`.
+
+## V824 – Smart FX Show Director
+
+`components/visualizer/smartFxShowDirectorV824.ts` erzeugt einen deterministischen
+Regie-Bogen aus den **bereits bestaetigten** V604-/V761-Songakten. Fuer Intro,
+Verse, Hook, Build, Drop, Break und Finale entstehen begrenzte relative Gains
+fuer die fuenf bestehenden Render-Lanes (Laser, LED-Wand, Partikel,
+Schaumkanone, V819-Uebergang). Ein Build steigt innerhalb seiner bestaetigten
+Aktzeit an. Genre, Performance-Modus und sichtbare Lyrics/Performer begrenzen
+die Intensitaet. Keine neuen Meshes, Audio-Erkennung, Kameraschnitte oder
+unbestaetigten Drop-Zeitpunkte.
+
+Manuell erstellte V823-Cues haben pro Lane Vorrang (Mute und Boost), auch
+bei gleichzeitiger automatischer Regie. Ein explizit ausgewaehltes V821-LED-Look
+bleibt erhalten. Endgueltige V810-Freigaben, Blackouts, Performance-/GPU-Budgets,
+V791-Szenenwechsel-Gates und bestehende Hart-Caps gelten weiterhin.
+Die Einstellungen werden wie gewohnt via UiPreferences normalisiert und
+exportiert. Der Editor `components/visualizer/ConcertFxStudioPanelV810.tsx`
+zeigt Regie-Modus und -Intensitaet mit rein simulierter Vorschau.
+Tests: `tests/v824-smart-fx-show-director-regression.cjs` und
+`tests/tsconfig.v824-core.json`.
+
+
+## V823 – Visual FX Timeline Editor
+
+Die songbezogenen FX-Cues werden in `components/visualizer/visualFxTimelineV823.ts` normalisiert (max. 200 insgesamt / 48 pro Titel) und von `components/visualizer/VisualFxTimelineEditorV823.tsx` als fuenf visuelle Spuren bearbeitet. Gespeichert wird in UiPreferences.concertFxV810;
+dies ist kompatibel mit den existierenden V657-Backups. Aktueller Track und Zeit kommen
+aus `components/visualizer/lightingPlayback.ts`. Die Runtime in `components/visualizer/DynamicStage.tsx`
+wendet Cues nur nach der V810 Music-Verification an und erhoeht niemals die Renderer-Anzahl.
+Boost/Mute wirken auf bereits aktive Laser-, V821-LED-, V816-Partikel-, V817-Schaum-
+und V819-Uebergangscues. Blackouts, manuelle Lichtvorgaben und Kameraregien gehen vor.
+Es werden keine Kameraschnitte und keine neuen Scene-Seams erzeugt. Tests: `tests/v823-visual-fx-timeline-regression.cjs` und `tests/tsconfig.v823-core.json`.
+
+## V813–V814 – Lyrics Projection & Atmospheric Concert FX
+
+V813 ergaenzt den V810-Planer um `components/visualizer/lyricsProjectionV813.ts`.
+Nur mit synchronisierten Texten, bestaetigten Song-Timings und V604-/V761-
+Regie werden Hook-Woerter und wortgenaue Akzente auf Boden oder Rueckwand
+projiziert. `components/visualizer/DynamicStage.tsx` erstellt einmal eine
+CanvasTexture, aktualisiert nur beim Wortwechsel und gibt sie beim Unmount frei.
+Regulaere Lyrics bleiben unveraendert. Reimaehnliche Endungen sind eine
+Heuristik und werden nicht als gesicherte Reime ausgegeben. Ohne Song-/Wort-
+Zeitmarken keine erfundenen Effekte.
+
+V814 verwendet `components/visualizer/atmosphericConcertFxV814.ts` und
+`components/visualizer/atmosphereShaderV814.ts` fuer dezente Bodennebel-Baenke
+und seitliche Lichtstrahlen mit festen Deckkraftobergrenzen. Der
+`ConcertAtmosphereRendererV308` bleibt Besitzer von `scene.fog`.
+Die neue Ebene ist opt-in ueber die zentralen Settings und respektiert
+Pause, Reduced Motion, Low-Tier, manuelle Lichtregie, Blackouts, Lyrics-
+und Gesichterschutz. Performance blendet die zusaetzlichen Lichtkegel aus.
+
+Tests: `tests/v813-lyrics-projection-regression.cjs` und
+`tests/v814-atmospheric-concert-fx-regression.cjs` plus V800–V812.
+V825–V829 sind noch nicht implementiert. Full Build und echte GPU-Tests
+sind ohne Projektabhaengigkeiten vor Ort weiterhin nicht bestaetigt.
+
+## V810–V812 – Concert FX Studio 2.0, Laser Matrix und LED-Wand
+
+`components/visualizer/concertFxStudioV810.ts` plant optionale Effekte deterministisch
+nur aus bestaetigten V604-/V761-Abschnitten und den vorhandenen Audio-Features. V810
+stellt `components/visualizer/ConcertFxStudioPanelV810.tsx` mit drei Qualitaetsstufen,
+Genre- und eigenen Farbpaletten, Intensitaet und schematischer Offline-Vorschau bereit.
+Die Einstellungen werden in `context/UiPreferencesContext.tsx` validiert und gespeichert.
+
+V811 integriert `components/visualizer/laserMatrixShaderV811.ts` als einzelne, begrenzte
+transparente Flaeche hinter den Darstellern. Laserfaecher und Lichtbaender sind rein
+optische WebGL-Effekte ohne Strobe, reale Laser oder neue Lichter. V812 erweitert mit
+`components/visualizer/reactiveLedWallV812.ts` den vorhandenen LED-Wand-Shader um
+Bass-/Mitten-/Hoehenbalken, Wellen und geometrische Ringe. Pause, Reduced Motion,
+manuelle Licht-Timelines, Blackouts, Low-Tier sowie Lyrics-/Portraetschutz bleiben
+hoeherrangig. Ein Performance-Preset blendet die zusaetzliche Laserflaeche aus.
+
+Tests: `tests/v810-concert-fx-studio-regression.cjs`,
+`tests/v811-laser-matrix-regression.cjs`, `tests/v812-reactive-led-wall-regression.cjs`
+und V800–V809. Vollstaendige Typpruefung, Build und echte Hardwarepruefungen
+sind mangels installierbarer Abhaengigkeiten hier nicht bestaetigt.
+V813–V814 sind implementiert, V818–V829 bleiben geplant.
+
+## V751 – Concert Quality Dashboard
+
+`components/visualizer/concertDashboardProjectionV751.ts` projects the V750 plan into a read-only
+status matrix: configured, enabled, and planning evidence remain separate.
+`components/visualizer/concertDashboardStoreV751.ts` publishes only limited, transient
+status snapshots from `components/visualizer/VisualizerStage.tsx`, without tracks or lyrics.
+The system/service tab and Dynamic Stage settings display
+`components/visualizer/ConcertQualityDashboardV751.tsx`; the optional existing V466
+WebGL probe is manually enabled from the dashboard, and its real measurements are
+displayed separately. No renderer, lighting or camera heuristics are labeled as measured FPS.
+
+## V742 – Genre Dance Intelligence (fuenf genretypische Hueft-Choreografien)
+
+`components/visualizer/genreHipIntelligenceV742.ts` erstellt deterministische,
+begrenzte Genre- und Songabschnitts-Profile fuer Hip_Sway, Hip_Circle und Hip_Bounce.
+Live-Buehne und Avatar-Vorschau verwenden denselben Planer. Erst die vorhandene
+V738-Logik blendet die Bewegungen weich ueber. Eigene GLB-Clips, manuelle
+Timelines, explizite Hip-Modi, Pausen und Reduced Motion behalten Vorrang.
+Bei unbekanntem Genre wird die V735-Automatik unveraendert benutzt; Foot-IK,
+Skin-Weights und AnimationClips werden nicht veraendert.
+Die Einstellungen stehen in `components/SettingsPanel.tsx` und werden in
+`context/UiPreferencesContext.tsx` gespeichert. Die Vorschau bietet neu auch
+Rock und simulierte Songabschnitte. Tests: `tests/v742-genre-hip-intelligence-regression.cjs`
+und `tests/tsconfig.v742-core.json`. Keine neuen APIs oder GLB-Dateien.
+
+## V741 - Advanced Hip & Glute Rig (optionale Laufzeitkanaele)
+
+`components/visualizer/advancedGluteRigV741.ts` erkennt benannte Glute-/Buttock-Morph-Targets fuer beide Seiten und gewichtet skinnende Gesaessknochen ausschliesslich mit Skin-Weight-Pruefung. Bei der Avatar-Instanz wird einmal ein struktureller Rig-Check durchgefuehrt. Es folgt eine additive, begrenzte Laufzeitverformung aus der V738-Hueftpose, ohne Foot-IK zu ersetzen, die Szene zu verschieben oder Meshgewichte zu schreiben. Bei Pause, deaktivierter Funktion und manueller Timeline klingt der Zusatz aus. Vorhandene Clip-Werte bleiben erhalten, Mixer-Reset und Nichtakkumulation sind getestet. `components/visualizer/GltfDancerAvatarV492.tsx` bindet Live-Daten an, `components/visualizer/AvatarEditor.tsx` zeigt Rig-/Skinning-Warnungen und nutzt SkeletonUtils fuer Preview-Clones. Einstellungen werden in `components/SettingsPanel.tsx` persistiert; Standard ist deaktiviert. Die GLB-Datei wird nicht veraendert und GLB-Export enthaelt diese Overlay-Kanaele nicht. Tests: `tests/v741-glute-rig-regression.cjs` und `tests/tsconfig.v741-core.json`.
+
+## V740 – Natural Body Dynamics
+
+`components/visualizer/naturalBodyDynamicsV740.ts` erzeugt begrenzte Gegenbewegungen fuer Brust, Arme, Unterarme und freie Beine aus der bereits weich ueberblendeten V738-Hueftpose. Fuer Stuetzfuesse wird kein zusaetzlicher Bein- oder Fusswinkel erzeugt; die bestehende Foot-IK bleibt die einzige Endkorrektur. Der Live-Avatar (`components/visualizer/GltfDancerAvatarV492.tsx`) und die Vorschau (`components/visualizer/AvatarEditor.tsx`) nutzen denselben Sampler, angewendet durch `components/visualizer/avatarRigController.ts`. Aktivierung und individuell regelbare Staerken fuer Koerper, Arme und Beine sind in `components/SettingsPanel.tsx` gespeichert; fehlende optionale Knochen werden in der Vorschau gemeldet. Manuelle Timelines, GLB-Clips, Pause und Reduced Motion unterbinden die zusaetzliche Dynamik. V739-GLB-Exporte bleiben unveraendert und enthalten nicht automatisch die V740-Laufzeit-Overlays. Keine neuen Mesh-Gewichte, kein zusaetzlicher IK-Solver, keine neuen API-Routen. Tests: `tests/v740-natural-body-regression.cjs`, `tests/tsconfig.v740-core.json`.
+
+## V728 – On This Day (lokales Last.fm-Musikgedächtnis)
+
+`lib/lastfm-on-this-day-v728.ts` gruppiert vollständige V713-Archiv-Scrobbles mit viewer-lokalem Monat/Tag in ausschließlich früheren Kalenderjahren. `components/LastFmOnThisDayPanelV728.tsx` zeigt eine Vergleichstagsauswahl, wiederkehrende Tracks und aufklappbare Jahreskarten; `components/LastFmHistoryPanelV706.tsx` stellt die bestehende V726-Filter- und V715-Chroniknavigation bereit. Das V722-Dashboard hat einen Direktlink. Keine neuen Server-Routen, API-Abfragen, Storage-Updates oder Spotify→Last.fm-Schreiboperationen. Core- und UI-Typechecks sowie Regressionen: `tests/v728-on-this-day-regression.cjs`, `tests/tsconfig.v728-*.json`.
+
+## V727 – Weekly & Monthly Music Recap
+
+`lib/lastfm-period-recap-v727.ts` berechnet lokale (DST-sichere) Wochen-/Monatsrückblicke mit fairen Vorperioden-Vergleichen, Top-Songs/Künstlern und erstmals im Archiv erfassten Interpreten, ausschließlich aus dem vollständigen V713-Archiv. `components/LastFmPeriodRecapPanelV727.tsx` wurde in `components/LastFmHistoryPanelV706.tsx` integriert, mit direkter Navigation über den bestehenden V726-Filter. Keine zusätzlichen API-Calls, Benachrichtigungen, Schreiboperationen oder Spotify→Last.fm-Scrobbles. Regression und isolierte TS-Prüfung: `tests/v727-period-recap-regression.cjs`, `tests/tsconfig.v727-core.json`, `tests/tsconfig.v727-ui.json`.
+
+## V725 – Connected Services Monitor
+
+`services/system/connectedServicesV725.ts` führt konfigurierte Service-Flags (bestehende V667-Route), tatsächlich frische Spotify-Signale, den explizit aktivierten Last.fm-Leseabgleich (V708) sowie für den aktuellen Song bestätigte Lyrics-Provider zusammen. `components/ConnectedServicesMonitorV725.tsx` ist in `ServiceStatusDashboardV667.tsx` eingebettet. Keine externen Gesundheitstests, keine neuen Credentials im Browser, keine Scrobble-Schreibvorgänge. Weitere Details: `V725-CONNECTED-SERVICES-MONITOR.md`.
+
+## V724 – Kontogebundene Dashboard-Presets
+
+`lib/lastfm-dashboard-presets-v724.ts` verwaltet bis zu 16 validierte Presets und fünf unveränderlich benannte, aber in ihrem Layout editierbare Grundansichten. Die Einstellungen werden ohne API/Scrobble-Zugriff nur in `localStorage` abgelegt. Der alte V723-Layoutschlüssel wird bei erster Nutzung ausschließlich gelesen und in das Preset „Mein Dashboard“ kopiert; er bleibt bestehen. `components/LastFmDashboardPresetsV724.tsx` übernimmt Auswahl, Kopieren, Umbenennen, Löschen, Speichern und Tab-Synchronisation. `components/LastFmDashboardStudioV723.tsx` hat zusätzlich einen kontrollierten Editor-Modus, verwendet aber dieselben sechs V722-Widgets und behält den bisherigen unkontrollierten V723-Modus bei. Isolierte Core-/UI-Typechecks und Funktionstests: `tests/v724-dashboard-presets-regression.cjs`, `tests/tsconfig.v724-*.json`.
+
+## V723 – Account-spezifische Dashboard-Konfiguration
+
+`lib/lastfm-dashboard-layout-v723.ts` kapselt validierte, versionierte, kontogebundene lokale Layouts mit sechs stabilen Widget-IDs, Sichtbarkeit, Größe, Verschiebung und Standard-Rücksetzung. `components/LastFmDashboardStudioV723.tsx` stellt die responsive, touch-/tastaturgeeignete Bearbeitung über der unveränderten V722-Aggregation bereit. Die bisherige `LastFmPersonalInsightsDashboardV722` und alle älteren detaillierten Auswertungen bleiben bestehen. `LastFmHistoryPanelV706` übergibt den kontogebundenen Namen; Storage-Fehler führen nicht zum Verlust der Archivdaten. Kein neues Server-API, keine Scrobble-Schreibfunktion. Prüftests: `tests/v723-dashboard-studio-regression.cjs` und die beiden `tsconfig.v723-*.json`.
+
+# V722 – Personal Music Insights Dashboard
+
+`lib/lastfm-personal-insights-v722.ts` bündelt rein lesend die bestehenden Auswertungen V717, V718, V720 und V721; `components/LastFmPersonalInsightsDashboardV722.tsx` zeigt Kennzahlen, Rekorde, Monatsübersicht, Künstler-Trends und Archiv-Erstbeobachtungen. Der Einstieg wird in `components/LastFmHistoryPanelV706.tsx` bei geladenem, kontogebundenem V713-Archiv vor der Langzeitstatistik montiert. Aktionen verwenden die vorhandenen Filter-/Chronik-Callbacks, Links vorhandene Abschnittsanker. Kein neuer API-Endpunkt, kein neuer Speicherpfad, kein Last.fm-Schreibzugriff. TypeScript-Checks verwenden isolierte Tests mit test-only React-Stubs.
+
+## V721 – Artist Discovery Dashboard (Read-only)
+
+`lib/lastfm-artist-dashboard-v721.ts` validiert und aggregiert vollständig lokal aus `archive.events` (V713) drei unabhängige Künstler-Klassifikationen: Anteilzuwachs zwischen zwei 30-tägigen, lokalen Kalenderfenstern am letzten Archivtag (beide Fenster mindestens zehn Scrobbles), langjährige Artist-Treue (mindestens drei Kalenderjahre und insgesamt 30 Scrobbles sowie jüngere Archivaktivität) und Künstler-Rückkehr nach belegter Lücke von mindestens 90 lokalen Kalendertagen. `components/LastFmArtistDashboardV721.tsx` präsentiert drei filterbare, durchsuchbare Bereiche und übergibt Navigationen ausschließlich an `components/LastFmHistoryPanelV706.tsx`, das die unveränderte V715-Chronik passend eingrenzt. Das System schätzt weder Genres noch Hörminuten und legt keinen zusätzlichen Scrobble-/API-/DB-Schreibpfad an. Regressions- und isolierte UI-/Core-Typechecks: `tests/v721-artist-dashboard-regression.cjs`, `tests/tsconfig.v721-*.json`; weitere Infos: `V721-ARTIST-DISCOVERY-DASHBOARD.md`, `V721-VERIFICATION.md`.
+
+## V720 – Music Discovery Timeline / Favorite Milestones
+
+`lib/lastfm-discovery-timeline-v720.ts` berechnet aus allen gültigen Scrobbles des bereits lokal geladenen V713-Archivs Künstler- und Songaggregate sowie lokale Monats-/Jahreswerte. Jahres-„Entdeckungen“ sind erste **archivierte** Auftritte. Ein messbarer Favoritenmoment erfordert in einem Monat ≥20 Gesamtscrobbles, ≥5 für den Künstler, ≥10 % Künstleranteil und einen monatlichen Top-3-Rang. Kein Netzaufruf, keine Speicherung, keine zusätzliche Spotify→Last.fm-Übermittlung. `components/LastFmDiscoveryTimelinePanelV720.tsx` bietet einen anklickbaren Jahresüberblick, Künstler-Suche, Monatsentwicklung, Meilensteine, Top-Songs und direkte Filter in `LastFmHistoryPanelV706.tsx`. Bestehende V706–V719-Panels bleiben aktiv. Neue Tests `tests/v720-lastfm-discovery-timeline-regression.cjs` und isolierte TypeScript-Konfigurationen `tests/tsconfig.v720-*.json`. Details: `V720-MUSIC-DISCOVERY-TIMELINE.md` und `V720-VERIFICATION.md`.
+
+## V719 – Musikjahre direkt vergleichen
+
+`lib/lastfm-year-compare-v719.ts` berechnet aus dem vollständigen, bereits kontogebunden geladenen V713-Last.fm-Archiv zwei unabhängig wählbare lokale Kalenderjahre mit Scrobble-, Künstler-, Song- und Tagessummen, zwölf Monatswerten, Künstlerzu-/abgängen, in beiden Jahren erfassten Künstlern sowie Änderungen ihrer *Scrobble-Anteile* (Prozentpunkte). „Neu in B“ ist nicht dasselbe wie „erstmals im gesamten Archiv“; beide Aussagen werden getrennt angezeigt. Eine Wiederentdeckung muss in **beiden** ausgewählten Jahren vorkommen und im chronologisch späteren Jahr durch eine tatsächlich nachgewiesene Pause von mindestens 90 lokalen Kalendertagen im gesamten archivierten Scrobble-Verlauf getrennt sein. Fehlende Daten/gleiche Jahre sind als nicht vergleichbar markiert. `components/LastFmYearComparePanelV719.tsx` bietet responsive A/B-Auswahl, Tauschen, gemeinsame Monatsbalken und Direktlinks über `components/LastFmHistoryPanelV706.tsx` in die bestehende Chronik. Rein lesend und ohne neuen Netz-/Speicher-/Scrobble-Pfad. Regressionen: `tests/v719-lastfm-year-compare-regression.cjs`, `tests/tsconfig.v719-core.json`, `tests/tsconfig.v719-ui.json`. Details: `V719-MUSIC-YEAR-COMPARISON.md`, `V719-VERIFICATION.md`.
+
+## V718 – Music Taste Story: interaktive Hörjahre
+
+`lib/lastfm-taste-story-v718.ts` erstellt aus dem **vollständigen** bereits geladenen kontogebundenen V713-Last.fm-Archiv lesende Jahresaggregate, inklusive leeren Jahren zwischen erfassten Zeiträumen, jährlichen Top-5-Künstlern, Top-3-Songs, erstmalig *im Archiv* erfassten und aus Vorjahren bekannten Künstlern, 12 lokalen Monatsbalken und einem Vorjahresvergleich nur bei beidseitiger Datenbasis. Die Berechnung nutzt dieselben lokalen Datumsgrenzen wie der V716-Kalender (inklusive DST), ohne Genres zu erraten. `components/LastFmTasteStoryPanelV718.tsx` zeigt die Zeitachse mit Tastatur-/Touch-Buttons und den Jahreskapiteln; `components/LastFmHistoryPanelV706.tsx` öffnet aus Jahres-, Monats- und Künstlerauswahl die vorhandene V715-Chronik. Kein neuer Netz- oder Speicherpfad, keine doppelten Last.fm-Scrobbles, alte Panels bleiben erhalten. Regressionen: `tests/v718-lastfm-taste-story-regression.cjs`, `tests/tsconfig.v718-core.json`, `tests/tsconfig.v718-ui.json`. Details: `V718-MUSIC-TASTE-STORY.md` und `V718-VERIFICATION.md`.
+
+## V717 – Persönliche Hörrekorde, Serien und Wiederentdeckungen
+
+`lib/lastfm-milestones-v717.ts` aggregiert ausschließlich bestehende und gültige V713-/V706-Last.fm-Scrobbles. Der rein lesende Kern berechnet Rekordtage/-monate, aufeinanderfolgende lokale Kalendertage (DST-sicher), häufigste Songs und Künstler, wiederentdeckte Tracks nach mindestens 90 lokalen Kalendertagen ohne beobachteten Scrobble sowie Monatskennzahlen. `components/LastFmMilestonesPanelV717.tsx` zeigt die Rekorde im V715/V716-Explorer mit direktem Tag-/Titel-Sprung. Der Kalender steuert den Monatsvergleich; vor Beginn des Archivs fehlt ein Referenzmonat ausdrücklich. Suche/Seitennavigation und beide Last.fm-Opt-ins bleiben unverändert. Regressionen `tests/v717-lastfm-milestones-regression.cjs`, `tests/tsconfig.v717-core.json`, `tests/tsconfig.v717-ui.json`. Details: `V717-HISTORY-MILESTONES.md`.
+
+## V716 – Interaktiver History-Kalender
+
+`lib/lastfm-history-calendar-v716.ts` aggregiert **nur** die bereits geladenen, kontogebundenen Last.fm-Ereignisse aus IndexedDB in lokale Kalendertage, einschließlich 23-/25-Stunden-Tagen bei Sommer-/Winterzeit. Die Farbskala ist absolut (0, 1–4, 5–14, 15–34, ab 35 Scrobbles); Tageszahlen sind stets sichtbar, nicht in Minuten umgerechnet. Ein Monatswechsel läuft nur innerhalb des belegten Archivzeitraums. Das neue Kalender-Panel in `components/LastFmHistoryPanelV706.tsx` reagiert auf Freitext- und Künstlerfilter, unabhängig vom Datumsfilter und der Pagination. Ein gewählter Kalendertag setzt den inklusiven V715-Eintagesfilter, startet auf Seite 1 und springt zur Chronik. Kein neuer Netzwerkpfad, keine zusätzlichen Scrobbles oder Speicherwrites. Tests: `tests/v716-history-calendar-regression.cjs`, `tests/tsconfig.v716-core.json`, `tests/tsconfig.v716-ui.json`. Browser- und Vollbuild-Abnahme bleiben gesonderte Freigabeschritte.
+
+## V715 – History Explorer 2.0
+
+`lib/lastfm-history-explorer-v715.ts` durchsucht die kontogebundene V713-IndexedDB-History ausschließlich lesend. Freitext (NFKC), exakter Künstlerfilter, beliebige inklusive lokale Tagesintervalle mit DST-korrekten Datumsgrenzen, gleitende 30/365-Tage-Fenster, bis zu 200 Einträge pro Seite, lokale Tagesgruppen und abgesicherter CSV-Export (höchstens 25.000 gefilterte Ereignisse) sind implementiert. Das JSON-Backup aus V713 sichert weiterhin alle Scrobbles ohne diese CSV-Sicherheitsgrenze. `components/LastFmHistoryPanelV706.tsx` integriert die Bedienung, ohne zusätzliche API-Calls, Scrobble-Schreiboperationen oder Änderungen am Spotify-Archiv. Regressionen und isolierte Kern-/UI-Typchecks: `tests/v715-history-explorer-regression.cjs`, `tests/tsconfig.v715-*.json`. Die reale Browser-Abnahme und der Produktionsbuild sind gesondert freizugeben.
+
+## V714 – Music Taste Evolution
+
+`lib/lastfm-taste-evolution-v714.ts` wertet das vollständige bereits kontogebundene V713-IndexedDB-Archiv rein lesend aus und erstellt Jahresverläufe, erstmals im **Archiv** erfasste Künstler, nach ganzen Kalenderjahren ohne Eintrag wiedererfasste Künstler, Jahresvergleich (nur bei beiden tatsächlich belegten Jahren), langfristige Favoriten sowie eine Künstler-Jahres-Matrix. Korrekte Kalenderjahre nach `Europe/Vienna` inklusive Sommerzeit oder UTC. `components/LastFmTasteEvolutionPanelV714.tsx` nutzt dieselben `archive.events` wie V711/V712 – ohne neue Requests, automatisches Scrobbling oder Veränderungen an Last.fm/Spotify. Die Jahresabdeckung kann unvollständig sein; Genre-Zuordnungen werden ohne verifizierte Metadaten ausdrücklich nicht behauptet. Tests: `tests/v714-taste-evolution-regression.cjs`, `tests/tsconfig.v714-*.json`.
+
+## V710 – Last.fm History Health & automatische Nachholung
+
+`lib/lastfm-health-v710.ts` kapselt unabhängige V710-Einwilligungen pro Last.fm-Konto, feste V709-Sitzungs-Snapshots, strikt geprüfte Seitenfortsetzung und aggregierte Langzeitstatistik aus dem V706-Archiv. `components/AutomaticLastFmRecoveryV710.tsx` verwendet Browser Web Locks zur Koordination zwischen Tabs; eine zusätzliche API-Seite wird nur bei vorliegender V709-Lückenwarnung und ausdrücklicher zweiter Einwilligung im sichtbaren fokussierten Tab abgefragt. `components/LastFmHistoryPanelV706.tsx` stellt Opt-in/Opt-out, Fortschritt, zwölf Monate und Tageszeit dar; V701/Spotify bleibt unverändert. Details: `V710-LASTFM-HISTORY-HEALTH.md`, `V710-VERIFICATION.md`.
+
+## V709 – Last.fm History Recovery
+
+Neue lokale Gap-Warnung nach vollem V708-Seite-1-Poll, explizite browserseitige 5-Seiten-Nachholung mit `to`-Zeitgrenze und originalem V706-Archiv. Tests, Grenzen und Dateien: `V709-LASTFM-HISTORY-RECOVERY.md`.
+
+# V708 – Opt-in Last.fm-Automatik
+
+`lib/automatic-lastfm-history-v708.ts` fügt einen separaten, standardmäßig abgeschalteten, kontogebundenen Einwilligungs- und Statusvertrag hinzu. `components/AutomaticLastFmHistoryRecorderV708.tsx` fragt nur im aktiven/fokussierten Browser-Tab und frühestens nach fünf Minuten die erste Seite des vorhandenen V706-Last.fm-GET-Endpunkts ab; bei Aktivierung oder Last.fm-Benutzerwechsel erfolgt eine Prüfung der aktuell ausgewählten Kontoidentität. Der Datenkern ergänzt nur vorhandene gültige V706-Archive und bewahrt den separaten V701-Spotify-Vertrag. Das V706-Panel enthält Opt-in/Opt-out und Status, der V707-Statistik-/Entdeckungsdialog reagiert auf erfolgreiche neue Daten. Regression `tests/v708-lastfm-auto-sync-regression.cjs`, isolierte TS-Configs `tests/tsconfig.v708-*.json`.
+
+# V707 – Quelle wählen und getrennte Archive vergleichen
+
+`lib/listening-sources-v707.ts` liest V701-Song-Events und V706-Last.fm-Scrobbles nur als Eingaben, bildet in der gemischten Ansicht strikt **heuristische**, 1:1 nach Künstler/Track/±90 Sekunden gepaarte Ereignisse und bietet V703-/V704-analoge Statistiken und Entdeckungen. `components/ListeningSourceDashboardV707.tsx` nutzt hierfür ausschließlich lokal validierte Archive; die bestehende Spotify-Ansicht V703/V704 bleibt Standard. Beide Archive sind unverändert, keine API-/Backend-Schreibpfade. Integration `components/RecentlyPlayedV672.tsx`, QA: `tests/v707-*`, `tests/tsconfig.v707-*.json`.
+
+# V706 Last.fm History Integration
+
+- Server-API `app/api/lastfm/recent-tracks/route.ts`, API-Schlüssel nur serverseitig (`LASTFM_API_KEY`).
+- Opt-in Last.fm Scrobbles und separates kontogebundenes lokales JSON-Archiv (`lib/lastfm-history-v706.ts`), keine Vermischung mit Spotify-/V701-Zeitreihen.
+- React-Oberfläche `components/LastFmHistoryPanelV706.tsx` im Zuletzt-gespielt-Dialog; rein lesender API-Zugriff, Import auf Klick.
+- Regressions- und isolierte Typprüfung `tests/v706-*` / `tests/tsconfig.v706-*.json`.
+
+## V705 – Smart Music Discovery Studio
+
+`lib/smart-music-discovery-v705.ts` plant höchstens drei explizit ausgelöste Spotify-Katalogsuchen (Genre oder sichere Artist-Suchabfrage) und filtert ausschließlich anhand der lokal kontogebundenen V701-Track-IDs / Künstler-Credits. `components/SmartMusicDiscoveryStudioV705.tsx` verifiziert die aktuelle Spotify-Kontoidentität vor jeder Suche und zeigt neue Katalogtreffer separat von archivierten Hörereignissen. Keine Spotify-Recommendations-API, kein User-Archiv an den Server, keine automatische Speicherung, keine Genre-Qualitätsbehauptung. Neuer Tab `recommendations` in `RecentlyPlayedV672.tsx`. Details: `V705-SMART-MUSIC-DISCOVERY-STUDIO.md`, `V705-VERIFICATION.md`.
+
+## V703 – Persönliches Listening Statistics Dashboard
+
+Pure Datenaufbereitung `lib/listening-statistics-v703.ts` (keine Browser- oder Netzwerk-APIs) aggregiert ausschließlich begrenzte, kontoidentifizierte `V701Archive.events`. Sie bildet Rolling-Window-Statistiken, 12-Monats-Balken mit explizit leeren Monaten, abgeschlossene Monatsvergleiche, deduplizierte Top-Songs/Künstler-Credits und lokale Wochentage/Stunden ab. `components/ListeningStatisticsDashboardV703.tsx` liest nach erfolgreichem GET `/api/spotify/history-identity` das bestehende kontogebundene Archiv schreibgeschützt und reagiert auf Archiv-Änderungen. Neue `statistics`-Ansicht im bestehenden `RecentlyPlayedV672.tsx`; keinerlei neue Tracker, Spotify-Abfragen, Backend-Writes oder Änderung am GLB-Renderer. Versionsbezogene Tests `tests/v703-listening-statistics-regression.cjs`, isolierte Typconfig `tests/tsconfig.v703-core.json` und `tests/tsconfig.v703-ui.json`. Darstellung und nicht nachgewiesene Vollständigkeit dokumentiert in `V703-LISTENING-STATISTICS-DASHBOARD.md` und `V703-VERIFICATION.md`.
+
+## V702 – Automatische Spotify-Hörverlauf-Sicherung (Opt-in)
+
+`lib/automatic-listening-history-v702.ts` speichert standardmäßig **deaktivierte**, kontoabhängige lokale Einwilligungen und validiert den append-only Abgleich mit dem vorhandenen V701-Archiv. `components/AutomaticListeningHistoryRecorderV702.tsx` läuft nur im aktiv sichtbaren/fokussierten verbundenen Sonic Display; bei bestätigter Einwilligung ruft er höchstens alle drei Minuten den vorhandenen Spotify-GET-Endpunkt ab, revalidiert bei jedem Durchlauf die Spotify-Konto-ID und unterbricht bei Ausblenden/Logout/Abschaltung. `components/PersistentListeningHistoryPanelV701.tsx` besitzt einen getrennten Ein-/Ausschalter und eine optionale Statusanzeige; `components/RecentlyPlayedV672.tsx` montiert den Sammler unabhängig vom geöffneten Dialog. Keine Server-Persistenz, Token-/Audio-/Lyrics-Speicherung, keine tatsächliche Browser-Hintergrundaufzeichnung. Nachweis `V702-AUTOMATIC-LISTENING-HISTORY.md`, `V702-VERIFICATION.md`; Test-Isolation unter `tests/tsconfig.v702-core.json` und `tests/tsconfig.v702-ui.json`.
+
+## V700 – Smart Listening History
+
+Die vorhandene V672-Dialog- und V699-Filterarchitektur erhält einen rein clientseitigen „Smart History“-Tab. `lib/smart-listening-history-v700.ts` erstellt die 14-Tage-Zeitachse (lokale Kalendertage), zeitlich stabile Replay-/Song-/Künstler-Credit-Ranglisten und den Zähler zusätzlicher Hörereignisse. `components/SmartListeningHistoryPanelV700.tsx` zeigt die Ergebnisse mit interaktiver Tagesauswahl, wiederholte-Songs-Schalter und lokalen Spotify-Links. Bis zu 600 bereits geladene Events; keine neuen Spotify-Rechte, Speicherung oder Bühnen-Dauerlast. Test-Only-React-Deklaration `tests/stubs/v700-react-jsx.d.ts` bleibt aus dem produktiven TypeScript-Typraum ausgeschlossen. V699 bleibt erhalten.
+
+## V699 – Verbesserte „Zuletzt gespielt“-Chronik
+
+Reine Browser-Datenaufbereitung `lib/recently-played-tools-v699.ts` ergänzt V672–V676 um lokale Such-/Datums-/Wiederholungsfilter, chronologische Sortierung, begrenztes Zusammenführen von Spotify-Paginierungen und expliziten CSV-Export mit Formel-Injektionsschutz. Das vorhandene `RecentlyPlayedV672.tsx` nutzt weiterhin den unveränderten serverseitigen Spotify-Endpunkt und das vorhandene OAuth-Read-Scope, ohne weitere Berechtigungen, Tracking-Polling oder lokale History-Persistenz. Automatische Song-/Bühnenanalyse der V673–V676-Tabs bleibt unverändert und bezieht sich auf geladene Ereignisse. Dialog-Fokus und Scrollsperre sind erweitert. Die 600er-Grenze und der Umfang von Spotify-Historie werden im UI gekennzeichnet.
+
+## V697 – Opt-in Concert Acceptance Dashboard
+
+Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, styling `app/acceptance/acceptance.css` und purem, streng geprüftem V696-Daten-Codec `concertAcceptanceDashboardV697.ts`. Link in `FullConcertQualityAuditPanelV641.tsx`. 6 echte Abnahmeszenarien erhalten manuell gepflegte Status, Notizen und Songzeitmarken; nur das validierte `review.json`-Format wird lokal im Browser gespeichert bzw. exportiert. V592-Report und PNGs werden ausschließlich über lokale Dateiauswahl als **unvalidierte, nicht gespeicherte Vorschau** geladen. Keine neuen Server-Endpunkte, keine automatische Freigabe oder GPU-/Musik-/Lyrics-Veränderung. CLI `v696-production-concert-acceptance.cjs` bleibt für PNG-CRC, echte GLBs und report-basierte Qualitätssperren verantwortlich; V695 bleibt für Produktionsbuild und WebGL vorgeschaltet. Siehe V697-Dokumentation.
+
+
+## V712 – Personal Music Wrapped
+
+- `lib/lastfm-wrapped-v712.ts` erstellt ohne Datenveränderung einen Jahresrückblick aus dem validierten V706-Last.fm-Archiv; `Europe/Vienna`/UTC mit korrekten Jahres- und Monatsgrenzen.
+- `components/LastFmWrappedPanelV712.tsx` wird in `LastFmHistoryPanelV706` mit denselben kontogebundenen Scrobbles dargestellt; frei auswählbare Jahre, Top-Künstler/Songs/Alben, Monatsgraph und Datenabdeckungshinweise.
+- Keine zusätzliche Last.fm-Abfrage, keine doppelte Scrobble-Übertragung, keine ungemessenen Hörminuten oder Behauptung über vollständige Historie. Spotify-Scrobbling bleibt ausschließlich bei der bereits verbundenen Last.fm-Anwendung.
+- Tests: `tests/v712-lastfm-personal-wrapped-regression.cjs`, `tests/tsconfig.v712-core.json`, `tests/tsconfig.v712-ui.json`.
+
+## V711 – Last.fm History Intelligence
+
+- Reiner Datenkern: `lib/lastfm-intelligence-v711.ts` verarbeitet validierte V706-Scrobbles ohne Netzwerk- oder Speicherzugriff; Zeitzonen wählbar `Europe/Vienna` / `UTC`.
+- UI: `components/LastFmIntelligencePanelV711.tsx` unter `components/LastFmHistoryPanelV706.tsx`. Liest nur `archive.events`; V706-Archiv, Spotify-Archiv, V708-Sicherung und V710-Recovery bleiben unverändert.
+- 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
+- Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `V711-VERIFICATION.md`.
+
+**Dokumentationsstand:** V865
+
+### V837 - Advanced Deutschrap Lip-Sync 7.0
+- Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
+- V368 remains sole mouth interpolator; V384/V415/V546/V644/V662 own viseme/mouth targets.
+- V837 cannot fabricate phonemes, override authored morphs, infer a singer, or change IK/camera/choreography.
+- V420 syllable edits, V423 audio, manual V644/V662 visemes, V661 stem envelopes and previews disable V837.
+- Test: `tests/v837-advanced-deutschrap-lip-sync-regression.cjs`; strict isolated typecheck: `tests/tsconfig.v837-core.json`.
+- Release evidence: `V837-ADVANCED-DEUTSCHRAP-LIP-SYNC-7-VERIFICATION.md`.
+
+
+**V704:** Die eigenständige „Entdeckungen“-Ansicht aggregiert ausschließlich das kontogebundene V701-Archiv (kein neuer API-Zugriff außer der bestehenden Identitätsprüfung). Sie kategorisiert archivierte Comebacks, selten gehörte Titel, erstmals erfasste Songs, Repeats und nur ausreichend belegte Veränderungen von Künstler-Credits. Die bestehende V702-Sicherung bleibt unverändert, die Ansicht schreibt keine Archivdaten. Verträge und Freigabegrenzen: `V704-MUSIC-DISCOVERY-DASHBOARD.md` und `V704-VERIFICATION.md`. 
+
+**V698:** Visual Concert Review Studio: separates, begrenztes menschliches Notizarchiv zu lokalen V697-V592-Vorschaubildern, mit ID-only-Verknüpfung zur unveränderten V694-Historie; keine automatische Freigabe. Siehe `V698-VISUAL-CONCERT-REVIEW-STUDIO.md`.
+
+## V696 – Real-GLB Konzertabnahme (sechs Varianten)
+
+`v696-production-concert-acceptance.cjs` bewertet **sechs separate** opt-in V592-Live-Captures: Deutschrap und Hardstyle/Hardtekk jeweils mit 1/2/4 wirklich gerenderten GLB-Darstellern. Bestehende Spotify-/3D-Render-/Kamera-/Lyrics- und Licht-Pipelines bleiben unverändert. Die Testmatrix prüft Berichtskonsistenz, Render-Meshes je Performer, echte PNG-Dateinachweise, Songfortschritt, rAF-FPS, P95-Framezeit und ein manuell ausgefülltes, begründetes Sichtprüfungsblatt. Die JS-Suite verwendet ausdrücklich **synthetische Testdaten**, die nicht als Projektbelege übernommen werden. Keine automatisch behauptete Tanz-, Lippen- oder Lichtqualität, kein Benchmark ohne echten Song und keine automatische Freigabe. Für vergleichbare 1-/2-/4-Avatar-FPS müssen der Track, die Auflösung und der Chromium-Aufnahmemodus übereinstimmen; GPU-Zeiten und Raspberry-Pi-Eignung werden dadurch nicht gemessen. Ergebnisse (`artifacts/v696`) werden lokal erstellt und nicht als falsche Erfolge mitausgeliefert.
+
+**Dokumentationsstand V696 (historisch):** V696
+
+## V695 – Release- und Browser-Qualitätsprüfung (fail-closed)
+
+V695 ergänzt ein **reproduzierbares Produktions-Freigabe-Gate**, ohne das Projekt ohne Nachweise als geprüft zu markieren. `scripts/v695-release-quality-gate.cjs` kontrolliert das projektkompatible Lockfile, lokal installierte npm-Abhängigkeiten, führt bei erfüllten Voraussetzungen tatsächlich `npm run typecheck` und `npm run build` aus und akzeptiert echte QA-/WebGL-Nachweise aus `scripts/v695-browser-qa-smoke.cjs` nur mit einer realen localhost-Anwendung. Ein optional übergebener aktueller, geprüfter V592-Bericht kann den GLB-Live-Nachweis liefern; PNG-Originale müssen vorhanden sein. Das V695-Protokoll unterscheidet `passed`, `failed`, `blocked`, `not-run` und `manual-required`. Selbst wenn sieben technische Gates bestehen, heißt das Ergebnis nur **needs-human-review** – keine automatische Freigabe von natürlichem Tanz, Lip-Sync, Lyrics-Lesbarkeit oder Bühnenlicht. Keine neuen GPU-Render-Pässe, keine Show-Regieänderungen, keine Audio-/Lyrics-Aufzeichnung. V694-Historie und manuelle Status bleiben unverändert.
+
+**Dokumentationsstand V695 (historisch):** V695
+
+## V694 – Dauerhafte Konzert-Qualitätshistorie
+
+Die V641/V692/V693-QA erhält eine **versionierte, lokal gespeicherte Aufgaben- und Vergleichshistorie**. Der Speicheradapter `concertQualityHistoryStorageV694.ts` ist strikt vom reinen Codec `concertQualityHistoryV694.ts` getrennt. Der vorhandene QA-Recorder lädt die Historie beim Öffnen; Benutzerklicks sichern manuelle Aufgabenstatus, explizite Vorher-/Nachher-Aufnahmen und ausdrücklich archivierte Vergleiche. `ConcertQualityHistoryPanelV694.tsx` zeigt historische Vergleiche **auch ohne aktuelle Song-Aufzeichnung**, einschließlich Versions- und vorsichtigen Performance-Differenzen, und erlaubt JSON-Import/-Export und Löschungen nach Bestätigung. Keine Rohstichproben, Lyrics, Audio oder automatische Qualitätsfreigabe. Tests `test:v694`, `test:v694:types`, `test:quick`. Siehe `V694-DURABLE-CONCERT-QUALITY-HISTORY.md`.
+
+**Dokumentationsstand V694 (historisch):** V694
+
+## V693 – Concert Quality Improvement Studio
+
+`concertQualityImprovementV693.ts` leitet aus dem **ausschließlich manuell gestarteten** V641-Vollsong-Capture fünf priorisierte, evidenzkennzeichnete Prüfschritte des V692-Inspektors ab. Die UI `ConcertQualityImprovementStudioV693.tsx` ist in `FullConcertQualityAuditPanelV641.tsx` integriert. Der Aufgabenstatus „Offen/In Prüfung/Von mir geprüft“ ist reiner, nur vom Benutzer geänderter React-Zustand im geöffneten QA-Panel; keine Änderung von Bühnen-/Kamera-/Lyrics-Einstellungen und keine dauerhafte Speicherung. Vorher- und Nachher-Snapshots enthalten lediglich Prüfzusammenfassungen ohne Audio/Lyrics-Inhalte oder Rohproben und müssen explizit als **zwei getrennte Aufzeichnungen** gewählt werden. Vergleiche werden bei anderem Song, abweichender Dauer, schwacher/unterschiedlicher Abdeckung oder Avatar-/GLB-Unterschieden unterbunden. Es werden nur „Warnhinweise nicht wiederholt“ und numerische FPS-/P95-Unterschiede ausgewiesen, niemals automatische Fehlerbehebung oder Qualitätsfreigabe. Tests: `test:v693`, `test:v693:types`, `test:quick`.
+
+**Dokumentationsstand V693 (historisch):** V693
+
+## V692 – Evidence-based Concert Quality Inspector
+
+`concertQualityInspectorV692.ts` aggregiert vorhandene V466-Proben bzw. ausschließlich vom Nutzer gestartete und mit V641 geprüfte Vollsong-Beobachtungen. Es werden separate Status je Tanz/Framing (nur Geometrie), Kamera (nur Regie-Metadaten), Lyrics (nur Rechteckgeometrie), Licht (keine direkte Messung, immer manuell) und Performance (FPS/P95) erzeugt. `ConcertQualityResultsPanelV692.tsx` ist im bestehenden QA-Panel und bei V641-Vollsong-Reports eingebunden. Automatische Freigaben, ungefragte Aufzeichnung, neue Render-Schleifen und Eingriffe in Choreografie/Kamera/Licht/Lyrics finden nicht statt. Tests `test:v692`, `test:v692:types`, `test:quick`.
+
+## V687 – Feature & Duet Performance
+
+`featureDuetPerformanceV687.ts` verfeinert ausschließlich trackgebundene, **explizit bestätigte** Sänger-Cues (V385/V416/V496), die von V517 autorisiert wurden. Die reine, seek-sichere Funktion erzeugt kleine, zeitlich begrenzte Blickkontakte und Oberkörperakzente bei Handoffs, Duetten, Features und bestätigten Ensemble-Hooks. Ein ungeprüfter visueller Fokus gilt nicht als Sänger. Die Integration in `GroupDancersV326SceneV492.tsx` sitzt nach V638 und vor V506/V508-Kollisionsschutz; unverändert bleiben Bühne, Kamera, Vocals, Lipsync, Lyrics, manuelle Gruppen, Foot-IK und Animationsclips. `npm run test:v687`, `npm run test:v687:types`.
+
+## V684 – Natural Dance Evolution
+
+Die additive GLB-Rig-Pipeline besitzt nach V666 eine weitere **rein deterministische**
+Verfeinerungsstufe `naturalDanceEvolutionV684.ts`. Sie variiert bereits vorhandene
+Arm- und Oberkörperakzente langsam über mehrere Sekunden und dämpft die
+Gewichtsverlagerung, wenn die bestehende IK beide Füße als aufgesetzt meldet.
+Eine zweite Funktion reduziert ausschließlich automatisch generierte 3-/4-Avatar-
+Schrittakzente **nach** V524/V587/V596, vor V487 und V494. Kein Clip-Retargeting,
+kein neuer Beat, keine erfundene Bodenkontaktmessung, keine zusätzlichen Root-Bewegungen.
+Manuelle Animationen, Qualitätsstufe `low`, reduzierte Bewegung und unbekannter GLB-
+Fußkontakt deaktivieren den GLB-Rig-Eingriff. Song-Zeit und Performer-Slot
+bestimmen die Variation; es entsteht kein weiterer Render-Loop.
+Tests: `test:v684`, `test:v684:types`, siehe `V684-VERIFICATION.md`.
+
+## V681 – Verse–Hook–Drop Intelligence
+
+`verseHookDropDirectionV681.ts` verarbeitet dieselben vollständig belegten
+V604-/V671-/V679-Abschnitte. Verse bewahren Platz für Lyrics, wiederholte Hooks
+wechseln kleine Bewegungs- und Kameragewichte, echte Builds steigen sanft an,
+Drops erhalten begrenzte Licht-/Tanzakzente und Breaks kontrastieren. Alle drei
+Automatikkanäle bleiben begrenzt (max. ±2,2 % in V681), verblassen an jedem
+Abschnittsrand und werden **vor** der finalen V670-Qualitätsgrenze angewendet.
+Manuelle Regie sowie Lyrics-/Vocal-Zeitmarken sind nicht betroffen.
+Eine Ansicht ist in `TrackAnalysisControlsV318.tsx` ergänzt. Ohne belegte
+Songstruktur ist V681 identisch zur bisherigen Regie. Tests: `test:v681`,
+`test:v681:types`, `test:smoke:v681`. `test:quick` bleibt build-sicher.
+
+
+## V680 – Build & Quality Gate
+
+`npm run build` führt über `prebuild` ausschließlich `check:fast` aus:
+`check:dependencies` (Node.js + installierte npm-Pakete, Lockfile-Warnung),
+`test:quick` (V669–V680 plus Syntax-/Architektur-/Case-/Typ-Isolation-/Spotify-Regression),
+`typecheck` und erst danach `next build`. Die vollständige V671→V66x-Historie
+bleibt in `check:release`/`test:smoke:v680` und wird **nicht** in jedem
+lokalen Build gestartet. Der sonntägliche CI-Workflow führt `verify:historical`
+getrennt aus. Ohne `node_modules` ist ein echter Next-Build **nicht bestanden**;
+der Diagnosebefehl liefert einen klaren Abbruch ohne falsche Erfolgsmeldung.
+`package-lock.json` fehlt weiterhin, siehe `V680-BUILD-QUALITY-GATE.md`.
+
+## V679 – Intelligent Song Arc Director
+
+`intelligentSongArcV679.ts` berechnet aus **derselben** bestätigten V604/V671-Zeitachse eine
+strategische Priorisierung von belegten Hook-/Drop-Höhepunkten, getrennten Nebengipfeln,
+Aufbauabschnitten und wirklichen Ruhephasen. Fehlen bestätigte Abschnitte oder die
+Zeitachsen stimmen nicht überein, bleibt die Ebene aus. Die Regie verändert ausschließlich
+kleine Multiplikatoren der vorhandenen automatischen Tanz-/Kamera-/Lichtkanäle und ist
+zwischen V671 und dem finalen V670-Qualitätswächter integriert. Es entstehen weder
+Kameraschnitte noch Songabschnitts-Timings, Sängerrollen, API-Zugriffe oder neue Timer.
+Die grafische, rein lesende Vorschau ist in `TrackAnalysisControlsV318.tsx` verfügbar.
+
+## V671 – Full-Song Dramaturgy / Verified Pacing
+
+`fullSongPacingV671.ts` plant kleine, deterministische Intensitätsvariationen auf Grundlage `fullSongConcertDramaturgyV604` und des genre-spezifischen `universalConcertShowDirectorV669`. `VisualizerStage.tsx` integriert sie **vor** `automaticShowQualityGuardV670` in demselben Gain-Pfad. Die V670-Qualitätskappen und manuelle Prioritäten bleiben damit maßgeblich. `TrackAnalysisControlsV318.tsx` zeigt eine read-only Vorschau aus lokaler V318-Analyse. Kein zweiter `useFrame`, keine Timing- oder Textkorrektur, keine neuen API-Anfragen.
+
+### V666 – Genre-spezifische, sichere Motion-Overlays
+
+`genreAwareMotionDirectorV536.ts` bewertet installierte Rock- und Pop-GLB-Clips nun getrennt. `genreDancePerformanceV666.ts` skaliert bestehende additive Rig-Kanäle innerhalb fester Grenzen nach explizitem Genre, Songphase und Beatdaten, nach V665-Grounding und vor der regulären V492-Rig-/IK-Aktualisierung. Kein zusätzlicher Frame-Loop; keine Änderung von Lip-Sync, Foot-IK oder manuellen Clip-Prioritäten. Die Einstellung wird per `unifiedBackup.ts` exportiert.
+
+> Aktueller Entwicklungsstand: **V666 – Genre-Specific Dance Intelligence** (Produktionsbuild ausständig).
+
+
+**V666 – Genre-Specific Dance Intelligence:** Die vorhandene V536-Motion-Auswahl behandelt Rock und Pop jetzt unterschiedlich. Optionaler, standardmäßig abgeschalteter V666-Regler gewichtet bereits vorhandene GLB-Oberkörper-Overlays je nach Deutschrap, Hardstyle, Hardtekk, Rock und Pop; manuelle Choreografien, V665-Grounding, Fuß-IK und Lip-Sync bleiben geschützt. Die Einstellung wird in der Gesamtsicherung übernommen. Tests: `npm run test:v666`, `npm run test:v666:types`; Produktionsfreigabe ausständig. Details `V666-GENRE-SPECIFIC-DANCE-INTELLIGENCE.md`.
+
+**V665 – Realistic Dance Physics & Grounding:** Opt-in-Beruhigung der bestehenden GLB-Zusatzrotationen bei bestätigtem IK-Fußkontakt und beim Wechsel in einen tatsächlich gewählten Hocke-Clip. Reine Overlay-Modulation nach V596, vor der einzigen bestehenden V492-Fuß-IK. Kein neuer Solver, keine neue Fußkontakt-Annahme, keine Root-Translation, keine Änderung an importierten Animationen. Über Einstellungen → Natürlicher Tanz. Tests: `npm run test:v665`, `npm run test:v665:types`; Produktionsfreigabe weiterhin ausständig.
+
+## V664 – Natural Duet & Feature Interaction
+
+`components/visualizer/naturalDuetFeatureInteractionV664.ts` erweitert den bestehenden V500/V575/V616-Planer mit ausdrücklich pro Song aktivierbaren, begrenzten Blick- und Oberkörperakzenten für V416-Lyrics- und V496-Zeitachsen-Zuordnungen. Es werden keine Sänger identifiziert oder Clips/Mundbewegungen verändert. Beide vorhandenen Zwei- und Vier-Avatar-Bühnen reichen den Opt-in-Modus an den gemeinsamen Planer weiter. Der Modus ist standardmäßig aus und wird durch `components/SmartLazySettings.tsx` beim Songwechsel auch bei geschlossenen Einstellungen zurückgesetzt. Tests `tests/v664-natural-duet-feature-regression.cjs` und `tests/tsconfig.v664-core.json`. Produktionsbuild und echte GLB-Runtime-Tests ausständig.
+
+## V663 – Expressive Deutschrap Performance
+
+`components/visualizer/expressiveDeutschrapPerformanceV663.ts` koordiniert ausschließlich die bereits bestätigten `V581`-Wort-/Sänger-Cues, V645-Performancemotive und manuell verifizierte V574-Blicke. `VocalRigV368.tsx` ergänzt kleine Kopf-, Blick-, Schulter- und IK-unterstützte Armbewegungen im bestehenden Renderloop, ohne Mund-/Becken-/Fußanimationen zu berühren. Die im `PhonemeTimelineLabV644.tsx` gewählte, ausschließlich songgebundene und standardmäßig deaktivierte Ausdrucksstärke wurde in `tests/v663-expressive-deutschrap-performance-regression.cjs` überprüft. Kein zweiter Renderer, kein Sprecher- oder Beat-Detektor. Siehe `V663-EXPRESSIVE-DEUTSCHRAP-PERFORMANCE.md`.
+
+## V662 – Advanced Phoneme Lip-Sync
+
+`components/visualizer/advancedPhonemeLipSyncV662.ts` erweitert den bestätigten, manuellen `V644`-Visem-Katalog um optionale koartikulatorische Kurven für Deutschrap und Gesang. Er liest den vorhandenen flüchtigen V644-Store nur bei explizitem Track-/Slot-Opt-in aus, indiziert die max. 4000 Cues pro Dokument und gibt nur innerhalb der Zeitmarken bounded Mundwerte zurück. `VocalRigV368.tsx` wendet V662 unmittelbar vor dem V644-Fallback innerhalb des *bestehenden* `useFrame` an; V562-Gesichtsprofil und bestehende Bone-/Morph-Fallbacks bleiben unverändert. `PhonemeTimelineLabV644.tsx` enthält die Profilauswahl. Keine automatische Phonemableitung aus V661-Energie. Regression `tests/v662-advanced-phoneme-lipsync-regression.cjs` und isolierter TypeScript-Test `tests/tsconfig.v662-core.json`. End-to-end-/GLB-/Build-Prüfung separat offen.
+
+## V661 – Local Vocal Timing Studio
+
+`components/visualizer/vocalAnalysisStudioV661.ts` wertet ausschließlich vom Nutzer bereitgestellte und als isolierte Gesangsspuren deklarierte V643-80-ms-Merkmale aus. Der V643-Dialog zeigt Kandidaten für Signalimpulse und längere Pausen pro Avatar-Slot, ohne Silben, Phoneme oder Sängeridentitäten vorzutäuschen. Ein ausdrücklich aktivierter, session-lokaler Store erlaubt in `VocalRigV368.tsx` eine maximal kleine additive Kiefermodulation **nur** bei wortgenauen Lyrics und bereits autorisierter Sängerrolle. V644-Viseme, manuelle V420-Edits und andere vorhandene Mundprioritäten bleiben vorrangig. `SmartLazySettings.tsx` löscht den Store beim Songwechsel; keine neue Audio- oder Render-Schleife. Tests `tests/v661-vocal-analysis-studio-regression.cjs` und `tests/tsconfig.v661-core.json`.
+
+## V660 – Smart Vocal Assignment
+
+`components/visualizer/smartVocalAssignmentV660.ts` erzeugt konfliktbewusste, ausdrücklich redaktionell autorisierte Zeitachsen-Vorschläge (V385/V416/Markierungen). `SmartVocalAssignmentPanelV660.tsx` zeigt sie in `VocalTimeEditorV496.tsx` zur expliziten Freigabe an. Nach Freigabe werden nur V496-Zeitmarken für die passende Track-ID ergänzt. Es gibt keine zusätzliche Audio-/Kamera-/GPU-Laufzeit. Siehe `V660-SMART-VOCAL-ASSIGNMENT.md`.
+
+## V652 – Intelligente Musik-Metadaten und szenenbasierte Fotos (28.10.2026)
+
+`services/musicMetadata/curationV652.ts` vergleicht MusicBrainz-/Last.fm-Künstler-IDs. Bei Konflikt wird keine MBID ausgegeben und keine verlinkte Song-/Album-Suche über diese ID gestartet; Last.fm-IDs allein sind *vorläufig*. Genretags werden ohne mehrfache Schreibweisen zusammengeführt. `lib/musicMetadataV651.ts` nennt die Quellen einzelner Künstlerdatenfelder; Suchtreffer mit identischem Song-/Albumtitel, aber falschem Künstler werden ausgeschlossen. Bildquellen sind Spotify (nur exakter Künstlername), Wikimedia Commons (geprüfte freie Lizenz), Flickr (vorausgefilterte offene Lizenzen + Nachweis) und TheAudioDB-Fanart ausschließlich bei explizitem Opt-in. Das reine Ranking wählt nachvollziehbar Portraits für Lyrics, Konzert-/Breitformatfotos für Hooks/Drops und ein neutrales Set für ausgewogene Szenen. Die Galerie liefert `selections` und `services/stageContent/stageContentV330.ts` beschränkt sie auf tatsächlich validierte HTTPS-Bilder; `components/visualizer/StageContentScreenV330.tsx` wählt während der Songabschnitte die entsprechende Bildreihenfolge. Keine Veränderung an Spotify-Steuerung, Sängerzuordnung, GPU-Shadern oder Audiozeit. Fototreffer können trotz Lizenz und Name falsch zugeordnet sein; die Vorschau bleibt wichtig. Tests: `tests/music-metadata-v652-curation-regression.cjs`, `tests/music-metadata-v652-identity-api.cjs` und bestehende V651-API-Tests; `npm run test:smoke:v652` / `npm run verify`.
+
 ## V651 – Smart Preset Automation (28.10.2026)
 
 `components/smartPresetAutomationV651.ts` ordnet ausschließlich sicher erkannte, gemeldete Track-/Künstler-Genres V650-Werksprofilen zu (0–100 heuristische Vertrauensskala, Track ≥80 / Künstler ≥88). Unklare, unbekannte und manuell korrigierte Genres werden nicht automatisch angewendet. `components/useSmartPresetAutomationV651.ts` bleibt in `components/TouchKioskControls.tsx` auch bei geschlossener Steuerzentrale montiert. Betriebsarten Off (Standard), Vorschlag und Auto werden in einem separaten lokalen Storage-Key gehalten. Auto wartet 900 ms auf stabile Angaben und funktioniert nur zu Beginn eines neuen, gerade abgespielten Songs (≤12 s); das erstmalige Einschalten darf den aktuellen Song nicht ändern. Manuelle Änderungen sperren automatische Änderungen für diesen Titel; pro Titel höchstens eine Anwendung. Sicherheitsfreigabe über V650-Validator und V649-Allowlist. Rückgängig stellt nur betroffene Settings und V648-Anzeigewerte für denselben Track wieder her. Weder Spotify-Daten/-Playback noch Sänger-/Kamera-/Show-Timelines, Viseme, Audio, WebGL-Schleifen oder GLB-Dateien werden modifiziert. Genre-Score ist keine wissenschaftlich kalibrierte Wahrscheinlichkeit. Tests: `tests/v651-smart-preset-automation-regression.cjs`, `tests/tsconfig.v651-core.json`; Doku `V651-SMART-PRESET-AUTOMATION.md`, `V651-VERIFICATION.md`.
@@ -370,7 +837,7 @@ Neue Fußkontakte führen unmittelbar zur Reduktion additiver Fußrotationen. De
 `services/show/liveConcertComparisonV544.ts` ergänzt eine reine A/B-Projektionsanalyse auf der bereits opt-in etwa sekündlich messenden V466-WebGL-Qualitätsprobe. `components/visualizer/ConcertVisualCompareV544.tsx` ist unter dem bestehenden QA-Knopf erreichbar und speichert maximal zwei manuell aufgenommene Momentaufnahmen (A/B) im React-UI-Zustand; die Schemabilder verwenden echte normalisierte Kopf- und Lyrics-Rechtecke und zeigen die vorhandenen FPS an, **keine Pixel/Fotos und keine optische Gesichts-/Tanzprüfung**. Der Anwender markiert Fußarbeit, Gesicht/Lip-Sync und Lyrics getrennt; `createComparisonReportV544` exportiert auf Klick einen JSON-Bericht, keine Auto-Freigabe. Bildrand-/Lyrics-Nähe werden heuristisch beurteilt, nicht über Objekt-Okklusion. Original-Bühnenkamera, Motion, Beleuchtung, GLBs, FPS-Messintervall und QA-Gating bleiben unangetastet. `tests/v544-visual-quality-regression.cjs`, `tests/tsconfig.v544-core.json`. Der Next.js-Build braucht vollständig installierte Abhängigkeiten.
 
 
-> **Dokumentationsstand:** V651 (27.10.2026)
+> **Dokumentationsstand:** V705 (28.10.2026)
 
 ## V539 – Multi-Avatar Concert Interaction 5.0
 
@@ -531,6 +998,22 @@ Explizite trackgebundene Time-Cues in `vocalTimeDirectorV496.ts` und `VocalTimeE
 > **Quellbasis:** Sonic Display V528 auf vollständiger V527-Basis; npm-Paketversion `0.1.0-v528`.
 > **Zweck:** Aktuelle Architektur und Verantwortlichkeiten, nicht chronologische Release-Historie.  
 > **Pflege:** Bei neuen/umgebauten Komponenten, Datenflüssen, Routen und Prioritätsregeln mitaktualisieren. Der Build kontrolliert referenzierte Quelldateien; fachliche Aussagen benötigen weiterhin ein Review.
+
+## V789 – Cinematic Light Architecture
+
+Die automatische Konzertbühne erhält eine schlanke Lichtarchitektur hinter den Performern:
+`components/visualizer/ConcertArchitectureV789.tsx` zeichnet maximal 64 Segmente in
+**einem GPU-Draw-Call** über instanzierte Geometrie. Die reinen, wiederholbaren
+Layouts definiert `components/visualizer/architecturalLightPlanV789.ts`:
+Galaxy-Halo, Rock-Arena-Traverse, Stage-Portale und dezente Studio-Rahmen.
+Keine zusätzlichen Lichtquellen, Schattenkarten, WebGL-Postprocessing-Pässe oder Timer.
+
+Die Intensität reagiert ruhig auf vorhandene Song-Abschnitte und bestätigte V761-Intents,
+keine neuen erfundenen Sängerzuweisungen oder Songabschnitte. Manuelle Beleuchtung hat
+Vorrang; echte Blackouts werden sofort durchgereicht. Die Architektur ist auf
+kleinen Performance-Tiers sowie bei reduzierter Szenendetail-Stufe ausblendbar.
+Synchrone Lyrics bleiben unverändert. Regression:
+`tests/v789-cinematic-architecture-regression.cjs`.
 
 ## 1. System auf einen Blick
 
@@ -1025,3 +1508,1343 @@ V631-Mundraten und alle Keyframes in den bisherigen Besitzbereichen. Tests:
 - Kiosk-only Sidecar in `TouchKioskControls.tsx`: lazy loaded `ConcertControlCenterV649.tsx`, keyboard Escape and accessible tab interface. Touch readibility and stage/lyrics/split views remain driven by `useTouchKiosk` (V648).
 - Existing settings source of truth via `useUiPreferences().updatePreferences()`. `concertControlPolicyV649.ts` validates an explicit allowlist and builds a one-change undo snapshot; no second settings cache, audio capture, or new 3D stage.
 - Manual authored camera/vocal assignments remain untouched. Live interaction can alter renderer modes; it is not a benchmark and does not claim gap-free GPU reconfiguration.
+
+
+## V653 – Smart Artist Visual Director
+
+Die reine, deterministische Policy `services/stageContent/smartArtistVisualDirectorV653.ts` koordiniert bereits gecachte V652-Fotos nach Verse, Hook, Drop und Instrumentalabschnitten. `components/visualizer/StageContentScreenV330.tsx` übergibt die resultierende Foto-Cue an die vorhandenen V338/V348-Renderer und erhält die manuellen V350-Prioritäten und V351/V352-Grenzen. `components/visualizer/StageContentScreensV333.tsx` und `components/visualizer/ThreeAvatar.tsx` reichen das bestehende Lip-Sync-Signal durch; ein separater Render-Loop wird nicht erzeugt. Das Preview und die lokalen Regler liegen in `components/visualizer/SmartArtistVisualSettingsV653.tsx`. Historische Rückwärtskompatibilitätsprüfungen bleiben erhalten. Details in `V653-SMART-ARTIST-VISUAL-DIRECTOR.md`.
+
+## V654 – Intelligent Concert Flow
+
+`components/visualizer/intelligentConcertFlowV654.ts` koordiniert die *vorhandenen* Kamera-, Licht-, Tanz- und Künstlerfoto-Lanes mit demselben, durch V600 und V604 bestätigten Songabschnitt. V654 erfindet keine Songstruktur, keine Rollen oder Shots: Unbestätigte Abschnitte und Pausen bleiben unverändert. An Abschnittsgrenzen kehrt die Intensität zur Ausgangskurve zurück; im Abschnitt gibt es längere ruhige Kamerahaltungen und nur kleine Licht-/Tanzmodulationen. `VisualizerStage.tsx` liefert den verifizierten Cue; `StageCameraDirectorV289.tsx` multipliziert nur die automatische Kameraglättung und lässt manuelle Cuts/Keyframes unangetastet. V653-Künstlerfotos werden durch `StageContentScreenV330.tsx` weiter reduziert, niemals erweitert. Lyrics/Lip-Sync und manuelle V350-Galerie haben Vorrang. Der Plan erzeugt keine Netzwerkaufrufe, GLB-Ladevorgänge, Zufallszahlen oder zusätzliche Timer. Tests: `npm run test:v654`, `npm run test:v654:types`, `npm run test:smoke:v654`. Dokumentation: `V654-INTELLIGENT-CONCERT-FLOW.md`.
+
+
+## V655 – Natural Concert Camera Intelligence
+
+`components/visualizer/naturalConcertCameraV655.ts` ergaenzt die bestehende automatische
+Kameraregie um einen expliziten, trackgebundenen, reproduzierbaren Haltezustand.
+Nur verifizierte V528-Saengerzuweisungen erlauben Portraet- oder Duett-Fokus;
+V604-verifizierte Abschnitte ohne Vocal-Beleg erhalten nur Ensemble-/Totalenbilder.
+Mindest-Haltezeiten und drei kleine Varianten vermeiden identische Wiederholungen;
+Seek, Trackwechsel und lange Zeitspruenge setzen den Regiezustand zurueck.
+Die Vorab-Framepruefung V550/V540 verweigert jede neue Bildbeschnitt-Verschlechterung;
+V351 bleibt die abschliessende Lyrics-Schutzschicht.
+Manuelle Kameramodi, Live-Editing, Presets, Keyframes und Authored-Timelines
+werden niemals veraendert. Keine zusaetzlichen Renderloops, Timer oder Netzwerkaufrufe.
+Integration: `components/visualizer/StageCameraDirectorV289.tsx`.
+Pruefungen: `tests/v655-natural-concert-camera-regression.cjs`,
+`tests/tsconfig.v655-core.json` und `npm run test:smoke:v655`.
+
+
+## V656 – Production Stability & Quality Gate
+
+- `tests/v656-production-stability-regression.cjs` testet Queue-Verdrängung (960 Imports),
+  GLTF-Cache (280 Vorschauen), Skeleton-/Mixer-Cleanup, portable Presets und
+  Spotify-Timer unter wiederholten Mount-/Unmount-/Tabwechseln. Es sind deterministische
+  Simulationen ohne echte GPU oder Browser.
+- `tests/v656-production-gate-regression.cjs` prüft die Release-Pipeline und die
+  Windows-/Ubuntu-Build-Matrix gegen versehentliche Testauslassungen.
+- **Verbindlich:** `npm run build` startet per `prebuild` `npm run check:release`,
+  einschließlich `test:smoke:v656`, Syntax, Architektur, Case-Kollisionen,
+  Ambient-Typ-Isolation und vollständigem `tsc --noEmit`. Der Next-Build
+  wird nach erfolgreichem Preflight einmalig ausgeführt.
+- `.github/workflows/concert-validation-v571.yml` führt genau diesen Build
+  auf Windows und Ubuntu für Push/PR aus.
+- **Erweitert:** `npm run verify:historical` und
+  `.github/workflows/production-quality-v405.yml` prüfen die umfangreiche
+  historische Suite wöchentlich oder manuell; sie wird nicht bei jedem PR
+  zusätzlich zum Produktionsbuild doppelt ausgeführt.
+- **Offen:** `package-lock.json` ist nicht vorhanden. CI nutzt dafür vorläufig
+  `npm install`; für reproduzierbare Builds muss ein Lockfile generiert und
+  committed werden. Lokaler vollständiger Next-Build ist nicht bestätigt.
+
+
+## V657 – Complete Portable Backup
+
+`components/PortableBackupV657.tsx` erweitert den Gerätewechsel im Display-Reiter um einen bewusst bestätigten TAR-Export mit den bestehenden V184-konformen Einstellungen, V190 Motion-Bibliothek, V492 GLB-Blend-Presets, V290 Kamerapresets, V354 Show-Timeline und Vercel-Blob-/lokal verwalteten GLB-/Vorschaudateien. `services/settings/portableArchiveV657.ts` serialisiert TAR-Daten ohne zusätzliche Abhängigkeit und prüft bei der Vorschau jeden eingelesenen SHA-256-Dateiwert, die TAR-Header und sichere relative Archivpfade. SHA-256 authentifiziert keine fremde Sicherung; kein automatischer Import vor Nutzerbestätigung.
+
+`lib/portableBackupAssetsV657.ts` und `app/api/portable-backup/assets/route.ts` listen ausschließlich serverseitig verwaltete Dateien und gefilterte Avatar-Metadaten nach Admin-Authentifizierung. `app/api/portable-backup/asset/route.ts` erlaubt nur Asset-IDs aus der bestätigten Liste – keine externe URL-Eingabe bzw. kein SSRF-Proxy. `app/api/portable-backup/import-file/route.ts` akzeptiert neuen lokalen GLB-/Bild-Upload nur im Development-Modus und mit Origin-/Admin-Prüfung. Auf Blob-Geräten verwendet die bestehende Admin-geschützte `app/api/avatars/upload/route.ts` den Clientupload mit neuen, kollisionsfreien Pfaden. `app/api/portable-backup/restore-metadata/route.ts` nimmt nur erlaubte Metadatenfelder für tatsächlich existierende Modelle oder explizite Default-Modelle an. Einstellungs- und Modellpfadreferenzen werden vor dem Browser-Import umgeschrieben, Konflikte bleiben ohne Opt-in unangetastet. Bereits installierte Dateien können bei Importfehlern übrigbleiben; Transaktion über mehrere große Blob-Uploads gibt es nicht. Externe/ephemere Ressourcen sind nicht Bestandteil des portablen Archivs und werden im Bericht separat aufgeführt; GLTF mit externen BIN-Texturen ist nicht automatisch abgedeckt.
+
+Tests: `tests/v657-portable-backup-regression.cjs`, `tests/tsconfig.v657-core.json`, `npm run test:smoke:v657`; produktiver TypeScript-Check und Next.js-Build bleiben verpflichtend in `check:release` und GitHub Actions. Keine Browser-/Vercel-Integration ohne echten Deployment-Test behaupten.
+
+## V658 – Reliable Configuration & Recovery (28.10.2026)
+
+`lib/avatarConfigSafetyV658.ts` erzeugt stabile revisionsbasierte SHA-256-Kennungen aus kanonischen Avatar-Metadaten und projiziert immutable Blob-Events deterministisch. Bei konkurrierenden gleichzeitigen Änderungen mit derselben `expectedRevision` wird nur ein Ereignis übernommen; verworfene Ereignisse bleiben diagnostizierbar. `lib/avatarBlob.ts` paginiert Snapshots/Journals, fällt bei defekten Snapshots auf die nächste lesbare Version zurück und blockiert bei unvollständigem Journal spätere Schreiboperationen. Lokale Updates sind innerhalb eines Prozesses serialisiert, schreiben über synchronisierte temporäre Datei + atomaren Rename und halten einen separaten gültigen `.bak`-Stand. API `app/api/avatars/config/route.ts` liefert Revisionen, 409-Konflikte und Status; `app/api/avatars/config/recovery/route.ts` ist Admin- und Origin-geschützt. `components/SettingsPanel.tsx` lädt beim Öffnen eines Editors Werte und Revision aus derselben Serverantwort und lässt die Eingaben bei Konflikten stehen.
+
+Wichtig: Vercel Blob besitzt in dieser Implementierung keine serverübergreifende atomare CAS-Transaktion. Die Journal-Projektion erkennt Konflikte deterministisch und verhindert stilles Last-Write-Wins beim Lesen, **garantiert aber keine sofortige 409-Antwort** bei gleichzeitig noch nicht sichtbaren Writes (eventual consistency). Der Blob-Fallback ist nur read-only bei Unsicherheit; eine manuelle Blob-Rücksetzung bedarf einer gesonderten, bewusst autorisierten Administrationsfunktion. Gegen eine kompromittierte/gelöschte einzige Sicherung hilft das `.bak` nicht; zusätzlich V657 TAR extern aufbewahren.
+
+## V659 – Unlimited Motion Playback (28.10.2026)
+
+`components/visualizer/GltfDancerAvatarV492.tsx` filtert den vollständigen Motion-Katalog ohne den bisherigen `.slice(-24)`-Verlust. `motionPlaybackWindowV659.ts` plant den gewünschten aktuellen Clip vor dem bisher aktiven Clip und vor optionalen Predictive-Cues, dedupliziert IDs und begrenzt die parallel gehaltenen dekodierten/retargetierten Clips. Der vorhandene `GLTFLoader` wird mit begrenzter Parallelität verwendet; Generationserkennung verhindert, dass alte Retargets nach Modellwechsel übernommen werden. Ein abgeschnittener In-flight-Request führt zu einem neuen Ladeplan statt verlorener Auswahl. Wenn der aktuell gewünschte Clip noch lädt, bleibt die laufende Action erhalten. Manuell vorgegebene `installed:*`-Rap-Cues gelangen in denselben Cache. Die 250-Einträge-Kappung in `characterMotionLibrary.ts`, dem V438-Profilindex und der V410-Vorschau entfällt ebenfalls; GLB-Import-Validierung und Browser-Speicherquoten gelten weiter.
+
+### V666.1 – Auto-Genre-Migration
+
+`genreDancePerformanceV666.ts` setzt bei fehlender/teilweise alter Konfiguration `enabled=true, style='auto', strength=65`. Ein explizites `enabled:false` bleibt erhalten, beschädigte explizite Aktivierungsflags werden nicht aktiviert. Die Autorität von manuellen Motion-/Rig-/V665-Foot-IK-Steuerungen bleibt unverändert. Es gibt keinen weiteren Audio-Worker, keine neue `useFrame`-Schleife oder automatische Genre-Zuordnung ohne bestätigte Tags.
+
+V666.1: Die gespeicherte Motion-Bibliothek (`characterMotionLibrary.ts`) wählt bei Neuinstallationen automatisch anhand von Genre und Songabschnitt; explizites `automatic:false` bleibt bestehen. Bereits gespeicherte Konfigurationen werden nicht ungefragt umgeschrieben.
+
+## V667 – System- & Service-Dashboard
+`SettingsPanel` öffnet standardmäßig die lazy geladene `ServiceStatusDashboardV667`-Ansicht.
+Sie kombiniert `MusicContext`, `AudioAnalysisContext`, `UiPreferencesContext`, lokale Motion- und Genre-Speicher
+sowie `GET /api/system/status`. Der Server liefert nur eine feste Liste boolescher
+Konfigurations-/Aktivierungsmerkmale aus Umgebungsvariablen, keine Credentials, keine aktiven Provider-Requests.
+Live-Erreichbarkeit wird nur dort als bestätigt dargestellt, wo die bereits bestehende Musik- oder Lyrics-Pipeline
+ein frisches positives Signal liefert. Eine konfigurierte API ist nicht automatisch erreichbar.
+Polling nur während Dashboard-Mount, 60 s, plus lokale Change-Events. Die Dashboard-Bedienoberfläche
+verändert keine Einstellungen von sich aus. Die historische `tests/v667-service-dashboard-regression.cjs`
+sichert die Konfigurations-Aussagen und UI-Anbindung ab.
+
+
+## V668 – Guided System Diagnostics
+`services/system/diagnosticAdviceV668.ts` wertet ausschließlich bereits bekannte V667-Statuszeilen aus und liefert
+begründete, priorisierte Handlungsempfehlungen. `components/DiagnosticAssistantV668.tsx` ist unterhalb der
+V667-Systemübersicht eingebettet und bietet direkte Navigation in die vorhandenen Settings.
+Der Adapter benötigt keine zusätzlichen Netzwerkabfragen und greift niemals auf Tokens, Browser-Storage oder
+Konfigurationsänderungen zu. Fehlende optionale Dienste werden nur nach expliziter Auswahl angezeigt.
+„Nicht geprüft“ ist kein Fehler und keine bestätigte Funktionsfähigkeit. Eine unzugängliche Serverstatus-Quelle
+wird separat gemeldet.
+
+## V669 – Universal Automatic Concert Show Director
+`components/visualizer/universalConcertShowDirectorV669.ts` erweitert V502/V654 innerhalb der bestehenden
+Regie um genreübergreifende, konservativ begrenzte Akzente für automatische Tanz-, Kamera- und
+Lichtkanäle. Vorhandene V600/V604-Songabschnitte gelten nur als bestätigt, wenn Plan und aktuelle
+Cue übereinstimmen. Ohne bestätigte Abschnitte greift eine sanfte Songkontur ohne erfundene
+Hook-/Drop-Ereignisse. Manuelle Animationen, Kamera-Keyframes, Lichtabschaltung, Lyrics,
+Sängerrollen und Songzeitmarken bleiben geschützt. `VisualizerStage.tsx` benutzt weiterhin den
+ursprünglichen Renderer, dessen Properties lediglich mit den zusätzlichen bounded Gains gespeist
+werden. Datenattribute `data-v669-*` liefern überprüfbaren Status.
+
+## V670 – Automatischer Show-Qualitätswächter
+`components/visualizer/automaticShowQualityGuardV670.ts` ist ein reiner, zustandsloser Guard **nach** der V669-Koordination im bestehenden `components/visualizer/VisualizerStage.tsx`-Datenfluss. Keine zweite Kamera, neue Render-Schleife, Netzwerk-Abfrage oder zusätzliche Audioerkennung. Er begrenzt ausschließlich automatische V502-Gain-Multiplikatoren; manuelle Dance-/Kamera-/Licht-Einstellungen, Karaoke-Text, echte Cut-Timings und GLB-Fuß-IK bleiben unberührt. Bei Lyrics-Vorrang engere Kameralichtgrenzen. Wiederholung wird **nur** aus verifiziertem V604-Act-Metadatum abgeleitet, nicht aus vermuteten Songszenen. `data-v670-quality`, `data-v670-flags` und `data-v670-confirmed` sind vorsichtige Diagnoseinformationen – keine behauptete Pixel-, Okklusions- oder Blitzfrequenzmessung. Tests: `tests/v670-show-quality-guard-regression.cjs`, `tests/tsconfig.v670-core.json`.
+
+
+### V672 – Zuletzt gespielt (Spotify-Hörverlauf)
+
+- `components/RecentlyPlayedV672.tsx`: lazy geladenes, touchfreundliches Verlaufsfenster über der 3D-Bühne; Suche, Zeitgruppen, Cover, Album und Spotify-Links; Daten nur auf Nutzerklick.
+- `app/api/spotify/recently-played/route.ts`: authentifizierte, nicht gecachte und paginierte Spotify-Abfrage mit Consent-Check, Token-Refresh sowie separaten Fehlerzuständen.
+- `lib/recently-played-v672.ts`: begrenzte Daten-Normalisierung inklusive gültiger Spotify-URLs und Bildquellen.
+- `tests/v672-recently-played-regression.cjs`: Testfälle für Historie, Pagination, Scope, Sicherheitsgrenzen und Integration.
+- Der OAuth-Scope `user-read-recently-played` verlangt eine neue Spotify-Freigabe bei bestehenden Accounts. Keine langfristige Speicherung der Hörhistorie; der Suchfilter betrifft geladene Titel.
+
+### V673 – Hör-Highlights (lokale Verlaufsauswertung)
+
+- `lib/recently-played-insights-v673.ts`: deterministische, rein lokale Aggregation bereits geladener Spotify-Hörereignisse nach Songs, Künstler-Credit-Zeilen, Wiederholungen, Tagen und lokaler Tageszeit; Top-5-Ranglisten. Keine vollständige Langzeit-Statistik und keine Audio-Hörzeit-Schätzung.
+- `components/RecentlyPlayedV672.tsx`: wechselt zwischen Chronik und responsivem V673-Highlights-Dashboard; nutzt nur `tracks` der V672-Route; keine neue externe API oder Datenspeicherung.
+- `tests/v673-listening-insights-regression.cjs`: Tests für Wiederholungen, Credits mit Features, Zeitzonen-unabhängige Tageszeit-Fälle, Grenzen und Verdrahtung.
+
+### V674 – Visuelle Hörhistorie und optionale Genre-Vorschläge
+
+- `components/RecentlyPlayedDiscoveryV674.tsx` integriert Cover-Wand, Songdetail, Künstler-Favoriten, Last.fm-basierte Genreansicht und explizite Bühne-/Tanzstil-Übernahme. Keine automatischen Änderungen an der laufenden Konzertshow.
+- `lib/recently-played-discovery-v674.ts` enthält reine Funktionen für Genre-Validierung, abdeckungsbewusste Statistik, Künstler-Ranking und kontrollierte Style-Vorschläge; kein Browser-Speicher.
+- Genre-Erkennung erfolgt nur nach Nutzeraktion, ist limitiert, abbruchfähig und baut auf `/api/genre` auf (optionales `LASTFM_API_KEY`). Fehlende oder schwache Genre-Evidenz bleibt als unbekannt gekennzeichnet.
+- `tests/v674-recent-discovery-regression.cjs` testet Modelle, Abdeckung, Sicherheit, UI-Verdrahtung und Test-Skripte.
+
+
+## V675 – Temporäres Smart Music Profile
+
+`lib/listening-profile-v675.ts` erstellt ausschließlich aus `RecentlyPlayedV672` und ausdrücklich in V674 geprüften Last.fm-Genres eine **flüchtige** Auswertung. Hauptkünstler werden anhand des Spotify-Primary-Artist-Labels gezählt; mehrere Wiedergaben desselben Songs werden als Wiedergaben gekennzeichnet. Die Genre-Familien kommen aus `config/musicGenres.ts`, unbekannte Genres bleiben unbekannt; keine Schätzungen aus Künstlernamen. Erst ab drei zugeordneten Wiedergaben **und mindestens zwei verschiedenen Songs je Familie** erscheint ein Vorschlag. Weitere Angaben zur Datenabdeckung erscheinen immer; keine Langzeit-Hörbehauptungen.
+
+`components/ListeningProfileV675.tsx` zeigt Genre-Familien, Künstler, und höchstens drei auswählbare Show-Looks als zusätzlichen Tab „Mein Musikprofil“ im vorhandenen Dialog `components/RecentlyPlayedV672.tsx`. Beim Übernehmen werden ausschließlich `stageTheme`, `stageReactive`, `stageLightStrength` und `avatarDancePreset` verändert; nur mit zusätzlichem Häkchen auch `danceFxEnabled`/`danceFxStrength`. Vorherige Werte können widerrufen werden, solange kein anderer Settings-Patch dazwischenkam. Spotify, Lyrics, Auto-Songdramaturgie, Kamera, Sängerrollen und Avatar-Modelle werden nicht verändert. Die Statistik wird nur im Client-Speicher gehalten und beim Schließen verworfen. Tests: `tests/v675-listening-profile-regression.cjs`; Details `V675-SMART-MUSIC-PROFILE.md`.
+
+### V676 – Persönlicher Konzert-Designer
+
+`components/ConcertLookDesignerV676.tsx` ist im Dialog „Zuletzt gespielt“ auch ohne geladenen Spotify-Verlauf verfügbar. Der Vorschau- und Bearbeitungsmodus ändert keine aktuellen Bühneneinstellungen; die manuelle Anwendung eines gespeicherten Looks setzt ausschließlich Bühne, Licht, Tanz-Preset und DanceFX. `lib/concert-look-designer-v676.ts` validiert ein begrenztes, versioniertes lokales Looks-Format einschließlich Genre-Zuordnung; ungültige Daten werden nicht überschrieben. Der Speicher-Schlüssel `sonic-display:v676:concert-looks` gehört zur Gruppe `ui` der portablen Gesamtsicherung in `services/settings/unifiedBackup.ts`. Die vorhandene Genreerkennung bleibt optional und unverändert.
+
+
+### V677 – Smarte Song-zu-Look-Automatik (Opt-in)
+
+- `lib/smart-concert-look-v677.ts`: Validierter Track-/Genre-Evidenzschutz, stabiler Hash für abwechslungsreiche Auswahl, exakte Genres vor Familien- und Universal-Looks; reine Funktionen ohne Seitenwirkungen.
+- `components/SmartConcertLookControllerV677.tsx`: Einmaliger, unsichtbarer Controller innerhalb des Musik-Providers. Spielt nur bei aktivierter Automatik, laufendem Song, verifiziertem Genre und gültiger lokal gespeicherter Look-Bibliothek einen der sechs Show-Regler ein. Jede manuelle Änderung an einem dieser Regler beendet die Automatik. Kein Netzwerkabruf und keine Änderung an Lyrics, Kameras, Vocal-Rollen, Show-Timelines oder Modellen.
+- `hooks/useGenreDetection.ts`, `context/MusicContext.tsx`, `types/music.ts`: Genre-Ergebnis wird an die exakt erkannte Track-ID gebunden. So kann bei Songwechseln kein altes Genre angewendet werden; ausdrücklich manuelle Genre-Korrekturen sind ebenfalls erlaubt.
+- `components/ConcertLookDesignerV676.tsx`: Touchfreundlicher Opt-in-Schalter mit Song-, Genre- und Look-Vorschau. Manuell aktivierte Looks stoppen Auto-Look. Umschaltung wird in vorhandenen UI-Einstellungen gesichert, bestehende Look-Bibliothek bleibt unverändert.
+- `tests/v677-smart-concert-look-regression.cjs`: Erkennung/Vertrauen, Auswahlpriorität, wiederholbare Variation, Gültigkeit, Opt-in und Integration, keine unerwarteten Nebenwirkungen.
+
+### V678 – Acoustic Mood / Opt-in
+
+`lib/live-mood-v678.ts` analysiert ausschließlich tatsächliche Mikrofonmesswerte (`volume`, `energyEnvelope`, `bass`, `highs`, `beatStrength`, `attack`) in einem begrenzten 4-Sekunden-Ringfenster. Ohne aktive Mikrofonfreigabe, laufende Spotify-Wiedergabe und Nutzer-Opt-in gibt es **keine** Klassifikation. Der als Spotify-Ersatz vorhandene synthetische `useEstimatedBeat` wird vollständig ausgeschlossen. Vier **akustische** Modi: ruhig, atmosphärisch, treibend, druckvoll. Keine zuverlässige Emotions-/Aggressionserkennung und kein Zugriff auf Spotify-Audiofeatures.
+
+`components/LiveMoodProviderV678.tsx` berechnet einen stabilisierten, songgebundenen Zustand (Hysterese, Reset bei Songwechsel, Audio-Ausfall oder Pause), ohne Audiodaten zu speichern. `VisualizerStage.tsx` wendet ausschließlich auf die bereits vollständig koordinierte finale Lichtstärke (±8 Punkte) und bei fehlender manueller Choreografie auf Tanzintensität (±8%) / Tanz-Impuls (±0,06) **reversible** Akzente an. Es werden keine Einstellungen überschrieben und keine weiteren Audio-/Rendering-Schleifen erzeugt. `components/ConcertLookDesignerV676.tsx` erlaubt Opt-in, Akzentstärke, Tanz-Freigabe und zeigt Quellen-/Messstatus. Die drei Einstellungen bleiben im bestehenden `UiPreferences`-Backup. Neue Tests: `tests/v678-live-mood-regression.cjs`. Vollständige Produktionsvalidierung separat dokumentiert.
+
+
+## V682 – Cinematic Camera Variety
+
+Evidence-bound and song-clock-driven shot-motif variety in `components/visualizer/cinematicCameraVarietyV682.ts`; V655 remains source of verified singer/section decisions. V550 and V540 checks prohibit worsened head/body/screen overflow; the V351 lyrics guard remains last. No new R3F canvas, camera cuts, clocks, persistence or fetches. V682 regression and isolated strict TypeScript checks are exposed via `test:v682` and `test:v682:types`. See `V682-CINEMATIC-CAMERA-VARIETY.md`.
+
+
+## V683 – Smart Ensemble Director
+
+Verified V681 sections drive **only** V442/V446 autogenerated, track-bound V326 3/4-avatar formation-root positions.
+`smartEnsembleDirectorV683.ts` maps verses to spotlight staging, alternate hooks to dialogue-like staging,
+confirmed drops to wide groups, builds to arcs and breaks to quieter formations. Existing focus slots are
+never reassigned as vocals, and V609 transitions and V326 root spacing remain authoritative. Manual groups,
+2-person duets, choreography overrides, songless data and absent verified timelines are untouched. Inspector
+`TrackAnalysisControlsV318.tsx` renders a read-only four-performer preview. Test with `npm run test:v683`
+and `npm run test:v683:types`; complete Next.js build requires dependencies.
+
+
+## V685 Advanced Rap Performance
+
+Begrenzte Rap-Gesten auf den vorhandenen V684-GLB-Overlays vor Debug/Foot-IK und nach der bestehenden Formationsregie. Zeitmarken stammen ausschließlich aus synchronisierten Lyrics und werden nur bei synchronem Track-Playhead berücksichtigt. Manuelle Clips, Live-Rap-Presets, Lyrics, Sänger-Zuordnung und Lip-Sync haben Vorrang. Tests: `test:v685`, `test:v685:types`.
+
+### V686 – Vocal & Lip-Sync Precision
+
+`components/visualizer/vocalTimingPrecisionV686.ts` optimiert nur die gefilterten Morph-Zielreaktionen in `VocalRigV368.tsx` bei bestätigten Lyrics-Wortmarken und bestehender Singer-Freigabe. Manuelle Visemes, Stems, V420/V423 und Preview übersteuern V686. Siehe `V686-VOCAL-LIP-SYNC-PRECISION.md`.
+
+
+### V688 – Cinematic Lyrics 2.0
+Die neue reine Planungsstufe `components/visualizer/cinematicLyricsV688.ts` begrenzt Textbreiten und verstärkt sichere Lesbarkeit in den bestehenden DOM- und 3D-Lyrics. Sie nutzt ausschließlich bestätigte Wort-Zeitmarken für optionale, kleine Highlight-Akzente. Es gibt keine neuen Caption-Layer, keine neue Positionierung, keine Veränderung des Karaoke-Fills und keine neuen Netzwerk-, Audio- oder Render-Loops.
+
+
+### V689 – Professional Lighting Director
+`professionalLightingDirectorV689.ts` erzeugt für dieselbe bestätigte V604/V600-Songzeit einen deterministischen Licht-Score. V308 führt damit nur bestehende Moving Heads/Lichtschächte/Nebelscheiben, V555 die vorhandenen Floor-Gobos und LED-Pixelwand. Die V636-/V621-/V602-/V640-Budgets werden **nicht** aufgestockt; für den neuen Layer sind sämtliche Multiplikatoren höchstens eins. Die LED-Shaders bekommen zwei zusätzlich auswählbare vorhandene prozedurale Muster, ohne neue Materialien oder Beleuchtungskörper. Die V308-Sänger-Zielposition wird niemals von V689 verschoben. Lyrics, Vocal-Portraits, User-Licht-Timelines, Blackouts, niedrige Qualitätsstufen und Reduced Motion genießen Vorrang. Details: `V689-PROFESSIONAL-LIGHTING-DIRECTOR.md`; Tests `test:v689`, `test:v689:types`.
+
+
+### V713 – Last.fm Langzeitarchiv
+
+`lib/lastfm-indexed-history-v713.ts` führt die browserseitige IndexedDB `sonic-display-lastfm-longterm-v713` mit kontogetrennten, einzigartigen Scrobble-Schlüsseln und atomaren Transaktionen ein. Historische V706-Events werden ausschließlich ergänzend migriert. Das ältere 8k-lokale JSON bleibt als Kurzzeitspiegel für V708–V710 erhalten, ist aber nicht mehr die Grenze für langfristige Auswertungen oder Backup/Restore. Der Background-Recorder spiegelt Legacy-Änderungen nach IndexedDB, ohne zusätzliche Netzwerkanfragen. Es findet kein automatisches Last.fm-Scrobbling statt. Browser-Speicherquoten und unvollständige Last.fm-Quellen bleiben Grenzen; produktive Browserabnahme erforderlich.
+
+## V726 Gemeinsame History-Filter
+
+`lib/lastfm-shared-history-filter-v726.ts` berechnet lokale Kalenderzeitfenster (DST-sicher), Archivjahre und Künstlerfilter. `components/LastFmSharedHistoryFilterV726.tsx` steuert die Auswahl in `components/LastFmHistoryPanelV706.tsx`. Nur `components/LastFmPersonalInsightsDashboardV722.tsx` und der History Explorer werden direkt durch diesen gemeinsamen Zeitraum eingegrenzt; historische Langzeit-/Jahresvergleiche bleiben unverändert und werden als Vollarchiv gekennzeichnet. Keine Scrobbler-Schreiboperationen oder Netzwerkanfragen.
+
+
+## V729 Advanced Artist & Track Explorer
+`lib/lastfm-explorer-v729.ts` aggregiert das vollständige Last.fm-Archiv in Künstler- und Songprofile. `components/LastFmExplorerV729.tsx` bietet Suche, Jahresstatistiken, Top-Songs, Wiederentdeckungen ab 90 lokalen Kalendertagen und paginierten Hörverlauf. `components/LastFmHistoryPanelV706.tsx` bindet Profile und direkte Chronikaktionen ein. Spotify wird ausschließlich über kodierte Suchlinks geöffnet. Keine Archivmigration und keine neuen Netzwerkzugriffe.
+
+
+## V730 Profile auswerten, vergleichen und merken
+`lib/lastfm-explorer-v730.ts` ergänzt lokale Datumsfilter, vollständige Monatsreihen, Jahres-/Profilvergleiche, geprüfte kontobezogene Favoriten und CSV-Ausgaben. `components/LastFmExplorerToolsV730.tsx` integriert diese Funktionen in den bestehenden Explorer. Favoriten schreiben ausschließlich bei expliziten Nutzeraktionen in einen eigenen localStorage-Schlüssel pro Konto; defekte gespeicherte Daten werden nicht überschrieben. Keine API-Erweiterung und keine Archivmigration.
+
+## V731
+Albumprofile und Wiederentdeckungen: `lib/lastfm-explorer-v731.ts`, `components/LastFmExplorerPlusV731.tsx`. Favoriten-Backup mit Formatprüfung und additivem Import im bestehenden Favoritenbereich.
+
+
+## V732 – Archivwerkzeuge
+
+`lib/lastfm-explorer-v732.ts`: Kalenderperioden, Zusammenfassungen, Vergleiche, Qualitätsdiagnose und Sammlungsschema. `components/LastFmInsightsV732.tsx` erweitert die bestehenden Explorer-Werkzeuge. `components/LastFmCollectionsV732.tsx` verwaltet Albumfavoriten und Merkliste pro Konto; `components/ExplorerBackupFileV732.tsx` liest lokale JSON-Dateien. Prüfungen: `tests/v732-explorer-regression.cjs`.
+
+
+## V733 – Stabilitätskorrekturen
+
+Upload-Grenzen: `lib/boundedUploadV733.ts`. Geteilter Avatar-Katalog: `services/avatarCatalogV733.ts`. Vorschaufehler: `components/visualizer/ModelPreviewBoundaryV733.tsx`. Regressionen: `tests/v733-bugfix-regression.cjs`, `tests/v733-async-regression.cjs`. Funktions- und Prüfstatus: V733-BUGFIXES.md und V733-VERIFICATION.md.
+
+
+## V734 � Begrenzte Anfragen und tempor�re Modelle
+
+`lib/requestDeadlineV734.ts` begrenzt vollst�ndige asynchrone Operationen einschlie�lich Body-Auswertung, entfernt Timer und Abbruch-Listener und verwirft versp�tete Ergebnisse. Spotify verwendet 15 Sekunden, Lyrics 20 Sekunden. Bildgr��en-Probes geben nach 8 Sekunden ihren Slot frei und werden beim Unmount abgebrochen. `components/visualizer/loadMotionAssetV734.ts` l�dt private Konvertierungsquellen mit 20 Sekunden Frist und gibt Geometrien, Materialien, Texturen, ImageBitmaps und Skelette nach der Konvertierung bzw. bei versp�teter Fertigstellung frei. Gemeinsame useGLTF-Modelle bleiben unber�hrt. Der Push-Job sortiert die vollst�ndige Kontoliste vor der Rotation; zwei Konten pro Aufruf bleiben das Arbeitsbudget.
+
+
+## V735 – Begrenzte prozedurale Hueftbewegungen
+
+`components/visualizer/hipDanceV735.ts` erzeugt drei konservative Bewegungsmuster **Hip_Sway**, **Hip_Circle** und **Hip_Bounce** auf den vorhandenen Rigkanälen. Auto variiert nach Genre und Songphrase. Einstellungen (Modus, Staerke, Tempo) im Dance Studio werden von `context/UiPreferencesContext.tsx` gespeichert. Die Avatar-Vorschau kann die drei Bewegungen auch ohne gleichnamige GLB-Clips anzeigen.
+
+Der `components/visualizer/avatarRigController.ts` mischt Pitch/Roll- sowie geringe anatomie-relative Hüfttransfers ein; `components/visualizer/useGltfFootContactV492.ts` fuehrt danach weiterhin die vorhandene Fuss-IK aus. Ohne erkannte beide Bein-Ketten oder bei deaktivierter Fuss-IK sind alle Translationen gesperrt; bei beobachteten Bodenkontakten werden die Bewegungen gedrosselt. Dies ist ein Laufzeit-Fallback, keine garantiert fussfeste Offline-IK und kein eingebetteter GLB-Animationsclip. Fuer eine Einbettung in Avatar v2 muss die Original-GLB vorliegen. Separate Gesäß-Morph-Targets oder Skin-Weights wurden nicht hinzugefuegt.
+
+Regression: `npm run test:v735`; Syntax: `npm run check:syntax`; Architektur: `npm run check:architecture`. Ohne erfolgreich installiertes npm-Dependency-Tree koennen weder vollstaendiger TypeScript-Check noch Next.js-Build als bestanden gelten.
+
+
+## V736 – Build & Motion Validation
+
+`tests/v736-motion-quality-regression.cjs` fuehrt einen deterministischen, GPU-freien
+Stress- und Integrationstest der drei V735-Hueftbewegungen durch: mehrere BPM,
+Genres, Songabschnitte, Fusskontaktmasken, Pausen, Reduced Motion, manuelle
+Choreografie und extreme Zeitwerte. Ueber simulierte Mixer-Resets wird der
+`components/visualizer/avatarRigController.ts` auf akkumulative Overlay-Drifts
+geprueft, ebenso das Zusammenspiel mit der nachgelagerten Foot-IK.
+
+`tests/tsconfig.v736-core.json` und `tests/stubs/v736-rig-three.d.ts`
+sind ein **isolierter** Typcheck. Die Stubs sind im Produktiv-tsconfig ausgeschlossen
+und ersetzen niemals das echte @types/three.
+
+`npm run test:v736` sowie `npm run test:v736:types` sind Teil der
+`test:quick`-Suite und somit des Build-Preflights. `npm run verify:v736`
+startet V735/V665/V666 Regressionen, Syntax-, Architektur- und Case-Pruefungen
+und anschliessend vollstaendiges `tsc --noEmit` sowie `next build`.
+
+`components/visualizer/hipDanceV735.ts` begrenzt bei ungueltiger BPM und
+extrem langen, aber endlichen Zeitspruengen die mathematische Phase, damit
+kein NaN/Infinity in den Rig-Kanaelen entsteht. Ohne reale GLB/Browser/GPU ist
+die tatsaechliche Fussstabilitaet weiterhin nicht visuell verifiziert.
+Ergebnisse und Grenzen stehen in `V736-VERIFICATION.md`.
+
+
+## V737 - Hip Foot Lock 2.0
+
+`components/visualizer/hipFootLockV737.ts` implementiert einen eigenstaendigen,
+konservativen Weltkoordinaten-Anker fuer automatisch generierte V735-Hueftbewegungen.
+Ein Anker entsteht erst, wenn die vorhandene V135-Kontakterkennung einen
+Stuetzzustand meldet. Er wird bei Fussheben, zu grosser Positionsabweichung,
+Pause, Trackwechsel oder Zeitsprung freigegeben. Korrekturen sind relativ zur
+Beinlaenge begrenzt und verwenden ausschliesslich den bereits vorhandenen
+`components/visualizer/avatarFootIK.ts`-Solver; es gibt keinen zweiten
+IK-Controller und keine Root-, Mesh- oder GLB-Aenderung.
+
+V737 ist nur bei aktiver automatischer Hueftanimation und aktivierter Foot-IK
+aktiv. Manuell vorgegebene Clips/Timelines sowie die explizite V322-Option haben
+Vorrang. `components/visualizer/useGltfFootContactV492.ts` veroeffentlicht
+ein gedrosseltes Diagnostik-Event. In
+`components/visualizer/IntelligentFootLockControlsV322.tsx` wird die
+Ankerabweichung *vor* IK als modellbezogene cm-Schaetzung dargestellt, niemals
+als nachgewiesenes Rest-Sliding.
+
+Regression und isolierter Core-Typcheck: `npm run test:v737` und
+`npm run test:v737:types`; der komplette Produktionscheck ist weiterhin
+abhaengig von installierten Node-Paketen und einem echten GLB/GPU-Test.
+
+
+### V738 - Hip Motion Studio
+
+`components/visualizer/hipMotionStudioV738.ts` crossfades the bounded V735 poses
+with per-avatar state and C1 easing. `components/visualizer/GltfDancerAvatarV492.tsx`
+uses this output before its single final foot IK pass. User preferences and preview
+share those controls. The preview reports contact phases, not measured foot sliding.
+Tests: `tests/v738-hip-motion-studio-regression.cjs`.
+
+
+### V739 – GLB Motion Integration und Verfügbarkeitswarnungen
+
+- `components/visualizer/hipClipAvailabilityV739.ts` trennt echte GLB-Clips von prozeduralen Bewegungen und meldet fehlende Clips.
+- `components/visualizer/hipGlbMotionV739.ts` erzeugt einen Animationsclip aus Rig-Rotationen/Beckenpositionen und exportiert eine GLB mit dem Avatar. Keine automatische Installation und keine gebackene IK-Garantie.
+- `components/visualizer/AvatarEditor.tsx` zeigt eine Warnung für fehlende GLB-Clips und bietet einen gesonderten prozeduralen Modus sowie den GLB-Export.
+- `components/CharacterMotionLibraryPanel.tsx` validiert Dateiverfügbarkeit und mindestens einen Clip vor Vorschau/Aktivierung.
+- Tests: `tests/v739-hip-glb-motion-regression.cjs`, `tests/tsconfig.v739-core.json`.
+
+## V743 - Beat & Bass Motion
+
+`components/visualizer/beatBassHipMotionV743.ts` moduliert nur bereits durch V738 erzeugte und ueberblendete Hueftkanaele mit vorhandenen Kick-, Bass-, Beat- und Attack-Signalen. Livebuehne und Avatar-Vorschau nutzen den gleichen Controller. `components/SettingsPanel.tsx` haelt getrennte Regler bereit, `types/music.ts` typisiert die persistente Einstellung `avatarBeatBassV743`. Beim Livebetrieb wird keine Audioquelle simuliert; die Vorschau besitzt einen ausdruecklichen Demo-Schalter. Manuelle Animationen, GLB-Clips und die bestehende Fuss-IK behalten Vorrang.
+
+Validierung: `tests/v743-beat-bass-motion-regression.cjs` und `tests/tsconfig.v743-core.json`; der vollstaendige Produktionsbuild muss separat erfolgreich laufen.
+
+
+## V744 - Smart Choreography 3.0
+
+`components/visualizer/smartHipChoreographyV744.ts` waehlt vorhandene prozedurale Hip-Modes phrasenbasiert und genre- und abschnittsabhaengig. V742 liefert das Profil, V744 sorgt fuer weniger Wiederholung, V738 mischt die Posen sanft. GLB-Motions, manuelle Timelines und Foot-IK haben Vorrang. UI-Einstellungen in `components/SettingsPanel.tsx`, Vorschau in `components/visualizer/AvatarEditor.tsx`, Test: `tests/v744-smart-hip-choreography-regression.cjs`.
+
+
+## V745 - Multi-Avatar Dance Sync
+
+`components/visualizer/multiAvatarHipSyncV745.ts` ergaenzt die V742/V744-Hueftchoreografie um eine songuhrbasierte Ensemble-Koordination fuer bis zu vier GLB-Performer: Synchron, Stagger und Call/Response (automatisch nach Verse, Build-up, Hook/Drop). Die alte Prioritaetskette bleibt erhalten: Nur bei aktivem prozeduralem Auto-Hip-Profil und laufender Wiedergabe werden Gain und Sample-Zeit des V738-Mixers moduliert. Es gibt keine direkten Bone-, Root-, IK- oder GLB-Writes und keinen Einfluss auf Gesangsrollen. Die Lead-Slot-Wahl ist persistent in `types/music.ts` und `context/UiPreferencesContext.tsx`; Live-Einbindung in `components/visualizer/GltfDancerAvatarV492.tsx`, Einzelrollen-Vorschau in `components/visualizer/AvatarEditor.tsx`, Einstellungen in `components/SettingsPanel.tsx`. Tests: `tests/v745-multi-avatar-hip-sync-regression.cjs` und `tests/tsconfig.v745-core.json`.
+
+
+## V746 – Vocal Performance 2.0
+
+`components/visualizer/vocalPerformanceDirectorV746.ts` erzeugt rein additive,
+begrenzte Kopf-, Brust- und Arm-Mikrobewegungen aus den bereits vorhandenen
+V372-Wort-Zeitmarken und Gesichtssignalen. Der Director vergibt keine Gesangsrollen
+aus der V745-Lead-Rolle: Bei mehreren Avataren ist eine explizite, zum Track
+passende Zuordnung notwendig; ansonsten bleibt das neue Overlay stumm. Bei
+Solo-Auftritten darf der einzige Performer gestikulieren.
+Die Einbindung erfolgt ueber `components/visualizer/gltfVocalPerformanceV492.ts`
+und `applyVocalStageOverlayV371` vor Hand-/Foot-IK. Keine Ueberschreibung der
+Mundanimation, AnimationClip-Mixer, Root-, Hueft- oder IK-Bewegung.
+Persistente Regler in `context/UiPreferencesContext.tsx`, `types/music.ts` und
+`components/SettingsPanel.tsx`. Tests: `tests/v746-vocal-performance-regression.cjs`
+und `tests/tsconfig.v746-core.json`.
+
+
+## V747 – Cinematic Camera Director: Performance-Bilder
+
+`components/visualizer/performanceCameraDirectorV747.ts` akzeptiert nur
+aktuelle und zum Track passende V528-Gesangsrollen sowie verifizierte
+V604-Songabschnitte. Die Runtime in
+`components/visualizer/StageCameraDirectorV289.tsx` komponiert diese kleinen
+Kamerakorrekturen nach V655/V682 und vor dem finalen V351-Lyrics-Guard.
+V550/V540 pruefen stets sichtbare Besetzung, Kopf- und Fusspositionen.
+Neue Kameraposen duerfen die bestehende Bildsicherheit nicht verschlechtern.
+Bei geschuetzten Lyrics wird kein zusaetzlicher horizontaler Schwenk erzeugt.
+Die Kamera respektiert manuelle Keyframes, Studio-Presets, gesetzte Timelines,
+Reduced Motion und gesperrte/fehlende Performerrollen.
+
+Persistente Einstellungen: `context/UiPreferencesContext.tsx`,
+`types/music.ts`, `components/SettingsPanel.tsx`,
+`components/visualizer/VisualizerStage.tsx`.
+Tests: `tests/v747-performance-camera-regression.cjs` und
+`tests/tsconfig.v747-core.json`. Browser/GLB-Abnahme steht aus.
+
+
+## V748 - Lyrics Performance Studio
+
+`components/visualizer/lyricsPerformanceStudioV748.ts` is the single pure planner for
+2D (`components/KineticLyrics.tsx`) and 3D (`components/visualizer/Lyrics3DScene.tsx`)
+lyric emphasis. `components/visualizer/VisualizerStage.tsx` passes the existing song
+section and evidence-based vocal scene to the stage lyric planner. The new settings
+are optional in `types/music.ts` and persist through `context/UiPreferencesContext.tsx`.
+Word accents require verified word timestamps; no audio or singer inference added.
+V747 framing and lyric protection remain authoritative. See V748-VERIFICATION.md.
+
+
+## V749 - Concert Lighting Director
+
+Pure, bounded performance lighting in components/visualizer/performanceLightingDirectorV749.ts,
+composed in DynamicStage after the V551 verified-cast planner and prior to rendering existing
+key/fill/beam lights. Respect manual timelines, blackouts, reduced motion, low tier and lyrics
+readability. Settings persisted as avatarPerformanceLightingV749. See V749-VERIFICATION.md.
+
+
+## V750 - Integrated Concert Quality & Performance
+
+V750 plant ein zentrales, deterministisches Qualitaetsbudget fuer die automatischen Zusatzeffekte V735/V746/V747/V748/V749. Es reduziert nur die Zusatzintensitaet und erhoeht optional die Lesbarkeit. Gespeicherte Choreografien, Kamerafahrten, Lichttimelines, Mundanimation und Fuss-IK bleiben unveraendert. Die Budgetwerte sind Heuristiken und keine GPU/FPS-Messungen.
+
+Dateien: `components/visualizer/integratedConcertQualityV750.ts`, `components/visualizer/VisualizerStage.tsx`, `components/visualizer/GltfDancerAvatarV492.tsx`, `components/visualizer/gltfVocalPerformanceV492.ts`, `components/KineticLyrics.tsx`, `components/SettingsPanel.tsx`, `tests/v750-integrated-concert-quality-regression.cjs`.
+
+
+## V752 – Build & Integration Stability
+
+- `scripts/release-integrity-v752.cjs` prueft offline und vor `npm ci` die Konsistenz von `package.json`, `package-lock.json`, CI-Gates und der produktiven TypeScript-Isolation. Eine bestandene Pruefung ist **kein** Ersatz fuer den realen Next.js-Build.
+- `tsconfig.json` schliesst den gesamten `tests/`-Ordner aus dem produktiven Typcheck aus. Test-Stubs bleiben ueber eigene `tests/tsconfig.vXXX*.json` gezielt pruefbar.
+- `check:fast` prueft fehlende npm-Pakete frueher. Unter Windows und Ubuntu laeuft in `.github/workflows/concert-validation-v571.yml` erst die Lockfile-Pruefung, dann `npm ci`, die statischen Regressionen, der echte TypeScript-Check und `npm run build`.
+- `npm run verify:v752:static` arbeitet auch in einem eingeschraenkten Build-Container ohne installierte npm-Abhaengigkeiten, sofern die systemweiten Werkzeuge vorhanden sind. `npm run verify:v752` verlangt die **echte** Anwendungstypisierung und den Next.js-Produktionsbuild.
+- Technische Details und nachpruefbare Umgebungsgrenzen stehen in `V752-BUILD-INTEGRATION-STABILITY.md` und `V752-VERIFICATION.md`.
+
+## V753 - Real Concert Performance Benchmark
+
+- `realConcertBenchmarkV753.ts`: read-only measurement sessions from V466, 12 fresh renderer windows, validity and comparability guards, CSV export; no simulated FPS.
+- `RealConcertBenchmarkPanelV753.tsx`: opt-in UI within V751 status dashboard; collected results only in component memory, 1-4 GLB slots must be manually configured.
+- `ConcertQualityProbeV466.tsx`: optional renderer resource counts and browser-supported JS heap telemetry; no GPU memory claim.
+- Production validation still requires npm ci, full tsc and Next.js build on a connected machine; no Pi benchmark without Pi hardware.
+
+
+## V754 - Visual Concert Quality Inspector
+
+- `components/visualizer/visualQualityInspectorV754.ts`: reine DOM-Rechteck-/Knochen-Projektions-Analyse, begrenzte 30-Fenster-Historie und explizite Unbekannt-Zustaende.
+- `components/visualizer/VisualConcertInspectorPanelV754.tsx`: read-only Live-Qualitaetshinweise im Dashboard, WebGL-Probe nur auf Wunsch; keine Canvas-Pixel, kein neuer Renderloop.
+- `components/visualizer/ConcertQualityProbeV466.tsx`: optionaler Kopf-/Hueft-/Fussknochen-Projektionsdatensatz im bestehenden 1Hz-WebGL-Telemetriepfad.
+- Kein automatischer Kamera-/Licht-/Bewegungseingriff, kein Nachweis der optischen Lichtqualitaet und keine Speicherung.
+
+
+## V755 - Smart Quality Auto-Tuning
+
+V755: optional, measurement-only 1 Hz WebGL feedback from V466/V753 and geometric inspection V754, with multi-sample hysteresis, stale-signal failsafe and additive V750 director gains only. No persistent setting, extra renderer, GPU light, avatar changes or access to authored GLB/IK. Benchmarks V753 block while tuning enabled. See V755-SMART-QUALITY-AUTO-TUNING.md.
+
+
+## V756 - Advanced Vocal Assignment
+
+- `advancedVocalReviewV756.ts`: redaktionelle Review-Korrekturen, Konfliktpruefung, explizite Ueberschreibung mit Intervall-Splitting, Adlib-Isolation, Timeline-Audit. Keine Sprechererkennung.
+- `AdvancedVocalReviewPanelV756.tsx`: optionaler Review-Bereich im V496 Vocal Time Editor; Vorschlag, Korrektur, Preview und Freigabe nur nach Klick.
+- Bestehende Prioritaet: V385 > V496 > V416; gesicherte V496-Cues steuern die bereits bestehenden Lipsync-/Kamera-/Licht-Ketten. V756 aendert keine GLB-Bones und keine Audio-/Voice-Inferenz.
+- `tests/v756-advanced-vocal-review-regression.cjs`, isolierte Core-/UI-Typpruefungen, `verify:v756:static`, `check:fast`, CI.
+
+
+## V757 - Vocal & Body Synchronization 3.0
+Pure word-onset body cue `components/visualizer/vocalBodySyncV757.ts` after V746 in `gltfVocalPerformanceV492.ts`; same `applyVocalStageOverlayV371` smoothing. Evidence: track-matching V756/V496/V385/V416 vocalist role, verified word timestamps, existing resolved mouth activity. No audio phoneme inference, no new rig writer, no GLB/IK/root/face writes. Preferences/UI under `avatarVocalBodySyncV757`; regression `tests/v757-vocal-body-sync-regression.cjs` and isolated TS gate. Full Next.js build requires real npm dependencies.
+
+
+## V758 - Natural Dance Motion 4.0
+
+Contact-aware secondary body balance after V738/V743 and V740, prior to final V492 IK. No root writes, clip changes, audio beat invention or new GPU effects. GLB live and preview share the same pure module. Isolated TS, regression checks and CI release gate.
+
+
+## V759 - Intelligent Dance Variety
+- Existing V666 additive rig channels are selectively modulated by the phrase-based V759 controller before V684; V758 hip and V492 foot grounding remain authoritative.
+- Authored GLB clips, custom timelines, group selections, mouth/face, planted limbs, hips and root positions are never changed by V759.
+- A shared pure controller is also used in the GLB studio preview, with explicit simulated clock and genre/section.
+- State is per track, model and slot; direct repetitions are avoided, transitions smoothed, invalid clocks and reduced motion bypassed.
+
+
+## V760 - Advanced Ensemble Director
+Opt-in director in existing GroupDancers frame callback after V638 and before V687; only 3-4 automatically generated groups. No singer identity inference, no X lane / GLB / IK changes. V494+V508 gate all additive root depth.
+
+
+## V761 - Cinematic Concert Director 4.0
+Validated V604 authored narrative acts -> deterministic V761 scene storyboard -> bounded automatic V502 dynamics before V654/V670 quality guards. Manual camera/light/dance, V750 quality, reduced motion and karaoke timings remain authoritative. No new voices, synthetic sections or GPU objects.
+
+V762: verified V761/V604 scenes -> cinematicScenicLightingV762 -> DynamicStage (one shader gobo, existing V635 LED and beam) + V308 haze. UI preferences + CI v762.
+
+
+## V763 - Interactive Concert Timeline Studio
+
+The verified V761 storyboard is published in the transient bridge `components/visualizer/concertTimelineBridgeV763.ts` for the Settings UI; there is no invented timing or automatic persistence. `components/visualizer/InteractiveConcertTimelineStudioV763.tsx` overlays read-only scenes with actual V354 authored show lanes using `services/stageContent/showTimelineV354.ts`. Authoring is song-ID and duration bound; overwriting a preexisting V354 show requires confirmation, with JSON export offered. The existing `components/visualizer/ThreeAvatar.tsx` continues to evaluate authored cues. A manual lighting cue blocks V762 automatic scenic lights in `components/visualizer/DynamicStage.tsx`. Tests: `tests/v763-interactive-concert-timeline-regression.cjs` and isolated V763 TypeScript configurations. The V354 persistence is still a single local show and must be exported before replacing it; no claim of multi-song persistence.
+
+
+## V764 – Smart Concert Timeline Automation and Multi-Song Library
+
+`services/stageContent/concertTimelineAutomationV764.ts` converts confirmed V761/V763 scenes into bounded V354-compatible camera, lighting, dance and lyrics **suggestions**. No suggestion changes live playback before explicit review and import. Same-lane overlaps with manual V354 cues are skipped. `services/stageContent/showTimelineV354.ts` remains the sole playback owner. `components/visualizer/SmartConcertTimelineAutomationV764.tsx` is loaded on demand in `components/SettingsPanel.tsx` and offers per-cue changes, selection, conflict counts and explicit import.
+
+A bounded 32-song localStorage library persists under `sonic-concert-song-library-v764`, matched by real track ID. `components/visualizer/ThreeAvatar.tsx` reads the actual ID on change (opt-in only) and backs up the outgoing V354 song before loading an existing saved song. Corrupt storage, quota failures and absent records never overwrite the live V354 slot. The library is included in `services/settings/unifiedBackup.ts` and portable V657 backup. Tests: `tests/v764-smart-concert-timeline-automation-regression.cjs`, `tests/tsconfig.v764-core.json`, `tests/tsconfig.v764-ui.json`.
+
+
+## V765 - Concert Show Library Studio
+
+`services/stageContent/concertShowLibraryStudioV765.ts` validates bounded V764 JSON imports,
+previews conflicts, checks stale library snapshots and preserves the local autoLoad setting.
+`components/visualizer/ConcertShowLibraryStudioV765.tsx` provides search, name edits, per-song
+exports and explicit imports below V764. The V354 live timeline is never written by V765.
+The V764 persistent key is retained for portable-backup compatibility.
+
+
+## V767 - GPU Memory Leak Check
+
+`app/diagnostics/gpu-memory/page.tsx` exposes an opt-in, loopback-only test using
+`components/visualizer/GpuMemoryStressV767.tsx` and real StageEnvironment meshes.
+`services/monitoring/gpuMemoryLeakV767.ts` compares resource counts at an identical
+anchor scene after two warm-up cycles. `scripts/v767-gpu-memory-browser.cjs` drives
+a real isolated Chromium WebGL canvas and exports a JSON report.
+`components/visualizer/LiveGpuMemoryProbeV767.tsx` offers bounded, opt-in live
+renderer sampling in the existing ThreeAvatar canvas. Neither renderer.info nor
+this diagnostic provides exact VRAM usage or proof of leak freedom.
+See `GPU_MEMORY_LEAK_V767.md` for commands and interpretation.
+
+
+## V768 - GLB-Avatar-Cache und Ressourcenbudget
+
+`components/visualizer/previewGltfCacheV654.ts` unterstuetzt jetzt auch ein
+weiches Budget in geschaetzten dekodierten Bytes: max. sechs inaktive GLBs oder
+96 MiB Idle-Payload. Aktive Taenzer/Previews bleiben angeheftet; gemeinsam
+genutzte GPU-Materialien, Geometrien und Texturen werden nicht von diesem Cache
+disposed. Nur Loader-Cacheeintraege werden bei Inaktivitaet ausgetragen.
+
+`components/visualizer/estimateGltfCacheBytesV768.ts` beruecksichtigt nach einer
+einmaligen Szeneninspektion Geometry-Arrays, Morph-Arrays, Texturen und
+Animationsspuren, mit Dedup fuer gemeinsame Speicherbereiche. Es handelt sich
+nicht um echte VRAM-Messwerte. Der Hook
+`components/visualizer/usePreviewGltfCacheV654.ts` verwaltet die Besitzer;
+`components/visualizer/GpuMemoryStressV767.tsx` zeigt den Budgetstatus
+auf dem lokalen Diagnosebildschirm. Test: `tests/v768-avatar-cache-budget-regression.cjs`.
+
+
+## V769 - GPU Resource Lifecycle Optimization
+
+`components/visualizer/privateGltfLifecycleV769.ts` disposes only privately loaded
+GLTF assets after one-off inspection or export. The async `finally` releases
+material/geometry/texture/skeleton resources on failures and late completions.
+Repeated assets within a scene are deduplicated. Shared `useGLTF` cache geometry,
+materials and textures remain protected. SkeletonUtils clones only release their
+private skeletons. Render targets stay owned by their generating passes/composers.
+Integrated in motion scan, clip analysis, motion transition, live camera preview,
+real lyrics preview, rap avatar preview, dance A/B comparison and GLB studios.
+Test with `npm run test:v769`; actual WebGL behavior requires V767 browser
+GPU test on target hardware.
+
+
+## V770 - Passive Live Performance & Memory Dashboard
+
+`components/visualizer/performanceMemoryHistoryV770.ts` records a bounded 360-sample
+5-second history from `components/visualizer/renderDiagnostics.ts` (the existing
+AdaptivePerformanceController once-per-second render window). No new render loop.
+`components/visualizer/usePreviewGltfCacheV654.ts` registers a lightweight cache
+statistics reader; idle decoded bytes are estimated rather than GPU VRAM.
+`components/visualizer/PerformanceMemoryDashboardV770.tsx` provides live FPS,
+draw calls, GPU resource counts, shader programs, GLB cache metrics, timeline
+plots and on-demand local JSON export and reset in both System Dashboard
+and Diagnostics. The trend is an advisory signal, not proof of a leak.
+Validation: `tests/v770-performance-memory-regression.cjs`.
+
+
+## V771 – Wiederholbarer WebGL-Langzeit-Stabilitätstest
+
+`scripts/v771-longrun-browser.cjs` steuert eine einzige lokale Chromium-WebGL-Sitzung
+über mindestens drei Testblöcke mit zusammen mindestens 24 Messzyklen. Es verwendet
+die sechs echten `StageEnvironment`-Bühnen sowie mindestens zwei Avatarvarianten
+(`components/visualizer/GpuMemoryStressV767.tsx`), optional bis zu vier lokale GLB-URLs.
+Pro Block zwei vollständige Warm-up-Runden; nach dem Block eine Abkühlphase und
+`HeapProfiler.collectGarbage`. Die opt-in Diagnoseschnittstelle liest `renderer.info`,
+GC-Heap und GLB-Cache-Zähler. `scripts/v771-longrun-assessment.cjs` bewertet
+ausschließlich identische Anker-Szenen und verlangt anhaltendes Wachstum statt
+Einzelspitzen. Ein Verdacht ist kein nachgewiesenes Leck. GPU-Objekte sind keine
+gemessenen VRAM-Bytes; kein neuer WebGL-Renderer in der Live-Konzertshow.
+Aufruf `npm run test:v771:browser -- --cycles=90 --batch=15` bei lokalem Server.
+Regression: `npm run test:v771`.
+
+
+## V773 – Transparent Overdraw Reduction
+
+`adaptiveOverdrawBudgetV773.ts` verwendet die hysteretische V640-Stufe. Bei hoher Last
+werden der zweite Lichtkegel und die zweite Nebelebene ausgeblendet, die Bodennebelfläche
+reduziert. Der primäre Kegel, Show-Cues und manuell gesetzte Lichtregie bleiben erhalten.
+Transparente Lichtkegel werden einseitig gerendert und verwenden nur 14 Segmente;
+unsichtbare Fragmentbereiche in Effektshadern werden verworfen. Die Bühnenvorschau
+zeichnet zwei einzelne Billboard-Nebel statt vier transparente Kugeln. Keine weiteren
+Canvas-, WebGL-Renderer-, Intervall- oder Animationsschleifen. Regression: `npm run test:v773`.
+
+
+## V774 – Dance FX Instanced Rendering
+
+`DanceFX.tsx` nutzt drei InstancedMesh-Batches für acht Schockwellen-, Abdruck-
+und Leuchtspur-Slots. `danceFxInstancePlanV774.ts` kompaktiert aktive Instanzen
+auf dem Frame-Thread ohne zusätzliche Arrays und erhält die Transparenz je
+Instanz über `instanceOpacity`. Die drei privaten Geometrien und Materialien
+werden nach dem Unmount freigegeben. Regression: `npm run test:v774`.
+
+## V775 - Static Stage Prop Batching
+
+`components/visualizer/stages/StageStaticBatchV775.tsx` uses R3F-managed `InstancedMesh` for fixed,
+opaque, same-material props. Matrices are written once in `useLayoutEffect`, and no extra
+render loop or WebGL context is used. R3F owns/disposes geometries and materials on stage unmount.
+`stageInstancePlansV775.ts` preserves the original transforms. Separate material-color batches
+are retained; the V635/V647 LED wall already uses a single mesh and remains untouched.
+Validation: `tests/v775-stage-static-batching-regression.cjs`, `npm run test:v775:types`.
+
+
+## V776 - Reproduzierbarer GPU-Buehnenbenchmark
+
+Ein lokaler, explizit freigegebener React-Three-Fiber-Canvas unter `/diagnostics/stage-benchmark?stageBenchV776=1` rendert sechs echte StageEnvironment-Varianten und zwei fest definierte prozedurale Darsteller mit 960x540, DPR 1, AA aus. Zwei Warm-up-Durchlaeufe, weitere 60 Frames je Szene sowie 240 Mess-Frames pro Szene und Messdurchlauf. Die V776-Skripte starten Chromium per CDP und vergleichen nur identische Konfigurationen, Browser-/Renderer-/Aufloesungseinstellungen. Fuer alte V766+-Quellstaende wird dieselbe Fixture ohne Aenderung der vorhandenen Buehnenimplementierung hinzugefuegt; ein separater Next.js-Server ist notwendig. FPS = Frames/Zeit; P95 ist Framezeit-Perzentil; WebGL-Geometrie-/Texturzaehler sind keine VRAM-Bytes. Ein Software-Renderer-Benchmark ist kein Hardware-Leistungsbeweis. Dies ist eine isolierte Buehnenfixture, kein kompletter Spotify-Konzert-Benchmark. Siehe V776-STAGE-BENCHMARK.md.
+
+
+## V777 — Real GLB Concert Benchmark
+
+Separate loopback-only benchmark fixture: 3 stages x 2/4 skinned GLB actors, AnimationMixer, morph-driven simulated lip sync, existing DanceFX, DynamicStage and 3D lyrics, in one Canvas. See V777-CONCERT-BENCHMARK.md. V776 static benchmark remains unchanged. Production/Spotify performance cannot be inferred from the bundled small reference GLB.
+
+
+## V778 - Concert Performance Quality Advisor
+
+`services/monitoring/concertQualityAdvisorV778.ts` validates measured V777 JSON cases and returns evidence-bounded 30/45/60 FPS advice for 2/4 GLB scenes. No device certification. `components/visualizer/ConcertQualityAdvisorV778.tsx` presents local file-based advice under `/diagnostics/concert-quality` without network upload, canvas or render loop. `scripts/v778-concert-quality-advisor.cjs` produces machine-readable JSON plus Markdown offline. Strict V777 environment/hash comparison is reused; invalid inputs are blocked without invented FPS. Test: `tests/v778-concert-quality-advisor-regression.cjs`.
+
+## V779 - Controlled Concert Quality Profile Sweep
+
+V779 adds real per-profile browser measurements to the existing V777 GLB fixture, with strict environment/assets/config validation and repeated counterbalanced profile order. Pure policy: `services/monitoring/concertQualityProfilesV779.ts`. Controlled variants affect actual stage/light activity, DanceFX, and GLB bone/mouth update stride; they do not pretend to alter mesh polygon LOD or a Spotify stream. CLI: `scripts/v779-quality-sweep.cjs`; tests: `tests/v779-concert-quality-profiles-regression.cjs`.
+
+## V780 – Reproduzierbare visuelle Konzert-Qualitaetskontrolle
+
+`components/visualizer/ConcertBenchmarkV777.tsx` erweitert das vorhandene V777-Fixture um eine ausschliesslich lokale, explizit aktivierte `__sonicV780.capture`-Schnittstelle. GLB-Szenen und Lyrics werden vor der Aufnahme geladen. Alle drei V779-Profile verwenden identische Test-Frames und dieselben GLB-Assets. Der neue pure Planer `services/monitoring/visualQualityPlanV780.ts` ist deterministisch und begrenzt Framewerte. Das visuelle Fixture haelt die logische R3F-Zeit und den Clip-/Morph-Zeitpunkt fuer Screenshots fest; normale V777-FPS-Messungen werden nicht beeinflusst. `preserveDrawingBuffer` ist nur im expliziten V780-Modus aktiv.
+
+`scripts/v780-visual-capture-browser.cjs` verwendet realen lokalen Chromium/CDP mit genau einem WebGL-Canvas und liest echte PNGs statt generierter Dummy-Bilder. `scripts/v780-visual-quality-report.cjs` prueft SHA256, PNG-Dimensionen, RGB-Daten, Bildkontrast und Konsistenz von Renderer/GLB sowie Vollstaendigkeit. Der Bericht `index.html` zeigt 3 Profil-Spalten pro Testfall. Pixelunterschiede sind **kein** automatisch ermitteltes Qualitaetsurteil, sondern technische Hinweise. Quelle der Audiosignale bleibt V777 synthetisch. Tests: `tests/v780-visual-quality-regression.cjs` und `test:v780:types`; keine neue Drittanbieter-Abhaengigkeit.
+
+## V781 - Real GLB Motion Smoothness Benchmark
+
+Post-mixer read-only bone and mouth morph sampling within the existing V777 fixture; independent per-avatar, per-pass timeseries. Foot sliding only reported when named foot bones and plausible contact intervals exist. Six counterbalanced profile runs and strict identical GLB/GPU/fixture validation. No speculative motion data, no automatic animation changes, no hardware certification. See V781-MOTION-SMOOTHNESS.md.
+
+## V782 - Opt-in adaptive GLB pose interpolation
+
+Local V777 fixture opt-in `?interpolationV782=on|off`: `services/monitoring/adaptiveAnimationInterpolationV782.ts` caches GLB transform and morph samples at V779 stride boundaries and interpolates world-agnostic local position/scale and shortest-path quaternion SLERP every display frame. Synthetic vocal cue is updated every frame. Legacy V779/V780/V781 reports retain their unchanged cadence. `services/monitoring/interpolationReviewV782.ts` checks paired V777 FPS and V781 motion evidence across eight counterbalanced Chromium runs and strictly verifies GPU/GLB/test identity, with no synthetic FPS claims. `scripts/v782-animation-interpolation.cjs` emits JSON and Markdown; `V782-ADAPTIVE-ANIMATION-INTERPOLATION.md` documents limits. The live avatar director is not modified.
+
+
+## V783 - Lip-Sync Quality Guard (Benchmark Only)
+
+Optionaler, framebasierter Mund-Morph-Schutz mit begrenztem Step, attack/release und Fail-Closed-Auswertung von acht gleichartigen Browser-Laeufen. Die V782-Koerperpose bleibt interpoliert, die V783-Mundwerte werden in jedem Frame neu gesetzt. Kein produktiver Avatar-Director-Eingriff. Dateien: `services/monitoring/lipSyncQualityGuardV783.ts`, `services/monitoring/lipSyncGuardReviewV783.ts`, `scripts/v783-lip-sync-guard.cjs`, `tests/v783-lip-sync-guard-regression.cjs`. Details: V783-LIP-SYNC-QUALITY-GUARD.md.
+
+
+### V784 – Cinematic Camera Smoothness
+
+Eigener opt-in Kamera-Diagnosemodus auf der realen GLB-Konzert-Fixture: deterministische Shot-Timeline, dynamisch geglaettete Kameraposition, Blickziel und FOV. Framebasierte Messungen direkt nach Kameratransform mit Projektionskontrolle fuer Lyrics und Avatare. Vier gegenlaeufige Browserlaeufe (off/on/on/off), strikte GLB-/GPU-/Frames-Konfiguration und Offline-Dashboard; keinerlei Aenderung am Live Camera Director.
+
+## V785 - Lyrics Performance Protection (local GLB diagnostic)
+
+services/monitoring/lyricsProtectionV785.ts evaluates true projected Three/Drei glyph bounds, delayed lyric changes, and explicitly estimated performer-position proxies. services/monitoring/lyricsReviewV785.ts requires 4 matching measured Browser runs (off/on/on/off). Fixture, browser runner, offline CLI and read-only dashboard use explicit local opt-in. Live show unchanged.
+
+
+## V786 - Real Avatar Complexity Profiler
+
+services/monitoring/avatarComplexityV786.cjs parses bounded local GLB 2.0 geometry, rig, morph, animation and textures without runtime dependencies. scripts/v786-avatar-complexity.cjs exports JSON/Markdown reports and optional SHA-256-matched V777 GPU benchmark evidence. services/monitoring/avatarComplexitySummaryV786.ts computes only theoretical 2/4 avatar geometry multiplication, never FPS. The local-only dashboard lives at /diagnostics/avatar-complexity. No live-avatar configuration or GLB asset is modified.
+
+## V787 Smart Avatar LOD Director
+
+Offline-GLB-Rig-Audit und eigenstaendige 3D-LOD-Vorschau mit SHA-256-Validierung, distanzbasierter Hysterese und synchroner Animationszeit. Live-LOD bleibt unveraendert. Siehe V787-SMART-AVATAR-LOD-DIRECTOR.md.
+
+
+## V788 Intelligent Concert Quality Governor
+
+Opt-in Browser-Diagnose mit echten Framezeiten, zwei Quality-Reduktionsstufen und Hysterese. `services/monitoring/concertQualityGovernorV788.ts` steuert nur Hintergrundlicht und DanceFX; animierte GLBs, Lip-Sync, Kamera, Lyrics und Lead-Performer werden nicht abgewertet. Vier paarweise lokale Browsermessungen prueft `services/monitoring/concertGovernorReviewV788.ts`; keine automatische Live-Umschaltung. Siehe V788-CONCERT-QUALITY-GOVERNOR.md.
+
+## V790 – Cinematic Show Director 2.0
+
+- `components/visualizer/cinematicShowDirectorV790.ts` verbindet nur die bestätigten V604/V761/V671/V679-Laufzeitinformationen zu einem Song- und Szenen-spezifischen Spannungsbogen, der bei ungeeigneten Daten neutral bleibt.
+- Die Ausgabe wird nach V681 in die bestehenden Auto-Gains gemischt; V670 bleibt der letzte Schutz. Manuelle Kamera-, Licht- und Tanzspuren werden nicht überschrieben.
+- `tests/v790-cinematic-show-director-regression.cjs` prüft Track-Identität, Zeitgrenzen, Highlight-Priorität, Pausen, Lyrics- und Override-Schutz, Seek-Sicherheit und die Integration der finalen V670-Kette.
+
+
+## V791 – Seamless Scene Transitions
+
+- `components/visualizer/seamlessSceneTransitionsV791.ts` plant aus benachbarten, bestätigten V790-Szenen symmetrische Übergänge von bis zu 2,2 Sekunden. Verschiedene Kamera-Intents innerhalb desselben Verse/Hook profitieren ebenso; Lücken bleiben unverändert.
+- `components/visualizer/VisualizerStage.tsx` erzeugt genau einen V791-Cue und reicht ihn über `components/visualizer/registry.tsx` und `components/visualizer/ThreeAvatar.tsx` an `components/visualizer/StageCameraDirectorV289.tsx`, `components/visualizer/DynamicStage.tsx` und `components/visualizer/ConcertAtmosphereRendererV308.tsx` weiter.
+- V609 bleibt als Akt-Grenzen-Fallback erhalten. Manuelle Schnitte, Licht-Cues, Blackouts, Reduced Motion und Lyrics-Schutz bleiben vorrangig. Es werden keine GPU-Objekte und kein zusätzlicher Frame-Loop erzeugt.
+- `tests/v791-seamless-scene-transitions-regression.cjs` validiert Grenzen, Track/Seek, Priorität und Runtime-Anbindung.
+
+
+## V792 – Smart Camera Choreography
+
+- `components/visualizer/smartCameraChoreographyV792.ts` erzeugt deterministische Dolly-, Kran- und Seitwärtsfahrten ausschliesslich auf dem verifizierten V790/V761-Szenenplan. `components/visualizer/VisualizerStage.tsx` reicht den Cue ueber `components/visualizer/registry.tsx` und `components/visualizer/ThreeAvatar.tsx` an die bestehende `components/visualizer/StageCameraDirectorV289.tsx`.
+- Keine zusaetzlichen Kameras, Renderloops, GLB-Gewichte oder erratenen Songzeiten. Manuelle Keyframes, Camera Studio, Timeline, Live-Edit und V655-Saengerfokus gewinnen. V550/V540 messen sichtbare Performer und Lyrics-Freiflaechen; V351 bleibt der letzte Guard.
+- `tests/v792-smart-camera-choreography-regression.cjs` prueft deterministische Fahrten, weiche Szenengrenzen, Track-Treue, Lyrics- und Performance-Schutz sowie die Laufzeit-Verkabelung.
+
+
+## V793 – Advanced Light Choreographer
+
+`components/visualizer/advancedLightChoreographerV793.ts` steuert die vorhandenen Leuchten
+mit verifizierten V604-/V761-Szenengrenzen. In `components/visualizer/DynamicStage.tsx`
+wird ausschliesslich der bestehende schattenfreie Spotlight neu ausgerichtet.
+`components/visualizer/ConcertArchitectureV789.tsx` nutzt das bestehende
+instanzierte Lichtbalken-Batch fuer passende Musterwellen.
+Manuelle Licht-Cues, Blackouts, Lyrics-Schutz, Performer-Slots und Low-Tier
+behalten Vorrang. Tests: `tests/v793-advanced-light-choreographer-regression.cjs`.
+
+
+## V794 – Epic Drop & Hook Moments
+
+`components/visualizer/epicPeakMomentsV794.ts` samples four phases (build,
+suspend, impact, release) only on the verified V790 scene clock. A contiguous,
+verified build must precede any anticipatory dip. Main peak and supporting hook
+receive different bounded intensity envelopes without synthetic beat markers.
+`components/visualizer/VisualizerStage.tsx` passes automatic gains through the
+V670 quality guard. `components/visualizer/ThreeAvatar.tsx` passes the cue to
+`components/visualizer/DynamicStage.tsx`; this renderer checks playback ID,
+manual light timeline, blackout, pause and GPU tier before modulation.
+`components/visualizer/ConcertArchitectureV789.tsx` reuses existing instanced
+bars at most once per 100 ms and adds no lights, geometry or rendering passes.
+The spotlight is reused and vocal/lyrics priority remains protected.
+Tests: `tests/v794-epic-peak-moments-regression.cjs`.
+
+## V795 – Dynamic Stage Evolution
+
+`dynamicStageEvolutionV795.ts` liest den verifizierten V790-Storyboard-Plan und berechnet deterministische Bühnenausbau-Cues. `VisualizerStage.tsx` reicht sie über `registry.tsx` und `ThreeAvatar.tsx` an `DynamicStage.tsx` weiter. Dort werden die tatsächlichen abgespeicherten Licht-Timelines und Performancegrenzen nochmals geprüft. Die V789-Instanzmatrizen verändern nur Positionen vorhandener Portalbalken, mit gedeckelter Frequenz; die existierende V635-LED-Wand sowie V622-/V690-Farbbudgets erhalten geringe, begrenzte Zusätze. Kein neuer Renderer oder Beleuchtungspass.
+
+
+## V796 - Deutschrap Performance Director
+
+`components/visualizer/deutschrapPerformanceDirectorV796.ts` refines the
+existing V437 lyric-timed rap cue, with optional V790 verified-show accents.
+It provides stable verse/hook phrase motifs and authored reply/duet accents,
+never infers vocal identity or adlibs. The live `VisualizerStage` applies only
+bounded automatic dance, expression and gesture values to existing avatar props.
+Real line/track timestamps are revalidated with a binary search. Manual dance,
+manual vocal/syllable edits, reduced motion, low tier and protected lyrics retain
+priority. Mouth/lip-sync strength, GLB clips, renderer and camera are unchanged.
+Tests: `tests/v796-deutschrap-performance-regression.cjs` and isolated strict
+TypeScript validation. Full build is a separate production quality gate.
+
+
+## V797 - Multi-Vocal Spotlight Director
+
+`components/visualizer/multiVocalSpotlightDirectorV797.ts` projects the EXISTING, explicitly
+verified V528 singer cast into one bounded solo, handoff, duet, or ensemble cue.
+`components/visualizer/ThreeAvatar.tsx` shares this cue with
+`components/visualizer/StageCameraDirectorV289.tsx` and
+`components/visualizer/DynamicStage.tsx`. The existing camera uses a tiny
+anchor-checked lens finish before the V351 lyrics framing guard. The existing
+key/fill lights follow authored singer slots with bounded brightness and no
+additional lights, shadows, geometry, cameras or render passes. Live blackout
+and authored light controls are checked immediately before application. Manual
+camera and lighting cues, lyric safety, reduced motion and low tier win. No
+vocal recognition, auto diarization, new lip-sync or dancer clips.
+Tests: `tests/v797-multi-vocal-spotlight-regression.cjs` and isolated strict
+TypeScript check. Full production build requires installed dependencies.
+
+
+## V798 – Advanced Facial & Lip-Sync Studio
+
+`components/visualizer/advancedFacialStudioV798.ts` prüft vorhandene GLB-Mundkanäle
+und Kieferknochen sowie gültige manuelle Zuordnungen.
+`components/visualizer/FacialAnimationStudioV370.tsx` zeigt die Diagnose und
+einen freiwilligen Avatar-spezifischen Rap-Präzisionsregler.
+`components/visualizer/VocalRigV368.tsx` verändert nur die Rate zur Erreichung
+bereits vorhandener Mundformen bei verifizierten Rap-Wörtern. Manuelle Viseme,
+Audio- und Vocal-Stems, reduzierte Bewegung und Low-Tier behalten Vorrang.
+Das V383-Gesichtsprofil importiert und exportiert V798-Einstellungen kompatibel.
+Tests: `tests/v798-advanced-facial-lipsync-regression.cjs`.
+Details: `V798-ADVANCED-FACIAL-LIP-SYNC-STUDIO.md`.
+
+## V799 – Natural Dance Continuity
+
+`components/visualizer/naturalDanceContinuityV799.ts` samples actual torso and
+bilateral arm quaternion curves at the V537-approved entry point and compares
+pose and gesture direction. Only after the V630 lower-body policy, the existing
+`useGltfClipTransitionsV492.ts` playback hook may conservatively extend an
+already-authorized **automatic** crossfade. No additional mixer, render loop,
+clip selection, IK reset, beat-guessing or GLB modification. Manual playback,
+short/partial rigs, missing animation evidence, low tier and Reduced Motion
+retain the earlier decision. V614 guards backward seeks; V135/V494 own foot locks.
+40 focused regression checks plus 3,000 deterministic transition samples:
+`tests/v799-natural-dance-continuity-regression.cjs`.
+Details: `V799-NATURAL-DANCE-CONTINUITY.md`.
+
+## V800 – Concert Experience Milestone
+
+`concertExperienceMilestoneV800.ts` audits den kompletten V790-Storyboard-Plan
+(Abdeckung, belegte Szenenlücken, Häufung identischer Kamera-Intents, Haupt- und
+Nebenhöhepunkte, Pausen und Szenenvielfalt) einmal pro neuem Plan über `useMemo`.
+Bei der aktuellen Playback-Position erfolgt eine kleine, reproduzierbare
+Korrektur ausschließlich der **automatischen** Tanz-, Kamera- und Licht-Gains.
+Der V670-Quality-Guard bleibt nach V800 der letzte Begrenzer; V791, V792,
+V794, V795 sowie alle manuellen Kamera-, Licht-, Tanz- und Vocal-Vorgaben bleiben
+autoritativ. Die Live-Diagnostik findet sich in `data-v800-*`-Attributen;
+Warnungen sind keine visuelle Messung oder ein bestandener 3D-Sichttest.
+Details: `V800-CONCERT-EXPERIENCE-MILESTONE.md`, `V800-VERIFICATION.md`.
+
+
+## V801 – Concert Experience Quality Inspector
+
+`concertExperienceInspectorV801.ts` liest nur bestaetigte V790-Szenen und den
+strukturellen V800-Audit. Daraus berechnet es nachvollziehbare Problembereiche
+(Kamera-Wiederholungen, Storyboard-Luecken, fehlende Atempausen und Lyrics-Evidenz).
+`concertExperienceInspectorStoreV801.ts` haelt das aktuelle, nicht persistierte
+Abbild im Arbeitsspeicher. Die Buehne publiziert dieses nach einem React-Commit
+mit maximal etwa 1 Hz. `ConcertExperienceInspectorPanelV801.tsx` ist in das
+bestehende V751-Qualitaetsdashboard integriert und bietet Filter, Song-Timeline,
+Szenendetails und konkrete Verbesserungshinweise. Die V754-WebGL-Probe bleibt
+separat; fehlende 3D-, Tanz-, Licht- oder Lyrics-Bildmessungen werden nie als
+Erfolg behauptet. Keine neue Renderer-Instanz, kein Show-Gain-Eingriff und
+keine neue Audio-/GLB-Analyse.
+
+
+## V802 – Intelligent Concert Improvement Assistant
+
+`components/visualizer/concertImprovementAssistantV802.ts` creates evidence-backed,
+ranked camera alternatives and manual review advice from the V790/V800/V801
+verified scene graph. It re-runs the V800 and V801 auditors for the cumulative
+Before/After storyboard preview, without a live camera mutation. No missing
+section, vocal identity, lyric time or GPU result is fabricated.
+`components/visualizer/ConcertImprovementAssistantPanelV802.tsx` is mounted in
+`components/visualizer/ConcertQualityDashboardV751.tsx` directly below V801.
+On deliberate consent only, the panel may transfer short, conservative camera
+clips to an already active, exact-track V354 show. Overlapping/manual camera
+clips are rejected, the save is atomic and checked, and no prior clips are
+deleted. `components/visualizer/VisualizerStage.tsx` only publishes the verified
+plan and evidence through `components/visualizer/concertExperienceInspectorStoreV801.ts`.
+Tests: `tests/v802-concert-improvement-assistant-regression.cjs`.
+Details: `V802-INTELLIGENT-CONCERT-IMPROVEMENT-ASSISTANT.md`.
+
+
+## V803 - Visual Concert Comparison Studio
+
+`components/visualizer/visualConcertComparisonV803.ts` validiert Songbindung, Szene und vorgeschlagene Kameraabsichten ohne Seiteneffekte. `VisualConcertComparisonPanelV803.tsx` startet die explizit anwählbare 3D-Vorschau. `CameraComparisonCanvasV803.tsx` rendert eine gemeinsame, eingefrorene DynamicStage + einen optionalen GLB-Klon in einem WebGL-Canvas durch zwei Scissor-Kameras. Der Songzeitpunkt ist identisch; Kamera-Posen sind angenäherte V790-Absichten und keine Live-Aufnahme. Keine automatische Übernahme; V802-/V354-Schutz bleibt bestehen. Siehe `V803-VISUAL-CONCERT-COMPARISON-STUDIO.md`, `V803-VERIFICATION.md` und `tests/v803-visual-concert-comparison-regression.cjs`.
+
+
+## V804 – Cinematic Framing & Visibility Inspector
+
+`components/visualizer/cinematicFramingInspectorV804.ts` wertet normalisierte GLB-Projektionspunkte ohne Seiteneffekte aus; fehlende Daten/Demo-Modell gelten niemals als verifizierte Messung. `CameraComparisonCanvasV803.tsx` nutzt weiterhin denselben WebGL-Context, dieselbe eingefrorene Szene und zwei Scissor-Kameras. Aus GLB-Bounds und vorhandenen Head/Foot-Bones werden Vorschaubefunde zu Bildausschnitt, Kopf, Fuessen sowie moeglichem Kontakt mit einer reservierten unteren Lyrics-Zone gebildet. Gruppenaufnahmen (V803 zeigt einen Performer), Verdeckung, Bildpixel, tatsaechlicher Text und Live-Kamera bleiben explizit ungemessen. Kein persistierender Zustand, kein Live-Eingriff; V802 entscheidet ueber Timeline-Cues. `V804-CINEMATIC-FRAMING-VISIBILITY-INSPECTOR.md`, `V804-VERIFICATION.md` und `tests/v804-cinematic-framing-visibility-regression.cjs`.
+
+
+### V805 Multi-Performer Visibility Studio
+
+- `components/visualizer/multiPerformerVisibilityV805.ts`: Deterministische projektionbasierte Gruppenmessung von zwei oder drei explizit ausgewaehlten, tatsaechlich geladenen GLB-Avataren; bei fehlenden Quellen kein positives Urteil.
+- `components/visualizer/CameraComparisonCanvasV803.tsx`: Wiederverwendung des bestehenden einzelnen WebGL Canvas mit zwei Scissor-Kameras, instanziiert ausgewaehlte GLB-Modelle in einer statischen Aufstellung und prueft Kanten, Koepfe, Fuesse sowie die angenommene Lyrics-Zone.
+- `components/visualizer/VisualConcertComparisonPanelV803.tsx`: Optionale zweite und dritte GLB-Auswahl aus der bestehenden Avatar-Bibliothek. Keine automatische Vocal-Zuordnung, keine Live-Kamera-Garantie.
+- `tests/v805-multi-performer-visibility-regression.cjs`: Gruppen-Grenzfaelle, Demo-/Loading-Sperren, deterministische Projektionsproben und ein-CANVAS/Read-only-Invarianten.
+
+## V806 Intelligent Ensemble Camera Director
+
+`components/visualizer/intelligentEnsembleCameraV806.ts` optimiert das vorhandene Live-Kamerabild mit dem verifizierten V528/V797-Vocal-Cast und den aktuell sichtbaren V377-Performer-Ankern. Die geometrischen Sicherheitsmessungen aus V550/V540 gelten fuer jede beteiligte Person und die gesamte Gruppe; ohne belastbare Daten oder bei manuellen Kamera-/Lyrics-Vorgaben bleibt das Bild unveraendert. Die V805-GLB-Review ist davon getrennt und wird nicht als Live-Sichtbarkeitsbeweis verwendet. `StageCameraDirectorV289.tsx` wendet die begrenzte Korrektur nach V797 und vor dem finalen V351-Lyrics-Guard an; keine neue WebGL-Kamera oder Render-Schleife. Tests: `tests/v806-intelligent-ensemble-camera-regression.cjs`.
+
+## V807 Natural Multi-Artist Stage Interaction
+
+`components/visualizer/naturalMultiArtistStageInteractionV807.ts` berechnet ausschliesslich aus bestaetigten, songgebundenen V416/V496-Saengerrollen, vorhandenen Buehnenpositionen und Wiedergabezeit begrenzte Blicke und Gesten fuer Lead, Support, Duett, Handoff und gemeinsamen Hook. Die bestehenden 2er- und 3/4er-Avatar-Renderer verwenden die identische, reine Planungslogik ueber V144/V145-Overlays. Manuelle Animationen, Buehnenformationen, Gesichts-/Lippensynchronisation und Fuss-IK bleiben unberuehrt. V506/V508-Kollisionsschutz ist final. Keine neuen GLB-Mixer, Renderloops oder GPU-Ressourcen. Tests: `tests/v807-natural-multi-artist-stage-interaction-regression.cjs`.
+
+> **Dokumentationsstand:** V819 (31.10.2026)
+
+## V808 Natural Performer Positioning
+
+`components/visualizer/naturalPerformerPositioningV808.ts` verwendet streng songgebundene V416/V496-Saengerzeiten fuer kleine, langsam ein- und ausblendende Z-Tiefenversatzbewegungen bei Duetten, expliziter Uebergabe und gemeinsamen Hooks. Keine X-Spurwechsel; die bisherigen Gruppenformationen V326/V495 bleiben zustaendig. Vor jeder optionalen Bewegung muessen echte Positionen, Mindestabstaende, der V506/V508-Risikoindikator und V494-Fusskontaktfreigabe vorliegen. Bei der 2er-Formation ohne V494-Individualkontakt ist V808 nur bei deaktiviertem V322-Footlock und ohne V324-Ensemble-Schutz aktiv. Authored cues und manuelle Choreografien gewinnen. V806-Kamera misst anschliessend die vorhandenen realen Buehnenanker. Keine neuen Mixer, Rendering-Paesse oder WebGL-Objekte.
+
+
+## V809 Cinematic Performer Interaction & Camera Harmony
+
+`components/visualizer/cinematicPerformerCameraHarmonyV809.ts` synchronisiert kurze, musikalisch begrenzte Kamerafokusse mit dem V807-Blickmotiv und den von V808 sicher verschobenen, tatsaechlich beobachteten V377-Buehnenankern. Bei autorisierten Duetten, Saengeruebergaben und Hooks verlangt die rein funktionale Kamera-Korrektur eine V528/V797-Uebereinstimmung aller Sprecherrollen, gueltige aktuelle Songzeiten und sichtbare reale Performer. V550/V540 sichern Kopf, Ganzkoerper und Bildrandsicherheit fuer alle Teilnehmer und die gesamte Gruppe ab. Keine Live-Kamera bei manuell verfassten Cues, Lyrics-Schutz, reduzierter Bewegung oder niedriger Leistungsstufe. `StageCameraDirectorV289.tsx` wendet V809 unmittelbar nach V806 und vor dem finalen V351-Lyrics-Guard im vorhandenen Renderloop an. Kein zweiter Canvas, keine neuen GLB-Clips, keine Persistenz. Regressionen: `tests/v809-cinematic-performer-camera-harmony-regression.cjs`.
+
+
+## V815 Virtual Concert Crowd
+Three bounded instanced meshes on audience wings. The pure V815 planner consumes the V810 verified song and section authority, with quality and safety gating. See V815-VIRTUAL-CONCERT-CROWD-VERIFICATION.md.
+
+## V816 Reactive Particle Studio
+The deterministic `components/visualizer/reactiveParticlePlannerV816.ts` plans capped sparks, shards, confetti and energy rings only from the verified V810 cue and the available audio analysis. Pauses, authored lighting, blackout, reduced-motion and low-tier suppress the effects. Four bounded instanced meshes in `components/visualizer/ReactiveParticleStudioV816.tsx` stay outside the central singer corridor; their instance data is updated at no more than 20 Hz. The existing V640 LED budget limits instance counts. See `V816-REACTIVE-PARTICLE-STUDIO-VERIFICATION.md` for test results.
+
+
+## V817 Kinetic Stage Architecture and Virtual Foam Cannon
+
+`components/visualizer/kineticStagePlannerV817.ts` and `components/visualizer/KineticStageV817.tsx`
+move at most twelve instanced LED columns behind the performers. The existing V810 verified
+act governs geometry and musical transitions; the V640 budget caps GPU work.
+
+`components/visualizer/foamCannonPlannerV817.ts` and `components/visualizer/FoamCannonV817.tsx`
+provide two virtual side-mounted nozzles with a bounded, two-mesh foam spray. No physical
+device control, hardware actuators or DMX output is supported. No effect during paused
+playback, unverified acts, blackout, manual light overrides or reduced motion. The central
+performer lane remains clear and face/lyrics priority attenuates the foam opacity.
+All settings are in the V810 Concert FX Studio and normalized on load. Tests:
+`tests/v817-kinetic-foam-regression.cjs`. Full TypeScript/build and hardware GPU
+verification remain separate quality gates.
+
+
+## V818 Spectral Music Visuals - Bass waves, frequency rings, 3D audio prisms
+
+`components/visualizer/spectralMusicPlannerV818.ts` computes a deterministic
+visual cue from already measured `audio.bass`, `audio.mids`, `audio.highs` and
+`audio.energyEnvelope`. It inherits the verified V810/V604/V761 song-act gate:
+no fake beat/drop creation, and no rendering during pause, inactive/unverified
+acts, blackouts, manual lighting takeover, reduced motion or low device tier.
+
+`components/visualizer/SpectralMusicVisualsV818.tsx` uses at most three
+instanced meshes: up to 12 side-floor bass waves, 20 vertical frequency rings
+and 48 geometric bars. All sit on the stage wings (even maximum ring radius
+leaves the central vocalist corridor clear); no real lights, new shadows or
+frame allocations, with at most 20 instance-buffer updates per second.
+Intensity follows measured bands, dramaturgy, genre, portrait and lyric safety,
+device tier, V810 quality and existing V640 LED performance budget.
+
+`components/visualizer/ConcertFxStudioPanelV810.tsx` offers independent controls,
+0-100% intensity and an explicitly simulated preview. Settings are normalized
+for old backups by `components/visualizer/concertFxStudioV810.ts`.
+`tests/v818-spectral-music-visuals-regression.cjs` checks 20 safety, musical,
+resource and integration groups. Full Next.js production build and actual 3D
+GPU testing remain release gates, not covered by the isolated planner check.
+
+
+## V819 Cinematic Scene Transition FX
+
+`components/visualizer/cinematicTransitionPlannerV819.ts` requires both verified
+V810/V604/V761 song-act cues and a V791/V790 confirmed adjacent-scene seam.
+It does not invent a new timer, hard camera cut or transition moment. V791 still
+owns camera and lighting interpolation. V819 passes both rates unchanged.
+
+`components/visualizer/CinematicSceneTransitionV819.tsx` draws two shader planes
+at the outer rear wings, never fullscreen: soft light wipe (Deutschrap), subtle
+glitch slices (Hardtekk/Hardstyle), or diffuse light dissolve (rock/pop).
+No new physical lights, strobe or shadows. Opacity is capped by V640 budget,
+V810 device quality, group/lyrics/portrait guards and manual camera or manual
+lighting overrides. Playback pause, unverified scenes, blackout, low tier,
+reduced motion and seek away from a seam all fail closed.
+
+`components/visualizer/ConcertFxStudioPanelV810.tsx` provides individual
+switches, style and intensity plus a clearly labelled simulated preview.
+`components/visualizer/concertFxStudioV810.ts` migrates old saved settings.
+`tests/v819-cinematic-scene-transition-regression.cjs` verifies source gating,
+clamping, determinism, zero-resource standby and stage integration. Full build
+and real WebGL/GPU visual tests remain explicit release gates.
+
+## V820 Vocal & Adlib FX Studio
+
+`components/visualizer/vocalAdlibFxPlannerV820.ts` reads only the active V810 verified
+concert act and saved, exact-track V496 vocal segments. Lead/feature and overlapping adlibs are
+visual editorial directions, not inferred voice identities. A projected adlib word additionally
+requires an explicitly tagged, synced lyric line with a valid word timestamp inside the authored
+adlib interval. Pauses, reduced motion, manual camera/lighting and low GPU tier disable V820.
+
+`components/visualizer/VocalAdlibFxV820.tsx` renders two low-opacity rear side-wing shader
+planes and an optional small adlib text plane, leaving singers, face/lips and readable lyrics
+untouched. One CanvasTexture is reused and disposed on unmount. No new lights, cameras or timers.
+The existing Concert FX settings persist via the V810 object with backwards-safe defaults.
+`tests/v820-vocal-adlib-fx-regression.cjs` tests strict vocal evidence, guardrails, side-stage
+renderer, UI integration and profile budgets. Full WebGL acceptance still required.
+
+
+## V821 – LED Wall Experience 2.0
+
+`components/visualizer/ledWallExperiencePlannerV821.ts` selects equalizers for verses,
+geometry for hooks, waves for intro/build/break, and bass tunnels for drops/finale.
+Only V810-confirmed sections and real analyzed audio drive the mode. Manual lighting,
+blackout, pause, reduced motion and low GPU tier turn the effect off.
+
+`components/visualizer/ledWallExperienceShaderV821.ts` extends V812/V647 in place on the
+existing single LED mesh. The alpha cap remains at 0.15 and the centre behind the cast
+stays dim. `components/visualizer/ConcertFxStudioPanelV810.tsx` provides settings
+and preview. All settings normalize through `components/visualizer/concertFxStudioV810.ts`,
+including safe migration of older stored configurations.
+
+`tests/v821-led-wall-experience-regression.cjs` and `tests/tsconfig.v821-core.json`
+cover mode selection, source guards, budgets, shader integration and TypeScript types.
+The complete production build and real browser/GPU acceptance are still required.
+
+## V822 – Advanced Beat Accent Director
+
+`components/visualizer/beatAccentDirectorV822.ts` adds a pure, deterministic
+accent distributor to the existing V810 verified song-act authority. It uses
+microphone-derived attack, onset-strength and kick/snare-like spectral bands
+from `types/audio.ts`; spectral proxy measurements cannot reliably identify
+individual instruments. Without a measured transient it generates no kick,
+snare-like or peak events. Continuous bass response is separately bounded.
+Peak accents require a verified hook, drop or finale.
+
+`components/visualizer/DynamicStage.tsx` applies the capped accent gains to the
+existing laser materials, existing V816 particle instances, existing V817 foam
+instances and existing V821 LED shader material. The back-wall enhancement in
+`components/visualizer/ledWallExperienceShaderV821.ts` uses three additional
+uniforms, with no added mesh or render pass. The original V821 alpha ceiling of
+0.15 remains in effect and the stage centre stays dim. No added light or camera
+is created. Authoring priority, blackout, pause, reduced motion, quality,
+performance budget, singer/lyrics protection and original FX switches all
+remain authoritative.
+
+`components/visualizer/ConcertFxStudioPanelV810.tsx` exposes sensitivity,
+intensity and four independent accent toggles, with a simulated and explicitly
+labelled preview. Normalization in `components/visualizer/concertFxStudioV810.ts`
+keeps old configurations valid and adds the V822 preferences to existing export.
+`tests/v822-beat-accent-director-regression.cjs` and `tests/tsconfig.v822-core.json`
+validate guards, isolation, caps, GLSL integration and typing. Full Next.js
+production build and browser GPU validation are still pending.
+
+
+## V826 – Concert Quality Dashboard 2.0
+
+`components/visualizer/concertQualityTelemetryV826.ts` erfasst die echten R3F-Frame-Abstaende in 0,5-s-Fenstern, ermittelt Durchschnitt, P95, Anteil langsamer Frames und diagnostische Hinweise. `DynamicStage.tsx` liefert nur die nach V825 gedrosselten, tatsaechlich an die jeweiligen Renderer uebergebenen Effekt-Cue-Instanzzahlen. `ConcertQualityDashboardV826.tsx` zeigt eine nur lesende Uebersicht in Display/Concert FX und Diagnose. Ein `useSyncExternalStore`-Abonnement begrenzt UI-Updates auf ca. 2 Hz, ohne die 3D-Buehne neu zu rendern. Messung ist per `qualityDashboardV826` in V810-Einstellungen speicherbar; keine Netzwerkanfrage/Telemetrie-Uebertragung. V825 FX-Kosten sind Schaetzungen, WebGLRenderer.info-Zahlen Zaehlersnapshots; weder echte GPU-Zeit noch GPU-Speicherbelegung werden gemessen. Pausen, Tab-Wakeup-Ausreisser, fehlende Live-Renderdaten werden ausdruecklich getrennt markiert.
+
+
+## V827 - Automatic Concert Quality Tuning
+
+`components/visualizer/automaticConcertQualityV827.ts` observes only valid and verified V826 frame-time windows. It changes FX pressure with hysteresis and capped recovery, never starts a previously forbidden effect or overrides V823 manual safety. `components/visualizer/concertBenchmarkV827.ts` accumulates up to three measured live-rendered configured performer-count profiles (1, 2, 4), separately from simulations. The benchmark does not alter avatar configurations; the user must choose the next count. Source of measurements is R3F frame cadence and WebGLRenderer.info, not hardware GPU timing. `components/visualizer/ConcertBenchmarkPanelV827.tsx` presents guided live captures, with limits on claims about loaded GLB meshes, consistency and hardware.
+
+
+## V828 - Concert Experience 4.0
+
+- `components/visualizer/concertExperienceDirectorV828.ts`: deterministic musical show motif per V604/V761 verified act; section-based contrast for verse/build/hook/drop/finale and four stable scene signatures. No inferred beats, adlibs, camera cuts, additional renderer or timers.
+- `components/visualizer/DynamicStage.tsx`: multiplies five existing FX lane gains BEFORE V825 budget caps; V823 authored cues override lane by lane. Reuses current LED wall shader and existing background/floor tint for subtle scene reveals. V810 blackout/manual-lighting/reduced-motion authority wins.
+- `components/visualizer/concertFxStudioV810.ts`: V828 enable, style and intensity fields normalised and persist via existing settings export.
+- `components/visualizer/ConcertFxStudioPanelV810.tsx`: three styles and a clearly labelled simulated preview.
+- `tests/v828-concert-experience-regression.cjs` and `tests/tsconfig.v828-core.json`: release gates.
+
+- `components/visualizer/ConcertMomentCrownV828.tsx`: a single optional 12-instance, light-free rear-stage crown; only verified hook/build/drop/finale, disabled for authored LED cues or manually disabled LED wall, and instance-capped by V825.
+
+
+## V829 - Ultimate Concert Experience / Real-Show-Abnahme
+
+- `components/visualizer/concertAcceptanceV829.ts`: 3 x 3 Matrix fuer Deutschrap, Hardtekk, Deutschrock und 1/2/4 konfigurierte Performer. Erfasst nur verifizierte, nahezu vollstaendige und zeitlich fortlaufende Live-Songs aus V826-Messfenstern, keine simulierten GPU- oder Lip-Sync-Passes. Bei Seek, Song-, Dauer- oder Profilwechsel wird die Aufnahme ungueltig.
+- `components/visualizer/ConcertAcceptancePanelV829.tsx`: manuelle visuelle Abnahme von Lyrics, Lip-Sync, Kamera, Choreografie, FX und Uebergaengen; JSON-Bericht mit Messwerten und klar als manuell gekennzeichneten Bewertungen. Keine automatische GLB- oder GPU-Validierung.
+- `components/visualizer/DynamicStage.tsx`: ruft den passiven Akzeptanzsammler nur bei fertiger V826-Live-Telemetrie auf; keine neuen Render-Objekte, keine Kamerasteuerung und keine Timer.
+- `tests/v829-ultimate-concert-acceptance-regression.cjs` und `tests/tsconfig.v829-core.json`: Verifikation von Live-Datenherkunft, verifizierten musikalischen Abschnitten, seek-freier Songabdeckung, manuellem Review, 9 Szenarien und geschuetzten Freigabeschranken.
+
+**Freigabe:** Ohne neun echte Live-Songs, manuelle visuelle Bewertungen, komplette TypeScript-Pruefung, Next.js-Produktionsbuild und GPU-/Browser-Test darf V829 nicht als Produktionserfolg bezeichnet werden.
+
+
+## V830 - Production Readiness & Sichtbarer GLB-Rig-Nachweis
+
+- `components/visualizer/concertProductionEvidenceV830.ts`: fail-closed Nachweis fuer 1/2/4 tatsaechlich **sichtbare SkinnedMeshes** unter den benannten Hauptbuehnen-Performer-Slots. Pruefung nur je abgeschlossenem V826-Messfenster; nicht pro Frame und keine GPU-Timer. Unsichtbare Rigs, Null-Geometry, leere/fehlende Slots und Fallback-Darstellungen gelten nicht als bestaetigt. Ein animierbarer Mesh-Nachweis garantiert weder GLB-Dateiherkunft noch gute Darstellung.
+- `components/visualizer/DynamicStage.tsx`: erfasst den Rig-Status unmittelbar vor der V829-Finalisierung des Live-Songs. V829-Rohabnahme wird nicht ueberschrieben; V830 erstellt einen strengeren separaten Produktionsnachweis mit mindestens 20 Messfenstern, >=95 % bestaetigten Slots, derselben Track-ID und Nachweis bis zum Songende.
+- `components/visualizer/ConcertAcceptancePanelV829.tsx`: Zeigt eine zusaetzliche V830-Cast-Matrix, resetet den Nachweis bei Neuaufnahme, exportiert V829- und V830-Ergebnisse gemeinsam als JSON. Keine synthetischen Abnahmepasses.
+- `scripts/v830-production-gate.cjs`: Blockierender lokaler Freigabe-Runner: zuerst `check:release`, dann **vollstaendiger** `typecheck`, danach der direkte Next.js-Produktionsbuild (nach erfolgreich absolvierter Preflight-Kette, ohne diese durch npm lifecycle doppelt aufzurufen). `--audit` prueft nur Installationsvoraussetzungen und gilt nicht als Testfreigabe. Erzeugt `v830-production-gate-result.json` mit exakt ausgefuehrten Ergebnissen; Fehler und fehlende Abhaengigkeiten blockieren statt sie zu ueberspringen.
+- `tests/v830-production-readiness-regression.cjs` und `tests/tsconfig.v830-core.json`: Rig-Erkennung und Produktionsevidenz rein mit expliziten Mock-Szenen getestet; dies ist **keine** reale GPU-/GLB-Abnahme.
+
+**Freigabe:** V830 ist erst dann produktionsreif, wenn `npm ci`, `npm run verify:production:v830`, alle neun realen Konzertdurchlaeufe, Reviewer-Sichtung und GPU-/Browser-Validierung auf echter Zielhardware nachweisbar abgeschlossen sind.
+
+
+## V831 - Production Build Stabilization (technische Vorpruefung)
+
+- `scripts/v831-build-readiness.cjs` erlaubt ein dependency-freies `npm run doctor:v831`.
+  Die Diagnose prueft Node, package/lock, echte lokale Next-/TypeScript-Binaries
+  und Windows-/Linux-Kollisionen (.ts/.tsx inklusive Gross-/Kleinschreibung).
+  `ready-to-test` ist KEIN erfolgreicher Typecheck und KEINE Produktionsfreigabe.
+- `scripts/v831-production-gate.cjs` verlangt nacheinander die tatsaechliche
+  `check:release`-Regression, `typecheck` und die reale lokale Next.js-CLI.
+  Das Build startet bewusst direkt ueber die Next.js-CLI, damit npm-prebuild die
+  umfangreichen Release-Regressionen nicht erneut ausfuehrt. Kein Skip-Parameter.
+- `.github/workflows/v831-production-on-demand.yml` bietet einen explizit
+  manuell ausloesbaren Windows-/Linux-GitHub-Actions-Prueflauf mit npm ci und
+  Fehlerbericht als Artefakt. Die bestehenden Push-/Historie-Jobs bleiben erhalten.
+- `tests/v831-production-build-stabilization-regression.cjs` testet
+  Fehlersicherheit, Lockfile-/Abhaengigkeitsdiagnose, Windows-Namen und die
+  unbedingten technischen Gates. Der V830-Rig-Nachweis bleibt unveraendert.
+
+**Freigabe:** V831 ist nur technisch bereit, wenn lokale Projektabhaengigkeiten
+installiert sind und echte Release-Regressionen, vollstaendiger TypeScript-
+Check und Next.js-Build bestanden wurden. Die neun realen Konzerte samt
+audiovisueller/GPU-Abnahme sind weiterhin separat erforderlich.
+
+
+## V832 - Real GLB Concert Benchmark 2.0 und kontinuierliche technische Validierung
+
+`components/visualizer/realGlbConcertBenchmarkV832.ts` protokolliert nur
+explizit gestartete reale V826-Renderloop-Messfenster mit gleichzeitigem
+V830-Nachweis sichtbarer, geriggter SkinnedMeshes in **allen** 1/2/4
+konfigurierten Performer-Slots. Fehlende Meshes, nicht bestaetigte Wiedergabe,
+Pausen, Songwechsel, Seek, Quality-Tier-Wechsel, Renderaufloesungswechsel oder
+Effektsettings-Wechsel verwerfen die aktive Probe. Die naechste Besetzung wird
+vom Nutzer eingestellt; V832 laedt keine GLB-Dateien eigenstaendig und
+erfindet keine Performerergebnisse. Messdauer je Cast: 15s.
+
+Die V832-Auswertung erfasst echte Renderloop-FPS und Framezeiten,
+Renderer.info Draw Calls/Dreiecke sowie Geometrien/Texturen und sichtbare
+SkinnedMesh-Vertices. Geometrie-/Texturzahlen sind **keine VRAM-Bytes**,
+Renderloop-Zeiten sind **keine GPU-Timer**; ein sichtbarer Rig beweist nicht
+die Herkunft aus einer GLB-Datei. Das lokale JSON-Protokoll traegt explizit
+`productionReleased:false`. Vergleichbarkeit erfordert denselben Song,
+denselben Quality-Tier, dieselbe Renderaufloesung und dieselbe FX-Signatur.
+
+UI: `components/visualizer/RealGlbBenchmarkPanelV832.tsx` wird im
+`components/visualizer/ConcertFxStudioPanelV810.tsx` angezeigt.
+Renderer-Anbindung: `components/visualizer/DynamicStage.tsx` im bestehenden
+~500ms-V826-Publish-Fenster; keine neuen 3D-Meshes/Draw Calls. Tests:
+`tests/v832-real-glb-concert-benchmark-regression.cjs`,
+`tests/tsconfig.v832-core.json`.
+
+`.github/workflows/v832-continuous-validation.yml` startet bei Pushes,
+Pull Requests und manuell auf Windows und Linux `npm ci` und
+`npm run verify:production:v831`, inkl. aller neuen V832-Regressionen,
+vollstaendigem Typecheck und echtem Next.js-Produktionsbuild. Die CI
+meldet Fehler als Blocker und laedt Reports auch bei Fehlschlag hoch.
+Live-WebGL-, GPU- und neun menschliche Konzertabnahmen bleiben separate
+Freigabebedingungen. Keine erfolgreich ausgefuehrte CI wird behauptet.
+
+
+## V835 Display Performance Studio
+
+- `components/visualizer/displayStudioV835.ts`: opt-in DPR/Pixelbudget-Limit, 30/45/60-FPS-Ziel, bedachte Hysterese, reine Funktion ohne GPU-Zeitmessung.
+- `components/visualizer/displayStudioStoreV835.ts`: persistierte Zusatzkonfiguration und Live-Status; kein zweiter Render-Loop.
+- `components/visualizer/DisplayPerformanceStudioV835.tsx`: Einstellungen in der vorhandenen 3D-Qualitaetsanzeige.
+- `components/visualizer/adaptivePerformance.tsx`: alte V253/V355/V388/V602-Obergrenzen bleiben aktiv. V835 kann DPR nur weiter begrenzen; Audio, Lyrics, Performer-Timing und Kamera bleiben unveraendert.
+- `tests/v835-display-performance-studio-regression.cjs`: Richtlinien-, Last-, Sicherheits- und Integrationsregression.
+- Keine verifizierte Raspberry-Pi-Erkennung, keine realen GPU-Timings oder garantierte FPS-Verbesserung.
+
+## V839 -- Natural Dance & Footwork 4.0
+
+The existing V492 frame pipeline calls `components/visualizer/naturalDanceFootworkV839.ts` for contact-evidenced dampening only. Existing GLB clips, authored animations, group roots, vocal/lip-sync and IK keep precedence. Controls: `components/visualizer/NaturalDanceControlsV320.tsx`. Unified backup includes the V839 dance settings. Verification: `tests/v839-natural-dance-footwork-regression.cjs` and `V839-NATURAL-DANCE-FOOTWORK-VERIFICATION.md`.
+
+
+## V840 - Dynamic Performer Stage Blocking 2.0
+
+- `components/visualizer/dynamicPerformerStageBlockingV840.ts` refines verified V808 depth offsets for 2-4 performers; requires stage coordinates and collision evidence, retains X lanes, does not infer singer roles or change IK/GLB clips.
+- `DanceFormationActorsV492.tsx` (duo) and `GroupDancersV326SceneV492.tsx` (3-4) share existing frame callback; manual cues, reduced motion, contact and safety have precedence.
+- Controls in `NaturalDanceControlsV320.tsx`, backup in `services/settings/unifiedBackup.ts`. No new render pass or physics engine.
+- Tests: `npm run test:v840` and `npm run test:v840:types`. Full project build and live GLB review are separately required.
+
+## V841 – Professional Lighting Show 5.0
+The existing verified V604/V761/V793 scene/act drives V841 optical modulation of the existing
+V762 procedural floor gobo, V811 backstage laser shader and V793 shadow-free spot target.
+No additional scene lights, passes, textures, geometry, GPU clocks or timers.
+The planner fails closed for manual lighting, blackouts, reduced motion, low-tier rendering,
+missing musical evidence and invalid playback; lyrics and performers reduce enhancement strength.
+Explicit V762 lighting overrides V841 floor gobo. Existing V825/V772 budgets and V823
+manual laser controls remain authoritative. These are shader stage visuals, not real lasers.
+
+
+## V842 - LED Wall Experience 3.0
+Procedural perspective tunnel and polygon geometry use the same V821 LED wall, no additional render passes, textures or meshes. See tests/v842-led-wall-experience-3-regression.cjs. Playback verification, manual settings and budget gates take precedence.
+
+
+## V843 – Foam Cannon Experience 2.0
+V843 modulates the existing two GPU-instanced V817 foam streams with deterministic arcing, stage-wing flutter and transient landing froth. `foamExperiencePlannerV843.ts` is pure and samples into a reused output object, with no new draw calls, geometry, texture or clock. V810 settings/backups enable opt-out and style selection. The V823 timeline and V825 performance budget are applied **before** V843 and can only reduce intensity. See `V843-FOAM-CANNON-EXPERIENCE-2-VERIFICATION.md`.
+
+## V844 - Festival Special FX 3.0 + optional strobe
+V844 verifies section/audio cues, schedules at most one dominant side-stage effect, and protects manual lighting and reduced motion. A single 48-instance CO2 mesh complements reused V816 spark/confetti. Optional strobe is OFF by default; floor-light pulse <=2 Hz, <=45ms, +0.12 intensity, never fullscreen. See V844-FESTIVAL-SPECIAL-FX-STROBE-VERIFICATION.md.
+
+
+## V845 - Soap Bubbles & Full-Stage-Flash
+- Pure music-verified, reduced-motion, manual-authority and budget-gated planners in festivalBubblesFlashPlannerV8441.ts.
+- SoapBubblesV8441.tsx: one bounded 64-instance bubble field behind performers.
+- FullStageFlashV8441.tsx: separately opted-in 3D-canvas-only camera-aligned wash, max 16% alpha, max 35ms and 2Hz.
+- No display/UI overlay; flash cannot be guaranteed photosensitive-safe.
+- Release requires full typecheck, Next.js build, and actual visual test.
+
+> **Dokumentationsstand:** V847 (01.11.2026)
+
+
+## V846 - Paper Streamers
+
+The verified V844/V845 companion cue drives festivalPaperStreamersPlannerV846.ts
+and a bounded 56-instance PaperStreamersV846.tsx renderer. It inherits manual-lighting,
+blackout, reduced-motion, lyrics, low-tier, performance and timing safeguards.
+Independent settings (classic, spiral and festival) are saved with V810 preferences.
+See V846-PAPER-STREAMERS-VERIFICATION.md.
+
+## V847 - Metallic Confetti Rain and Virtual Spark Wheels
+
+festivalFinalePlannerV847.ts reads only the confirmed V810/V844 cue and respects
+all V816 particle toggles, V823 timelines, V825 budgets, manual control, reduced
+motion, blackouts and performer/lyrics protection. The V844 confetti window permits
+metallic rain, while spark windows permit virtual spark wheels. These are mutually
+exclusive and suppressed during the CO2 hero effect. Legacy V816 sparks/confetti
+are attenuated, never re-enabled. FestivalFinaleV847.tsx uses two bounded GPU
+instanced meshes (80/32) without any actual pyrotechnics, new lights, shadows
+or extra render passes. Metallic highlights are simulated using color and rotation.
+Settings persist via V810 and the existing unified backup system. Tests: v847
+regression and isolated TypeScript. Full project typecheck, Next.js production build
+and actual GPU/browser acceptance remain separate mandatory release gates.
+
+
+## V848 - Cinematic Camera Director 4.0
+
+The pure `components/visualizer/cinematicCameraDirectorV848.ts` finishes the
+existing `components/visualizer/StageCameraDirectorV289.tsx` pose after
+V838 harmony and before V351's final lyrics guard. It uses verified V528/V797
+vocalist evidence for portraits and duets; a wide drop requires the verified
+V792 storyboard and sampled V377 roots (1-4). V540/V550 projected-frame guards
+reject any newly worse head/feet/lyrics framing. Existing manual presets,
+authored V354/V400, reduced motion and low-tier settings always win. No second
+camera, actor inference, random timer, new frame loop or GPU resources.
+
+Tests: `tests/v848-cinematic-camera-director-regression.cjs` and
+`tests/tsconfig.v848-core.json`. Not yet production released: whole-project
+TypeScript build, Next.js build and real browser/GLB QA are still required.
+
+
+## V849 – Intelligent Concert Transitions 5.0
+
+`components/visualizer/intelligentConcertTransitionsV849.ts` plant aus
+verifizierten V791-Szenengrenzen genau einen gemeinsamen Cue. Die vorhandene
+Kamera und DynamicStage verwenden denselben begrenzten Übergang. LED (V821/V842),
+Laser, V819-Overlay sowie V844/V847-Festival-FX werden lediglich abgeschwächt,
+während Kamera- und Lichtblenden vorübergehend langsamer werden. Es gibt keine
+neuen Beats, Schnitte, Lights, Shader, Timer oder Render-Loops.
+
+Gespeicherte Kamera-/Licht-Timelines, V823-LED-/Laser-Spuren, V351-Lyrics,
+Reduced Motion sowie Low-Tier- und FPS-Limits haben weiterhin Vorrang.
+Die V849-Einstellungen werden im vorhandenen V810-Konfigurationsobjekt
+verwaltet und sind damit Teil des portablen V657-Backups.
+Tests: `tests/v849-intelligent-concert-transitions-regression.cjs` und
+`tests/tsconfig.v849-core.json`. Vollständiger Typecheck, Next.js-Build und
+realistische GPU-/Browser-Showabnahme sind eigene Freigabegates.
+
+## V850 – Smart Festival Show Director 4.0
+
+`components/visualizer/smartFestivalShowDirectorV850.ts` uses only verified
+V604/V761/V810 musical acts and the real act interval. A stable per-track
+and per-act motif rotates emphasis among LED, laser and particle visuals,
+while verse, break, hook, build, drop and finale receive different restrained
+profiles. The act-start and act-end envelope returns all gains smoothly to
+neutral, including after seeking. The planner never invents sections,
+beats, actor assignments, camera cuts or dance actions.
+
+`DynamicStage.tsx` composes V850 after the V824 director and V823 authored
+lane checks, before existing V825 performance caps. All V850 gains are <=1;
+manual V823 lanes and manual lighting have final authority. Optional
+festival CO2, metallic rain, spark wheels, paper streamers, soap bubbles and
+full-stage flash can only be dimmed, never enabled. V848 camera blocking,
+V849 shared transition seam, V351 lyrics protection and the V487 foot-IK
+controls retain their prior behavior. The existing V810 settings/backup
+persist the enable/strength/style switches.
+
+Verification: `tests/v850-smart-festival-show-director-regression.cjs`,
+`tests/tsconfig.v850-core.json`, historical regression suites and automated
+source checks. Whole-project typecheck, Next production build and real
+GPU/browser review remain mandatory production gates.
+
+## V851 – Spotify Playlist & Speaker Control
+
+Die bereits vorhandene serverseitige Spotify-Session (`lib/spotify.ts`,
+`lib/session.ts`) versorgt die neue per Klick geladene Playlist-Oberfläche
+`components/SpotifyPlaylistsV851.tsx` in `components/SonicDisplay.tsx`.
+`app/api/spotify/playlists/route.ts` gibt paginierte eigene und gespeicherte
+Playlists zurück, `app/api/spotify/playlists/[id]/items/route.ts` liest nach
+der Spotify-API-Änderung vom Februar 2026 ausdrücklich `/items` statt `/tracks`.
+`app/api/spotify/devices/route.ts` liest Spotify-Connect-Geräte;
+`app/api/spotify/playlists/play/route.ts` nimmt geprüfte POST-Anfragen nur von
+der konfigurierten kanonischen Origin entgegen und steuert die Spotify-Wiedergabe
+auf einem spezifischen Gerät. Es gibt keine App-interne Audio-Wiedergabe.
+
+Gemeinsame API-Validierung, Scopes, Session-Refresh, No-Store-Header,
+429-Retry-Header und verständliche Fehler liegen in
+`lib/spotify-playlists-server-v851.ts`; reine Normalisierer, Modelle,
+Favoritenvalidierung und Trackpositionen in `lib/spotify-playlists-v851.ts`.
+Es werden nur Playlist-IDs und Namen als lokale Favoriten im Browser
+persistiert, nicht OAuth-Zugangsdaten und nicht Geräte-IDs. Ein `403` beim
+Abruf fremder Playlist-Titel wird als Spotify-Beschränkung kommuniziert.
+
+Regression: `tests/v851-spotify-playlists-speaker-regression.cjs` und der isolierte
+strikte Typcheck der Utility-Library in `test:v851:types`. Der komplette
+TypeScript-Check, Next.js-Produktionsbuild und der reale Spotify-Connect-Test
+bleiben zwingende Abnahmeprüfungen vor einer Produktionsfreigabe.
+Weitere Details: `V851-SPOTIFY-PLAYLIST-SPEAKER-CONTROL.md`.
+
+
+## V852 – Concert Music Library
+
+Die `components/SpotifyPlaylistsV851.tsx` bleibt bewusst unter dem ursprünglichen Modulnamen,
+damit der dynamische Import in `components/SonicDisplay.tsx` und die V851-API-Tests
+kompatibel bleiben. Die V852-Shell bietet visuelle Playlist-Kacheln, Direktstart,
+Playlist-Hero, Geräte-Chips, Lade-/Fehlerzustände und mobile horizontale Gallery.
+Die Styles stehen in `app/globals.css`; die pure Spotify-Validierung und Server-Endpunkte
+aus V851 bleiben unverändert. Bei fehlendem Gerät wird jede Play-Aktion deaktiviert.
+
+Neue UI-Regression: `tests/v852-concert-playlist-library-regression.cjs`.
+Weitere Hinweise: `V852-CONCERT-MUSIC-LIBRARY.md`.
+
+
+## V853 – Spotify Concert Mini Player
+
+Der schmale, dauerhaft sichtbare `components/SpotifyMiniPlayerV853.tsx` benutzt
+`context/MusicContext.tsx` als alleinige Quelle für Songtitel, Fortschritt und
+Play/Pause-Status, statt einen zweiten Trackpoller zu starten. Er aktualisiert
+`app/api/spotify/devices/route.ts` in einem sparsamen Zyklus für die Anzeige
+des aktiven Connect-Geräts. Der vorhandene V852-Musikbibliotheksdialog bleibt
+über „Meine Musik“ geöffnet und meldet erfolgreich gestartete Playlists an die
+Mini-Steuerung. `app/api/spotify/player/control/route.ts` führt nur manuell
+ausgelöste, auf `lib/spotify-mini-player-v853.ts` geprüfte Befehle aus,
+mit Origin-Prüfung, Scope-Kontrolle, Token-Refresh und Spotify-Fehlerbehandlung.
+Keine eigenständige Audioausgabe, kein neuer Songpoller, keine Änderungen an
+Kamera, Lyrics oder Concert FX. Regression: `tests/v853-spotify-mini-player-regression.cjs`.
+Vollständige TS-/Next.js-Checks und reale Spotify-Connect-QA sind Release-Gates.
+
+## V854 – Spotify Connect Sound Control
+
+Der bereits dauerhaft sichtbare `components/SpotifyMiniPlayerV853.tsx` hat in V854
+zusätzlich ein responsives Geräte-/Sound-Popover. Es zeigt die verfügbaren
+Spotify-Connect-Ausgänge, ihren aktiven Status, einen nur bei `supports_volume`
+freigegebenen Lautstärkeregler sowie Shuffle und Repeat (aus, Kontext, Titel).
+Ein Tap auf ein anderes Gerät fordert eine Übertragung an; der aktuelle
+Wiedergabestatus wird dabei als `play`-Flag mitgegeben. Ein Erfolg der API
+bestätigt nur die Annahme des Befehls, nicht die sofortige Geräteaktivierung.
+Nach Übertragungen wird erneut abgefragt; die Playlist-Bibliothek wird über ein
+Window-Event benachrichtigt und synchronisiert die Geräteauswahl.
+
+`app/api/spotify/player/settings/route.ts` kapselt die GET-Anfrage auf
+`/me/player` sowie die vier erlaubten PUT-Befehle. Die Eingaben und Spotify-Pfade
+werden in `lib/spotify-connect-v854.ts` strikt validiert bzw. normalisiert.
+Schreibzugriffe erfordern Origin-Check, `user-modify-playback-state` und eine
+bestehende Spotify-Session. GET braucht `user-read-playback-state`. Der
+`context/MusicContext.tsx` bleibt die einzige UI-Songquelle; der Statusaufruf
+für Connect-Einstellungen erfolgt nur bei geöffnetem Panel und bei gezielten
+Geräte-Aktualisierungen, ohne einen zweiten Titelpoller. Einzelheiten und
+Einschränkungen: `V854-SPOTIFY-CONNECT-SOUND-CONTROL.md`.
+
+Regression: `tests/v854-spotify-connect-settings-regression.cjs`; isolierter
+TS-Check und vorhandene V851-V853-Tests bleiben aktiv. Vor Produktivfreigabe
+vollständigen TypeScript-/Next.js-Build und einen Spotify-Premium-Gerätetest
+auf echter Hardware durchführen.
+
+## V855 – Spotify History Studio
+
+Das V701-Spotify-Archiv verwendet für den rückblickenden Verlauf `ListeningHistoryExplorerV855.tsx` mit rein lokalen Filtern in `lib/listening-history-explorer-v855.ts`. Dadurch keine zweite Spotify-API-Abfrage, keine zusätzliche Erfassung und kein Storage-Wechsel. CSV wird nur auf expliziten Klick mit neutralisierten Tabellenformeln erstellt; die ursprünglichen JSON-Import-/Exportpfade sind unverändert. Design ist touch-optimiert. Prüfungen über `test:v855` und `test:v855:types`.
+
+
+## V856 · Last.fm Music Memory Insights
+
+`lib/lastfm-monthly-insights-v856.ts` berechnet rein lokal Monatsvergleiche, aufkommende Favoriten und Song-Wiederentdeckungen (ab 90 Tagen zwischen zwei gespeicherten Scrobbles). `components/LastFmMonthlyInsightsV856.tsx` wird im bestehenden kontogebundenen `components/LastFmHistoryPanelV706.tsx` angezeigt. Das Last.fm-Langzeitarchiv bleibt die einzige Datenquelle; keine neuen Fetch-/Speichervorgänge. Tests: `tests/v856-monthly-history-insights-regression.cjs`, `tests/tsconfig.v856-ui.json`.
+
+## V857 · Personal Music Discovery (Last.fm)
+
+- `lib/lastfm-personal-discovery-v857.ts`: reine, kontoagnostische Funktionen für Künstler-Share-Momentum, sechsmonatige Stichprobenwahl, validierte Metadaten und Genre-Abdeckung.
+- `components/LastFmPersonalDiscoveryV857.tsx`: kontoabhängig neu gemounteter Bereich in `LastFmHistoryPanelV706`; opt-in-Sampling via bestehender `/api/genre`, maximal 36 Titel / 3 parallele Requests, AbortController für Unmount. Keine zusätzliche Hintergrund-Synchronisierung.
+- `tests/v857-personal-music-discovery-regression.cjs`: Zeiträume, Künstlernormalisierung, Track-Genres nur aus Tags, Sampling-Limits, Datenschutz und Version-/Release-Gates.
+
+Beim Genre-Kompass werden bekannte Genre-Wiedergaben gegen die *abgedeckten* Wiedergaben normalisiert; unerkannte und noch nicht abgefragte Scrobbles bleiben sichtbar separat. Die Auswertung ist deskriptiv, keine prädiktive KI.
+
+
+## V858 · Music Discovery Dashboard 2.0
+
+- `components/LastFmDiscoveryHomeV858.tsx`: neue touchoptimierte History-Einstiegsseite im kontogebundenen `LastFmHistoryPanelV706.tsx` oberhalb der umfangreichen Detailberichte. Monatsauswahl, 12-Monats-Balkendiagramm, Top-Künstler, aufkommende Favoriten, neue Künstler und Song-Wiederentdeckungen; Links in die vorhandenen Explorer und Auswertungen.
+- `lib/lastfm-discovery-dashboard-v858.ts`: reine Aggregationsschicht auf Grundlage der vorhandenen validierten V856-/V857-Berechnungen. Keine Datenbankmutation, keine weiteren Last.fm- oder Spotify-Aufrufe. Nullwerte und fehlende Archivdaten bleiben sichtbar.
+- `tests/v858-discovery-home-regression.cjs` und `tests/tsconfig.v858-ui.json`: automatisierte Daten-, Integrations-, UI-Syntax- und isolierte Typprüfungen. Vollständiger TypeScript-Check und Next.js-Build sind weiterhin notwendige Freigabeschranken; eine erfolgreiche isolierte Prüfung ersetzt diese nicht.
+- `scripts/diagnose-build-v858.cjs`: nur lesende Abhängigkeitsdiagnose mit erklärter Abhilfe bei fehlender lokaler Installation; ersetzt keinen vollständigen Build.
+
+
+## V859 · Interactive Music Timeline
+
+- `lib/lastfm-interactive-timeline-v859.ts`: reine, schreibfreie Mehrjahres-Zeitachse aus dem kontogebundenen V713/Last.fm-Archiv, einheitliche Monats-/Jahresgrenzen in Wien oder UTC, Unicode-normalisierte Künstlerzuordnung. Gesamtes Archiv inklusive Jahren ohne Einträge; solche Lücken sind **nicht** als echte Hörpausen zu interpretieren. Validierte ISO-Zeitstempel ohne zukünftige Ereignisse; kein zweiter Last.fm-Abruf.
+- `components/LastFmInteractiveTimelineV859.tsx`: direkt unter `LastFmDiscoveryHomeV858.tsx` im `LastFmHistoryPanelV706.tsx` als Jahresübersicht, selektierbare 12-Monats-Grafik, Monats-Künstlerliste, durchsuchbare Künstlerauswahl, Jahresverlauf und Meilensteine. Direkte Navigation in den bestehenden Artist Explorer. Zugängliche `aria-pressed`-Auswahl, Tastatur-Fokus, mobile Scroll-Achse und reduzierte Animationen.
+- CSS in `app/globals.css` (`lastfm-timeline-v859`). Keine persistenten Änderungen, keine Spotify-Scopes, keine API-Endpunkte oder neuen Poller.
+- Tests: `tests/v859-interactive-music-timeline-regression.cjs`, `tests/tsconfig.v859-ui.json` und strenge Kern-TypeScript-Prüfung. Regressionen V849–V858 bleiben vorgeschaltet.
+- Bekannte Grenzen: Der volle Next.js-Produktionsbuild und der gesamte Produktiv-TypeScript-Check benötigen installierte Projektabhängigkeiten. Berechnete Wiedergaben sind ausschließlich erfasste Scrobbles, keine geschätzte Hörzeit.
+
+## V860 · Artist Deep Dive
+
+- `lib/lastfm-artist-deep-dive-v860.ts`: reine, datenschutzbewusste Artist-Drilldown-Analyse für das bestehende kontogebundene Last.fm-Archiv. Unicode-normalisierte Künstler- und Titelnamen, validierte UTC-Zeitstempel, Wiener/UTC-Kalenderjahre, zeitlich begrenzte Top-Song- und Albumranglisten, getrennte unbekannte Alben, Jahresanteile relativ zu *allen im Archiv erfassten* Scrobbles. Lücken im Archiv werden nicht als tatsächliche Hörpausen gewertet.
+- `components/LastFmArtistDeepDiveV860.tsx`: nach dem V859-Timeline-Bereich im bestehenden `LastFmHistoryPanelV706.tsx`. Durchsuchbare Künstlerkacheln, interaktiver Jahresverlauf, Filter Alle Jahre/Jahr, Top-Songs und Top-Alben, Links zurück in den V729 History Explorer. Accountabhängiger React-Key verhindert Auswahlübernahme zwischen Accounts; kein Fetch und keine Storage-Mutation.
+- Neues responsives Styling in `app/globals.css`, direkter Schnellzugriff vom V858-Startdashboard. Weder zusätzliche Spotify-Scopes noch Last.fm-API-Routen/Poller, keine Änderungen an Konzert-/GPU-Rendering.
+- Tests: `tests/v860-artist-deep-dive-regression.cjs`, `tests/tsconfig.v860-ui.json`, strenger TypeScript-Kerncheck. Die Test-JSX-Stubs verbleiben ausschließlich unter `tests/stubs`.
+- Produktive Freigabe setzt weiterhin `npm run typecheck`, vollständige `npm run build`-Kette und Browser-/Touch-Test nach installierten Projektabhängigkeiten voraus.
+
+## V861 · Song Rediscovery Intelligence 2.0
+
+- `lib/lastfm-song-rediscovery-v861.ts`: reine, deterministische Auswertung des bereits geladenen Last.fm-Langzeitarchivs. Pro normalisiertem Künstler-/Titelnamen werden gültige Scrobbles nach UTC sortiert und zeitgleiche Doppelimporte zusammengefasst. Die jüngste Rückkehr mit einem zeitlichen Abstand von mindestens 90, 180 oder 365 × 24 Stunden wird angezeigt. Zusätzlich findet die Analyse früher mehrfach erfasste Songs ohne aktuellen Archiveintrag; sie nennt keinen Zeitraum ohne Scrobble eine nachgewiesene Hörpause. Ungültige/future timestamps werden ignoriert. Keine Requests oder Speichermutationen.
+- `components/LastFmSongRediscoveryV861.tsx`: accountgebundene History-Oberfläche mit Mindestabstand-Auswahl, Comeback-/Favoriten-Reiter, Suche und 10-Einträge-Seitennavigation; Links in V729 Explorer. Daten bleiben auch beim Benutzerwechsel getrennt (`key` aus Last.fm-Benutzername). Kompakt, responsiv und mit Keyboard- sowie Reduced-Motion-Support.
+- Tests: `tests/v861-song-rediscovery-regression.cjs`, `tests/tsconfig.v861-ui.json`, separater strenger Kern-Typecheck; Build-Gates bleiben erhalten.
+
+
+## V862 · Genre Evolution Studio
+
+- `lib/lastfm-genre-evolution-v862.ts` erzeugt strikt lesende 24-Monats- und 10-Jahres-Auswertungen auf dem vorhandenen V713-Last.fm-Archiv, mit den bei V857 bereits eingeführten Genre-Evidenzregeln: nur explizite Song-/Künstler-Tags mit ausreichender Konfidenz und verifizierbarer Herkunft; Titel-/Künstlernamens-Heuristiken werden ausgeschlossen. Wiener Kalenderzeit oder UTC einstellbar; nicht erfasste Scrobbles werden **nicht** als Hörpause interpretiert.
+- `components/LastFmGenreEvolutionV862.tsx` ist nach V861 im accountgebundenen `LastFmHistoryPanelV706.tsx` eingebunden. Eine zusätzliche V858-Startseitenverknüpfung führt direkt zum Studio. Touch-optimierte, horizontal scrollbarere 24-/10-Balkengrafik, Auswahl einzelner Zeiträume, Genre-Fokus, Verteilung, Datenabdeckung sowie Unterscheidung zwischen präziseren Track- und gröberen Künstler-Tags.
+- Genre-Metadaten werden nur nach ausdrücklichem Klick und nur für höchstens 72 über Zeiträume verteilte, deduplizierte Titel je Ansicht geladen; höchstens drei Requests parallel via bestehendem `/api/genre`, Abbruch bei Unmount. Fehlgeschlagene Antworten werden nicht als erfolgreiche Genrezuordnung gespeichert und können erneut versucht werden. Ergebnisse bleiben im kontobezogenen Komponenten-Arbeitsspeicher; **kein neuer dauerhafter Speicher, Poller, Spotify-Scope oder automatischer Wiedergabestart**. Die getrennten Genre-Panels verwenden keine gemeinsamen persistenten Caches.
+- Alle Prozentsätze beziehen sich entweder klar auf die erkannten Scrobbles oder auf die Abdeckung **aller** Scrobbles. Änderungen in Prozentpunkten erscheinen nur bei mindestens zehn erkannten Scrobbles und mindestens 20 % Abdeckung in beiden Perioden; keine Behauptung statistischer Repräsentativität.
+- Tests: `tests/v862-genre-evolution-regression.cjs`, `tests/tsconfig.v862-ui.json` und strenger Kern-TypeScript-Check. Offene Freigabepflicht: `npm ci`, vollständiger `npm run typecheck`, kompletter `npm run build` sowie visueller Browser-/Touch-Test; isolierte Tests sind kein Ersatz.
+
+
+## V863 · Listening Session Analyzer
+
+- `lib/lastfm-listening-sessions-v863.ts` gruppiert Ereignisse aus dem bestehenden kontogebundenen Last.fm-Langzeitarchiv. Sessions bestehen aus mindestens zwei Scrobbles mit 20/30/60 Minuten maximalem Abstand zwischen benachbarten Einträgen; exakte Duplikate werden nicht mehrfach gezählt. Ein Scrobble ist **keine verlässliche Messung der Wiedergabedauer**. Angezeigte Session-Minuten sind nur die Zeitspanne zwischen erstem und letztem erfassten Scrobble.
+- `components/LastFmListeningSessionAnalyzerV863.tsx` zeigt Tagesstunden-, Wochentags- und Tageszeit-Statistiken sowie durchsuchbare Sessions mit Künstler- und Song-Explorer-Aktionen. Wiener Ortszeit / UTC, Archiv-/30-/90-/365-Tage-Filter, touchoptimierte Karten und mobile Layouts. Die Oberflächeninstanz wird beim Last.fm-Kontowechsel durch `key` neu erzeugt.
+- Reine lokale und deterministische Auswertung mit vorgegebenem `now`; keine weiteren Spotify/Last.fm-Anfragen, keine Server-Änderungen, keine automatische Wiedergabe, keine extern gespeicherten Statistiken.
+- Tests: `tests/v863-listening-session-analyzer-regression.cjs`, `tests/tsconfig.v863-ui.json` und Kern-Typecheck; vor Produktionsfreigabe bleiben zusätzlich `npm ci`, vollständiger `npm run typecheck`, `npm run build` und Browser-/Touch-Test Pflicht.
+
+
+## V864 · Playlist Taste Analyzer
+
+- `components/SpotifyPlaylistTasteAnalyzerV864.tsx` ist in den selektierten Spotify-Playlist-Detailbereich eingebettet. Start ausschließlich per Klick, getrennte, abbrechbare Playlist-Paginierung bis 500 Einträge über bestehende geschützte API-Routen. Beim Wechsel der Playlist wird die Analyse durch React-Key zurückgesetzt; beim Schließen wird die Abfrage abgebrochen.
+- `lib/spotify-playlist-taste-v864.ts` vergleicht Playlist-Songs lokal anhand streng normalisierter Hauptkünstler-/Titelschlüssel mit Scrobbles (Remix/Live werden nicht zu anderen Versionen umgedeutet), fasst doppelte Titel zusammen und gibt Künstleranteile, Lieblingssongs und Archivtreffer zurück. Kein Anspruch, nie gespielte Titel zweifelsfrei festzustellen.
+- Last.fm-Daten stammen ausschließlich aus dem kontogebundenen IndexedDB-Langzeitarchiv; bei technischen Problemen kann der vorhandene lokale Kurzzeit-Spiegel gelesen werden und wird deutlich gekennzeichnet. Kein neuer Last.fm- oder Spotify-OAuth-Scope, kein lokales Speichern der Vergleichsauswertung.
+- V864-Regression, gezielte TypeScript-/UI-Prüfung, Syntax-/Architektur-/Windows-Modulkollisionsprüfung. Vollständiger `npm ci`, `npm run typecheck`, `npm run build` und tatsächlicher Browser-/Premium-Test weiterhin vor Freigabe.

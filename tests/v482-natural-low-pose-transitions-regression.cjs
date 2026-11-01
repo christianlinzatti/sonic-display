@@ -61,5 +61,10 @@ const source=fs.readFileSync('components/visualizer/naturalLowPoseTransitionsV48
 assert(!/fetch\(|setInterval\(|Date\.now\(|Math\.random\(/.test(source));
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1])>=482);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v482 && npm run test:v482:types'));
+// Since V656, release validation is an explicit smoke chain rather than the historical prebuild chain.
+assert(pkg.scripts.prebuild==='npm run check:fast');
+assert(((pkg.scripts['check:release'].includes('npm run test:smoke:v667') || ((pkg.scripts['check:release'].includes('npm run test:smoke:v668') || ((pkg.scripts['check:release'].includes('npm run test:smoke:v669') || ((pkg.scripts['check:release'].includes('npm run test:smoke:v670') || (pkg.scripts['check:release'].includes('npm run test:smoke:v671') && pkg.scripts['test:smoke:v671'].includes('npm run test:smoke:v670'))) && pkg.scripts['test:smoke:v670'].includes('npm run test:smoke:v669'))) && pkg.scripts['test:smoke:v669'].includes('npm run test:smoke:v668'))) && pkg.scripts['test:smoke:v668'].includes('npm run test:smoke:v667'))) && pkg.scripts['test:smoke:v667'].includes('npm run test:smoke:v6661') && pkg.scripts['test:smoke:v6661'].includes('npm run test:smoke:v666')) && pkg.scripts['test:smoke:v666'].includes('npm run test:smoke:v665'), 'V665 remains reachable from production release gate');
+assert(pkg.scripts['test:smoke:v665'].includes('npm run test:v482'));
+assert(pkg.scripts['test:smoke:v665'].includes('npm run test:v482:types'));
+
 console.log('PASS V482: smooth pelvis/knee coupling, torso weight shifts, GLB clip hysteresis & overrides, 30-minute stability, stage wiring');

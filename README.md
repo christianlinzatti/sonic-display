@@ -1,3 +1,403 @@
+## V865 – Smart History Fusion 2.0
+
+Im Bereich **Statistiken / Entdeckungen** die Datenquelle **Gemeinsam** auswählen. Die neue Übersicht erklärt mögliche Spotify-/Last.fm-Dopplungen, quellenexklusive Einträge und Tage ohne archivierte Daten über 30, 90 oder 365 Tage. Tagesbalken lassen sich auf Touchdisplays öffnen. Die 90-Sekunden-Zuordnung bleibt eine Heuristik und ist kein Nachweis identischer Wiedergaben. Die Funktion verwendet lokale Daten; die Originalarchive bleiben getrennt. Details und Tests in `V865-SMART-HISTORY-FUSION.md`.
+
+## V864 · Spotify Playlist Taste Analyzer
+
+Playlist-Detailansicht mit manueller Analyse (bis zu 500 Einträge) und optionalem, lokalem Last.fm-Archivvergleich. Details in `V864-PLAYLIST-TASTE-ANALYZER.md` und `V864-VERIFICATION.md`.
+
+## V863 · Listening Session Analyzer
+
+Neue History-Auswertung über zusammenhängende Last.fm-Scrobbles, Tagesstunden, Wochentage und Künstler nach Tageszeit. Abstand 20/30/60 Minuten, 30/90/365 Tage oder gesamtes Archiv, Wiener Ortszeit / UTC und Explorer-Navigation. **Zeitspannen sind keine echten Hörzeiten.** Keine zusätzlichen API-Abfragen. Details: `V863-LISTENING-SESSION-ANALYZER.md` und `V863-VERIFICATION.md`.
+
+## V862 · Genre Evolution Studio
+
+Neue, freiwillig aktivierbare Genre-Zeitreise direkt in der Last.fm-History: 24-Monats- und 10-Jahres-Ansicht, interaktive Zeiträume, Genre-Fokus, belegte Tag-Verteilung und sichtbare Datenabdeckung. Last.fm-Track-/Künstler-Tags werden getrennt ausgewiesen. Höchstens 72 unterschiedliche Songs werden pro Ansicht und Klick geprüft; keine automatische Spotify-Wiedergabe und keine Änderungen am Archiv. Details und Prüfgrenzen: `V862-GENRE-EVOLUTION-STUDIO.md` und `V862-VERIFICATION.md`.
+
+## V861 · Song Rediscovery Intelligence 2.0
+
+Langfristige Song-Wiederentdeckungen und früher oft gehörte Titel direkt im Last.fm-Verlauf. 90/180/365-Tage-Filter, Suche, Seitenansicht und History-Explorer-Verknüpfung ohne neue API-Anfragen. Siehe `V861-SONG-REDISCOVERY.md`.
+
+## V860 · Artist Deep Dive
+
+Künstlerdaten aus dem bereits gespeicherten Last.fm-Archiv: Suchbare Künstlerprofile, erste/letzte archivierte Wiedergabe, Jahresanteile, selektierbare Jahre, meistgehörte Titel und bekannte Alben. Ohne neue Last.fm-Anfragen, siehe `V860-ARTIST-DEEP-DIVE.md`.
+
+## V859 · Interaktive Musik-Zeitreise
+
+Mehrjährige Last.fm-History mit klickbaren Jahres- und Monatsbalken, Künstler-Zeitreise (erste/letzte Aufzeichnung, stärkster Monat, Wiederentdeckungen nach 90 Tagen) und direkter Artist-Explorer-Navigation. Keine zusätzlichen API-Anfragen oder neuen gespeicherten Daten. Siehe `V859-INTERACTIVE-MUSIC-TIMELINE.md`.
+
+## Sonic Display V854 – Spotify Connect Sound Control
+
+Die Mini-Steuerung bietet einen touch-optimierten Sound-Dialog für den
+Lautsprecherwechsel, Lautstärke (wenn vom Gerät unterstützt), Shuffle und
+Repeat (Aus/Playlist/Titel). Vorhandene Playlist-Favoriten und der Spotify-Player
+bleiben erhalten. Anleitung: `V854-SPOTIFY-CONNECT-SOUND-CONTROL.md`.
+
+## Sonic Display V852 – Concert Music Library
+
+Die Spotify-Playlists aus V851 haben jetzt ein neues, in die Konzertoberfläche
+integriertes Design: Musikbibliothek mit Cover-Kacheln, Playlist-Hero,
+Spotify-Connect-Geräteleiste und Direktstart je Playlist. Die favorisierten
+Playlists werden übernommen; die APIs bleiben kompatibel.
+
+Spotify nach dem Update gegebenenfalls neu verbinden, unten **Meine Musik** öffnen,
+Lautsprecher wählen und Play drücken. Dokumentation: `V852-CONCERT-MUSIC-LIBRARY.md`.
+Prüfungen: `npm run test:v852`, `npm run test:v851`, `npm run check:syntax`.
+Ein kompletter Produktionsbuild ist noch auf einer Maschine mit installierten
+Projektabhängigkeiten auszuführen.
+
+## Sonic Display V850 – Smart Festival Show Director 4.0
+
+V850 ergänzt eine deterministische Konzertdramaturgie für wiederholte Songabschnitte.
+Einstellungen, Implementierung und Teststatus: `V850-SMART-FESTIVAL-SHOW-DIRECTOR-VERIFICATION.md`.
+
+## Sonic Display V849 – Intelligent Concert Transitions 5.0
+
+Gemeinsame Kamera-, Licht-, LED- und Spezialeffekt-Übergänge auf Basis
+verifizierter V791-Szenengrenzen. Das Concert FX Studio bietet Aktivierung,
+Stärke und die Stile Sanft, Filmisch und Festival. Kein neuer Render-Pass;
+manuelle Regie, Lyrics- und Performance-Schutz behalten Vorrang.
+Tests: `npm run test:v849` und `npm run test:v849:types`.
+Siehe `V849-INTELLIGENT-CONCERT-TRANSITIONS-VERIFICATION.md`.
+
+## Sonic Display V848 - Cinematic Camera Director 4.0
+
+Neu: sanfte Portrait-, Duett- und Drop-Totalen mit abgesicherten V528/V797
+Stimmrollen bzw. bestaetigter V792-Szene. Die V377-Positionen werden real
+aus der Szene gelesen. V540/V550/V351 behalten Kopf-, Fuss- und Lyrics-Schutz.
+Keine neuen Kamera-Renderloops; manuelle Einstellungen haben Vorrang.
+
+Tests: `npm run test:v848`, `npm run test:v848:types`.
+Weitere Details: `V848-CINEMATIC-CAMERA-DIRECTOR-VERIFICATION.md`.
+
+## Sonic Display V838 – Intelligent Vocal & Duet Director 3.0
+
+Neuer gemeinsamer, streng songgebundener Regieplan für verifizierte Lead-/Feature-Wechsel: sanfte Kameraakzente mit V540/V550-Bildsicherheitsprüfung, begrenzte V797-Lichtmodulation und kurze Blickreaktionen bei sichtbaren GLB-Gruppenperformern. Adlib-Reaktionen verwenden nur bestätigte V632-Backing-Rollen. Manuelle Kamera, Lyrics, Vocal-Casting, Lippenanimation und Dance-IK bleiben geschützt. Automatische Tests in der Release-Kette; vollständiger Next.js-Build und echte GPU-Abnahme bleiben ausstehend. Siehe `V838-INTELLIGENT-VOCAL-DUET-DIRECTOR-VERIFICATION.md`.
+
+## Sonic Display V837 – Advanced Deutschrap Lip-Sync 7.0
+
+V837 verbessert ausschließlich die Reaktionsgeschwindigkeit vorhandener Gesichts-Morphs bei bestätigten, synchronisierten Deutschrap-Wörtern und bereits autorisierten Sängern. B/P/M-Verschlüsse, manuelle Viseme, Audio-Overrides und gesperrte Performer behalten Vorrang. Keine automatische Audio-Phonemerkennung; volle Produktions-/GPU-Abnahme bleibt ausstehend. Die technischen Tests werden über die bestehende Windows/Linux-GitHub-Actions-Freigabekette ausgeführt. Siehe `V837-ADVANCED-DEUTSCHRAP-LIP-SYNC-7-VERIFICATION.md`.
+
+## Sonic Display V820 – Vocal & Adlib FX Studio
+
+Neue, dezente und strikt songgebundene Seitenbuehnen-Effekte fuer bestaetigte Lead-, Feature- und Adlib-Passagen. Adlib-Text erscheint nur mit expliziter V496-Zuordnung, [vocal:adlib:Slot]-Tag und echter Wort-Zeitmarke. Individuelle Schalter im Concert FX Studio. Keine neue Kamera-/Lichtregie; Performance/Balanced/Ultra und Karaoke-/Face-Schutz bleiben erhalten. Siehe `V820-VOCAL-ADLIB-FX-VERIFICATION.md`.
+
+## Sonic Display V783 – Lip-Sync Quality Guard (Benchmark)
+
+Optionale Mund-Morph-Glättung für die GLB-Konzert-Testumgebung. Keine Änderung am produktiven Avatar-Director. Vergleiche mit echten Benchmarkdaten über `npm run benchmark:v783:lip`; siehe [V783-LIP-SYNC-QUALITY-GUARD.md](V783-LIP-SYNC-QUALITY-GUARD.md).
+
+## V781 Motion Smoothness Benchmark
+
+Neue reine Offline-/Browser-Diagnose unter `/diagnostics/motion-smoothness`; Anleitung in `V781-MOTION-SMOOTHNESS.md`.
+
+## Neu in V780: Visuelle Qualitätskontrolle
+
+Mit `npm run benchmark:v780:visual` Screenshots der echten V777-Konzerntestbühne für Cinematic, Balanced und Economy erzeugen; ausführlich: `V780-VISUAL-QUALITY-REVIEW.md`.
+
+## V777 — Real GLB Concert Benchmark
+
+Separate, opt-in diagnostic: `/diagnostics/concert-benchmark?concertBenchV777=1` on localhost. Real GLB with animation/mouth morph, 2 or 4 performers, stage lighting, 3D text and DanceFX, deterministic simulated beat. Details: `V777-CONCERT-BENCHMARK.md`.
+
+> **V776 · Stage Benchmark:** Reproduzierbare WebGL-Bühnenmessung mit sechs Szenen, P95/FPS/Draw Calls und Vorher-nachher-JSON. Anleitung: [V776-STAGE-BENCHMARK.md](V776-STAGE-BENCHMARK.md). Die Messung benötigt einen echten lokalen Browser und ist kein vollständiger Konzertbenchmark.
+
+## Sonic Display V765 - Concert Show Library Studio
+
+V765 erweitert die V764-Mehrsongbibliothek um Suche, Sortierung, sicheres Umbenennen, Einzelshow-Export und einen JSON-Import mit Konfliktvorschau. Vorhandene Shows werden standardmaessig nicht ueberschrieben. Die Songwechsel-Automatik und die laufende V354-Show bleiben unveraendert. Siehe `V765-CONCERT-SHOW-LIBRARY-STUDIO.md` und `V765-VERIFICATION.md`.
+
+## Sonic Display V764 - Smart Concert Timeline Automation
+
+V764 adds review-only V761-scene suggestions to V763 and a local 32-song timeline library. All suggestions need explicit approval and do not overwrite manual V354 cues. Saved shows can be restored explicitly, or at real song changes after opt-in. The previous V354 song is backed up before switching; storage failures prevent replacement. The library is part of portable backups. No invented voices, beat timestamps or renderers. Details: `V764-SMART-CONCERT-TIMELINE-AUTOMATION.md`, `V764-VERIFICATION.md`.
+
+## V763 – Interactive Concert Timeline Studio
+
+Verifizierte V761-Szenen sind neben den manuell wirksamen V354-Kamera-, Licht-, Tanz-, FX-, Foto- und Lyrics-Cues sichtbar. Songgebundener Editor im Dynamic-Stage-Settings-Tab, bestätigungspflichtiges Ersetzen der einzigen V354-Show, JSON-Export und Schutz der V762-Lichtakzente. Siehe `V763-INTERACTIVE-CONCERT-TIMELINE.md` und `V763-VERIFICATION.md`.
+
+## V762 – Dynamic Stage & Lighting 4.0
+
+Neue optionale Gobo-, LED-, Spotlight- und Haze-Inszenierung auf Basis verifizierter V761-/V604-Szenen; alle manuellen Prioritäten bleiben erhalten. Details: `V762-DYNAMIC-STAGE-LIGHTING.md` und `V762-VERIFICATION.md`. Ein vollständiger Next.js-Build ist ohne npm-Abhängigkeiten noch nicht verifiziert.
+
+## V758 – Natural Dance Motion 4.0
+
+Zusätzliche kontaktbasierte Gewichtsverlagerung und Oberkörperbewegungen für automatische GLB-Tänze. Einstellungen unter Avatar → Natural Dance Motion 4.0. Live-Renderer und GLB-Vorschau teilen dieselbe additive Logik; Foot-IK, GLB-Clips und manuelle Timelines haben Vorrang. Siehe `V758-NATURAL-DANCE-MOTION.md` und `V758-VERIFICATION.md`.
+
+## V757 – Vocal & Body Synchronization 3.0
+
+Zusätzliche Wortanfangs-Akzente für bestätigte Sängerrollen. Details: `V757-VOCAL-BODY-SYNCHRONIZATION.md` und `V757-VERIFICATION.md`. Vollständiger Build nur mit installierten npm-Abhängigkeiten verifizierbar.
+
+## V756 – Advanced Vocal Assignment
+
+Neues optionales Korrekturstudio im bestehenden V547 Vocal Assignment Studio: Sänger, Features, Duette und Hooks auf 2–4 Avatar-Slots bearbeiten, Konflikte vor dem Speichern prüfen, explizite Overrides mit Intervall-Splitting und eine nicht-seekende Rollen-Vorschau. Redaktionelle Hinweise, **keine akustische Sprechererkennung**. Die bestehenden V496-Zeitmarken versorgen nach Bestätigung die vorhandene Live-Regie.
+
+Details: `V756-ADVANCED-VOCAL-ASSIGNMENT.md` und `V756-VERIFICATION.md`. Vollständiger Next.js-Build ohne installierte npm-Abhängigkeiten **nicht verifiziert**.
+
+## V755 – Smart Quality Auto-Tuning
+
+Optionales, standardmäßig deaktiviertes Auto-Tuning unter Concert Quality Dashboard. Nutzt echte WebGL-Telemetrie und schützt manuelle Regie. Details: `V755-SMART-QUALITY-AUTO-TUNING.md` und `V755-VERIFICATION.md`.
+
+# Sonic Display V753 - Real Concert Performance Benchmark
+
+Neu: freiwilliger WebGL-Benchmark im V751-Concert-Quality-Dashboard mit 1-4 echten GLB-Avataren, 12 gemessenen Renderer-Fenstern, Renderpixel-/Profil-Schutz, tabellarischem Vergleich und CSV-Export. Keine GPU-Speicher- oder erfundenen FPS-Werte. Siehe `V753-REAL-CONCERT-PERFORMANCE-BENCHMARK.md` und `V753-VERIFICATION.md`.
+
+# Sonic Display V751 - Concert Quality Dashboard
+
+Neu: read-only Live-Status unter Einstellungen > Dashboard und Anzeige > Dynamic Stage. Sieben Regie-Module mit getrennten Konfigurations-, Aktivierungs- und Planungsinformationen. Echte WebGL-Leistungswerte nur bei aktivierter QA-Probe; keine erfundenen FPS. Siehe `V751-CONCERT-QUALITY-DASHBOARD.md` und `V751-VERIFICATION.md`.
+
+# Sonic Display V734 � Anfrage- und Ressourcenfreigabe
+
+Zeitlimits f�r Spotify, Lyrics, Bildgr��en und Animationen; Freigabe tempor�rer Animationsmodelle; Push-Rotation ohne 100-Konten-Abschneidung. Siehe [V734-BUGFIXES.md](V734-BUGFIXES.md) und [V734-VERIFICATION.md](V734-VERIFICATION.md).
+
+# Sonic Display V733 – Stabilitätskorrekturen
+
+Korrekturen für Uploads, Spotify/Lyrics, Backups, Push, Timeline, Bühneninhalte und Vorschauen. Details und Grenzen: [V733-BUGFIXES.md](V733-BUGFIXES.md). Tatsächlicher Prüfstatus: [V733-VERIFICATION.md](V733-VERIFICATION.md).
+
+# Sonic Display V732
+
+Musikkalender, erweiterter Zeitraumvergleich, Monats-/Jahresrückblicke, Albumfavoriten, Merkliste, Datenqualitätsanzeige und Dateiimport für Backups. Details: [V732-FEATURES.md](V732-FEATURES.md). Prüfstatus: [V732-VERIFICATION.md](V732-VERIFICATION.md).
+
+## V731 – Alben, Wiederentdeckungen und Favoriten-Backup
+
+Siehe V731-VERIFICATION.md für Funktionen und tatsächlichen Prüfstatus.
+
+## V730 – Profile vertiefen, vergleichen und merken
+
+Der Last.fm Artist & Track Explorer bietet Zeitraumfilter, zwölf Monatswerte pro ausgewähltem Jahr, Jahresvergleiche, zwei vergleichbare Profile, lokale Favoriten pro Last.fm-Konto und CSV-Statistiken. Details: V730-EXPLORER-PLUS.md. Tatsächlicher Prüfstatus: V730-VERIFICATION.md.
+
+## V729 – Advanced Artist & Track Explorer
+
+In Last.fm History findest du den neuen Explorer mit Suche nach Künstlern und Songs. Jeder Chronikeintrag bietet Künstlerprofil und Songprofil. Profile zeigen archivierte Wiedergaben, Jahresstatistiken, Top-Songs und beobachtete Rückkehr nach mindestens 90 lokalen Kalendertagen. Spotify-Suchlinks benötigen keine neue Berechtigung. Details und Prüfstatus: V729-ADVANCED-EXPLORER.md und V729-VERIFICATION.md.
+
+## V728 – On This Day (29.10.2026)
+
+Musik-Zeitreise: Wiedergaben am selben lokalen Kalendertag früherer Jahre, aufklappbare Jahreskarten mit Top-Künstlern, Songs und Einzelereignissen, Wiederholungs-Highlights aus mindestens zwei Jahren und direkte Navigation zur Chronik. Volle Archivbasis, read-only und ohne zusätzliche API/Scrobble-Schreibwege. Details: `V728-ON-THIS-DAY.md`, `V728-VERIFICATION.md`.
+
+## V726 – Intelligent History Filters
+
+Gemeinsamer Zeitraumfilter für Personal Insights und History Explorer: gesamtes Archiv, letzte 7/30/90 lokale Archivkalendertage, Jahr, gültiger benutzerdefinierter Zeitraum und Künstler. Zeitfenster relativ zum letzten gespeicherten Scrobble, nicht zur Uhrzeit. Vertiefende Langzeitberichte bleiben ausdrücklich Vollarchiv-Auswertungen. Keine neuen API-Abfragen oder Last.fm-Schreiboperationen. Details: `V726-INTELLIGENT-HISTORY-FILTERS.md`.
+
+## V725 – Connected Services Monitor
+
+Neue Service-Übersicht unter **Einstellungen → Dienste & Status**: Spotify, Last.fm-Archiv, Lyrics und optionale Dienste mit nachvollziehbaren Konfigurations-, Aktivierungs- und Laufzeitsignalen. Keine externen Prüfanfragen oder zusätzlichen Scrobbles. Details: `V725-CONNECTED-SERVICES-MONITOR.md`.
+
+## V724 – Smart Dashboard Presets (29.10.2026)
+
+Im Last.fm Personal Music Insights Dashboard gibt es jetzt fünf mit einem Fingertipp umschaltbare Ansichten („Mein Dashboard“, „Konzert“, „Musikgeschichte“, „Entdeckungen“, „Statistiken“), anpassbare Kachel-Layouts pro Ansicht und eigene kopierbare, umbenennbare/löschbare Presets. Das bisherige V723-Layout wird beim ersten Aufruf verlustfrei nach „Mein Dashboard“ übernommen und sein ursprünglicher Speicherwert nicht verändert. Rein lokal, kontogebunden, touch- und tastaturgeeignet, ohne neue Scrobbles. Details: `V724-SMART-DASHBOARD-PRESETS.md`, `V724-VERIFICATION.md`.
+
+## V723 – Personal Dashboard Studio (29.10.2026)
+
+Das zentrale Last.fm-Dashboard kann je Konto konfiguriert werden: Sechs vorhandene Bereiche sichtbar/unsichtbar schalten, ihre Reihenfolge ändern (Maus-Drag & Drop oder barrierefreie 44-Pixel-Pfeiltasten) und zwischen Halb- und Vollbreite wechseln. Änderungen werden mit einer streng validierten V723-Konfiguration im lokalen Browser-Speicher abgelegt und beim Kontowechsel bzw. bei Änderungen in anderen Tabs neu geladen. Ein Knopf stellt das Standardlayout wieder her. Keine Änderung der scrobble-Daten, keine doppelte Spotify→Last.fm-Übertragung. Details: `V723-PERSONAL-DASHBOARD-STUDIO.md` und `V723-VERIFICATION.md`.
+
+# Sonic Display V722 – Personal Music Insights Dashboard
+
+**Zuletzt gespielt → Last.fm-History → Personal Music Insights:** Kompakte Startseite mit Archivkennzahlen, Tages-/Monatsrekorden, meistgehörten Künstlern und Songs, sechs Archivmonaten, Künstleraufstiegen, Langzeitfavoriten, Comebacks und jüngsten ersten Archiv-Beobachtungen. Jeder Link öffnet eine vorhandene Detailansicht oder gefilterte Chronik. Rein lokales Last.fm-IndexedDB-Archiv; keine weiteren API-Abfragen oder doppeltes Spotify→Last.fm-Scrobbling. Quellen und Limits: `V722-PERSONAL-MUSIC-INSIGHTS.md`, `V722-VERIFICATION.md`.
+
+## V721 – Artist Discovery Dashboard
+
+**Zuletzt gespielt → Last.fm-History → Artist Dashboard**: Aufstrebende Künstler über zwei 30-Tage-Fenster mit expliziter Mindestdatenmenge, langjährige Favoriten mit Aktivität über mindestens drei Kalenderjahre und nach mindestens 90 archiv-relativen Kalendertagen nachgewiesene Künstler-Comebacks. Die Ansicht ist durchsuchbar, touch- und tastaturbedienbar und öffnet passende Zeiträume direkt in der vorhandenen Chronik. Alle Daten kommen aus dem bereits geladenen Last.fm-IndexedDB-Archiv; keine weiteren API-Anfragen oder Spotify→Last.fm-Scrobbles. Details: `V721-ARTIST-DISCOVERY-DASHBOARD.md`, `V721-VERIFICATION.md`.
+
+## V720 – Music Discovery Timeline
+
+„Zuletzt gespielt → Last.fm-History → Discovery Timeline“: Erstmals im lokalen Archiv erfasste Künstler nach Jahr, Suchfunktion, interaktive Künstlerporträts mit definierter Monats-Favoritenschwelle, zwölf Monatsbalken, Top-5-Songs und direkter Navigation in die bereits vorhandene Chronik. Rein lesend ohne doppeltes Scrobbling. Einzelheiten: `V720-MUSIC-DISCOVERY-TIMELINE.md` und `V720-VERIFICATION.md`.
+
+## V719 – Musikjahre im Vergleich
+
+In der Last.fm-History lassen sich jetzt zwei Musikjahre frei vergleichen. A/B-Werte, Monatsverlauf, Veränderungen bei Künstlern, Archiv-Neuzugänge sowie nachgewiesene Wiederentdeckungen (mindestens 90 Kalendertage Archiv-Pause) bleiben lokal, ohne zusätzliches Last.fm-Scrobbling. Details in `V719-MUSIC-YEAR-COMPARISON.md`.
+
+# Sonic Display V718 – Music Taste Story
+
+**Zuletzt gespielt → Last.fm-History → Music Taste Story**: Interaktive Jahres-Zeitachse, persönliche Jahreskapitel, Jahres-Top-Künstler/Songs, erstmals im lokalen Archiv beobachtete Künstler und monatliche Scrobble-Balken. Öffnet ausgewählte Jahre/Monate/Künstler direkt in der vorhandenen History-Chronik. Das vollständige IndexedDB-Archiv wird ausschließlich gelesen; kein zusätzliches Last.fm-Scrobbling. Die Interpretation ist ausdrücklich auf archivierte Daten begrenzt. Details: `V718-MUSIC-TASTE-STORY.md` und `V718-VERIFICATION.md`.
+
+# V716 – History Calendar
+
+In „Zuletzt gespielt → Last.fm-History“ öffnet sich der Monatskalender im V715-History-Explorer. Er zeigt Scrobble-Zahlen je lokalem Kalendertag; Tippen auf einen Tag setzt den History-Datumsfilter und springt zu dessen Songs. Monatsnavigation, Tagesmarkierung und Legende sind touch- und tastaturbedienbar. Künstler- und Suchfilter gelten auch für die Kalenderfarben; kein doppelter Spotify→Last.fm-Scrobbler. Dokumentation: `V716-HISTORY-CALENDAR.md`, `V716-VERIFICATION.md`.
+
+# V714 – Music Taste Evolution
+
+In „Zuletzt gespielt → Last.fm-History“ zeigt „Dein Musikgeschmack im Wandel“ Jahresverläufe, erstmals im lokalen Archiv auftauchende Künstler, Wiederentdeckungen nach mindestens einem ganzen Kalenderjahr ohne erfasste Scrobbles, Jahresdifferenzen und langjährige Favoriten. Es liest das vollständige, kontogebundene IndexedDB-Archiv aus V713 nur lesend. Zeitzone Wien (inklusive Sommerzeit) / UTC; Genre-Trends werden mangels verlässlicher Tags nicht erfunden. Keine weiteren Last.fm-Abfragen oder doppelten Scrobble-Übertragungen. Details: `V714-MUSIC-TASTE-EVOLUTION.md`, `V714-VERIFICATION.md`.
+
+## V713 – Unlimited Listening History (IndexedDB)
+
+Last.fm-Scrobbles werden in IndexedDB pro Konto und eindeutigem Ereignisschlüssel gespeichert. Das alte V706-`localStorage`-Archiv wird verlustfrei hinzugefügt (nie gelöscht); es bleibt als höchstens 8.000 Einträge großer Kompatibilitätsspiegel für die automatische Sicherung und Recovery bestehen. Manuelle Seitenimporte und JSON-Backups nutzen das vollständige IndexedDB-Archiv. Die V708-/V710-Sammler spiegeln neue lokale Ereignisse auch bei geschlossenem History-Dialog in IndexedDB. „Meine Statistik“, „Entdeckungen“, V711 und V712 erhalten die vollständige Datenmenge. IndexedDB ist durch die tatsächlich verfügbare Browser-Speicherquote begrenzt; weder vollständiger Last.fm-Verlauf noch grenzenlose Kapazität werden garantiert. V713 ist ausschließlich ein Lesearchiv, das keine zusätzlichen Scrobbles übermittelt.
+
+Details und Einschränkungen: `V713-UNLIMITED-LISTENING-HISTORY.md`, `V713-VERIFICATION.md`.
+
+# Sonic Display V712 – Personal Music Wrapped
+
+In **Zuletzt gespielt → Last.fm-History** zeigt V712 einen Jahresrückblick: Scrobble-Zahlen, Top-Künstler, Top-Songs und Alben, aktive Hörtage sowie zwölf Monate. Jahre anhand der tatsächlich archivierten Scrobbles frei wählbar, Zeitgrenzen für Wien (Sommerzeit) oder UTC. Das aktuelle Jahr und die eingeschränkte Datenabdeckung werden erläutert. Der Rückblick ist rein lesend und sendet **keine** Scrobbles an Last.fm: Deine vorhandene Spotify-Scrobbling-Verbindung reicht aus. Details in `V712-PERSONAL-MUSIC-WRAPPED.md` und `V712-VERIFICATION.md`.
+
+# Sonic Display V711 – Last.fm History Intelligence
+
+Die neue Ansicht unter **Zuletzt gespielt → Last.fm-History** erweitert V710 um Künstler- und Songrankings, Wochentage, Tageszeiten, Monatsentwicklungen und zwei 30-Tage-Künstlertrends. Zeitangaben lassen sich zwischen Wien (einschließlich Sommerzeit) und UTC umstellen. Es werden ausschließlich lokal gespeicherte Scrobbles gelesen; keine zusätzliche Last.fm-Abfrage, keine Spotify-Änderung und keine automatische Speicherung. Details unter `V711-LASTFM-HISTORY-INTELLIGENCE.md` und `V711-VERIFICATION.md`.
+
+# Sonic Display V710 – Last.fm History Health & Auto Recovery
+
+In **Zuletzt gespielt → Last.fm-History** zeigt V710 den letzten automatischen Abgleich, eine mögliche Lückenwarnung und den Fortschritt der Nachholung. Nach zweiter ausdrücklicher Einwilligung kann die History-Recovery bei aktivem Tab höchstens eine Last.fm-Seite alle fünf Minuten automatisch ergänzen (bis 100 Seiten, nur wenn ein Vor-Lücken-Anker vorliegt). Zwölf-Monats-Auswertung, 30-Tage-Vergleich und erfasste Hörtage. Details: `V710-LASTFM-HISTORY-HEALTH.md`, `V710-VERIFICATION.md`.
+
+# Sonic Display V709 – Last.fm History Recovery
+
+Unter **Zuletzt gespielt → Last.fm-History** warnt V709 vor möglichen Lücken nach langen Abständen und ermöglicht bewusst gestartetes Nachladen älterer Last.fm-Seiten. Höchstens 1.000 Scrobbles je Klick und eine feste Zeitobergrenze. Das eigene Last.fm- und Spotify-Archiv bleiben getrennt; Last.fm muss die Scrobbles tatsächlich enthalten. Details: `V709-LASTFM-HISTORY-RECOVERY.md` und `V709-VERIFICATION.md`.
+
+# Sonic Display V708 – Automatische Last.fm-History-Synchronisierung
+
+Nach ausdrücklicher Aktivierung in **Zuletzt gespielt → Last.fm-History** übernimmt Sonic Display in der geöffneten und fokussierten Browseransicht höchstens alle fünf Minuten neue, tatsächlich gescrobbbelte Last.fm-Ereignisse in das bereits bestehende lokale Last.fm-Archiv. Die Automatik ist getrennt von Spotify und standardmäßig aus, berücksichtigt API-Limits, speichert keine Passwörter und kann jederzeit ausgeschaltet werden. Details: `V708-AUTOMATIC-LASTFM-HISTORY.md` und `V708-VERIFICATION.md`.
+
+# Sonic Display V707 – Last.fm / Spotify Quellenvergleich
+
+In **Zuletzt gespielt → Meine Statistik** und **Entdeckungen** kannst du als Datenquelle **Spotify**, **Last.fm** oder **Gemeinsam** wählen. Der gemeinsame Modus gleicht gleiche Künstler-/Song-Credits mit Zeitstempeln innerhalb von 90 Sekunden heuristisch und paarweise ab. Er ist keine garantierte Deduplizierung, beide Archive bleiben unverändert und getrennt. Last.fm muss vorher im V706-Panel importiert werden. Dokumentation: `V707-LASTFM-SPOTIFY-SOURCE-COMPARISON.md`, `V707-VERIFICATION.md`.
+
+# Sonic Display V706 – Last.fm-History
+
+Neuer Bereich **„Zuletzt gespielt → Last.fm-History“** für den paginierten Import von Last.fm-Scrobbles. In `.env.local` muss der Server-Schlüssel `LASTFM_API_KEY=...` hinterlegt werden. Das Last.fm-Archiv ist lokal und separat zum Spotify-Hörarchiv. Details unter `V706-LASTFM-HISTORY.md`.
+
+# Sonic Display V705 – Smart Music Discovery Studio
+
+Neuer Tab **Zuletzt gespielt → ♫ Musikvorschläge** mit nutzergesteuerter Spotify-Katalogsuche nach Deutschrap, Hardstyle und Hardtekk. Die Ansicht kann archivierte Titel aus V701/V702 anhand ihrer Spotify-Track-ID ausblenden, weitere Titel häufiger Künstler suchen oder Künstler-Credits des Archivs ausschließen. Suchresultate sind *Katalogvorschläge*, **keine** bestätigten Spotify-Personalisierungen, „garantiert ungehörten Titel“ oder vollständig erschlossene Künstlergenres. Erst ein Klick auf „Musikvorschläge suchen“ startet maximal drei Spotify-Katalogabfragen. Ohne Archiv ist nur unpersonalisierte Genresuche möglich. Bestehende Hörstatistiken und das Archiv werden nicht geändert.
+
+Mehr in `V705-SMART-MUSIC-DISCOVERY-STUDIO.md` und im Testbericht `V705-VERIFICATION.md`.
+
+## V704 – Music Discovery Dashboard
+
+„Zuletzt gespielt → Entdeckungen“ zeigt aus dem opt-in gespeicherten V701-Musikarchiv Comebacks, selten erfasste Songs, erstmals archivierte Titel, aktuelle Wiederholungen und sample-basierte Künstler-Credit-Änderungen. Keine zusätzlichen Spotify-Verlaufsabfragen oder Serverübertragung; die Ansicht benötigt zuvor gespeicherte Ereignisse. Details: `V704-MUSIC-DISCOVERY-DASHBOARD.md`.
+
+# Sonic Display V703 – Listening Statistics Dashboard
+
+Unter **Zuletzt gespielt → Meine Statistik** gibt es jetzt ein eigenständiges Langzeit-Dashboard für das **bewusst aktivierte, lokale Spotify-Hörarchiv** (V701/V702): letzte 30/90/365 Tage oder gesamtes Archiv, zwölf lokale Kalendermonate einschließlich 0-Werten, Vergleich der letzten **zwei abgeschlossenen** Kalendermonate, Lieblingssongs, Künstler-Credits sowie Uhrzeit- und Wochentags-Verteilung. Konto wird serverseitig per bestehendem GET-Endpunkt identifiziert; das Archiv selbst wird nur im Browser gelesen und niemals übertragen. Keine neuen Scopes, kein zusätzlicher Spotify-Recently-Played-GET, keine automatische Aktivierung oder Datenänderung. Zahlen sind **archivierte Abspielereignisse**, keine gemessenen Hörminuten; ein nicht erfasster Monat ist keine bewiesene Hörpause. Test-/Buildstatus siehe `V703-VERIFICATION.md`, Beschreibung in `V703-LISTENING-STATISTICS-DASHBOARD.md`.
+
+# Sonic Display V702 – Automatische Hörverlaufsicherung (Opt-in)
+
+Nach dem bewussten Anlegen des lokalen V701-Archivs kann unter **Zuletzt gespielt → Mein Archiv** eine **zusätzliche** automatische Sicherung aktiviert werden. Solange Sonic Display mit Spotify verbunden und der Browser-Tab sichtbar/fokussiert ist, synchronisiert es höchstens alle drei Minuten die jüngsten Spotify-Wiedergaben in das kontoabhängige lokale Archiv. Die Automatik ist standardmäßig aus, lässt sich jederzeit ausschalten und läuft **nicht** bei geschlossenem Browser. Kein Cloud-Backup, keine vollständige Spotify-Historie und keine neue Spotify-Berechtigung; siehe `V702-AUTOMATIC-LISTENING-HISTORY.md` und `V702-VERIFICATION.md`.
+
+# Sonic Display V700 – Smart Listening History
+
+Neuer **◈ Smart History**-Tab im Dialog „Zuletzt gespielt“: interaktive 14-Tage-Timeline, nachvollziehbare Song-Wiederholungen (mit erstem/letztem geladenen Abspielzeitpunkt), 10 meistgehörte Künstler-Credits und gezielte Filter aus V699. Statistiken gelten ausschließlich für freiwillig geladene Spotify-Wiedergaben; keine automatische Speicherung, kein zusätzliches Tracking und keine erfundenen Hördauern. Siehe `V700-SMART-LISTENING-HISTORY.md` und `V700-VERIFICATION.md`.
+
+# Sonic Display V699 – Zuletzt gespielt: History Explorer
+
+Die bestehende „Zuletzt gespielt“-Ansicht bietet jetzt Filter für Heute / letzte 7 Tage / letzte 30 Tage / alle **geladenen** Ereignisse, Song-Wiederholungen oder eindeutige Titel, Sortierung auf- und absteigend, eine akzent-insensitive Suche und einen expliziten **CSV-Export** der aktuell gefilterten Wiedergaben. V673–V676 (Highlights, Galerie, Genre-Mix, Musikprofil, Designer) bleiben erhalten; keine zusätzlichen Spotify-Scopes, kein Polling, kein automatisches Speichern. Der Dialog hält Tastaturfokus und sperrt das Scrollen des Hintergrunds. Anleitung `V699-RECENTLY-PLAYED-EXPLORER.md`; tatsächlicher Prüfstatus `V699-VERIFICATION.md`.
+
+# Sonic Display V698 – Visual Concert Review Studio
+
+Interaktiver Bildvergleich innerhalb `/acceptance` mit manuellen Beobachtungen, Nachbesserungen, Zeitmarken, Prioritäten und optionaler lesender Referenz auf V694-QA-Historieneinträge. Keine automatische GLB-/Screenshot-Prüfung, keine Cloud-Uploads. Näheres in `V698-VISUAL-CONCERT-REVIEW-STUDIO.md`.
+
+## V697 – Concert Acceptance Dashboard (neue QA-Oberfläche)
+
+Unter `/acceptance` (direkt aus der V641/V692-QA-Ansicht verlinkt) jetzt 6 profilbezogene manuelle Abnahmeprüfblätter, Song-Zeitmarken, lokale V592-JSON-/PNG-Vorschau, vorsichtiger 1-/2-/4-GLB-FPS-Vergleich und V696-kompatibler `review.json`-Import/-Export. Prüfstatus explizit im Browser speichern, keine Serveruploads, keine automatisch bestätigte Qualität. CLI bleibt die maßgebliche V696-/V695-Abnahme. Details: `V697-CONCERT-ACCEPTANCE-DASHBOARD.md` und `V697-VERIFICATION.md`.
+
+## V696 – Produktionsnahe Konzertabnahme mit 1/2/4 GLB-Avataren
+
+Sechs Live-Benchmark-Profile (Deutschrap + Hardstyle/Hardtekk × 1, 2, 4 Avatare), manuelle Abnahme für Lyrics, Kamera, Licht, Gestik, Lip-Sync und musikalische Dynamik, separate FPS/P95-Vergleiche und reproduzierbarer HTML-/JSON-Bericht. Ohne echte lokale Spotify-/GLB-Bühne bleibt die Aufnahme konsequent gesperrt. **Anleitung:** `V696-PRODUCTION-CONCERT-ACCEPTANCE.md`; **Prüfstatus:** `V696-VERIFICATION.md`. Keine zusätzliche Renderlast und keine Veränderung der Show-Regie durch V696.
+
+## V695 – Release- und Browser-Qualitätsprüfung
+
+Neues ausführbares, vorsichtiges Freigabe-Gate für Lockfile, 17 npm-Abhängigkeiten, vollständigen TypeScript-Check, tatsächlichen Next.js-Produktionsbuild, reale Chromium-QA-/localStorage-Neustartprüfung, WebGL-Canvas und echten V592-GLB-Live-Nachweis. Fehlt etwas, bleibt die Freigabe **blockiert**. Der abgesetzte Chromium-Fixture-Test beweist **nicht** das Verhalten der Anwendung. Alle positiven automatischen Nachweise führen höchstens zu einer manuellen visuellen Abnahme – niemals zu einer erfundenen Konzertqualitätsnote. Befehle/Prüfprotokoll: `V695-RELEASE-BROWSER-QUALITY.md` und `V695-VERIFICATION.md`.
+
+## V693 – Concert Quality Improvement Studio
+
+Der bestehende QA-Dialog enthält jetzt nach einer **freiwilligen Vollsong-Aufzeichnung** eine nach Evidenz priorisierte Prüfliste für Tanz/Framing, Kamera, Lyrics, Licht und Performance. Aufgaben werden nur manuell als „Offen“, „In Prüfung“ oder „Von mir geprüft“ markiert. Vorher-/Nachher-Vergleiche sind nur mit zwei explizit gewählten, vergleichbaren Songaufnahmen möglich; „Warnung nicht wiederholt“ bedeutet keine bestätigte Fehlerbehebung. Nur im QA-Panel gehaltene Daten, keine dauerhafte Speicherung oder automatische Show-Änderungen. Details `V693-CONCERT-QUALITY-IMPROVEMENT-STUDIO.md` und `V693-VERIFICATION.md`.
+
+## V692 – Concert Quality Inspector
+
+Der bestehende QA-Dialog zeigt jetzt fünf evidenzgekennzeichnete Qualitätsbereiche für Tanz/Avatar-Framing, Kamera, Lyrics, Licht und Performance – live und bei optionaler Vollsong-Aufzeichnung mit nachvollziehbaren Zeitmarken und konkreten Prüfschritten. Keine automatisch erfundene Tanz-/Lichtbewertung und keine Show-Änderungen. Siehe `V692-CONCERT-QUALITY-INSPECTOR.md` und `V692-VERIFICATION.md`.
+
+## V691 – Music Mood Fusion
+
+Musikalisch einheitlichere Farben und bestehende Bühnenprojektionen aus bestätigten V604-Abschnitten. Keine zusätzlichen Render-Pässe oder künstliche Emotionsanalyse. Siehe `V691-MUSIC-MOOD-FUSION.md`.
+
+## V690 – Adaptive Stage Transformation
+
+V690 erweitert die vorhandene Bühne über geprüfte Songabschnitte mit sanfter Perspektivöffnung, Bodentönung und leicht größerer Nebelsichtweite. Keine zusätzlichen Bühnenobjekte, Render-Pässe oder manuelle Überschreibungen. Siehe `V690-ADAPTIVE-STAGE-TRANSFORMATION.md`.
+
+## V688 – Cinematic Lyrics 2.0
+
+Bessere Textlesbarkeit bei 3–4 Avataren, zurückhaltende wortgenaue Akzente bei bestätigten Zeitmarken und gleichbleibende manuelle Lyric-Position. `npm run test:v688`, `npm run test:v688:types` und `npm run test:quick` prüfen die neue Stufe. Details in `V688-CINEMATIC-LYRICS-2.md`.
+
+## V687 – Feature & Duet Performance (aktuell)
+
+Bestätigte Sängerwechsel und Duette erhalten kurze Blicke und dezente Oberkörperreaktionen, ohne neue Sänger zu erraten. V385/V416/V496/V517 bleiben für Sprecherrollen zuständig, V506/V508 für den Kollisionsschutz. Automatische visuelle Lead-Auswahl ohne Sänger-Cue löst **keine** Gesangsinteraktion aus. Details: [`V687-FEATURE-DUET-PERFORMANCE.md`](V687-FEATURE-DUET-PERFORMANCE.md). Tests: `npm run test:v687`, `npm run test:v687:types`, `npm run test:quick`.
+
+## V686 – Vocal & Lip-Sync Precision
+
+Bessere Wortanfangs- und -endreaktion bei schnellen Deutschrap-Lyrics, mit Schutz für autorisierte Sänger, bestehende Lippenverschlüsse und alle manuell/aus Audio stammenden Mouth-Quellen. Details: [`V686-VOCAL-LIP-SYNC-PRECISION.md`](V686-VOCAL-LIP-SYNC-PRECISION.md).
+
+## V685 – Advanced Rap Performance (aktuell)
+
+Automatische Deutschrap-/Hip-Hop-Gesten auf bestehenden GLB-Overlays: dezente Unterschiede zwischen Strophe und Hook, variierende Performer-Phrasen und optionale Akzente aus synchronisierten Lyrics-Zeitmarken. Keine neuen Clips, keine Gesangs-/Sängererkennung; Face-, Lip-Sync-, Root- und Foot-IK-Owner bleiben unverändert. V685-Details: `V685-ADVANCED-RAP-PERFORMANCE.md`. Prüfungen: `npm run test:v685`, `npm run test:v685:types`, `npm run test:quick`. Der Produktionsbuild ist in der Offline-Umgebung noch nicht abgeschlossen.
+
+## V684 – Natural Dance Evolution
+
+V684 bringt sanfte, wiederholungsarme Variationen in die bestehenden **automatischen**
+GLB-Arm- und Oberkörper-Overlays und in die begrenzten 3-/4-Performer-Gruppenschritte.
+Rap- und Hardstyle/Hardtekk-Klangwelten nutzen verschiedene Phrasenprofile.
+Erkannte Fußkontakte werden berücksichtigt, ohne Foot IK, importierte GLB-Clips,
+V683-Ensembleformationen, Sänger-Lip-Sync oder Lyrics zu überschreiben.
+Der Modus verwendet vorhandene Songzeit und bestehende Bewegungen; er
+**erkennt keine neuen Beats** und erzeugt keine neuen Tanzclips.
+`npm run test:v684`, `npm run test:v684:types`; Details in
+`V684-NATURAL-DANCE-EVOLUTION.md` und `V684-VERIFICATION.md`.
+
+## V683 – Smart Ensemble Director
+
+Die automatisch erzeugten 3-/4-Avatar-Bühnenformationen reagieren auf **bestätigte V681-Songabschnitte**: Solofokus in Strophen, dialogartige Hooks, breites Ensemble in Drops, ruhige Breaks und gestaffelte Builds. Keine Stimmenerkennung, keine zusätzlichen Songabschnitte oder Kameraschnitte. Manuelle Formationen sowie die bestehenden Sänger-/Lyrics-/Tanzregeln haben Vorrang. Die Vorschau erscheint in *Unified Track Analysis*. Details: `V683-SMART-ENSEMBLE-DIRECTOR.md`; Prüfliste: `V683-VERIFICATION.md`.
+
+## V680 – Zuverlässiger Build & Quality Gate
+
+Der normale `npm run build` prüft jetzt **nur die schnelle, aktuelle Pflichtsuite**, den
+Abhängigkeitsstatus und den vollständigen TypeScript-Code, bevor `next build` startet.
+Für die komplette historische Testkette bitte bewusst `npm run check:release`
+ausführen; `npm run verify:historical` bleibt separat für CI. Ohne installierte
+Pakete zuerst `npm install` ausführen und das erzeugte `package-lock.json`
+versionieren. Siehe `V680-BUILD-QUALITY-GATE.md`.
+
+> **V678:** Opt-in-Live-Mood aus echten Mikrofonmerkmalen für dezente Bühnenlicht- und Tanzakzente. Keine Spotify-Emotionsanalyse. Siehe `V678-LIVE-ACOUSTIC-MOOD.md` und `V678-VERIFICATION.md`.
+
+## V676 – Persönlicher Konzert-Designer
+
+Unter **Zuletzt gespielt → Konzert-Designer** kannst du bis zu 24 eigene Bühnen-Looks mit Licht, Tanzstil und DanceFX entwerfen, für einzelne Genres oder universell taggen, speichern, bearbeiten, kopieren und nur auf ausdrücklichen Klick anwenden. Optional lassen sich V675-Musikprofil-Vorschläge als Entwurf laden. Die Looks sind lokal gespeichert, als JSON übertragbar und in der Gerätesicherung enthalten. Keine Änderung der automatischen Konzertregie, Lyrics, Kamera oder Sängerzuordnungen. Details in `V676-CONCERT-LOOK-DESIGNER.md`, Prüfstatus in `V676-VERIFICATION.md`. Produktionsbuild noch nicht verifiziert.
+
+## V671 – Automatische Songdramaturgie
+
+V671 stimmt die bestehende Full-Song-Regie über bestätigte Songabschnitte hinweg feiner ab: Aufbau, Höhepunkt, Ruhe und Finale mit sanften Übergängen und einer Vorschau im Track-Analyse-Dialog. Bestehende Kamera-, Licht-, Tanz- und Ensemble-Regie bleibt erhalten; V670 ist weiterhin die letzte Qualitätsschranke. Ohne verifizierte Abschnittsdaten gibt es nur eine neutrale zeitbasierte Kontur, keine erfundenen Songabschnitte. Details in `V671-FULL-SONG-DRAMATURGY.md`.
+
+## V670 – Automatischer Show-Qualitätswächter
+
+Aktiv bei automatischer Smart-Concert-Regie: begrenzt überstarke automatische Kamera-, Licht- und Tanz-Intensitätsmultiplikatoren; schützt Lyrics-Priorität, manuelle Regievorgaben und bestätigte Songabschnitte. Wiederholungen werden ausschließlich bei verifizierten Song-Acts markiert und ihr Tanz-Gain gedeckelt. **Keine echte Bildanalyse oder tatsächliche Erkennung von Lyrics-Überdeckung/Kameracuts.** Details `V670-SHOW-QUALITY-GUARD.md`. Tests `npm run test:v670`, `npm run test:v670:types`, `npm run test:smoke:v670`. Produktionsbuild bleibt zu verifizieren.
+
+## V666 – Genre-Specific Dance Intelligence
+
+Der vorhandene GLB-Motion-Director priorisiert Rock und Pop getrennt; ein optionaler, begrenzter Overlay-Regler setzt unterschiedliche Akzente für Deutschrap, Hardstyle, Hardtekk, Rock und Pop. Konfiguration: **Einstellungen → Natürlicher Tanz → V666**. Standardmäßig ausgeschaltet; manuelle Animationen, Sänger-/Visem- und Fuß-IK-Systeme behalten Vorrang. Siehe `V666-GENRE-SPECIFIC-DANCE-INTELLIGENCE.md` und `V666-VERIFICATION.md`.
+
+> Aktueller Entwicklungsstand: **V666 – Genre-Specific Dance Intelligence** (Produktionsbuild ausständig).
+
+
+**V666 – Genre-Specific Dance Intelligence:** Die vorhandene V536-Motion-Auswahl behandelt Rock und Pop jetzt unterschiedlich. Optionaler, standardmäßig abgeschalteter V666-Regler gewichtet bereits vorhandene GLB-Oberkörper-Overlays je nach Deutschrap, Hardstyle, Hardtekk, Rock und Pop; manuelle Choreografien, V665-Grounding, Fuß-IK und Lip-Sync bleiben geschützt. Die Einstellung wird in der Gesamtsicherung übernommen. Tests: `npm run test:v666`, `npm run test:v666:types`; Produktionsfreigabe ausständig. Details `V666-GENRE-SPECIFIC-DANCE-INTELLIGENCE.md`.
+
+**V665 – Realistic Dance Physics & Grounding:** Opt-in-Beruhigung der bestehenden GLB-Zusatzrotationen bei bestätigtem IK-Fußkontakt und beim Wechsel in einen tatsächlich gewählten Hocke-Clip. Reine Overlay-Modulation nach V596, vor der einzigen bestehenden V492-Fuß-IK. Kein neuer Solver, keine neue Fußkontakt-Annahme, keine Root-Translation, keine Änderung an importierten Animationen. Über Einstellungen → Natürlicher Tanz. Tests: `npm run test:v665`, `npm run test:v665:types`; Produktionsfreigabe weiterhin ausständig.
+
+**V664 – Natural Duet & Feature Interaction:** Unter **Einstellungen → V416 Multi-Avatar Rap Duet Studio** kann pro Song optional eine zurückhaltende oder bühnentaugliche Duett-Interaktion aktiviert werden. V664 ergänzt die bestehende V500/V616-Regie mit sehr kleinen, abwechslungsreichen Blick- und Oberkörperreaktionen auf ausdrücklich gespeicherte V416-/V496-Zuordnungen (Sängerwechsel, Duett, gemeinsame Hook). Keine Sängererkennung, keine neuen Renderloops, keine Manipulation an Mund, Fuß-IK oder Animationen. Bei geschlossenen Einstellungen wird der Modus beim Songwechsel ebenfalls gelöscht. Tests: `npm run test:v664`, `npm run test:v664:types`, `npm run test:smoke:v664`. Details `V664-NATURAL-DUET-FEATURE-INTERACTION.md`.
+
+**V663 – Expressive Deutschrap Performance:** Per-Song-Opt-in mit zwei Intensitäten für die Koordination von Kopf, manuell bestätigtem Blick, Schulter und IK-gestütztem Arm während bereits verifizierter Rap-Wörter. Verses bleiben ruhiger als Hooks; manuelle GLB-Bewegungen und die gesamten V644/V662-Mundformen behalten Vorrang. V663 deaktiviert sich beim Songwechsel. Keine neue Sänger-/Phonemerkennung. `npm run test:v663`, `npm run test:v663:types`, `npm run test:smoke:v663`. Details `V663-EXPRESSIVE-DEUTSCHRAP-PERFORMANCE.md`.
+
+**V662 – Advanced Phoneme Lip-Sync:** Die manuell markierte V644-Visem-Timeline bietet jetzt optional zwei V662-Kurvenprofile: Deutschrap (präzise Konsonanten) und Gesang (weichere Übergänge). Kurze, zeitlich begrenzte Übergänge zwischen *direkt benachbarten* manuell markierten Visemen lassen den Mittelpunkt der artikulierten Laute unverändert und respektieren B/P/M-Lippenverschlüsse. Ohne ausdrückliche Aktivierung bleibt V644 unverändert; Authored-Animationen, V420-Edits, Preview und V562-Rigkalibrierung haben weiterhin Vorrang. Keine automatische Laut-/Spracherkennung, kein Spotify-PCM, keine neue Render-/Audio-Schleife. `npm run test:smoke:v662`; Details `V662-ADVANCED-PHONEME-LIP-SYNC.md`.
+
+**V661 – Vocal Analysis Studio:** Erweiterung des V643-Stem-Labs um mögliche Einsatzimpulse, Pausen und signalbasierte Qualitätswarnungen für vom Nutzer bereitgestellte isolierte Vocals. Optional (standardmäßig aus) eine subtile Verstärkung des Kiefers bei wortgenauen Lyrics und bestätigtem Avatar-Slot; weder Spotify-Audio noch erkannte Silben/Phoneme oder Sprecheridentitäten. Die Session-Hilfe verschwindet beim Songwechsel. Tests: `npm run test:v661`, `npm run test:v661:types`, `npm run test:smoke:v661`. Details: `V661-VOCAL-ANALYSIS-STUDIO.md`.
+
+**V660 – Smart Vocal Assignment:** Der V547-Zeitachseneditor enthält nun einen Vorschlagsassistenten für ausdrücklich gespeicherte V385-/V416-Sängerrollen und streng markierte, synchronisierte Lyrics. Er schlägt Lead, Feature, Duett, Hook und Adlib vor, ohne Spotify-Credits als Stimmbeweis auszugeben. Die Vorschläge sind einzeln überprüfbar; keine automatische Übernahme, keine Änderung alter manueller Zeitmarken oder Show-Overrides. Details: `V660-SMART-VOCAL-ASSIGNMENT.md`; Tests: `npm run test:smoke:v661`.
+
+**V659 – Unlimited Motion Playback:** Die feste 24-Motions-Grenze im 3D-Renderer entfällt. Die komplette installierte Motion-Bibliothek bleibt für Autodance, adaptive Auswahl und Vorhersage verfügbar. Ein begrenzter Decoding-/Retarget-Cache lädt nur die aktuell gewählte, laufende und bevorstehende Motion sowie manuelle Rap-Live-Cues. Unbenutzte Clips werden verdrängt, aktive Clips beim asynchronen Nachladen erhalten. Die bisherige 250-Einträge-Beschränkung der lokalen Bibliothek und des Autodance-Profils entfällt ebenfalls; Browser-Speicherquota sowie die separate 64-Clips-pro-GLB-Bulk-Importgrenze bleiben bestehen. Details: `V659-UNLIMITED-MOTION-PLAYBACK.md`. Tests: `npm run test:smoke:v659`.
+
+**V658 – Reliable Configuration & Recovery:** Admin-geschützte Avatar-Konfigurationen verwenden SHA-256-basierte Versionskennungen; veraltete Editoren erhalten HTTP 409 statt unbemerkt neuere Änderungen zu überschreiben. Lokale Daten werden atomar geschrieben und eine letzte gültige Sicherung (`data/avatars.local.json.bak`) kann bei Fehlern wiederhergestellt werden. Der Blob-Eventverlauf meldet konkurrierende Änderungen und defekte Einträge; beschädigte Snapshots erhalten einen lesbaren Fallback, während unsichere Journals weitere Schreibversuche sperren. Unter **Einstellungen → Avatar-Bibliothek → V658** stehen Status und lokale Recovery zur Verfügung. Details: `V658-RELIABLE-CONFIGURATION-RECOVERY.md`. Tests: `npm run test:smoke:v658`, danach `npm run verify`.
+
+**V657 – Complete Portable Backup:** Übertragbare Sicherung mit verwalteten GLB-Avataren, Motion-Dateien, Vorschaugrafiken, gefilterten Avatar-Metadaten und den bisherigen Browser-Einstellungen. Unter **Einstellungen → Display → V657 · Vollständige Geräteübertragung** lassen sich Archive exportieren, vor dem Import auf SHA-256-Integrität prüfen und nach ausdrücklicher Bestätigung wiederherstellen. Externe/temporäre Dateien werden als offene Referenzen ausgewiesen. Grenzen und Admin-Voraussetzungen: `V657-COMPLETE-PORTABLE-BACKUP.md`. Tests: `npm run test:v657`, `npm run test:smoke:v657`.
+
+**V656 – Production Stability & Quality Gate:** Verbindliche, schnellere Release-Gates für Windows/Linux, neue Last- und Fehlerfalltests für Import/Spotify/GLTF/Mixer/Backup und getrennte historische CI-Regressionen. `npm run verify` führt den Produktionsbuild samt `prebuild` mit vollem TypeScript-Check aus; `npm run test:v656` prüft die neuen Invarianten ohne Next.js. Ohne `package-lock.json` ist CI noch nicht reproduzierbar. Details: `V656-PRODUCTION-STABILITY-QUALITY-GATE.md`.
+
+**V655 – Natural Concert Camera Intelligence:** Verifizierte Saenger erhalten ueber laengere Kamerahaltungen einen ruhigeren Fokus, wiederholte Verse/Hook-Aufnahmen wechseln zwischen drei vorsichtigen Bildvarianten. Die Regie arbeitet im bestehenden Three.js-Kamera-Loop ohne zusaetzliche Timer; bei manuellen Einstellungen, unbekannten Songabschnitten und ungueltigen Ankern bleibt sie inaktiv. Bildbeschnitt- und Lyrics-Schutz haben Vorrang. Tests: `npm run test:smoke:v655`, `npm run verify`. Details: `V655-NATURAL-CONCERT-CAMERA.md`.
+
+**V654 – Intelligent Concert Flow:** Eine gemeinsame, verifizierte Songregie verbindet weiche Kamera-Haltephasen, reduzierte Fotobewegung und zurückhaltende Licht-/Tanzakzente. Wiederholte Hooks variieren über bestehende Motive, ohne neue Kameraposen oder Songabschnitte zu erfinden. Manuelle Einstellungen, Lyrics und Lip-Sync bleiben vorrangig. Tests: `npm run test:smoke:v654`, `npm run verify`. Mehr: `V654-INTELLIGENT-CONCERT-FLOW.md`.
+
+**V653 – Smart Artist Visual Director:** Verse, Hook, Drop und Instrumentalpausen steuern vorhandene V652-Künstlerfotos und Biografie-Texte. Lyrics-/Lip-Sync-Fokus und manuelle V350-Einstellungen haben Vorrang. Unter Galerie-Vorschau können Fotoanzahl, Übergänge, Lyrics-Schutz und Hook-Energie angepasst werden. Details: `V653-SMART-ARTIST-VISUAL-DIRECTOR.md`. Prüfen: `npm run test:smoke:v653`, `npm run verify`.
+
+**V652 – Intelligente Musik-Metadaten:** Sonic Display führt Künstler-IDs aus MusicBrainz und Last.fm konfliktbewusst zusammen, entfernt doppelte Genre-Tags, liefert Datenquellen je Feld und sortiert lizenzgeprüfte Künstlerfotos abhängig von Lyrics, Hook/Drop oder neutraler Konzertszene. Im *Gallery Preview Editor* kann man die drei Bildauswahlen vergleichen. Die API-Schlüssel-Einstellungen bleiben die aus `V651-ARTIST-METADATA-PROVIDERS.md`. Details: `V652-INTELLIGENT-METADATA-AND-PHOTOS.md`. Prüfungen: `npm run test:smoke:v652`, `npm run verify`.
+
 **V651 – Smart Preset Automation:** Touchmodus → Steuerzentrale → Profile: Profilwahl Aus (Standard), nur Vorschläge oder automatische Anwendung bei hoher Heuristik-Sicherheit und ausschließlich am Songbeginn. Pro Titel maximal ein automatischer Wechsel; manuelle Einstellungen, Korrekturen und Rückgängig haben Vorrang. Details: `V651-SMART-PRESET-AUTOMATION.md`, Tests `npm run verify:v651`.
 
 **V650 – Smart Concert Presets:** Die Touch-„Steuerzentrale“ hat jetzt einen Tab **„Profile“** mit sechs Vorlagen (Deutschrap, Hardtekk, Hardstyle, Rock, Pop, 10-Zoll-Lyrics), bis zu 12 lokal gespeicherten eigenen Profilen, sicherem JSON-Import/-Export und Rückgängig nach Anwendung. Profile ändern ausschließlich V649-Regler und V648-Ansicht/Lesbarkeit sowie optional das V388-Displayprofil, nicht Spotify oder manuelle Sängerregie. Siehe `V650-SMART-CONCERT-PRESETS.md` und `V650-VERIFICATION.md`.
@@ -976,3 +1376,202 @@ In der bestehenden V522/V626-Benchmarkoberfläche analysiert V627 vorhandene **e
 - [V380-REAL-3D-LYRICS-STUDIO.md](./V380-REAL-3D-LYRICS-STUDIO.md)
 - [V381-VISUAL-3D-LYRICS-EDITOR.md](./V381-VISUAL-3D-LYRICS-EDITOR.md)
 - [V382-ADVANCED-KINETIC-LYRICS.md](./V382-ADVANCED-KINETIC-LYRICS.md)
+
+## Künstler- und Musikmetadaten (TheAudioDB, Flickr, MusicBrainz, Last.fm)
+
+Die optionalen Provider erweitern Künstlerbiografien, die lizenzgeprüfte Fotogalerie und eine Vorschau mit Album-/Song-Infos. API-Schlüssel nur serverseitig in `.env.local` setzen. Hinweise zu Limits, Lizenzen, fehlenden Keys, Caching und Beispielaufrufen stehen in [V651-ARTIST-METADATA-PROVIDERS.md](V651-ARTIST-METADATA-PROVIDERS.md). Zur Prüfung: `npm run test:metadata:v651`.
+
+
+## V657 – Complete Portable Backup
+
+Unter **Einstellungen → Display → V657 · Vollständige Geräteübertragung** können Administratoren ein TAR-Archiv mit lokalen Einstellungen **und** verwalteten GLB-Avataren, Motion-Dateien und Vorschaubildern herunterladen. Das Archiv enthält außerdem die gefilterten Avatar-Metadaten und die V190/V492/V290/V354-Konfigurationen. Beim Einlesen werden Dateien und SHA-256-Digests vor jeder Änderung geprüft. Erst nach ausdrücklicher Bestätigung werden Binärdateien unter neuen Namen hochgeladen, Referenzen neu verknüpft und Browser-Einstellungen (standardmäßig ohne Überschreiben) übernommen. Für Default-Avatar-Einstellungen existiert ein gesondertes Opt-in.
+
+**Grenzen:** Administrator-Anmeldung und HTTPS/localhost für SHA-256 erforderlich. Maximal 150 Dateien, 100 MB pro Einzeldatei, 650 MB Gesamtgröße; lokaler Entwicklungsimport 35 MB je GLB/5 MB je Bild. Nur eigenständige GLBs und verwaltete Bilder werden automatisch übertragen; externe URLs, temporäre `blob:`-Objekte, separat gespeicherte Bibliotheken auf anderen Hosts und externe glTF-BIN-Dateien müssen manuell migriert werden. Ein unterbrochener Import kann bereits installierte Dateien zurücklassen. SHA-256 schützt gegen versehentliche Beschädigung, nicht gegen absichtlich manipulierte Archive. Das Backup ist **kein** Export von Spotify-Anmeldedaten. Details: `V657-COMPLETE-PORTABLE-BACKUP.md`. Test: `npm run test:smoke:v657`.
+
+## V666.1 – Automatische Genre-Tanzregie
+
+Die V666-Genre-Ausdrucksebene ist ab V666.1 standardmäßig eingeschaltet und auf `auto` gestellt. Ein erkanntes Song-Genre (Deutschrap, Hardstyle, Hardtekk, Rock, Pop) steuert die stilistische Verstärkung vorhandener Animationen passend zu Verse/Hook/Drop. Der Benutzer muss nichts aktivieren; bewusst gespeicherte Abschaltungen und explizite Stilüberschreibungen bleiben erhalten. Unbekannte Genre-Tags werden nicht geraten. Manuelle Choreografien, Pausen, reduzierte Bewegung und niedrige Renderqualität haben Vorrang. Details: `V666.1-AUTOMATIC-GENRE-DANCE.md`.
+
+### V667 – Status-Dashboard
+Unter **Einstellungen → Dashboard** sind Spotify, laufender Song, aktuelle Lyrics-Quelle,
+Mikrofon, Vocal-Stems, Genre-/Motion-Automatik, Lip-Sync und externe Dienstkonfigurationen sichtbar.
+Die Spalten **Konfiguriert**, **Aktiv** und **Status** sind bewusst getrennt.
+Externe Provider werden nicht automatisch getestet; **Nicht geprüft** bedeutet nicht defekt.
+Gehe über die Schaltflächen direkt zu Anzeige, Audio, Avataren oder Performance.
+Die Aktualisierung läuft etwa einmal pro Minute nur bei geöffneter Ansicht.
+Siehe `V667-SYSTEM-SERVICE-DASHBOARD.md` und `V667-VERIFICATION.md`.
+
+
+### V668 – Intelligente Systemdiagnose
+**Einstellungen → Dashboard → Systemdiagnose & Einrichtungshilfe.**
+Priorisierte Vorschläge bei fehlender Spotify-Konfiguration, Spotify-Fehlern, Mikrofon-Berechtigungsproblemen,
+aktivierter Motion-Automatik ohne GLB-Motions und noch unbekanntem Genre. Fehlende Lyrics werden nur bei vorhandenem
+Song als unverifizierter Hinweis ausgegeben. Optionale Dienste lassen sich ausdrücklich einblenden; standardmäßig
+werden keine unnötigen Hinweise zu unbenutzten Providern angezeigt.
+Die vorgeschlagenen Aktionen öffnen vorhandene Einstellungen oder aktualisieren ausschließlich die bereits
+existierende Konfigurationsübersicht; **keine automatischen Reparaturen, kein Anbieter-Ping, keine Zugangsdaten im Browser**.
+Siehe `V668-GUIDED-SYSTEM-DIAGNOSTICS.md` und `V668-VERIFICATION.md`.
+
+### V669 – Universal Automatic Concert Show Director
+Die automatische Konzertregie verwendet Genre-Profile für Deutschrap/Hip-Hop, Deutschrock/Rock,
+Metal/NDH, Pop, Hardstyle/Hardtekk, Techno/EDM, ruhige Musik und unbekannte Genres.
+Sie verstärkt ausschließlich bereits vorhandene automatische Bewegungs-, Kamera- und Lichtkanäle
+konservativ. Bei nicht belegten Songabschnitten wird kein Refrain/Drop behauptet; manuelle
+Einstellungen, Lyrics und bestätigte Sängerzuordnungen behalten Vorrang.
+Standardmäßig an, solange der bestehende Smart Concert Director aktiviert ist.
+Siehe `V669-UNIVERSAL-AUTOMATIC-CONCERT-SHOW.md` und `V669-VERIFICATION.md`.
+
+### V674 – Cover-Galerie, Genre-Mix und Bühnenvorschläge
+
+Die private Spotify-Chronik bietet zusätzlich eine Cover-Wand (maximal 36 Wiedergaben je Anzeige), eine Detailansicht, Beispielcover der meistgehörten Künstler-Credits und eine Genre-Auswertung. Genre-Abfragen an die bereits vorhandene Last.fm-Anbindung starten **nur nach Klick**, untersuchen maximal 12 unterschiedliche Songs pro Klick (höchstens 2 parallel) und werden nicht gespeichert. Bei fehlendem `LASTFM_API_KEY`, unbekannten Tags oder schwachen Heuristiken bleibt das Genre unbekannt; die Statistik zeigt explizit die Datenabdeckung. Ein passender Bühnen- und Tanzstil lässt sich nur **manuell** übernehmen und mit Rückgängig unmittelbar zurücknehmen. Avatar-Modelle, Kamera, Lyrics und Spotify-Wiedergabe werden dadurch nicht verändert.
+
+Test: `npm run test:v674`. Vollständige Qualitätsprüfung: `npm run check:release && npm run build`.
+
+### V675 – Smart Music Profile
+
+Unter **Zuletzt gespielt → Mein Musikprofil** erstellt Sonic Display eine visuell aufbereitete, **flüchtige** Auswertung der geladenen Wiedergaben: meistgehörte Hauptkünstler, erkannte Musikrichtungen und bis zu drei Show-Look-Empfehlungen. Das Musikprofil wird im Browser aus den Daten von V672/V674 berechnet und **nicht dauerhaft gespeichert**. Genre-Zuordnungen benötigen die freiwillige Last.fm-Abfrage im Tab „Genre-Mix“ (serverseitig `LASTFM_API_KEY`). Bei zu wenig Genre-Daten wird bewusst kein Bühnenvorschlag gemacht. Die Empfehlungen verändern die Bühne nur auf manuellen Klick; DanceFX nur mit zusätzlicher Auswahl. Bestehende Musik-/Lyrics-/Kamera-/Sängerregie bleibt unberührt. Details in `V675-SMART-MUSIC-PROFILE.md`, Tests in `V675-VERIFICATION.md`.
+
+### V677 – Intelligente automatische Konzert-Looks
+
+Im Tab **Zuletzt gespielt → Konzert-Designer** gibt es einen optionalen Schalter **Automatische Look-Auswahl**. Standardmäßig AUS. V677 kann zu Songbeginn anhand eines für den *aktuellen* Track erkannten, ausreichend sicheren Genres einen zuvor gespeicherten Konzert-Look auswählen. Exakte Genre-Zuordnung, verwandte Genre-Familie und Universal-Look haben feste Priorität; mehrere gleich passende Looks variieren stabil nach Song-ID. Nach 20 Sekunden und bei fehlender Genre-Evidenz bleibt der bestehende Look bestehen. Manuelle Änderungen an Bühne, Licht, Tanz oder FX beenden die Automatik. Die eigentliche Konzertregie, Lyrics, Kameras und Vocal-Zuweisung bleiben unangetastet. Details: `V677-SMART-CONCERT-LOOKS.md`, Prüfstatus: `V677-VERIFICATION.md`.
+
+
+## V689 – Professional Lighting Director
+Die vorhandenen Bühnenstrahler, Moving Heads, Boden-Gobos, LED-Pixelwand und Bodennebel werden anhand derselben bestätigten Song-Abschnitte koordiniert. Unterschiedliche Looks für Strophen, Builds, Hooks, Drops und Breaks – keine zusätzlichen Lichtquellen, Lichtblitze oder Regiezeitgeber. Manuelle Licht-Timelines bleiben maßgeblich. Prüfungen: `npm run test:v689`, `npm run test:v689:types`, `npm run test:quick`. Für den tatsächlichen Produktionsbuild nach `npm install` `npm run build` ausführen. Details: `V689-PROFESSIONAL-LIGHTING-DIRECTOR.md`.
+
+
+### V694 – Dauerhafte Konzert-Qualitätshistorie
+
+In der QA-Ansicht werden manuell gesetzte Prüfstatus und explizit gespeicherte Vorher-/Nachher-Aufnahmen künftig **lokal auf diesem Gerät** über Sitzungen hinweg behalten. Vergleiche lassen sich **ausdrücklich archivieren**, später nach Release/Song erneut ansehen und als kleine JSON-Sicherung auf einen anderen Browser übertragen. Nicht identische Bedingungen verhindern einen irreführenden Versionsvergleich. Der komplette Funktionsumfang steht in `V694-DURABLE-CONCERT-QUALITY-HISTORY.md`; Tests: `npm run test:v694 && npm run test:v694:types && npm run test:quick`. Browserdaten-Löschung entfernt lokale Historie; deshalb JSON-Sicherung vor Gerätewechsel erstellen.
+
+## V727 — Weekly & Monthly Music Recap
+
+V727 ergänzt unter Last.fm History automatisch beim Öffnen berechnete Wochen-/Monatsrückblicke mit historischen Vergleichen, Top-Künstlern, Lieblingssongs und erstmals archivierten Künstlern. Keine zusätzlichen API-Abfragen und keine neuen Scrobbles. Details: [V727-WEEKLY-MONTHLY-RECAP.md](V727-WEEKLY-MONTHLY-RECAP.md).
+
+
+### V735 – Hip Dance auf GLB-Rigs
+
+Unter **Einstellungen -> Dance Studio -> Hueftbewegungen** sind Hip_Sway, Hip_Circle, Hip_Bounce und Auto, Staerke und Tempo wählbar. In der Avatar-Vorschau stehen fehlende Bewegungen als prozedurale Optionen bereit. Foot IK laeuft nach dem Hueft-Overlay; die originale GLB wird nicht modifiziert. Gesäßverformung benoetigt zusaetzliche Skinning-Bones oder Morph-Targets.
+
+
+### V736 – Motion Quality Gate und Build-Validierung
+
+V736 prueft die V735-Hueftbewegungen unter ueber 61.000 synthetischen
+Bewegungssituationen mit kontrollierten Fusskontakten, manueller Choreografie,
+GLB-Overlay-Resets und extremen Zeit-/BPM-Werten.
+
+- `npm ci` (Node.js >=20.9, Node 22 fuer CI empfohlen)
+- `npm run test:v736` – GPU-freie Laufzeit- und Matheregression
+- `npm run test:v736:types` – isolierter TypeScript-Check
+- `npm run verify:v736` – alte Motion-Regressionen, Architektur,
+  vollstaendiges TypeScript und realer Next.js-Produktionsbuild.
+
+Bevor V736 als vollstaendig produktionsvalidiert gilt, muessen alle echten
+Build-Checks mit installierten Abhaengigkeiten erfolgreich sein. Reale
+GLB-/Browser-Fussstabilitaet wird separat geprueft. Siehe `V736-VERIFICATION.md`.
+
+
+## V747 – Cinematic Camera Director
+
+Die automatische Performance-Kamera ergaenzt Singer-Fokus bei verifizierter
+Vocal-Rolle, Duettwechsel sowie sichere Hook-/Drop-Gruppenbilder.
+Die Einstellungen unter Avatar & Tanz steuern Intensitaet, Vocal-/Gruppenfokus
+und Einblendzeit. Eigene Kamerapresets und Lyrics-Schutz gehen vor.
+Details: V747-CINEMATIC-CAMERA-DIRECTOR.md und V747-VERIFICATION.md.
+
+
+## V748 - Lyrics Performance Studio
+
+Shared 2D/3D lyric emphasis, verified-word-only accents, safe hook/drop highlights
+and adaptive contrast for group/vocal stage scenes. Controls under Display / Lyrics.
+See V748-LYRICS-PERFORMANCE-STUDIO.md and V748-VERIFICATION.md.
+
+
+## V754 - Visual Concert Quality Inspector
+
+Read-only 1 Hz browser geometry check for projected anatomical head, hip and foot anchors, camera framing, and active lyrics rectangles. Run it from the Concert Quality Dashboard using the opt-in WebGL probe. Missing measurements are shown as unknown; it does **not** measure pixel visibility, perceived lighting, shadows, fog, GPU time or actual contrast. Results stay in volatile memory, no settings are changed. See V754-VISUAL-CONCERT-QUALITY-INSPECTOR.md and V754-VERIFICATION.md.
+
+
+## V759 - Intelligent Dance Variety
+Adds a phrase-aware, repetition-resistant expressive rig variation controller for Verse/Hook/Drop and a matching GLB studio preview. Manual GLB and timeline choices, IK, hip/foot grounding and vocal assignment retain priority. See V759-INTELLIGENT-DANCE-VARIETY.md.
+
+
+## V760 - Advanced Ensemble Director
+Optional 3-4-person ensemble motifs and visual lead rotation. See `V760-ADVANCED-ENSEMBLE-DIRECTOR.md`. Pure regie preview, contact/collision-gated stage depth; no changes to singer assignments.
+
+## V761 – Cinematic Concert Director 4.0
+
+Verified V604 acts feed a deterministic, repetition-resistant scene storyboard: portrait, dialogue, ensemble, wide, build/rise, pulse and respite. The optional bounded cue is routed through the existing V654/V670/V750 quality-guarded pipeline; no new renderers, clips or inferred singers. Controls in Dynamic Stage; see `V761-CINEMATIC-CONCERT-DIRECTOR.md` and `V761-VERIFICATION.md`.
+
+V762: See `V762-DYNAMIC-STAGE-LIGHTING.md` for optional genre-sensitive scenic accent settings and safeguards.
+
+
+### V774 - Instanced Dance FX
+
+Die Schockwellen, Fussabdruecke und Leuchtspuren des 3D-Konzerts laufen
+in drei InstancedMesh-Batches statt in bis zu 24 Einzelmeshes.
+Details und Tests: [V774-INSTANCED-DANCE-FX.md](V774-INSTANCED-DANCE-FX.md).
+
+
+## V778 – Concert Performance Quality Advisor
+
+Open `/diagnostics/concert-quality` to inspect a locally generated V777 concert benchmark JSON (2/4 GLB performers, 30/45/60 FPS targets). Or run `npm run benchmark:v778:advise -- --input=artifacts/v777/current.json --target=60`. Results include P95 headroom, conservative quality-profile experiments and explicit limits on hardware claims. See `V778-CONCERT-QUALITY-ADVISOR.md`. No browser measurements are simulated by the advisor.
+
+## V782 - Adaptive Animation Interpolation
+
+Opt-in GLB pose interpolation and paired motion/FPS browser comparison in the V777 fixture, see `V782-ADAPTIVE-ANIMATION-INTERPOLATION.md`. Legacy concert modes and the live dance director remain unchanged.
+
+
+V784: [Cinematic Camera Smoothness](V784-CINEMATIC-CAMERA-SMOOTHNESS.md), local `/diagnostics/camera-smoothness`, `npm run benchmark:v784:camera`.
+
+- [V785 Lyrics Performance Protection](V785-LYRICS-PERFORMANCE-PROTECTION.md): real projected GLB-fixture lyric bounds, line stability and strict paired off/on review.
+
+
+### V786 Avatar Complexity Profiler
+
+See `V786-REAL-AVATAR-COMPLEXITY.md` for local GLB analysis with optional real V777 benchmark linkage and the `/diagnostics/avatar-complexity` dashboard.
+
+- [V787: Smart Avatar LOD Director](V787-SMART-AVATAR-LOD-DIRECTOR.md): Offline Rig-/Morph-Pruefung, hashgesicherte 3D-Vorschau und distanzbasierte LOD-Hysterese.
+
+
+### V788 – Intelligent Concert Quality Governor
+
+Lokaler Performance-Benchmark mit Schutzprioritaet fuer Lyrics, Lip-Sync und Saenger: `npm run benchmark:v788:governor -- --url=http://127.0.0.1:3000 --glb=/benchmark/mein-avatar.glb`, Bericht unter `/diagnostics/concert-governor`. Siehe `V788-CONCERT-QUALITY-GOVERNOR.md`.
+
+
+## V793 – Advanced Light Choreographer
+
+Das bestehende SpotLight und die instanzierte V789-Lichtarchitektur erhalten
+zusammenhaengende, genre- und szenenabhaengige Lichtmuster. Manuelle Licht-Cues,
+Lyrics, Low-Tier und Saengerfokus bleiben geschuetzt. Details in
+`V793-ADVANCED-LIGHT-CHOREOGRAPHER.md`; Testprotokoll `V793-VERIFICATION.md`.
+
+
+## V822 – Advanced Beat Accent Director
+
+Neue mikrofonbasierte Akzentsteuerung im Concert FX Studio: getrennt regelbare
+Kick-, Snare-artige, Bass- und Peak-Akzente mit Empfindlichkeit und Intensitaet.
+Die bestehenden LED-/Laser-/Partikel-/Schaumeffekte werden nur innerhalb ihrer
+bestehenden Sicherheits- und Leistungsbudgets moduliert. Snare-Bandwerte sind
+Heuristiken und keine sichere Instrumentenerkennung. `npm run test:v822` und
+`npm run test:v822:types` testen die neue Engine. Vollstaendiger Build und GPU-
+Abnahme bleiben vor einer Produktionsfreigabe erforderlich.
+
+
+## V845 - Soap Bubbles and Optional Full-Stage-Flash
+See V845-BUBBLES-FULL-STAGE-FLASH-VERIFICATION.md. The new stage-canvas flash is opt-in only; flash content may be hazardous for photosensitive people. Before any production release the full TypeScript and Next.js builds and real visual/GPU tests are mandatory.
+
+
+## V856 – Music Memory Insights
+Neue monatliche Last.fm-History-Auswertung mit 12-Monats-Vergleich, aufkommenden Künstlerfavoriten und Wiederentdeckungen einzelner Songs nach 90 Tagen erfasster Pause. Lokale Auswertung ohne neue APIs und ohne Änderungen am Archiv. Siehe `V856-MUSIC-MEMORY-INSIGHTS.md`.
+
+### V857 · Personal Music Discovery Intelligence
+
+Im Last.fm-History-Bereich neu: „Dein Musik-Radar“ mit Anteilsveränderungen der Lieblingskünstler (aktueller Monat vs. drei Vormonate), erstmals im Archiv erfassten Künstlern und einem optionalen Genre-Kompass auf Grundlage echter Last.fm-Tags. Nur durch Klick werden höchstens 36 Songs (max. 3 parallele Anfragen) über die vorhandene `/api/genre`-Route abgefragt. Die Anzeige legt erkannte und unbekannte Wiedergaben offen und errät keine Genres aus Künstlernamen. Details: `V857-PERSONAL-MUSIC-DISCOVERY.md`.
+
+
+## V858 – Music Discovery Dashboard 2.0
+
+Im Last.fm-Hörverlauf erscheint nach dem Archiv-/Importbereich das neue Music Discovery Dashboard. Es nutzt lokal gespeicherte, kontoabhängige Scrobbles und zeigt Monatsvergleich, 12-Monats-Grafik, Top-Künstler und Links zu Künstler-Explorer, Genre-Kompass und Wiederentdeckungen. Die neue Übersicht verwendet bewusst **das ganze Archiv** unabhängig vom gemeinsamen V726-Detailfilter; die vorhandenen Auswertungen und Filter bleiben separat nutzbar. Keine zusätzlichen Spotify-/Last.fm-Berechtigungen oder API-Aufrufe.
+
+Für die lokale Freigabe: `npm ci`, `npm run doctor:v858`, `npm run typecheck`, `npm run build`. Der gezielte Test ist `npm run test:v858`, der UI-Typcheck `npm run test:v858:ui-types`.

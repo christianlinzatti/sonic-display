@@ -1,6 +1,20 @@
 "use client";
 import {resolveImmersiveLyricFontV648,type TouchReadabilityV648} from "@/components/touchDisplayPolicyV648";
 
+import {planIntegratedConcertQualityV750,scaleAutomaticPercentV750,strengthenReadabilityV750} from "./integratedConcertQualityV750";
+import {useConcertQualityV466} from './concertQualityStoreV466';
+import {assessVisualQualityV754} from './visualQualityInspectorV754';
+import {advanceQualityTuneV755,effectiveQualityTuneV755,applyTuneMultiplierV755} from './qualityAutoTunerV755';
+import {getQualityAutoTuneStatusV755,publishQualityAutoTuneV755,
+ useQualityAutoTuneEnabledV755,useQualityAutoTuneStatusV755} from './qualityAutoTuneStoreV755';
+import {buildConcertDashboardV751} from "./concertDashboardProjectionV751";
+import {publishConcertDashboardV751} from "./concertDashboardStoreV751";
+import {normalizeSmartHipV744} from "./smartHipChoreographyV744";
+import {normalizeEnsembleHipV745} from "./multiAvatarHipSyncV745";
+import {normalizeVocalPerformanceV746} from "./vocalPerformanceDirectorV746";
+import {normalizePerformanceCameraV747} from "./performanceCameraDirectorV747";
+import {normalizePerformanceLightingV749} from "./performanceLightingDirectorV749";
+import {normalizeLyricsPerformanceV748} from "./lyricsPerformanceStudioV748";
 import {LiveStageDomProbeV592} from "./LiveStageDomProbeV592";
 import {planAutomaticRapPerformanceV437,sampleAutomaticRapPerformanceV437,applyAutomaticRapPerformanceV437} from "./automaticRapPerformanceV437";
 import {buildRapCameraTimelineV431} from "./rapCameraTimelineV431";
@@ -18,6 +32,8 @@ import {initialEvolutionV313,advanceEvolutionV313,applyEvolutionV313,readEvoluti
 import {initialShowQualityV310,advanceShowQualityV310,applyShowQualityV310,readShowQualitySettingsV310,SHOW_QUALITY_EVENT_V310} from "./smartShowQualityV310";
 import { SHOW_PRESET_APPLIED_EVENT } from "./showPresetsV309";
 import {useEffect,useMemo,useRef,useState} from "react";
+import {useLiveMoodV678} from "@/components/LiveMoodProviderV678";
+import {moodStageCueV678,modulateMoodLightV678,modulateMoodDanceV678} from "@/lib/live-mood-v678";
 import {useStageContentV330} from "@/services/stageContent/useStageContentV330";
 import {useScreenLayoutV333} from "@/services/stageContent/useScreenLayoutV333";
 import {ANALYSIS_EVENT_V318,ANALYSIS_STORAGE_KEY_V318,readTrackAnalysisV318,resolveTimelineV318} from "@/services/musicAnalysis/trackAnalysisV318";
@@ -62,7 +78,25 @@ import {coordinateConcertEditionV642} from "./concertEditionV642";
 import {IntelligentConcertTimelineV646} from "./ConcertTimelineOverlayV646";
 import {planIntelligentSongDramaturgyV629,sampleIntelligentSongDramaturgyV629} from "./intelligentSongDramaturgyV629";
 import {planFullSongDramaturgyV604,sampleFullSongDramaturgyV604,refineAutomaticGroupV604} from "./fullSongConcertDramaturgyV604";
+import {planCinematicConcertV761,sampleCinematicConcertV761} from "./cinematicConcertDirectorV761";
+import {planCinematicShowV790,sampleCinematicShowV790} from "./cinematicShowDirectorV790";
+import {auditConcertExperienceV800,sampleConcertExperienceV800} from "./concertExperienceMilestoneV800";
+import {inspectConcertExperienceV801} from "./concertExperienceInspectorV801";
+import {publishConcertInspectorV801} from "./concertExperienceInspectorStoreV801";
+import {sampleSeamlessSceneTransitionV791} from "./seamlessSceneTransitionsV791";
+import {sampleSmartCameraChoreographyV792} from "./smartCameraChoreographyV792";
+import {sampleEpicPeakMomentsV794} from "./epicPeakMomentsV794";
+import {sampleDynamicStageEvolutionV795} from "./dynamicStageEvolutionV795";
+import {sampleDeutschrapPerformanceV796,applyDeutschrapPerformanceV796} from "./deutschrapPerformanceDirectorV796";
+import {publishConcertTimelineV763} from "./concertTimelineBridgeV763";
 import {refineAutoGroupTransitionsV609} from "./seamlessConcertTransitionsV609";
+import {planIntelligentConcertFlowV654,coordinateConcertDynamicsV654} from "./intelligentConcertFlowV654";
+import {planUniversalConcertV669,coordinateUniversalConcertV669} from "./universalConcertShowDirectorV669";
+import {planFullSongPacingV671,sampleFullSongPacingV671,coordinateFullSongPacingV671} from "./fullSongPacingV671";
+import {planIntelligentSongArcV679,sampleIntelligentSongArcV679,coordinateIntelligentSongArcV679} from "./intelligentSongArcV679";
+import {planSectionDirectionV681,sampleSectionDirectionV681,coordinateSectionDirectionV681} from "./verseHookDropDirectionV681";
+import {planSmartEnsembleV683,refineSmartEnsembleV683,ensembleMomentAtV683} from "./smartEnsembleDirectorV683";
+import {planShowQualityGuardV670,applyShowQualityGuardV670} from "./automaticShowQualityGuardV670";
 import {planGenreConcertV610} from "./genreConcertExperienceV610";
 import {planContinuousConcertV611} from "./continuousConcertExperienceV611";
 import {planSmartConcertDynamicsV502,concertDynamicsPercentV502,concertDynamicsEnergyV502} from "./smartConcertDynamicsV502";
@@ -77,6 +111,11 @@ import type { VisualizerProps } from "./registry";
 export function VisualizerStage({ lyrics, progressMs = 0, activeIndex = -1, playing = false, stagePalette, visualBalanceV451, kioskReadabilityV648 }: { stagePalette?: AmbientPalette; lyrics?: Lyrics | null; progressMs?: number; activeIndex?: number; playing?: boolean; visualBalanceV451?: VisualBalanceV451; kioskReadabilityV648?: TouchReadabilityV648 }) {
   const { preferences, audio, audioActive, track, isPlaying, genre, genreFusion } = useVisualizer();
   // The shared context distinguishes live microphone analysis from estimated Spotify beats.
+  const liveMoodV678=useLiveMoodV678();
+  const moodAllowedV678=preferences.liveMoodEnabledV678===true&&liveMoodV678.measuring&&audioActive&&isPlaying&&!preferences.reducedMotion;
+  const moodCueV678=moodStageCueV678(liveMoodV678.mood,preferences.liveMoodStrengthV678??45,moodAllowedV678);
+  const manualDanceV678=preferences.avatarMotionMode==='choreography'||!!preferences.avatarTimelineEnabled||!!preferences.avatarBlendEnabled||!!preferences.smartDanceOverride||(preferences.avatarDancePreset??'auto')!=='auto';
+  const moodDanceCueV678=preferences.liveMoodDanceV678!==false&&!manualDanceV678?moodCueV678:moodStageCueV678(null,0,false);
   const microphoneActiveV445=audioActive;
   const stageContentV330=useStageContentV330(track);
   // V440: Spotify contributor credits can request a second STAGE avatar, not a singer assignment.
@@ -357,6 +396,285 @@ export function VisualizerStage({ lyrics, progressMs = 0, activeIndex = -1, play
     lyricsProtected:smartConcertV568.lyricsProtected,confirmedV600:concertArcV600,base:directedDynamicsV600,
   });
   const directedDynamicsV604=fullSongCueV604.dynamics;
+  // V761: verified V604 acts yield a shared, repetition-aware visual storyboard.
+  // Only bounded automatic intensity offsets; downstream V654/V670/V750 safety remains final.
+  const cinematicPlanV761=useMemo(()=>planCinematicConcertV761(fullSongPlanV604,preferences.cinematicConcertV761),
+    [fullSongPlanV604,preferences.cinematicConcertV761?.variety]);
+  // V763: publish the genuine V761 storyboard only; no writing to authored cues.
+  const previewSecondV763=Math.floor(progressMs/1000);
+  useEffect(()=>publishConcertTimelineV763(cinematicPlanV761,previewSecondV763*1000,isPlaying),
+    [cinematicPlanV761,previewSecondV763,isPlaying]);
+  const cinematicCueV761=sampleCinematicConcertV761(cinematicPlanV761,{
+    settings:preferences.cinematicConcertV761,narrative:fullSongCueV604,
+    trackId:track?.id??'',progressMs,playing:isPlaying,
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    manualDance:preferences.visualizerMode!=='avatar'||!rapDanceAllowedV437||
+      preferences.avatarMotionMode==='choreography'||preferences.avatarTimelineEnabled===true,
+    manualCamera:preferences.visualizerMode!=='avatar'||!!preferences.avatarCameraTimelineV400?.enabled||
+      !!preferences.avatarCameraStudioV398?.enabled||Boolean(track?.id&&
+      preferences.rapCameraKeyframesEnabledV432&&(preferences.rapCameraKeyframesV432??{})[track.id]?.length),
+    manualLighting:preferences.visualizerMode!=='avatar'||preferences.stageReactive===false,
+    manualLyrics:preferences.lyricsBeatReactive===false||preferences.lyricsVisible===false,
+    lyricsProtected:smartConcertV568.lyricsProtected,
+    verifiedSinger:cinematicSceneV528?.active===true&&cinematicSceneV528.trackId===track?.id, // only confirmed V528 scene evidence.
+    base:directedDynamicsV604,
+  });
+  const directedDynamicsV761=cinematicCueV761.dynamics;
+  // V654: all existing automatic lanes share one verified act/time envelope.
+  // No change to authored song sections, word timings, singer roles or camera poses.
+  const concertFlowV654=planIntelligentConcertFlowV654({
+    narrative:{plan:fullSongPlanV604,cue:fullSongCueV604},
+    trackId:track?.id??'',positionMs:progressMs,playing:isPlaying,
+    enabled:preferences.smartConcertDirectorEnabledV568??true,
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    lyricsProtected:smartConcertV568.lyricsProtected,
+    manualDance:preferences.visualizerMode!=='avatar'||!rapDanceAllowedV437,
+    manualCamera:preferences.visualizerMode!=='avatar'||Boolean(preferences.avatarCameraTimelineV400?.enabled||
+      preferences.avatarCameraStudioV398?.enabled||track?.id&&preferences.rapCameraKeyframesEnabledV432&&
+      (preferences.rapCameraKeyframesV432??{})[track.id]?.length),
+    manualLighting:preferences.visualizerMode!=='avatar'||preferences.stageReactive===false,
+  });
+  const directedDynamicsV654=coordinateConcertDynamicsV654(directedDynamicsV761,concertFlowV654);
+  // V669: automatic universal genre direction shares V604/V654 evidence and
+  // applies bounded gains to EXISTING lanes, never creates a parallel director.
+  const universalShowV669=planUniversalConcertV669({
+    trackId:track?.id??'',durationMs:track?.durationMs??0,progressMs,playing:isPlaying,
+    enabled:(preferences.smartConcertDirectorEnabledV568??true)&&preferences.visualizerMode==='avatar',
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    genre:genre||concertArcPlanV600.genre,energy:audio.energyEnvelope??0,
+    lyricsProtected:smartConcertV568.lyricsProtected,
+    manualDance:!rapDanceAllowedV437||preferences.avatarMotionMode==='choreography'||
+      preferences.avatarTimelineEnabled===true,
+    manualCamera:!!preferences.avatarCameraTimelineV400?.enabled||
+      !!preferences.avatarCameraStudioV398?.enabled||Boolean(track?.id&&
+      preferences.rapCameraKeyframesEnabledV432&&(preferences.rapCameraKeyframesV432??{})[track.id]?.length),
+    manualLighting:preferences.stageReactive===false,
+    narrative:{plan:fullSongPlanV604,cue:fullSongCueV604},
+  });
+  const directedDynamicsV669=coordinateUniversalConcertV669(directedDynamicsV654,universalShowV669);
+  // V671: an additional bounded whole-song pacing contour over verified V604 acts.
+  // This feeds V670's quality guard; the safety cap remains the FINAL authority.
+  const fullSongPacingPlanV671=useMemo(()=>planFullSongPacingV671(fullSongPlanV604),[fullSongPlanV604]);
+  const fullSongPacingV671=sampleFullSongPacingV671(fullSongPacingPlanV671,{
+    trackId:track?.id??'',durationMs:track?.durationMs??0,progressMs,playing:isPlaying,
+    enabled:(preferences.smartConcertDirectorEnabledV568??true)&&preferences.visualizerMode==='avatar',
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    energy:audio.energyEnvelope??0,style:universalShowV669.style,
+    lyricsProtected:smartConcertV568.lyricsProtected,
+    manualDance:preferences.visualizerMode!=='avatar'||!rapDanceAllowedV437||
+      preferences.avatarMotionMode==='choreography'||preferences.avatarTimelineEnabled===true,
+    manualCamera:preferences.visualizerMode!=='avatar'||!!preferences.avatarCameraTimelineV400?.enabled||
+      !!preferences.avatarCameraStudioV398?.enabled||Boolean(track?.id&&
+        preferences.rapCameraKeyframesEnabledV432&&(preferences.rapCameraKeyframesV432??{})[track.id]?.length),
+    manualLighting:preferences.visualizerMode!=='avatar'||preferences.stageReactive===false,
+    narrativeCue:fullSongCueV604,
+  });
+  const directedDynamicsV671=coordinateFullSongPacingV671(directedDynamicsV669,fullSongPacingV671);
+  // V679: a strategic, evidence-bound peak/rest score from the SAME V604/V671
+  // verified acts. V670 remains the final gain guard; never modifies shots or cues.
+  const intelligentArcPlanV679=useMemo(()=>planIntelligentSongArcV679(fullSongPlanV604,fullSongPacingPlanV671),
+    [fullSongPlanV604,fullSongPacingPlanV671]);
+  const intelligentArcV679=sampleIntelligentSongArcV679(intelligentArcPlanV679,{
+    trackId:track?.id??'',durationMs:track?.durationMs??0,progressMs,playing:isPlaying,
+    enabled:(preferences.smartConcertDirectorEnabledV568??true)&&preferences.visualizerMode==='avatar',
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    lyricsProtected:smartConcertV568.lyricsProtected,
+    manualDance:preferences.visualizerMode!=='avatar'||!rapDanceAllowedV437||manualDanceV678,
+    manualCamera:preferences.visualizerMode!=='avatar'||!!preferences.avatarCameraTimelineV400?.enabled||
+      !!preferences.avatarCameraStudioV398?.enabled||Boolean(track?.id&&
+        preferences.rapCameraKeyframesEnabledV432&&(preferences.rapCameraKeyframesV432??{})[track.id]?.length),
+    manualLighting:preferences.visualizerMode!=='avatar'||preferences.stageReactive===false,
+    narrativeCue:fullSongCueV604,pacingCue:fullSongPacingV671,
+  });
+  const directedDynamicsV679=coordinateIntelligentSongArcV679(directedDynamicsV671,intelligentArcV679);
+  // V681: verified verse / hook / build / drop / break contrasts; never an
+  // independent clock or scene cut. V670 is still the FINAL quality gate.
+  const sectionPlanV681=useMemo(()=>planSectionDirectionV681(fullSongPlanV604,fullSongPacingPlanV671,
+    intelligentArcPlanV679),[fullSongPlanV604,fullSongPacingPlanV671,intelligentArcPlanV679]);
+  const sectionCueV681=sampleSectionDirectionV681(sectionPlanV681,{
+    trackId:track?.id??'',durationMs:track?.durationMs??0,progressMs,playing:isPlaying,
+    enabled:(preferences.smartConcertDirectorEnabledV568??true)&&preferences.visualizerMode==='avatar',
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    lyricsProtected:smartConcertV568.lyricsProtected,
+    manualDance:preferences.visualizerMode!=='avatar'||!rapDanceAllowedV437||manualDanceV678||
+      preferences.avatarMotionMode==='choreography'||preferences.avatarTimelineEnabled===true,
+    manualCamera:preferences.visualizerMode!=='avatar'||!!preferences.avatarCameraTimelineV400?.enabled||
+      !!preferences.avatarCameraStudioV398?.enabled||Boolean(track?.id&&
+        preferences.rapCameraKeyframesEnabledV432&&(preferences.rapCameraKeyframesV432??{})[track.id]?.length),
+    manualLighting:preferences.visualizerMode!=='avatar'||preferences.stageReactive===false,
+    narrativeCue:fullSongCueV604,pacingCue:fullSongPacingV671,arcCue:intelligentArcV679,
+  });
+  const directedDynamicsV681=coordinateSectionDirectionV681(directedDynamicsV679,sectionCueV681);
+  // V790: ONE verified storyboard joins V761 visual variation with V679 peak
+  // priority and V671 timing. Only subtle gains to existing automatic lanes.
+  // Fails closed for live-estimated sections; V670 remains the final guard.
+  const cinematicShowPlanV790=useMemo(()=>planCinematicShowV790(
+    fullSongPlanV604,cinematicPlanV761,intelligentArcPlanV679),
+    [fullSongPlanV604,cinematicPlanV761,intelligentArcPlanV679]);
+  // V800: one read-only whole-song audit per confirmed V790 storyboard.
+  const concertExperiencePlanV800=useMemo(()=>auditConcertExperienceV800(cinematicShowPlanV790),
+    [cinematicShowPlanV790]);
+  // V801: read-only verified whole-song projection. Never enters the V670
+  // quality chain and never invents vocals, timestamps, GLB or render evidence.
+  const concertInspectorEvidenceV802=useMemo(()=>({
+      trackId:track?.id??'',durationMs:track?.durationMs??0,
+      avatarStage:preferences.visualizerMode==='avatar',
+      performers:performerCountV440,
+      lyricsAvailable:Boolean(lyrics?.lines?.length),lyricsSynced:lyrics?.synced===true,
+      manualDance:preferences.visualizerMode!=='avatar'||
+        preferences.avatarMotionMode==='choreography'||preferences.avatarTimelineEnabled===true,
+      manualCamera:preferences.visualizerMode!=='avatar'||
+        !!preferences.avatarCameraTimelineV400?.enabled||!!preferences.avatarCameraStudioV398?.enabled||
+        Boolean(track?.id&&preferences.rapCameraKeyframesEnabledV432&&
+          (preferences.rapCameraKeyframesV432??{})[track.id]?.length),
+      manualLighting:preferences.visualizerMode!=='avatar'||preferences.stageReactive===false,
+      reducedMotion:preferences.reducedMotion,
+    }),[track?.id,track?.durationMs,preferences.visualizerMode,
+      preferences.avatarMotionMode,preferences.avatarTimelineEnabled,
+      preferences.avatarCameraTimelineV400?.enabled,preferences.avatarCameraStudioV398?.enabled,
+      preferences.rapCameraKeyframesEnabledV432,preferences.rapCameraKeyframesV432,
+      preferences.stageReactive,preferences.reducedMotion,performerCountV440,
+      lyrics?.lines?.length,lyrics?.synced]);
+  const concertInspectionV801=useMemo(()=>inspectConcertExperienceV801(
+    cinematicShowPlanV790,concertExperiencePlanV800,concertInspectorEvidenceV802),
+    [cinematicShowPlanV790,concertExperiencePlanV800,concertInspectorEvidenceV802]);
+  // V802: publish the matching verified plan/evidence for isolated, consent-only
+  // improvement previews in the QA dashboard. No scene or gain mutation here.
+  useEffect(()=>publishConcertInspectorV801({at:Date.now(),progressMs,
+    playing:isPlaying,report:concertInspectionV801,plan:cinematicShowPlanV790,
+    audit:concertExperiencePlanV800,evidence:concertInspectorEvidenceV802}),
+    [concertInspectionV801,cinematicShowPlanV790,concertExperiencePlanV800,
+      concertInspectorEvidenceV802,progressMs,isPlaying]);
+  const cinematicShowV790=sampleCinematicShowV790(cinematicShowPlanV790,{
+    trackId:track?.id??'',durationMs:track?.durationMs??0,progressMs,playing:isPlaying,
+    enabled:(preferences.smartConcertDirectorEnabledV568??true)&&
+      (preferences.cinematicConcertV761?.enabled??true)&&preferences.visualizerMode==='avatar',
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    strength:preferences.cinematicConcertV761?.strength??65,
+    lyricsProtected:smartConcertV568.lyricsProtected,
+    manualDance:preferences.visualizerMode!=='avatar'||!rapDanceAllowedV437||manualDanceV678||
+      preferences.avatarMotionMode==='choreography'||preferences.avatarTimelineEnabled===true,
+    manualCamera:preferences.visualizerMode!=='avatar'||!!preferences.avatarCameraTimelineV400?.enabled||
+      !!preferences.avatarCameraStudioV398?.enabled||Boolean(track?.id&&
+      preferences.rapCameraKeyframesEnabledV432&&(preferences.rapCameraKeyframesV432??{})[track.id]?.length),
+    manualLighting:preferences.visualizerMode!=='avatar'||preferences.stageReactive===false,
+    narrative:fullSongCueV604,cinematic:cinematicCueV761,pacing:fullSongPacingV671,
+    arc:intelligentArcV679,base:directedDynamicsV681,
+  });
+  // V796: additive Deutschrap phrasing on the existing lyric-timed V437 cue.
+  // Authored singer/camera/motion and manual body/face settings keep priority.
+  // V790 supplies optional verified climax contrast; no inferred adlib identity.
+  const deutschrapCueV796=sampleDeutschrapPerformanceV796({
+    trackId:track?.id??'',positionMs:progressMs,genre,playing:isPlaying,
+    enabled:(preferences.rapAutoPerformanceEnabledV437??true)&&
+      preferences.visualizerMode==='avatar'&&(preferences.smartConcertDirectorEnabledV568??true),
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    lyricsProtected:smartConcertV568.lyricsProtected,
+    manualDance:!rapDanceAllowedV437||manualDanceV678||
+      (preferences.avatarHipDanceModeV735!==undefined&&preferences.avatarHipDanceModeV735!=='auto'),
+    manualVocal:preferences.avatarManualVocalEnabledV385===true||
+      preferences.rapSyllableEditsEnabledV420===true,
+    linePlan:rapPerformancePlanV437,lineCue:rapPerformanceCueV437,
+    show:cinematicShowV790,
+  });
+  const rapPerformanceValuesV796=applyDeutschrapPerformanceV796(
+    rapPerformanceValuesV437,deutschrapCueV796);
+  // V791 uses precisely the V790-confirmed scene. It does not invent timing or
+  // ask renderers to recompute plans; every channel gets the same handoff cue.
+  const seamlessSceneV791=sampleSeamlessSceneTransitionV791(cinematicShowPlanV790,{
+    trackId:track?.id??'',durationMs:track?.durationMs??0,positionMs:progressMs,
+    playing:isPlaying,enabled:(preferences.smartConcertDirectorEnabledV568??true)&&
+      (preferences.cinematicConcertV761?.enabled??true)&&preferences.visualizerMode==='avatar',
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    lyricsProtected:smartConcertV568.lyricsProtected,
+    manualCamera:!!preferences.avatarCameraTimelineV400?.enabled||
+      !!preferences.avatarCameraStudioV398?.enabled||Boolean(track?.id&&
+      preferences.rapCameraKeyframesEnabledV432&&(preferences.rapCameraKeyframesV432??{})[track.id]?.length),
+    manualLighting:preferences.stageReactive===false,
+    show:cinematicShowV790,
+  });
+  // V792 rides on the same VERIFIED V790 scene; no synthetic timing or second
+  // camera. Manual camera controls and lyrics protection always take priority.
+  const smartCameraV792=sampleSmartCameraChoreographyV792(cinematicShowPlanV790,{
+    trackId:track?.id??'',durationMs:track?.durationMs??0,positionMs:progressMs,
+    playing:isPlaying,enabled:(preferences.smartConcertDirectorEnabledV568??true)&&
+      (preferences.cinematicConcertV761?.enabled??true)&&preferences.visualizerMode==='avatar',
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    lyricsProtected:smartConcertV568.lyricsProtected,
+    manualCamera:!!preferences.avatarCameraTimelineV400?.enabled||
+      !!preferences.avatarCameraStudioV398?.enabled||Boolean(track?.id&&
+      preferences.rapCameraKeyframesEnabledV432&&(preferences.rapCameraKeyframesV432??{})[track.id]?.length),
+    show:cinematicShowV790,
+  });
+  // V794: build/suspend/impact/release only from contiguous, verified V790
+  // scenes. Reuses existing automatic gains and V789 fixtures; V670 caps last.
+  const epicPeakV794=sampleEpicPeakMomentsV794(cinematicShowPlanV790,{
+    trackId:track?.id??'',durationMs:track?.durationMs??0,positionMs:progressMs,
+    playing:isPlaying,enabled:(preferences.smartConcertDirectorEnabledV568??true)&&
+      (preferences.cinematicConcertV761?.enabled??true)&&preferences.visualizerMode==='avatar',
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    strength:preferences.cinematicConcertV761?.strength??65,
+    lyricsProtected:smartConcertV568.lyricsProtected,
+    manualDance:preferences.visualizerMode!=='avatar'||!rapDanceAllowedV437||manualDanceV678||
+      preferences.avatarMotionMode==='choreography'||preferences.avatarTimelineEnabled===true,
+    manualCamera:preferences.visualizerMode!=='avatar'||!!preferences.avatarCameraTimelineV400?.enabled||
+      !!preferences.avatarCameraStudioV398?.enabled||Boolean(track?.id&&
+      preferences.rapCameraKeyframesEnabledV432&&(preferences.rapCameraKeyframesV432??{})[track.id]?.length),
+    manualLighting:preferences.visualizerMode!=='avatar'||preferences.stageReactive===false,
+    show:cinematicShowV790,base:cinematicShowV790.dynamics,
+  });
+  // V795: breathe the existing stage architecture with the V790-verified scenes.
+  // This is geometry/depth only; the renderer still checks real light timelines.
+  const stageEvolutionV795=sampleDynamicStageEvolutionV795(cinematicShowPlanV790,{
+    trackId:track?.id??'',durationMs:track?.durationMs??0,positionMs:progressMs,
+    playing:isPlaying,enabled:(preferences.smartConcertDirectorEnabledV568??true)&&
+      (preferences.cinematicConcertV761?.enabled??true)&&preferences.visualizerMode==='avatar'&&
+      (preferences.stageReactive??true),
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    strength:preferences.cinematicConcertV761?.strength??65,
+    lyricsProtected:smartConcertV568.lyricsProtected,
+    vocalFocus:!!cinematicSceneV528?.active,
+    groupCount:Math.max(1,Math.min(4,performerCountV440)),show:cinematicShowV790,
+  });
+  const directedDynamicsV790=epicPeakV794.dynamics;
+
+  // V800: the existing V670 guard remains LAST; V790–V795 continue to own
+  // scene, camera, stage and peak decisions. Only existing automatic gains vary.
+  const manualQualityV670={
+    dance:preferences.visualizerMode!=='avatar'||!rapDanceAllowedV437||
+      preferences.avatarMotionMode==='choreography'||preferences.avatarTimelineEnabled===true,
+    camera:preferences.visualizerMode!=='avatar'||!!preferences.avatarCameraTimelineV400?.enabled||
+      !!preferences.avatarCameraStudioV398?.enabled||Boolean(track?.id&&
+      preferences.rapCameraKeyframesEnabledV432&&(preferences.rapCameraKeyframesV432??{})[track.id]?.length),
+    lighting:preferences.visualizerMode!=='avatar'||preferences.stageReactive===false,
+  };
+  const concertExperienceV800=sampleConcertExperienceV800(concertExperiencePlanV800,{
+    trackId:track?.id??'',durationMs:track?.durationMs??0,positionMs:progressMs,
+    playing:isPlaying,enabled:(preferences.smartConcertDirectorEnabledV568??true)&&
+      (preferences.cinematicConcertV761?.enabled??true)&&preferences.visualizerMode==='avatar',
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    lyricsProtected:smartConcertV568.lyricsProtected,
+    manualDance:manualQualityV670.dance,manualCamera:manualQualityV670.camera,
+    manualLighting:manualQualityV670.lighting,
+    show:cinematicShowV790,handoff:seamlessSceneV791,camera:smartCameraV792,
+    peak:epicPeakV794,stage:stageEvolutionV795,base:directedDynamicsV790,
+  });
+  const directedDynamicsV800=concertExperienceV800.dynamics;
+
+  // V670: post-V669 quality caps on the SAME automatic gain lanes. A diagnostic
+  // flag means intensity pressure, NOT measured visual obstruction or cuts.
+  const showQualityV670=planShowQualityGuardV670({
+    trackId:track?.id??'',durationMs:track?.durationMs??0,progressMs,
+    playing:isPlaying,enabled:(preferences.smartConcertDirectorEnabledV568??true)&&
+      preferences.visualizerMode==='avatar',reducedMotion:preferences.reducedMotion,
+    tier:getActivePerformanceTier(),lyricsProtected:smartConcertV568.lyricsProtected,
+    manualDance:manualQualityV670.dance,manualCamera:manualQualityV670.camera,
+    manualLighting:manualQualityV670.lighting,base:directedDynamicsV800,
+    narrative:{plan:fullSongPlanV604,cue:fullSongCueV604},flow:concertFlowV654,
+  });
+  const directedDynamicsV670=applyShowQualityGuardV670(
+    directedDynamicsV800,showQualityV670,manualQualityV670);
+
   // V610 adjusts only automatically selected motions with genuine labelled cues.
   const concertGenreV610=planGenreConcertV610({
     narrative:{plan:fullSongPlanV604,cue:fullSongCueV604},
@@ -592,6 +910,22 @@ export function VisualizerStage({ lyrics, progressMs = 0, activeIndex = -1, play
     enabled:preferences.smartConcertDirectorEnabledV568??true,
     reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
   }),[concertGroupV604,fullSongPlanV604,preferences.smartConcertDirectorEnabledV568,preferences.reducedMotion,getActivePerformanceTier()]);
+  // V683: refine only the already-generated 3/4-avatar group. A verified
+  // imported section may adjust stage ROOT positions, never singer assignment,
+  // manual formations, choreography clips or V682 camera composition.
+  const ensemblePlanV683=useMemo(()=>planSmartEnsembleV683(sectionPlanV681,
+    multiArtistCastV442.count===4?4:3),[sectionPlanV681,multiArtistCastV442.count]);
+  const concertGroupV683=useMemo(()=>refineSmartEnsembleV683(concertGroupV609,ensemblePlanV683,{
+    enabled:(preferences.smartConcertDirectorEnabledV568??true)&&multiArtistCastV442.enabled,
+    reducedMotion:preferences.reducedMotion,tier:getActivePerformanceTier(),
+    manualProtected:!rapDanceAllowedV437||preferences.avatarManualVocalEnabledV385===true||
+      Boolean(track?.id&&preferences.rapDuetEnabledV416&&
+        (preferences.rapDuetAssignmentsV416??{})[track.id]?.length),
+  }),[concertGroupV609,ensemblePlanV683,preferences.smartConcertDirectorEnabledV568,
+    multiArtistCastV442.enabled,preferences.reducedMotion,rapDanceAllowedV437,
+    preferences.avatarManualVocalEnabledV385,preferences.rapDuetEnabledV416,
+    preferences.rapDuetAssignmentsV416,track?.id]);
+  const ensembleMomentV683=ensembleMomentAtV683(ensemblePlanV683,progressMs);
   const smartShowCueV446=sampleSmartRapShowV446(smartShowPlanV446,progressMs,{
     enabled:smartShowAllowedV446,playing:isPlaying,reducedMotion:preferences.reducedMotion,
     manualProtected:!rapDanceAllowedV437||preferences.avatarManualVocalEnabledV385===true||
@@ -676,7 +1010,7 @@ export function VisualizerStage({ lyrics, progressMs = 0, activeIndex = -1, play
             (continuityV457.quality==="low"?.08:.12)*featureDirectionV460.responseGain)):
       base;
     const motionEnergy=concertDynamicsEnergyV502(
-      concertMotionEnergyV464(concertExperienceV464,directed,energy),directedDynamicsV604);
+      concertMotionEnergyV464(concertExperienceV464,directed,energy),directedDynamicsV670);
     return concertGenreV610.dance===1&&concertContinuityV611.dance===1?motionEnergy:
       Math.min(1,Math.max(0,motionEnergy*concertGenreV610.dance*concertContinuityV611.dance));
   };
@@ -704,14 +1038,91 @@ export function VisualizerStage({ lyrics, progressMs = 0, activeIndex = -1, play
     immersiveLyrics:!!preferences.lyricsImmersiveEnabled&&preferences.visualizerMode==='avatar',
     count:performerCountV440,bubbles:artistBubblePlanV441,feature:featureDirectionV460,
   });
+  // V755 reads the *same* opt-in V466 probe as the quality dashboard.
+  // Updates occur in React effects on distinct ~1Hz measurements, NOT in useFrame.
+  const qualityAutoTuneEnabledV755=useQualityAutoTuneEnabledV755();
+  const qualityProbeV755=useConcertQualityV466();
+  const qualityTuneStatusV755=useQualityAutoTuneStatusV755();
+  const qualityTuneTrackV755=track?.id??'';
+  const qualityTuneAvatarStageV755=preferences.visualizerMode==='avatar';
+  const qualityTuneTierV755=getActivePerformanceTier();
+  useEffect(()=>{
+    const next=advanceQualityTuneV755(getQualityAutoTuneStatusV755(),{
+      enabled:qualityAutoTuneEnabledV755,playing:isPlaying,
+      reducedMotion:preferences.reducedMotion,avatarStage:qualityTuneAvatarStageV755,
+      trackId:qualityTuneTrackV755,expectedAvatars:performerCountV440,
+      visual:assessVisualQualityV754(qualityProbeV755,Date.now()).status,
+      probe:qualityProbeV755,now:Date.now(),
+    });
+    publishQualityAutoTuneV755(next);
+  },[qualityAutoTuneEnabledV755,qualityProbeV755,qualityTuneTrackV755,
+    qualityTuneAvatarStageV755,isPlaying,preferences.reducedMotion,performerCountV440,
+    qualityTuneTierV755]);
+  const autoTuneV755=effectiveQualityTuneV755(qualityTuneStatusV755,{
+    enabled:qualityAutoTuneEnabledV755,playing:isPlaying,
+    reducedMotion:preferences.reducedMotion,avatarStage:qualityTuneAvatarStageV755,
+    trackId:qualityTuneTrackV755,now:Date.now(),
+  });
+  // V750: a single track-clock-based quality envelope across the existing
+  // five automatic show layers; manual stages and authored assets keep priority.
+  const qualityV750=planIntegratedConcertQualityV750({
+    settings:preferences.concertQualityV750,trackId:track?.id??"",
+    durationMs:track?.durationMs??0,progressMs,playing:isPlaying,
+    reducedMotion:preferences.reducedMotion,section:directedSection,
+    tier:getActivePerformanceTier(),ensembleCount:performerCountV440,
+    lyricVisible:preferences.lyricsVisible===true&&activeIndex>=0&&Boolean(lyrics?.lines?.[activeIndex]?.text?.trim()),
+    lyricSynced:lyrics?.synced===true,
+    activeLineLength:[...(lyrics?.lines?.[activeIndex]?.text??"")].length,
+    verifiedVocal:cinematicSceneV528?.active===true&&cinematicSceneV528.trackId===track?.id,
+    manualDance:manualQualityV670.dance||manualDanceV678||
+      (preferences.avatarHipDanceModeV735!==undefined&&
+       preferences.avatarHipDanceModeV735!=="auto"),
+    manualCamera:manualQualityV670.camera,manualLighting:manualQualityV670.lighting,
+    repeatedAct:showQualityV670.verified&&showQualityV670.repeatedAct,
+  });
+  // V751 – read-only live status from the SAME V750 plan that will be passed
+  // to the real automatic camera, lighting, lyrics and avatar modules below.
+  // No new audio or animation sample; the store throttles unchanged snapshots.
+  useEffect(()=>{
+    const report=buildConcertDashboardV751({
+      now:Date.now(),playing:isPlaying,avatarStage:preferences.visualizerMode==='avatar',
+      section:directedSection??null,count:performerCountV440,quality:qualityV750,
+      qualityEnabled:preferences.concertQualityV750?.enabled??true,
+      danceEnabled:normalizeSmartHipV744(preferences.avatarSmartHipV744).enabled,
+      ensembleEnabled:normalizeEnsembleHipV745(preferences.avatarEnsembleHipV745).enabled,
+      vocalEnabled:normalizeVocalPerformanceV746(preferences.avatarVocalPerformanceV746).enabled,
+      cameraEnabled:normalizePerformanceCameraV747(preferences.avatarPerformanceCameraV747).enabled,
+      lyricsEnabled:normalizeLyricsPerformanceV748(preferences.lyricsPerformanceV748).enabled,
+      lightingEnabled:normalizePerformanceLightingV749(preferences.avatarPerformanceLightingV749).enabled,
+      lyricsVisible:preferences.lyricsVisible===true&&activeIndex>=0&&
+        Boolean(lyrics?.lines?.[activeIndex]?.text?.trim()),lyricsSynced:lyrics?.synced===true,
+      verifiedVocal:cinematicSceneV528?.active===true&&cinematicSceneV528.trackId===track?.id,
+      manualDance:manualQualityV670.dance||manualDanceV678||
+        (preferences.avatarHipDanceModeV735!==undefined&&preferences.avatarHipDanceModeV735!=='auto'),
+      manualCamera:manualQualityV670.camera,manualLighting:manualQualityV670.lighting,
+      reducedMotion:preferences.reducedMotion,
+    });
+    publishConcertDashboardV751(report);
+  });
+  const cameraSettingsV750=normalizePerformanceCameraV747(preferences.avatarPerformanceCameraV747);
+  const lightingSettingsV750=normalizePerformanceLightingV749(preferences.avatarPerformanceLightingV749);
+  const lyricsSettingsV750=normalizeLyricsPerformanceV748(preferences.lyricsPerformanceV748);
+  const coordinatedCameraV750={...cameraSettingsV750,
+    strength:scaleAutomaticPercentV750(cameraSettingsV750.strength,applyTuneMultiplierV755(qualityV750.camera,manualQualityV670.camera?1:autoTuneV755.camera))};
+  const coordinatedLightingV750={...lightingSettingsV750,
+    strength:scaleAutomaticPercentV750(lightingSettingsV750.strength,applyTuneMultiplierV755(qualityV750.lighting,manualQualityV670.lighting?1:autoTuneV755.lighting))};
+  const coordinatedLyricsV750={...lyricsSettingsV750,
+    readability:strengthenReadabilityV750(lyricsSettingsV750.readability,qualityV750.readabilityBonus),
+    wordAccent:scaleAutomaticPercentV750(lyricsSettingsV750.wordAccent,applyTuneMultiplierV755(qualityV750.lyricsAccent,autoTuneV755.lyricsAccent)),
+    hookAccent:scaleAutomaticPercentV750(lyricsSettingsV750.hookAccent,applyTuneMultiplierV755(qualityV750.lyricsAccent,autoTuneV755.lyricsAccent))};
   // V443 visual direction is inferred only for the *automatic* V442 group.
   // Stored V416 vocal assignments and manual vocal control retain priority.
-  const artistSpotlightPoseV443=concertGroupV609&&multiArtistCastV442.enabled?
-    evaluateGroupV326(concertGroupV609,Math.max(0,progressMs)/1000):null;
-  const artistSpotlightCueAtV443=concertGroupV609?.cues.find(c=>c.id===artistSpotlightPoseV443?.cueId)?.at??0;
+  const artistSpotlightPoseV443=concertGroupV683&&multiArtistCastV442.enabled?
+    evaluateGroupV326(concertGroupV683,Math.max(0,progressMs)/1000):null;
+  const artistSpotlightCueAtV443=concertGroupV683?.cues.find(c=>c.id===artistSpotlightPoseV443?.cueId)?.at??0;
   const artistSpotlightV443=featureSpotlightV460(planArtistSpotlightV443({pose:artistSpotlightPoseV443,
     count:performerCountV440,seconds:progressMs/1000,cueAt:artistSpotlightCueAtV443,
-    enabled:(preferences.rapArtistSpotlightEnabledV443??true)&&!!concertGroupV609,
+    enabled:(preferences.rapArtistSpotlightEnabledV443??true)&&!!concertGroupV683,
     playing:isPlaying,reducedMotion:preferences.reducedMotion,
     manualPriority:artistBubblePlanV441.source==="manual-stage"||
       !!preferences.avatarManualVocalEnabledV385,
@@ -792,6 +1203,8 @@ export function VisualizerStage({ lyrics, progressMs = 0, activeIndex = -1, play
   const inCanvas = immersive && preferences.visualizerMode === "avatar";
   const lyricsScene: VisualizerProps["lyricsScene"] = inCanvas && lyrics ? {
     lyrics, progressMs, activeIndex, playing, side, depth, avatarCountV477:performerCountV440,
+    performanceV748:coordinatedLyricsV750, sectionV748:directedSection,
+    cameraFocusV748:cinematicSceneV528?.active===true,
     colorFrom: preferences.lyricsGradientFrom ?? "#79f7ff",
     colorTo: preferences.lyricsGradientTo ?? "#d789ff",
     intensity: preferences.lyricsAnimationIntensity ?? 65,
@@ -806,16 +1219,16 @@ export function VisualizerStage({ lyrics, progressMs = 0, activeIndex = -1, play
     kineticDropsV382:preferences.lyricsKineticDropsV382??true,genreV382:genre??"",
     concertLyricAccentV502:directedDynamicsV604.lyrics,cinematicSceneV528,
   } : undefined;
-  return <section className={`immersive-stage ${immersive && (preferences.avatarLyricsCameraModeV378??"off")!=="off" ? "v378-lyrics-stage" : ""} ${immersive && !inCanvas ? "immersive-active" : ""} ${inCanvas ? "immersive-webgl" : ""} immersive-side-${side}`} style={{ "--immersive-depth": depth / 100 } as CSSProperties} aria-label={`${definition.label} visualization`} data-v456-moment={ultimateShowV456.moment} data-v457-quality={continuityV457.quality} data-v460-moment={featureDirectionV460.moment} data-v464-act={concertExperienceV464.act} data-v568-mode={smartConcertV568.mode} data-v568-evidence={smartConcertV568.evidence} data-v568-focus={smartConcertV568.focusSlot??"none"} data-v568-lyrics-protected={smartConcertV568.lyricsProtected?"yes":"no"} data-v502-genre={dynamicsV502.genre} data-v502-section-source={dynamicsV502.evidence} data-v478-shot={concertExperienceV464.visualV478.shot} data-v464-breathing={concertExperienceV464.breathing ? "yes" : "no"} data-v465-visual-mode={visualQualityV465.mode} data-v465-visible-labels={visualQualityV465.visibleLabels} data-v604-chapter={fullSongCueV604.chapter??"unclassified"} data-v604-motif={fullSongCueV604.motif??"none"} data-v604-act={fullSongCueV604.active?fullSongCueV604.act:-1} data-v629-beat={concertStoryV629.beat??"off"} data-v629-emphasis={concertStoryV629.emphasis??"off"} data-v629-hook={concertStoryV629.hookIndex} data-v628-moment={concertExperienceV628.moment} data-v628-motif={concertExperienceV628.motif??"none"} data-v628-repetition={concertExperienceV628.repetition} data-v642-focus={concertEditionV642.focus} data-v642-lane={concertEditionV642.leadLane} data-v642-act={concertEditionV642.act} data-v623-priority={concertDramaturgyV623.priority} data-v623-act={concertDramaturgyV623.act} data-v611-story={concertContinuityV611.moment} data-v611-act={concertContinuityV611.act} data-v611-repetition={concertContinuityV611.repetition} data-v641-track-id={track?.id??""} data-v641-duration-ms={track?.durationMs??0} data-v641-progress-ms={progressMs} data-v641-playing={isPlaying?"yes":"no"} data-v592-live-stage="true"><LiveStageDomProbeV592 trackId={track?.id??""} durationMs={track?.durationMs??0} progressMs={progressMs} playing={isPlaying} activeIndex={activeIndex} lyricsPresent={Boolean(lyrics?.lines?.length)} lyricsSynced={lyrics?.synced===true}/><Mode lipSync={{cinematicSceneV528,concertCameraArmedV454:smartShowAllowedV446&&!!track?.id,concertCameraCueV454:(featureDirectionV460.cameraCue??(ultimateShowV456.active?ultimateShowV456.cameraCue:smartShowCueV446))??undefined,concertCameraCastCountV454:performerCountV440,rapCameraCueV429,rapCameraArmedV429,rapCameraEnabledV429:preferences.rapCameraEnabledV429??false,rapCameraStrengthV429:preferences.rapCameraStrengthV429??65,rapCameraOverridesV430:rapCameraEditsV436, rapCameraTransitionsEnabledV433:(preferences.rapCameraTransitionsEnabledV433??false)||rapAutoFixActiveV436,rapCameraBeatSyncV433:rapAutoFixActiveV436?rapAutoFixPlanV436.settings.beatSync:(preferences.rapCameraBeatSyncV433??true),rapCameraTransitionSmoothnessV433:rapAutoFixActiveV436?rapAutoFixPlanV436.settings.smoothness:(preferences.rapCameraTransitionSmoothnessV433??55),rapCameraBpmV433:audio.bpm,rapCameraKickV433:audio.kickAccentIntensity??0,concertEnergyV610:audio.energyEnvelope??0,multiArtistCastCountV442:multiArtistCastV442.enabled?performerCountV440:undefined,rapCameraKeyframesEnabledV432:preferences.rapCameraKeyframesEnabledV432??false,rapCameraKeyframesV432:track?.id?(preferences.rapCameraKeyframesV432??{})[track.id]??[]:[], vocalCameraModeV401:preferences.avatarVocalCameraModeV401??"off",vocalCameraStrengthV401:preferences.avatarVocalCameraStrengthV401??55,cameraStudioV398:preferences.avatarCameraStudioV398,cameraTimelineV400:preferences.avatarCameraTimelineV400,visualDirectorModeV397:preferences.avatarVisualDirectorModeV397??"off",visualDirectorStrengthV397:preferences.avatarVisualDirectorStrengthV397??65,visualDirectorTierV397:getActivePerformanceTier(),performanceModeV393:chooseExperienceModeV396(preferences.avatarVocalPerformanceModeV393??"off",sharedExperienceCueV402.vocalMode,sharedExperienceCueV402),performanceStrengthV393:preferences.avatarVocalPerformanceModeV393&&preferences.avatarVocalPerformanceModeV393!=="off"?(preferences.avatarVocalPerformanceStrengthV393??55):sharedExperienceCueV402.active?Math.round(60*sharedExperienceCueV402.vocalGain):preferences.avatarVocalPerformanceStrengthV393??55,expressiveFaceEnabledV390:preferences.avatarExpressiveFaceEnabledV390??false,expressiveFaceStrengthV390:preferences.avatarExpressiveFaceStrengthV390??45,reducedMotionV390:preferences.reducedMotion,lyrics: lyrics ?? null,progressMs,playing,enabled:(preferences.avatarLipSyncEnabled ?? true) && !preferences.reducedMotion,strength:rapLipStrengthV408(preferences.avatarLipSyncStrength ?? 90,preferences.rapPerformanceEditorV408),mode:preferences.avatarLipSyncMode ?? "lyrics",style:rapPerformanceCueV437.active&&(preferences.avatarVocalStyleV368??"auto")==="auto"?"rap":preferences.avatarVocalStyleV368??"auto",expression:rapPerformanceValuesV437.face,jawFollowV369:preferences.avatarJawFollowV369 ?? 65,profilesV370:preferences.avatarFacialProfilesV370 ?? {},cameraModeV369:preferences.avatarVocalCameraV369 ?? "auto",cameraStrengthV369:preferences.avatarVocalCameraStrengthV369 ?? 55,bodyEnabledV371:preferences.avatarVocalBodyEnabledV371 ?? true,bodyStrengthV371:rapPerformanceValuesV437.gesture,eyeContactV371:preferences.avatarVocalEyeContactV371 ?? true,gesturesV371:preferences.avatarVocalGesturesV371 ?? true,coordinationEnabledV372:preferences.avatarVocalCoordinationEnabledV372 ?? true,coordinationStrengthV372:preferences.avatarVocalCoordinationStrengthV372 ?? 70,coordinationOffsetMsV372:preferences.avatarVocalCoordinationOffsetMsV372 ?? 0,qualityEnabledV374:preferences.avatarVocalQualityEnabledV374 ?? true,mouthSmoothnessV374:preferences.avatarVocalMouthSmoothnessV374 ?? 65,rapLipEnabledV415:rapPerformanceValuesV437.rapLip,rapLipPrecisionV415:preferences.avatarRapLipPrecisionV415??70,rapSyllableEnabledV419:preferences.avatarRapSyllableEnabledV419??false,rapSyllableStrengthV419:preferences.avatarRapSyllableStrengthV419??65,rapSyllableSmoothnessV419:preferences.avatarRapSyllableSmoothnessV419??70,rapSyllableEditsEnabledV420:preferences.rapSyllableEditsEnabledV420??false,rapSyllableTrackIdV420:track?.id??"",rapSyllableDocumentV420:track?.id?(preferences.rapSyllableDocumentsV420??{})[track.id]??null:null,rapAudioEnabledV423:preferences.rapAudioEnabledV423??false,rapAudioStrengthV423:preferences.rapAudioStrengthV423??45,rapAudioOffsetMsV423:preferences.rapAudioOffsetMsV423??0,rapAudioTrackIdV423:track?.id??"",rapAudioDocumentV423:track?.id?(preferences.rapAudioDocumentsV423??{})[track.id]??null:null,rapLipOffsetMsV415:preferences.rapTimingLiveEnabledV418?preferences.rapTimingOffsetsV418?.mouthMs??0:preferences.avatarRapLipOffsetMsV415??0,rapGestureCalmV374:preferences.avatarVocalRapGestureCalmV374 ?? 70,naturalArticulationEnabledV384:preferences.avatarNaturalArticulationEnabledV384 ?? true,articulationStrengthV384:preferences.avatarArticulationStrengthV384 ?? 70,lipSealV384:preferences.avatarLipSealV384 ?? 90,jawStabilityV384:preferences.avatarJawStabilityV384 ?? 65,ensembleModeV374:preferences.avatarVocalEnsembleModeV374 ?? "lead",performanceModeV375:preferences.avatarAdaptivePerformanceModeV375 ?? "off",performanceStrengthV375:preferences.avatarAdaptivePerformanceStrengthV375 ?? 65,concertModeV386:preferences.avatarConcertDirectorModeV386??"off",concertStrengthV386:preferences.avatarConcertDirectorStrengthV386??65,concertCameraV386:preferences.avatarConcertDirectorCameraV386??true,concertLightingV386:preferences.avatarConcertDirectorLightingV386??true,rapTimingLiveEnabledV418:preferences.rapTimingLiveEnabledV418??false,rapRoleOffsetMsV418:preferences.rapTimingOffsetsV418?.roleMs??0,rapDuetEnabledV416:preferences.rapDuetEnabledV416??false,rapDuetCameraV416:preferences.rapDuetCameraV416??true,rapDuetTrackIdV416:track?.id,rapDuetAssignmentsV416:track?.id?(preferences.rapDuetAssignmentsV416??{})[track.id]??[]:[],vocalTimeEnabledV496:preferences.vocalTimeEnabledV496??false,vocalTimeTrackIdV496:track?.id??"",vocalTimeSegmentsV496:track?.id?(preferences.vocalTimeSegmentsV496??{})[track.id]??[]:[],manualVocalEnabledV385:preferences.avatarManualVocalEnabledV385??false,manualVocalCameraV385:preferences.avatarManualVocalCameraV385??true,manualVocalAssignmentsV385:track?.id?(preferences.avatarVocalAssignmentsV385??{})[track.id]??[]:[],manualVocalTrackIdV385:track?.id,duetModeV376:preferences.avatarVocalDuetModeV376??"off",duetStrengthV376:preferences.avatarVocalDuetStrengthV376??60,cinematicDuetCameraModeV377:preferences.avatarDuetCameraModeV377??"off",cinematicDuetCameraStrengthV377:preferences.avatarDuetCameraStrengthV377??65,cinematicLyricsModeV378:preferences.avatarLyricsCameraModeV378??"off",cinematicLyricsStrengthV378:preferences.avatarLyricsCameraStrengthV378??70,cinematicLyricsSideV378:immersive?side:null,cinematicLyricsVisibleV378:immersive,}} concertDetailsV555={{enabled:preferences.concertDetailEnabledV555??DEFAULT_CONCERT_DETAILS_V555.enabled,gobo:preferences.concertGoboV555??true,pixelWall:preferences.concertPixelWallV555??true,floorFog:preferences.concertFloorFogV555??true,duetArc:preferences.concertDuetArcV555??true,adlibEcho:preferences.concertAdlibEchoV555??true,hookProjection:preferences.concertHookProjectionV555??true,rhymeAccent:preferences.concertRhymeAccentV555??true,strength:preferences.concertDetailStrengthV555??45,avatarLight:preferences.concertAvatarLightV557??true,avatarLightStrength:preferences.concertAvatarLightStrengthV557??55,portraitLight:preferences.concertPortraitLightV558??true,portraitWarmth:preferences.concertPortraitWarmthV558??52,beatPortraitLight:preferences.concertBeatPortraitLightV559??true,beatPortraitStrength:preferences.concertBeatPortraitStrengthV559??45,cinematicFaceLightV566:preferences.concertCinematicFaceLightV566??true,cinematicFaceStrengthV566:preferences.concertCinematicFaceStrengthV566??50}} lyricsScene={lyricsScene} lyricsSignalV350={{active:!!preferences.lyricsVisible&&hasActiveLyricsV350(lyrics,activeIndex,progressMs),side:immersive?side:null}} audio={audio} track={track} isPlaying={isPlaying} reducedMotion={preferences.reducedMotion} genre={genre} genreFusion={genreFusion} avatarModelUrl={preferences.visualizerMode === "avatar" ? avatarModelUrl : null} avatarModelId={selectedAvatarId} multiAvatarMode={effectiveMultiModeV440} duoDirectorEnabled={preferences.duoDirectorEnabled ?? false} partnerContactCalibration={preferences.partnerContactCalibration} secondaryContactCalibration={preferences.secondaryContactCalibration} secondaryAvatarModelId={secondaryAvatarId} secondaryAvatarModelUrl={secondaryAvatar.url} secondaryAvatarAnimationUrl={secondaryAvatar.animationUrl} secondaryAvatarSharedMotionUrlV531={secondaryAvatar.sharedMotionUrl} preferredMotionUrlV440={autoChoreoV440?smartMotionV438.url:undefined} secondaryPreferredMotionUrlV440={autoChoreoV440&&featureCastV440.enabled?secondaryMotionV440.url:undefined} artistBubblePlanV441={visualQualityV465.bubbles} artistSpotlightV443={artistSpotlightV443} featureDirectionV460={featureDirectionV460} artistInteractionEnabledV444={preferences.rapArtistInteractionEnabledV444??true} artistInteractionStrengthV444={Math.min(100,Math.round((preferences.rapArtistInteractionStrengthV444??60)*ultimateShowV456.interactionMultiplier))} vocalChangeEnabledV445={preferences.rapVocalChangeEnabledV445??true} vocalChangeSensitivityV445={preferences.rapVocalChangeSensitivityV445??60} vocalChangeMicrophoneActiveV445={microphoneActiveV445} autoMultiArtistGroupV442={concertGroupV609} multiArtistMotionsV442={multiArtistCastV442.enabled&&autoChoreoV440?[smartMotionV438.url,secondaryMotionV440.url,...extraMotionsV442]:undefined} secondaryDancePreset={preferences.secondaryDancePreset ?? "auto"} avatarAnimationUrl={preferences.visualizerMode === "avatar" ? avatarAnimationUrl : null} avatarSharedMotionUrlV531={preferences.visualizerMode === "avatar" ? avatarModel.sharedMotionUrl : null} avatarScale={preferences.avatarScale} avatarOffsetY={preferences.avatarOffsetY} avatarAnimationIntensity={concertDynamicsPercentV502(rapPerformanceValuesV437.intensity,directedDynamicsV604.dance)*(motionStore.automatic?concertGenreV610.dance:1)*(motionStore.automatic?concertContinuityV611.dance:1)*(motionStore.automatic?concertDramaturgyV623.dance:1)} danceAggression={rapPerformanceValuesV437.aggression} danceVariation={rapPerformanceValuesV437.variation} danceMotionStyle={rapPerformanceValuesV437.style} avatarMotionMode={preferences.avatarMotionMode} smartDanceEnabled={preferences.smartDanceEnabled} smartDanceOverride={preferences.smartDanceOverride} avatarClipSpeed={preferences.avatarClipSpeed} avatarBlendEnabled={preferences.avatarBlendEnabled} avatarBlendClip={preferences.avatarBlendClip} avatarBlendWeight={preferences.avatarBlendWeight} avatarBlendAutoEnergy={preferences.avatarBlendAutoEnergy} avatarBlendBpmSync={preferences.avatarBlendBpmSync} avatarBlendReferenceBpm={preferences.avatarBlendReferenceBpm} avatarBlendSmoothing={preferences.avatarBlendSmoothing} avatarBlendCurve={preferences.avatarBlendCurve} avatarBlendSpeed={preferences.avatarBlendSpeed} avatarBlendMask={preferences.avatarBlendMask ?? "full"} avatarCrossfadeSeconds={preferences.avatarCrossfadeSeconds} avatarArmResponse={preferences.avatarArmResponse} avatarLegResponse={preferences.avatarLegResponse} avatarFootIKEnabled={preferences.avatarFootIKEnabled} avatarFootIKStrength={preferences.avatarFootIKStrength} avatarFootIKContact={preferences.avatarFootIKContact} avatarFootIKLock={preferences.avatarFootIKLock} stagePalette={stageContentV330.musicPalette??stagePalette} stageScreenV330={stageContentV330.item} stageScreensV333={screenLayoutV333.screens} stageLayoutEnabledV333={screenLayoutV333.enabled} stageSlidesV333={stageContentV330.slides} stageLivePushV333={stageContentV330.livePush} stageRotationIndexV333={stageContentV330.rotationIndex} stageScreenSettingsV330={stageContentV330.settings} stageTheme={directedStage} showCue={showEnabled ? directedShowCue : undefined} concertShowCueV387={concertShowCueV387} festivalShowCueV394={festivalShowCueV394} experienceCueV396={sharedExperienceCueV402}
+  return <section className={`immersive-stage ${immersive && (preferences.avatarLyricsCameraModeV378??"off")!=="off" ? "v378-lyrics-stage" : ""} ${immersive && !inCanvas ? "immersive-active" : ""} ${inCanvas ? "immersive-webgl" : ""} immersive-side-${side}`} style={{ "--immersive-depth": depth / 100 } as CSSProperties} aria-label={`${definition.label} visualization`} data-v456-moment={ultimateShowV456.moment} data-v457-quality={continuityV457.quality} data-v460-moment={featureDirectionV460.moment} data-v464-act={concertExperienceV464.act} data-v568-mode={smartConcertV568.mode} data-v568-evidence={smartConcertV568.evidence} data-v568-focus={smartConcertV568.focusSlot??"none"} data-v568-lyrics-protected={smartConcertV568.lyricsProtected?"yes":"no"} data-v502-genre={dynamicsV502.genre} data-v502-section-source={dynamicsV502.evidence} data-v478-shot={concertExperienceV464.visualV478.shot} data-v464-breathing={concertExperienceV464.breathing ? "yes" : "no"} data-v755-level={autoTuneV755.active?autoTuneV755.level:"off"} data-v755-visual-guard={autoTuneV755.visualGuard?"yes":"no"} data-v750-mode={qualityV750.mode} data-v750-reason={qualityV750.reason} data-v750-pressure={qualityV750.pressure} data-v465-visual-mode={visualQualityV465.mode} data-v465-visible-labels={visualQualityV465.visibleLabels} data-v796-phrase={deutschrapCueV796.phrase} data-v796-source={deutschrapCueV796.source} data-v795-mode={stageEvolutionV795.mode} data-v795-scene={stageEvolutionV795.sceneIndex} data-v794-phase={epicPeakV794.phase} data-v794-level={epicPeakV794.intensity} data-v794-evidence={epicPeakV794.active?"verified-show":"off"} data-v792-move={smartCameraV792.move} data-v792-scene={smartCameraV792.sceneIndex} data-v792-evidence={smartCameraV792.reason} data-v791-edge={seamlessSceneV791.edge} data-v791-scene={seamlessSceneV791.sceneIndex} data-v791-kind={seamlessSceneV791.kind} data-v800-state={concertExperiencePlanV800.source} data-v800-moment={concertExperienceV800.moment} data-v800-coverage={concertExperiencePlanV800.coverage} data-v800-issues={concertExperiencePlanV800.issues.join(",")||"none"} data-v800-scene={concertExperienceV800.sceneIndex} data-v790-moment={cinematicShowV790.moment??"off"} data-v790-scene={cinematicShowV790.sceneIndex} data-v790-peak={cinematicShowPlanV790.peakAct} data-v790-evidence={cinematicShowV790.reason} data-v761-scene={cinematicCueV761.intent??"off"} data-v761-act={cinematicCueV761.actIndex} data-v761-evidence={cinematicCueV761.reason} data-v604-chapter={fullSongCueV604.chapter??"unclassified"} data-v604-motif={fullSongCueV604.motif??"none"} data-v604-act={fullSongCueV604.active?fullSongCueV604.act:-1} data-v669-style={universalShowV669.style} data-v669-evidence={universalShowV669.evidence} data-v670-quality={showQualityV670.active?"guarded":"off"} data-v670-flags={showQualityV670.flags.join(",")||"none"} data-v670-confirmed={showQualityV670.verified?"yes":"no"} data-v669-chapter={universalShowV669.chapter} data-v671-evidence={fullSongPacingV671.evidence} data-v671-intent={fullSongPacingV671.intent} data-v671-beat={fullSongPacingV671.beatIndex} data-v671-high-point={fullSongPacingPlanV671.highPointIndex} data-v679-source={intelligentArcPlanV679.source} data-v679-role={intelligentArcV679.role??"none"} data-v679-main-peak={intelligentArcPlanV679.peakIndex} data-v681-evidence={sectionCueV681.evidence} data-v681-section={sectionCueV681.section??"none"} data-v681-flavor={sectionCueV681.flavor??"none"} data-v683-source={ensemblePlanV683.source} data-v683-mode={concertGroupV683&&multiArtistCastV442.enabled&&isPlaying&&ensembleMomentV683?ensembleMomentV683.mode:"off"} data-v654-flow={concertFlowV654.phase} data-v654-act={concertFlowV654.act} data-v654-motif={concertFlowV654.motif??"none"} data-v629-beat={concertStoryV629.beat??"off"} data-v629-emphasis={concertStoryV629.emphasis??"off"} data-v629-hook={concertStoryV629.hookIndex} data-v628-moment={concertExperienceV628.moment} data-v628-motif={concertExperienceV628.motif??"none"} data-v628-repetition={concertExperienceV628.repetition} data-v642-focus={concertEditionV642.focus} data-v642-lane={concertEditionV642.leadLane} data-v642-act={concertEditionV642.act} data-v623-priority={concertDramaturgyV623.priority} data-v623-act={concertDramaturgyV623.act} data-v611-story={concertContinuityV611.moment} data-v611-act={concertContinuityV611.act} data-v611-repetition={concertContinuityV611.repetition} data-v641-track-id={track?.id??""} data-v641-duration-ms={track?.durationMs??0} data-v641-progress-ms={progressMs} data-v641-playing={isPlaying?"yes":"no"} data-v678-mood={moodAllowedV678?(liveMoodV678.mood??"pending"):"off"} data-v678-source={audioActive?"live-microphone":"unavailable"} data-v592-live-stage="true"><LiveStageDomProbeV592 trackId={track?.id??""} durationMs={track?.durationMs??0} progressMs={progressMs} playing={isPlaying} activeIndex={activeIndex} lyricsPresent={Boolean(lyrics?.lines?.length)} lyricsSynced={lyrics?.synced===true}/><Mode lipSync={{cinematicSceneV528,concertCameraArmedV454:smartShowAllowedV446&&!!track?.id,concertCameraCueV454:(featureDirectionV460.cameraCue??(ultimateShowV456.active?ultimateShowV456.cameraCue:smartShowCueV446))??undefined,concertCameraCastCountV454:performerCountV440,rapCameraCueV429,rapCameraArmedV429,rapCameraEnabledV429:preferences.rapCameraEnabledV429??false,rapCameraStrengthV429:preferences.rapCameraStrengthV429??65,rapCameraOverridesV430:rapCameraEditsV436, rapCameraTransitionsEnabledV433:(preferences.rapCameraTransitionsEnabledV433??false)||rapAutoFixActiveV436,rapCameraBeatSyncV433:rapAutoFixActiveV436?rapAutoFixPlanV436.settings.beatSync:(preferences.rapCameraBeatSyncV433??true),rapCameraTransitionSmoothnessV433:rapAutoFixActiveV436?rapAutoFixPlanV436.settings.smoothness:(preferences.rapCameraTransitionSmoothnessV433??55),rapCameraBpmV433:audio.bpm,rapCameraKickV433:audio.kickAccentIntensity??0,concertEnergyV610:audio.energyEnvelope??0,multiArtistCastCountV442:multiArtistCastV442.enabled?performerCountV440:undefined,rapCameraKeyframesEnabledV432:preferences.rapCameraKeyframesEnabledV432??false,rapCameraKeyframesV432:track?.id?(preferences.rapCameraKeyframesV432??{})[track.id]??[]:[], performanceCameraV747:coordinatedCameraV750,qualityDanceGainV750:applyTuneMultiplierV755(qualityV750.dance,(manualQualityV670.dance||manualDanceV678||(preferences.avatarHipDanceModeV735!==undefined&&preferences.avatarHipDanceModeV735!=="auto"))?1:autoTuneV755.dance),qualityVocalGainV750:applyTuneMultiplierV755(qualityV750.vocal,autoTuneV755.vocal),vocalCameraModeV401:preferences.avatarVocalCameraModeV401??"off",vocalCameraStrengthV401:preferences.avatarVocalCameraStrengthV401??55,cameraStudioV398:preferences.avatarCameraStudioV398,cameraTimelineV400:preferences.avatarCameraTimelineV400,visualDirectorModeV397:preferences.avatarVisualDirectorModeV397??"off",visualDirectorStrengthV397:preferences.avatarVisualDirectorStrengthV397??65,visualDirectorTierV397:getActivePerformanceTier(),performanceModeV393:chooseExperienceModeV396(preferences.avatarVocalPerformanceModeV393??"off",sharedExperienceCueV402.vocalMode,sharedExperienceCueV402),performanceStrengthV393:preferences.avatarVocalPerformanceModeV393&&preferences.avatarVocalPerformanceModeV393!=="off"?(preferences.avatarVocalPerformanceStrengthV393??55):sharedExperienceCueV402.active?Math.round(60*sharedExperienceCueV402.vocalGain):preferences.avatarVocalPerformanceStrengthV393??55,expressiveFaceEnabledV390:preferences.avatarExpressiveFaceEnabledV390??false,expressiveFaceStrengthV390:preferences.avatarExpressiveFaceStrengthV390??45,reducedMotionV390:preferences.reducedMotion,lyrics: lyrics ?? null,progressMs,playing,enabled:(preferences.avatarLipSyncEnabled ?? true) && !preferences.reducedMotion,strength:rapLipStrengthV408(preferences.avatarLipSyncStrength ?? 90,preferences.rapPerformanceEditorV408),mode:preferences.avatarLipSyncMode ?? "lyrics",style:rapPerformanceCueV437.active&&(preferences.avatarVocalStyleV368??"auto")==="auto"?"rap":preferences.avatarVocalStyleV368??"auto",expression:rapPerformanceValuesV796.face,jawFollowV369:preferences.avatarJawFollowV369 ?? 65,profilesV370:preferences.avatarFacialProfilesV370 ?? {},cameraModeV369:preferences.avatarVocalCameraV369 ?? "auto",cameraStrengthV369:preferences.avatarVocalCameraStrengthV369 ?? 55,bodyEnabledV371:preferences.avatarVocalBodyEnabledV371 ?? true,bodyStrengthV371:rapPerformanceValuesV796.gesture,eyeContactV371:preferences.avatarVocalEyeContactV371 ?? true,gesturesV371:preferences.avatarVocalGesturesV371 ?? true,coordinationEnabledV372:preferences.avatarVocalCoordinationEnabledV372 ?? true,coordinationStrengthV372:preferences.avatarVocalCoordinationStrengthV372 ?? 70,coordinationOffsetMsV372:preferences.avatarVocalCoordinationOffsetMsV372 ?? 0,qualityEnabledV374:preferences.avatarVocalQualityEnabledV374 ?? true,mouthSmoothnessV374:preferences.avatarVocalMouthSmoothnessV374 ?? 65,rapLipEnabledV415:rapPerformanceValuesV437.rapLip,rapLipPrecisionV415:preferences.avatarRapLipPrecisionV415??70,rapSyllableEnabledV419:preferences.avatarRapSyllableEnabledV419??false,rapSyllableStrengthV419:preferences.avatarRapSyllableStrengthV419??65,rapSyllableSmoothnessV419:preferences.avatarRapSyllableSmoothnessV419??70,rapSyllableEditsEnabledV420:preferences.rapSyllableEditsEnabledV420??false,rapSyllableTrackIdV420:track?.id??"",rapSyllableDocumentV420:track?.id?(preferences.rapSyllableDocumentsV420??{})[track.id]??null:null,rapAudioEnabledV423:preferences.rapAudioEnabledV423??false,rapAudioStrengthV423:preferences.rapAudioStrengthV423??45,rapAudioOffsetMsV423:preferences.rapAudioOffsetMsV423??0,rapAudioTrackIdV423:track?.id??"",rapAudioDocumentV423:track?.id?(preferences.rapAudioDocumentsV423??{})[track.id]??null:null,rapLipOffsetMsV415:preferences.rapTimingLiveEnabledV418?preferences.rapTimingOffsetsV418?.mouthMs??0:preferences.avatarRapLipOffsetMsV415??0,rapGestureCalmV374:preferences.avatarVocalRapGestureCalmV374 ?? 70,naturalArticulationEnabledV384:preferences.avatarNaturalArticulationEnabledV384 ?? true,articulationStrengthV384:preferences.avatarArticulationStrengthV384 ?? 70,lipSealV384:preferences.avatarLipSealV384 ?? 90,jawStabilityV384:preferences.avatarJawStabilityV384 ?? 65,ensembleModeV374:preferences.avatarVocalEnsembleModeV374 ?? "lead",performanceModeV375:preferences.avatarAdaptivePerformanceModeV375 ?? "off",performanceStrengthV375:preferences.avatarAdaptivePerformanceStrengthV375 ?? 65,concertModeV386:preferences.avatarConcertDirectorModeV386??"off",concertStrengthV386:preferences.avatarConcertDirectorStrengthV386??65,concertCameraV386:preferences.avatarConcertDirectorCameraV386??true,concertLightingV386:preferences.avatarConcertDirectorLightingV386??true,rapTimingLiveEnabledV418:preferences.rapTimingLiveEnabledV418??false,rapRoleOffsetMsV418:preferences.rapTimingOffsetsV418?.roleMs??0,rapDuetEnabledV416:preferences.rapDuetEnabledV416??false,rapDuetCameraV416:preferences.rapDuetCameraV416??true,rapDuetTrackIdV416:track?.id,rapDuetAssignmentsV416:track?.id?(preferences.rapDuetAssignmentsV416??{})[track.id]??[]:[],vocalTimeEnabledV496:preferences.vocalTimeEnabledV496??false,vocalTimeTrackIdV496:track?.id??"",vocalTimeSegmentsV496:track?.id?(preferences.vocalTimeSegmentsV496??{})[track.id]??[]:[],manualVocalEnabledV385:preferences.avatarManualVocalEnabledV385??false,manualVocalCameraV385:preferences.avatarManualVocalCameraV385??true,manualVocalAssignmentsV385:track?.id?(preferences.avatarVocalAssignmentsV385??{})[track.id]??[]:[],manualVocalTrackIdV385:track?.id,duetModeV376:preferences.avatarVocalDuetModeV376??"off",duetStrengthV376:preferences.avatarVocalDuetStrengthV376??60,cinematicDuetCameraModeV377:preferences.avatarDuetCameraModeV377??"off",cinematicDuetCameraStrengthV377:preferences.avatarDuetCameraStrengthV377??65,cinematicLyricsModeV378:preferences.avatarLyricsCameraModeV378??"off",cinematicLyricsStrengthV378:preferences.avatarLyricsCameraStrengthV378??70,cinematicLyricsSideV378:immersive?side:null,cinematicLyricsVisibleV378:immersive,}} concertDetailsV555={{enabled:preferences.concertDetailEnabledV555??DEFAULT_CONCERT_DETAILS_V555.enabled,gobo:preferences.concertGoboV555??true,pixelWall:preferences.concertPixelWallV555??true,floorFog:preferences.concertFloorFogV555??true,duetArc:preferences.concertDuetArcV555??true,adlibEcho:preferences.concertAdlibEchoV555??true,hookProjection:preferences.concertHookProjectionV555??true,rhymeAccent:preferences.concertRhymeAccentV555??true,strength:preferences.concertDetailStrengthV555??45,avatarLight:preferences.concertAvatarLightV557??true,avatarLightStrength:preferences.concertAvatarLightStrengthV557??55,portraitLight:preferences.concertPortraitLightV558??true,portraitWarmth:preferences.concertPortraitWarmthV558??52,beatPortraitLight:preferences.concertBeatPortraitLightV559??true,beatPortraitStrength:preferences.concertBeatPortraitStrengthV559??45,cinematicFaceLightV566:preferences.concertCinematicFaceLightV566??true,cinematicFaceStrengthV566:preferences.concertCinematicFaceStrengthV566??50}} lyricsScene={lyricsScene} lyricsSignalV350={{active:!!preferences.lyricsVisible&&hasActiveLyricsV350(lyrics,activeIndex,progressMs),side:immersive?side:null}} audio={audio} track={track} isPlaying={isPlaying} reducedMotion={preferences.reducedMotion} genre={genre} genreFusion={genreFusion} avatarModelUrl={preferences.visualizerMode === "avatar" ? avatarModelUrl : null} avatarModelId={selectedAvatarId} multiAvatarMode={effectiveMultiModeV440} ensembleCountV745={performerCountV440} duoDirectorEnabled={preferences.duoDirectorEnabled ?? false} partnerContactCalibration={preferences.partnerContactCalibration} secondaryContactCalibration={preferences.secondaryContactCalibration} secondaryAvatarModelId={secondaryAvatarId} secondaryAvatarModelUrl={secondaryAvatar.url} secondaryAvatarAnimationUrl={secondaryAvatar.animationUrl} secondaryAvatarSharedMotionUrlV531={secondaryAvatar.sharedMotionUrl} preferredMotionUrlV440={autoChoreoV440?smartMotionV438.url:undefined} secondaryPreferredMotionUrlV440={autoChoreoV440&&featureCastV440.enabled?secondaryMotionV440.url:undefined} artistBubblePlanV441={visualQualityV465.bubbles} artistSpotlightV443={artistSpotlightV443} featureDirectionV460={featureDirectionV460} artistInteractionEnabledV444={preferences.rapArtistInteractionEnabledV444??true} artistInteractionStrengthV444={Math.min(100,Math.round((preferences.rapArtistInteractionStrengthV444??60)*ultimateShowV456.interactionMultiplier))} vocalChangeEnabledV445={preferences.rapVocalChangeEnabledV445??true} vocalChangeSensitivityV445={preferences.rapVocalChangeSensitivityV445??60} vocalChangeMicrophoneActiveV445={microphoneActiveV445} autoMultiArtistGroupV442={concertGroupV683} multiArtistMotionsV442={multiArtistCastV442.enabled&&autoChoreoV440?[smartMotionV438.url,secondaryMotionV440.url,...extraMotionsV442]:undefined} secondaryDancePreset={preferences.secondaryDancePreset ?? "auto"} avatarAnimationUrl={preferences.visualizerMode === "avatar" ? avatarAnimationUrl : null} avatarSharedMotionUrlV531={preferences.visualizerMode === "avatar" ? avatarModel.sharedMotionUrl : null} avatarScale={preferences.avatarScale} avatarOffsetY={preferences.avatarOffsetY} avatarAnimationIntensity={modulateMoodDanceV678(concertDynamicsPercentV502(rapPerformanceValuesV796.intensity,directedDynamicsV670.dance)*(motionStore.automatic?concertGenreV610.dance:1)*(motionStore.automatic?concertContinuityV611.dance:1)*(motionStore.automatic?concertDramaturgyV623.dance:1),moodDanceCueV678)} danceAggression={Math.max(0,Math.min(1,rapPerformanceValuesV796.aggression+moodDanceCueV678.aggressionDelta))} danceVariation={rapPerformanceValuesV796.variation} danceMotionStyle={rapPerformanceValuesV796.style} avatarMotionMode={preferences.avatarMotionMode} smartDanceEnabled={preferences.smartDanceEnabled} smartDanceOverride={preferences.smartDanceOverride} avatarClipSpeed={preferences.avatarClipSpeed} avatarBlendEnabled={preferences.avatarBlendEnabled} avatarBlendClip={preferences.avatarBlendClip} avatarBlendWeight={preferences.avatarBlendWeight} avatarBlendAutoEnergy={preferences.avatarBlendAutoEnergy} avatarBlendBpmSync={preferences.avatarBlendBpmSync} avatarBlendReferenceBpm={preferences.avatarBlendReferenceBpm} avatarBlendSmoothing={preferences.avatarBlendSmoothing} avatarBlendCurve={preferences.avatarBlendCurve} avatarBlendSpeed={preferences.avatarBlendSpeed} avatarBlendMask={preferences.avatarBlendMask ?? "full"} avatarCrossfadeSeconds={preferences.avatarCrossfadeSeconds} avatarArmResponse={preferences.avatarArmResponse} avatarLegResponse={preferences.avatarLegResponse} avatarFootIKEnabled={preferences.avatarFootIKEnabled} avatarFootIKStrength={preferences.avatarFootIKStrength} avatarFootIKContact={preferences.avatarFootIKContact} avatarFootIKLock={preferences.avatarFootIKLock} stagePalette={stageContentV330.musicPalette??stagePalette} stageScreenV330={stageContentV330.item} stageScreensV333={screenLayoutV333.screens} stageLayoutEnabledV333={screenLayoutV333.enabled} stageSlidesV333={stageContentV330.slides} stageLivePushV333={stageContentV330.livePush} stageRotationIndexV333={stageContentV330.rotationIndex} stageScreenSettingsV330={stageContentV330.settings} stageTheme={directedStage} showCue={showEnabled ? directedShowCue : undefined} concertShowCueV387={concertShowCueV387} festivalShowCueV394={festivalShowCueV394} experienceCueV396={sharedExperienceCueV402}
       festivalShowCameraV394={(preferences.avatarFestivalCameraV394??true) && (!unifiedCueV402.active || (preferences.avatarFestivalModeV394??"off")!=="off" || experienceCueV396.active || unifiedCueV402.camera)}
       festivalShowLightingV394={(preferences.avatarFestivalLightingV394??true) && (!unifiedCueV402.active || (preferences.avatarFestivalModeV394??"off")!=="off" || experienceCueV396.active || unifiedCueV402.lighting)}
       festivalShowAtmosphereV394={(preferences.avatarFestivalAtmosphereV394??true) && (!unifiedCueV402.active || (preferences.avatarFestivalModeV394??"off")!=="off" || experienceCueV396.active || unifiedCueV402.lighting)}
       festivalShowLasersV394={preferences.avatarFestivalLasersV394??false}
       concertShowCameraV387={(preferences.avatarShowCameraV387??true) && (!unifiedCueV402.active || (preferences.avatarShowModeV387??"off")!=="off" || experienceCueV396.active || unifiedCueV402.camera)}
       concertShowLightingV387={(preferences.avatarShowLightingV387??true) && (!unifiedCueV402.active || (preferences.avatarShowModeV387??"off")!=="off" || experienceCueV396.active || unifiedCueV402.lighting)}
-      concertShowAtmosphereV387={(preferences.avatarShowAtmosphereV387??true) && (!unifiedCueV402.active || (preferences.avatarShowModeV387??"off")!=="off" || experienceCueV396.active || unifiedCueV402.lighting)} cameraDirectorEnabled={showEnabled && directedShowCue.cameraEnabled || directorSettings.enabled && directorSettings.realCamera} cameraDirectorIntensity={concertDynamicsPercentV502(showEnabled && directedShowCue.cameraEnabled ? showSettings.intensity : directorSettings.cameraIntensity,directedDynamicsV604.camera)} cameraDirectorSection={directedSection} cameraDirectorProgressMs={progressMs} cameraNarrativeV605={{plan:fullSongPlanV604,cue:fullSongCueV604,manualCamera:Boolean(preferences.avatarCameraTimelineV400?.enabled||preferences.avatarCameraStudioV398?.enabled||track?.id&&preferences.rapCameraKeyframesEnabledV432&&(preferences.rapCameraKeyframesV432??{})[track.id]?.length)}} stageReactive={preferences.stageReactive ?? true} stageLightStrength={concertDynamicsPercentV502(lightStrengthForUltimateShowV456(ultimateShowV456,preferences.stageLightStrength??60,preferences.stageReactive??true),directedDynamicsV604.lighting)} dancePostEnabledV468={preferences.dancePostEnabledV468??true} shaderEnvironmentV468={preferences.shaderEnvironmentV468??'auto'} wardrobeModeV468={preferences.wardrobeModeV468??'album'} wardrobeColorV468={preferences.wardrobeColorV468??'#de38fa'} wardrobePatternV468={preferences.wardrobePatternV468??'original'} wardrobeGlowV468={preferences.wardrobeGlowV468??35} audioMotionEnabledV468={preferences.audioMotionEnabledV468??true} audioMotionStrengthV468={preferences.audioMotionStrengthV468??45} danceFxEnabled={preferences.danceFxEnabled} danceFxStrength={preferences.danceFxStrength} danceFxShockwaves={preferences.danceFxShockwaves} danceFxFootprints={preferences.danceFxFootprints} danceFxTrails={preferences.danceFxTrails} avatarRigProfile={preferences.avatarRigProfile} avatarDancePreset={preferences.avatarDancePreset} />{(directorSettings.enabled || showEnabled) && !preferences.reducedMotion && preferences.visualizerMode === "avatar" && stageDirectorRef.current.lastChangeMs > 0 && (!showEnabled || showStateRef.current.changeAtMs >= 0 && progressMs - showStateRef.current.changeAtMs < 10000) && (showEnabled || directorSettings.cinematic
+      concertShowAtmosphereV387={(preferences.avatarShowAtmosphereV387??true) && (!unifiedCueV402.active || (preferences.avatarShowModeV387??"off")!=="off" || experienceCueV396.active || unifiedCueV402.lighting)} cameraDirectorEnabled={showEnabled && directedShowCue.cameraEnabled || directorSettings.enabled && directorSettings.realCamera} cameraDirectorIntensity={concertDynamicsPercentV502(showEnabled && directedShowCue.cameraEnabled ? showSettings.intensity : directorSettings.cameraIntensity,directedDynamicsV670.camera)} cameraDirectorSection={directedSection} cameraDirectorProgressMs={progressMs} concertFlowV654={concertFlowV654} cameraNarrativeV605={{plan:fullSongPlanV604,cue:fullSongCueV604,manualCamera:Boolean(preferences.avatarCameraTimelineV400?.enabled||preferences.avatarCameraStudioV398?.enabled||track?.id&&preferences.rapCameraKeyframesEnabledV432&&(preferences.rapCameraKeyframesV432??{})[track.id]?.length)}} stageReactive={preferences.stageReactive ?? true} performanceLightingV749={coordinatedLightingV750} concertFxV810={preferences.concertFxV810} scenicLightingV762={preferences.scenicLightingV762} cinematicCueV761={cinematicCueV761} cinematicTransitionV791={seamlessSceneV791} smartCameraChoreographyV792={smartCameraV792} epicPeakV794={epicPeakV794} stageEvolutionV795={stageEvolutionV795} stageLightStrength={modulateMoodLightV678(concertDynamicsPercentV502(lightStrengthForUltimateShowV456(ultimateShowV456,preferences.stageLightStrength??60,preferences.stageReactive??true),directedDynamicsV670.lighting),moodCueV678)} dancePostEnabledV468={preferences.dancePostEnabledV468??true} shaderEnvironmentV468={preferences.shaderEnvironmentV468??'auto'} wardrobeModeV468={preferences.wardrobeModeV468??'album'} wardrobeColorV468={preferences.wardrobeColorV468??'#de38fa'} wardrobePatternV468={preferences.wardrobePatternV468??'original'} wardrobeGlowV468={preferences.wardrobeGlowV468??35} audioMotionEnabledV468={preferences.audioMotionEnabledV468??true} audioMotionStrengthV468={preferences.audioMotionStrengthV468??45} danceFxEnabled={preferences.danceFxEnabled} danceFxStrength={preferences.danceFxStrength} danceFxShockwaves={preferences.danceFxShockwaves} danceFxFootprints={preferences.danceFxFootprints} danceFxTrails={preferences.danceFxTrails} avatarRigProfile={preferences.avatarRigProfile} avatarDancePreset={preferences.avatarDancePreset} />{(directorSettings.enabled || showEnabled) && !preferences.reducedMotion && preferences.visualizerMode === "avatar" && stageDirectorRef.current.lastChangeMs > 0 && (!showEnabled || showStateRef.current.changeAtMs >= 0 && progressMs - showStateRef.current.changeAtMs < 10000) && (showEnabled || directorSettings.cinematic
     ? <CinematicStageTransitionV288 key={`${stageDirectorRef.current.trackId}:${directedStage}:${stageDirectorRef.current.lastChangeMs}`} stage={directedStage} section={directedSection} durationMs={directorSettings.transitionMs} cameraMotion={directorSettings.cameraMotion} dropFlash={showEnabled ? directedShowCue.accent > 0.05 : directorSettings.dropFlash} />
-    : <div key={`${stageDirectorRef.current.trackId}:${directedStage}:${stageDirectorRef.current.lastChangeMs}`} className="stage-director-transition-v287" style={{ animationDuration: `${directorSettings.transitionMs}ms` }} aria-hidden="true" />)}{preferences.visualizerMode === "avatar" && stagePalette && <LightingChoreographyStudio trackId={track?.id ?? ""} durationMs={track?.durationMs ?? 0} positionMs={progressMs} audio={audio} isPlaying={isPlaying} />}{immersive && !inCanvas && <div className={`immersive-lyrics-overlay v461-immersive-overlay ${preferences.avatarLyricsContrastV378??true?"v378-lyrics-contrast":""}`}><KineticLyrics lyrics={lyrics ?? null} progressMs={progressMs} activeIndex={activeIndex} playing={playing} genre={genre??""} avatarCountV477={performerCountV440} concertLyricAccentV502={directedDynamicsV604.lyrics} cinematicSceneV528={cinematicSceneV528} sectionCueV598={directedSection === "hook" ? "hook" : "unknown"} fullSongCueV604={fullSongCueV604} concertDramaturgyV623={concertDramaturgyV623} immersive/></div>}{inCanvas && <span className="sr-only" aria-live="off">{lyrics?.lines[activeIndex]?.text ?? ""}</span>}{preferences.visualizerMode === "avatar" && <IntelligentConcertTimelineV646
+    : <div key={`${stageDirectorRef.current.trackId}:${directedStage}:${stageDirectorRef.current.lastChangeMs}`} className="stage-director-transition-v287" style={{ animationDuration: `${directorSettings.transitionMs}ms` }} aria-hidden="true" />)}{preferences.visualizerMode === "avatar" && stagePalette && <LightingChoreographyStudio trackId={track?.id ?? ""} durationMs={track?.durationMs ?? 0} positionMs={progressMs} audio={audio} isPlaying={isPlaying} />}{immersive && !inCanvas && <div className={`immersive-lyrics-overlay v461-immersive-overlay ${preferences.avatarLyricsContrastV378??true?"v378-lyrics-contrast":""}`}><KineticLyrics lyrics={lyrics ?? null} progressMs={progressMs} activeIndex={activeIndex} playing={playing} genre={genre??""} avatarCountV477={performerCountV440} concertLyricAccentV502={directedDynamicsV761.lyrics} cinematicSceneV528={cinematicSceneV528} performanceSettingsV750={coordinatedLyricsV750} sectionCueV598={directedSection === "hook" ? "hook" : "unknown"} fullSongCueV604={fullSongCueV604} concertDramaturgyV623={concertDramaturgyV623} immersive/></div>}{inCanvas && <span className="sr-only" aria-live="off">{lyrics?.lines[activeIndex]?.text ?? ""}</span>}{preferences.visualizerMode === "avatar" && <IntelligentConcertTimelineV646
    trackId={track?.id??""} durationMs={track?.durationMs??0} progressMs={progressMs}
    playing={isPlaying} arc={concertArcPlanV600} narrative={fullSongPlanV604} confirmed={concertArcV600}
    vocal={track?.id?(preferences.vocalTimeSegmentsV496??{})[track.id]:[]}

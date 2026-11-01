@@ -1,0 +1,15 @@
+{
+  "extends":"./tsconfig.v604-core.json",
+  "compilerOptions":{"incremental":false},
+  "files":[
+    "../components/visualizer/intelligentConcertFlowV654.ts",
+    "../components/visualizer/fullSongConcertDramaturgyV604.ts",
+    "../components/visualizer/ultimateConcertDirectorV600.ts",
+    "../components/visualizer/smartConcertDynamicsV502.ts",
+    "../services/stageContent/lyricsPhotoChoreographyV350.ts",
+    "../components/visualizer/multiAvatarStageDirectorV326.ts",
+    "../services/musicAnalysis/trackAnalysisV318.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts","stubs/v508-three-types.d.ts"
+  ]
+}

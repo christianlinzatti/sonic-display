@@ -1,4 +1,5 @@
 "use client";
+import {invalidateAvatarCatalogV733} from "@/services/avatarCatalogV733";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import { AvatarPreview3D } from "@/components/visualizer/AvatarPreview3D";
@@ -15,6 +16,7 @@ import { planAdditionalMotionClipsV533, validateMotionAssignmentV533, explainAdd
 import { inspectSharedMotionV531, stripDuplicateAnimationsV531, sameSharedMotionV531, type MotionIdentityV531 } from "@/components/visualizer/sharedEmbeddedMotionV531";
 import { inspectEmbeddedAvatarFileV529, type EmbeddedAvatarBundleV529 } from "@/components/visualizer/embeddedAvatarBundleV529";
 import { previewChecksV532, reviewKeyV532, type PreviewModeV532 } from "@/components/visualizer/avatarPreviewQualityV532";
+import {retainImportQueueV654} from "@/components/importQueueRetentionV654";
 
 type Item = { id: string; file: File; kind: "character"|"motion"; url: string; error: string; installed: boolean; installedUrl?: string; installedSharedUrl?:string; target: string };
 type Props = {admin:boolean; blobEnabled:boolean; models:AvatarModel[]; preferences:UiPreferences; onInstalled:()=>Promise<void>};
@@ -27,7 +29,10 @@ async function validGLB(file:File){
 }
 export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferences,onInstalled}:Props){
   const [items,setItems]=useState<Item[]>([]);
-  const blobUrls=useRef<string[]>([]);
+  // Each retained queue ID owns exactly one Blob URL. Evicted entries lose ownership immediately.
+  const ownedBlobUrls=useRef(new Map<string,string>());
+  const queueRef=useRef<Item[]>([]);
+  const live=useRef(true);
   const [active,setActive]=useState<string>("");
   const [busy,setBusy]=useState(false);
   const [message,setMessage]=useState("");
@@ -65,18 +70,38 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
   const comparisonModeV532:PreviewModeV532=showOriginalV531||!current?.installedUrl?"original":"installed";
   const qualityCompleteV532=qualityClipsV532.length===3&&qualityClipsV532.every(clip=>acceptedClipsV532[reviewKeyV532(current?.id??"",clip.name)]);
   const available=useMemo(()=>items.filter(x=>!x.installed),[items]);
-  useEffect(()=>()=>{blobUrls.current.forEach(url=>URL.revokeObjectURL(url));},[]);
+  useEffect(()=>{live.current=true;return ()=>{
+    live.current=false;
+    for(const url of ownedBlobUrls.current.values()) URL.revokeObjectURL(url);
+    ownedBlobUrls.current.clear();queueRef.current=[];
+  };},[]);
+  function releaseQueueEntries(entries:readonly Item[]){
+    if(!entries.length)return;
+    const ids=new Set(entries.map(item=>item.id));
+    for(const item of entries){
+      const url=ownedBlobUrls.current.get(item.id);
+      if(url){URL.revokeObjectURL(url);ownedBlobUrls.current.delete(item.id);}
+    }
+    const prune=<T,>(previous:Record<string,T>)=>Object.fromEntries(Object.entries(previous).filter(([key])=>!ids.has(key.split(":",1)[0]))) as Record<string,T>;
+    setInspections(prune);setEmbeddedBundles(prune);setFingerprintsV535(prune);
+    setQualityReportsV533(prune);setAdvancedReportsV534(prune);setClipIndices(prune);
+    setNextClipV534(prune);setAcceptedClipsV532(prune);setPlayedModesV532(prune);
+  }
   async function addFiles(files:FileList|null,kind:"character"|"motion"){
-    if(!files)return;
-    const next=Array.from(files).slice(0,30).map(file=>({id:crypto.randomUUID(),file,kind,url:URL.createObjectURL(file),error:"",installed:false,target:modelOptions[0]?.id||""}));
-    blobUrls.current.push(...next.map(x=>x.url));
-    setItems(old=>[...old,...next].slice(-60));setActive(next[0]?.id||active);setShowOriginalV531(false);setMessage("");
+    if(!files||files.length===0)return;
+    const next:Item[]=Array.from(files).slice(0,30).map(file=>({id:crypto.randomUUID(),file,kind,url:URL.createObjectURL(file),error:"",installed:false,target:modelOptions[0]?.id||""}));
+    for(const item of next)ownedBlobUrls.current.set(item.id,item.url);
+    const {kept,evicted}=retainImportQueueV654(queueRef.current,next,60);
+    queueRef.current=kept;
+    setItems(kept);
+    releaseQueueEntries(evicted);
+    setActive(next[0]?.id||"");setShowOriginalV531(false);setMessage("");
     // Only the JSON chunk is inspected; do not decode 3D meshes or textures here.
     // Scan one file at a time to avoid holding 30 GLBs in memory simultaneously.
     for (const item of next.filter(item=>item.kind==="character")) {
       try {
         const report=await inspectEmbeddedAvatarFileV529(item.file);
-        setEmbeddedBundles(old=>({...old,[item.id]:report}));
+        if(live.current&&ownedBlobUrls.current.has(item.id))setEmbeddedBundles(old=>({...old,[item.id]:report}));
       } catch(error) { update(item.id,{error:error instanceof Error?error.message:"GLB-Analyse fehlgeschlagen"}); }
     }
   }
@@ -87,9 +112,10 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
       await validGLB(item.file);
       const model=modelOptions.find(x=>x.id===item.target);
       const result=await inspectMotion(item.url,model?.url||undefined);
+      if(!ownedBlobUrls.current.has(item.id))return;
       setInspections(old=>({...old,[item.id]:result}));
-      try {const fingerprints=await fingerprintMotionClipsV535(item.url);setFingerprintsV535(old=>({...old,[item.id]:fingerprints}));}
-      catch {setFingerprintsV535(old=>({...old,[item.id]:[]}));} // Older/unusual GLBs remain importable without hash-based dedupe.
+      try {const fingerprints=await fingerprintMotionClipsV535(item.url);if(ownedBlobUrls.current.has(item.id))setFingerprintsV535(old=>({...old,[item.id]:fingerprints}));}
+      catch {if(ownedBlobUrls.current.has(item.id))setFingerprintsV535(old=>({...old,[item.id]:[]}));} // Older/unusual GLBs remain importable without hash-based dedupe.
       update(item.id,{error:""});
     }catch(err){update(item.id,{error:err instanceof Error?err.message:"Clip-Prüfung fehlgeschlagen"});}
     finally{setInspectionBusy(false);}
@@ -100,7 +126,7 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
     setQualityBusyV533(true);
     try{
       const report=await inspectSelectedMotionQualityV533(item.url,index);
-      setQualityReportsV533(old=>({...old,[`${item.id}:${index}`]:report}));
+      if(ownedBlobUrls.current.has(item.id))setQualityReportsV533(old=>({...old,[`${item.id}:${index}`]:report}));
     }catch(error){setMessage(error instanceof Error?error.message:"Qualitätsanalyse fehlgeschlagen");}
     finally{setQualityBusyV533(false);}
   }
@@ -114,7 +140,7 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
       // Inspect the original GLB, not a modified asset. For separate motion GLBs
       // these are source-rig diagnostics; final retarget quality is only visual.
       const report=await inspectAdvancedMotionV534(item.url,index,following,item.kind==="character"?"original-glb":"separate-motion-glb");
-      setAdvancedReportsV534(old=>({...old,[advancedKeyV534(item)]:report}));
+      if(ownedBlobUrls.current.has(item.id))setAdvancedReportsV534(old=>({...old,[advancedKeyV534(item)]:report}));
     }catch(error){setMessage(error instanceof Error?error.message:"Erweiterte Bewegungsanalyse fehlgeschlagen");}
     finally{setAdvancedBusyV534(false);}
   }
@@ -157,7 +183,11 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
     });
     setPreviewSeekV534(undefined);
   }
-  function update(id:string,patch:Partial<Item>){setItems(old=>old.map(x=>x.id===id?{...x,...patch}:x));}
+  function update(id:string,patch:Partial<Item>){
+    if(!live.current||!ownedBlobUrls.current.has(id))return;
+    queueRef.current=queueRef.current.map(x=>x.id===id?{...x,...patch}:x);
+    setItems(queueRef.current);
+  }
   type SharedInfoV531=MotionIdentityV531 & {sourceUrl?:string};
   async function send(file:File,kind:"character"|"motion",shared?:SharedInfoV531){
     await validGLB(file);
@@ -166,7 +196,7 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
       const uploaded=await upload(`sonic/${kind==="character"?"models":"animations"}/${filename}`,file,{access:"public",handleUploadUrl:"/api/avatars/upload",contentType:"model/gltf-binary"});
       if(!uploaded.url)throw new Error("Blob Upload fehlgeschlagen");
       if(kind==="character"){
-        const response=await fetch("/api/avatars/config",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({filename:uploaded.pathname.split("/").pop(),metadata:{label:cleanName(file.name),description:"Über Batch Installer installiert",preview:"/avatars/custom-preview.svg",genre:[],tags:[],category:"Eigene Modelle",favorite:false,defaultDancePreset:"auto",sharedMotionUrl:shared?.sourceUrl||"",sharedMotionFingerprint:shared?.fingerprint||"",sharedRigFingerprint:shared?.rigFingerprint||"",sharedMotionClipCount:shared?.clips||0}})});
+        const response=await fetch("/api/avatars/config",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({filename:uploaded.pathname.split("/").pop(),metadata:{label:cleanName(file.name),description:"Über Batch Installer installiert",preview:"/avatars/custom-preview.svg",genre:[],tags:[],category:"Eigene Modelle",favorite:false,defaultDancePreset:"auto",...(shared?.sourceUrl ? {sharedMotionUrl:shared.sourceUrl,sharedMotionFingerprint:shared.fingerprint,sharedRigFingerprint:shared.rigFingerprint,sharedMotionClipCount:shared.clips} : {})}})});
         if(!response.ok)throw new Error("Modell hochgeladen, aber Metadaten konnten nicht gespeichert werden");
       }
       return uploaded.url;
@@ -188,7 +218,7 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
     // uploaded in this same batch. Failed uploads are NEVER used as a source.
     const knownPacksV531:Array<MotionIdentityV531 & {url:string}>=[];
     if(shareMotionsV531)try{
-      const response=await fetch("/api/avatars",{cache:"no-store"});
+      invalidateAvatarCatalogV733();const response=await fetch("/api/avatars",{cache:"no-store"});
       if(response.ok){const data=await response.json();
         for(const m of [...(data.models??[]),...(data.defaults??[])]){
           if(m.url&&!m.sharedMotionUrl&&/^[a-f0-9]{64}$/.test(m.sharedMotionFingerprint)&&
@@ -379,7 +409,7 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
             <small>Die 3D-Vorschau bietet eigene Wiedergabe- und Clip-Regler. Mit „Alle Clips“ wird jede Animation als eigener Bibliothekseintrag exportiert; sonst nur die ausgewählte.</small>
           </>}
         </div>}
-        <button type="button" onClick={()=>{URL.revokeObjectURL(current.url);blobUrls.current=blobUrls.current.filter(url=>url!==current.url);setItems(old=>old.filter(x=>x.id!==current.id));setActive("");}} disabled={busy}>Aus Warteschlange entfernen</button>
+        <button type="button" onClick={()=>{releaseQueueEntries([current]);queueRef.current=queueRef.current.filter(x=>x.id!==current.id);setItems(queueRef.current);setActive("");}} disabled={busy}>Aus Warteschlange entfernen</button>
       </div>
     </div>}
     <label className="setting-check"><input type="checkbox" checked={allowUnmatched} onChange={e=>setAllowUnmatched(e.target.checked)}/> Installation ohne passende Rig-Spuren ausdrücklich erlauben</label>

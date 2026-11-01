@@ -1,14 +1,20 @@
 "use client";
 import {useSyncExternalStore} from 'react';
+import type {ProjectedBodyV754} from './visualQualityInspectorV754';
 import type {ConcertQualityAssessmentV466,ProjectedAvatarV466,ScreenRectV466} from '@/services/show/concertQualityInspectorV466';
 import {observationFromConcertQualityV467,type ConcertQualityObservationV467} from '@/services/show/concertQualityAdvisorV467';
 export interface ConcertQualitySnapshotV466 {
   at:number; canvas:ScreenRectV466|null; lyrics:ScreenRectV466|null;
+  /** V754: projected anatomical anchors sampled alongside the existing 1Hz probe. */
+  bodyV754?:readonly ProjectedBodyV754[];
   avatars:readonly ProjectedAvatarV466[];
   assessment:ConcertQualityAssessmentV466|null;
   fps:number|null; frameMs:number|null; p95FrameMs:number|null;
   drawCalls:number|null; triangles:number|null;
   qualityTier:string; samples:number;
+  /** V753: optional resource telemetry, not GPU bytes. */
+  geometries?:number|null; textures?:number|null; jsHeapMb?:number|null;
+  renderWidthPx?:number|null; renderHeightPx?:number|null; metricsAt?:number|null;
   /** V467: opt-in, current-song-only, bounded history of V466 probe snapshots. */
   historyV467?:readonly ConcertQualityObservationV467[];
 }

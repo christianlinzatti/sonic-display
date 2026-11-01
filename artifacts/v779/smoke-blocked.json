@@ -1,0 +1,20 @@
+{
+  "format": "sonic-quality-sweep-v779",
+  "version": 1,
+  "status": "blocked",
+  "issues": [
+    "Es werden zwei bis sechs komplette Profilrunden benötigt.",
+    "Messung 1 unvollständig, fehlerhaft oder in falscher Reihenfolge."
+  ],
+  "targetFps": 45,
+  "targetAvatars": 4,
+  "rounds": 0.3333333333333333,
+  "recommendedProfile": null,
+  "twoAvatarAlternative": null,
+  "rows": [],
+  "renderer": null,
+  "assetsMode": null,
+  "notes": [
+    "Keine Hardware- oder Performanceaussage ohne vollständige echte Browsermessungen."
+  ]
+}

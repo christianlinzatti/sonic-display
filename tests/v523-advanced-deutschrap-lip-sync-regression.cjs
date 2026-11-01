@@ -82,5 +82,6 @@ assert(morph.includes('const authored=Math.max(0,Math.min(1,inf[morph.index]-mor
 assert(!fs.readFileSync('components/visualizer/advancedDeutschrapLipSyncV523.ts','utf8').includes('requestAnimationFrame('));
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]??0)>=523);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v523 && npm run test:v523:types && npm run test:v522'));
+assert(pkg.scripts['test:v523'].includes('v523-advanced-deutschrap-lip-sync-regression.cjs'));
+assert(pkg.scripts['check:release'].includes('npm run test:v686'), 'V680+ explicit release checks active');
 console.log(`PASS V523: ${count} timed-verse simulations + bilabial/edit/audio/singer priority + GLB/procedural wiring`);

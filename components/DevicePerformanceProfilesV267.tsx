@@ -22,8 +22,8 @@ export function DevicePerformanceProfilesV267({experiments}:{experiments:readonl
  useEffect(()=>{setFingerprint(currentDeviceFingerprint());try{setProfiles(decodeProfiles(window.localStorage.getItem(PROFILE_KEY)));}catch{}setDirector(readMultiAvatarDirectorEnabled());const update=()=>setDirector(readMultiAvatarDirectorEnabled());window.addEventListener('sonic:v260-director',update);return()=>window.removeEventListener('sonic:v260-director',update);},[]);
  const recommended=useMemo(()=>recommendProfile(profiles,fingerprint),[profiles,fingerprint]);
  const autoSuggestion=useMemo(()=>selectDeviceProfile(profiles,fingerprint,{mode:performance.mode,director}),[profiles,fingerprint,performance.mode,director]);
- function save(next:DevicePerformanceProfile[]){setProfiles(next);try{window.localStorage.setItem(PROFILE_KEY,JSON.stringify(next));}catch{setFeedback('Profil nur für diese Sitzung gespeichert: Browser-Speicher nicht verfügbar.');}}
- function create(){const e=experiments.find(x=>x.id===selectedExperiment);if(!e||!fingerprint)return;const result=profileFromExperiment(e,fingerprint,label,Date.now());if(!result){setFeedback('Dieser Versuch enthält keine gültigen Vergleichswerte.');return;}save(storeProfile(profiles,result));setFeedback('Profil für dieses Gerät gespeichert. Es wird nicht automatisch aktiviert.');}
+ function save(next:DevicePerformanceProfile[]){setProfiles(next);try{window.localStorage.setItem(PROFILE_KEY,JSON.stringify(next));return true;}catch{setFeedback('Profil nur für diese Sitzung gespeichert: Browser-Speicher nicht verfügbar.');return false;}}
+ function create(){const e=experiments.find(x=>x.id===selectedExperiment);if(!e||!fingerprint)return;const result=profileFromExperiment(e,fingerprint,label,Date.now());if(!result){setFeedback('Dieser Versuch enthält keine gültigen Vergleichswerte.');return;}if(save(storeProfile(profiles,result)))setFeedback('Profil für dieses Gerät gespeichert. Es wird nicht automatisch aktiviert.');}
  function apply(){if(!preview||preview.fingerprint!==fingerprint)return;setUndo({mode:performance.mode,director});setPerformanceMode(preview.config.mode);setMultiAvatarDirectorEnabled(preview.config.director);setDirector(preview.config.director);setPreview(null);setFeedback('Geräteprofil übernommen. Die vorherige Einstellung kann rückgängig gemacht werden.');}
  function revert(){if(!undo)return;setPerformanceMode(undo.mode);setMultiAvatarDirectorEnabled(undo.director);setDirector(undo.director);setUndo(null);setFeedback('Vorherige Performance-Einstellungen wiederhergestellt.');}
  function downloadBackup(){
@@ -38,7 +38,7 @@ export function DevicePerformanceProfilesV267({experiments}:{experiments:readonl
   if(!incoming)return;
   const next=mergeImportedProfiles(profiles,incoming.profiles,choices);
   if(next.length===profiles.length&&next.every((p,i)=>p===profiles[i])){setFeedback('Keine Profile übernommen.');return;}
-  save(next);setIncoming(null);setChoices([]);setFeedback(`${next.length} Profile sind nun lokal gespeichert. Importierte Profile wurden nicht aktiviert.`);
+  const saved=save(next);setIncoming(null);setChoices([]);if(saved)setFeedback(`${next.length} Profile sind nun lokal gespeichert. Importierte Profile wurden nicht aktiviert.`);
  }
  const matching=profiles.filter(p=>p.fingerprint===fingerprint);
  return <section aria-label="V267 Adaptive Performance Profile Manager" style={{marginTop:18}}>

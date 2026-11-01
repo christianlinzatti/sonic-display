@@ -7,6 +7,17 @@ export type BackupData = { format: typeof UNIFIED_BACKUP_FORMAT; version: 1; exp
 export type BackupPreview = { data: BackupData; newKeys: string[]; conflicts: string[]; same: string[]; counts: Record<BackupGroup,number> };
 const EXACT: Record<string,BackupGroup> = {
  "sonic-display-ui-preferences-v1":"ui",
+ "sonic-display:v676:concert-looks":"ui",
+ "sonic-realistic-dance-grounding-v665":"avatar",
+ "sonic-natural-footwork-v839":"avatar",
+ "sonic-stage-blocking-v840":"avatar",
+ "sonic-advanced-ensemble-v760":"avatar",
+ "sonic-genre-dance-performance-v666":"avatar",
+ "sonic.character.motion.library.v190":"avatar",
+ "sonic-display-glb-blend-presets-v492":"avatar",
+ "sonic-camera-presets-v290":"timeline",
+ "sonic-show-timeline-v354":"timeline",
+ "sonic-concert-song-library-v764":"timeline",
  "sonic-display:v181:genre-corrections":"genre",
  "sonic-display:v183:genre-memory-snapshots":"genre",
  "sonic-display:lighting-preset-v171":"lighting",
@@ -50,9 +61,9 @@ const groups:BackupGroup[]=["genre","lighting","timeline","avatar","device","ui"
 export function createUnifiedBackup(store:Pick<Storage,"length"|"key"|"getItem">): BackupData {
  const entries:Record<string,string>=Object.create(null);
  for(let i=0;i<store.length;i++) { const key=store.key(i);if(!key || !groupForBackupKey(key))continue;
-   const value=store.getItem(key);if(typeof value==="string" && value.length<=150000)entries[key]=value;
+   const value=store.getItem(key);if(typeof value==="string")entries[key]=value;
  }
- return {format:UNIFIED_BACKUP_FORMAT,version:1,exportedAt:new Date().toISOString(),entries};
+ return parseUnifiedBackup(JSON.stringify({format:UNIFIED_BACKUP_FORMAT,version:1,exportedAt:new Date().toISOString(),entries}));
 }
 export function parseUnifiedBackup(text:string):BackupData {
  if(new TextEncoder().encode(text).length>MAX_BACKUP_BYTES)throw new Error("Die Sicherung ist zu groß (maximal 2 MB).");
@@ -64,7 +75,7 @@ export function parseUnifiedBackup(text:string):BackupData {
  const pairs=Object.entries(v.entries);
  if(pairs.length>600)throw new Error("Zu viele Einträge.");
  for(const [key,content] of pairs){if(!groupForBackupKey(key))throw new Error(`Unzulässiger Schlüssel: ${key.slice(0,90)}`);
-   if(typeof content!=="string"||content.length>150000)throw new Error("Ungültiger Einstellungswert.");
+   if(typeof content!=="string"||content.length>MAX_BACKUP_BYTES)throw new Error("Ungültiger Einstellungswert.");
    // Structured settings must be valid JSON. Primitive flags and mode selectors are allowed.
    if(content.startsWith("{")||content.startsWith("[")){try{JSON.parse(content);}catch{throw new Error(`Beschädigter JSON-Wert: ${key}`);}}
    entries[key]=content;

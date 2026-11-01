@@ -1,0 +1,1 @@
+{"extends":"../tsconfig.json","compilerOptions":{"incremental":false,"plugins":[],"jsx":"preserve","noEmit":true},"files":["../lib/smart-history-fusion-v865.ts","../components/SmartHistoryFusionPanelV865.tsx","stubs/v701-react-jsx.d.ts"],"include":[],"exclude":[]}

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": []
+  },
+  "files": [
+    "../components/visualizer/disposeDancePostProcessingV654.ts",
+    "../components/visualizer/previewGltfCacheV654.ts",
+    "../services/lyrics/providerDeadlineV654.ts",
+    "../hooks/microphoneResourceCleanupV654.ts"
+  ]
+}

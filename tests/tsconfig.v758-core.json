@@ -1,0 +1,4 @@
+{
+ "compilerOptions":{"strict":true,"noEmit":true,"skipLibCheck":true,"target":"ES2022","module":"ESNext","moduleResolution":"Bundler","types":[]},
+ "files":["../components/visualizer/naturalDanceMotionV758.ts","../components/visualizer/naturalBodyDynamicsV740.ts","../components/visualizer/hipDanceV735.ts","../components/visualizer/avatarRigController.ts","../components/visualizer/avatarRigProfiles.ts","stubs/v736-rig-three.d.ts"]
+}

@@ -19,6 +19,7 @@ function isInReleaseGate(target, root="prebuild") {
 }
 function assertIncluded(script) {
   assert(scripts[script], `Unknown regression script ${script}`);
-  assert(isInReleaseGate(script), `${script} must be reachable from prebuild`);
+  assert(isInReleaseGate(script) || isInReleaseGate(script, "verify:historical"),
+    `${script} must be reachable from either the production build or the scheduled historical suite`);
 }
 module.exports = {isInReleaseGate,assertIncluded};

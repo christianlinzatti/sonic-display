@@ -9,6 +9,7 @@ import {OutputPass} from 'three/examples/jsm/postprocessing/OutputPass.js';
 import {getActivePerformanceTier,useAdaptivePerformance} from './adaptivePerformance';
 import {advanceDanceFxEnvelopeV468,initialDanceFxEnvelopeV468} from './danceVisualEngineV468';
 import type {AudioFeatures} from '@/types/audio';
+import {disposeDancePostProcessingV654} from './disposeDancePostProcessingV654';
 
 /** One compositor owns the final render (priority 2). No full-screen flashes/strobes.
  * The optional afterimage is a bounded temporal echo, NOT motion-vector blur. */
@@ -26,7 +27,8 @@ export function DancePostProcessingV468({audio,playing,reducedMotion,enabled,str
  useEffect(()=>{
    if(!enabled||reducedMotion||qualityTier==='low')return;
    const composer=new EffectComposer(gl);
-   composer.addPass(new RenderPass(scene,camera));
+   const render=new RenderPass(scene,camera);
+   composer.addPass(render);
    const shader=new ShaderPass({uniforms:{tDiffuse:{value:null},uTexel:{value:[1/1024,1/768]},uPulse:{value:0},uGlitch:{value:0},uTime:{value:0},uAnticipation:{value:0},uBloom:{value:0}},
     vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
     fragmentShader:`uniform sampler2D tDiffuse;uniform vec2 uTexel;uniform float uPulse,uGlitch,uTime,uAnticipation,uBloom;varying vec2 vUv;
@@ -43,9 +45,10 @@ export function DancePostProcessingV468({audio,playing,reducedMotion,enabled,str
    const echo=new AfterimagePass(.65);
    echo.enabled=false;
    composer.addPass(echo);
-   composer.addPass(new OutputPass());
+   const output=new OutputPass();
+   composer.addPass(output);
    passes.composer=composer;passes.shader=shader;passes.echo=echo;
-   return ()=>{passes.composer=null;passes.shader=null;passes.echo=null;composer.dispose();};
+   return ()=>{passes.composer=null;passes.shader=null;passes.echo=null;disposeDancePostProcessingV654(composer,[render,shader,echo,output]);};
  },[gl,scene,camera,enabled,reducedMotion,qualityTier,passes]);
  useEffect(()=>{passes.composer?.setSize(size.width,size.height);},[size.width,size.height,passes]);
  useFrame((_,dt)=>{

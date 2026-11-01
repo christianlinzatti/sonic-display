@@ -1,5 +1,10 @@
 import type {Lyrics} from "@/types/music";
-import type {DuetInteractionV376} from "./interactiveVocalDuetsV376";
+// Structural V376 contract keeps manual casting independently testable without
+// pulling scene/React dependencies into standalone TypeScript tests.
+type DuetInteractionV376={enabled:boolean;leadSlot:number;partnerSlot:number|null;
+  activeSlots:number[];fromSlot:number|null;toSlot:number;
+  event:"none"|"handoff"|"reply";phase:number;emphasis:number;
+  source:"word-timed"|"line-timed"|"none";lineIndex:number;count:number};
 
 /** User-authored, per-track visual stage cast. Never represents detected human speakers. */
 export type VocalRoleV385="lead"|"feature"|"hook";

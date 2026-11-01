@@ -18,9 +18,9 @@ import type {LyricsPhotoDecisionV350} from '@/services/stageContent/lyricsPhotoC
 import type {PhotoCompositionV345} from '@/services/stageContent/multiPhotoLayoutV345';
 
 /** Optional physically-separated Drei Html photo panels. Only mounted for enabled image content. */
-export function StagePhotoGallery3DV348({images,alt,credits={},composition,settings,width,height,scale,section='',genre='',beatAccent=0,playing=true,choreography,fxCue}:{
+export function StagePhotoGallery3DV348({images,alt,credits={},composition,settings,width,height,scale,section='',genre='',beatAccent=0,playing=true,choreography,fxCue,curatedOrder=false}:{
  images:string[];alt:string;credits?:Record<string,string>;composition:PhotoCompositionV345;settings:PhotoGallery3DSettingsV348;
- width:number;height:number;scale:number;section?:string;genre?:string;beatAccent?:number;playing?:boolean;choreography?:LyricsPhotoDecisionV350;fxCue?:VisualFxCueV353;
+ width:number;height:number;scale:number;section?:string;genre?:string;beatAccent?:number;playing?:boolean;choreography?:LyricsPhotoDecisionV350;fxCue?:VisualFxCueV353;curatedOrder?:boolean;
 }){
  const groups=useRef<Record<number,Group|null>>({});
  const [failed,setFailed]=useState<string[]>([]);
@@ -50,7 +50,7 @@ export function StagePhotoGallery3DV348({images,alt,credits={},composition,setti
  const candidates=useMemo(()=>safeImages.map(url=>({url,...dimensions[url]})),[safeImages,dimensions]);
  const orderedImages=useMemo(()=>smartSelection.enabled
   ?rankPhotosForFrameV349(candidates,{width,height,displayWidth:960,displayHeight:540},smartSelection).slice(0,gallery.maxImages).map(v=>v.url)
-  :rankImagesV340(candidates,width/height,selection).slice(0,gallery.maxImages).map(v=>v.url),[candidates,width,height,selection,smartSelection,gallery.maxImages]);
+  :curatedOrder?candidates.slice(0,gallery.maxImages).map(v=>v.url):rankImagesV340(candidates,width/height,selection).slice(0,gallery.maxImages).map(v=>v.url),[candidates,width,height,selection,smartSelection,gallery.maxImages,curatedOrder]);
  const interval=musicGalleryIntervalV341(gallery.intervalSeconds,section,music);
  useEffect(()=>{
   if(!playing||!gallery.enabled||gallery.mode!=='slideshow'||orderedImages.length<2)return;

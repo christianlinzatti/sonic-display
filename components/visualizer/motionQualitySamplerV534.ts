@@ -1,7 +1,7 @@
 /** Browser-only sampler. Three.js evaluates original animation tracks on a
  * separately loaded GLB; the installed avatar, library and stage are untouched. */
 import { AnimationMixer, Box3, LoopOnce, Vector3, type Object3D } from "three";
-import { readGLB } from "./motionClipInspector";
+import { withPrivateGltfV769 } from "./privateGltfLifecycleV769";
 import { inspectSampledMotionV534, compareMotionTransitionV534, motionReviewLabelV534,
   type MotionPointV534, type SampledPoseV534, type MotionSampleReportV534, type PoseTransitionV534 } from "./advancedMotionInspectorV534";
 import { analyzeGLBMotionClip, type ClipQualityReport } from "./glbMotionQualityAnalyzer";
@@ -24,7 +24,8 @@ function capture(node:Object3D|undefined):MotionPointV534|undefined{
 export async function inspectAdvancedMotionV534(url:string,clipIndex:number,followingIndex?:number,source:AdvancedMotionReportV534["source"]="original-glb"):Promise<AdvancedMotionReportV534>{
  if(!Number.isInteger(clipIndex)||clipIndex<0||clipIndex>1024)throw Error("Ungültiger Animationsindex");
  if(followingIndex!==undefined&&(!Number.isInteger(followingIndex)||followingIndex<0||followingIndex>1024||followingIndex===clipIndex))throw Error("Ungültiger Folgeclip");
- const gltf=await readGLB(url),clip=gltf.animations[clipIndex],next=followingIndex===undefined?undefined:gltf.animations[followingIndex];
+ return withPrivateGltfV769(url,gltf=>{
+ const clip=gltf.animations[clipIndex],next=followingIndex===undefined?undefined:gltf.animations[followingIndex];
  if(!clip||(followingIndex!==undefined&&!next))throw Error("Animationsclip wurde in der GLB nicht gefunden");
  const scene=gltf.scene;
  scene.updateMatrixWorld(true);
@@ -57,4 +58,5 @@ export async function inspectAdvancedMotionV534(url:string,clipIndex:number,foll
   }
   return {clipName:clip.name,source,keyframes,pose,curveEvents,transition,transitionCurveDegrees,transitionTo:next?.name??null,summary:motionReviewLabelV534(pose,transition??undefined)};
  }finally{mixer.stopAllAction();mixer.uncacheRoot(scene);}
+ });
 }

@@ -1,0 +1,6 @@
+{
+ "extends":"../tsconfig.json",
+ "compilerOptions":{"incremental":false,"plugins":[],"noEmit":true,"jsx":"preserve"},
+ "files":["../lib/recently-played-v672.ts","../lib/smart-listening-history-v700.ts","../components/SmartListeningHistoryPanelV700.tsx","stubs/v700-react-jsx.d.ts"],
+ "include":[],"exclude":[]
+}

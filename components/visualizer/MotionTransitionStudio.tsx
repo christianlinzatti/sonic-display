@@ -2,7 +2,8 @@
 import { Suspense,useCallback,useEffect,useMemo,useRef,useState } from "react";
 import { Canvas,useFrame } from "@react-three/fiber";
 import { OrbitControls,useGLTF } from "@react-three/drei";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { withPrivateGltfV769 } from "./privateGltfLifecycleV769";
+import { disposeClonedAvatarSkeletonsV654 } from "./disposeClonedAvatarSkeletonsV654";
 import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUtils.js";
 import { AnimationMixer, type AnimationClip, type AnimationAction } from "three";
 import { retargetHumanoidClips,readRetargetCalibration } from "./avatarAnimationRetarget";
@@ -21,12 +22,12 @@ function PreviewActor({modelUrl,from,to,duration,request,onStatus}:{modelUrl:str
  const seen=useRef(0);
  const callback=useRef(onStatus);callback.current=onStatus;
  useEffect(()=>{let cancelled=false;setClips([]);
-  const loader=new GLTFLoader();Promise.allSettled([from,to].map(m=>loader.loadAsync(m.url))).then(results=>{
+  Promise.allSettled([from,to].map(m=>withPrivateGltfV769(m.url,gltf=>
+    retargetHumanoidClips(gltf.animations,gltf.scene,rig,readRetargetCalibration(modelUrl)).clips[0]??null))).then(results=>{
    if(cancelled)return;
    const next:Prepared[]=[];
    results.forEach((result,index)=>{if(result.status!=="fulfilled"){callback.current(`GLB ${index+1} konnte nicht geladen werden.`);return;}
-    const retargeted=retargetHumanoidClips(result.value.animations,result.value.scene,rig,readRetargetCalibration(modelUrl));
-    const clip=retargeted.clips[0];if(clip)next.push({id:index===0?from.id:to.id,clip});
+    if(result.value)next.push({id:index===0?from.id:to.id,clip:result.value});
    });setClips(next);
    if(next.length!==2)callback.current("Nicht beide Motions besitzen kompatible Animationsspuren. Vorschau eingeschränkt.");
    else callback.current("Beide Motions geladen. Übergang kann gestartet werden.");
@@ -48,7 +49,8 @@ function PreviewActor({modelUrl,from,to,duration,request,onStatus}:{modelUrl:str
   callback.current(match && match.comparedTracks > 0 ? `Motion-Matching: Übergang bei ${match.time.toFixed(2)} s, ${match.comparedTracks} gemeinsame Spuren.` : `Crossfade gestartet (${duration.toFixed(2)} s; keine vergleichbaren Spuren).`);
  },[request,clips,to.id,duration,mixer]);
  useFrame((_,delta)=>mixer.update(Math.min(delta,0.07)));
- return <primitive object={rig}/>;
+ useEffect(()=>()=>{mixer.stopAllAction();mixer.uncacheRoot(rig);disposeClonedAvatarSkeletonsV654(rig);},[mixer,rig]);
+ return <primitive object={rig} dispose={null}/>;
 }
 export function MotionTransitionStudio({model,motions}:{model:AvatarModel;motions:InstalledCharacterMotion[]}){
  const [settings,setSettings]=useState<MotionTransitionSettings>(()=>readMotionTransitionSettings(model.id));

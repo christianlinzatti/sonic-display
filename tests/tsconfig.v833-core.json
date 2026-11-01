@@ -1,0 +1,8 @@
+{
+ "extends":"./tsconfig.v654-resilience.json",
+ "files":[
+  "../components/visualizer/resourceCleanupV833.ts",
+  "../components/visualizer/disposeDancePostProcessingV654.ts",
+  "../components/visualizer/previewGltfCacheV654.ts"
+ ]
+}

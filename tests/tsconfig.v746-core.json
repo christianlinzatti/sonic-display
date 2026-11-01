@@ -1,0 +1,5 @@
+{
+  "compilerOptions": {"target":"ES2022","module":"commonjs","moduleResolution":"node", "strict":true,
+    "skipLibCheck":true,"noEmit":true,"types":[],"lib":["ES2022","DOM"]},
+  "files":["../components/visualizer/vocalPerformanceDirectorV746.ts"]
+}

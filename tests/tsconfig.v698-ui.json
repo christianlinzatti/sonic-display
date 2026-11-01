@@ -1,0 +1,12 @@
+{
+ "extends":"../tsconfig.json",
+ "compilerOptions":{"incremental":false,"plugins":[],"noEmit":true,"jsx":"preserve"},
+ "files":[
+  "../components/visualizer/concertVisualReviewV698.ts",
+  "../components/visualizer/concertAcceptanceDashboardV697.ts",
+  "../components/visualizer/ConcertVisualReviewPanelV698.tsx",
+  "../components/visualizer/ConcertAcceptanceDashboardPanelV697.tsx",
+  "../app/acceptance/page.tsx",
+  "stubs/v697-react-jsx.d.ts"
+ ],"include":[],"exclude":[]
+}

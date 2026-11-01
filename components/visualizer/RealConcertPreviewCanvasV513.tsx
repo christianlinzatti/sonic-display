@@ -1,10 +1,12 @@
 'use client';
+import {usePreviewGltfCacheV654} from './usePreviewGltfCacheV654';
 /** An opt-in OFFLINE WebGL scene. It never mounts in the live visualizer Canvas. */
 import {Component,Suspense,useCallback,useEffect,useMemo,useRef,useState,type ReactNode,type RefObject} from 'react';
 import {Canvas,useFrame} from '@react-three/fiber';
 import {OrbitControls,useGLTF} from '@react-three/drei';
 import {AnimationMixer,Box3,Quaternion,Vector3,type AnimationClip} from 'three';
-import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {withPrivateGltfV769} from './privateGltfLifecycleV769';
+import {disposeClonedAvatarSkeletonsV654} from './disposeClonedAvatarSkeletonsV654';
 import {readRetargetCalibration,retargetHumanoidClips} from './avatarAnimationRetarget';
 import {clone as cloneSkinnedScene} from 'three/examples/jsm/utils/SkeletonUtils.js';
 import {findAnimatedBonesV508,sampleAnimatedGlbV508} from './measureAnimatedGlbV508';
@@ -40,6 +42,7 @@ class RigLoadBoundaryV513 extends Component<{children:ReactNode;index:number},{f
 }
 function RigV513({index,url,motionUrl,clock,tier,pi,count,onSample,qualityEnabled,onQualityPose}:{index:number;url:string;motionUrl:string|null;clock:RefObject<{seconds:number;playing:boolean}>;tier:PreviewTierV513;pi:PreviewPiV513;count:number;onSample:(slot:number,sample:MotionSampleV508|undefined)=>void;qualityEnabled:boolean;onQualityPose:(slot:number,pose:MotionPoseV514|undefined)=>void}){
  const {scene,animations}=useGLTF(url);
+  usePreviewGltfCacheV654(url);
  const clone=useMemo(()=>{
   const copy=cloneSkinnedScene(scene);
   const box=new Box3().setFromObject(copy);
@@ -51,6 +54,7 @@ function RigV513({index,url,motionUrl,clock,tier,pi,count,onSample,qualityEnable
   }
   return copy;
  },[scene]);
+ useEffect(()=>()=>disposeClonedAvatarSkeletonsV654(clone),[clone]);
  const mixer=useMemo(()=>new AnimationMixer(clone),[clone]);
  const bones=useMemo(()=>findAnimatedBonesV508(clone),[clone]);
  const profile=useMemo(()=>measureGlbBodyV507(clone,1),[clone]);
@@ -59,10 +63,8 @@ function RigV513({index,url,motionUrl,clock,tier,pi,count,onSample,qualityEnable
  useEffect(()=>{
   let cancelled=false;setExternalClip(null);
   if(!motionUrl)return;
-  new GLTFLoader().loadAsync(motionUrl).then(gltf=>{
-   if(cancelled)return;
-   const result=retargetHumanoidClips(gltf.animations,gltf.scene,clone,readRetargetCalibration(url));
-   if(!cancelled)setExternalClip(result.clips.find(c=>c.tracks.length>0)??null);
+  withPrivateGltfV769(motionUrl,gltf=>retargetHumanoidClips(gltf.animations,gltf.scene,clone,readRetargetCalibration(url)).clips.find(c=>c.tracks.length>0)??null).then(clip=>{
+   if(!cancelled)setExternalClip(clip);
   }).catch(()=>{if(!cancelled)setExternalClip(null);});
   return ()=>{cancelled=true;};
  },[motionUrl,clone,url]);

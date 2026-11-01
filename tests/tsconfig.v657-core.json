@@ -1,0 +1,6 @@
+{
+ "extends":"../tsconfig.json",
+ "compilerOptions":{"incremental":false,"types":[]},
+ "files":["../services/settings/portableArchiveV657.ts"],
+ "include":[],"exclude":[]
+}

@@ -58,7 +58,7 @@ assert.match(mount,/!show3D&&/);
 assert.match(mount,/canShowPhotoGallery3DV348/);
 assert.match(mount,/photoComposition.layers.length>=2/);
 assert.match(ui,/Räumliche Fotogalerie aktivieren/);assert.match(ui,/Tiefe/);assert.match(ui,/Kamera-Parallaxe/);assert.match(ui,/Qualität/);
-assert.match(preview,/PhotoGallery3DSettingsV348 images=\{images\}/);
+assert.match(preview,/PhotoGallery3DSettingsV348 images=\{previewImages\}/);
 assert.match(read('app/globals.css'),/sonic-photo-3d-stage-card-v348/);
 const pkg=require('../package.json');assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 350);
 assert(pkg.scripts['verify:offline'].includes('test:v348'));

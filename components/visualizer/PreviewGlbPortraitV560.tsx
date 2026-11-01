@@ -1,4 +1,5 @@
 "use client";
+import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
 import {Suspense,useEffect,useMemo,useRef,type ReactNode,Component} from 'react';
 import {useFrame} from '@react-three/fiber';
 import {VocalRigV368} from './VocalRigV368';
@@ -36,6 +37,7 @@ type PreviewGlbPropsV561={url:string;correct:boolean;lowTier:boolean;lipModeV561
 const QUIET_AUDIO_V561:AudioFeatures={bass:0,mids:0,highs:0,volume:0,beat:false,beatStrength:0,bpm:0,kick:0,snare:0,hiHat:0,energyEnvelope:0,attack:0,decay:0};
 function GlbPreviewModelV560({url,correct,lowTier,lipModeV561='off',playingV561=true,reducedMotionV561=false,songV561,profileV561,onDiagnosticsV561,slotV563=0,xV563=0,voiceActiveV563=true,lookTowardV563=false,rapBodyV564=false,rapBodyStrengthV564=65,motionPreviewV565=false,motionSmoothV565=true,onMotionCountV565}:PreviewGlbPropsV561){
   const {scene,animations}=useGLTF(url);
+  usePreviewGltfCacheV654(url);
   const rootV563=useRef<Group>(null);
   const model=useMemo(()=>{
     const clone=cloneSkinnedScene(scene);

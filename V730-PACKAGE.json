@@ -1,0 +1,31 @@
+{
+  "release": "V730",
+  "base": "sonic-display-v729-advanced-artist-track-explorer.zip",
+  "baseSha256": "682045b4721c5b1df7b0dd92b24ca4d8a58fcc58c13f48145218204a8d9f900b",
+  "baseFilesPreserved": 3099,
+  "missingBaseFiles": [],
+  "addedFiles": [
+    "V730-EXPLORER-PLUS.md",
+    "V730-VERIFICATION.md",
+    "components/LastFmExplorerToolsV730.tsx",
+    "lib/lastfm-explorer-v730.ts",
+    "tests/helpers/explorer-module-loader.cjs",
+    "tests/tsconfig.v730-core.json",
+    "tests/tsconfig.v730-ui.json",
+    "tests/v730-explorer-regression.cjs",
+    "verification-v730/RESULTS.json",
+    "verification-v730/v730-build.log",
+    "verification-v730/v730-history.log",
+    "verification-v730/v730-http-smoke.log",
+    "verification-v730/v730-test-dependency.log",
+    "verification-v730/v730-tests.log",
+    "verification-v730/v730-typecheck-portable.log",
+    "verification-v730/v730-typecheck.log",
+    "verification-v730/v730-ui-types.log"
+  ],
+  "excludedGeneratedDirectories": [
+    ".git",
+    ".next",
+    "node_modules"
+  ]
+}

@@ -101,5 +101,5 @@ for(let ms=260;ms<11700;ms+=87)for(const quality of ['high','balanced'])for(cons
 }
 test('screen-safe deterministic samples',()=>assert(checks>500&&accepted>20,`${checks} ${accepted}`));
 const pkg=require('../package.json');
-test('release scripts and version',()=>{assert.match(pkg.version,/^0\.1\.0-v(?:60[6-9]|6[1-9][0-9])$/);assert(pkg.scripts['build:preflight'].includes('test:smoke:v642') && pkg.scripts['test:smoke:v642'].includes('test:smoke:v641') && pkg.scripts['test:smoke:v607'].includes('test:v606'));assert(pkg.scripts['test:smoke:v606'].includes('test:v605'));});
+test('release scripts and version',()=>{assert.match(pkg.version,/^0\.1\.0-v(?:60[6-9]|6[1-9][0-9])$/);assert(pkg.scripts['check:release'].includes('test:smoke:v671') && pkg.scripts['test:smoke:v642'].includes('test:smoke:v641') && pkg.scripts['test:smoke:v607'].includes('test:v606'));assert(pkg.scripts['test:smoke:v606'].includes('test:v605'));});
 console.log(`PASS V606: ${n} test groups; ${checks} sampled camera frames; ${accepted} guarded refinements.`);

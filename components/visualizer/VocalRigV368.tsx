@@ -16,6 +16,7 @@ import {planIntelligentConcertPerformanceV503,composeConcertFaceV503} from "./in
 import {synchronizeRapExpressionV516} from "./naturalDeutschrapSyncV516";
 import {planExpressiveRapV510,composeExpressiveRapFaceV510} from "./expressiveRapPerformanceV510";
 import {getActivePerformanceTier} from "./adaptivePerformance";
+import {planRapMouthPrecisionV798,rapMouthRateV798,sampleRapidRapDemoV798} from "./advancedFacialStudioV798";
 import {calibrateMouthPoseV562} from "./advancedFacialCalibrationV562";
 import {refineDeutschrapFaceV538} from "./deutschrapVocalPerformanceV538";
 import {refineAdvancedRapArticulationV546} from "./advancedDeutschrapArticulationV546";
@@ -23,8 +24,12 @@ import {refineDeutschrapLipFlowV597,rapLipFlowRateV597} from "./advancedDeutschr
 import {refineExpressiveVocalFaceV612,expressiveVocalRateV612} from "./expressiveVocalFaceV612";
 import {refineVocalFacialRealismV617,vocalFacialRateV617} from "./advancedVocalFacialRealismV617";
 import {planAdvancedVocalLipSyncV631,vocalMouthRateV631} from "./advancedVocalLipSyncV631";
+import {planVocalTimingPrecisionV686,vocalTimingRateV686} from "./vocalTimingPrecisionV686";
+import {planAdvancedDeutschrapLipSyncV837,deutschrapLipRateV837} from "./advancedDeutschrapLipSyncV837";
 import {multiArtistMouthTargetV632} from "./multiArtistVocalDirectorV632";
-import {sampleLiveVisemeV644} from "./phonemeLipSyncV644";
+import {sampleLiveVocalEnvelopeV661,refineVocalJawV661,getLiveVocalEnvelopeV661} from "./vocalAnalysisStudioV661";
+import {sampleLiveVisemeV644,getLiveVisemeV644} from "./phonemeLipSyncV644";
+import {sampleAdvancedVisemeV662} from "./advancedPhonemeLipSyncV662";
 import {planExpressiveArtistV645,addExpressiveArtistFaceV645} from "./expressiveArtistPerformanceV645";
 import {coordinateFullBodyPerformanceV618} from "./fullBodyPerformanceCoordinationV618";
 import {planRapMouthDynamicsV572,rapMouthRateV572} from "./rapMouthDynamicsV572";
@@ -32,6 +37,7 @@ import {planNaturalRapExpressionV573,applyNaturalRapExpressionV573} from "./natu
 import {planVerifiedEyeContactV574} from "./verifiedEyeContactV574";
 import {planCoherentRapFaceV581,addCoherentRapExpressionV581,coherentRapRateV581,additiveBoneAxisV581,releaseBoneAxisV581} from "./coherentRapFacialPerformanceV581";
 import {planNaturalDanceFacialCoordinationV582,applyBodyBoneAxisV582,releaseBodyBoneAxisV582,type BodyBoneAxisV582} from "./naturalDanceFacialCoordinationV582";
+import {planDeutschrapPerformanceV663,getDeutschrapPerformanceModeV663} from "./expressiveDeutschrapPerformanceV663";
 import {resolveVocalPerformanceQualityV374} from "./vocalPerformanceQualityV374";
 import {resolveFacialPoseV369,type FacialPoseV369} from "./facialPerformanceV369";
 import {scanFacialRigV370,bindingsForFacialProfileV370,facialGainV370,sampleFacialDemoV370,type FacialProfileV370,type FacialChannelV370} from "./facialRigStudioV370";
@@ -56,7 +62,7 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
   profileV370?:FacialProfileV370;
   /** Preview overrides lyric analysis but uses the exact same rendering/overlay path. */
   previewPoseV370?:Partial<FacialPoseV369>;
-  demoV370?: "off" | "rap" | "singing";
+  demoV370?: "off" | "rap" | "singing" | "fast-rap";
   /** Isolated morph audition; takes precedence over the complete facial pose and lyric automation. */
   previewTargetV383?:{id:string;weight:number}|null;
 }) {
@@ -161,7 +167,7 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
       }) : null;
     const expressive = expressiveFaceV390({timeSeconds:(lipSync?.progressMs??0)/1000,slot:avatarSlot,playing:lipSync?.playing??false,active:!!lipSync?.enabled&&!!lipSync?.expressiveFaceEnabledV390&&demoV370==="off"&&!previewPoseV370&&!previewTargetV383,strength:lipSync?.expressiveFaceStrengthV390??45,reducedMotion:lipSync?.reducedMotionV390??false,rap:lipSync?.style==="rap"||genre?.toLowerCase().includes("rap"),energy:audio.mids,phrase:coordinated?.face?.jaw??0});
     const target:Record<Channel,number>=previewTargetV383 ? ZERO : demoV370!=="off"
-      ? {...ZERO,...sampleFacialDemoV370(state.clock.elapsedTime,demoV370)}
+      ? {...ZERO,...(demoV370==="fast-rap"?sampleRapidRapDemoV798(state.clock.elapsedTime):sampleFacialDemoV370(state.clock.elapsedTime,demoV370))}
       : previewPoseV370 ? {...ZERO,...previewPoseV370}
       : coordinated?.face??ZERO;
     if(expressive.blink||expressive.brow||expressive.smile||expressive.squint){
@@ -332,6 +338,15 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
     // V631 only alters response rates for already verified rapid-word targets.
     const mouthContinuityV631=planAdvancedVocalLipSyncV631(
       facialRealismV617.frame,optionsV538,getActivePerformanceTier());
+    // V686: response-rate timing only; V644/V662 authored silence, V661 stems,
+    // V420 word edits and V423 audio remain exclusive mouth authorities.
+    const authoredVisemeV686=getLiveVisemeV644();
+    const activeStemV686=getLiveVocalEnvelopeV661();
+    const protectedMouthV686=(authoredVisemeV686?.enabled===true&&authoredVisemeV686.document.trackId===trackId)||
+      (activeStemV686?.trackId===trackId&&activeStemV686.slots.includes(avatarSlot))||
+      authoredPriorityV499||demoV370!=="off"||!!previewPoseV370||!!previewTargetV383;
+    const precisionV686=planVocalTimingPrecisionV686(optionsV538,getActivePerformanceTier(),
+      protectedMouthV686);
     // V582 consumes the SAME verified word/singer cue as the face.
     // Each joint receives its own safely removable overlay; manual choreography wins.
     const bodyFaceCueV582=planNaturalDanceFacialCoordinationV582({
@@ -368,28 +383,41 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
       energy:Math.max(0,Math.min(1,audio.mids)),word:coherentCueV581,
       eye:eyeCueV574,body:coordinatedBodyV618,
     });
+    // V663 – opt-in, evidence-bound phrase expression. All other GLB owners
+    // stay authoritative; no extra render loop, facial/mouth edits or IK guesses.
+    const expressionV663=planDeutschrapPerformanceV663({
+      trackId,avatarSlot,timeMs:optionsV538.effectiveTimeMs,
+      playing:optionsV538.playing,rap:optionsV538.rap,
+      mode:getDeutschrapPerformanceModeV663(trackId),
+      reducedMotion:optionsV538.reducedMotion,
+      authoredPriority:authoredPriorityV499||optionsV538.manualPriority,
+      tier:getActivePerformanceTier(),section:sectionV503,
+      strength:lipSync?.expression??55,energy:Math.max(0,Math.min(1,audio.mids)),
+      word:coherentCueV581,phrase:artistCueV645,eye:eyeCueV574,
+      body:coordinatedBodyV618.body,supported:coordinatedBodyV618,
+    });
     const expressiveArtistFaceV645=addExpressiveArtistFaceV645(facialRealismV617.frame,artistCueV645);
     const supportedBodyV618=coordinatedBodyV618.body;
     applyBodyBoneAxisV582(upperBodyBonesV582[0],supportedBodyV618.chestPitch);
     applyBodyBoneAxisV582(upperBodyBonesV582[1],supportedBodyV618.chestRoll);
-    applyBodyBoneAxisV582(upperBodyBonesV582[2],supportedBodyV618.leftShoulderRoll);
-    applyBodyBoneAxisV582(upperBodyBonesV582[3],supportedBodyV618.rightShoulderRoll);
-    applyBodyBoneAxisV582(upperArmBonesV618[0],Math.min(.00531,coordinatedBodyV618.leftArmPitch+artistCueV645.leftArmPitch));
-    applyBodyBoneAxisV582(upperArmBonesV618[1],Math.min(.00531,coordinatedBodyV618.rightArmPitch+artistCueV645.rightArmPitch));
+    applyBodyBoneAxisV582(upperBodyBonesV582[2],Math.max(-.012,Math.min(.012,supportedBodyV618.leftShoulderRoll+expressionV663.leftShoulderRoll)));
+    applyBodyBoneAxisV582(upperBodyBonesV582[3],Math.max(-.012,Math.min(.012,supportedBodyV618.rightShoulderRoll+expressionV663.rightShoulderRoll)));
+    applyBodyBoneAxisV582(upperArmBonesV618[0],Math.min(.00531,coordinatedBodyV618.leftArmPitch+artistCueV645.leftArmPitch+expressionV663.leftArmPitch));
+    applyBodyBoneAxisV582(upperArmBonesV618[1],Math.min(.00531,coordinatedBodyV618.rightArmPitch+artistCueV645.rightArmPitch+expressionV663.rightArmPitch));
     if(headBoneV581){
       const o=headOverlayV581.current;
       // Mixer may have rewritten the authored keyframe; only undo our overlay
       // when it actually survived. Pitch/yaw are limited to <= 0.025 rad.
-      const expressivePitchV612=Math.max(-.030,Math.min(.030,coherentCueV581.headPitch+expressiveVocalV612.headPitch+facialRealismV617.headPitch+artistCueV645.headPitch));
-      const expressiveYawV612=Math.max(-.030,Math.min(.030,coherentCueV581.headYaw+expressiveVocalV612.headYaw+facialRealismV617.headYaw+artistCueV645.headYaw));
+      const expressivePitchV612=Math.max(-.030,Math.min(.030,coherentCueV581.headPitch+expressiveVocalV612.headPitch+facialRealismV617.headPitch+artistCueV645.headPitch+expressionV663.headPitch));
+      const expressiveYawV612=Math.max(-.030,Math.min(.030,coherentCueV581.headYaw+expressiveVocalV612.headYaw+facialRealismV617.headYaw+artistCueV645.headYaw+expressionV663.headYaw));
       headBoneV581.rotation.x=additiveBoneAxisV581(headBoneV581.rotation.x,expressivePitchV612,o.lastPitch,o.renderedPitch);
       headBoneV581.rotation.y=additiveBoneAxisV581(headBoneV581.rotation.y,expressiveYawV612,o.lastYaw,o.renderedYaw);
       o.lastPitch=expressivePitchV612;o.lastYaw=expressiveYawV612;
       o.renderedPitch=headBoneV581.rotation.x;o.renderedYaw=headBoneV581.rotation.y;
     }
     for(const eye of eyeBonesV574){
-      const yaw=Math.max(-.065,Math.min(.065,eyeCueV574.yaw+coherentCueV581.eyeYawDelta+facialRealismV617.eyeYaw+artistCueV645.eyeYaw));
-      const pitch=Math.max(-.04,Math.min(.04,eyeCueV574.pitch+coherentCueV581.eyePitchDelta+facialRealismV617.eyePitch+artistCueV645.eyePitch));
+      const yaw=Math.max(-.065,Math.min(.065,eyeCueV574.yaw+coherentCueV581.eyeYawDelta+facialRealismV617.eyeYaw+artistCueV645.eyeYaw+expressionV663.eyeYaw));
+      const pitch=Math.max(-.04,Math.min(.04,eyeCueV574.pitch+coherentCueV581.eyePitchDelta+facialRealismV617.eyePitch+artistCueV645.eyePitch+expressionV663.eyePitch));
       // Subtract only if our overlay survived the mixer since the last frame.
       const keptYaw=Math.abs(eye.bone.rotation.y-eye.renderedYaw)<.0001?eye.lastYaw:0;
       const keptPitch=Math.abs(eye.bone.rotation.x-eye.renderedPitch)<.0001?eye.lastPitch:0;
@@ -412,10 +440,41 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
     // V644: manually time-aligned visemes only; never confuse V643 energy/onsets
     // with recognized phonemes. Preview, authored facial work and explicit
     // syllable/audio timing retain priority. Opt-in is memory-only and track-bound.
-    const manualVisemeV644=demoV370==='off'&&!previewPoseV370&&!previewTargetV383&&
+    const advancedVisemeV662=demoV370==='off'&&!previewPoseV370&&!previewTargetV383&&
       !authoredPriorityV499&&!lipSync?.rapSyllableEditsEnabledV420&&
       !lipSync?.rapAudioEnabledV423&&lipSync?.enabled!==false
-      ?sampleLiveVisemeV644(trackId,avatarSlot,clockV453,lipSync?.playing===true):null;
+      ?sampleAdvancedVisemeV662(trackId,avatarSlot,clockV453,lipSync?.playing===true):null;
+    const manualVisemeV644=advancedVisemeV662?.mouth??(demoV370==='off'&&!previewPoseV370&&!previewTargetV383&&
+      !authoredPriorityV499&&!lipSync?.rapSyllableEditsEnabledV420&&
+      !lipSync?.rapAudioEnabledV423&&lipSync?.enabled!==false
+      ?sampleLiveVisemeV644(trackId,avatarSlot,clockV453,lipSync?.playing===true):null);
+    // V837: retain the V368 morph interpolator as the only mouth owner.
+    // An authorized singer, genuine timed word and no authored viseme are required.
+    const articulationV837=planAdvancedDeutschrapLipSyncV837(
+      optionsV538,getActivePerformanceTier(),castVerifiedV581,
+      !!protectedMouthV686||!!manualVisemeV644||
+      !!lipSync?.rapSyllableEditsEnabledV420&&!!editsV453?.length||
+      !!lipSync?.rapAudioEnabledV423&&lipSync.rapAudioTrackIdV423===trackId);
+    // V798: only boost the response speed of existing targets when the word,
+    // singer and avatar's actual mouth controls are verified. Never fabricate
+    // visemes, override authored events or alter a hand-authored face preview.
+    const precisionV798=planRapMouthPrecisionV798(profileV370?.rapMouthPrecisionV798,{
+      verifiedWord:coordinated?.confidence==='word'&&unifiedLipV526.activeV523,
+      rap:coordinated?.vocal.style==='rap',playing:lipSync?.playing===true,
+      authorisedSinger:castVerifiedV581&&optionsV538.roleAllowed&&!manualSilentV453,
+      manualPriority:authoredPriorityV499||!!previewTargetV383||
+        (!!previewPoseV370&&demoV370!=='rap'&&demoV370!=='fast-rap')||
+        (demoV370!=='off'&&demoV370!=='rap'&&demoV370!=='fast-rap')||
+        !!lipSync?.rapSyllableEditsEnabledV420&&!!editsV453?.length||
+        !!lipSync?.rapAudioEnabledV423&&lipSync.rapAudioTrackIdV423===trackId,
+      authoredViseme:!!manualVisemeV644||!!(activeStemV686?.trackId===trackId&&activeStemV686.slots.includes(avatarSlot)),
+      reducedMotion:reducedMotion||!!lipSync?.reducedMotionV390,
+      lowTier:getActivePerformanceTier()==='low',
+      hasJaw:(targets.hasJawMorph||!!targets.jawBone&&profileV370?.mapping?.jaw!=='none')&&
+        profileV370?.mapping?.jaw!=='none'&&profileV370?.gains?.jaw!==0,
+      hasLipClosure:targets.morphs.some(m=>m.channel==='lipsClosed')&&profileV370?.gains?.lipsClosed!==0,
+      previewRap:demoV370==='rap'||demoV370==='fast-rap',
+    });
     for (const c of channels) {
       const articulatingV384=!!coordinated?.articulationV384.active;
       const mouthTargetV476=lipV476.activeV476?lipV476.face[c]:lipV459.face[c];
@@ -443,14 +502,36 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
           lipSync.rapAudioTrackIdV423===lipSync.rapAudioDocumentV423.trackId);
       const alignedMouthV644=manualVisemeV644&&
         (c==='jaw'||c==='wide'||c==='round'||c==='lipsClosed')?manualVisemeV644[c]:null;
-      const finalMouthTargetV644=alignedMouthV644??directedTargetV632;
+      // V661 uses ONLY a user-provided isolated stem, explicitly activated in
+      // settings and bound to this song/slot. It cannot create an unverified
+      // mouth: word timing + authorized singer, and every authored override wins.
+      const v661Allowed=c==='jaw'&&alignedMouthV644===null&&!authoredPriorityV499&&
+        !reducedMotion&&!lipSync?.reducedMotionV390&&demoV370==='off'&&
+        !previewPoseV370&&!previewTargetV383&&lipSync?.enabled===true&&
+        coordinated?.confidence==='word'&&castVerifiedV581&&!manualSilentV453&&
+        !(lipSync?.rapSyllableEditsEnabledV420&&!!editsV453?.length)&&
+        !(lipSync?.rapAudioEnabledV423&&!!lipSync.rapAudioDocumentV423&&
+          lipSync.rapAudioTrackIdV423===trackId);
+      const v661Signal=v661Allowed?sampleLiveVocalEnvelopeV661(trackId,avatarSlot,clockV453,lipSync?.playing===true):null;
+      let finalMouthTargetV644=alignedMouthV644??directedTargetV632;
+      if(v661Signal&&alignedMouthV644===null){
+        finalMouthTargetV644=refineVocalJawV661(finalMouthTargetV644,
+          lipV499.face.lipsClosed,v661Signal);
+      }
       const speed=finalTargetV612>current.current[c] ? (c==="blink"?40:articulatingV384&&c==="lipsClosed"?lipV476.closureHz:lipV476.attackHz) : (c==="blink"?32:articulatingV384&&c==="lipsClosed"?Math.max(26,lipV476.releaseHz):lipV476.releaseHz);
+      // V662: crisp authored consonants can reach their target within a short
+      // rap interval; singing keeps the original smoother response curve.
+      const tunedSpeedV662=advancedVisemeV662&&(c==='jaw'||c==='wide'||c==='round'||c==='lipsClosed')
+        ?Math.max(speed,advancedVisemeV662.mode==='rap'?48:31):speed;
       const attackingV581=finalTargetV546>current.current[c];
-      const cadenceSpeedV572=speed*(mouthDynamicsV572?rapMouthRateV572(mouthDynamicsV572,c,attackingV581):1)*
+      const cadenceSpeedV572=tunedSpeedV662*(mouthDynamicsV572?rapMouthRateV572(mouthDynamicsV572,c,attackingV581):1)*
         coherentRapRateV581(coherentCueV581,c,attackingV581)*
         rapLipFlowRateV597(lipV597,c,attackingV581);
       current.current[c]+=(finalMouthTargetV644-current.current[c])*(1-Math.exp(-cadenceSpeedV572*expressiveVocalRateV612(expressiveVocalV612,c,attackingV581)*vocalFacialRateV617(facialRealismV617,c,attackingV581)*
-        vocalMouthRateV631(mouthContinuityV631,c,attackingV581,current.current[c],finalMouthTargetV644)*delta));
+        vocalMouthRateV631(mouthContinuityV631,c,attackingV581,current.current[c],finalMouthTargetV644)*
+        vocalTimingRateV686(precisionV686,c,current.current[c],finalMouthTargetV644)*
+        deutschrapLipRateV837(articulationV837,c,current.current[c],finalMouthTargetV644)*
+        rapMouthRateV798(precisionV798,c,finalMouthTargetV644>current.current[c])*delta));
     }
     // V562 is opt-in per-avatar; keep solo morph audition unmodified.
     // The same post-filter applies to live show and real-GLB close-up preview.

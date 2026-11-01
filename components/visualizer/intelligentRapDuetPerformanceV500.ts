@@ -16,6 +16,8 @@ export interface RapDuetInputV500 {
   count:number;positions:readonly (readonly [number,number,number])[];
   playing:boolean;reducedMotion:boolean;manualPriority:boolean;
   beat:number;strength?:number;tier:RapDuetTierV500;
+  /** V664: explicit per-song opt-in, defaults to off. */
+  interactionModeV664?:import('./naturalDuetFeatureInteractionV664').NaturalDuetModeV664;
 }
 const clamp=(value:number,low:number,high:number)=>Number.isFinite(value)?Math.min(high,Math.max(low,value)):low;
 const smooth=(v:number)=>{const x=clamp(v,0,1);return x*x*(3-2*x);};

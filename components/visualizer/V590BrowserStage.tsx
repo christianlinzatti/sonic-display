@@ -1,4 +1,5 @@
 'use client';
+import {usePreviewGltfCacheV654} from './usePreviewGltfCacheV654';
 /** Local V590 screenshot target. Loads genuine GLB(s), never a procedural substitute. */
 import {Suspense,useCallback,useEffect,useMemo,useRef,useState, type MutableRefObject} from 'react';
 import {Canvas,useFrame, useThree} from '@react-three/fiber';
@@ -18,6 +19,7 @@ const initial:Shot={ready:false,error:null,modelUrl:'',motionUrl:null,clipNames:
 function RenderRig({modelUrl,motionUrl,selection,onReady,shotRef}:{modelUrl:string;motionUrl:string|null;
  selection:{clipIndex:number;seconds:number;generation:number};onReady:(names:string[],durations:number[])=>void;shotRef:MutableRefObject<Shot>}){
  const source=useGLTF(modelUrl);const motion=useGLTF(motionUrl||modelUrl);
+ usePreviewGltfCacheV654(modelUrl);
  const gltf=useMemo(()=>cloneSkinnedScene(source.scene),[source.scene]);
  const clips=useMemo<AnimationClip[]>(()=>motionUrl
   ?retargetHumanoidClips(motion.animations,motion.scene,gltf,readRetargetCalibration(modelUrl)).clips

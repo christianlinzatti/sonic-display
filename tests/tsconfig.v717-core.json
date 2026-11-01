@@ -1,0 +1,1 @@
+{"extends": "../tsconfig.json", "compilerOptions": {"incremental": false, "plugins": [], "noEmit": true}, "files": ["../lib/lastfm-milestones-v717.ts"], "include": [], "exclude": []}

@@ -1,6 +1,7 @@
+import {boundedFormDataV733,UploadLimitErrorV733,localHostV733} from "@/lib/boundedUploadV733";
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, sameOrigin } from "@/lib/avatarAdmin";
-import { readAvatarConfig, writeAvatarConfig, useBlob } from "@/lib/avatarBlob";
+import { updateAvatarMetadata, useBlob } from "@/lib/avatarBlob";
 import { mkdir, writeFile, unlink, stat } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
@@ -12,7 +13,7 @@ export async function POST(req: NextRequest) {
   if (process.env.NODE_ENV !== "development" || useBlob) return NextResponse.json({ error: "Lokale Installation nur in der Entwicklung ohne Blob" }, { status: 403 });
   if (Number(req.headers.get("content-length") || 0) > MAX_BYTES + 1024 * 1024) return NextResponse.json({error:"Datei zu groß"},{status:413});
   try {
-    const form=await req.formData(); const file=form.get("file");
+    const form=await boundedFormDataV733(req,MAX_BYTES+1024*1024); const file=form.get("file");
     const sourceUrl=String(form.get("sharedMotionUrl")??"");
     const fingerprint=String(form.get("sharedMotionFingerprint")??"");
     const rigFingerprint=String(form.get("sharedRigFingerprint")??"");
@@ -33,10 +34,9 @@ export async function POST(req: NextRequest) {
     await mkdir(dir,{recursive:true});
     await writeFile(path.join(dir,filename),bytes,{flag:"wx"});
     try {
-      const metadata=await readAvatarConfig();
-      metadata[filename]={label:base,description:"Über Character & Motion Library installiert",preview:"/avatars/custom-preview.svg",category:"Eigene Modelle",genre:[],tags:[],favorite:false,defaultDancePreset:"auto",sharedMotionUrl:sourceUrl,sharedMotionFingerprint:fingerprint,sharedRigFingerprint:rigFingerprint,sharedMotionClipCount:clipCount};
-      await writeAvatarConfig(metadata);
+      const metadata={label:base,description:"Über Character & Motion Library installiert",preview:"/avatars/custom-preview.svg",category:"Eigene Modelle",genre:[],tags:[],favorite:false,defaultDancePreset:"auto",sharedMotionUrl:sourceUrl,sharedMotionFingerprint:fingerprint,sharedRigFingerprint:rigFingerprint,sharedMotionClipCount:clipCount};
+      await updateAvatarMetadata(filename,metadata);
     } catch { await unlink(path.join(dir,filename)).catch(()=>{}); throw new Error("Avatar-Metadaten konnten nicht gesichert werden"); }
     return NextResponse.json({id:`local:${filename}`,url:`/avatars/${encodeURIComponent(filename)}`,label:base});
-  } catch {return NextResponse.json({error:"Charakter-Installation fehlgeschlagen"},{status:500});}
+  } catch (error) {if(error instanceof UploadLimitErrorV733)return NextResponse.json({error:error.message},{status:413});return NextResponse.json({error:"Charakter-Installation fehlgeschlagen"},{status:500});}
 }

@@ -72,7 +72,7 @@ export function MusicDiscoveryV361(){
  },[open,mode,genre,debounced,offset,refresh,withGenre]);
  useEffect(()=>{
   if(!open||!selectedRelease){setAlbumTracks([]);setAlbumHasMore(false);return;}
-  const controller=new AbortController();setAlbumLoading(true);setAlbumError(null);setAlbumTracks([]);
+  const controller=new AbortController();setAlbumLoading(true);setAlbumError(null);if(albumOffset===0)setAlbumTracks([]);
   const load=async()=>{try{
    const q=new URLSearchParams({mode:"album",albumId:selectedRelease.id,offset:String(albumOffset)});
    const res=await fetch(`/api/spotify/music-discovery?${q}`,{cache:"no-store",signal:controller.signal});

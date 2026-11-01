@@ -85,7 +85,8 @@ for(const token of ['planAdvancedDanceFootworkV486({','GroupFootSupportContextV4
 const groundingSource=fs.readFileSync('components/visualizer/realisticGlbFootContactV494.ts','utf8');
 for(const axis of ['X','Z']){
  const original=avatar.includes(`advancedFootworkV486.slots[i].offset${axis}`);
- const protectedV524=avatar.includes('const naturalFootworkV524=stabilizedBodyV524.footwork')&&
+ const protectedV524=avatar.includes('const naturalFootworkV524=refineGroupFootworkV684(stabilizedBodyV524.footwork')&&
+  fs.readFileSync('components/visualizer/naturalDanceEvolutionV684.ts','utf8').includes('return {...s,liftLeft:')&&
   avatar.includes('footwork:advancedFootworkV486,')&&
   fs.readFileSync('components/visualizer/naturalFullBodyDanceV524.ts','utf8').includes(`offset${axis}:source.offset${axis}`)&&
   avatar.includes('stepNaturalFullBodyV524(naturalBodyStateV524.current');
@@ -100,5 +101,5 @@ const source=fs.readFileSync('components/visualizer/advancedDanceFootworkV486.ts
 assert(!/\b(fetch|setInterval|setTimeout|requestAnimationFrame|Date\.now|Math\.random|new THREE)\b/.test(source),'pure bounded planner');
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=486);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v486 && npm run test:v486:types'));
+assert(pkg.scripts['test:v486']&&pkg.scripts['test:v486:types']); // V680: historical suites are intentionally not in the normal prebuild gate
 console.log('PASS V486: song-clock stance, alternating foot swings, measured GLB IK support, guard priority, BPM seek, 33-min simulation');

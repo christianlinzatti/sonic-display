@@ -39,7 +39,8 @@ export function PushSettingsV365(){
   setBusy(true);setMessage('');
   try{
    const subscription=supported?await (await navigator.serviceWorker.ready).pushManager.getSubscription():null;
-   const response=await fetch('/api/push/subscription',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify(subscription?{endpoint:subscription.endpoint}:{all:true})});
+   if(!subscription){await refresh();setMessage('Auf diesem Gerät ist kein Push-Abo vorhanden. Andere Geräte bleiben angemeldet.');return;}
+   const response=await fetch('/api/push/subscription',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:subscription.endpoint})});
    if(!response.ok)throw new Error('Serverseitige Abmeldung fehlgeschlagen. Bitte erneut versuchen.');
    if(subscription)await subscription.unsubscribe();
    await refresh();setMessage('Push für dieses Gerät deaktiviert.');

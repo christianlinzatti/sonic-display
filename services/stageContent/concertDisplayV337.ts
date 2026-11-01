@@ -11,7 +11,7 @@ export const safePosterV337=(value:unknown):string|undefined=>{
 export function selectTicketmasterPosterV337(images:unknown):string|undefined {
  if(!Array.isArray(images))return undefined;
  const candidates=images.filter((v):v is {url:string;width?:number;height?:number}=>!!v&&typeof v==="object"&&typeof v.url==="string"&&!!safePosterV337(v.url));
- candidates.sort((a,b)=>Math.abs((b.width||0)-850)-Math.abs((a.width||0)-850));
+ candidates.sort((a,b)=>Math.abs((a.width||0)-850)-Math.abs((b.width||0)-850));
  return candidates[0]&&safePosterV337(candidates[0].url);
 }
 export function selectOeticketPosterV337(product:unknown,group:unknown):string|undefined {
@@ -41,8 +41,10 @@ export function displayTicketStatusV337(status?:string):string|null {
  if(!status)return null;
  const s=status.toLocaleLowerCase();
  if(/sold.?out|ausverkauft/.test(s))return "Ausverkauft";
- if(/available|verfügbar/.test(s))return "Tickets verfügbar";
+ if(/cancelled|canceled|abgesagt/.test(s))return "Abgesagt";
+ if(/postponed|verschoben/.test(s))return "Verschoben";
  if(/unavailable|nicht verfügbar/.test(s))return "Derzeit nicht verfügbar";
+ if(/available|verfügbar/.test(s))return "Tickets verfügbar";
  return null; // never expose unknown upstream enums as user-facing guarantees
 }
 export function formattedConcertDateV337(date:string):string {

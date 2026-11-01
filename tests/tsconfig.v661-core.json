@@ -1,0 +1,5 @@
+{
+ "extends":"./tsconfig.v643-core.json",
+ "compilerOptions":{"incremental":false},
+ "files":["../components/visualizer/vocalAnalysisStudioV661.ts","../components/visualizer/vocalStemAnalysisV643.ts","v414-music-types.d.ts"]
+}

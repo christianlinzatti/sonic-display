@@ -1,0 +1,4 @@
+{
+  "compilerOptions":{"strict":true,"noEmit":true,"skipLibCheck":true,"target":"ES2022","module":"ESNext","moduleResolution":"Bundler","types":[]},
+  "files":["../components/visualizer/smartVocalAssignmentV660.ts","../components/visualizer/vocalTimeDirectorV496.ts","../components/visualizer/manualVocalCastingV385.ts","../components/visualizer/rapDuetStudioV416.ts","v414-music-types.d.ts"]
+}

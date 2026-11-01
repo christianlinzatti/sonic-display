@@ -16,7 +16,7 @@ import {PHOTO_SELECTION_EVENT_V349,readPhotoSelectionV349,rankPhotosForFrameV349
 import {usePhotoDimensionsV349} from '@/services/stageContent/usePhotoDimensionsV349';
 import type {LyricsPhotoDecisionV350} from '@/services/stageContent/lyricsPhotoChoreographyV350';
 /** In-screen gallery: no extra Three meshes or additional animation loops. */
-export function StageImageGalleryV338({images,alt,reducedMotion=false,className='',credits={},targetAspectRatio=16/9,section='unknown',beatAccent=0,playing=true,paused=false,genre='',choreography,fxCue}:{images:string[];alt:string;reducedMotion?:boolean;className?:string;credits?:Record<string,string>;targetAspectRatio?:number;section?:string;beatAccent?:number;playing?:boolean;paused?:boolean;genre?:string;choreography?:LyricsPhotoDecisionV350;fxCue?:VisualFxCueV353}){
+export function StageImageGalleryV338({images,alt,reducedMotion=false,className='',credits={},targetAspectRatio=16/9,section='unknown',beatAccent=0,playing=true,paused=false,genre='',choreography,fxCue,curatedOrder=false}:{images:string[];alt:string;reducedMotion?:boolean;className?:string;credits?:Record<string,string>;targetAspectRatio?:number;section?:string;beatAccent?:number;playing?:boolean;paused?:boolean;genre?:string;choreography?:LyricsPhotoDecisionV350;fxCue?:VisualFxCueV353;curatedOrder?:boolean}){
  const [settings,setSettings]=useState(readGalleryV338);
  const [layouts,setLayouts]=useState(readGalleryLayoutsV344);
  const [multiPhoto,setMultiPhoto]=useState(readPhotoCompositionsV345);
@@ -57,7 +57,7 @@ export function StageImageGalleryV338({images,alt,reducedMotion=false,className=
  const candidates=useMemo(()=>safeImages.map(url=>({url,...dimensions[url]})),[safeImages,dimensions]);
  const orderedImages=useMemo(()=>smartSelection.enabled
   ?rankPhotosForFrameV349(candidates,{width:targetAspectRatio*900,height:900,displayWidth:960,displayHeight:540},smartSelection).slice(0,settings.maxImages).map(x=>x.url)
-  :rankImagesV340(candidates,targetAspectRatio,selection).slice(0,settings.maxImages).map(x=>x.url),[candidates,targetAspectRatio,selection,smartSelection,settings.maxImages]);
+  :curatedOrder?candidates.slice(0,settings.maxImages).map(x=>x.url):rankImagesV340(candidates,targetAspectRatio,selection).slice(0,settings.maxImages).map(x=>x.url),[candidates,targetAspectRatio,selection,smartSelection,settings.maxImages,curatedOrder]);
  const intervalSeconds=musicGalleryIntervalV341(settings.intervalSeconds,section,musicSettings);
  useEffect(()=>{if(!settings.enabled||settings.mode!=='slideshow'||reducedMotion||paused||(musicSettings.enabled&&!playing)||orderedImages.length<2)return;
    const timer=window.setInterval(()=>{lastAdvance.current=Date.now();setIndex(i=>i+1);},intervalSeconds*1000);return()=>window.clearInterval(timer);

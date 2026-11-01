@@ -1,4 +1,5 @@
 "use client";
+import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { Canvas, ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
@@ -6,6 +7,7 @@ import { Bone, Euler, Quaternion, Vector3 } from "three";
 import { diagnosticsForRig, proposeJointLimits, type AxisDiagnostic } from "./anatomicalAxisDiagnostics";
 import { DEFAULT_JOINT_LIMITS, jointConstraintKey, normalizeConstraintMap, setJointAxis, type JointAxis, type JointConstraintMap, type JointLimits } from "./jointConstraintCalibration";
 import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUtils.js";
+import {disposeClonedAvatarSkeletonsV654} from "./disposeClonedAvatarSkeletonsV654";
 
 const SLOTS = ["head","neck","spine","chest","hips","leftArm","rightArm","leftForearm","rightForearm","leftHand","rightHand","leftLeg","rightLeg","leftFoot","rightFoot"] as const;
 type Slot = typeof SLOTS[number];
@@ -14,7 +16,9 @@ export const skeletonCalibrationKey = (url: string) => `sonic-display:v152:skele
 
 function RigScene({url, selected, onSelect, overrides, constraints, onDiagnostics, showAxes}: {url: string; selected: string; onSelect: (name: string) => void; overrides: Overrides; constraints: JointConstraintMap; onDiagnostics: (values: AxisDiagnostic[]) => void; showAxes: boolean}) {
   const gltf = useGLTF(url);
+  usePreviewGltfCacheV654(url);
   const model = useMemo(() => cloneSkinnedScene(gltf.scene), [gltf.scene]);
+  useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(model);},[model]);
   // Preview is applied to a cloned GLB, never to the source asset. Rest poses
   // are cached to prevent accumulating rotations on every slider change.
   const rest = useMemo(() => {

@@ -1,7 +1,7 @@
 "use client";
 import {useEffect,useMemo,useRef,useState} from "react";
-import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader.js";
-import type {AnimationClip,Group} from "three";
+import {withPrivateGltfV769} from "./privateGltfLifecycleV769";
+import type {AnimationClip} from "three";
 import {aggregateMotionQuality,analyzeGLBMotionClips,type ClipQualityReport} from "./glbMotionQualityAnalyzer";
 import {inspectMotionQualityV321,polishMotionClipV321,transitionQualityV321,DEFAULT_MOTION_QUALITY_V321,
  MOTION_QUALITY_EVENT_V321,readMotionQualityV321,refreshMotionQualityV321,writeMotionQualityV321,
@@ -12,7 +12,7 @@ import {inspectAdvancedMotionV534,type AdvancedMotionReportV534} from "./motionQ
 import {VisualDanceReviewPanelV589} from "./VisualDanceReviewPanelV589";
 import {LongSongReviewPanelV589} from "./LongSongReviewPanelV589";
 
-type Result={url:string;reports:ClipQualityReport[];clips:AnimationClip[];scene:Group};
+type Result={url:string;reports:ClipQualityReport[];clips:AnimationClip[]};
 export function MotionQualityOptimizerDashboard({avatarId,motions,modelUrl}:{avatarId:string;motions:InstalledCharacterMotion[];modelUrl?:string}){
  const [motionId,setMotionId]=useState("");const [result,setResult]=useState<Result|null>(null);
  const [busy,setBusy]=useState(false);const [error,setError]=useState("");const request=useRef(0);
@@ -39,10 +39,10 @@ export function MotionQualityOptimizerDashboard({avatarId,motions,modelUrl}:{ava
  useEffect(()=>{if(!playing||!selected)return;const interval=window.setInterval(()=>setSeconds(t=>(t+0.05)%duration),50);return()=>window.clearInterval(interval);},[playing,selected,duration]);
  function inspect(){if(!current)return;const req=++request.current;setBusy(true);setError("");setResult(null);setPlaying(false);setShow3D(false);
   setVisualReportV589(null);setVisualBusyV589(false);
-  new GLTFLoader().load(current.url,gltf=>{if(req!==request.current)return;
-    setResult({url:current.url,reports:analyzeGLBMotionClips(gltf.animations),clips:gltf.animations,scene:gltf.scene});
-    setIndex(0);setSecond(-1);setSeconds(0);setBusy(false);
-  },undefined,e=>{if(req!==request.current)return;setError(e instanceof Error?e.message:"GLB konnte nicht geladen werden.");setBusy(false);});
+  void withPrivateGltfV769(current.url,gltf=>({reports:analyzeGLBMotionClips(gltf.animations),clips:gltf.animations}))
+    .then(data=>{if(req!==request.current)return;
+      setResult({url:current.url,...data});setIndex(0);setSecond(-1);setSeconds(0);setBusy(false);
+    }).catch(e=>{if(req!==request.current)return;setError(e instanceof Error?e.message:"GLB konnte nicht geladen werden.");setBusy(false);});
  }
  return <section className="avatar-metadata-editor" aria-label="Advanced Motion Quality Studio V321">
   <h3>V321 · Advanced Motion Quality Studio</h3>

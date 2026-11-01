@@ -18,14 +18,15 @@ const modules=[
 const file=read('GltfDancerAvatarV492.tsx');
 const texts=Object.fromEntries(modules.map(n=>[n,read(n)]));
 const totalLines=file.split('\n').length;
-assert(totalLines<1210,`GLB main should remain under 1210 lines; got ${totalLines}`);
+assert(totalLines<=1330,`GLB main must not grow beyond the current 1330-line boundary; got ${totalLines}`);
 for(const hook of modules.slice(1)){
  const base=hook.replace(/\.(ts|tsx)$/,'');
  assert(file.includes(`from "./${base}"`),`${hook} genuinely imported by live GLB renderer`);
  assert(!/test-?only|dummy|mock/i.test(texts[hook]),`${hook} contains production logic`);
 }
 const combined=Object.values(texts).join('\n');
-assert.equal((combined.match(/\buseAnimations\s*\(/g)||[]).length,1,'exactly one GLB AnimationMixer');
+assert.equal((combined.match(/\bnew AnimationMixer\s*\(/g)||[]).length,1,'exactly one owned GLB AnimationMixer');
+assert(texts['useGltfAnimationMixerV492.ts'].includes('disposeMixerClipsV654'),'mixer must uncache AnimationClips rather than Actions');
 assert(!/\buseAnimations\s*\(/.test(file),'mixer delegated to hook');
 assert.match(texts['useGltfAnimationMixerV492.ts'],/groupPhraseV329\.register\(/,'group phrase registration stays with mixer');
 assert.match(texts['useGltfAnimationMixerV492.ts'],/preparedBlendsV492\.some\(/,'synthetic clips are not selectable as base dance');

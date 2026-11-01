@@ -1,12 +1,18 @@
-name: Sonic Display V571 production build verification
+name: Sonic Display production build gate (V680)
 on:
   push:
   pull_request:
   workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: sonic-release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   production:
     name: Node 22 / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -16,20 +22,67 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - name: Install dependencies (warn if reproducible lockfile is missing)
-        shell: pwsh
-        run: |
-          if (Test-Path package-lock.json) {
-            npm ci --no-audit --no-fund
-          } else {
-            Write-Warning 'package-lock.json is missing! CI bootstrap is not reproducible until the generated lockfile is committed.'
-            npm install --no-audit --no-fund
-          }
-      - name: Latest V651 smoke and full release gate (case, ambient types, application TypeScript)
-        run: npm run test:smoke:v651 && npm run check:release
-      - name: Real Next.js production build
+      - name: Verify release and lockfile before install (no npm dependencies required)
+        run: npm run check:lockfile:v752
+      - name: Install project dependencies
+        run: npm ci --no-audit --no-fund
+      - name: V752 static integration, architecture and filename regression
+        run: npm run verify:v752:static
+      - name: V753 benchmark regression and strict isolated type gates
+        run: npm run verify:v753:static
+      - name: V754 visual inspection regression and strict isolated type gates
+        run: npm run verify:v754:static
+      - name: V755 Smart Quality Auto-Tuning regression and isolated type gates
+        run: npm run verify:v755:static
+      - name: V756 Advanced Vocal Assignment regression and isolated type gates
+        run: npm run verify:v756:static
+      - name: V757 Vocal & Body Synchronization regression and strict isolated type gate
+        run: npm run verify:v757:static
+      - name: V758 natural dance motion and foot-contact safety checks
+        run: npm run verify:v758:static
+      - name: V759 phrase variety and manual-clip priority regression
+        run: npm run verify:v759:static
+      - name: V760 Advanced Ensemble Director regression and isolated type gates
+        run: npm run verify:v760:static
+      - name: V761 Cinematic Concert Director storyboard, regression and isolated typecheck
+        run: npm run test:v761 && npm run test:v761:types
+      - name: V762 Dynamic Stage & Lighting 4.0 policy, shader and integration tests
+        run: npm run test:v762 && npm run test:v762:types
+      - name: V763 Interactive Concert Timeline Studio and isolated type gates
+        run: npm run test:v763 && npm run test:v763:types && npm run test:v763:ui-types
+      - name: V764 Smart Concert Timeline Automation, song library and UI gates
+        run: npm run test:v764 && npm run test:v764:types && npm run test:v764:ui-types
+      - name: V765 concert show library studio
+        run: npm run test:v765 && npm run test:v765:types && npm run test:v765:ui-types
+      - name: V766 Galaxy single-draw-call starfield and resource cleanup
+        run: npm run test:v766
+      - name: V773 transparent overdraw optimization and adaptive policy regression
+        run: npm run test:v773 && npm run test:v773:types
+      - name: V775 static stage geometry batching
+        run: npm run test:v775 && npm run test:v775:types
+      - name: V774 instanced dance effects and bounded GPU alpha regression
+        run: npm run test:v774 && npm run test:v774:types
+      - name: V781 temporal motion quality and V776-V780 regression suite
+        run: npm run verify:v781:static
+      - name: V782 interpolated GLB pose and paired motion regression
+        run: npm run test:v782 && npm run test:v782:types
+      - name: V783 lip-sync quality guard and real-browser comparison checks
+        run: npm run test:v783 && npm run test:v783:types
+      - name: V784 cinematic camera smoothing and paired real-browser regression
+        run: npm run test:v784 && npm run test:v784:types
+      - name: V785 projected 3D lyrics safety and paired browser regression
+        run: npm run test:v785 && npm run test:v785:types
+      - name: V786 GLB complexity, hash provenance, rig and texture validation
+        run: npm run test:v786 && npm run test:v786:types
+      - name: V787 validated GLB rig, LOD policy and animation-time preview
+        run: npm run test:v787 && npm run test:v787:types
+      - name: V788 priority-preserving concert governor and strict measured browser audit
+        run: npm run test:v788 && npm run test:v788:types
+      - name: Application TypeScript (real project, no test stubs)
+        run: npm run typecheck
+      - name: Real Next.js production build (V680 bounded prebuild, full TypeScript and integrity guards)
         run: npm run build
-      - name: Report local dependency and lock state
+      - name: Environment diagnostics
         if: always()
         run: npm run audit:v571:environment
-# Browser/CDP + real GLBs and Raspberry Pi measurements are separate manual stages.
+# Full historical regression is intentionally scheduled separately. Real GLB/GPU browser benchmarks require a real browser and remain separate.

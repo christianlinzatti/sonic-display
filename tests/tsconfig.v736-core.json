@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": [],
+    "lib": ["ES2022"]
+  },
+  "files": [
+    "../components/visualizer/hipDanceV735.ts",
+    "../components/visualizer/avatarRigController.ts",
+    "../components/visualizer/avatarRigProfiles.ts",
+    "stubs/v736-rig-three.d.ts"
+  ]
+}

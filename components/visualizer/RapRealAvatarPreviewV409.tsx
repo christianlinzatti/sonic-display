@@ -1,11 +1,13 @@
 "use client";
+import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
 
 import {useEffect,useMemo,useRef,useState} from "react";
 import {useFrame} from "@react-three/fiber";
 import {useGLTF} from "@react-three/drei";
 import {clone as cloneSkinnedScene} from "three/examples/jsm/utils/SkeletonUtils.js";
+import {disposeClonedAvatarSkeletonsV654} from "./disposeClonedAvatarSkeletonsV654";
 import {AnimationMixer,Box3,Vector3,type AnimationAction,type AnimationClip,type Object3D,type Mesh,type Quaternion} from "three";
-import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader.js";
+import {withPrivateGltfV769} from "./privateGltfLifecycleV769";
 import {collectAvatarRigNodes} from "./avatarRigController";
 import type {AvatarRigProfileId} from "./avatarRigProfiles";
 import type {RapPerformanceEditorSettingsV408} from "./rapPerformanceEditorV408";
@@ -25,8 +27,10 @@ const gain=(n:number)=>Math.max(0,Math.min(1.5,n/100));
 /** Clones the loaded skinned hierarchy so preview pose/morphs never mutate the cached scene or the live stage. */
 export function RapRealAvatarPreviewV409({url,mouthPreviewV418=null,settings,section,playing,reducedMotion,rigProfile,onRigInfo,motion,motionSpeed,onEmbeddedClips,onMotionInfo,timeline,timelineMotions=[],timelineLoop=true,timelineSeek,onTimelineClock}:Props){
   const {scene,animations}=useGLTF(url);
+  usePreviewGltfCacheV654(url);
   useEffect(()=>onEmbeddedClips(animations.map(clip=>clip.name)),[animations,onEmbeddedClips]);
   const clone=useMemo(()=>cloneSkinnedScene(scene),[scene]);
+  useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(clone);},[clone]);
   const clock=useRef(0);
   const mixer=useMemo(()=>new AnimationMixer(clone),[clone]);
   const [external,setExternal]=useState<{url:string;clips:AnimationClip[];matchedTracks:number;error?:string}|null>(null);
@@ -36,13 +40,11 @@ export function RapRealAvatarPreviewV409({url,mouthPreviewV418=null,settings,sec
     let cancelled=false;
     const motionUrl=motion.url;
     setExternal(null);
-    new GLTFLoader().load(motionUrl,gltf=>{
-      if(cancelled)return;
-      try{
-        const result=retargetHumanoidClips(gltf.animations,gltf.scene,clone,readRetargetCalibration(url));
-        setExternal({url:motionUrl,clips:result.clips.filter(c=>c.tracks.length>0),matchedTracks:result.report.matchedTracks});
-      }catch(error){setExternal({url:motionUrl,clips:[],matchedTracks:0,error:error instanceof Error?error.message:"Retargeting fehlgeschlagen"});}
-    },undefined,()=>{if(!cancelled)setExternal({url:motionUrl,clips:[],matchedTracks:0,error:"Motion-Datei konnte nicht geladen werden (URL/CORS/Dateiformat)."});});
+    void withPrivateGltfV769(motionUrl,gltf=>{
+      const result=retargetHumanoidClips(gltf.animations,gltf.scene,clone,readRetargetCalibration(url));
+      return {url:motionUrl,clips:result.clips.filter(c=>c.tracks.length>0),matchedTracks:result.report.matchedTracks};
+    }).then(value=>{if(!cancelled)setExternal(value);})
+      .catch(error=>{if(!cancelled)setExternal({url:motionUrl,clips:[],matchedTracks:0,error:error instanceof Error?error.message:"Motion-Datei konnte nicht geladen werden (URL/CORS/Dateiformat)."});});
     return()=>{cancelled=true;};
   },[motion?.kind,motion?.url,clone,url,Boolean(timeline)]);
   const clip=useMemo(()=>{
@@ -84,13 +86,11 @@ export function RapRealAvatarPreviewV409({url,mouthPreviewV418=null,settings,sec
     let disposed=false;
     setTimelineExternal({});
     for(const sourceUrl of timelineUrls){
-      new GLTFLoader().load(sourceUrl,gltf=>{
-        if(disposed)return;
-        try{
-          const result=retargetHumanoidClips(gltf.animations,gltf.scene,clone,readRetargetCalibration(url));
-          setTimelineExternal(old=>({...old,[sourceUrl]:{clip:result.clips.find(c=>c.tracks.length>0)??null,matched:result.report.matchedTracks}}));
-        }catch(error){setTimelineExternal(old=>({...old,[sourceUrl]:{clip:null,matched:0,error:error instanceof Error?error.message:"Retargeting fehlgeschlagen"}}));}
-      },undefined,()=>{if(!disposed)setTimelineExternal(old=>({...old,[sourceUrl]:{clip:null,matched:0,error:"Motion nicht geladen (URL/CORS)"}}));});
+      void withPrivateGltfV769(sourceUrl,gltf=>{
+        const result=retargetHumanoidClips(gltf.animations,gltf.scene,clone,readRetargetCalibration(url));
+        return {clip:result.clips.find(c=>c.tracks.length>0)??null,matched:result.report.matchedTracks};
+      }).then(value=>{if(!disposed)setTimelineExternal(old=>({...old,[sourceUrl]:value}));})
+        .catch(error=>{if(!disposed)setTimelineExternal(old=>({...old,[sourceUrl]:{clip:null,matched:0,error:error instanceof Error?error.message:"Motion nicht geladen (URL/CORS)"}}));});
     }
     return()=>{disposed=true;};
   // Changes in slot order/crossfade do not refetch unchanged external GLBs.

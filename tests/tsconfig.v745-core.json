@@ -1,0 +1,9 @@
+{
+ "compilerOptions": {"target":"ES2022","module":"commonjs","moduleResolution":"node","strict":true,
+  "skipLibCheck":true,"noEmit":true,"types":[],"lib":["ES2022","DOM"]},
+ "files":["../components/visualizer/multiAvatarHipSyncV745.ts",
+  "../components/visualizer/smartHipChoreographyV744.ts",
+  "../components/visualizer/genreHipIntelligenceV742.ts",
+  "../components/visualizer/hipMotionStudioV738.ts",
+  "../components/visualizer/hipDanceV735.ts","stubs/v736-rig-three.d.ts"]
+}

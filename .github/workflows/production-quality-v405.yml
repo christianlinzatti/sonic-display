@@ -1,28 +1,23 @@
-name: Sonic Display release quality
+name: Sonic Display historical regression suite
 on:
-  push:
-  pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '17 4 * * 0'
+permissions:
+  contents: read
 jobs:
-  quality:
-    name: Quality checks (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-24.04, windows-latest]
+  historical:
+    name: Extended historical regressions (Node 22 / Ubuntu)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - name: Install project dependencies
-        shell: pwsh
-        run: |
-          if (Test-Path package-lock.json) {
-            npm ci --no-audit --no-fund
-          } else {
-            npm install --no-audit --no-fund
-          }
-      - name: Full verification (regression suite, typecheck and production build)
-        run: npm run verify
+      - name: Validate release lockfile and CI gates
+        run: npm run check:lockfile:v752
+      - name: Install dependencies reproducibly
+        run: npm ci --no-audit --no-fund
+      - name: Extended historical checks (not duplicated on every push)
+        run: npm run verify:historical

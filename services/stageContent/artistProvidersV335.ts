@@ -1,9 +1,9 @@
 /** V335 — pure safety/normalization rules for independently sourced artist data. */
 import {selectTicketmasterPosterV337,selectConcertImagesV338} from "./concertDisplayV337";
-export interface ArtistConcertV335 {date:string; title:string; venue:string; city:string; url?:string;posterUrl?:string;posterUrls?:string[];status?:string;}
+export interface ArtistConcertV335 {id?:string;time?:string;date:string; title:string; venue:string; city:string; url?:string;posterUrl?:string;posterUrls?:string[];status?:string;}
 export const safeArtistNameV335=(value:unknown):string=>typeof value==='string'&&value.trim().length>=2&&value.trim().length<=120&&!/[\x00-\x1f]/.test(value)?value.trim():'';
 export function artistMatchV335(expected:string,actual:string):boolean {
-  const norm=(s:string)=>s.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  const norm=(s:string)=>s.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();
   const a=norm(expected),b=norm(actual);
   return !!a&&!!b&&(a===b||b.startsWith(a+' ')||a.startsWith(b+' '));
 }
@@ -15,7 +15,7 @@ export function normalizeWikipediaV335(data:unknown,artist:string):{title:string
   return text.length>=40?{title:d.title,text}:null;
 }
 export function exactArtistMatchV335(expected:string,actual:string):boolean {
-  const norm=(s:string)=>s.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  const norm=(s:string)=>s.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();
   return !!norm(expected)&&norm(expected)===norm(actual);
 }
 export function normalizeTicketmasterV335(payload:unknown,artist:string,nowISO:string):ArtistConcertV335[] {
@@ -26,15 +26,15 @@ export function normalizeTicketmasterV335(payload:unknown,artist:string,nowISO:s
   const results:ArtistConcertV335[]=[];
   for(const item of entries){
     if(!item||typeof item!=='object')continue;
-    const e=item as {name?:unknown;url?:unknown;images?:unknown;dates?:{start?:{localDate?:unknown}};_embedded?:{attractions?:Array<{name?:string}>;venues?:Array<{name?:string;city?:{name?:string}}>;}};
+    const e=item as {id?:string;name?:unknown;url?:unknown;images?:unknown;dates?:{status?:{code?:string};start?:{localDate?:unknown;localTime?:string}};_embedded?:{attractions?:Array<{name?:string}>;venues?:Array<{name?:string;city?:{name?:string}}>;}};
     // Require an exact artist attraction rather than a keyword hit in another act's title.
     if(!Array.isArray(e._embedded?.attractions)||!e._embedded!.attractions!.some(a=>typeof a.name==='string'&&exactArtistMatchV335(artist,a.name)))continue;
     const date=e.dates?.start?.localDate;
     if(typeof date!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(date)||date<nowISO.slice(0,10))continue;
     const venue=e._embedded?.venues?.[0];
     const url=typeof e.url==='string'&&/^https:\/\//.test(e.url)?e.url:undefined;
-    results.push({date,title:typeof e.name==='string'?e.name.slice(0,95):artist.slice(0,95),venue:typeof venue?.name==='string'?venue.name.slice(0,90):'',city:typeof venue?.city?.name==='string'?venue.city.name.slice(0,70):'',url,posterUrl:selectTicketmasterPosterV337(e.images),posterUrls:selectConcertImagesV338(e.images)});
+    results.push({id:typeof e.id==="string"?e.id:undefined,time:typeof e.dates?.start?.localTime==="string"?e.dates.start.localTime:undefined,status:e.dates?.status?.code,date,title:typeof e.name==='string'?e.name.slice(0,95):artist.slice(0,95),venue:typeof venue?.name==='string'?venue.name.slice(0,90):'',city:typeof venue?.city?.name==='string'?venue.city.name.slice(0,70):'',url,posterUrl:selectTicketmasterPosterV337(e.images),posterUrls:selectConcertImagesV338(e.images)});
   }
   const seen=new Set<string>();
-  return results.sort((a,b)=>a.date.localeCompare(b.date)).filter(e=>{const key=e.date+'|'+e.venue+'|'+e.title;if(seen.has(key))return false;seen.add(key);return true;}).slice(0,12);
+  return results.sort((a,b)=>a.date.localeCompare(b.date)).filter(e=>{const key=e.id||e.date+'|'+(e.time??'')+'|'+e.venue+'|'+e.title;if(seen.has(key))return false;seen.add(key);return true;}).slice(0,12);
 }

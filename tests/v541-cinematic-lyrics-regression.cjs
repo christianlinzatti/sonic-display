@@ -67,5 +67,5 @@ assert(gpu.includes('planCinematicLyricsV541')&&dom.includes('planCinematicLyric
 const source=fs.readFileSync('components/visualizer/cinematicLyricsExperienceV541.ts','utf8');
 for(const banned of ['setInterval(', 'requestAnimationFrame(', 'Math.random(', 'Date.now(', 'document.', 'window.', 'new Audio('])assert(!source.includes(banned));
 assert(Number(require('../package.json').version.match(/-v(\d+)$/)?.[1]||0)>=541);
-assert(require('../package.json').scripts['build:preflight'].includes('npm run test:v541 && npm run test:v541:types'));
+assert(require('../package.json').scripts['check:release'].includes('npm run test:v541 && npm run test:v541:types'));
 console.log(`PASS V541 cinematic lyrics: ${frames} real-timestamp word samples, DOM/WebGL wiring, reduced-motion and 10-inch contrast safeguards`);

@@ -1,9 +1,11 @@
 'use client';
+import {usePreviewGltfCacheV654} from './usePreviewGltfCacheV654';
 import {Suspense,useEffect,useMemo,useState} from 'react';
 import {Canvas,useFrame} from '@react-three/fiber';
 import {OrbitControls,useGLTF} from '@react-three/drei';
 import {AnimationMixer} from 'three';
 import {clone as cloneScene} from 'three/examples/jsm/utils/SkeletonUtils.js';
+import {disposeClonedAvatarSkeletonsV654} from "./disposeClonedAvatarSkeletonsV654";
 import type {GroupPoseV326} from './multiAvatarStageDirectorV326';
 import type {TrackAnalysisV318} from '@/services/musicAnalysis/trackAnalysisV318';
 import {GROUP_SYNC_DEFAULT_V327,readGroupSyncV327,GROUP_SYNC_EVENT_V327,evaluateGroupSyncV327} from './groupDanceSynchronizationV327';
@@ -12,7 +14,9 @@ import {PHRASE_DEFAULT_V329,readPhraseV329,PHRASE_EVENT_V329,describeAnimationCl
 const colors=['#64def0','#bd8aff','#68e9ab','#ffcc7d'];
 function ImportedFigure({url,seconds,index,sync,bpm,beatTimes,playing,phrase,plan,register}:{url:string;seconds:number;index:number;sync:MotionSyncV328;bpm:number;beatTimes?:readonly number[];playing:boolean;phrase:PhraseSettingsV329;plan:PhraseMatchV329;register:(slot:number,profiles:readonly PhraseSignatureV329[])=>void}){
  const {scene,animations}=useGLTF(url);
+  usePreviewGltfCacheV654(url);
  const model=useMemo(()=>cloneScene(scene),[scene]);
+ useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(model);},[model]);
  const mixer=useMemo(()=>new AnimationMixer(model),[model]);
  const signatures=useMemo(()=>phrase.enabled?describeAnimationClipsV329(animations,phrase.maxCandidates):[],[animations,phrase.enabled,phrase.maxCandidates]);
  useEffect(()=>{if(phrase.enabled)register(index,signatures);},[phrase.enabled,register,index,signatures]);

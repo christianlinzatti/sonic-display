@@ -6,7 +6,7 @@ import {readTrackAnalysisV318,ANALYSIS_EVENT_V318,ANALYSIS_STORAGE_KEY_V318,type
 import {MusicAlignedTimelineEditorV319} from "./MusicAlignedTimelineEditorV319";
 import {timelineSongSecondsV319} from "./musicMotionTimelineV319";
 const MotionTimelinePreview3DV319=dynamic(()=>import("./MotionTimelinePreview3DV319").then(m=>m.MotionTimelinePreview3DV319),{ssr:false});
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { withPrivateGltfV769 } from "./privateGltfLifecycleV769";
 import { useUiPreferences } from "@/context/UiPreferencesContext";
 import { VisualKeyframeCurveEditor } from "./VisualKeyframeCurveEditor";
 import { ChoreographyQualityStudio } from "./ChoreographyQualityStudio";
@@ -18,7 +18,7 @@ import { sanitizeTimeline, timelineDuration, timelineWeights, snapToBeat, type T
 export function MotionTimelineStudio({modelUrl,animationUrl}:{modelUrl:string|null;animationUrl?:string}) {
  const {preferences,updatePreferences}=useUiPreferences(); const [clips,setClips]=useState<string[]>([]);const [playhead,setPlayhead]=useState(0);const [jsonError,setJsonError]=useState("");
  const timeline=sanitizeTimeline(preferences.avatarTimeline); const enabled=preferences.avatarTimelineEnabled??false;
- useEffect(()=>{let active=true;setClips([]);if(!modelUrl)return;const loader=new GLTFLoader();Promise.all([loader.loadAsync(modelUrl),animationUrl?loader.loadAsync(animationUrl):Promise.resolve(null)]).then(([a,b])=>{if(active)setClips([...a.animations.map(x=>x.name),...(b?.animations||[]).map(x=>`Imported: ${x.name}`)]);}).catch(()=>{});return()=>{active=false;};},[modelUrl,animationUrl]);
+ useEffect(()=>{let active=true;setClips([]);if(!modelUrl)return;withPrivateGltfV769(modelUrl, a=>a.animations.map(x=>x.name)).then(async embedded => [...embedded,...(animationUrl ? await withPrivateGltfV769(animationUrl,b=>b.animations.map(x=>`Imported: ${x.name}`)):[])]).then(names=>{if(active)setClips(names);}).catch(()=>{});return()=>{active=false;};},[modelUrl,animationUrl]);
  const {track,progressMs,isPlaying}=useMusic();
  const activeTrackId=track?.id??"";
  const [analysis,setAnalysis]=useState<TrackAnalysisV318|null>(null);

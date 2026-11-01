@@ -95,7 +95,7 @@ t('V580 rejects NaN measurement',()=>assert.equal(summarizeFrames([NaN,...Array(
 t('V580 Pi profile refuses desktop hardware as real Pi',()=>assert.match(source('scripts/v580-pi-benchmark.cjs'),/if\(!isPi&&!allowedDesktop\)throw Error/));
 const pkg=require('../package.json');
 t('V580 baseline release is retained',()=>{const v=Number(pkg.version.match(/-v(\d+)$/)?.[1]);assert(Number.isInteger(v)&&v>=580);});
-t('V580+ fast prebuild remains',()=>{const v=Number(pkg.scripts.prebuild.match(/^npm run test:smoke:v(\d+)$/)?.[1]);assert(Number.isInteger(v)&&v>=580);assert(pkg.scripts['test:smoke:v580']);});
+t('V580+ fast prebuild remains',()=>{const {isInReleaseGate}=require('./helpers/release-coverage-v651.cjs');assert(isInReleaseGate('test:smoke:v656'));assert(pkg.scripts['test:smoke:v580']);});
 t('V580 retains V572 historical release suite',()=>assert.match(pkg.scripts['verify:v580'],/verify:v572/));
 for(let i=0;i<12000;i++){
  const time=1000+(i*17)%650,word=words.find(w=>time>=w.startMs&&time<w.endMs)?.text??null;

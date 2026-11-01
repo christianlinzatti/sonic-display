@@ -1,0 +1,44 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const ts=require('./typescript-loader.cjs');
+function transpile(path,deps={}){
+ const source=fs.readFileSync(path,'utf8');
+ const out=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX},reportDiagnostics:true});
+ assert(!out.diagnostics?.length,`Syntax diagnostics in ${path}`);
+ const exports={};
+ vm.runInNewContext(out.outputText,{exports,require:id=>{assert(id in deps,`Unexpected import: ${id}`);return deps[id];},Map,Set,Array,Object,Number,String,Math,Date,RegExp}, {filename:path});
+ return exports;
+}
+const genre=transpile('config/musicGenres.ts');
+const discovery=transpile('lib/recently-played-discovery-v674.ts',{'../config/musicGenres':genre});
+const model=transpile('lib/listening-profile-v675.ts',{'./recently-played-discovery-v674':discovery,'../config/musicGenres':genre});
+const ex=(id,artist,playedAt='2026-10-28T17:24:00Z')=>({id,title:id,artist,primaryArtist:artist.split(', ')[0],album:'Record',albumCoverUrl:'https://i.scdn.co/image/demo',durationMs:180000,spotifyUrl:`https://open.spotify.com/track/${id}`,playedAt});
+const tracks=[ex('one','A, B'),ex('two','A, Guest'),ex('one','A, B'),ex('three','C'),ex('four','C'),ex('five','D')];
+let count=0;
+function test(label,fn){try{fn();count++;}catch(e){e.message=`V675 ${label}: ${e.message}`;throw e;}}
+const profile=model.buildListeningProfileV675(tracks,{one:'deutschrap',two:'trap',three:'hardtekk',four:'hardtekk',five:null});
+test('genres resolved only from verified metadata',()=>{assert.equal(profile.classified,5);assert.equal(profile.unclassified,1);assert.equal(profile.total,6);assert.equal(profile.uniqueTracks,5);});
+test('replays count, but unique songs separately',()=>{assert.equal(profile.families[0].family,'hiphop');assert.equal(profile.families[0].plays,3);assert.equal(profile.families[0].uniqueSongs,2);});
+test('genre family does not conflate hardtekk and hiphop',()=>{assert.equal(profile.families[1].family,'hardtekk');assert.equal(profile.families[1].plays,2);});
+test('coverage counts unknowns in denominator',()=>{assert.equal(profile.coverage,83);assert.equal(profile.unclassified,1);});
+test('primary artist, not feature credits used',()=>{assert.equal(profile.artists[0].name,'A');assert.equal(profile.artists[0].plays,3);assert.equal(profile.artists[0].uniqueSongs,2);});
+test('recommended only when 3 events and 2 distinct tracks',()=>{assert.equal(profile.recommendations.length,1);assert.equal(profile.recommendations[0].key,'hiphop');assert.equal(profile.recommendations[0].share,60);});
+test('no suggestions for repeated single song',()=>{const s=[ex('same','Artist'),ex('same','Artist'),ex('same','Artist')];const p=model.buildListeningProfileV675(s,{same:'hardtekk'});assert.equal(p.recommendations.length,0);assert.equal(p.classified,3);});
+test('no fake profile with unknown tags',()=>{const p=model.buildListeningProfileV675(tracks,{one:'invented',two:null});assert.equal(p.classified,0);assert.equal(p.recommendations.length,0);assert.match(p.note,/Noch keine Genres/);});
+test('genre parser resistant to prototype pollution',()=>{const p=model.buildListeningProfileV675(tracks,Object.assign(Object.create(null),{__proto__:'hardstyle',one:'pop'}));assert.equal(p.classified,2);assert.equal(p.recommendations.length,0);});
+test('empty history remains valid',()=>{const p=model.buildListeningProfileV675([],{});assert.equal(p.total,0);assert.equal(p.coverage,0);assert.equal(p.artists.length,0);assert.equal(p.families.length,0);});
+test('can propose three families with enough evidence',()=>{const many=['rock','pop','hardtekk','techno'].flatMap((name,index)=>[ex(`a${index}`,`Art${index}`),ex(`b${index}`,`Art${index}`),ex(`c${index}`,`Art${index}`)]);const map=Object.fromEntries(many.map(x=>[x.id, x.artist==='Art0'?'rock':x.artist==='Art1'?'pop':x.artist==='Art2'?'hardtekk':'techno']));const p=model.buildListeningProfileV675(many,map);assert.equal(p.recommendations.length,3);});
+test('danceFX off unless selected by user',()=>{const r=profile.recommendations[0];const p=model.musicProfilePatchV675(r,false);assert(!Object.hasOwn(p,'danceFxEnabled'));assert(!Object.hasOwn(p,'danceFxStrength'));});
+test('opt-in danceFX bounded and family appropriate',()=>{const p=model.musicProfilePatchV675(profile.recommendations[0],true);assert.equal(p.danceFxEnabled,false);assert(p.danceFxStrength>=0&&p.danceFxStrength<=100);});
+test('hardtekk FX remains optional but uses energizing preset',()=>{const s=[ex('a','Q'),ex('b','Q'),ex('c','Q')];const r=model.buildListeningProfileV675(s,{a:'hardtekk',b:'hardtekk',c:'hardtekk'}).recommendations[0];assert.equal(model.musicProfilePatchV675(r,true).danceFxEnabled,true);assert.equal(model.musicProfilePatchV675(r,false).danceFxEnabled,undefined);});
+test('only whitelisted stage, lighting and dance preferences modified',()=>{const p=model.musicProfilePatchV675(profile.recommendations[0],false);assert.equal(Object.keys(p).sort().join(','),'avatarDancePreset,stageLightStrength,stageReactive,stageTheme');assert(!('avatarModelId' in p));assert(!('lyricsVisible' in p));assert(!('autoAvatarByGenre' in p));});
+test('snapshot supports undo and never copies unrelated preferences',()=>{const orig={stageTheme:'classic',stageLightStrength:20,stageReactive:false,avatarDancePreset:'rock-metal',danceFxEnabled:false,lyricsVisible:true,avatarModelId:'my-model'};const patch=model.musicProfilePatchV675(profile.recommendations[0],true);const old=model.snapshotProfilePatchV675(orig,patch);assert.equal(Object.keys(old).sort().join(','),'avatarDancePreset,danceFxEnabled,danceFxStrength,stageLightStrength,stageReactive,stageTheme');assert.equal(old.stageTheme,'classic');assert.equal(old.lyricsVisible,undefined);});
+const ui=fs.readFileSync('components/RecentlyPlayedV672.tsx','utf8'), comp=fs.readFileSync('components/ListeningProfileV675.tsx','utf8'), css=fs.readFileSync('app/globals.css','utf8'),arch=fs.readFileSync('ARCHITECTURE.md','utf8'),pkg=require('../package.json');
+test('V675 is a real tab with shared, ephemeral V674 genre data',()=>{for(const token of ['Mein Musikprofil','ListeningProfileV675 tracks={tracks} known={knownGenres}','onOpenGenres={()=>setView(\'genres\')}','setKnownGenres({})'])assert(ui.includes(token),token);});
+test('recommendations only via opt-in click and optional FX checkbox',()=>{for(const token of ['onClick={()=>apply(rec)}','checked={useFx}','onClick={undo}','setLastChange','onOpenGenres','profile.recommendations.map'])assert(comp.includes(token),token);assert(!comp.includes('/api/spotify/'));assert(!comp.includes('localStorage'));});
+test('undo refuses to overwrite later settings edits',()=>{assert(comp.includes("preferences[k]!==lastChange.applied[k]"));assert(comp.includes('setLastChange(null)'));});
+test('mobile and accessible interface with reduced motion',()=>{for(const token of ['recent-profile-metrics-v675','recent-profile-rec-grid-v675','@media(max-width:530px)','prefers-reduced-motion:reduce'])assert(css.includes(token));assert(comp.includes('aria-label="Dein temporäres Musikprofil"'));});
+test('versions and release test chain updated',()=>{assert(Number(pkg.version.match(/-v(\d+)$/)[1])>=675);assert(pkg.scripts['test:smoke:v675'].includes('test:smoke:v674'));assert(pkg.scripts['check:release'].includes('test:v675'));assert(arch.includes(`**Dokumentationsstand:** V${pkg.version.split('-v')[1]}`));});
+console.log(`PASS V675 Smart Music Profile: ${count} checks`);

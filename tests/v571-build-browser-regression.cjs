@@ -43,7 +43,7 @@ try{
  fs.rmSync(path.join(dummy,'package-lock.json'));
  t('missing lock does not prevent reading other statuses',()=>assert.equal(inspect(dummy).dependencyStatus,'installed'));
  t('V571 or later version valid',()=>assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1]??0)>=571));
- t('quick prebuild is independent from legacy slow preflight',()=>assert.match(pkg.scripts.prebuild,/^npm run test:smoke:v\d+$/));
+ t('quick prebuild is independent from legacy slow preflight',()=>{assert.equal(pkg.scripts.prebuild,'npm run check:fast');assert(!pkg.scripts['check:fast'].includes('verify:offline:fast'));});
  t('fast checks includes syntax',()=>assert.match(pkg.scripts['test:smoke:v571'],/check:syntax/));
  t('fast checks includes architecture',()=>assert.match(pkg.scripts['test:smoke:v571'],/check:architecture/));
  t('fast checks includes last release',()=>assert.match(pkg.scripts['test:smoke:v571'],/test:v570/));

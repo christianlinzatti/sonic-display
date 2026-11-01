@@ -1,0 +1,4 @@
+{
+ "compilerOptions":{"strict":true,"noEmit":true,"skipLibCheck":true,"target":"ES2022","module":"ESNext","moduleResolution":"node","baseUrl":"..","paths":{"@/*":["./*"]},"typeRoots":["./v789-empty-types"]},
+ "files":["../components/visualizer/concertFxStudioV810.ts","../components/visualizer/beatAccentDirectorV822.ts","../components/visualizer/ledWallExperiencePlannerV821.ts","../components/visualizer/reactiveLedWallV812.ts","../components/visualizer/ledWallExperienceShaderV821.ts"]
+}

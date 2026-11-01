@@ -88,5 +88,5 @@ const src=fs.readFileSync('components/visualizer/cinematicLyricsExperienceV549.t
 for(const disallowed of ['Math.random(', 'setInterval(', 'setTimeout(', 'requestAnimationFrame(', 'Date.now(', 'document.', 'window.'])assert(!src.includes(disallowed));
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]||0)>=549,'V549 must remain active in future releases');
-assert(pkg.scripts['build:preflight'].includes('npm run test:v549 && npm run test:v549:types'));
+assert(pkg.scripts['check:release'].includes('npm run test:v549 && npm run test:v549:types'));
 console.log(`PASS V549 cinematic lyrics: ${frames} deterministic timestamps, verified cues, UI/3D and low-GPU safeguards`);

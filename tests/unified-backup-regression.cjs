@@ -6,7 +6,7 @@ const ui=read('components/UnifiedSettingsBackup.tsx');
 const panel=read('components/SettingsPanel.tsx');
 const pkg=require('../package.json');
 const checks=[
- pkg.version==='0.1.0-v248',pkg.scripts['verify:offline'].includes('test:unified-backup'),
+ Number(pkg.version.match(/v(\d+)$/)?.[1])>=248,pkg.scripts['test:unified-backup']?.includes('unified-backup-regression.cjs'),
  engine.includes('createUnifiedBackup'),engine.includes('parseUnifiedBackup'),engine.includes('previewUnifiedBackup'),engine.includes('applyUnifiedBackup'),
  engine.includes('MAX_BACKUP_BYTES'),engine.includes('Object.create(null)'),engine.includes('groupForBackupKey'),
  engine.includes('token|secret|password|authorization|cookie|credential|oauth|session'),

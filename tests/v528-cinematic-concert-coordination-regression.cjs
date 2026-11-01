@@ -88,7 +88,9 @@ const src=fs.readFileSync('components/visualizer/cinematicConcertCoordinationV52
 for(const symbol of ['requestAnimationFrame(', 'setInterval(','new Audio(','window.','localStorage','Math.random('])assert(!src.includes(symbol));
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]||0)>=528);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v528 && npm run test:v528:types'));
+// V680 separated fast production builds from the explicitly scheduled historical suite.
+const coverage=require('./helpers/release-coverage-v651.cjs');
+coverage.assertIncluded('test:v528');coverage.assertIncluded('test:v528:types');
 console.log(`PASS V528: ${n} verified camera+lyrics frames; manual priority, invalid identity, tracks, hooks and integration`);
 
 assert(require("node:fs").readFileSync("components/visualizer/StageCameraDirectorV289.tsx","utf8").indexOf("composeCinematicDuetInteractionV585(concertFramedV550,sceneV528")<require("node:fs").readFileSync("components/visualizer/StageCameraDirectorV289.tsx","utf8").indexOf("composeFullSongCameraV605(duetFramedV585"),"V585 must precede V605");

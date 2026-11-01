@@ -9,6 +9,7 @@ import {planNaturalMotionTransitionV537} from "./naturalMotionTransitionsV537";
 import {planIntelligentDanceTransitionV565} from "./intelligentDanceTransitionsV565";
 import {createNaturalMotionFlowStateV614,planNaturalMotionFlowV614} from "./naturalMotionFlowV614";
 import {planNaturalDancePerformanceV630} from "./naturalDancePerformanceV630";
+import {planNaturalDanceContinuityV799} from "./naturalDanceContinuityV799";
 import {resolveLiveTransitionDuration} from "./liveMotionTransitionDirector";
 import type {readMotionTransitionSettings} from "./motionTransitionStudioSettings";
 import {planNaturalGlbMotionV489} from "./naturalGlbFullBodyMotionV489";
@@ -155,6 +156,20 @@ export function useGltfClipTransitionsV492({actions,selectedClip,audio,genre,isP
         reducedMotion,quality:getActivePerformanceTier(),
       });
       if(naturalPerformanceV630.enabled)effectiveFadeDurationV311=naturalPerformanceV630.fadeSeconds;
+      // V799: compare real torso/arm curves at the V537-approved entry point.
+      // Only EXTEND the automatic fade when a measured pose/gesture discontinuity
+      // warrants it. V630 leg protection, V135 foot locks, manual cues, clip
+      // selection and beat matching continue to own their original decisions.
+      const continuityV799=planNaturalDanceContinuityV799({
+        outgoing:outgoingClip,incoming:incomingClip,
+        outgoingSeconds:previousAction?.time,incomingSeconds:nextAction.time,
+        baseSeconds:effectiveFadeDurationV311,bpm:audio.bpm,
+        plantedLeft:footIK.current.left?.contact.phase==='planted',
+        plantedRight:footIK.current.right?.contact.phase==='planted',
+        automatic:autoV565&&flowV614.enabled&&!manualSelectionV565,
+        playing:isPlaying,reducedMotion,quality:getActivePerformanceTier(),
+      });
+      if(continuityV799.enabled)effectiveFadeDurationV311=continuityV799.fadeSeconds;
       nextAction.paused = !isPlaying || reducedMotion;
       nextAction.fadeIn(effectiveFadeDurationV311).play();
       // A valid foot plant remains anchored by V135 IK while both actions overlap.

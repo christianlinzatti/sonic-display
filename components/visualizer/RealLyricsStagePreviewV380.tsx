@@ -1,4 +1,5 @@
 "use client";
+import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
 
 import { Component, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -8,7 +9,8 @@ import { AnimationMixer, Box3, Vector3, type Group, type Object3D } from "three"
 import { normalizeSpatialLayoutV381, type LyricsSpatialLayoutV381 } from "./lyricsSpatialEditorV381";
 import { SpatialLyricsHandlesV381, type SpatialSafetyV381 } from "./SpatialLyricsHandlesV381";
 import { clone as cloneSkeleton } from "three/examples/jsm/utils/SkeletonUtils.js";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { withPrivateGltfV769 } from "./privateGltfLifecycleV769";
+import { disposeClonedAvatarSkeletonsV654 } from "./disposeClonedAvatarSkeletonsV654";
 import { retargetHumanoidClips, readRetargetCalibration } from "./avatarAnimationRetarget";
 import { DynamicStage } from "./DynamicStage";
 import { Lyrics3DScene } from "./Lyrics3DScene";
@@ -32,6 +34,7 @@ class AvatarLoadBoundaryV380 extends Component<{children:ReactNode;fallback:Reac
 /** A standalone avatar clone: the preview cannot advance the actual stage's AnimationMixer. */
 function InstalledAvatarV380({url,animationUrl,positionMs,speed}:{url:string;animationUrl?:string;positionMs:number;speed:number}) {
   const gltf=useGLTF(url);
+  usePreviewGltfCacheV654(url);
   const scene=useMemo(()=>cloneSkeleton(gltf.scene),[gltf.scene]);
   const mixer=useMemo(()=>new AnimationMixer(scene),[scene]);
   const fit=useMemo(()=>{
@@ -51,7 +54,7 @@ function InstalledAvatarV380({url,animationUrl,positionMs,speed}:{url:string;ani
     return ()=>{action.stop();};
   },[clip,mixer]);
   useEffect(()=>{if(clip)mixer.setTime(previewClipTimeV380(positionMs,clip.duration,speed));},[mixer,clip,positionMs,speed]);
-  useEffect(()=>()=>{mixer.stopAllAction();mixer.uncacheRoot(scene);},[mixer,scene]);
+  useEffect(()=>()=>{mixer.stopAllAction();mixer.uncacheRoot(scene);disposeClonedAvatarSkeletonsV654(scene);},[mixer,scene]);
   return <group position={[fit.offset.x,fit.offset.y,fit.offset.z]}><group scale={fit.scale}><primitive object={scene}/></group></group>;
 }
 
@@ -61,11 +64,9 @@ function useExternalAnimationV380(url:string,animationUrl:string|undefined,scene
     setClips([]);
     if(!animationUrl)return;
     let alive=true;
-    new GLTFLoader().load(animationUrl,gltf=>{
-      if(!alive)return;
-      try {setClips(retargetHumanoidClips(gltf.animations,gltf.scene,scene,readRetargetCalibration(url)).clips);}
-      catch {setClips([]);}
-    },undefined,()=>{if(alive)setClips([]);});
+    void withPrivateGltfV769(animationUrl,gltf=>retargetHumanoidClips(gltf.animations,gltf.scene,scene,readRetargetCalibration(url)).clips)
+      .then(clips=>{if(alive)setClips(clips);})
+      .catch(()=>{if(alive)setClips([]);});
     return ()=>{alive=false;};
   },[url,animationUrl,scene]);
   return clips;

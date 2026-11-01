@@ -29,10 +29,10 @@ test('evictions protect next',()=>assert.deepEqual(eng.choosePrefetchEvictions([
 test('no eviction within capacity',()=>assert.deepEqual(eng.choosePrefetchEvictions(['a','b','c'],[],6),[]));
 test('all pinned do not evict',()=>assert.deepEqual(eng.choosePrefetchEvictions(['a','b','c','d'],['a','b','c','d'],3),[]));
 const stage=fs.readFileSync(path.join(dir,'ThreeAvatar.tsx'),'utf8');const ui=fs.readFileSync(path.join(dir,'PredictiveDanceTransitionsPanel.tsx'),'utf8');const panel=fs.readFileSync(path.join(dir,'IntelligentMotionPrefetchPanel.tsx'),'utf8');
-for(const symbol of ['prefetchActive','planMotionPrefetch(','choosePrefetchEvictions(','prefetchedCache','prefetchInFlight','prefetchGeneration','loadAsync(target.url)','if (prefetchActive) return','setPrefetchTargets(plan)','setLibraryClips(clips)'])test('integration '+symbol,()=>assert.ok(stage.includes(symbol)));
+for(const symbol of ['prefetchActive','planMotionPrefetch(','choosePrefetchEvictions(','prefetchedCache','prefetchInFlight','prefetchGeneration','loadAsync(target.url)','planMotionPlaybackV659','setPrefetchTargets(plan)','setLibraryClips(Array.from(pool.values()).flat())'])test('integration '+symbol,()=>assert.ok(stage.includes(symbol)));
 test('panel visible',()=>assert.ok(ui.includes('<IntelligentMotionPrefetchPanel/>')));
 test('settings event wired',()=>assert.ok(stage.includes('MOTION_PREFETCH_EVENT')));
 test('required legacy settings',()=>assert.ok(stage.includes('readPredictiveDance().enabled && readEvolution().enabled')));
-test('limit concurrency',()=>assert.ok(stage.includes('Math.min(prefetchSettings.concurrency,pending.length)')));
+test('limit concurrency',()=>assert.ok(stage.includes('prefetchSettings.concurrency:2,pending.length')));
 test('always component client',()=>{assert.ok(stage.startsWith('"use client"'));assert.ok(ui.startsWith('"use client"'));assert.ok(panel.startsWith('"use client"'))});
 console.log(`${count} V212 tests passed`);

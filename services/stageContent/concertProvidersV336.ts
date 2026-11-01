@@ -8,7 +8,7 @@ export interface OeticketProductV336{productId?:string;name?:string;status?:stri
 export interface OeticketGroupV336{productGroupId?:string;name?:string;mainAttraction?:{name?:string};products?:OeticketProductV336[];imageUrl?:string;image?:string;images?:unknown[];}
 export interface OeticketResponseV336{totalResults?:number;productGroups?:OeticketGroupV336[];}
 const cleaned=(v:unknown,max=120)=>typeof v==='string'?v.trim().slice(0,max):'';
-const canonical=(v:string)=>v.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('de').replace(/[^a-z0-9]+/g,' ').trim();
+const canonical=(v:string)=>v.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('de').replace(/[^\p{L}\p{N}]+/gu,' ').trim();
 export const normalizeArtistQueryV336=(v:string)=>v.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').trim();
 const isoDate=(v:unknown):string=>{const s=cleaned(v,32);return /^\d{4}-\d{2}-\d{2}(?:T|$)/.test(s)&&Number.isFinite(Date.parse(s.slice(0,10)+'T12:00:00Z'))?s.slice(0,10):'';};
 export function safeConcertUrlV336(domain:unknown,path:unknown=''):string|undefined{
@@ -40,7 +40,7 @@ export function normalizeOeticketV336(raw:unknown,artist:string,nowISO:string,ci
       const location=p.typeAttributes?.liveEntertainment?.location;
       if(city&&canonical(location?.city||'')!==canonical(city))continue;
       const link=safeConcertUrlV336(p.url?.domain,p.url?.path);
-      events.push({source:'oeticket',date:d,title:cleaned(p.name||group.name,95)||artist,venue:cleaned(location?.name,90),city:cleaned(location?.city,70),url:link,status:cleaned(p.status,32),posterUrl:selectOeticketPosterV337(p,group),posterUrls:selectOeticketImagesV338(p,group),country:'AT'});
+      events.push({id:p.productId,time:p.typeAttributes?.liveEntertainment?.startDate?.slice(11,19)||undefined,source:'oeticket',date:d,title:cleaned(p.name||group.name,95)||artist,venue:cleaned(location?.name,90),city:cleaned(location?.city,70),url:link,status:cleaned(p.status,32),posterUrl:selectOeticketPosterV337(p,group),posterUrls:selectOeticketImagesV338(p,group),country:'AT'});
     }
   }
   return events.sort((a,b)=>a.date.localeCompare(b.date)).slice(0,30);
@@ -53,7 +53,7 @@ export function mergeConcertsV336(items:ConcertV336[],max=12):ConcertV336[]{
   const result:ConcertV336[]=[];
   // Match by same calendar date, venue and city (avoid title differences across sites).
   for(const e of [...items].sort((a,b)=>a.date.localeCompare(b.date)||score(b)-score(a))){
-    const match=result.find(r=>r.date===e.date&&canonical(r.venue)===canonical(e.venue)&&canonical(r.city)===canonical(e.city)&&!!canonical(r.venue)&&!!canonical(r.city));
+    const match=result.find(r=>r.date===e.date&&(r.source===e.source&&r.id&&e.id?r.id===e.id:(r.time&&e.time?r.time===e.time:!r.id&&!e.id&&!r.time&&!e.time))&&canonical(r.venue)===canonical(e.venue)&&canonical(r.city)===canonical(e.city)&&!!canonical(r.venue)&&!!canonical(r.city));
     if(match){
       if(!match.posterUrl&&e.posterUrl)match.posterUrl=e.posterUrl;
       match.posterUrls=[...new Set([...(match.posterUrls??[]),...(e.posterUrls??[])])].slice(0,8);

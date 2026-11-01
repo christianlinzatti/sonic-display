@@ -1,0 +1,34 @@
+name: V831 Full Production Gate (manual)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  production-v831:
+    name: V831 actual checks / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Exact dependency installation
+        run: npm ci --no-audit --no-fund
+      - name: Full regressions, full TypeScript and real Next.js build (no bypass)
+        run: npm run verify:production:v831
+      - name: Save gate report even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v831-${{ matrix.os }}-technical-gate
+          path: |
+            v831-production-gate-result.json
+            v831-build-readiness-result.json
+          if-no-files-found: warn
+# Real browser/GPU tests and nine witnessed live concerts remain manual acceptance gates.

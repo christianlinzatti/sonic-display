@@ -97,8 +97,8 @@ test('GLB and group integration keep one existing frame pipeline',()=>{
  assert(nat.includes('stepGroupFootworkQualityV596('));assert(nat.indexOf('refineExpressiveFootworkV587(')<nat.indexOf('stepGroupFootworkQualityV596('));
  assert(groupCode.includes('qualityV596:{state:qualityStateV596.current}'));
  assert(glbCode.indexOf('refineExpressiveRigV587(motionV545')<glbCode.indexOf('stepGlbFootworkQualityV596('));
- assert(glbCode.indexOf('stepGlbFootworkQualityV596(')<glbCode.indexOf('applyAvatarRigMotion(rigTargets.current, debugMotion'));
- assert(glbCode.indexOf('applyAvatarRigMotion(rigTargets.current, debugMotion')<glbCode.indexOf('updateFootGrounding({delta'));
+ assert(glbCode.indexOf('stepGlbFootworkQualityV596(')<glbCode.indexOf('applyAvatarRigMotion(rigTargets.current, footworkV839.motion'));
+ assert(glbCode.indexOf('applyAvatarRigMotion(rigTargets.current, footworkV839.motion')<glbCode.indexOf('updateFootGrounding({delta'));
 });
 test('real V524→V587→V596 group pipeline retains contact authority',()=>{
  const {newNaturalFullBodyStateV524,stepNaturalFullBodyV524}=load('components/visualizer/naturalFullBodyDanceV524');

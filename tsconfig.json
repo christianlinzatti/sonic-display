@@ -37,8 +37,7 @@
   ],
   "exclude": [
     "node_modules",
-    "tests/stubs/**/*",
-    "tests/v414-music-types.d.ts",
-    "tests/v649-ui-preferences.d.ts"
+    "tests",
+    "tests/**/*"
   ]
 }

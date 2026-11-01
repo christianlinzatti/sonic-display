@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target":"ES2022",
+    "lib":["ES2022","DOM"],
+    "module":"ESNext",
+    "moduleResolution":"Bundler",
+    "strict":true,
+    "noEmit":true,
+    "skipLibCheck":true,
+    "types":[]
+  },
+  "files":[
+    "../components/importQueueRetentionV654.ts",
+    "../components/visualizer/disposeClonedAvatarSkeletonsV654.ts",
+    "../hooks/playbackPollingSchedulerV654.ts",
+    "stubs/v654-resource-skeleton-three.d.ts"
+  ]
+}

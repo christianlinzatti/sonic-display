@@ -1,13 +1,14 @@
 /** V330 — browser-safe configuration and content contracts for the stage display. */
 export type StageContentSourceV330 = "canvas" | "cover" | "text" | "photos" | "concerts";
 export type StageContentKindV330 = "video" | "image" | "text" | "events";
-export interface ConcertEventV330 { date: string; title: string; venue: string; city: string; url?: string; posterUrl?:string; posterUrls?:string[]; status?:string; }
+export interface ConcertEventV330 { id?:string;time?:string;date: string; title: string; venue: string; city: string; url?: string; posterUrl?:string; posterUrls?:string[]; status?:string; }
 export interface StageContentV330 {
   source: StageContentSourceV330;
   kind: StageContentKindV330;
   title: string;
   url?: string;
   images?: string[];
+  imageSelections?: {lyrics:string[];balanced:string[];photos:string[]};
   imageCredits?: Record<string,string>;
   text?: string;
   events?: ConcertEventV330[];
@@ -105,10 +106,16 @@ export function normalizeStageResponseV330(source: "text"|"photos"|"concerts", i
     const gallery=[...images.map(x=>safeStageMediaV330(isRecord(x)?x.url:x)),safeStageMediaV330(input.imageUrl??input.photoUrl??input.url)].filter((x):x is string=>!!x);
     const unique=[...new Set(gallery)].slice(0,12);
     const credits=isRecord(input.credits)?input.credits:{};
-    return unique.length ? {source,kind:"image",title:limited(input.title,90)||"Künstlerfoto",url:unique[0],images:unique,imageCredits:Object.fromEntries(unique.map(url=>[url,limited(credits[url],320)]).filter(([,credit])=>!!credit))} : null;
+    const rawSelections=isRecord(input.selections)?input.selections:{};
+    const safeSelection=(scene:'lyrics'|'balanced'|'photos')=>Array.isArray(rawSelections[scene])
+      ? [...new Set((rawSelections[scene] as unknown[]).map(safeStageMediaV330).filter((url):url is string=>!!url&&unique.includes(url)))].slice(0,12)
+      : unique;
+    const imageSelections={lyrics:safeSelection('lyrics'),balanced:safeSelection('balanced'),photos:safeSelection('photos')};
+    return unique.length ? {source,kind:"image",title:limited(input.title,90)||"Künstlerfoto",url:unique[0],images:unique,imageSelections,imageCredits:Object.fromEntries(unique.map(url=>[url,limited(credits[url],320)]).filter(([,credit])=>!!credit))} : null;
   }
   const list=Array.isArray(input.events) ? input.events : Array.isArray(input.concerts) ? input.concerts : [];
   const events=list.slice(0,12).filter(isRecord).map(event=>({
+    id:limited(event.id,200),time:typeof event.time==="string"&&/^\d{2}:\d{2}(:\d{2})?$/.test(event.time)?event.time:undefined,
     date: limited(event.date ?? event.startDate,32),
     title: limited(event.title ?? event.name,95),
     venue: limited(event.venue,90), city: limited(event.city,70),

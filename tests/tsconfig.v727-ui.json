@@ -1,0 +1,1 @@
+{"extends":"../tsconfig.json","compilerOptions":{"incremental":false,"plugins":[],"noEmit":true},"files":["../components/LastFmPeriodRecapPanelV727.tsx","../components/LastFmHistoryPanelV706.tsx","../components/LastFmPersonalInsightsDashboardV722.tsx","stubs/v701-react-jsx.d.ts"],"include":[],"exclude":[]}

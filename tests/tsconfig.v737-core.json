@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": [],
+    "lib": ["ES2022"]
+  },
+  "files": [
+    "../components/visualizer/hipFootLockV737.ts",
+    "../components/visualizer/groundContactEngine.ts"
+  ]
+}

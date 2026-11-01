@@ -65,11 +65,11 @@ for(const style of ['Deutschrap','Hardstyle','Hardtekk','Pop']){
 const group=fs.readFileSync('components/visualizer/GroupDancersV326SceneV492.tsx','utf8');
 const proc=fs.readFileSync('components/visualizer/ProceduralDancerAvatarV492.tsx','utf8');
 assert(group.includes('stepNaturalFullBodyV524(naturalBodyStateV524.current')&&group.includes('naturalBodyStateV524.current=stabilizedBodyV524.state'));
-assert(group.includes('const naturalFootworkV524=stabilizedBodyV524.footwork')&&group.includes('footwork:naturalFootworkV524.slots[i]')&&group.includes('naturalFootworkV524.slots[i].rootSpeed'));
+assert(group.includes('const naturalFootworkV524=refineGroupFootworkV684(stabilizedBodyV524.footwork')&&group.includes('footwork:naturalFootworkV524.slots[i]')&&group.includes('naturalFootworkV524.slots[i].rootSpeed'));
 assert(group.includes('Object.assign(footworkV486.current[i].current,naturalFootworkV524.slots[i])'));
 assert(proc.includes('groupFootworkV486?.current.liftLeft')&&proc.includes('planNaturalFullBodyV488({'));
 const engine=fs.readFileSync('components/visualizer/naturalFullBodyDanceV524.ts','utf8');
 assert(!/\b(requestAnimationFrame|setInterval|setTimeout|fetch|localStorage|Date\.now|Math\.random)\b/.test(engine),'no hidden loop, network or nondeterminism');
 const pkg=require('../package.json');assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]||0)>=524);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v524 && npm run test:v524:types && npm run test:v523'));
+assert(pkg.scripts['test:v524']&&pkg.scripts['test:v524:types']&&pkg.scripts['test:v523']); // V680 independent historical tests
 console.log(`PASS V524: ${simulated} genre/stance/seek tests and original-clip/foot-IK safety wiring`);

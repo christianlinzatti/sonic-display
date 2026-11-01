@@ -103,5 +103,11 @@ assert(controls.includes('<GlbGroundingCalibrationPanelV494 />'));
 for(const token of ['GLB_GROUND_REPORT_EVENT_V494','writeGlbGroundCalibrationV494','driftThresholdCm','stanceDamping','transitionHoldMs'])assert(ui.includes(token));
 assert(!/(setInterval|requestAnimationFrame|useFrame\()/.test(ui));
 const pkg=require('../package.json');assert(Number(pkg.version.match(/-v(\d+)/)?.[1])>=494,'V494 test requires V494 or newer');
-assert(pkg.scripts['build:preflight'].includes('npm run test:v494 && npm run test:v494:types && npm run test:v493'));
+// Since V656, release validation is an explicit smoke chain rather than the historical prebuild chain.
+assert(pkg.scripts.prebuild==='npm run check:fast');
+assert(((pkg.scripts['check:release'].includes('npm run test:smoke:v667') || ((pkg.scripts['check:release'].includes('npm run test:smoke:v668') || ((pkg.scripts['check:release'].includes('npm run test:smoke:v669') || ((pkg.scripts['check:release'].includes('npm run test:smoke:v670') || (pkg.scripts['check:release'].includes('npm run test:smoke:v671') && pkg.scripts['test:smoke:v671'].includes('npm run test:smoke:v670'))) && pkg.scripts['test:smoke:v670'].includes('npm run test:smoke:v669'))) && pkg.scripts['test:smoke:v669'].includes('npm run test:smoke:v668'))) && pkg.scripts['test:smoke:v668'].includes('npm run test:smoke:v667'))) && pkg.scripts['test:smoke:v667'].includes('npm run test:smoke:v6661') && pkg.scripts['test:smoke:v6661'].includes('npm run test:smoke:v666')) && pkg.scripts['test:smoke:v666'].includes('npm run test:smoke:v665'), 'V665 remains reachable from production release gate');
+assert(pkg.scripts['test:smoke:v665'].includes('npm run test:v494'));
+assert(pkg.scripts['test:smoke:v665'].includes('npm run test:v494:types'));
+assert(pkg.scripts['test:smoke:v665'].includes('npm run test:v493'));
+
 console.log('PASS V494: contact-aware optional GLB travel, safe reset/guards, per-model calibration, 30-minute simulation, stable render architecture');

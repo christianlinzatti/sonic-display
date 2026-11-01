@@ -170,6 +170,6 @@ test('all existing facial, IK and animation planners retain authority',()=>{
   const calls=[...pkg.scripts[script].matchAll(/npm run ([a-zA-Z0-9:._-]+)/g)].map(m=>m[1]);
   return calls.some(reachesV616);
  }
- assert(reachesV616('prebuild'),'prebuild must transitively run V616');
+ assert(reachesV616('check:release'),'the full historical release gate must transitively run V616; V680 deliberately keeps prebuild lean');
 });
 console.log(`PASS V616: ${groups} groups, safe 2–4 artist stage interactions and deterministic cue-bound gestures`);

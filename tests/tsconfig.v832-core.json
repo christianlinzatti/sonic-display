@@ -1,0 +1,4 @@
+{
+  "extends":"./tsconfig.v831-core.json",
+  "files":["../components/visualizer/realGlbConcertBenchmarkV832.ts"]
+}

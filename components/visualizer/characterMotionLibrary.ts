@@ -4,14 +4,18 @@ export type InstalledCharacterMotion = { id: string; avatarId: string; name: str
 export type CharacterMotionStore = { version: 1; motions: InstalledCharacterMotion[]; automatic: boolean };
 export const CHARACTER_MOTION_CHANGE_EVENT = "sonic:character-motions-changed";
 const STORAGE_KEY = "sonic.character.motion.library.v190";
-const EMPTY: CharacterMotionStore = {version:1,motions:[],automatic:false};
+// V666.1: freshly installed motion libraries run automatically. Explicit saved opt-outs remain valid.
+const EMPTY: CharacterMotionStore = {version:1,motions:[],automatic:true};
 const GENRES = new Set(["", "hardtekk", "hardstyle", "techno", "deutschrap", "hip-hop", "rock", "ambient", "pop", "other"]);
 function goodUrl(value:unknown): value is string { return typeof value === "string" && value.length > 0 && value.length < 2048 && (/^https:\/\//.test(value) || /^\/((?!\/)[^?#]*)/.test(value)); }
 export function sanitizeCharacterMotionStore(input: unknown): CharacterMotionStore {
   if (!input || typeof input !== "object") return {...EMPTY};
   const data = input as Record<string,unknown>;
-  const motions: InstalledCharacterMotion[] = [];
-  if (Array.isArray(data.motions)) for (const raw of data.motions.slice(-500)) {
+  // V659: preserve every valid installed descriptor. Browser storage quota, not
+  // an arbitrary 250-item trim, determines the maximum portable catalog size.
+  // A Map makes last-write-wins deduplication linear for larger libraries.
+  const motions = new Map<string,InstalledCharacterMotion>();
+  if (Array.isArray(data.motions)) for (const raw of data.motions) {
     if (!raw || typeof raw !== "object") continue;
     const m = raw as Record<string,unknown>;
     if (typeof m.id !== "string" || !/^[\w-]{1,100}$/.test(m.id) || typeof m.avatarId !== "string" || m.avatarId.length > 160 || typeof m.name !== "string" || !m.name.trim() || m.name.length > 100 || !goodUrl(m.url)) continue;
@@ -20,9 +24,9 @@ export function sanitizeCharacterMotionStore(input: unknown): CharacterMotionSto
     const bpmMin = Number.isFinite(m.bpmMin) ? Math.max(0,Math.min(300,Number(m.bpmMin))) : 0;
     const bpmMax = Number.isFinite(m.bpmMax) ? Math.max(bpmMin,Math.min(300,Number(m.bpmMax))) : 300;
     const next = {id:m.id,avatarId:m.avatarId,name:m.name.trim(),url:m.url,genre,bpmMin,bpmMax,section,addedAt:Number.isFinite(m.addedAt)?Number(m.addedAt):0,category:validMotionCategoryV535(m.category)?m.category:suggestMotionCategoryV535(String(m.name)),favorite:m.favorite===true,...(validMotionFingerprintV535(m.fingerprint)?{fingerprint:m.fingerprint}:{})};
-    const prev = motions.findIndex(x=>x.id===next.id);if(prev>=0)motions.splice(prev,1);motions.push(next);
+    motions.delete(next.id);motions.set(next.id,next);
   }
-  return {version:1,motions:motions.slice(-250),automatic:data.automatic===true};
+  return {version:1,motions:[...motions.values()],automatic:data.automatic===false?false:true};
 }
 export function loadCharacterMotionStore(): CharacterMotionStore {
   if (typeof window === "undefined") return {...EMPTY};

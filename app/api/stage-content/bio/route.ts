@@ -2,6 +2,7 @@ import {NextResponse} from 'next/server';
 import {getValidSession,ReauthRequiredError} from '@/lib/spotify';
 import {setSessionCookie} from '@/lib/session';
 import {safeArtistNameV335,normalizeWikipediaV335} from '@/services/stageContent/artistProvidersV335';
+import {readMusicMetadataV651} from '@/lib/musicMetadataV651';
 /** Wikipedia page summaries; no scraping, API keys, or direct browser requests. */
 export async function GET(request:Request){
   const artist=safeArtistNameV335(new URL(request.url).searchParams.get('artist'));
@@ -18,6 +19,14 @@ export async function GET(request:Request){
       content=normalizeWikipediaV335(await response.json(),artist);
       if(content)break;
     }catch{/* next language or empty result */}
+  }
+  // Wikipedia remains the preferred biography. TheAudioDB (German/English) and
+  // Last.fm are optional fallbacks for artists without a Wikipedia summary.
+  if(!content){
+    try{
+      const metadata=await readMusicMetadataV651(artist);
+      if(metadata.artist.biography)content={title:metadata.artist.name,text:metadata.artist.biography};
+    }catch{/* preserve existing empty result */}
   }
   const res=NextResponse.json(content??{title:artist,text:null});
   res.headers.set('Cache-Control','private, no-store');

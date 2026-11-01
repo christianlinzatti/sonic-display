@@ -1,5 +1,8 @@
 "use client";
 import { useEffect, useRef, useSyncExternalStore, useState } from "react";
+import DisplayPerformanceStudioV835 from "./DisplayPerformanceStudioV835";
+import {initialDisplayStudioStateV835,stepDisplayStudioV835,planDisplayStudioV835} from "./displayStudioV835";
+import {subscribeDisplayStudioV835,getDisplayStudioSettingsV835,getDisplayStudioServerSettingsV835,loadDisplayStudioSettingsV835,publishDisplayStudioStatusV835} from "./displayStudioStoreV835";
 import {useDisplayProfileV388} from "../DisplayPerformanceV388";
 import {samplePiConcertV479,readPiConcertBudgetV479,usePiConcertBudgetV479} from "./piConcertRuntimeV479";
 import {planPiConcertVisualQualityV602,capPiConcertDprV602} from "./piConcertOptimizationV602";
@@ -50,6 +53,9 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
   const mode = useAdaptivePerformance().mode;
   const piBudgetV602=usePiConcertBudgetV479();
   const displayV388 = useDisplayProfileV388();
+  const displaySettingsV835=useSyncExternalStore(subscribeDisplayStudioV835,getDisplayStudioSettingsV835,getDisplayStudioServerSettingsV835);
+  const displayStateV835=useRef(initialDisplayStudioStateV835());
+  useEffect(()=>loadDisplayStudioSettingsV835(),[]);
   const [displayDeviceV388,setDisplayDeviceV388]=useState({width:1600,height:900,pixelRatio:1,cores:8,memoryGb:8,saveData:false});
   useEffect(()=>{
     const read=()=>{const nav=navigator as Navigator & {deviceMemory?:number;connection?:{saveData?:boolean}};
@@ -70,6 +76,7 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
   const deviceCap = useRef<CalibratedTier>("high");
   const calibrationSamples = useRef<CalibrationSample[]>([]);
   const calibrated = useRef(false);
+  useEffect(()=>{displayStateV835.current=initialDisplayStudioStateV835();},[displaySettingsV835.profile,displaySettingsV835.targetFps,displaySettingsV835.adaptive]);
   useEffect(() => {
     try {
       const ctx = gl.getContext();
@@ -105,9 +112,12 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
     setVisualLevelV640("full");
     tier.current = mode === "auto" ? deviceCap.current : mode;
     const requestedDprV602=limitDisplayDprV388(dprFor(tier.current, deviceDpr.current),displayBudgetV388);
-    const dpr=capPiConcertDprV602(requestedDprV602,planPiConcertVisualQualityV602({budget:readPiConcertBudgetV479(),avatarCount,autoQuality:mode==='auto',manualLighting:false,reactive:true}),mode==='auto');
+    const piDprV835=capPiConcertDprV602(requestedDprV602,planPiConcertVisualQualityV602({budget:readPiConcertBudgetV479(),avatarCount,autoQuality:mode==='auto',manualLighting:false,reactive:true}),mode==='auto');
+    const studioPlanV835=planDisplayStudioV835(piDprV835,displaySettingsV835,{...displayDeviceV388,avatarCount},displayStateV835.current);
+    const dpr=studioPlanV835.dpr;
+    publishDisplayStudioStatusV835(studioPlanV835);
     setDpr(dpr);
-    update({ mode, tier: tier.current, dpr, reason: mode !== "auto" ? "Manual quality" : dpr<requestedDprV602 ? "V602 Pi concert quality budget" : "Monitoring frame rate" });
+    update({ mode, tier: tier.current, dpr, reason: studioPlanV835.limited?studioPlanV835.reason:mode !== "auto" ? "Manual quality" : dpr<requestedDprV602 ? "V602 Pi concert quality budget" : "Monitoring frame rate" });
   }, [mode, setDpr]);
   // V355 only caps the existing DPR policy. A protection-level change must not reset
   // V253/254 calibration, render workload history, or manual quality settings.
@@ -116,10 +126,13 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
     const baseline = mode === "auto" ? limitDpr(dprFor(tier.current, deviceDpr.current),renderBudget.current.tier) : dprFor(tier.current,deviceDpr.current);
     const stableDpr = (mode === "auto" && stabilitySettingsV355.enabled) ? Math.min(baseline,stabilityDprCapV355(stabilityCapV355,stabilityDeviceV355)) : baseline;
     const requestedDprV602=limitDisplayDprV388(stableDpr,displayBudgetV388);
-    const dpr=capPiConcertDprV602(requestedDprV602,planPiConcertVisualQualityV602({budget:readPiConcertBudgetV479(),avatarCount,autoQuality:mode==='auto',manualLighting:false,reactive:true}),mode==='auto');
+    const piDprV835=capPiConcertDprV602(requestedDprV602,planPiConcertVisualQualityV602({budget:readPiConcertBudgetV479(),avatarCount,autoQuality:mode==='auto',manualLighting:false,reactive:true}),mode==='auto');
+    const studioPlanV835=planDisplayStudioV835(piDprV835,displaySettingsV835,{...displayDeviceV388,avatarCount},displayStateV835.current);
+    const dpr=studioPlanV835.dpr;
+    publishDisplayStudioStatusV835(studioPlanV835);
     setDpr(dpr);
-    update({...current,dpr,reason:dpr<requestedDprV602?"V602 Pi concert quality budget":dpr<stableDpr?displayBudgetV388.reason:dpr<baseline?"V355 long-session render guard":current.reason});
-  }, [mode,setDpr,stabilityCapV355,stabilityDeviceV355,stabilitySettingsV355.enabled,displayBudgetV388.dprCap,displayBudgetV388.enabled,displayDeviceV388.pixelRatio,piBudgetV602.level,piBudgetV602.enabled,avatarCount]);
+    update({...current,dpr,reason:studioPlanV835.limited?studioPlanV835.reason:dpr<requestedDprV602?"V602 Pi concert quality budget":dpr<stableDpr?displayBudgetV388.reason:dpr<baseline?"V355 long-session render guard":current.reason});
+  }, [mode,setDpr,stabilityCapV355,stabilityDeviceV355,stabilitySettingsV355.enabled,displayBudgetV388.dprCap,displayBudgetV388.enabled,displayDeviceV388.pixelRatio,piBudgetV602.level,piBudgetV602.enabled,avatarCount,displaySettingsV835.profile,displaySettingsV835.adaptive,displaySettingsV835.targetFps]);
   useFrame((_state, delta) => {
     // V218: one sample window feeds both diagnostics and the adaptive DPR policy.
     // Exclude long suspended-tab frames so returning to the page cannot force low quality.
@@ -147,6 +160,7 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
       slowPercent: 100 * slowRatio,
       drawCalls: info.render.calls, triangles: info.render.triangles,
       geometries: info.memory.geometries, textures: info.memory.textures,
+      programs: info.programs?.length ?? null,
       renderer: gpuDescription.current.renderer, webgl: gpuDescription.current.webgl,
       samples: d.frames, avatarCount, updatedAt: nowV518,
     });
@@ -180,6 +194,25 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
     }else if(getVisualLevelV640()!=='full'){
       visualBudgetV640.current=initialVisualBudgetV640();
       setVisualLevelV640('full');
+    }
+    // V835: same measured frame window; no second RAF. Never use hidden/paused/transition windows.
+    const previousLevelV835=displayStateV835.current.level;
+    displayStateV835.current=stepDisplayStudioV835(displayStateV835.current,
+      {fps,p95Ms:p95FrameMs,elapsed,playing,visible:true,transitioning:transitioningV640},displaySettingsV835);
+    const studioLevelChangedV835=previousLevelV835!==displayStateV835.current.level;
+    // Keep the displayed status linked to the real canvas pixel-ratio controller.
+    if(studioLevelChangedV835){
+      const baselineV835=mode==='auto'?limitDpr(dprFor(tier.current,deviceDpr.current),renderBudget.current.tier):dprFor(tier.current,deviceDpr.current);
+      const stableV835=(mode==='auto'&&stabilitySettingsV355.enabled)?Math.min(baselineV835,stabilityDprCapV355(stabilityCapV355,stabilityDeviceV355)):baselineV835;
+      const displayV835=limitDisplayDprV388(stableV835,displayBudgetV388);
+      const piV835=capPiConcertDprV602(displayV835,planPiConcertVisualQualityV602({budget:readPiConcertBudgetV479(),avatarCount,autoQuality:mode==='auto',manualLighting:false,reactive:true}),mode==='auto');
+      const planV835=planDisplayStudioV835(piV835,displaySettingsV835,{...displayDeviceV388,avatarCount},displayStateV835.current);
+      setDpr(planV835.dpr);
+      publishDisplayStudioStatusV835(planV835);
+      update({...current,dpr:planV835.dpr,reason:planV835.limited?planV835.reason:current.reason});
+    } else {
+      const planV835=planDisplayStudioV835(current.dpr,displaySettingsV835,{...displayDeviceV388,avatarCount},displayStateV835.current);
+      publishDisplayStudioStatusV835(planV835);
     }
     if (mode !== "auto" || transitioningV640) return;
     // V254: passive calibration from real scene load. Collect once, then reuse the
@@ -224,9 +257,12 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
       const baseDpr = limitDpr(dprFor(tier.current, deviceDpr.current), renderBudget.current.tier);
       const stableDpr = (mode === "auto" && stabilitySettingsV355.enabled) ? Math.min(baseDpr,stabilityDprCapV355(stabilityCapV355,stabilityDeviceV355)) : baseDpr;
       const requestedDprV602=limitDisplayDprV388(stableDpr,displayBudgetV388);
-      const dpr=capPiConcertDprV602(requestedDprV602,planPiConcertVisualQualityV602({budget:readPiConcertBudgetV479(),avatarCount,autoQuality:mode==='auto',manualLighting:false,reactive:true}),mode==='auto');
+      const piDprV835=capPiConcertDprV602(requestedDprV602,planPiConcertVisualQualityV602({budget:readPiConcertBudgetV479(),avatarCount,autoQuality:mode==='auto',manualLighting:false,reactive:true}),mode==='auto');
+    const studioPlanV835=planDisplayStudioV835(piDprV835,displaySettingsV835,{...displayDeviceV388,avatarCount},displayStateV835.current);
+    const dpr=studioPlanV835.dpr;
+    publishDisplayStudioStatusV835(studioPlanV835);
       setDpr(dpr);
-      update({ mode, tier: tier.current, dpr, reason: dpr<requestedDprV602 ? "V602 Pi concert quality budget" : renderBudget.current.tier !== "high"
+      update({ mode, tier: tier.current, dpr, reason: studioPlanV835.limited?studioPlanV835.reason:dpr<requestedDprV602 ? "V602 Pi concert quality budget" : renderBudget.current.tier !== "high"
         ? "Render workload budget (draw calls / triangles)" : tier.current !== budgetTier ? "Device calibration cap" : fps < 42 || slowRatio > 0.3 ? "Sustained slow frames" : "Stable frame rate" });
     }
   });
@@ -248,6 +284,7 @@ export function AdaptivePerformanceSettings() {
     <p className="settings-note">V254: Automatic quality calibrates against the real scene and remembers a device-specific cap for up to 14 days. Manual modes bypass the cap. <button type="button" onClick={() => { clearDeviceRenderCalibration(); window.location.reload(); }}>Recalibrate device</button></p>
     <p className="settings-note">Active: {tier} · pixel ratio {dpr.toFixed(2)} · {reason}. Auto lowers resolution after sustained slow frames and raises it only after a longer stable period. This does not change dance timing or microphone analysis.</p>
     <p className="settings-note">V640: Optional stage decoration {decorationV640}. Reduces LED/Gobo/Haze and nonessential beams before legacy DPR downshift, using measured FPS/P95 and draw-call/triangle proxies. Manual quality bypasses this guard; lip-sync, lyrics, dance and camera clocks stay intact.</p>
+    <DisplayPerformanceStudioV835 />
     <p className="settings-note">V552: invisible light shafts/haze do not consume transparent GPU draw calls; inactive dance effects stop updating their mesh pool. Existing Pi concert presets and measured FPS/P95/P99 still control adaptive quality. No changes to lyric, lip-sync, camera or dance timing.</p>
   </div>;
 }

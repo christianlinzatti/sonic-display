@@ -1,11 +1,11 @@
 /** V339 – conservatively select reusable, artist-matched Wikimedia Commons photos. */
-export interface CommonsPhotoV339 {url:string;credit:string;descriptionUrl:string;license:string;}
+export interface CommonsPhotoV339 {url:string;credit:string;descriptionUrl:string;license:string;width?:number;height?:number;title?:string;}
 type Obj=Record<string,unknown>;
 const record=(value:unknown):value is Obj=>!!value&&typeof value==='object'&&!Array.isArray(value);
 const field=(value:unknown)=>typeof value==='string'?value.trim():'';
 const plain=(value:string)=>value.replace(/<[^>]*>/g,' ').replace(/&(?:amp|quot|lt|gt|nbsp);/g,' ').replace(/\s+/g,' ').trim().slice(0,140);
 const safeHttps=(value:unknown):string=>{try{const url=new URL(field(value));return url.protocol==='https:'?url.href:'';}catch{return '';}};
-const canonical=(value:string)=>value.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+const canonical=(value:string)=>value.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();
 export function commonsSearchUrlV339(artist:string):string{
  const p=new URLSearchParams({action:'query',generator:'search',gsrsearch:`"${artist}" concert`,gsrnamespace:'6',gsrlimit:'24',prop:'imageinfo',iiprop:'url|size|extmetadata',iiurlwidth:'960',format:'json',formatversion:'2'});
  return `https://commons.wikimedia.org/w/api.php?${p.toString()}`;
@@ -33,7 +33,7 @@ export function selectCommonsPhotosV339(data:unknown,artist:string,max=8):Common
   if(!url||!descriptionUrl)continue;
   const author=plain(meta('Artist')||meta('Credit')||'Wikimedia Commons');
   if(result.some(p=>p.descriptionUrl===descriptionUrl||p.url===url))continue;
-  result.push({url,descriptionUrl,license,credit:`${author} · ${license}`.slice(0,180)});
+  result.push({url,descriptionUrl,license,credit:`${author} · ${license}`.slice(0,180),width,height,title:file});
   if(result.length>=Math.min(12,Math.max(1,max)))break;
  }
  return result;

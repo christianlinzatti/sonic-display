@@ -31,13 +31,15 @@ function hash(input:string):number {
   for(let i=0;i<input.length;i++)h=Math.imul(h^input.charCodeAt(i),16777619);
   return h>>>0;
 }
-export type GenreMotionFamilyV536 = 'rap'|'hardstyle'|'hardtekk'|'general';
+export type GenreMotionFamilyV536 = 'rap'|'hardstyle'|'hardtekk'|'rock'|'pop'|'general';
 export type GenreMotionSectionV536 = 'quiet'|'verse'|'hook'|'drop';
 export function motionFamilyV536(value:string|null|undefined):GenreMotionFamilyV536 {
   const s=(value??'').toLowerCase();
   if(/hardtekk|hard.?tekk|tekk|tekno/.test(s))return 'hardtekk';
   if(/hardstyle|rawstyle|hardcore|gabber|hard.?dance|uptempo|hard.?techno|rave/.test(s))return 'hardstyle';
   if(/deutschrap|hip[\s_-]?hop|trap|drill|boom.?bap|rap|r[&n]b|cloudrap/.test(s))return 'rap';
+  if(/rock|metal|punk/.test(s))return 'rock';
+  if(/pop/.test(s))return 'pop';
   return 'general';
 }
 export function motionSectionV536(value:string|null|undefined):GenreMotionSectionV536 {
@@ -84,6 +86,19 @@ export function rankGenreMotionsV536(input:GenreMotionInputV536,phrase:string,re
         if(dance&&section==='verse')score+=1.2;
         if(family==='hardtekk'&&/tekk|shuffle|bounce|step/.test(n))score+=1.2;
         if(family==='hardstyle'&&/stomp|jump|hardstyle|armsup/.test(n))score+=.95;
+      }
+      // V666: Rock and Pop must not fall back to the same generic choreography.
+      // These are preferences among real installed clips, never eligibility claims.
+      if(family==='rock') {
+        if(/rock|guitar|headbang|power|stomp|punk|metal/.test(n))score+=section==='hook'?3.0:2.2;
+        if(energetic&&section==='drop')score+=2;
+        if(/sway|soft|flow/.test(n)&&section==='verse')score+=.3;
+        if(/pop|ballad|disco/.test(n)&&!/rock/.test(n))score-=.8;
+      }
+      if(family==='pop') {
+        if(/pop|dance|sway|groove|sidestep|step|flow|disco/.test(n))score+=section==='hook'?2.8:2;
+        if(dance&&section==='hook')score+=1.4;
+        if(/headbang|metal|guitar|hardstyle|tekk/.test(n))score-=1.5;
       }
       if(section!=='quiet'&&idle)score-=5.8;
       if(section!=='quiet'&&/greeting|wavehello|salute/.test(n))score-=4;

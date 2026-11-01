@@ -78,5 +78,5 @@ const pkg=require('../package.json');
 require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(407);
 assert(pkg.scripts['verify:offline'].includes('test:v407'));
 require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v407');
-assert(pkg.scripts.prebuild.includes('npm run verify:offline:fast'),'npm run build must execute the legacy suite automatically');
+assert(pkg.scripts['verify:historical'].includes('npm run verify:offline:fast'),'the legacy suite must remain accessible through the historical CI gate');
 console.log('PASS V407: measured kick->chest, snare->head, verse/hook gestures, no synthetic-onset claims, vocal roles, bounded poses, pause/seek guards and both avatar pipelines');

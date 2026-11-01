@@ -14,13 +14,13 @@ export function ConcertDisplayV337({events,title,reducedMotion=false}:{events:Co
    <header><span>LIVE · NÄCHSTE KONZERTE</span><h3>{title}</h3></header>
    {settings.style==='spotlight'&&<section className="sonic-concert-feature-v337">
      {usePoster&&<StageImageGalleryV338 images={posterImages} alt={`Eventbild: ${lead.title}`} reducedMotion={reducedMotion} className="sonic-concert-poster-v338"/>}
-     <div className="sonic-concert-feature-text-v337"><strong className="sonic-concert-date-v337">{formattedConcertDateV337(lead.date)}</strong><h4>{lead.title}</h4><p>{[lead.venue,lead.city].filter(Boolean).join(' · ')}</p>
+     <div className="sonic-concert-feature-text-v337"><strong className="sonic-concert-date-v337">{formattedConcertDateV337(lead.date)} {lead.time?.slice(0,5)}</strong><h4>{lead.title}</h4><p>{[lead.venue,lead.city].filter(Boolean).join(' · ')}</p>
        {settings.showTicketStatus&&displayTicketStatusV337(lead.status)&&<span className="sonic-concert-status-v337">{displayTicketStatusV337(lead.status)}</span>}
        {lead.url&&<span className="sonic-concert-link-v337">Ticketinfos verfügbar</span>}
      </div>
    </section>}
    <div className="sonic-concert-list-v337">{(settings.style==='spotlight'?events.slice(1,4):events.slice(0,5)).map((e,i)=><div className="sonic-concert-row-v337" key={`${e.date}-${e.title}-${i}`}>
-     <strong>{formattedConcertDateV337(e.date)}</strong><span>{e.title}<small>{[e.venue,e.city].filter(Boolean).join(' · ')}</small></span>
+     <strong>{formattedConcertDateV337(e.date)} {e.time?.slice(0,5)}</strong><span>{e.title}<small>{[e.venue,e.city].filter(Boolean).join(' · ')}</small></span>
      {settings.showTicketStatus&&displayTicketStatusV337(e.status)&&<em>{displayTicketStatusV337(e.status)}</em>}
    </div>)}</div>
  </div>;

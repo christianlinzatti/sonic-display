@@ -8,7 +8,7 @@ const checks=[
 ['batch characters',()=>assert.match(ui,/multiple accept="\.glb/)],
 ['character preview',()=>assert.match(ui,/<AvatarPreview3D/)],
 ['motion assignments',()=>assert.match(ui,/Ziel-Avatar/)],
-['existing motion replacement consent',()=>assert.match(ui,/model.animationUrl&&!replace/)],
+['existing motion replacement consent',()=>{assert.match(ui,/validateMotionAssignmentV533\(appendMotionsV533,assignments.has\(item.target\),Boolean\(model.animationUrl\),replace\)/);const {load}=require('./helpers/ts-loader-v404.cjs');const {validateMotionAssignmentV533:validate}=load('components/visualizer/expandableMotionLibraryV533');assert.match(validate(false,false,true,false),/Ersetzen/);assert.equal(validate(false,false,true,true),null);}],
 ['avoid duplicate target assignments',()=>assert.match(ui,/assignments.has\(item.target\)/)],
 ['preserve status per file',()=>assert.match(ui,/error:error instanceof Error/)],
 ['blob upload',()=>assert.match(ui,/@vercel\/blob\/client/)],

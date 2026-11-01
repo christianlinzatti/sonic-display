@@ -90,5 +90,6 @@ const src=fs.readFileSync('components/visualizer/expressiveLipSyncV476.ts','utf8
 assert(!/Math\.random|Date\.now|localStorage|AudioContext/.test(src),'no nondeterministic or invasive timing');
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=476, 'V476 regression remains valid in newer releases');
-assert(pkg.scripts['build:preflight'].includes('npm run test:v476 && npm run test:v476:types'));
+assert(pkg.scripts['test:v476'].includes('v476-expressive-lipsync-regression.cjs'));
+assert(pkg.scripts['check:release'].includes('npm run test:v686'), 'V680+ explicit release checks active');
 console.log('PASS V476: verified word-bounded shaping, fast rap coarticulation, closures/audio/manual author priority, pause/seeks, deterministic 30-minute playback, GLB and procedural render paths');

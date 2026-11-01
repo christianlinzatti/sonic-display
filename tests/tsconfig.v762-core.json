@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"noEmit":true,"skipLibCheck":true,"target":"ES2022","module":"ESNext","moduleResolution":"Bundler","types":[]},"files":["../components/visualizer/cinematicScenicLightingV762.ts","../components/visualizer/scenicGoboShaderV762.ts"]}

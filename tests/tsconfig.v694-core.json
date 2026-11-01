@@ -1,0 +1,12 @@
+{
+ "extends":"./tsconfig.v693-core.json",
+ "compilerOptions":{"incremental":false},
+ "files":[
+  "../components/visualizer/concertQualityHistoryV694.ts",
+  "../components/visualizer/concertQualityHistoryStorageV694.ts",
+  "../components/visualizer/concertQualityImprovementV693.ts",
+  "../components/visualizer/concertQualityInspectorV692.ts",
+  "../components/visualizer/fullConcertQualityAuditV641.ts",
+  "v414-music-types.d.ts"
+ ]
+}

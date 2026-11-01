@@ -74,8 +74,8 @@ const preferences=fs.readFileSync('context/UiPreferencesContext.tsx','utf8');
 const types=fs.readFileSync('types/music.ts','utf8');
 for(const [source,required] of [
   [stage,'planAutomaticRapPerformanceV437'],[stage,'sampleAutomaticRapPerformanceV437'],
-  [stage,'applyAutomaticRapPerformanceV437'],[stage,'danceAggression={rapPerformanceValuesV437.aggression}'],
-  [stage,'avatarAnimationIntensity={concertDynamicsPercentV502(rapPerformanceValuesV437.intensity,directedDynamicsV604.dance)'],
+  [stage,'applyAutomaticRapPerformanceV437'],[stage,'applyDeutschrapPerformanceV796('],[stage,'rapPerformanceValuesV437,deutschrapCueV796'],[stage,'danceAggression={Math.max(0,Math.min(1,rapPerformanceValuesV796.aggression'],
+  [stage,'concertDynamicsPercentV502(rapPerformanceValuesV796.intensity,directedDynamicsV670.dance)'],
   [stage,'rapLipEnabledV415:rapPerformanceValuesV437.rapLip'],
   [stage,'!preferences.avatarTimelineEnabled'],[stage,'!preferences.avatarManualVocalEnabledV385'],
   [stage,'detectedSection:rapMotionHookV437?"hook":directedSection'],[stage,'eventSlot:rapMotionHookV437'],

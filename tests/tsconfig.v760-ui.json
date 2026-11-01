@@ -1,0 +1,1 @@
+{"compilerOptions":{"strict":true,"noEmit":true,"skipLibCheck":true,"target":"ES2022","module":"ESNext","moduleResolution":"Bundler","jsx":"preserve","types":[],"lib":["ES2022","DOM"]},"files":["../components/visualizer/AdvancedEnsembleControlsV760.tsx","stubs/v701-react-jsx.d.ts"]}

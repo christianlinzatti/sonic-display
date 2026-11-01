@@ -10,6 +10,7 @@ import { createFootContactState, updateFootContact } from "./avatarFootContact";
 import { createFootIKState, initializeFootIK, updateFootIK } from "./avatarFootIK";
 import { createBeatFootworkState, updateBeatFootwork } from "./beatPerfectFootworkV234";
 import { readFootLockV322, groundLockReportV322, FOOT_LOCK_DIAGNOSTIC_EVENT_V322 } from "./intelligentFootLockV322";
+import {HIP_FOOT_LOCK_DIAGNOSTICS_V737,hipFootLockReportV737} from "./hipFootLockV737";
 import { collectAvatarRigNodes, type AvatarRigTargets } from "./avatarRigController";
 import type { AvatarRigProfileId } from "./avatarRigProfiles";
 import { measureProfilerPhase } from "./runtimeProfiler";
@@ -26,7 +27,7 @@ type GroundingArgs = {
   enabled:boolean; strength:number; contact:number; lock:number;
   trackId:string; progressMs:number|undefined;
   rigTargets:{current:AvatarRigTargets}; constraints:{current:JointConstraintMap};
-  avatarKey:string; ikQualitySampler:{current:Parameters<typeof sampleIKQuality>[0]};
+  avatarKey:string; hipFootLockV737?:{enabled:boolean;intensity:number}; ikQualitySampler:{current:Parameters<typeof sampleIKQuality>[0]};
   handIK:{current:Parameters<typeof sampleIKQuality>[1]['handState']};
   activeHandCue:Parameters<typeof updatePartnerHandIK>[2];
 };
@@ -49,17 +50,25 @@ export function useGltfFootContactV492(root:RefObject<Group|null>,model:Object3D
   function updateFootGrounding({delta,elapsed,root:avatarRoot,audio,genre,playing:isPlaying,reducedMotion,
     enabled:avatarFootIKEnabled,strength:avatarFootIKStrength,contact:avatarFootIKContact,
     lock:avatarFootIKLock,trackId,progressMs,rigTargets, constraints:ikConstraints,
-    avatarKey,ikQualitySampler,handIK,activeHandCue}:GroundingArgs) {
+    avatarKey,hipFootLockV737,ikQualitySampler,handIK,activeHandCue}:GroundingArgs) {
     // Keep the original IK/fallback/diagnostic order. Neither model nor tracks are mutated here.
     const footCueV234 = updateBeatFootwork(beatFootworkV234.current, {
       beat: audio.beat, beatStrength: audio.beatStrength, kick: audio.kickAccentIntensity,
       bpm: audio.bpm ?? undefined, genre, playing: isPlaying, reducedMotion, delta,
     });
     const enableIK = avatarFootIKEnabled && isPlaying && !reducedMotion;
-    const activeIK = measureProfilerPhase("footIK", () => updateFootIK(footIK.current, avatarRoot, delta, enableIK, avatarFootIKStrength / 100, Math.min(1, avatarFootIKContact / 100 + footCueV234.contactBoost), Math.min(1, avatarFootIKLock / 100 + footCueV234.lockBoost), ikConstraints.current, footCueV234, readFootLockV322(), {trackId,playheadMs:progressMs}));
+    const activeIK = measureProfilerPhase("footIK", () => updateFootIK(footIK.current, avatarRoot, delta, enableIK, avatarFootIKStrength / 100, Math.min(1, avatarFootIKContact / 100 + footCueV234.contactBoost), Math.min(1, avatarFootIKLock / 100 + footCueV234.lockBoost), ikConstraints.current, footCueV234, readFootLockV322(), {trackId,playheadMs:progressMs},hipFootLockV737));
     if(activeIK&&readFootLockV322().enabled&&elapsed-footLockLastReportV322.current>=1&&typeof window!=='undefined'){
       footLockLastReportV322.current=elapsed;
       window.dispatchEvent(new CustomEvent(FOOT_LOCK_DIAGNOSTIC_EVENT_V322,{detail:groundLockReportV322(footIK.current.groundV322)}));
+    }
+    // V737: report pre-IK anchor deviation; not a physical measured residual slip.
+    if(activeIK&&!readFootLockV322().enabled&&elapsed-footLockLastReportV322.current>=1&&typeof window!=='undefined'){
+      footLockLastReportV322.current=elapsed;
+      window.dispatchEvent(new CustomEvent(HIP_FOOT_LOCK_DIAGNOSTICS_V737,{detail:{
+        ...hipFootLockReportV737(footIK.current.hipLockV737),
+        enabled:!!hipFootLockV737?.enabled, floorY:footIK.current.floorY,
+      }}));
     }
     if (!activeIK) updateFootContact(footContact.current, avatarRoot, rigTargets.current, delta, enableIK, avatarFootIKStrength / 100);
     // V486: publish only the existing measured IK stance to the parent group.

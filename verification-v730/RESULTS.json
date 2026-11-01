@@ -1,0 +1,15 @@
+{
+  "newRegressionChecks": 68,
+  "newRegressionExitCode": 0,
+  "v730CoreTypecheckExitCode": 0,
+  "v730UiTypecheckExitCode": 0,
+  "existingHistoryAndProjectStages": 29,
+  "existingHistoryAndProjectExitCode": 0,
+  "additionalV704V705ExitCode": 0,
+  "fullTypecheckExitCode": 0,
+  "portableTypecheckExitCode": 0,
+  "nextBuildCommand": "npm --ignore-scripts run build",
+  "nextBuildExitCode": 0,
+  "productionHttpStatus": 200,
+  "fullHistoricalQuickSuite": "not rerun"
+}

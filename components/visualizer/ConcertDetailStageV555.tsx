@@ -4,15 +4,19 @@ import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import { AdditiveBlending, BufferGeometry, Color, Float32BufferAttribute, Line, LineBasicMaterial, ShaderMaterial, SpotLight, Vector3 } from 'three';
 import { getActivePerformanceTier,useAdaptivePerformance } from './adaptivePerformance';
-import {getVisualFactorsV640} from './adaptiveVisualBudgetV640';
+import {getVisualFactorsV640,getVisualLevelV640} from './adaptiveVisualBudgetV640';
+import {resolveLightingBudgetV772} from './adaptiveLightingBudgetV772';
 import {usePiConcertBudgetV479,readPiConcertBudgetV479} from './piConcertRuntimeV479';
 import {planPiConcertVisualQualityV602,planPiConcertStageFxV602} from './piConcertOptimizationV602';
 import type { ConcertDetailSettingsV555,ConcertDetailsCueV555 } from './concertDetailEffectsV555';
 import {planAdvancedConcertStageFxV601} from './advancedConcertStageFxV601';
 import {planUltimateConcertDramaturgyV623,composeConcertLightingV623} from "./ultimateConcertDramaturgyV623";
 import {planAdvancedStageLightingV621,composeStageFxV621} from './advancedStageLightingV621';
-import {planProfessionalLightingV636,composeProfessionalStageFxV636} from './professionalLightingShowV636';
+import {planProfessionalLightingV636,composeProfessionalStageFxV636,type ProfessionalLightingInputV636} from './professionalLightingShowV636';
+import {planProfessionalLightingDirectorV689,composeProfessionalStageFxV689} from './professionalLightingDirectorV689';
 import {planDynamicStageTransformationV622} from './dynamicStageTransformationV622';
+import {planAdaptiveStageTransformationV690} from './adaptiveStageTransformationV690';
+import {planMusicMoodFusionV691} from "./musicMoodFusionV691";
 import {getLightingPlayback} from './lightingPlayback';
 import type {NarrativePlanV604,NarrativeCueV604} from './fullSongConcertDramaturgyV604';
 // V601 delegates the original shared additive budget to balanceConcertDetailsV556; shaders are unchanged in count.
@@ -43,11 +47,15 @@ export function ConcertDetailStageV555({cue,settings,playing,reducedMotion,secti
   const neutralTintV622=useMemo(()=>new Color('#ffffff'),[]);
   const moodTargetV622=useMemo(()=>new Color(),[]);
   const common=useMemo(()=>({uTime:{value:0},uIntensity:{value:0},uHook:{value:0},uDensity:{value:0},uPattern:{value:0},uSweep:{value:0},uShape:{value:0},uGoboVariant:{value:0},uGoboMix:{value:0},uTint:{value:new Color('#ffffff')}}),[]);
-  const wallUniforms=useMemo(()=>({uTime:{value:0},uIntensity:{value:0},uHook:{value:0},uDensity:{value:0},uPattern:{value:0},uSweep:{value:0},uShape:{value:0},uTint:{value:new Color('#ffffff')}}),[]);
+  const wallUniforms=useMemo(()=>({uTime:{value:0},uIntensity:{value:0},uHook:{value:0},uDensity:{value:0},uPattern:{value:0},uSweep:{value:0},uShape:{value:0},uLedMotif:{value:0},uLedMix:{value:0},uBeatPulse:{value:0},uTint:{value:new Color('#ffffff')}}),[]);
   const mistUniforms=useMemo(()=>({uTime:{value:0},uIntensity:{value:0},uTint:{value:new Color('#ffffff')}}),[]);
   useEffect(()=>()=>{arc.material.dispose();arcGeometry.dispose();},[arc,arcGeometry]);
   useFrame((state,dt)=>{
     const frameTier=getActivePerformanceTier();
+    // V772: optional sweep light drops out of the renderer under pressure;
+    // the LED/gobo show and manually authored timing stay independent.
+    if(sweepSpot.current)sweepSpot.current.visible=
+      resolveLightingBudgetV772(frameTier,getVisualLevelV640(),'other').detailSpot;
     const baselineV601=planAdvancedConcertStageFxV601({cue,settings,playing,reducedMotion,tier:frameTier,section,manualLighting,reactive,lyricsProtected,genre});
     const piQualityV602=planPiConcertVisualQualityV602({budget:readPiConcertBudgetV479(),avatarCount,autoQuality:performanceModeV602==='auto',manualLighting:manualLighting===true,reactive:reactive!==false});
     // V621 follows precisely the same verified song cue/clock as the main rig.
@@ -66,7 +74,7 @@ export function ConcertDetailStageV555({cue,settings,playing,reducedMotion,secti
       energy:energyV621,kick:kickV621,lyricsProtected:lyricsProtected===true,vocalFocus:vocalFocusV621,
       manualLighting:manualLighting===true,
     }));
-    const professionalLightV636=planProfessionalLightingV636({
+    const professionalInputV689:ProfessionalLightingInputV636={
       narrative:cameraNarrativeV605,trackId:playbackV621.trackId,
       positionMs:playbackV621.positionMs,durationMs:playbackV621.durationMs,
       section:(['intro','verse','build','hook','drop','break'].includes(section??'')?section:'intro') as 'intro'|'verse'|'build'|'hook'|'drop'|'break',
@@ -74,17 +82,20 @@ export function ConcertDetailStageV555({cue,settings,playing,reducedMotion,secti
       reactive:reactive!==false,reducedMotion,tier:frameTier,
       authored:manualLighting===true,blackout:false,enabled:settings.enabled,
       lyricsProtected:lyricsProtected===true,vocalFocus:vocalFocusV621,groupCount:avatarCount,
-    });
+    };
+    const professionalLightV636=planProfessionalLightingV636(professionalInputV689);
+    const coordinatedLightV689=planProfessionalLightingDirectorV689(professionalInputV689);
     const balance=composeProfessionalStageFxV636(
       composeStageFxV621(planPiConcertStageFxV602(baselineV601,piQualityV602),lightingV621),
       professionalLightV636);
 
+    const coordinatedBalanceV689=composeProfessionalStageFxV689(balance,coordinatedLightV689);
     // V640: scale optional procedural planes only; keep portraits, lyric projection,
     // duet arcs and manually authored light programming intact.
     const decorationV640=manualLighting?{led:1,gobo:1,haze:1,beams:1}:getVisualFactorsV640();
-    const visualV640={...balance,gobo:balance.gobo*decorationV640.gobo,
-      pixelWall:balance.pixelWall*decorationV640.led,
-      floorFog:balance.floorFog*decorationV640.haze};
+    const visualV640={...coordinatedBalanceV689,gobo:coordinatedBalanceV689.gobo*decorationV640.gobo,
+      pixelWall:coordinatedBalanceV689.pixelWall*decorationV640.led,
+      floorFog:coordinatedBalanceV689.floorFog*decorationV640.haze};
     const transformationV622=planDynamicStageTransformationV622({
       narrative:cameraNarrativeV605,trackId:playbackV621.trackId,
       positionMs:playbackV621.positionMs,durationMs:playbackV621.durationMs,
@@ -92,9 +103,20 @@ export function ConcertDetailStageV555({cue,settings,playing,reducedMotion,secti
       reducedMotion,tier:frameTier,authored:manualLighting===true,
       blackout:false,lyricsProtected:lyricsProtected===true,vocalFocus:vocalFocusV621,
     });
+    // V690: enrich only EXISTING stage texture hues; never gain, timing or authored lighting.
+    const stageMoodInputV691:import("./adaptiveStageTransformationV690").AdaptiveStageInputV690={
+      narrative:cameraNarrativeV605,trackId:playbackV621.trackId,
+      positionMs:playbackV621.positionMs,durationMs:playbackV621.durationMs,
+      section,genre,playing:playing&&playbackV621.playing,reactive:reactive!==false,
+      reducedMotion,tier:frameTier,authored:manualLighting===true,blackout:false,
+      lyricsProtected:lyricsProtected===true,vocalFocus:vocalFocusV621,
+      visualsEnabled:settings.enabled,groupCount:avatarCount,foundation:transformationV622,
+    };
+    const stageScaleV690=planAdaptiveStageTransformationV690(stageMoodInputV691);
+    const musicMoodV691=planMusicMoodFusionV691(stageMoodInputV691,stageScaleV690);
     const easing=1-Math.exp(-Math.max(0,Math.min(.12,dt))*5);
-    moodTargetV622.copy(coolTintV622).lerp(warmTintV622,(transformationV622.tone+1)/2);
-    const tintAmountV622=transformationV622.accent*.30;
+    moodTargetV622.copy(coolTintV622).lerp(warmTintV622,Math.max(0,Math.min(1,(transformationV622.tone+1)/2+(stageScaleV690.warmth+musicMoodV691.warmth)*.22)));
+    const tintAmountV622=Math.min(.35,transformationV622.accent*.30+stageScaleV690.ambientMix+musicMoodV691.ambientMix);
     moodTargetV622.lerp(neutralTintV622,1-tintAmountV622);
     const tintEaseV622=1-Math.exp(-Math.max(0,Math.min(.12,dt))*2.8);
     common.uTint.value.lerp(moodTargetV622,tintEaseV622);
@@ -109,12 +131,15 @@ export function ConcertDetailStageV555({cue,settings,playing,reducedMotion,secti
     common.uIntensity.value=move(common.uIntensity.value,visualV640.gobo);
     common.uSweep.value=move(common.uSweep.value,balance.sweep);
     common.uShape.value=move(common.uShape.value,balance.ledShape/2);
-    common.uGoboVariant.value=professionalLightV636.goboVariant;
-    common.uGoboMix.value=move(common.uGoboMix.value,professionalLightV636.goboMix);
+    common.uGoboVariant.value=coordinatedLightV689.active?coordinatedLightV689.goboVariant:professionalLightV636.goboVariant;
+    common.uGoboMix.value=move(common.uGoboMix.value,Math.max(professionalLightV636.goboMix,coordinatedLightV689.goboMix));
     common.uHook.value=manualLighting?(cue.hook?1:0):balance.mode==='hook'||balance.mode==='drop'?1:0;
     common.uDensity.value=Number.isFinite(cue.density)?Math.max(0,Math.min(1,cue.density)):0;
     common.uPattern.value=cue.pattern??0;
     wallUniforms.uIntensity.value=move(wallUniforms.uIntensity.value,visualV640.pixelWall);
+    wallUniforms.uLedMotif.value=coordinatedLightV689.ledMotif;
+    wallUniforms.uLedMix.value=move(wallUniforms.uLedMix.value,coordinatedLightV689.ledMix);
+    wallUniforms.uBeatPulse.value=move(wallUniforms.uBeatPulse.value,coordinatedLightV689.beatPulse);
     wallUniforms.uSweep.value=move(wallUniforms.uSweep.value,balance.sweep);
     wallUniforms.uShape.value=move(wallUniforms.uShape.value,balance.ledShape/2);
     wallUniforms.uHook.value=manualLighting?(cue.hook?1:0):balance.mode==='hook'||balance.mode==='drop'?1:0;
@@ -122,8 +147,8 @@ export function ConcertDetailStageV555({cue,settings,playing,reducedMotion,secti
     wallUniforms.uPattern.value=cue.pattern??0;
     mistUniforms.uIntensity.value=move(mistUniforms.uIntensity.value,visualV640.floorFog);
     if(sweepSpot.current){
-      sweepSpot.current.intensity=move(sweepSpot.current.intensity,balance.spotlight);
-      sweepSpot.current.position.x=Math.sin(common.uTime.value*.8)*balance.sweep*1.45;
+      sweepSpot.current.intensity=move(sweepSpot.current.intensity,coordinatedBalanceV689.spotlight);
+      sweepSpot.current.position.x=Math.sin(common.uTime.value*.8)*coordinatedBalanceV689.sweep*1.45+coordinatedLightV689.aimOffset;
     }
     if(gobo.current)gobo.current.visible=common.uIntensity.value>.001;
     if(pixels.current)pixels.current.visible=wallUniforms.uIntensity.value>.001;
@@ -165,16 +190,21 @@ export function ConcertDetailStageV555({cue,settings,playing,reducedMotion,secti
     <mesh position={[0,.15,-3.6]} renderOrder={-2}><planeGeometry args={[9,5.2]}/>
       <shaderMaterial ref={pixels} visible={false} transparent depthWrite={false} depthTest={true} blending={AdditiveBlending}
         uniforms={wallUniforms} vertexShader={stageVertex}
-        fragmentShader={`varying vec2 vUv;uniform float uTime,uIntensity,uHook,uDensity,uPattern,uSweep,uShape;uniform vec3 uTint;
+        fragmentShader={`varying vec2 vUv;uniform float uTime,uIntensity,uHook,uDensity,uPattern,uSweep,uShape,uLedMotif,uLedMix,uBeatPulse;uniform vec3 uTint;
           void main(){vec2 q=floor(vUv*vec2(36.,20.));vec2 p=fract(vUv*vec2(36.,20.))-.5;
             float point=1.-smoothstep(.28,.43,length(p));
+            if(point<.001) discard; // V773: skip complex LED math outside illuminated pixels
             float stripe=.5+.5*sin(q.x*.45+q.y*.35+uTime*2.);
             float diamond=step(.72,abs(sin((q.x+q.y)*.17+uTime)));
             float waves=.5+.5*sin(q.x*.2-q.y*.16+uTime*2.2);
             float pattern=mix(.28+.3*stripe,.38+.58*diamond,max(uHook,uShape));
             pattern=mix(pattern,.25+.53*waves,uShape*.38);
             pattern=mix(pattern,.3+.5*abs(sin(q.x*.19-q.y*.22+uTime)),step(.5,uPattern));
-            float calm=mix(1.,.48,step(.75,uDensity));
+            float ledColumns=.32+.57*pow(.5+.5*cos(q.x*.33+uTime*.45),3.);
+            float ledDiagonals=.28+.62*abs(sin((q.x-q.y)*.16-uTime*.42));
+            float chosen=uLedMotif<.5?stripe:uLedMotif<1.5?ledColumns:ledDiagonals;
+            pattern=mix(pattern,.29+.49*chosen,uLedMix);
+            float calm=mix(1.,.48,step(.75,uDensity))*(1.-uBeatPulse*.28);
             vec3 color=mix(vec3(.19,.5,.68),vec3(.64,.31,.75),stripe);
             gl_FragColor=vec4(color*uTint,point*pattern*uIntensity*calm);}`}/>
     </mesh>
@@ -203,6 +233,7 @@ export function ConcertDetailStageV555({cue,settings,playing,reducedMotion,secti
         uniforms={mistUniforms} vertexShader={stageVertex}
         fragmentShader={`varying vec2 vUv;uniform float uTime,uIntensity;uniform vec3 uTint;
           void main(){float a=pow(sin(vUv.y*3.14159),1.7)*smoothstep(0.,.12,vUv.x)*smoothstep(0.,.12,1.-vUv.x);
+          if(a*uIntensity<.001) discard; // V773: no transparent blend on fully faded fragments
           float mist=.78+.22*sin(vUv.x*13.+uTime*1.6)+.12*sin(vUv.x*31.-uTime);
           gl_FragColor=vec4(vec3(.38,.63,.85)*uTint,a*mist*uIntensity);}`}/>
     </mesh>

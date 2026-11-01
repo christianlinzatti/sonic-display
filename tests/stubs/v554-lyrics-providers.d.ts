@@ -14,3 +14,7 @@ declare module "@/services/lyrics/providers/genius" {
 declare module "@/services/lyrics/providers/spotifyColorLyrics" {
   export function lookupSpotifyColorLyrics(trackId:string,albumId:string|undefined,token:string): Promise<import("@/types/music").Lyrics|null>;
 }
+// Real implementation is typechecked by tests/tsconfig.v654-resilience.json.
+declare module "@/services/lyrics/providerDeadlineV654" {
+  export function withProviderDeadlineV654<T>(task: Promise<T>, timeoutMs: number): Promise<T>;
+}

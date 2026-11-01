@@ -1,0 +1,4 @@
+{
+ "compilerOptions":{"target":"ES2022","module":"commonjs","moduleResolution":"node","strict":true,"skipLibCheck":true,"noEmit":true,"types":[],"lib":["ES2022"]},
+ "files":["../components/visualizer/advancedGluteRigV741.ts","../components/visualizer/hipDanceV735.ts","stubs/v736-rig-three.d.ts"]
+}

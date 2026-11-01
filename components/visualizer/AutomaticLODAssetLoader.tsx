@@ -58,27 +58,27 @@ function FadeLayer({ children, fadeIn }: {children: ReactNode; fadeIn: boolean})
   const group = useRef<Group>(null);
   const start = useRef<number | null>(null);
   const previousDirection = useRef(fadeIn);
-  const originals = useRef<Array<{mesh: Mesh; material: Material | Material[]}>>([]);
+  const originals = useRef<Array<{mesh: Mesh; materials: Array<{material:Material;opacity:number;transparent:boolean;depthWrite:boolean}>}>>([]);
   useEffect(() => {
     const root = group.current;
     if (!root) return;
     const entries: typeof originals.current = [];
     root.traverse(object => {
       if (!(object instanceof Mesh)) return;
-      const old = object.material;
-      const list = Array.isArray(old) ? old : [old];
-      object.material = Array.isArray(old) ? list.map(m => m.clone()) : old.clone();
-      const newList = Array.isArray(object.material) ? object.material : [object.material];
-      for (const mat of newList) {mat.transparent = true; mat.depthWrite = false;}
-      entries.push({mesh:object, material:old});
+      // Keep the wardrobe/material-session references live while crossfading.
+      // These materials are private to the rendered avatar instance.
+      const list = Array.isArray(object.material) ? object.material : [object.material];
+      const materials = list.map(material => ({material, opacity:material.opacity, transparent:material.transparent, depthWrite:material.depthWrite}));
+      for (const mat of list) {mat.transparent = true; mat.depthWrite = false;}
+      entries.push({mesh:object,materials});
     });
     originals.current = entries;
     start.current = null;
     return () => {
-      for (const {mesh, material} of entries) {
-        const list = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-        mesh.material = material;
-        for (const mat of list) mat.dispose();
+      for (const {materials} of entries) for (const entry of materials) {
+        entry.material.opacity = entry.opacity;
+        entry.material.transparent = entry.transparent;
+        entry.material.depthWrite = entry.depthWrite;
       }
       originals.current = [];
     };
@@ -93,10 +93,9 @@ function FadeLayer({ children, fadeIn }: {children: ReactNode; fadeIn: boolean})
     const elapsed = Math.max(0, clock.elapsedTime - start.current);
     const t = Math.min(1, elapsed / 0.28);
     const alpha = fadeIn ? t : 1 - t;
-    for (const {mesh} of originals.current) {
-      const list = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-      for (const mat of list) {
-        if ('opacity' in mat) (mat as Material & {opacity:number}).opacity = alpha;
+    for (const {materials} of originals.current) {
+      for (const {material:mat,opacity} of materials) {
+        if ('opacity' in mat) (mat as Material).opacity = opacity * alpha;
       }
     }
   });

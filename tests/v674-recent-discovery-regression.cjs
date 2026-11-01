@@ -1,0 +1,37 @@
+'use strict';
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const ts=require('./typescript-loader.cjs');
+const asModule=(path,dependencies={})=>{
+ const source=fs.readFileSync(path,'utf8');
+ const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+ const exports={};
+ vm.runInNewContext(js,{exports,require:name=>{if(!dependencies[name])throw new Error(`Unexpected import ${name}`);return dependencies[name];},Map,Set,Array,Object,Number,String,Math,Date,RegExp},{filename:path});
+ return exports;
+};
+const registry=asModule('config/musicGenres.ts');
+const model=asModule('lib/recently-played-discovery-v674.ts',{'../config/musicGenres':registry});
+const example=(id,artist='Artist',time='2026-10-28T17:20:00.000Z')=>({id,title:id,artist,album:'Album',albumCoverUrl:'https://i.scdn.co/image/x',spotifyUrl:`https://open.spotify.com/track/${id}`,durationMs:201000,playedAt:time});
+const data=[example('a','Alpha, Guest'),example('a','Alpha, Guest','2026-10-27T11:00:00.000Z'),example('b','Techno Duo'),example('c','Unclassified')];
+let n=0;
+function test(name,check){try{check();n++;}catch(err){err.message=`V674 ${name}: ${err.message}`;throw err;}}
+test('genre parser rejects arbitrary genres and missing confidence',()=>{assert.equal(model.genreResponseV674({genre:'Deutschrap',confidence:99}),null);assert.equal(model.genreResponseV674({genre:'hardtekk'}),null);assert.equal(model.genreResponseV674({genre:'hardstyle',confidence:39}),null);assert.equal(model.genreResponseV674({genre:'hardstyle',confidence:40}),'hardstyle');assert.equal(model.genreResponseV674(null),null);});
+test('valid loaded plays keep repetition per genre',()=>{const r=model.historyGenresV674(data,{a:'deutschrap',b:'hardtekk',c:null});assert.equal(r.total,4);assert.equal(r.covered,4);assert.equal(r.bars[0].count,2);assert.equal(r.bars[0].label,'Deutschrap');assert.equal(r.bars[1].genre,'hardtekk');assert.equal(r.unknown,1);assert.equal(r.classifiedSongs,2);});
+test('unrequested/unclassified events not invented as genre',()=>{const r=model.historyGenresV674(data,{a:'hiphop'});assert.equal(r.covered,2);assert.equal(r.unknown,2);assert.equal(r.bars.length,1);assert.equal(r.classifiedSongs,1);});
+test('unknown genre key cannot contaminate counts or prototype',()=>{const r=model.historyGenresV674(data,{a:'not-real',b:'rock'});assert.equal(r.bars.length,1);assert.equal(r.bars[0].genre,'rock');assert.equal(r.unknown,3);});
+test('empty input safely yields zero counts',()=>{const r=model.historyGenresV674([],{});assert.equal(r.total,0);assert.equal(r.covered,0);assert.equal(r.unknown,0);assert.equal(r.bars.length,0);});
+test('favorite artist credits remain intact and repeated',()=>{const a=model.favoriteArtistsV674(data);assert.equal(a[0].name,'Alpha, Guest');assert.equal(a[0].count,2);assert.equal(a[0].cover,'https://i.scdn.co/image/x');assert.equal(a.length,3);});
+test('favorite selection bounded and input unchanged',()=>{assert.equal(model.favoriteArtistsV674(data,2).length,2);assert.equal(data[0].artist,'Alpha, Guest');});
+test('stage recommendations safe for unknown, genre-specific',()=>{assert.equal(model.suggestHistoryStageV674(null),null);assert.equal(model.suggestHistoryStageV674('nonsense'),null);assert.equal(model.suggestHistoryStageV674('hardtekk').stageTheme,'festival');assert.equal(model.suggestHistoryStageV674('deutschrap').avatarDancePreset,'auto');assert.equal(model.suggestHistoryStageV674('metal').avatarDancePreset,'rock-metal');assert.equal(model.suggestHistoryStageV674('uptempo').avatarDancePreset,'hardstyle');});
+test('stage patch limited; no private or unrelated preferences',()=>{for(const genre of registry.GENRES.map(g=>g.id)){const p=model.suggestHistoryStageV674(genre);assert(p);assert.deepEqual(Object.keys(p).sort().join(','),'avatarDancePreset,description,label,stageLightStrength,stageReactive,stageTheme');assert(p.stageLightStrength>=0&&p.stageLightStrength<=100);}});
+const component=fs.readFileSync('components/RecentlyPlayedDiscoveryV674.tsx','utf8');
+const ui=fs.readFileSync('components/RecentlyPlayedV672.tsx','utf8');
+const css=fs.readFileSync('app/globals.css','utf8');
+const pkg=require('../package.json');
+test('new views are wired to existing dialog and only loaded plays',()=>{for(const x of ['Cover-Galerie','Genre-Mix','HistoryGalleryV674 tracks={tracks}','HistoryGenresV674 tracks={tracks}'])assert(ui.includes(x));assert(!component.includes('/me/player/recently-played'));});
+test('genre metadata is opt-in, limited and abortable',()=>{for(const x of ['onClick={()=>void lookup()}','available.slice(0,12)','i+=2','AbortController','/api/genre?artist=','genreResponseV674','currentRequest.current?.abort()'])assert(component.includes(x),x);assert(!component.includes('localStorage')&&!component.includes('sessionStorage'));});
+test('stage only changes on explicit action and undo is possible',()=>{assert(component.includes('onClick={apply}'));assert(component.includes('onClick={undo}'));assert(component.includes('updatePreferences({stageTheme:suggestion.stageTheme'));assert(!component.includes('avatarModelId'));});
+test('Last.fm requests use the original primary artist for feature tracks',()=>{const normalizer=asModule('lib/recently-played-v672.ts');const id='4iV5W9uYEdYUVa79Axb7Rh';const item={played_at:'2026-10-28T12:00:00Z',track:{id,name:'Track',artists:[{name:'Lead'},{name:'Guest'}],album:{name:'Album',images:[]}}};const track=normalizer.normalizeRecentlyPlayedV672({items:[item]}).tracks[0];assert.equal(track.artist,'Lead, Guest');assert.equal(track.primaryArtist,'Lead');assert(component.includes('track.primaryArtist||track.artist'));});
+test('interactive albums remain accessible with Spotify links',()=>{for(const x of ['aria-pressed={selectedTrack===track}','aria-label={`${track.title} von ${track.artist} anzeigen`}','rel="noopener noreferrer"','Cover-Welt','Künstler-Favoriten'])assert(component.includes(x),x);});
+test('touch responsive and reduced motion supported',()=>{for(const x of ['recent-cover-wall-v674','recent-favorite-grid-v674','recent-stage-match-v674','@media(max-width:600px)','prefers-reduced-motion:reduce'])assert(css.includes(x),x);});
+test('V674 release commands include V673 + V672 smoke',()=>{assert(pkg.scripts['check:release'].includes('test:v674'));assert(pkg.scripts['test:smoke:v674'].includes('test:smoke:v673'));});
+console.log(`PASS V674 recent discovery: ${n} checks`);

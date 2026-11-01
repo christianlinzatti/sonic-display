@@ -20,7 +20,7 @@ export function getRuntimeMotionSettings(): Readonly<MotionDebugSettings> { retu
 export function filterMotionDebugLayers<T extends Record<string, number>>(motion: T, settings: MotionDebugSettings): T {
   const result = {...motion};
   const keys: Record<MotionDebugLayer,string[]> = {
-    head:['headNod','headTurn','headLag'],torso:['spineSway','hipSway','shoulderRoll','chestPulse','weightShift'],
+    head:['headNod','headTurn','headLag'],torso:['spineSway','hipSway','shoulderRoll','chestPulse','weightShift','hipPitch','hipRoll','hipLateral','hipVertical'],
     arms:['armSwing','followThrough','leftArmAccent','rightArmAccent'],legs:['legGroove','footStep','kneeFollow'],
     expression:['expressionJaw','expressionBrow','expressionEyeNarrow','expressionHeadTilt'],
     physics:['torsoTwist','counterArm','hipCounter','headCounter']

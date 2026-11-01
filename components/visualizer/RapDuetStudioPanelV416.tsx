@@ -1,5 +1,6 @@
 "use client";
 import {useEffect,useMemo,useState} from "react";
+import {getNaturalDuetModeV664,setNaturalDuetModeV664,type NaturalDuetModeV664} from "./naturalDuetFeatureInteractionV664";
 import {readGroupV326,canRunGroupV326,GROUP_EVENT_V326} from "./multiAvatarStageDirectorV326";
 import {useMusic} from "@/context/MusicContext";
 import {useUiPreferences} from "@/context/UiPreferencesContext";
@@ -29,6 +30,8 @@ export function RapDuetStudioV416(){
   const [editing,setEditing]=useState<number|null>(null);
   const [preview,setPreview]=useState<number|null>(null);
   const id=track?.id??"";
+  const [duetModeV664,setDuetModeV664]=useState<NaturalDuetModeV664>("off");
+  useEffect(()=>{setDuetModeV664(getNaturalDuetModeV664(id));},[id]);
   const lineCount=lyrics?.synced?lyrics.lines.length:0;
   const values=useMemo(()=>normalizeRapDuetAssignmentsV416(
     id?(preferences.rapDuetAssignmentsV416??{})[id]:[],lineCount),
@@ -62,6 +65,19 @@ export function RapDuetStudioV416(){
       checked={preferences.rapDuetCameraV416??true}
       onChange={e=>updatePreferences({rapDuetCameraV416:e.target.checked})}/>
       Automatischen Kamerafokus für Lead, Duett und Hook erlauben</label>
+    <label>V664 · Natural Duet & Feature Interaction
+      <select disabled={!id||count<2} value={duetModeV664} onChange={event=>{
+        const mode=event.target.value as NaturalDuetModeV664;
+        if(setNaturalDuetModeV664(id,mode))setDuetModeV664(mode);
+      }}>
+        <option value="off">Aus – bisherige Duett-Regie</option>
+        <option value="natural">Natürlich – dezente Blicke und Reaktionen</option>
+        <option value="live">Live-Bühne – stärkere Übergaben und Hooks</option>
+      </select>
+    </label>
+    <small>V664 gilt nur für den aktuellen Titel. Bestätigte V416/V496-Sängerrollen erforderlich;
+      keine Stimmenerkennung. Handanimationen, Lippen, manuelle Regie, reduzierte Bewegung
+      und die Performance-Schutzgrenzen bleiben unangetastet.</small>
     <p><strong>Auf der Bühne:</strong> {count} Avatar{count===1?"":"e"}.
       {count<2?" Aktiviere eine Duo- oder 3/4-Avatar-Bühne für die Live-Duette.":""}</p>
     <p><strong>Aktueller Titel:</strong> {track?`${track.artist} – ${track.title}`:"Kein Titel"}

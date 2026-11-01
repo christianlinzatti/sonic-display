@@ -14,13 +14,14 @@ export function usePhotoDimensionsV349(images:string[],enabled:boolean,maxProbe=
   for(const url of urls){const value=cache.get(url);if(value)known[url]=value;}
   setDimensions(known);
   const pending=urls.filter(u=>!known[u]);
-  let next=0,running=0;const active=new Set<HTMLImageElement>();
+  let next=0,running=0;const active=new Set<HTMLImageElement>();const timers=new Map<HTMLImageElement,ReturnType<typeof setTimeout>>();
   // Probe at most four images concurrently; failed remote images are left to the normal <img> fallback.
   const launch=()=>{while(!cancelled&&running<4&&next<pending.length){
    const url=pending[next++];const img=new Image();running++;active.add(img);
    const finish=(success:boolean)=>{
     if(!active.has(img))return;
-    active.delete(img);img.onload=null;img.onerror=null;running--;
+    active.delete(img);clearTimeout(timers.get(img));timers.delete(img);img.onload=null;img.onerror=null;running--;
+    if(!success)img.src="";
     if(!cancelled&&success&&img.naturalWidth>0&&img.naturalHeight>0){
      const value={width:img.naturalWidth,height:img.naturalHeight};
      cache.delete(url);cache.set(url,value);
@@ -29,10 +30,11 @@ export function usePhotoDimensionsV349(images:string[],enabled:boolean,maxProbe=
     }
     launch();
    };
+   timers.set(img,setTimeout(()=>finish(false),8000));
    img.onload=()=>finish(true);img.onerror=()=>finish(false);img.decoding='async';img.src=url;
   }};
   launch();
-  return ()=>{cancelled=true;for(const img of active){img.onload=null;img.onerror=null;}active.clear();};
+  return ()=>{cancelled=true;for(const img of active){clearTimeout(timers.get(img));img.onload=null;img.onerror=null;img.src="";}timers.clear();active.clear();};
  },[signature,enabled,maxProbe]);
  return dimensions;
 }

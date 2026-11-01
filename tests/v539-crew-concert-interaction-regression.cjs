@@ -74,5 +74,5 @@ for(const path of ['components/visualizer/GroupDancersV326SceneV492.tsx','compon
 const source=fs.readFileSync('components/visualizer/crewConcertInteractionV539.ts','utf8');
 for(const banned of ['requestAnimationFrame(','setInterval(','localStorage','navigator.mediaDevices','new Audio(','setState('])assert(!source.includes(banned));
 const pkg=require('../package.json');assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]||0)>=539);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v539 && npm run test:v539:types'));
+assert(pkg.scripts['check:release'].includes('npm run test:legacy:interaction') && pkg.scripts['test:legacy:interaction'].includes('npm run test:v539'), 'V539 is part of the historical release gate');
 console.log(`PASS V539: ${frames} ensemble samples, duet/handoff/hooks, track priority, risk gates and stage wiring`);

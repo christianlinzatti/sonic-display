@@ -79,7 +79,8 @@ export function resolveTimelineV318(x:TimelineInputV318,analysis:TrackAnalysisV3
   const beatEnd=doc?upperBoundMarkerV318(doc.beats,at):0;
   const barEnd=doc?upperBoundMarkerV318(doc.bars,at):0;
   const sectionEnd=doc?upperBoundMarkerV318(doc.sections,at):0;
-  const sec=sectionEnd&&doc?doc.sections[sectionEnd-1]:undefined;
+  const candidate=sectionEnd&&doc?doc.sections[sectionEnd-1]:undefined;
+  const sec=candidate&&at<candidate.startMs+candidate.durationMs?candidate:undefined;
   const labeled=sec?.label && sec.confidence>=.5?sec.label:undefined;
   const beatIndex=doc?.beats.length?beatEnd-1:null;
   const barIndex=doc?.bars.length?barEnd-1:null;

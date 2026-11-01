@@ -97,7 +97,7 @@ test('manager gives opt-in explicit apply',()=>has(manager,'automationV651.apply
 test('manager gives one-click rollback',()=>has(manager,'automationV651.undoLast()'));
 test('large touch controls',()=>{has(css,'.v651-automation button{min-height:48px');has(css,'.v651-modes label{display:flex');});
 test('release scripts',()=>{for(const k of ['test:v651','test:v651:types','test:smoke:v651','verify:v651'])assert(pkg.scripts[k],k);});
-test('release version',()=>assert.equal(pkg.version,'0.1.0-v651'));
+test('release version',()=>assert(Number(pkg.version.match(/-v(\d+)$/)?.[1])>=651,'release must be V651 or newer'));
 // The isolated V649 stub must never shadow the production music types during the root typecheck.
 test('isolated V649 test types excluded from application typecheck',()=>{
  const rootConfig=JSON.parse(read('tsconfig.json'));
@@ -107,7 +107,7 @@ test('isolated V649 test types excluded from application typecheck',()=>{
  assert(fs.existsSync('types/music.ts'));
 });
 
-test('release documentation',()=>has(read('ARCHITECTURE.md'),'**Dokumentationsstand:** V651'));
+test('release documentation',()=>has(read('ARCHITECTURE.md'),`**Dokumentationsstand:** V${pkg.version.match(/-v(\d+)$/)?.[1]}`));
 test('readme new version',()=>has(read('README.md'),'V651'));
 test('new release description',()=>has(read('V651-SMART-PRESET-AUTOMATION.md'),'# V651'));
 let seed=651;function rnd(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/2**32;}

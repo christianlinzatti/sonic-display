@@ -4,6 +4,8 @@ import {useMusic} from "@/context/MusicContext";
 import {useUiPreferences} from "@/context/UiPreferencesContext";
 import {normalizeVocalTimeSegmentsV496,resolveVocalTimeCueV496,
  type VocalTimeSegmentV496,type VocalTimeStyleV496,type VocalTimeRoleV547} from "./vocalTimeDirectorV496";
+import {SmartVocalAssignmentPanelV660} from "./SmartVocalAssignmentPanelV660";
+import {AdvancedVocalReviewPanelV756} from "./AdvancedVocalReviewPanelV756";
 import {projectFeatureVocalTimelineV547,snapVocalTimestampV547} from "./featureVocalTimelineV547";
 const pretty=(ms:number)=>`${Math.floor(ms/60000)}:${String(Math.floor(ms/1000)%60).padStart(2,"0")}.${String(Math.floor(ms%1000)).padStart(3,"0")}`;
 const seconds=(ms:number)=>Math.round(ms)/1000;
@@ -75,6 +77,8 @@ export function VocalTimeEditorV496(){
    Nur explizit von dir gespeicherte Zuordnungen werden für Mundbewegungen, Rap-Gesten
    und die vorhandene automatische Kameraregie berücksichtigt. Gleiche Zeitbereiche werden
    als Überlappung markiert; zuletzt gespeicherte Hauptpassage gewinnt, Adlibs ergänzen nur.</small></p>
+  {!!trackId&&<SmartVocalAssignmentPanelV660 key={trackId} trackId={trackId} durationMs={durationMs}/>}
+  {!!trackId&&<AdvancedVocalReviewPanelV756 key={`v756-${trackId}`} trackId={trackId} durationMs={durationMs}/>}
   {!trackId?<p>Wähle einen Song, um Zeitmarken zu bearbeiten.</p>:<>
    <div aria-label="V547 visuelle Sänger-Timeline" style={{background:"#10182b",color:"#fff",borderRadius:12,padding:12,marginBlock:12}}>
      <div style={{display:"flex",justifyContent:"space-between",fontSize:12,opacity:.85}}>

@@ -88,5 +88,5 @@ assert(group.indexOf('const roleCrewV548=')<group.indexOf('if(collisionV506.acti
 assert(group.includes('audio.beatStrength=Math.min(1,Math.max(0,(audio.beatStrength??0)*slot.grooveGain))'));
 assert(!fs.readFileSync('components/visualizer/crewChoreographyV548.ts','utf8').includes('useFrame('));
 const pkg=require('../package.json');assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]||0)>=548);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v548 && npm run test:v548:types &&'));
+assert(pkg.scripts['check:release'].includes('npm run test:legacy:interaction') && pkg.scripts['test:legacy:interaction'].includes('npm run test:v548'), 'V548 is part of the historical release gate');
 console.log(`PASS V548: ${checked} deterministic frames, selective V547 hooks, role separation, safety, legacy singer control, duo/group wiring`);

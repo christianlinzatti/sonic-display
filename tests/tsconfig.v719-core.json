@@ -1,0 +1,1 @@
+{"extends":"../tsconfig.json","compilerOptions":{"incremental":false,"plugins":[],"noEmit":true},"files":["../lib/lastfm-year-compare-v719.ts"],"include":[],"exclude":[]}

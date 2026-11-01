@@ -52,7 +52,7 @@ for (const layout of ['standard','immersive','stage-3d']) {
   }
  }
 }
-assert(/maxWidth=\{Math\.min\(\s*visualV477\.max3DWidth\s*,\s*lyricPolishV634\.max3DWidth\s*\)\}/.test(scene),
+assert(/maxWidth=\{Math\.min\(\s*visualV477\.max3DWidth\s*,\s*Math\.min\(\s*lyricPolishV634\.max3DWidth\s*,\s*stageLyricCinemaV688\.max3DWidth\s*\)\)\}/.test(scene),
  '3D text must use the stricter V477/V634 width cap');
 assert(scene.includes('visualV461.allowWordMeshes'));
 assert(scene.includes('activeCaptionV461?.visibleLineCount === 1'));

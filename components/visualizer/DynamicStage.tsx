@@ -1,10 +1,80 @@
 "use client";
 import type {SmartStageCueV351} from "@/services/stageContent/smartStageCompositionV351";
 import { useFrame } from "@react-three/fiber";
+import {planConcertFxV810,normalizeConcertFxV810} from "./concertFxStudioV810";
+import type {CoordinatedConcertTransitionV849} from "./intelligentConcertTransitionsV849";
+import {applyConcertTransitionGainV849} from "./intelligentConcertTransitionsV849";
+import {planSmartFestivalShowV850,dimFestivalLaneV850} from "./smartFestivalShowDirectorV850";
+import type {ConcertFxSettingsV810,ConcertFxSectionV810} from "./concertFxStudioV810";
+import {LASER_MATRIX_VERTEX_V811,LASER_MATRIX_FRAGMENT_V811} from "./laserMatrixShaderV811";
+import {LED_WALL_FRAGMENT_V842} from "./ledWallExperienceShaderV842";
+import {planLedWallExperienceV842} from "./ledWallExperiencePlannerV842";
+import {planLedWallExperienceV821} from "./ledWallExperiencePlannerV821";
+import {planBeatAccentDirectorV822} from "./beatAccentDirectorV822";
+import {evaluateFxTimelineV823,fxTimelineMultiplierV823} from "./visualFxTimelineV823";
+import {planConcertExperienceV828,EXPERIENCE_OFF_V828} from "./concertExperienceDirectorV828";
+import type {ConcertExperienceCueV828} from "./concertExperienceDirectorV828";
+import {ConcertMomentCrownV828} from "./ConcertMomentCrownV828";
+import {planSmartFxShowDirectorV824,mergeSmartFxWithTimelineV824} from "./smartFxShowDirectorV824";
+import {applyCameraAwarePerformanceV834} from "./cameraAwarePerformanceV834";
+import {createFxPerfStateV825,advanceFxPerfStateV825,planFxPerformanceV825} from "./concertFxPerformanceOptimizerV825";
+import {createAutoQualityV827,advanceAutomaticQualityV827,effectiveFxPressureV827} from "./automaticConcertQualityV827";
+import {recordBenchmarkWindowV827} from "./concertBenchmarkV827";
+import {recordRealGlbWindowV832} from "./realGlbConcertBenchmarkV832";
+import {inspectVisibleCastV830} from "./concertProductionEvidenceV830";
+import {recordAcceptanceV829,getAcceptanceV829} from "./concertAcceptanceV829";
+import {recordCastWindowV830} from "./concertProductionEvidenceV830";
+import {createConcertQualityMonitorV826,accumulateConcertFrameV826,completeConcertQualityV826,publishConcertQualityV826,clearConcertQualityV826} from "./concertQualityTelemetryV826";
+import {planLyricsProjectionV813} from "./lyricsProjectionV813";
+import {planAtmosphericConcertFxV814} from "./atmosphericConcertFxV814";
+import {ATMOSPHERE_VERTEX_V814,ATMOSPHERE_FRAGMENT_V814} from "./atmosphereShaderV814";
+import {VirtualConcertCrowdV815} from "./VirtualConcertCrowdV815";
+import {planVirtualConcertCrowdV815,CROWD_OFF_V815} from "./virtualConcertCrowdPlannerV815";
+import type {VirtualCrowdCueV815} from "./virtualConcertCrowdPlannerV815";
+import {planFestivalSpecialFxV844,mergeFestivalParticlesV844,coordinateFestivalFoamV844,FESTIVAL_OFF_V844} from './festivalSpecialFxPlannerV844';
+import type {FestivalCueV844} from './festivalSpecialFxPlannerV844';
+import {FestivalCo2V844} from './FestivalCo2V844';
+import {planSoapBubblesV8441,planFullStageFlashV8441,BUBBLES_OFF_V8441,FLASH_OFF_V8441} from './festivalBubblesFlashPlannerV8441';
+import type {SoapBubbleCueV8441,FullStageFlashCueV8441} from './festivalBubblesFlashPlannerV8441';
+import {SoapBubblesV8441} from './SoapBubblesV8441';
+import {FullStageFlashV8441} from './FullStageFlashV8441';
+import {planPaperStreamersV846,STREAMERS_OFF_V846} from './festivalPaperStreamersPlannerV846';
+import type {PaperStreamersCueV846} from './festivalPaperStreamersPlannerV846';
+import {PaperStreamersV846} from './PaperStreamersV846';
+import {planFestivalFinaleV847,FINALE_OFF_V847,coordinateFestivalParticlesV847} from './festivalFinalePlannerV847';
+import type {FestivalFinaleCueV847} from './festivalFinalePlannerV847';
+import {FestivalFinaleV847} from './FestivalFinaleV847';
+import {ReactiveParticleStudioV816} from "./ReactiveParticleStudioV816";
+import {FoamCannonV817} from "./FoamCannonV817";
+import {planFoamExperienceV843} from "./foamExperiencePlannerV843";
+import {planFoamCannonV817,FOAM_OFF_V817} from "./foamCannonPlannerV817";
+import type {FoamCannonCueV817} from "./foamCannonPlannerV817";
+import {KineticStageV817} from "./KineticStageV817";
+import {SpectralMusicVisualsV818} from "./SpectralMusicVisualsV818";
+import {CinematicSceneTransitionV819} from "./CinematicSceneTransitionV819";
+import {VocalAdlibFxV820} from "./VocalAdlibFxV820";
+import {planVocalAdlibFxV820,VOCAL_FX_OFF_V820} from "./vocalAdlibFxPlannerV820";
+import type {VocalAdlibFxCueV820} from "./vocalAdlibFxPlannerV820";
+import {planCinematicTransitionV819,TRANSITION_OFF_V819} from "./cinematicTransitionPlannerV819";
+import type {CinematicTransitionCueV819} from "./cinematicTransitionPlannerV819";
+import {planSpectralMusicV818,SPECTRAL_OFF_V818} from "./spectralMusicPlannerV818";
+import type {SpectralMusicCueV818} from "./spectralMusicPlannerV818";
+import {planKineticStageV817,KINETIC_OFF_V817} from "./kineticStagePlannerV817";
+import type {KineticStageCueV817} from "./kineticStagePlannerV817";
+import {planReactiveParticlesV816,PARTICLES_OFF_V816} from "./reactiveParticlePlannerV816";
+import type {ReactiveParticleCueV816} from "./reactiveParticlePlannerV816";
+import type {Lyrics} from "@/types/music";
 import { useEffect, useRef } from "react";
-import { Color, Vector3 } from "three";
+import { AdditiveBlending as importedAdditiveBlendingV811,Color, Vector3,CanvasTexture,LinearFilter,SRGBColorSpace } from "three";
+import {planAdvancedLightChoreographyV793,LIGHT_CHOREOGRAPHY_OFF_V793} from "./advancedLightChoreographerV793";
+import {planProfessionalLightingV841} from "./professionalLightingExperienceV841";
+import type {LightChoreographyCueV793} from "./advancedLightChoreographerV793";
+import type {EpicPeakCueV794} from "./epicPeakMomentsV794";
+import {STAGE_EVOLUTION_OFF_V795} from "./dynamicStageEvolutionV795";
+import type {StageEvolutionCueV795} from "./dynamicStageEvolutionV795";
 import type {Scene,Object3D} from "three";
 import type {VisualizerProps} from "./registry";
+import type {MultiVocalSpotlightCueV797} from "./multiVocalSpotlightDirectorV797";
 import {concertLightMultiplierV497} from "./cinematicConcertChoreographyV497";
 import type {VocalConcertHandoffV498} from "./vocalHandoffDirectorV498";
 import {resolveDuetInteractionV376} from "./interactiveVocalDuetsV376";
@@ -12,6 +82,10 @@ import {resolveManualVocalCueV385,applyManualVocalCueV385} from "./manualVocalCa
 import type {ConcertShowCueV387} from "./concertShowDirectorV387";
 import {resolveConcertCueV386,concertLightAccentV386} from "./expressiveConcertDirectorV386";
 import { getLightingPlayback } from "./lightingPlayback";
+import {planDynamicStageLightingV762,SCENIC_LIGHTING_OFF_V762} from "./cinematicScenicLightingV762";
+import type {DynamicStageLightingSettingsV762,ScenicLightingCueV762} from "./cinematicScenicLightingV762";
+import type {CinematicCueV761} from "./cinematicConcertDirectorV761";
+import {GOBO_VERTEX_V762,GOBO_FRAGMENT_V762} from "./scenicGoboShaderV762";
 import { advanceStageDirector, createStageDirectorState } from "./smartStageDirectorV236";
 import { sceneDetailFlags, useSceneDetail } from "./scenePerformanceControls";
 import { evaluateLightTimeline, loadLightCues, LIGHT_TIMELINE_CHANGED, type LightCue } from "./lightingTimeline";
@@ -33,20 +107,27 @@ import {planCinematicAvatarLightingV566} from "./cinematicAvatarLightingV566";
 import type {ConcertDetailSettingsV555,ConcertDetailsCueV555} from "./concertDetailEffectsV555";
 import {refineConcertLightingV542} from "./intelligentConcertLightingV542";
 import {planStageAtmosphereV551} from "./intelligentStageAtmosphereV551";
+import {planPerformanceLightingV749,advancePerformanceLightingV749,createPerformanceLightingStateV749,normalizePerformanceLightingV749} from "./performanceLightingDirectorV749";
+import type {PerformanceLightingSettingsV749} from "./performanceLightingDirectorV749";
 import {planDynamicConcertLightingV608} from "./dynamicConcertLightingV608";
 import {planUltimateConcertDramaturgyV623,composeConcertLightingV623} from "./ultimateConcertDramaturgyV623";
 import {planAdvancedStageLightingV621} from "./advancedStageLightingV621";
 import {planDynamicStageTransformationV622} from "./dynamicStageTransformationV622";
+import {planAdaptiveStageTransformationV690} from "./adaptiveStageTransformationV690";
+import {planMusicMoodFusionV691} from "./musicMoodFusionV691";
 import {planDynamicConcertStagesV635,LED_WALL_VERTEX_V635} from "./dynamicConcertStagesV635";
-import {planCinematicStageEnvironmentV647,LED_WALL_FRAGMENT_V647} from "./cinematicStageEnvironmentsV647";
-import {getVisualFactorsV640} from "./adaptiveVisualBudgetV640";
+import {planCinematicStageEnvironmentV647} from "./cinematicStageEnvironmentsV647";
+import {getVisualFactorsV640,getVisualLevelV640} from "./adaptiveVisualBudgetV640";
+import {resolveLightingBudgetV772} from "./adaptiveLightingBudgetV772";
 import {planGenreConcertV610} from "./genreConcertExperienceV610";
 import {planContinuousConcertV611} from "./continuousConcertExperienceV611";
 import {planSeamlessConcertTransitionV609} from "./seamlessConcertTransitionsV609";
+import type {SceneTransitionCueV791} from "./seamlessSceneTransitionsV791";
 import type {NarrativePlanV604,NarrativeCueV604} from "./fullSongConcertDramaturgyV604";
 import type { StageSection } from "./stageDirectorV287";
 import {combineFestivalGainsV394,type FestivalShowCueV394} from "./festivalShowDirectorV394";
 import { ConcertAtmosphereRendererV308 } from "./ConcertAtmosphereRendererV308";
+import { ConcertArchitectureV789 } from "./ConcertArchitectureV789";
 import type { StageEnvironmentId } from "./stages";
 export type StageTheme = StageEnvironmentId;
 const palettes = {
@@ -85,8 +166,8 @@ function followPerformerLightV557(scene:Scene,slot:number|null,home:Vector3,
 }
 
 /** Lights are reused across frames; low tier disables animated beam sweeping and floor pulse geometry. */
-export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotion, reactive = true, strength = 60, genre, musicPalette, showCue, composition, glowGainV353=1, timelineGainV354=1, cinematicCueV497, concertLipSyncV386, concertShowCueV387, concertShowLightingV387=true,concertShowAtmosphereV387=true,festivalShowCueV394,festivalShowLightingV394=true,festivalShowAtmosphereV394=true,festivalShowLasersV394=false,lyricsProtectedV542=false,groupCountV542=1,vocalFocusV542=false,performerLightingV557,cameraNarrativeV605,cameraSectionV608 }: {
-  theme?: StageTheme; audio: AudioFeatures; isPlaying: boolean; reducedMotion: boolean; reactive?: boolean; strength?: number; genre?: string | null; musicPalette?: { primary: string; secondary: string; glow: string }; showCue?: ShowCue; composition?:SmartStageCueV351;glowGainV353?:number; timelineGainV354?:number;cinematicCueV497?:VocalConcertHandoffV498;concertLipSyncV386?:VisualizerProps["lipSync"];concertShowCueV387?:ConcertShowCueV387;concertShowLightingV387?:boolean;concertShowAtmosphereV387?:boolean;festivalShowCueV394?:FestivalShowCueV394;festivalShowLightingV394?:boolean;festivalShowAtmosphereV394?:boolean;festivalShowLasersV394?:boolean;lyricsProtectedV542?:boolean;groupCountV542?:number;vocalFocusV542?:boolean;performerLightingV557?:{settings:ConcertDetailSettingsV555;cue:ConcertDetailsCueV555;scene?:import("./cinematicConcertCoordinationV528").ConcertSceneV528|null;progressMs?:number};cameraNarrativeV605?:{plan:NarrativePlanV604;cue:NarrativeCueV604;manualCamera:boolean};cameraSectionV608?:StageSection;
+export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotion, reactive = true, strength = 60, genre, musicPalette, showCue, composition, glowGainV353=1, timelineGainV354=1, cinematicCueV497, concertLipSyncV386, concertShowCueV387, concertShowLightingV387=true,concertShowAtmosphereV387=true,festivalShowCueV394,festivalShowLightingV394=true,festivalShowAtmosphereV394=true,festivalShowLasersV394=false,lyricsProtectedV542=false,groupCountV542=1,vocalFocusV542=false,performerLightingV557,cameraNarrativeV605,cameraSectionV608,performanceLightingV749,concertFxV810,lyricsV813,lyricsVisibleV813=false,scenicLightingV762,cinematicCueV761,manualLightingV763=false,transitionV791,transitionV849,epicPeakV794,stageEvolutionV795,vocalSpotlightV797,liveShowV827=false }: {
+  theme?: StageTheme; audio: AudioFeatures; isPlaying: boolean; reducedMotion: boolean; reactive?: boolean; strength?: number; genre?: string | null; musicPalette?: { primary: string; secondary: string; glow: string }; showCue?: ShowCue; composition?:SmartStageCueV351;glowGainV353?:number; timelineGainV354?:number;cinematicCueV497?:VocalConcertHandoffV498;concertLipSyncV386?:VisualizerProps["lipSync"];concertShowCueV387?:ConcertShowCueV387;concertShowLightingV387?:boolean;concertShowAtmosphereV387?:boolean;festivalShowCueV394?:FestivalShowCueV394;festivalShowLightingV394?:boolean;festivalShowAtmosphereV394?:boolean;festivalShowLasersV394?:boolean;lyricsProtectedV542?:boolean;groupCountV542?:number;vocalFocusV542?:boolean;performerLightingV557?:{settings:ConcertDetailSettingsV555;cue:ConcertDetailsCueV555;scene?:import("./cinematicConcertCoordinationV528").ConcertSceneV528|null;progressMs?:number};cameraNarrativeV605?:{plan:NarrativePlanV604;cue:NarrativeCueV604;manualCamera:boolean};cameraSectionV608?:StageSection;performanceLightingV749?:PerformanceLightingSettingsV749;concertFxV810?:ConcertFxSettingsV810;lyricsV813?:Lyrics|null;lyricsVisibleV813?:boolean;scenicLightingV762?:DynamicStageLightingSettingsV762;cinematicCueV761?:CinematicCueV761;manualLightingV763?:boolean;transitionV791?:SceneTransitionCueV791;transitionV849?:CoordinatedConcertTransitionV849;epicPeakV794?:EpicPeakCueV794;stageEvolutionV795?:StageEvolutionCueV795;vocalSpotlightV797?:MultiVocalSpotlightCueV797;liveShowV827?:boolean;
 }) {
   const palette = palettes[theme];
   const sceneFlags = sceneDetailFlags(useSceneDetail());
@@ -102,12 +183,51 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
   const floorMaterialV622=useRef<import('three').MeshStandardMaterial>(null);
   // V635: one reusable planar LED wall, never any per-frame mesh/material allocation.
   const ledWallV635=useRef<Mesh>(null);
+  const laserMeshV811=useRef<Mesh>(null);
+  const lyricsWallV813=useRef<Mesh>(null);
+  const lyricsFloorV813=useRef<Mesh>(null);
+  const lyricsWallMatV813=useRef<MeshBasicMaterial>(null);
+  const lyricsFloorMatV813=useRef<MeshBasicMaterial>(null);
+  const lyricsCanvasV813=useRef<HTMLCanvasElement|null>(null);
+  const lyricsTextureV813=useRef<CanvasTexture|null>(null);
+  const lyricsDrawnV813=useRef('');
+  const fxPerfStateV825=useRef(createFxPerfStateV825());
+  const autoQualityStateV827=useRef(createAutoQualityV827());
+  const qualityMonitorV826=useRef(createConcertQualityMonitorV826());
+  const qualityPublishedV826=useRef(false);
+  const crowdCueV815=useRef<VirtualCrowdCueV815>({...CROWD_OFF_V815});
+  const festivalCueV844=useRef<FestivalCueV844>({...FESTIVAL_OFF_V844});
+  const soapBubbleCueV8441=useRef<SoapBubbleCueV8441>({...BUBBLES_OFF_V8441});
+  const fullStageFlashCueV8441=useRef<FullStageFlashCueV8441>({...FLASH_OFF_V8441});
+  const paperStreamersCueV846=useRef<PaperStreamersCueV846>({...STREAMERS_OFF_V846});
+  const festivalFinaleCueV847=useRef<FestivalFinaleCueV847>({...FINALE_OFF_V847});
+  const particlesCueV816=useRef<ReactiveParticleCueV816>({...PARTICLES_OFF_V816});
+  const secondaryTintV828=useRef(new Color());
+  const crownCueV828=useRef<ConcertExperienceCueV828>({...EXPERIENCE_OFF_V828});
+  const foamCueV817=useRef<FoamCannonCueV817>({...FOAM_OFF_V817});
+  const kineticCueV817=useRef<KineticStageCueV817>({...KINETIC_OFF_V817});
+  const spectralCueV818=useRef<SpectralMusicCueV818>({...SPECTRAL_OFF_V818});
+  const transitionCueV819=useRef<CinematicTransitionCueV819>({...TRANSITION_OFF_V819});
+  const vocalFxCueV820=useRef<VocalAdlibFxCueV820>({...VOCAL_FX_OFF_V820});
+  const hazeFloorV814=useRef<Mesh>(null);
+  const hazeShaftsV814=useRef<Mesh>(null);
+  const hazeFloorMatV814=useRef<import('three').ShaderMaterial>(null);
+  const hazeShaftsMatV814=useRef<import('three').ShaderMaterial>(null);
+  const laserMaterialV811=useRef<import("three").ShaderMaterial>(null);
+  const scenicCueV762=useRef<ScenicLightingCueV762>(SCENIC_LIGHTING_OFF_V762);
+  const lightChoreographyV793=useRef<LightChoreographyCueV793>(LIGHT_CHOREOGRAPHY_OFF_V793);
+  const peakCueRefV794=useRef<EpicPeakCueV794|null>(null);
+  const evolutionRefV795=useRef<StageEvolutionCueV795>(STAGE_EVOLUTION_OFF_V795);
+  const beamTargetV793=useRef<Object3D>(null);
+  const goboMeshV762=useRef<Mesh>(null);
+  const goboMaterialV762=useRef<import('three').ShaderMaterial>(null);
   const ledMaterialV635=useRef<import('three').ShaderMaterial>(null);
   // V558 cached neutral portrait temperatures; no per-frame Color allocations.
   const warmPortraitV558 = useRef(new Color('#ffe5d6'));
   const coolDuetV558 = useRef(new Color('#c3d9ff'));
   // V559: smoothed accents, no geometry/shadow/light allocations in render loop.
   const beatAccentV559 = useRef(0);
+  const lightingMixV749=useRef(createPerformanceLightingStateV749());
   // Cached V566 camera directions + sampled performer position; never allocate in frame loop.
   const cameraFaceV566=useRef(new Vector3());
   const cameraForwardV566=useRef(new Vector3());
@@ -139,12 +259,36 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     return () => { window.removeEventListener(LIGHTING_CHANGED, reload); window.removeEventListener(GENRE_PROFILE_CHANGED,reload); window.removeEventListener(PRESET_LIBRARY_CHANGED,reload); window.removeEventListener(LIGHT_TIMELINE_CHANGED,reloadCues); };
   }, []);
   useEffect(()=>{lightingPreset.current=selectGenrePreset(genre,loadGenreProfiles(),loadPresetLibrary())??loadLightingPreset();},[genre]);
+  // V813: create ONE canvas/texture for both projection surfaces; dispose on unmount.
+  // Drawing happens only on a new timed word, not every animation frame.
+  useEffect(()=>{
+    const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=256;
+    const texture=new CanvasTexture(canvas);texture.colorSpace=SRGBColorSpace;
+    texture.minFilter=LinearFilter;texture.magFilter=LinearFilter;
+    lyricsCanvasV813.current=canvas;lyricsTextureV813.current=texture;
+    if(lyricsWallMatV813.current){lyricsWallMatV813.current.map=texture;lyricsWallMatV813.current.needsUpdate=true;}
+    if(lyricsFloorMatV813.current){lyricsFloorMatV813.current.map=texture;lyricsFloorMatV813.current.needsUpdate=true;}
+    return ()=>{
+      if(lyricsWallMatV813.current){lyricsWallMatV813.current.map=null;lyricsWallMatV813.current.needsUpdate=true;}
+      if(lyricsFloorMatV813.current){lyricsFloorMatV813.current.map=null;lyricsFloorMatV813.current.needsUpdate=true;}
+      lyricsCanvasV813.current=null;lyricsTextureV813.current=null;lyricsDrawnV813.current='';
+      texture.dispose();
+    };
+  },[]);
+  useEffect(()=>()=>clearConcertQualityV826(),[]);
   useFrame((state, delta) => {
     const presetMix = reducedMotion ? 1 : 1-Math.exp(-Math.min(Math.max(delta,0),.1)*2.0);
     activePreset.current.anticipation += (lightingPreset.current.anticipation-activePreset.current.anticipation)*presetMix;
     activePreset.current.kickRollStrength += (lightingPreset.current.kickRollStrength-activePreset.current.kickRollStrength)*presetMix;
     activePreset.current.blackoutStrength += (lightingPreset.current.blackoutStrength-activePreset.current.blackoutStrength)*presetMix;
     const tier = getActivePerformanceTier();
+    // V772: switch visibility, not only intensity=0: invisible Three.js lights
+    // no longer occupy a shader light slot. Hysteresis is inherited from V640.
+    const budgetV772=resolveLightingBudgetV772(tier,getVisualLevelV640(),theme);
+    if(key.current)key.current.visible=budgetV772.key;
+    if(fill.current)fill.current.visible=budgetV772.fill;
+    if(beam.current)beam.current.visible=budgetV772.centerSpot&&sceneFlags.extraLights;
+    if(floorLight.current)floorLight.current.visible=budgetV772.floor&&sceneFlags.extraLights;
     const smartCue=advanceStageDirector(smartStage.current,audio,delta,genre,isPlaying && reactive,reducedMotion);
     const cue = advanceStageCue(cueState.current, audio, delta, genre, isPlaying && reactive, reducedMotion, strength, tier);
     const director = advanceLightingDirector(directorState.current, audio, delta, Boolean(musicPalette && reactive && isPlaying), reducedMotion);
@@ -224,6 +368,20 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
       lyricsProtected:lyricsProtectedV542,
     });
+    // V749: one bounded, smoothed lighting layer. Saved light timelines and
+    // deliberate show/blackout commands beat automatic cues. V551 validates casts.
+    const lightingV749=planPerformanceLightingV749({
+      settings:performanceLightingV749,cast:lightingV551,
+      section:cameraSectionV608??atmosphereSection.current,
+      energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,
+      playing:isPlaying&&playback.playing,reactive,reducedMotion,tier,
+      authored:authoredLightsV386||showCue?.lightingEnabled===false||!concertShowLightingV387,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,groupCount:groupCountV542,
+      cameraFocus:concertLipSyncV386?.cinematicSceneV528?.active===true,
+    });
+    const lightingMixV749Now=advancePerformanceLightingV749(lightingMixV749.current,lightingV749,delta,
+      normalizePerformanceLightingV749(performanceLightingV749).transitionMs);
     const lightingV621=composeConcertLightingV623(planAdvancedStageLightingV621({narrative:cameraNarrativeV605,
       trackId:playback.trackId,durationMs:playback.durationMs,positionMs:playback.positionMs,
       section:cameraSectionV608??atmosphereSection.current,genre,
@@ -276,6 +434,54 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       visualsEnabled:theme!=='minimal'&&sceneFlags.extraLights,
       groupCount:Math.max(1,Math.min(4,Math.round(groupCountV542)||1)),base:stageVisualV635,
     });
+    // V690: expand the EXISTING scenic depth and color over the verified song arc.
+    // Never replace the selected theme or add geometry/lighting/render passes.
+    const stageMoodInputV691:import("./adaptiveStageTransformationV690").AdaptiveStageInputV690={
+      narrative:cameraNarrativeV605,trackId:playback.trackId,positionMs:playback.positionMs,
+      durationMs:playback.durationMs,section:cameraSectionV608??atmosphereSection.current,
+      genre,playing:isPlaying&&playback.playing,reactive,reducedMotion,tier,
+      authored:authoredLightsV386||showCue?.lightingEnabled===false||!concertShowLightingV387,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      visualsEnabled:theme!=='minimal'&&sceneFlags.extraLights,
+      groupCount:Math.max(1,Math.min(4,Math.round(groupCountV542)||1)),foundation:transformationV622,
+    };
+    const stageScaleV690=planAdaptiveStageTransformationV690(stageMoodInputV691);
+    const musicMoodV691=planMusicMoodFusionV691(stageMoodInputV691,stageScaleV690);
+    // V795 uses exactly the V790 verified scene and SAME playback clock.
+    // The real saved light timeline/blackout and manual user controls have final
+    // authority. Disabled/low-tier => portal eases back to the original layout.
+    const evolveV795=stageEvolutionV795;
+    const evolutionAllowedV795=evolveV795?.active===true&&isPlaying&&playback.playing&&reactive&&
+      !reducedMotion&&tier!=='low'&&theme!=='minimal'&&sceneFlags.extraLights&&
+      !manualLightingV763&&!authoredLightsV386&&showCue?.lightingEnabled!==false&&
+      timelineCue.blackout<=0&&timelineCue.strobe<=0&&timelineCue.scale>0&&
+      timelineGainV354>0&&evolveV795.trackId===playback.trackId&&
+      evolveV795.durationMs===playback.durationMs&&
+      playback.positionMs>=evolveV795.sceneStartMs&&
+      playback.positionMs<evolveV795.sceneEndMs;
+    evolutionRefV795.current=evolutionAllowedV795?evolveV795:STAGE_EVOLUTION_OFF_V795;
+
+    // V762: decorative scenic direction comes solely from verified V761/V604 scenes.
+    // Saved lighting cues, blackout, manual theme, low-tier and lyrics readability win.
+    const scenicV762=planDynamicStageLightingV762({
+      settings:scenicLightingV762,scene:cinematicCueV761,narrative:cameraNarrativeV605,
+      trackId:playback.trackId,progressMs:playback.positionMs,genre,
+      playing:isPlaying&&playback.playing,reactive,reducedMotion,tier,
+      authored:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false||!concertShowLightingV387,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,visualsEnabled:theme!=='minimal'&&sceneFlags.extraLights,
+      ledBudget:getVisualFactorsV640().led,hazeBudget:getVisualFactorsV640().haze,
+      energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,
+    });
+    scenicCueV762.current=scenicV762;
+    if(goboMaterialV762.current){
+      goboMaterialV762.current.uniforms.uOpacity.value=scenicV762.goboOpacity;
+      goboMaterialV762.current.uniforms.uPattern.value=scenicV762.goboPattern;
+      goboMaterialV762.current.uniforms.uPhase.value=scenicV762.goboPhase;
+      (goboMaterialV762.current.uniforms.uColor.value as Color).set(musicPalette?.secondary??palette.secondary);
+      if(goboMeshV762.current)goboMeshV762.current.visible=scenicV762.goboOpacity>.003;
+    }
     // V640: optional LED plane fades to zero before any avatar/lyrics reduction.
     // A zero-opacity plane is also culled by the existing mesh.visible gate.
     const ledBudgetV640=getVisualFactorsV640().led;
@@ -284,11 +490,12 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     if(led){
       const mix=1-Math.exp(-Math.min(Math.max(delta,0),.1)*5);
       const o=led.uniforms.uOpacity;
-      o.value+=(stageVisualV635.opacity*ledBudgetV640-o.value)*mix;
-      led.uniforms.uPattern.value=stageVisualV635.pattern;
+      o.value+=(stageVisualV635.opacity*ledBudgetV640*scenicV762.ledGain-o.value)*mix;
+      led.uniforms.uPattern.value=scenicV762.active&&scenicV762.ledGain>1?scenicV762.ledPattern:stageVisualV635.pattern;
       led.uniforms.uPhase.value=stageVisualV635.phase;
       led.uniforms.uSpeed.value=stageVisualV635.speed*ledBudgetV640;
       led.uniforms.uSceneStyle.value=sceneMotifV647.style;
+      led.uniforms.uStageMorph.value=Math.min(.75,stageScaleV690.morph+musicMoodV691.morph+(stageVisualV635.active?evolutionRefV795.current.ledMorph:0));
       led.uniforms.uVariation.value=sceneMotifV647.variation;
       led.uniforms.uArchitecture.value=sceneMotifV647.architecture*ledBudgetV640;
       led.uniforms.uDepth.value=sceneMotifV647.depth*ledBudgetV640;
@@ -298,11 +505,498 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       if(ledWallV635.current)ledWallV635.current.visible=o.value>.004&&
         stageVisualV635.active&&tier!=='low';
     }
-    moodTintV622.current.copy(coolTintV622.current).lerp(warmTintV622.current,(transformationV622.tone+1)/2);
+    // V810–V812: one verified song authority, same timeline/blackout precedence
+    // as the existing V635 LED wall. Unknown sections never become fake drops.
+    const verifiedActV810=cameraNarrativeV605?.cue;
+    const currentActV810=verifiedActV810?.active?cameraNarrativeV605?.plan.acts[verifiedActV810.act]:undefined;
+    const currentSectionV810=currentActV810?.section;
+    const fxCueV810=planConcertFxV810({settings:concertFxV810,genre,
+      section:(currentSectionV810==='intro'||currentSectionV810==='verse'||currentSectionV810==='hook'||currentSectionV810==='build'||currentSectionV810==='drop'||currentSectionV810==='break'||currentSectionV810==='finale'?currentSectionV810:'verse') as ConcertFxSectionV810,
+      progressMs:playback.positionMs,startMs:currentActV810?.startMs??0,endMs:currentActV810?.endMs??0,
+      active:stageVisualV635.active&&theme!=='minimal'&&sceneFlags.extraLights,
+      verified:cameraNarrativeV605?.plan.source==='verified-v600'&&verifiedActV810?.source==='verified-v600'&&
+        cinematicCueV761?.active===true&&cinematicCueV761.reason==='verified-act'&&
+        cameraNarrativeV605.plan.trackId===playback.trackId&&
+        cameraNarrativeV605.plan.durationMs===playback.durationMs&&
+        cinematicCueV761.actIndex===verifiedActV810.act,
+      playing:isPlaying&&playback.playing,reactive,reducedMotion,
+      authored:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false||!concertShowLightingV387,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542,tier,
+      energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+      bass:audio.bass??0,mids:audio.mids??0,highs:audio.highs??0,
+      ledBudget:ledBudgetV640,laserBudget:getVisualFactorsV640().beams});
+    // V823 timeline only shapes already-authorized V810 effects. It NEVER forces
+    // a disabled renderer on, changes the camera, or bypasses blackout/manual cues.
+    const authoredFxV823=evaluateFxTimelineV823({
+      cues:concertFxV810?.timelineCuesV823??[],enabled:concertFxV810?.timelineEnabledV823===true,
+      trackId:playback.trackId,durationMs:playback.durationMs,progressMs:playback.positionMs,
+      verified:fxCueV810.active&&fxCueV810.reason==='music',
+      playing:isPlaying&&playback.playing,reducedMotion});
+    // V824: dramaturgy follows the SAME verified V604/V761 act and cannot
+    // activate blocked FX. The V823 author envelope wins per lane.
+    const smartFxV824=planSmartFxShowDirectorV824({settings:concertFxV810,fx:fxCueV810,
+      trackId:playback.trackId,startMs:currentActV810?.startMs??0,endMs:currentActV810?.endMs??0,
+      progressMs:playback.positionMs,tier,lyricsProtected:lyricsProtectedV542,
+      vocalFocus:vocalFocusV542,groupCount:groupCountV542});
+    const smartMixV824=mergeSmartFxWithTimelineV824(smartFxV824,authoredFxV823);
+    // V850: repeat-aware dramaturgy for the SAME verified act, not a new
+    // controller of song structure, camera, dancers or manual FX timelines.
+    const authoredLanesV850=(['laser','led','particles','foam','transition'] as const).filter(lane=>
+      authoredFxV823[lane].boost>.001||authoredFxV823[lane].mute>.001);
+    const festivalShowV850=planSmartFestivalShowV850({settings:concertFxV810,fx:fxCueV810,
+      trackId:playback.trackId,actIndex:verifiedActV810?.act??-1,
+      actStartMs:currentActV810?.startMs??0,actEndMs:currentActV810?.endMs??0,
+      progressMs:playback.positionMs,playing:isPlaying&&playback.playing,reactive,reducedMotion,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      groupCount:groupCountV542,tier,budget:getVisualFactorsV640().led,
+      authoredLanes:authoredLanesV850});
+    // V828: visual staging of this verified musical act. Alternating motifs,
+    // negative space and background atmosphere, without any new draw calls,
+    // camera cuts, guessed drops or bypass of V823 user-authored cues.
+    const experienceV828=planConcertExperienceV828({settings:concertFxV810,fx:fxCueV810,
+      authored:authoredFxV823,trackId:playback.trackId,
+      startMs:currentActV810?.startMs??0,endMs:currentActV810?.endMs??0,
+      progressMs:playback.positionMs,tier,lyricsProtected:lyricsProtectedV542,
+      vocalFocus:vocalFocusV542,groupCount:groupCountV542});
+    // V825: observed R3F frame cadence (not GPU milliseconds) drives gradual,
+    // prioritized shedding. Expensive stage layers yield before vocal/LED. No new draw calls.
+    advanceFxPerfStateV825(fxPerfStateV825.current,delta,
+      fxCueV810.reason==='music'&&concertFxV810?.perfOptimizerV825!==false&&isPlaying,
+      tier==='balanced'?30:60);
+    const fxPerfV825=planFxPerformanceV825({settings:concertFxV810,fx:fxCueV810,tier,
+      pressure:effectiveFxPressureV827(fxPerfStateV825.current.pressure,
+        autoQualityStateV827.current,liveShowV827&&concertFxV810?.qualityDashboardV826!==false&&concertFxV810?.autoQualityV827!==false&&concertFxV810?.perfOptimizerV825!==false),
+      lyricsProtected:lyricsProtectedV542,
+      vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+      authoredLanes:(['laser','led','particles','foam','transition'] as const).filter(lane=>
+        authoredFxV823[lane].boost>.001||authoredFxV823[lane].mute>.001)});
+    // V834: VERIFIED cinematic intent only, never assumed actual occlusion.
+    // Reduce decorative side-stage instances on portrait/dialogue scenes under
+    // sustained V825 pressure. Wide views and festival drops retain V825 priority.
+    const cameraBudgetV834=applyCameraAwarePerformanceV834(fxPerfV825,{
+      settings:concertFxV810,fx:fxCueV810,
+      intent:cinematicCueV761?.intent??null,
+      verifiedCamera:cinematicCueV761?.active===true&&cinematicCueV761.reason==='verified-act'&&
+        cinematicCueV761.actIndex===verifiedActV810?.act,
+      manualCamera:cameraNarrativeV605?.manualCamera===true,
+      groupCount:groupCountV542,
+      authoredLanes:(['laser','led','particles','foam','transition'] as const).filter(lane=>
+        authoredFxV823[lane].boost>.001||authoredFxV823[lane].mute>.001),
+    });
+
+    crownCueV828.current=experienceV828.active?{
+      ...experienceV828,
+      crownCount:Math.floor(experienceV828.crownCount*fxPerfV825.gains.led),
+      crownOpacity:experienceV828.crownOpacity*fxPerfV825.gains.led,
+    }:EXPERIENCE_OFF_V828;
+    const laserGainV823=dimFestivalLaneV850(fxTimelineMultiplierV823(authoredFxV823.laser)*smartMixV824.gains.laser*experienceV828.gains.laser*fxPerfV825.gains.laser,festivalShowV850.gains.laser,authoredLanesV850.includes('laser'));
+    const ledGainV823=dimFestivalLaneV850(fxTimelineMultiplierV823(authoredFxV823.led)*smartMixV824.gains.led*experienceV828.gains.led*fxPerfV825.gains.led,festivalShowV850.gains.led,authoredLanesV850.includes('led'));
+    const particleGainV823=dimFestivalLaneV850(fxTimelineMultiplierV823(authoredFxV823.particles)*smartMixV824.gains.particles*experienceV828.gains.particles*fxPerfV825.gains.particles,festivalShowV850.gains.particles,authoredLanesV850.includes('particles'));
+    const foamGainV823=dimFestivalLaneV850(fxTimelineMultiplierV823(authoredFxV823.foam)*smartMixV824.gains.foam*experienceV828.gains.foam*fxPerfV825.gains.foam,festivalShowV850.gains.foam,authoredLanesV850.includes('foam'));
+    const transitionGainV823=dimFestivalLaneV850(fxTimelineMultiplierV823(authoredFxV823.transition)*smartMixV824.gains.transition*experienceV828.gains.transition*fxPerfV825.gains.transition,festivalShowV850.gains.transition,authoredLanesV850.includes('transition'));
+    // V822 derives distinct, bounded accents ONLY from microphone transients and bands.
+    // The V810 music authority has already enforced blackout, authored light, pause,
+    // reduced motion and verified song timing. No separate beat timer or GPU layer.
+    const beatV822=planBeatAccentDirectorV822({fx:fxCueV810,
+      settings:normalizeConcertFxV810(concertFxV810),tier,budget:getVisualFactorsV640().led,
+      beatStrength:audio.beatStrength??0,kickOnset:audio.kickAccentIntensity??0,
+      kickBand:audio.kick??0,snareBand:audio.snare??0,bass:audio.bass??0,
+      energy:audio.energyEnvelope??0,attack:audio.attack??0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542});
+    // V813: copies only confirmed, timestamped synchronized lyrics onto a BACKWALL
+    // or a FLOOR decal. Regular 3D lyrics are unchanged and always remain in front.
+    const lyricsCueV813=planLyricsProjectionV813({fx:fxCueV810,
+      settings:normalizeConcertFxV810(concertFxV810),lyrics:lyricsV813,progressMs:playback.positionMs,
+      verifiedSong:fxCueV810.reason==='music',lyricsVisible:lyricsVisibleV813,groupCount:groupCountV542});
+    const showWallV813=lyricsCueV813.active&&lyricsCueV813.surface==='wall'&&!!lyricsTextureV813.current;
+    const showFloorV813=lyricsCueV813.active&&lyricsCueV813.surface==='floor'&&!!lyricsTextureV813.current;
+    if(lyricsCueV813.active&&lyricsDrawnV813.current!==lyricsCueV813.text){
+      const canvas=lyricsCanvasV813.current;const ctx=canvas?.getContext('2d');
+      if(canvas&&ctx){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        let size=148;
+        ctx.font=`bold ${size}px system-ui, sans-serif`;
+        while(size>45&&ctx.measureText(lyricsCueV813.text).width>canvas.width*.90){
+          size-=8;ctx.font=`bold ${size}px system-ui, sans-serif`;
+        }
+        ctx.shadowColor='#ffffff';ctx.shadowBlur=12;ctx.fillStyle='#ffffff';
+        ctx.fillText(lyricsCueV813.text,canvas.width/2,canvas.height/2);
+        if(lyricsTextureV813.current)lyricsTextureV813.current.needsUpdate=true;
+        lyricsDrawnV813.current=lyricsCueV813.text;
+      }
+    }
+    if(lyricsWallV813.current)lyricsWallV813.current.visible=showWallV813;
+    if(lyricsFloorV813.current)lyricsFloorV813.current.visible=showFloorV813;
+    if(lyricsWallMatV813.current){lyricsWallMatV813.current.opacity=showWallV813?lyricsCueV813.opacity:0;
+      lyricsWallMatV813.current.color.set(lyricsCueV813.accent==='rhyme'?fxCueV810.secondary:fxCueV810.primary);}
+    if(lyricsFloorMatV813.current){lyricsFloorMatV813.current.opacity=showFloorV813?lyricsCueV813.opacity:0;
+      lyricsFloorMatV813.current.color.set(lyricsCueV813.accent==='rhyme'?fxCueV810.secondary:fxCueV810.primary);}
+    // V814 augments the existing V308 fog and V762 gobo. No scene.fog replacement.
+    const hazeV814=planAtmosphericConcertFxV814({fx:fxCueV810,
+      settings:normalizeConcertFxV810(concertFxV810),lyricsProtected:lyricsProtectedV542,
+      vocalFocus:vocalFocusV542,groupCount:groupCountV542,tier,
+      hazeBudget:getVisualFactorsV640().haze});
+    hazeV814.floorOpacity*=fxPerfV825.gains.haze*festivalShowV850.gains.ambience;
+    hazeV814.shaftsOpacity*=fxPerfV825.gains.haze*festivalShowV850.gains.ambience;
+    if(hazeFloorMatV814.current){
+      hazeFloorMatV814.current.uniforms.uOpacity.value=hazeV814.floorOpacity;
+      hazeFloorMatV814.current.uniforms.uPhase.value=hazeV814.phase;
+      (hazeFloorMatV814.current.uniforms.uColor.value as Color).set(hazeV814.color);
+    }
+    if(hazeShaftsMatV814.current){
+      hazeShaftsMatV814.current.uniforms.uOpacity.value=hazeV814.shaftsOpacity;
+      hazeShaftsMatV814.current.uniforms.uPhase.value=hazeV814.phase;
+      (hazeShaftsMatV814.current.uniforms.uColor.value as Color).set(hazeV814.color);
+    }
+    if(hazeFloorV814.current)hazeFloorV814.current.visible=hazeV814.floorOpacity>.002;
+    if(hazeShaftsV814.current)hazeShaftsV814.current.visible=hazeV814.shaftsOpacity>.002;
+    // V815 uses the SAME verified FX cue; disables on pauses, blackout, manual
+    // light tracks and low tier, and stays outside the central performer lane.
+    crowdCueV815.current=planVirtualConcertCrowdV815({fx:fxCueV810,
+      settings:normalizeConcertFxV810(concertFxV810),tier,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      groupCount:groupCountV542,energy:audio.energyEnvelope??0,
+      kick:audio.kickAccentIntensity??0,crowdBudget:getVisualFactorsV640().led});
+    // V849: shared scene seam from ThreeAvatar; per-frame manual and performance
+    // safeguards always win. Visual gains can only REDUCE the existing FX.
+    const transitionsActiveV849=transitionV849?.active===true&&
+      tier!=='low'&&reactive&&isPlaying&&playback.playing&&!reducedMotion&&
+      fxCueV810.reason==='music'&&
+      !manualLightingV763&&!authoredLightsV386&&
+      showCue?.lightingEnabled!==false&&timelineGainV354===1&&
+      timelineCue.blackout<=0&&timelineCue.strobe<=0&&timelineCue.scale>0;
+    const ledBlendV849=transitionsActiveV849?transitionV849!.ledGain:1;
+    const laserBlendV849=transitionsActiveV849?transitionV849!.laserGain:1;
+    const festivalBlendV849=transitionsActiveV849?transitionV849!.festivalGain:1;
+    const overlayBlendV849=transitionsActiveV849?transitionV849!.overlayGain:1;
+    // V844: one verified festival hero effect, after V823/V825 authoring and budget checks.
+    // No autonomous/unverified drops. Manual light tracks and blackouts win.
+    festivalCueV844.current=planFestivalSpecialFxV844({fx:fxCueV810,
+      settings:normalizeConcertFxV810(concertFxV810),playing:isPlaying&&playback.playing&&reactive,
+      reducedMotion,manualLighting:authoredLightsV386||manualLightingV763||showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+      tier,energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+      particleBudget:getVisualFactorsV640().led,foamBudget:getVisualFactorsV640().led,
+      timelineGain:Math.min(particleGainV823,foamGainV823),
+      performanceGain:Math.min(fxPerfV825.gains.particles,fxPerfV825.gains.foam)});
+    // V844.1: atmospheric bubbles + separately opted-in canvas-wide stage flash.
+    // Both inherit the V844 verified music, manual-light, blackout and performance gates.
+    // An opted-in full-stage flash replaces (never stacks with) the floor strobe.
+    const companionInputsV8441={fx:fxCueV810,settings:normalizeConcertFxV810(concertFxV810),
+      playing:isPlaying&&playback.playing&&reactive,reducedMotion,
+      manualLighting:authoredLightsV386||manualLightingV763||showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+      tier,energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+      budget:getVisualFactorsV640().led,timelineGain:particleGainV823,
+      performanceGain:fxPerfV825.gains.particles,moment:festivalCueV844.current.moment};
+    soapBubbleCueV8441.current=planSoapBubblesV8441(companionInputsV8441);
+    fullStageFlashCueV8441.current=planFullStageFlashV8441(companionInputsV8441);
+    paperStreamersCueV846.current=planPaperStreamersV846(companionInputsV8441);
+    // V847: reuse the same verified V844/V845 gate and V825/V823 budgets.
+    festivalFinaleCueV847.current=planFestivalFinaleV847(companionInputsV8441);
+    if(festivalBlendV849<1){
+      const special=festivalCueV844.current,finale=festivalFinaleCueV847.current;
+      festivalCueV844.current={...special,
+        co2Count:Math.floor(special.co2Count*festivalBlendV849),
+        co2Opacity:applyConcertTransitionGainV849(special.co2Opacity,festivalBlendV849),
+        sparkGain:applyConcertTransitionGainV849(special.sparkGain,festivalBlendV849),
+        confettiGain:applyConcertTransitionGainV849(special.confettiGain,festivalBlendV849)};
+      festivalFinaleCueV847.current={...finale,
+        rainCount:Math.floor(finale.rainCount*festivalBlendV849),
+        wheelCount:Math.floor(finale.wheelCount*festivalBlendV849),
+        rainOpacity:applyConcertTransitionGainV849(finale.rainOpacity,festivalBlendV849),
+        wheelOpacity:applyConcertTransitionGainV849(finale.wheelOpacity,festivalBlendV849)};
+    }
+    // V850 quiet-space and motif cadence: optional festival effects are
+    // attenuated AFTER V847/V849 and NEVER enabled by this director.
+    // Authored particle lanes preserve their exact existing result.
+    if(festivalShowV850.active&&!authoredLanesV850.includes('particles')){
+      const g=festivalShowV850.gains.festival;
+      const special=festivalCueV844.current,finale=festivalFinaleCueV847.current;
+      festivalCueV844.current={...special,
+        co2Count:Math.floor(special.co2Count*g),
+        co2Opacity:dimFestivalLaneV850(special.co2Opacity,g,false),
+        sparkGain:dimFestivalLaneV850(special.sparkGain,g,false),
+        confettiGain:dimFestivalLaneV850(special.confettiGain,g,false)};
+      festivalFinaleCueV847.current={...finale,
+        rainCount:Math.floor(finale.rainCount*g),
+        wheelCount:Math.floor(finale.wheelCount*g),
+        rainOpacity:dimFestivalLaneV850(finale.rainOpacity,g,false),
+        wheelOpacity:dimFestivalLaneV850(finale.wheelOpacity,g,false)};
+      const bubble=soapBubbleCueV8441.current,streamers=paperStreamersCueV846.current;
+      soapBubbleCueV8441.current={...bubble,count:Math.floor(bubble.count*g),
+        opacity:dimFestivalLaneV850(bubble.opacity,g,false)};
+      paperStreamersCueV846.current={...streamers,count:Math.floor(streamers.count*g),
+        opacity:dimFestivalLaneV850(streamers.opacity,g,false)};
+      // The full-stage flash remains explicit opt-in; we may only dim it.
+      const flash=fullStageFlashCueV8441.current;
+      fullStageFlashCueV8441.current={...flash,
+        opacity:dimFestivalLaneV850(flash.opacity,g,false)};
+    }
+    if(companionInputsV8441.settings.festivalFullStageFlashV8441 &&
+        festivalCueV844.current.strobeGain>0){
+      festivalCueV844.current={...festivalCueV844.current,strobeGain:0};
+    }
+    // V816: particle bursts inherit the SAME V810 verification and blackout rules.
+    // Instancing and budget caps live in the renderer/planner; no new scene lights.
+    particlesCueV816.current=planReactiveParticlesV816({fx:fxCueV810,
+      settings:normalizeConcertFxV810(concertFxV810),tier,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+      energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+      bass:audio.bass??0,highs:audio.highs??0,
+      particleBudget:getVisualFactorsV640().led});
+    if(crowdCueV815.current.active){
+      const c=crowdCueV815.current,g=fxPerfV825.gains.crowd;
+      crowdCueV815.current={...c,count:Math.floor(c.count*g),
+        movement:c.movement*g,phoneOpacity:c.phoneOpacity*g,lightGain:c.lightGain*g,
+        active:g>.001&&Math.floor(c.count*g)>=2};
+    }
+    particlesCueV816.current=mergeFestivalParticlesV844(particlesCueV816.current,
+      festivalCueV844.current,normalizeConcertFxV810(concertFxV810));
+    if(particlesCueV816.current.active&&beatV822.particles>0){
+      const c=particlesCueV816.current;
+      particlesCueV816.current={...c,
+        sparkOpacity:Math.min(.62,c.sparkOpacity*(1+beatV822.particles*.22)),
+        shardOpacity:Math.min(.50,c.shardOpacity*(1+beatV822.particles*.25)),
+        ringOpacity:Math.min(.37,c.ringOpacity*(1+beatV822.particles*.24))};
+    }
+    if(particlesCueV816.current.active){
+      const c=particlesCueV816.current;
+      const opacity=(x:number,cap:number)=>Math.min(cap,x*particleGainV823);
+      particlesCueV816.current={...c,
+        sparkOpacity:opacity(c.sparkOpacity,.62),shardOpacity:opacity(c.shardOpacity,.50),
+        confettiOpacity:opacity(c.confettiOpacity,.52),ringOpacity:opacity(c.ringOpacity,.37),
+        active:particleGainV823>.001};
+    }
+    if(particlesCueV816.current.active){
+      const c=particlesCueV816.current,g=fxPerfV825.gains.particles;
+      // V816 is instanced: reduce actual instances, not just their opacity.
+      particlesCueV816.current={...c,
+        sparks:Math.floor(c.sparks*g),shards:Math.floor(c.shards*g),
+        confetti:Math.floor(c.confetti*g),rings:Math.floor(c.rings*g),
+        active:g>.001&&(Math.floor(c.sparks*g)+Math.floor(c.shards*g)+Math.floor(c.confetti*g)+Math.floor(c.rings*g))>0};
+    }
+    // V847 dim only matching legacy instances, never reactivate authored/disabled particles.
+    particlesCueV816.current=coordinateFestivalParticlesV847(particlesCueV816.current,festivalFinaleCueV847.current);
+    // V817: verified FX authority controls BOTH kinetic architecture and foam cannon.
+    // Side-only foam respects performer/lyric sightlines and costs at most 2 instanced draws.
+    foamCueV817.current=planFoamCannonV817({fx:fxCueV810,
+      settings:normalizeConcertFxV810(concertFxV810),tier,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+      energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+      foamBudget:getVisualFactorsV640().led});
+    if(foamCueV817.current.active&&beatV822.foam>0){
+      const c=foamCueV817.current;
+      foamCueV817.current={...c,opacity:Math.min(.62,c.opacity*(1+beatV822.foam*.18))};
+    }
+    if(foamCueV817.current.active){
+      const c=foamCueV817.current;
+      foamCueV817.current={...c,opacity:Math.min(.62,c.opacity*foamGainV823),
+        power:Math.min(1,c.power*foamGainV823),active:foamGainV823>.001};
+    }
+    if(foamCueV817.current.active){
+      const c=foamCueV817.current,g=fxPerfV825.gains.foam;
+      foamCueV817.current={...c,bubbles:Math.floor(c.bubbles*g),mist:Math.floor(c.mist*g),
+        active:g>.001&&Math.floor(c.bubbles*g)>=2&&Math.floor(c.mist*g)>=2};
+    }
+    // V844 cross-effect scheduler: dim foam during CO2/confetti hero moments,
+    // without ever bypassing the previously applied V817/V823/V825 gates.
+    foamCueV817.current=coordinateFestivalFoamV844(foamCueV817.current,festivalCueV844.current);
+    // V843 runs only after the V823 and V825 foam safety/budget gates; it
+    // changes trajectories, never particle count, alpha or authority.
+    if(foamCueV817.current.active){
+      const c=foamCueV817.current;
+      foamCueV817.current={...c,experienceV843:planFoamExperienceV843({
+        cue:c,fx:fxCueV810,settings:normalizeConcertFxV810(concertFxV810),tier,
+        lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+      })};
+    }
+    kineticCueV817.current=planKineticStageV817({fx:fxCueV810,
+      settings:normalizeConcertFxV810(concertFxV810),tier,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+      energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+      architectureBudget:getVisualFactorsV640().led});
+    if(kineticCueV817.current.active){
+      const c=kineticCueV817.current,g=fxPerfV825.gains.kinetic;
+      kineticCueV817.current={...c,columns:Math.floor(c.columns*g),
+        lift:c.lift*g,spread:c.spread*g,opacity:c.opacity*g,
+        active:g>.001&&Math.floor(c.columns*g)>=2};
+    }
+    // V818: use only REAL already-analyzed bands, and inherit the V810
+    // verified-act, manual-lighting, pause and lyric/portrait protection gates.
+    spectralCueV818.current=planSpectralMusicV818({fx:fxCueV810,
+      settings:normalizeConcertFxV810(concertFxV810),tier,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+      energy:audio.energyEnvelope??0,bass:audio.bass??0,mids:audio.mids??0,highs:audio.highs??0,
+      spectralBudget:getVisualFactorsV640().led});
+    if(spectralCueV818.current.active){
+      const c=spectralCueV818.current,g=fxPerfV825.gains.spectral;
+      spectralCueV818.current={...c,waves:Math.floor(c.waves*g),rings:Math.floor(c.rings*g),
+        prisms:Math.floor(c.prisms*g),waveOpacity:c.waveOpacity*g,
+        ringOpacity:c.ringOpacity*g,prismOpacity:c.prismOpacity*g,
+        active:g>.001};
+    }
+    // V819: V791 explicitly verifies the adjacent scene seam and owns camera/light
+    // easing. V819 is strictly visual, behind the performer lane, no second timer.
+    transitionCueV819.current=planCinematicTransitionV819({fx:fxCueV810,
+      transition:transitionV791,settings:normalizeConcertFxV810(concertFxV810),
+      playing:isPlaying&&playback.playing,reducedMotion,
+      manualCamera:cameraNarrativeV605?.manualCamera===true,manualLighting:manualLightingV763||authoredLightsV386,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      groupCount:groupCountV542,tier,budget:getVisualFactorsV640().led});
+    if(transitionCueV819.current.active){
+      const c=transitionCueV819.current;
+      transitionCueV819.current={...c,opacity:Math.min(.27,c.opacity*transitionGainV823*overlayBlendV849),
+        active:transitionGainV823>.001};
+    }
+    // V820: editorial V496 time segments for THIS track only. No inferred singer
+    // identity or fabricated adlib text; camera and lip-sync remain authoritative.
+    vocalFxCueV820.current=planVocalAdlibFxV820({fx:fxCueV810,
+      settings:concertFxV810,trackId:playback.trackId,
+      vocalTrackId:concertLipSyncV386?.vocalTimeTrackIdV496??'',
+      segments:concertLipSyncV386?.vocalTimeSegmentsV496,
+      vocalEnabled:concertLipSyncV386?.vocalTimeEnabledV496===true,
+      progressMs:playback.positionMs,playing:isPlaying&&playback.playing,reducedMotion,
+      lyrics:lyricsV813,lyricsVisible:lyricsVisibleV813,
+      manualCamera:cameraNarrativeV605?.manualCamera===true,
+      manualLighting:manualLightingV763||authoredLightsV386,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      groupCount:groupCountV542,tier,budget:getVisualFactorsV640().led});
+    if(vocalFxCueV820.current.active){
+      const c=vocalFxCueV820.current,g=fxPerfV825.gains.vocal;
+      vocalFxCueV820.current={...c,leadOpacity:c.leadOpacity*g,
+        adlibOpacity:c.adlibOpacity*g};
+    }
+    // V826: read-only instrumentation uses the post-budget render cues, not theoretical
+    // maxima. Only publish every >=500ms; never set React state inside the R3F loop.
+    // WebGLRenderer.info counters describe a renderer snapshot, not GPU timings.
+    if(concertFxV810?.qualityDashboardV826!==false){
+      if(accumulateConcertFrameV826(qualityMonitorV826.current,delta,tier==='low'?30:60)){
+      const c=particlesCueV816.current,f=foamCueV817.current,k=kineticCueV817.current,
+        sp=spectralCueV818.current,crowd=crowdCueV815.current;
+      const info=state.gl.info;
+      const snapshot=completeConcertQualityV826(qualityMonitorV826.current,{
+        playing:isPlaying&&playback.playing,verified:fxCueV810.active&&fxCueV810.reason==='music',
+        targetFps:tier==='low'?30:60,pressure:fxPerfStateV825.current.pressure,
+        fxActive:fxPerfV825.active,fxCapacity:fxPerfV825.capacity,fxCost:fxPerfV825.cost,
+        gains:fxPerfV825.gains,performanceTier:tier,
+        autoQualityPressureV827:autoQualityStateV827.current.pressure,
+        autoQualityReasonV827:autoQualityStateV827.current.reason,
+        cameraAwareReasonV834:cameraBudgetV834.reason,
+        cameraAwareSavingsV834:cameraBudgetV834.relativeCostSaved,
+        cameraIntentV834:cameraBudgetV834.intent??undefined,
+        counts:{crowd:crowd.active?crowd.count:0,
+          sparks:c.active?c.sparks:0,shards:c.active?c.shards:0,confetti:c.active?c.confetti:0,
+          energyRings:c.active?c.rings:0,foamBubbles:f.active?f.bubbles:0,foamMist:f.active?f.mist:0,
+          kineticColumns:k.active?k.columns:0,
+          spectralWaves:sp.active?sp.waves:0,spectralRings:sp.active?sp.rings:0,
+          spectralPrisms:sp.active?sp.prisms:0},
+        rendererCalls:info.render.calls,rendererTriangles:info.render.triangles,
+        rendererGeometries:info.memory.geometries,rendererTextures:info.memory.textures});
+      // V827 uses only completed V826 sample windows: no per-frame tuner allocations.
+      // The verified V810 authority, manual FX switches and V825 floors still win.
+      advanceAutomaticQualityV827(autoQualityStateV827.current,{snapshot,
+        enabled:concertFxV810?.autoQualityV827!==false&&liveShowV827,
+        optimizerEnabled:concertFxV810?.perfOptimizerV825!==false,
+        response:concertFxV810?.autoResponseV827??'balanced'});
+      recordBenchmarkWindowV827({snapshot,count:groupCountV542,trackId:playback.trackId??'',
+        liveShow:liveShowV827,targetSeconds:12});
+      // V832: real scene and renderer evidence, sampled at most twice per second.
+      // Count actual V830 SkinnedMeshes, NOT merely configured performer slots.
+      // Draw-buffer pixels describe physical WebGL resolution including DPR.
+      recordRealGlbWindowV832({snapshot,
+        proof:inspectVisibleCastV830(state.scene,groupCountV542),
+        configuredCount:groupCountV542,trackId:playback.trackId??'',
+        progressMs:playback.positionMs,liveShow:liveShowV827,
+        pixelsX:state.gl.domElement.width,pixelsY:state.gl.domElement.height,
+        fxSignature:JSON.stringify(normalizeConcertFxV810(concertFxV810))});
+      // V830: verify visible skinned meshes in the actual performer slot roots.
+      // Collect only at a finished V826 measurement window, never per frame.
+      // This runs before V829 may finalize and clear the active case on last window.
+      recordCastWindowV830({key:getAcceptanceV829().active,scene:state.scene,
+        expected:groupCountV542,trackId:playback.trackId??'',progressMs:playback.positionMs,
+        playing:snapshot.playing,verified:snapshot.verified&&snapshot.available&&snapshot.sampleCount>=6&&snapshot.p95FrameMs>0,liveShow:liveShowV827});
+      // V829 records REAL nearly-complete songs (no synthetic quality verdict).
+      recordAcceptanceV829({snapshot,genre:fxCueV810.genre,count:groupCountV542,trackId:playback.trackId??'',
+        progressMs:playback.positionMs,durationMs:playback.durationMs,section:fxCueV810.section,
+        liveShow:liveShowV827});
+      publishConcertQualityV826(snapshot);qualityPublishedV826.current=true;
+      }
+    }else{
+      // No telemetry means no evidence for V827 feedback; drop cached overrides.
+      autoQualityStateV827.current.pressure=0;
+      autoQualityStateV827.current.badWindows=0;
+      autoQualityStateV827.current.goodWindows=0;
+      autoQualityStateV827.current.reason='off';
+      if(qualityPublishedV826.current){
+        clearConcertQualityV826();qualityPublishedV826.current=false;
+      }
+    }
+    const laser=laserMaterialV811.current;
+    if(laser){
+      const alpha=1-Math.exp(-Math.min(Math.max(delta,0),.1)*7);
+      laser.uniforms.uOpacity.value+=(Math.min(.20,fxCueV810.laserOpacity*(1+beatV822.laser*.22)*laserGainV823*(authoredFxV823.laser.boost>.001||authoredFxV823.laser.mute>.001?1:laserBlendV849))-laser.uniforms.uOpacity.value)*alpha;
+      laser.uniforms.uRibbons.value=Math.min(.35,fxCueV810.ribbonGain*(1+beatV822.laser*.18)*laserGainV823);
+      laser.uniforms.uLaserOn.value=concertFxV810?.lasers!==false?1:0;
+      laser.uniforms.uPhase.value=fxCueV810.phase;
+      laser.uniforms.uMode.value=fxCueV810.ledStyle;
+      (laser.uniforms.uPrimary.value as Color).set(fxCueV810.primary);
+      (laser.uniforms.uSecondary.value as Color).set(fxCueV810.secondary);
+      if(laserMeshV811.current)laserMeshV811.current.visible=laser.uniforms.uOpacity.value>.001&&
+        tier!=='low'&&fxCueV810.reason==='music';
+    }
+    const wallV821=planLedWallExperienceV821({fx:fxCueV810,
+      settings:(experienceV828.active&&experienceV828.ledLook!=='auto'?experienceV828.ledLook:smartMixV824.ledLook)==='auto'?concertFxV810:
+        {...normalizeConcertFxV810(concertFxV810),ledLookV821:experienceV828.active&&experienceV828.ledLook!=='auto'?experienceV828.ledLook:smartMixV824.ledLook},
+      tier,budget:ledBudgetV640,lyricsProtected:lyricsProtectedV542,
+      vocalFocus:vocalFocusV542,groupCount:groupCountV542});
+    if(led){
+      led.uniforms.uBeat22Kick.value=wallV821.active?beatV822.kick:0;
+      led.uniforms.uBeat22Snare.value=wallV821.active?beatV822.snareLike:0;
+      led.uniforms.uBeat22Peak.value=wallV821.active?beatV822.peak:0;
+      led.uniforms.uLed21Power.value=Math.min(.38,wallV821.power*ledGainV823*(authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001?1:ledBlendV849));
+      led.uniforms.uLed21Look.value=wallV821.look;
+      led.uniforms.uLed21Bass.value=wallV821.bass;
+      led.uniforms.uLed21Mids.value=wallV821.mids;
+      led.uniforms.uLed21Highs.value=wallV821.highs;
+      led.uniforms.uLed21Drop.value=Math.min(.8,wallV821.dropAccent*ledGainV823*(authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001?1:ledBlendV849));
+      led.uniforms.uLed21Phase.value=wallV821.phase;
+      led.uniforms.uLed21Tempo.value=wallV821.tempo;
+      led.uniforms.uLed21Variation.value=wallV821.variation+(experienceV828.active?experienceV828.signature*.18:0);
+      // Existing LED architecture morph; do not allocate or reposition meshes.
+      if(experienceV828.active&&led.uniforms.uStageMorph){
+        led.uniforms.uStageMorph.value=Math.min(.75,led.uniforms.uStageMorph.value+experienceV828.architectureMotion);
+      }
+      led.uniforms.uFxPower.value=Math.min(1,fxCueV810.ledGain*ledGainV823*(authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001?1:ledBlendV849));
+      if(fxCueV810.ledGain>.001){
+        (led.uniforms.uPrimary.value as Color).set(fxCueV810.primary);
+        (led.uniforms.uSecondary.value as Color).set(fxCueV810.secondary);
+      }
+      led.uniforms.uFxStyle.value=fxCueV810.ledStyle;
+      led.uniforms.uAudioBass.value=fxCueV810.bass;
+      led.uniforms.uAudioMids.value=fxCueV810.mids;
+      led.uniforms.uAudioHighs.value=fxCueV810.highs;
+      // The original V647 layer remains the authority and stays behind performers.
+    }
+    moodTintV622.current.copy(coolTintV622.current).lerp(warmTintV622.current,Math.max(0,Math.min(1,(transformationV622.tone+1)/2+(stageScaleV690.warmth+musicMoodV691.warmth)*.18)));
     const environmentRateV622=reducedMotion?1:1-Math.exp(-Math.min(Math.max(delta,0),.1)*2.6*1);
-    backgroundTargetV622.current.set(palette.base).lerp(moodTintV622.current,Math.min(.19,transformationV622.background+stageVisualV635.ambientTint*ledBudgetV640));
+    backgroundTargetV622.current.set(palette.base).lerp(moodTintV622.current,Math.min(.23,transformationV622.background+stageVisualV635.ambientTint*ledBudgetV640+stageScaleV690.ambientMix+evolutionRefV795.current.ambientMix));
+    // V828 colors only the existing background/floor and only when V810 has
+    // verified authority. Manual lighting remains an absolute stop.
+    if(experienceV828.active&&!timelineCue.color&&!manualLightingV763){
+      backgroundTargetV622.current.lerp(secondaryTintV828.current.set(fxCueV810.secondary),experienceV828.backgroundAccent);
+    }
     if(state.scene.background instanceof Color){state.scene.background.lerp(backgroundTargetV622.current,environmentRateV622);}
-    floorTargetV622.current.set(palette.floor).lerp(moodTintV622.current,Math.min(.22,transformationV622.floor+stageVisualV635.floorTint*ledBudgetV640));
+    floorTargetV622.current.set(palette.floor).lerp(moodTintV622.current,Math.min(.26,transformationV622.floor+stageVisualV635.floorTint*ledBudgetV640+stageScaleV690.floorMix+evolutionRefV795.current.floorMix));
+    if(experienceV828.active&&!timelineCue.color&&!manualLightingV763){
+      floorTargetV622.current.lerp(secondaryTintV828.current,experienceV828.backgroundAccent*.58);
+    }
     if(floorMaterialV622.current)floorMaterialV622.current.color.lerp(floorTargetV622.current,environmentRateV622);
     // Portrait key/fill are altered only very slightly and never override authored colors.
     if(transformationV622.active&&!timelineCue.color){
@@ -336,6 +1030,80 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     });
     // V609 shares the same verified playback/act across camera and both lighting
     // rigs. No extra polling or render callback; authored blackout stays instant.
+    // V793: verified V604 act + V761 storyboard, same playback as camera V792.
+    // Completely bypass on authored cues, blackout, protected motion and low tier.
+    const choreographyV793=planAdvancedLightChoreographyV793({
+      trackId:playback.trackId,durationMs:playback.durationMs,positionMs:playback.positionMs,
+      playing:isPlaying&&playback.playing,reactive,reducedMotion,tier,
+      authored:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false||
+        !concertShowLightingV387||timelineGainV354!==1,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||
+        timelineGainV354<=0,lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      genre,energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,
+      scene:cinematicCueV761,narrative:cameraNarrativeV605,
+    });
+    lightChoreographyV793.current=choreographyV793;
+    // V841: bounded refinements of existing shaders/spotlight, from VERIFIED V793
+    // choreography only. Fail closed on authored cues, low tier or blackout.
+    const actSectionV841=choreographyV793.active?
+      cameraNarrativeV605?.plan.acts[cinematicCueV761?.actIndex??-1]?.section??'':'off';
+    const professionalV841=planProfessionalLightingV841({
+      settings:{professionalLightingV841:concertFxV810?.professionalLightingV841!==false,
+        lightingStrengthV841:concertFxV810?.lightingStrengthV841??65,
+        lightingStyleV841:concertFxV810?.lightingStyleV841??'balanced'},
+      choreography:choreographyV793,section:actSectionV841,
+      positionMs:playback.positionMs,durationMs:playback.durationMs,
+      sceneBlend:cinematicCueV761?.blend??0,
+      enabledFx:concertFxV810?.enabled!==false&&fxCueV810.active,
+      playing:isPlaying&&playback.playing,reducedMotion,tier,
+      manualLighting:manualLightingV763||authoredLightsV386||timelineGainV354!==1||
+        showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      lasersEnabled:concertFxV810?.lasers!==false&&fxCueV810.laserOpacity>0&&
+        authoredFxV823.laser.boost<=.001&&authoredFxV823.laser.mute<=.001&&laserGainV823>0,
+      gobosAvailable:scenicLightingV762?.enabled!==true,
+      energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,
+      laserBudget:getVisualFactorsV640().beams,goboBudget:budgetV772.centerSpot?1:0,
+    });
+    // V842: extend the EXISTING single LED shader, after V841 confirmed light cue.
+    // V823 manually authored LED lanes and explicit V821 modes take absolute priority.
+    const wallDepthV842=planLedWallExperienceV842({
+      fx:fxCueV810,wall:wallV821,settings:concertFxV810,light:professionalV841,
+      section:fxCueV810.section,playing:isPlaying&&playback.playing,reducedMotion,tier,
+      budget:ledBudgetV640,timelineGain:Math.min(1,Math.max(0,ledGainV823)),
+      manualLed:authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false||
+        timelineGainV354!==1,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+    });
+    if(led){
+      const u=led.uniforms;
+      u.uLed42Power.value=wallDepthV842.power*(authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001?1:ledBlendV849);
+      u.uLed42Mode.value=wallDepthV842.mode;
+      u.uLed42Depth.value=wallDepthV842.depth;
+      u.uLed42Geometry.value=wallDepthV842.geometry;
+      u.uLed42Tunnel.value=wallDepthV842.tunnel;
+      u.uLed42Phase.value=wallDepthV842.phase;
+      u.uLed42Flow.value=wallDepthV842.flow;
+      u.uLed42LightLink.value=wallDepthV842.lightLink;
+    }
+    // Explicit scenic settings have priority over the automatic V841 floor Gobo.
+    if(goboMaterialV762.current){
+      const u=goboMaterialV762.current.uniforms;
+      u.uScale.value=professionalV841.active&&professionalV841.goboOpacity>0?professionalV841.goboScale:1;
+      if(professionalV841.active&&professionalV841.goboOpacity>0){
+        u.uOpacity.value=professionalV841.goboOpacity;
+        u.uPattern.value=professionalV841.goboPattern;
+        u.uPhase.value=professionalV841.goboPhase;
+        if(goboMeshV762.current)goboMeshV762.current.visible=true;
+      }
+    }
+    if(laserMaterialV811.current){
+      laserMaterialV811.current.uniforms.uFanSpread.value=professionalV841.active?professionalV841.laserSpread:1;
+      laserMaterialV811.current.uniforms.uFanMotion.value=professionalV841.active?professionalV841.laserMotion:0;
+    }
     const lightingBlendV609=planSeamlessConcertTransitionV609({
       narrative:cameraNarrativeV605,trackId:playback.trackId,
       positionMs:playback.positionMs,playing:isPlaying&&playback.playing,
@@ -344,8 +1112,21 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
         timelineCue.blackout>0||timelineCue.strobe>0||timelineGainV354<=0||
         showCue?.lightingEnabled===false,
     });
-    const lerp=1-Math.exp(-Math.min(Math.max(delta,0),.1)*9*lightingBlendV609.lightingRate);
-    const colorFade=reducedMotion?1:1-Math.exp(-Math.min(Math.max(delta,0),.1)*2.4*lightingBlendV609.lightingRate);
+    const lerp=1-Math.exp(-Math.min(Math.max(delta,0),.1)*9*Math.min(lightingBlendV609.lightingRate,!(authoredLightsV386||!reactive||manualLightingV763||timelineCue.blackout>0||timelineCue.strobe>0||timelineGainV354<=0)&&transitionV791?.active?transitionV791.lightingRate:1));
+    const colorFade=reducedMotion?1:1-Math.exp(-Math.min(Math.max(delta,0),.1)*2.4*Math.min(lightingBlendV609.lightingRate,!(authoredLightsV386||!reactive||manualLightingV763||timelineCue.blackout>0||timelineCue.strobe>0||timelineGainV354<=0)&&transitionV791?.active?transitionV791.lightingRate:1));
+    // V794 accents only the existing beam + architecture in automatic scenes.
+    // Authored lighting, blackouts, singer focus and lyric visibility take priority.
+    const peakLightingAllowedV794=epicPeakV794?.active===true&&
+      epicPeakV794.trackId===playback.trackId&&epicPeakV794.durationMs===playback.durationMs&&
+      playback.positionMs>=epicPeakV794.sceneStartMs&&playback.positionMs<epicPeakV794.sceneEndMs&&
+      !authoredLightsV386&&!manualLightingV763&&reactive&&isPlaying&&playback.playing&&
+      !reducedMotion&&tier!=='low'&&concertShowLightingV387&&
+      timelineCue.blackout<=0&&timelineCue.strobe<=0&&timelineCue.scale>0&&
+      timelineGainV354>0;
+    // Separate ref prevents V789 from bypassing actual saved timeline blackouts.
+    peakCueRefV794.current=peakLightingAllowedV794?epicPeakV794:null;
+    const peakBeamGainV794=peakLightingAllowedV794&&!lyricsProtectedV542&&
+      !vocalFocusV542?Math.max(.78,Math.min(1.09,epicPeakV794?.lightingGain??1)):1;
     // V497 uses only existing rig lights; do not brighten manual timelines or blackouts.
     const cinematicKeyV497=concertLightMultiplierV497(cinematicCueV497,"key",{
       authored:authoredLightsV386,
@@ -445,8 +1226,16 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       targetPrimary.current.set(timelineCue.color ?? musicPalette?.primary ?? palette.primary),colorFade);
     if (beam.current) beam.current.color.lerp(
       targetSecondary.current.set(musicPalette?.secondary ?? palette.secondary),colorFade);
-    const keyTargetV462=Math.min(3,Math.max(lightingV542.faceFloor||lightingV462.faceFloor,directed(cue.key)*lightScale*showGain*lightingV462.keyGain*lightingV542.keyGain*lightingV551.keyGain*lightingV608.key*concertGenreV610.key*lightingV621.key*concertContinuityV611.key*cinematicKeyV497)*performerPlanV557.keyGain);
-    const fillTargetV462=Math.min(2.4,Math.max(Math.max(lightingV462.faceFloor,lightingV542.faceFloor)*.75,directed(cue.fill)*lightScale*showGain*lightingV462.fillGain*lightingV542.fillGain*lightingV551.fillGain*lightingV608.fill*concertGenreV610.fill*lightingV621.fill*concertContinuityV611.fill)*performerPlanV557.fillGain);
+    // V797: only existing portrait lights, no new fixtures/renderer pass.
+    // Cross-check the LIVE authored timeline and blackout, not only the UI flag.
+    const vocalSafeV797=!!vocalSpotlightV797?.lightingActive&&!authoredLightsV386&&
+      isPlaying&&reactive&&!reducedMotion&&tier!=='low'&&
+      !timelineCue.color&&timelineCue.blackout<=0&&timelineCue.strobe<=0&&
+      timelineCue.scale>0&&timelineGainV354>0&&showCue?.lightingEnabled!==false;
+    const vocalKeyV797=vocalSafeV797?(vocalSpotlightV797?.keyGain??1):1;
+    const vocalFillV797=vocalSafeV797?(vocalSpotlightV797?.fillGain??1):1;
+    const keyTargetV462=Math.min(3,Math.max(lightingV542.faceFloor||lightingV462.faceFloor,directed(cue.key)*lightScale*showGain*lightingV462.keyGain*lightingV542.keyGain*lightingV551.keyGain*lightingV608.key*lightingMixV749Now.key*concertGenreV610.key*lightingV621.key*concertContinuityV611.key*cinematicKeyV497)*performerPlanV557.keyGain*vocalKeyV797);
+    const fillTargetV462=Math.min(2.4,Math.max(Math.max(lightingV462.faceFloor,lightingV542.faceFloor)*.75,directed(cue.fill)*lightScale*showGain*lightingV462.fillGain*lightingV542.fillGain*lightingV551.fillGain*lightingV608.fill*lightingMixV749Now.fill*concertGenreV610.fill*lightingV621.fill*concertContinuityV611.fill)*performerPlanV557.fillGain*vocalFillV797);
     // V559 applies only capped percentages to existing V462/V557 light targets.
     // These factors never overpower a manual cue, low tier, pause, or blackout.
     const beatKeyTargetV559=Math.min(3,keyTargetV462*(1+beatPortraitPlanV559.keyLift*beatScaleV559+cinematicPlanV566.keyLift*cinematicScaleV566));
@@ -454,10 +1243,19 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     if (key.current) key.current.intensity += (beatKeyTargetV559-key.current.intensity)*lerp;
     if (fill.current) fill.current.intensity += (beatFillTargetV559-fill.current.intensity)*lerp;
     if (floorLight.current) floorLight.current.intensity += ((sceneFlags.extraLights ? Math.min(2.5,directed(cue.floor) * lightScale * showGain) : 0) - floorLight.current.intensity) * lerp;
+    // V844: optional narrow stage-floor strobe, never a fullscreen or portrait flash.
+    // Apply after normal lighting interpolation, under the original budget visibility mask.
+    if(floorLight.current&&floorLight.current.visible&&festivalCueV844.current.strobeGain>0)
+      floorLight.current.intensity=Math.min(2.5,floorLight.current.intensity+festivalCueV844.current.strobeGain);
     if (beam.current) {
-      beam.current.intensity += ((sceneFlags.extraLights ? (theme === "minimal" ? .2 : Math.min(3.0,directed(cue.beam) * (1 + smartCue.sweep * .12) * showBeam * lightingV462.beamGain * lightingV542.beamGain * lightingV551.beamGain * lightingV608.beam * concertGenreV610.beam * lightingV621.beam * concertContinuityV611.beam * cinematicBeamV497)) * lightScale : 0) - beam.current.intensity) * lerp;
+      beam.current.intensity += ((sceneFlags.extraLights ? (theme === "minimal" ? .2 : Math.min(3.0,directed(cue.beam) * (1 + smartCue.sweep * .12) * showBeam * lightingV462.beamGain * lightingV542.beamGain * lightingV551.beamGain * lightingV608.beam * lightingMixV749Now.beam * concertGenreV610.beam * lightingV621.beam * concertContinuityV611.beam * cinematicBeamV497*scenicCueV762.current.beamGain * peakBeamGainV794 * (lightAccentV386.focusSlot===null&&!(cinematicBeamV497>1&&cinematicCueV497?.focusSlot!=null)?choreographyV793.beamGain:1))) * lightScale : 0) - beam.current.intensity) * lerp;
       beam.current.position.x = sceneFlags.beamSweep && cue.sweep && !reducedMotion && tier === "high"
-        ? Math.sin(state.clock.elapsedTime * .65) * (1.2 + cue.sweep + director.sweep + predictive.anticipation * .15 + smartCue.sweep * .24) * lightingV462.sweepGain * lightingV542.sweepGain * lightingV551.sweepGain * lightingV608.sweep * concertGenreV610.sweep * lightingV621.sweep * concertContinuityV611.sweep : 0;
+        ? Math.sin(state.clock.elapsedTime * .65) * (1.2 + cue.sweep + director.sweep + predictive.anticipation * .15 + smartCue.sweep * .24) * lightingV462.sweepGain * lightingV542.sweepGain * lightingV551.sweepGain * lightingV608.sweep * lightingMixV749Now.sweep * concertGenreV610.sweep * lightingV621.sweep * concertContinuityV611.sweep : 0;
+      if(scenicCueV762.current.active&&sceneFlags.beamSweep&&!lyricsProtectedV542&&
+          (cinematicCueV497?.focusSlot===null||cinematicCueV497?.focusSlot===undefined)&&
+          lightAccentV386.focusSlot===null){
+        beam.current.position.x=Math.max(-2.1,Math.min(2.1,beam.current.position.x+scenicCueV762.current.beamOffset));
+      }
       // V497 may focus the existing beam even when V386 concert lighting is disabled.
       // Never steer a user-authored lighting timeline or a deliberate blackout.
       const lightFocusV497=cinematicBeamV497>1?cinematicCueV497?.focusSlot:null;
@@ -490,12 +1288,30 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
         }
       }
     }
+    // V793: steer only the existing shadow-free spotlight. Singer-assigned beams
+    // take priority, and disabling the choreography restores the neutral target.
+    if(beam.current&&beamTargetV793.current){
+      if(beam.current.target!==beamTargetV793.current)beam.current.target=beamTargetV793.current;
+      const hasSingerBeam=lightAccentV386.focusSlot!==null||
+        (cinematicBeamV497>1&&cinematicCueV497?.focusSlot!=null);
+      const eligible=choreographyV793.active&&!hasSingerBeam&&
+        sceneFlags.beamSweep&&sceneFlags.extraLights&&budgetV772.centerSpot;
+      const rate=eligible?1-Math.exp(-Math.min(Math.max(delta,0),.1)*4):1;
+      const targetX=eligible?choreographyV793.sweep*(professionalV841.active?professionalV841.sweepScale:1):0;
+      const targetZ=eligible?choreographyV793.tilt:0;
+      beamTargetV793.current.position.x+=(targetX-beamTargetV793.current.position.x)*rate;
+      beamTargetV793.current.position.z+=(targetZ-beamTargetV793.current.position.z)*rate;
+      const angle=eligible?.5+Math.min(.07,choreographyV793.depth*.10)+(professionalV841.active?professionalV841.angleAdd:0):.5;
+      beam.current.angle+=(angle-beam.current.angle)*rate;
+      // Beam gain is part of the already capped target above, never multiplied
+      // onto the previous frame (which would accumulate extra brightness).
+    }
     // V557: track real stage roots, not a synthetic singer position. Existing lights only.
     // Target position follows the actual performers with smooth, bounded travel and returns
     // to the authored default when no trusted cast is present or light cues take priority.
-    followPerformerLightV557(state.scene,performerPlanV557.focusSlot,homeKeyV557.current,
+    followPerformerLightV557(state.scene,(vocalSafeV797?vocalSpotlightV797?.leadSlot:null)??performerPlanV557.focusSlot??lightingV749.focusSlot,homeKeyV557.current,
       key.current,followPositionV557.current,-.65,lerp,cinematicPlanV566.enabled?cinematicPlanV566.faceBalance:portraitPlanV558.faceBodyBalance);
-    followPerformerLightV557(state.scene,portraitPlanV558.enabled?portraitPlanV558.fillSlot:performerPlanV557.partnerSlot,homeFillV557.current,
+    followPerformerLightV557(state.scene,(vocalSafeV797?vocalSpotlightV797?.partnerSlot:null)??(portraitPlanV558.enabled?portraitPlanV558.fillSlot:(performerPlanV557.partnerSlot??lightingV749.partnerSlot)),homeFillV557.current,
       fill.current,followPositionV557.current,.65,lerp,cinematicPlanV566.enabled?cinematicPlanV566.faceBalance:portraitPlanV558.faceBodyBalance);
     if (pulseMesh.current) {
       const visible = sceneFlags.pulse && tier !== "low" && theme !== "minimal" && reactive && isPlaying && !reducedMotion && cue.glow > .015;
@@ -509,22 +1325,94 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
   return <group>
     <color attach="background" args={[palette.base]}/>
     <ambientLight intensity={theme === "minimal" ? 1.2 : 0.9}/>
-    <ConcertAtmosphereRendererV308 cameraSectionV608={cameraSectionV608} cameraNarrativeV605={cameraNarrativeV605} concertSceneV551={concertLipSyncV386?.cinematicSceneV528} genreV462={genre} lyricsProtectedV542={lyricsProtectedV542} groupCountV542={groupCountV542} vocalFocusV542={vocalFocusV542} audio={audio} isPlaying={isPlaying} reducedMotion={reducedMotion} reactive={reactive} theme={theme} musicPalette={musicPalette} showCue={showCue} timelineGainRef={atmosphereTimelineGain} sectionRef={atmosphereSection} concertShowCueV387={concertShowAtmosphereV387?concertShowCueV387:undefined} festivalShowCueV394={festivalShowAtmosphereV394?festivalShowCueV394:undefined} festivalShowLasersV394={festivalShowLasersV394}
+    {/* V789: one instanced architectural backdrop, read-only to playback and authored cues. */}
+    <VirtualConcertCrowdV815 cueRef={crowdCueV815}/>
+    <ReactiveParticleStudioV816 cueRef={particlesCueV816}/>
+    <FestivalCo2V844 cueRef={festivalCueV844}/>
+    <SoapBubblesV8441 cueRef={soapBubbleCueV8441}/>
+    <FullStageFlashV8441 cueRef={fullStageFlashCueV8441}/>
+    <PaperStreamersV846 cueRef={paperStreamersCueV846}/>
+    <FestivalFinaleV847 cueRef={festivalFinaleCueV847}/>
+    <KineticStageV817 cueRef={kineticCueV817}/>
+    <FoamCannonV817 cueRef={foamCueV817}/>
+    <ConcertMomentCrownV828 cueRef={crownCueV828}/>
+    <SpectralMusicVisualsV818 cueRef={spectralCueV818}/>
+    <CinematicSceneTransitionV819 cueRef={transitionCueV819}/>
+    <VocalAdlibFxV820 cueRef={vocalFxCueV820}/>
+    <ConcertArchitectureV789 key={theme} theme={theme} audio={audio} isPlaying={isPlaying}
+      reactive={reactive} reducedMotion={reducedMotion}
+      primary={musicPalette?.primary??palette.primary} secondary={musicPalette?.secondary??palette.secondary}
+      sectionRef={atmosphereSection} timelineGainRef={atmosphereTimelineGain}
+      timelineGain={timelineGainV354} strength={strength} showCue={showCue} cinematicCue={cinematicCueV761}
+      lyricsProtected={lyricsProtectedV542} manualLighting={manualLightingV763}
+      choreographyRefV793={lightChoreographyV793} peakRefV794={peakCueRefV794}
+      evolutionRefV795={evolutionRefV795}/>
+    <ConcertAtmosphereRendererV308 transitionV791={transitionV791?.active&&!manualLightingV763?transitionV791:undefined} scenicCueRefV762={scenicCueV762} cameraSectionV608={cameraSectionV608} cameraNarrativeV605={cameraNarrativeV605} concertSceneV551={concertLipSyncV386?.cinematicSceneV528} genreV462={genre} lyricsProtectedV542={lyricsProtectedV542} groupCountV542={groupCountV542} vocalFocusV542={vocalFocusV542} audio={audio} isPlaying={isPlaying} reducedMotion={reducedMotion} reactive={reactive} theme={theme} musicPalette={musicPalette} showCue={showCue} timelineGainRef={atmosphereTimelineGain} sectionRef={atmosphereSection} concertShowCueV387={concertShowAtmosphereV387?concertShowCueV387:undefined} festivalShowCueV394={festivalShowAtmosphereV394?festivalShowCueV394:undefined} festivalShowLasersV394={festivalShowLasersV394}
       authoredLightingV387={timeline.current.cues.length>0||timelineGainV354!==1||showCue?.lightingEnabled===true||showCue?.lightingEnabled===false}/>
+    {/* V762: low-cost procedural floor gobo, depth-tested and never above performers. */}
+    <mesh ref={goboMeshV762} name="v762-floor-gobo" visible={false} position={[0,-1.928,-0.15]} rotation={[-Math.PI/2,0,0]} renderOrder={1}>
+      <planeGeometry args={[4.2,3.5]}/>
+      <shaderMaterial ref={goboMaterialV762} transparent depthWrite={false} depthTest
+        vertexShader={GOBO_VERTEX_V762} fragmentShader={GOBO_FRAGMENT_V762}
+        uniforms={{uColor:{value:new Color(palette.secondary)},uOpacity:{value:0},uPattern:{value:0},uPhase:{value:0},uScale:{value:1}}}/>
+    </mesh>
     {/* V635: back-wall LED pattern is one low-cost mesh behind the cast.
         When disabled its draw call is gated; it cannot cover a singer/lyrics. */}
     <mesh ref={ledWallV635} visible={false} position={[0,0.05,-3.8]} renderOrder={-1}>
       <planeGeometry args={[6.2,3.35]}/>
       <shaderMaterial ref={ledMaterialV635} transparent depthWrite={false}
-        vertexShader={LED_WALL_VERTEX_V635} fragmentShader={LED_WALL_FRAGMENT_V647}
+        vertexShader={LED_WALL_VERTEX_V635} fragmentShader={LED_WALL_FRAGMENT_V842}
         uniforms={{uOpacity:{value:0},uPattern:{value:0},uPhase:{value:0},uSpeed:{value:0},
-          uSceneStyle:{value:0},uVariation:{value:0},uArchitecture:{value:0},uDepth:{value:0},uMotion:{value:0},
+          uSceneStyle:{value:0},uStageMorph:{value:0},uVariation:{value:0},uArchitecture:{value:0},uDepth:{value:0},uMotion:{value:0},
+          uLed21Power:{value:0},uLed21Look:{value:0},uLed21Bass:{value:0},
+          uLed21Mids:{value:0},uLed21Highs:{value:0},uLed21Drop:{value:0},
+          uLed21Phase:{value:0},uLed21Tempo:{value:0},uLed21Variation:{value:0},
+          uLed42Power:{value:0},uLed42Mode:{value:0},uLed42Depth:{value:0},
+          uLed42Geometry:{value:0},uLed42Tunnel:{value:0},uLed42Phase:{value:0},
+          uLed42Flow:{value:0},uLed42LightLink:{value:0},
+          uBeat22Kick:{value:0},uBeat22Snare:{value:0},uBeat22Peak:{value:0},
+          uFxPower:{value:0},uFxStyle:{value:0},uAudioBass:{value:0},uAudioMids:{value:0},uAudioHighs:{value:0},
           uPrimary:{value:new Color(palette.primary)},uSecondary:{value:new Color(palette.secondary)}}}/>
+    </mesh>
+    {/* V811: one lightweight laser/ribbon shader behind all performers, no flashes. */}
+    <mesh ref={laserMeshV811} name="v811-laser-matrix" visible={false} position={[0,0.05,-3.57]} renderOrder={-1}>
+      <planeGeometry args={[6.3,3.4]}/>
+      <shaderMaterial ref={laserMaterialV811} transparent depthWrite={false} depthTest
+        blending={importedAdditiveBlendingV811}
+        vertexShader={LASER_MATRIX_VERTEX_V811} fragmentShader={LASER_MATRIX_FRAGMENT_V811}
+        uniforms={{uOpacity:{value:0},uLaserOn:{value:1},uRibbons:{value:0},uPhase:{value:0},uMode:{value:0},uFanSpread:{value:1},uFanMotion:{value:0},
+          uPrimary:{value:new Color('#35b5d8')},uSecondary:{value:new Color('#8d3bd2')}}}/>
+    </mesh>
+    {/* V813 uses a single shared canvas texture, behind singers or on the floor.
+        Avoid geometry or texture creation per beat. Existing lyric renderer is untouched. */}
+    <mesh name="v813-lyrics-wall-projection" ref={lyricsWallV813} visible={false} position={[-1.58,-1.27,-3.44]} renderOrder={-1}>
+      <planeGeometry args={[2.75,.68]}/>
+      <meshBasicMaterial ref={lyricsWallMatV813} transparent opacity={0} depthWrite={false} depthTest toneMapped={false}/>
+    </mesh>
+    <mesh name="v813-lyrics-floor-projection" ref={lyricsFloorV813} visible={false} rotation={[-Math.PI/2,0,0]} position={[0,-1.909,-1.18]} renderOrder={1}>
+      <planeGeometry args={[2.8,.78]}/>
+      <meshBasicMaterial ref={lyricsFloorMatV813} transparent opacity={0} depthWrite={false} depthTest toneMapped={false}/>
+    </mesh>
+    {/* V814 procedural low-opacity haze layer AND backstage shaft graphics.
+        Performance and low-tier skip expensive shafts; V308 remains Fog owner. */}
+    <mesh name="v814-floor-haze" ref={hazeFloorV814} visible={false} rotation={[-Math.PI/2,0,0]} position={[0,-1.913,-.6]} renderOrder={1}>
+      <planeGeometry args={[5.7,3.5]}/>
+      <shaderMaterial ref={hazeFloorMatV814} transparent depthWrite={false} depthTest
+        vertexShader={ATMOSPHERE_VERTEX_V814} fragmentShader={ATMOSPHERE_FRAGMENT_V814}
+        uniforms={{uColor:{value:new Color(palette.primary)},uOpacity:{value:0},uPhase:{value:0},uKind:{value:0}}}/>
+    </mesh>
+    <mesh name="v814-backstage-light-shafts" ref={hazeShaftsV814} visible={false} position={[0,.02,-3.52]} renderOrder={-1}>
+      <planeGeometry args={[6.2,3.4]}/>
+      <shaderMaterial ref={hazeShaftsMatV814} transparent depthWrite={false} depthTest
+        blending={importedAdditiveBlendingV811}
+        vertexShader={ATMOSPHERE_VERTEX_V814} fragmentShader={ATMOSPHERE_FRAGMENT_V814}
+        uniforms={{uColor:{value:new Color(palette.primary)},uOpacity:{value:0},uPhase:{value:0},uKind:{value:1}}}/>
     </mesh>
     <pointLight ref={key} color={palette.primary} position={[-2.3, 2.4, 2.2]} intensity={1.1} distance={11}/>
     <pointLight ref={fill} color={palette.secondary} position={[2.4, 1.5, 1.8]} intensity={0.65} distance={10}/>
     <pointLight ref={floorLight} color={palette.primary} position={[0, -1.6, 0.4]} intensity={0.45} distance={7}/>
-    <spotLight ref={beam} color={palette.secondary} position={[0, 3.0, 1.4]} angle={0.5} penumbra={0.9} intensity={0.7} distance={9}/>
+    <spotLight ref={beam} color={palette.secondary} position={[0, 3.0, 1.4]} angle={0.5} penumbra={0.9} intensity={0.7} distance={9} castShadow={false}/>
+    <object3D ref={beamTargetV793} name="v793-reused-spotlight-target" position={[0,0,0]}/>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.95, 0]}>
       <circleGeometry args={[3.2, 48]}/><meshStandardMaterial ref={floorMaterialV622} color={palette.floor} roughness={0.7} metalness={0.18}/>
     </mesh>

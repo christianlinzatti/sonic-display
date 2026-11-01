@@ -1,0 +1,1 @@
+{"extends":"../tsconfig.json","compilerOptions":{"incremental":false,"plugins":[],"noEmit":true},"files":["../lib/lastfm-history-v706.ts","../lib/automatic-lastfm-history-v708.ts","../lib/lastfm-recovery-v709.ts"],"include":[],"exclude":[]}

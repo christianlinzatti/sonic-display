@@ -1,9 +1,11 @@
 "use client";
+import {ModelPreviewBoundaryV733} from "./ModelPreviewBoundaryV733";
 import {Suspense,useEffect,useMemo,useState} from 'react';
 import {Canvas,useFrame} from '@react-three/fiber';
 import {OrbitControls,useGLTF} from '@react-three/drei';
 import {AnimationMixer,type AnimationClip,type Group} from 'three';
-import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {withPrivateGltfV769} from './privateGltfLifecycleV769';
+import {disposeClonedAvatarSkeletonsV654} from './disposeClonedAvatarSkeletonsV654';
 import {clone as cloneSkinnedScene} from 'three/examples/jsm/utils/SkeletonUtils.js';
 import {retargetHumanoidClips,readRetargetCalibration} from './avatarAnimationRetarget';
 import {timelinePosition,timelineWeights,type MotionTimeline} from './motionTimelineEngine';
@@ -16,11 +18,9 @@ function Preview({modelUrl,animationUrl,timeline,seconds}:{modelUrl:string;anima
  useEffect(()=>{
    let cancelled=false;setExternal([]);
    if(!animationUrl)return;
-   new GLTFLoader().load(animationUrl,gltf=>{
-     if(cancelled)return;
-     const result=retargetHumanoidClips(gltf.animations,gltf.scene,cloned,readRetargetCalibration(modelUrl));
-     setExternal(result.clips);
-   },undefined,()=>{if(!cancelled)setExternal([]);});
+   void withPrivateGltfV769(animationUrl,gltf=>retargetHumanoidClips(gltf.animations,gltf.scene,cloned,readRetargetCalibration(modelUrl)).clips)
+     .then(clips=>{if(!cancelled)setExternal(clips);})
+     .catch(()=>{if(!cancelled)setExternal([]);});
    return()=>{cancelled=true;};
  },[animationUrl,cloned,modelUrl]);
  const catalog=useMemo(()=>[
@@ -28,8 +28,8 @@ function Preview({modelUrl,animationUrl,timeline,seconds}:{modelUrl:string;anima
    ...external.map(c=>({name:`Imported: ${c.name}`,clip:c})),
  ],[animations,external]);
  const actions=useMemo(()=>catalog.map(c=>({...c,action:mixer.clipAction(c.clip)})),[catalog,mixer]);
- useEffect(()=>{mixer.stopAllAction();},[mixer,actions]);
- useEffect(()=>()=>{mixer.stopAllAction();mixer.uncacheRoot(cloned);},[mixer,cloned]);
+ useEffect(()=>{mixer.stopAllAction();return()=>{for(const clip of external){mixer.uncacheAction(clip,cloned);mixer.uncacheClip(clip);}};},[mixer,external,cloned]);
+ useEffect(()=>()=>{mixer.stopAllAction();mixer.uncacheRoot(cloned);disposeClonedAvatarSkeletonsV654(cloned);},[mixer,cloned]);
  useFrame(()=>{
    const position=timelinePosition(timeline,seconds);
    const weights=timelineWeights(timeline,seconds);
@@ -50,12 +50,12 @@ export function MotionTimelinePreview3DV319({modelUrl,animationUrl,timeline,seco
  if(!modelUrl)return <p>Kein 3D-Avatar ausgewählt.</p>;
  return <section aria-label="3D Timeline Motion Vorschau V319" style={{minWidth:0}}>
    <div style={{height:320,borderRadius:10,overflow:'hidden',background:'#121b2a',border:'1px solid #495b75'}}>
-     <Canvas camera={{position:[0,1.35,4.2],fov:42}} dpr={[1,1.4]}>
+     <ModelPreviewBoundaryV733 key={`${modelUrl}:${animationUrl}`} onRetry={()=>{if(modelUrl)useGLTF.clear(modelUrl);if(animationUrl)useGLTF.clear(animationUrl);}}><Canvas camera={{position:[0,1.35,4.2],fov:42}} dpr={[1,1.4]}>
        <ambientLight intensity={1.1}/><directionalLight position={[3,6,5]} intensity={1.8}/>
        <Suspense fallback={null}><Preview modelUrl={modelUrl} animationUrl={animationUrl} timeline={timeline} seconds={seconds}/></Suspense>
        <OrbitControls enablePan={false} minDistance={2} maxDistance={8}/>
        <gridHelper args={[8,12,'#53657a','#293144']} position={[0,-1.05,0]}/>
-     </Canvas>
+     </Canvas></ModelPreviewBoundaryV733>
    </div>
    <small>Die 3D-Vorschau verwendet dieselben Clip-Gewichte und Zeitpositionen wie die Mehrspur-Timeline. Externe GLB-Clips werden retargetet; ihr Aussehen hängt vom Rig ab. Es wird kein Spotify-Audio wiedergegeben.</small>
  </section>;

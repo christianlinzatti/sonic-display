@@ -30,6 +30,8 @@ import type {RapGrooveSettings} from "./rapGrooveEngine";
 import type {AvatarRigTargets} from "./avatarRigController";
 import type {VisualizerProps} from "./registry";
 import {getActivePerformanceTier} from "./adaptivePerformance";
+import {directVocalPerformanceV746,resolveVocalRoleV746} from "./vocalPerformanceDirectorV746";
+import {directVocalBodySyncV757} from "./vocalBodySyncV757";
 
 type Args={
   propsLipSyncV367:VisualizerProps['lipSync'];trackId:string;audio:VisualizerProps['audio'];
@@ -201,8 +203,57 @@ export function applyGltfVocalPerformanceV492({propsLipSyncV367,trackId,audio,ge
     });
     expressiveRapV510=synchronizeRapExpressionV516(expressiveRapV510,{lyrics:propsLipSyncV367?.lyrics,effectiveTimeMs:synchronizedV372.effectiveTimeMs,section:showCue?.enabled?showCue.section:performanceSection});
     const rapBodyV510=composeExpressiveRapStageV510(rapBodyV503,expressiveRapV510);
-    applyVocalStageOverlayV371(rigTargets.current,
-      addAdvancedVocalHeadV459(addExpressiveHeadV453(rapBodyV510,lipHeadV453),lipHeadV523),
+    // V746: Only a confirmed, track-matching singer (or a solo performer)
+    // receives extra head/body expression. Mouth, face and background dance
+    // continue through their existing independent pipelines.
+    const cueForThisTrackV746=!!trackId&&(
+      trackId===propsLipSyncV367?.manualVocalTrackIdV385||
+      trackId===propsLipSyncV367?.rapDuetTrackIdV416||
+      trackId===propsLipSyncV367?.vocalTimeTrackIdV496);
+    const authoredCueV746=cueForThisTrackV746&&confirmedSingerV453?.active===true;
+    const timedCueV746=cueForThisTrackV746&&vocalTimeV510&&lipHeadV499.activeV499===true;
+    const roleV746=resolveVocalRoleV746({slot:workloadSlot,
+      count:propsLipSyncV367?.ensembleCountV374??1,trackId,
+      cueTrackIds:[propsLipSyncV367?.manualVocalTrackIdV385,
+        propsLipSyncV367?.rapDuetTrackIdV416,propsLipSyncV367?.vocalTimeTrackIdV496],
+      assignedSlots:authoredCueV746?confirmedSingerV453.singingSlots:undefined,
+      authoredCueActive:authoredCueV746,timedCueActive:timedCueV746});
+    const baseVocalBodyV746=addAdvancedVocalHeadV459(addExpressiveHeadV453(rapBodyV510,lipHeadV453),lipHeadV523);
+    const vocalPerformanceV746=directVocalPerformanceV746({
+      settings:{...groovePreferences.avatarVocalPerformanceV746,
+        strength:(groovePreferences.avatarVocalPerformanceV746?.strength??65)*
+          (propsLipSyncV367?.qualityVocalGainV750??1)},body:baseVocalBodyV746,
+      vocal:synchronizedV372.vocal,role:roleV746,playing:isPlaying&&propsLipSyncV367?.playing!==false&&propsLipSyncV367?.enabled!==false,
+      reducedMotion,manualBodyPriority:avatarMotionMode==='choreography'||!!stableLibraryClip,
+      bodyEnabled:propsLipSyncV367?.bodyEnabledV371!==false,
+      gesturesEnabled:propsLipSyncV367?.gesturesV371!==false,
+      genre,focus:synchronizedV372.focus,
+      section:showCue?.enabled?showCue.section:performanceSection,
+    });
+    // V757: verified word-onset timing + existing mouth activity -> additional
+    // additive body cue, still through the *same* smoothed V371 overlay.
+    // No guessed syllables, singer identification, second animation loop or face writes.
+    const syncedBodyV757=directVocalBodySyncV757({
+      // V750 quality gate also governs V757's new automatic body accents.
+      // A lower quality budget must never accidentally restore movement.
+      settings:{...groovePreferences.avatarVocalBodySyncV757,
+        strength:(groovePreferences.avatarVocalBodySyncV757?.strength??55)*
+          (propsLipSyncV367?.qualityVocalGainV750??1)},
+      body:vocalPerformanceV746.body,role:roleV746,
+      playing:isPlaying&&propsLipSyncV367?.playing!==false&&propsLipSyncV367?.enabled!==false,
+      reducedMotion,manualBodyPriority:avatarMotionMode==='choreography'||!!stableLibraryClip,
+      bodyEnabled:propsLipSyncV367?.bodyEnabledV371!==false,
+      gesturesEnabled:propsLipSyncV367?.gesturesV371!==false,
+      lyricSynced:propsLipSyncV367?.lyrics?.synced===true,
+      lines:propsLipSyncV367?.lyrics?.lines,
+      effectiveTimeMs:synchronizedV372.effectiveTimeMs,
+      activeWord:synchronizedV372.vocal.activeWord,
+      vocalConfidence:synchronizedV372.vocal.confidence,
+      vocalStyle:synchronizedV372.vocal.style,
+      mouthActivity:synchronizedV372.face.jaw,
+      focus:synchronizedV372.focus,genre,
+    });
+    applyVocalStageOverlayV371(rigTargets.current,syncedBodyV757.body,
       delta,vocalStageOverlayV371.current);
 
 

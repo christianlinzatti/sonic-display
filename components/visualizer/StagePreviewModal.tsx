@@ -1,9 +1,10 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Billboard, OrbitControls } from "@react-three/drei";
 import { createPortal } from "react-dom";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Color } from "three";
 import type { Group } from "three";
 import {PreviewGlbPortraitV560,type GlbLipDiagnosticsV561} from "./PreviewGlbPortraitV560";
 import {useMusic} from '@/context/MusicContext';
@@ -86,8 +87,8 @@ function MovingSpotlight({ position, color, phase, moving, strength }: {
   });
   return <group ref={group} position={position}>
     <mesh position={[0,-1.4,0]}>
-      <coneGeometry args={[.9,2.8,22,1,true]} />
-      <meshBasicMaterial color={color} transparent opacity={.10 * strength} depthWrite={false} side={2} />
+      <coneGeometry args={[.9,2.8,14,1,true]} />
+      <meshBasicMaterial color={color} transparent opacity={.10 * strength} depthWrite={false} />
     </mesh>
     <mesh>
       <cylinderGeometry args={[.12,.18,.18,12]} />
@@ -106,15 +107,20 @@ function HazeCloud({ position, tint, phase, moving }: {
     root.current.position.x = position[0] + Math.sin(clock.elapsedTime * .17 + phase) * .6;
     root.current.position.y = position[1] + Math.sin(clock.elapsedTime * .27 + phase) * .10;
   });
+  // V773: one camera-facing, soft-masked plane per fog cloud rather than
+  // two overlapping, double-sided transparent spheres (4 meshes -> 2 total).
+  // The billboards preserve the movement/position and visual softness.
+  const color=useMemo(()=>new Color(tint),[tint]);
   return <group ref={root} position={position}>
-    <mesh>
-      <sphereGeometry args={[.82,12,8]} />
-      <meshBasicMaterial color={tint} transparent opacity={.055} depthWrite={false} side={2} />
-    </mesh>
-    <mesh position={[.65,.09,-.2]}>
-      <sphereGeometry args={[.67,12,8]} />
-      <meshBasicMaterial color={tint} transparent opacity={.04} depthWrite={false} side={2} />
-    </mesh>
+    <Billboard>
+      <mesh>
+        <planeGeometry args={[2.8,1.65]}/>
+        <shaderMaterial transparent depthWrite={false} depthTest={true}
+          uniforms={{uColor:{value:color}}}
+          vertexShader={'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}' }
+          fragmentShader={'uniform vec3 uColor;varying vec2 vUv;void main(){vec2 p=(vUv-.5)*2.;float a=length((p+vec2(.28,.03))*vec2(1.04,1.35));float b=length((p-vec2(.25,-.06))*vec2(1.25,1.52));float fog=max((1.-smoothstep(.27,.91,a))*.055,(1.-smoothstep(.20,.85,b))*.042);if(fog<.0008)discard;gl_FragColor=vec4(uColor,fog);}'}/>
+      </mesh>
+    </Billboard>
   </group>;
 }
 

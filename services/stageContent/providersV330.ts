@@ -38,10 +38,17 @@ export const STAGE_CONTENT_PROVIDERS_V330:readonly StageContentProviderV330[]=[
   fromEndpoint("concerts","Konzerttermine"),
 ];
 function isRecord(value:unknown):value is Record<string,unknown>{return typeof value==="object"&&value!==null&&!Array.isArray(value);}
-export async function loadStageSlidesV330(track:StageContentContextV330,settings:StageContentSettingsV330,signal:AbortSignal):Promise<StageContentV330[]>{
+export async function loadStageSlidesV330(track:StageContentContextV330,settings:StageContentSettingsV330,signal:AbortSignal,onProgress?:(slides:StageContentV330[])=>void):Promise<StageContentV330[]>{
   const selected=STAGE_CONTENT_PROVIDERS_V330.filter(p=>settings.sources[p.id]);
   // One failing / unauthorized provider must not prevent other sources from appearing.
-  const results=await Promise.all(selected.map(p=>p.load(track,settings,signal).catch(()=>null)));
+  const partial:(StageContentV330|null)[]=selected.map(()=>null);
+  const results=await Promise.all(selected.map((p,index)=>new Promise<StageContentV330|null>(resolve=>{
+    const controller=new AbortController();let finished=false;
+    const finish=(value:StageContentV330|null)=>{if(finished)return;finished=true;clearTimeout(timer);signal.removeEventListener('abort',abort);controller.abort();partial[index]=value;if(!signal.aborted)onProgress?.(partial.filter((x):x is StageContentV330=>x!==null));resolve(value);};
+    const abort=()=>finish(null);const timer=setTimeout(abort,8000);
+    signal.addEventListener('abort',abort,{once:true});if(signal.aborted){abort();return;}
+    Promise.resolve().then(()=>p.load(track,settings,controller.signal)).then(finish,()=>finish(null));
+  })));
   if(signal.aborted)return [];
   return results.filter((x):x is StageContentV330=>x!==null);
 }

@@ -1,5 +1,6 @@
+import {boundedFormDataV733,UploadLimitErrorV733,localHostV733} from "@/lib/boundedUploadV733";
 import { NextRequest, NextResponse } from "next/server";
-import { mkdir, mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rename, copyFile, unlink, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
@@ -33,8 +34,8 @@ function runBlender(source: string, target: string): Promise<void> {
 
 export async function POST(req: NextRequest) {
   // Conversion executes a native 3D parser: NEVER expose it to remote users.
-  const host = req.headers.get("host")?.split(":")[0]?.toLowerCase();
-  if (process.env.NODE_ENV !== "development" || !["127.0.0.1", "localhost", "[::1]"].includes(host || "")) {
+  const host = req.headers.get("host");
+  if (process.env.NODE_ENV !== "development" || !localHostV733(host)) {
     return NextResponse.json({ error: "FBX-Import ist ausschließlich im lokalen Entwicklungsmodus verfügbar." }, { status: 403 });
   }
   if (Number(req.headers.get("content-length") || 0) > MAX_BYTES + 1024 * 1024) {
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
   }
   let tempDir: string | undefined;
   try {
-    const form = await req.formData();
+    const form = await boundedFormDataV733(req,MAX_BYTES+1024*1024);
     const file = form.get("file");
     if (!(file instanceof File) || !/\.fbx$/i.test(file.name)) return NextResponse.json({ error: "Bitte eine .fbx-Datei auswählen." }, { status: 400 });
     if (file.size === 0 || file.size > MAX_BYTES) return NextResponse.json({ error: "FBX muss zwischen 1 Byte und 35 MB groß sein." }, { status: 413 });
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
     const dir = path.join(process.cwd(), "public", "avatars");
     await mkdir(dir, { recursive: true });
     const filename = `${name}-${randomUUID().slice(0, 8)}.glb`;
-    await rename(output, path.join(dir, filename));
+    try { await rename(output, path.join(dir, filename)); } catch(error) { if((error as NodeJS.ErrnoException).code!=="EXDEV")throw error; await copyFile(output,path.join(dir,filename));await unlink(output); }
     const dataDir = path.join(process.cwd(), "data");
     await mkdir(dataDir, { recursive: true });
     const configPath = path.join(dataDir, "avatars.local.json");
@@ -78,6 +79,7 @@ export async function POST(req: NextRequest) {
     await writeFile(configPath, JSON.stringify(metadata, null, 2) + "\n", "utf8");
     return NextResponse.json({ model: { id: `local:${filename}`, label: name, url: `/avatars/${encodeURIComponent(filename)}`, description: "Aus FBX konvertiert", preview: "/avatars/custom-preview.svg" } });
   } catch (error) {
+    if(error instanceof UploadLimitErrorV733)return NextResponse.json({error:error.message},{status:413});
     console.error("FBX import failed", error instanceof Error ? error.message : "unknown");
     return NextResponse.json({ error: error instanceof Error ? error.message : "FBX-Konvertierung fehlgeschlagen" }, { status: 500 });
   } finally {

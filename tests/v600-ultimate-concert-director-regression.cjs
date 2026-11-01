@@ -108,10 +108,10 @@ test('live V568/V577 chain now followed by V600 without replacing V528',()=>{
  const s=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');
  assert.match(s,/varyConcertDirectorV577\(smartConcertV568/);
  assert.match(s,/sampleUltimateConcertV600\(concertArcPlanV600/);
- assert.match(s,/concertDynamicsPercentV502\([^\n]*,directedDynamicsV60(?:0|4)\.dance\)/);
+ assert.match(s,/concertDynamicsPercentV502\([^\n]*,directedDynamicsV6(?:00|04|70)\.dance\)/);
  assert(s.includes('cameraDirectorIntensity={concertDynamicsPercentV502('));
- assert(s.includes('directedDynamicsV604.camera')&&s.includes('base:directedDynamicsV600'));
- assert(s.includes('directedDynamicsV604.lighting'));
+ assert(s.includes('directedDynamicsV670.camera')&&s.includes('base:directedDynamicsV600'));
+ assert(s.includes('directedDynamicsV670.lighting')&&s.includes('coordinateConcertDynamicsV654(directedDynamicsV761,concertFlowV654)'));
  assert(s.includes('refineAutomaticConcertGroupV600(multiArtistGroupV442,concertArcPlanV600)'));
 });
 test('no new audio listeners, network, or animation frames',()=>{

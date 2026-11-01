@@ -80,7 +80,8 @@ assert(src.indexOf('composeCinematicConcertCameraV550(')<src.indexOf('guardAutom
 const moduleSource=fs.readFileSync('components/visualizer/cinematicConcertCameraV550.ts','utf8');
 for(const illegal of ['window.', 'document.', 'Math.random(', 'requestAnimationFrame(', 'setInterval(', 'setTimeout(', 'new Audio('])assert(!moduleSource.includes(illegal));
 const pkg=require('../package.json');assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]||0)>=550);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v550 && npm run test:v550:types'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v550');
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v550:types');
 console.log(`PASS V550: ${cases} verified cinematic role/aspect/timing scenarios, ${actual} refined (${solo} solos, ${handoff} handoffs, ${ensemble} hooks), camera/lyrics safety`);
 
 assert(require("node:fs").readFileSync("components/visualizer/StageCameraDirectorV289.tsx","utf8").indexOf("composeCinematicDuetInteractionV585(concertFramedV550,sceneV528")<require("node:fs").readFileSync("components/visualizer/StageCameraDirectorV289.tsx","utf8").indexOf("composeFullSongCameraV605(duetFramedV585"),"V585 must precede V605");

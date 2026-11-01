@@ -1,0 +1,55 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const Module=require('node:module');
+const ts=require('./typescript-loader.cjs');
+const root=path.resolve(__dirname,'..');
+const policyPath=path.join(root,'components/visualizer/adaptiveLightingBudgetV772.ts');
+const source=fs.readFileSync(policyPath,'utf8');
+const output=ts.transpileModule(source,{fileName:policyPath,compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}});
+assert.equal(output.diagnostics?.length??0,0,'typeScript parser');
+const mod=new Module(policyPath,module);
+mod.filename=policyPath;
+mod.paths=Module._nodeModulePaths(path.dirname(policyPath));
+mod._compile(output.outputText,policyPath);
+const {resolveLightingBudgetV772:plan,plannedLightsV772:count}=mod.exports;
+const tier=['low','balanced','high'],pressure=['full','trimmed','minimal'],themes=['classic','rock','festival','galaxy','white','cyberpunk'];
+for(const t of tier)for(const p of pressure)for(const theme of themes){
+ const b=plan(t,p,theme);
+ assert.equal(b.key,true,'retain key / singer light');assert.equal(b.fill,true,'retain fill');
+ assert(count(b)<=b.maxLights,`${t}:${p}:${theme} must respect active light cap`);
+ assert(Object.isFrozen(b),'no mutable render-loop budget');
+ assert.strictEqual(plan(t,p,theme),b,'no object allocations per render frame');
+ if(p==='minimal'||t==='low')assert.equal(b.level,'essential');
+ if(theme!=='rock')assert.equal(b.rockSpot,false);
+}
+assert.equal(count(plan('high','full','rock')),8,'maximum actual simultaneous physical lights');
+assert.equal(count(plan('balanced','full','rock')),5);
+assert.equal(count(plan('high','trimmed','rock')),5);
+assert.equal(count(plan('high','minimal','rock')),3);
+assert.equal(count(plan('high','full','classic')),7);
+assert.equal(count(plan('low','full','classic')),2);
+assert.equal(plan('high','full','classic').atmosphereRight,true);
+assert.equal(plan('high','trimmed','classic').atmosphereRight,false);
+assert.equal(plan('high','minimal','classic').centerSpot,false);
+const read=file=>fs.readFileSync(path.join(root,'components/visualizer',file),'utf8');
+const dynamic=read('DynamicStage.tsx'),atmosphere=read('ConcertAtmosphereRendererV308.tsx'),detail=read('ConcertDetailStageV555.tsx'),stages=read('stages/index.tsx'),canvas=read('ThreeAvatar.tsx'),governor=read('adaptiveVisualBudgetV640.ts');
+for(const [file,body] of [['DynamicStage',dynamic],['ConcertAtmosphereRenderer',atmosphere],['ConcertDetailStage',detail],['StageEnvironment',stages]]){
+ assert.match(body,/resolveLightingBudgetV772/,'budget wired to '+file);
+ assert.match(body,/getVisualLevelV640\(\)/,'measured quality level wired to '+file);
+}
+for(const name of ['key','fill','beam','floorLight'])assert.match(dynamic,new RegExp(`if\\(${name}\\.current\\)${name}\\.current\\.visible=budgetV772\\.`));
+assert.match(atmosphere,/leftSpot\.current\.visible=budgetV772\.atmosphereLeft/);
+assert.match(atmosphere,/rightSpot\.current\.visible=budgetV772\.atmosphereRight/);
+assert.match(detail,/sweepSpot\.current\.visible=/);
+assert.match(stages,/<RockTrussSpotV772\/>/);
+assert.equal((stages.match(/<spotLight\b/g)||[]).length,1,'only ONE real rock truss spotlight');
+assert.match(canvas,/<Canvas\b[^>]*shadows=\{false\}/,'main scene cannot allocate shadow maps');
+assert.match(governor,/pressureSeconds>=3/);assert.match(governor,/recoverySeconds>=16/,'V640 hysteresis prevents light flicker');
+assert.doesNotMatch(source,/setInterval|setTimeout|requestAnimationFrame|new WebGLRenderer|new Canvas/,'no second work loop');
+const pkg=require('../package.json');
+assert.match(pkg.version,/^0\.1\.0-v(?:77[2-9]|7[89]\d|[89]\d\d)$/,'V772 must remain compatible with newer releases');
+assert.equal(pkg.scripts['test:v772'],'node tests/v772-adaptive-lighting-regression.cjs');
+assert(pkg.scripts['check:fast'].includes('npm run test:v772 &&'),'V772 check remains in release chain');
+console.log('PASS V772: 8-light cap, tier/pressure priorities, one physical rock spot, real V640 hysteresis, persistent key/fill, shadow-free stage');

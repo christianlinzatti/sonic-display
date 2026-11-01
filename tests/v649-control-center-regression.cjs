@@ -101,7 +101,7 @@ test('original root touch gate untouched',()=>has(screen,'const touchClassV648=k
 test('no animated background work on hidden panel',()=>assert(!panel.includes('setInterval')));
 test('new versioned package',()=>assert(/^0\.1\.0-v\d+$/.test(pkg.version)&&Number(pkg.version.split('-v')[1])>=649));
 test('new smoke script',()=>has(pkg.scripts['test:smoke:v649'],'test:smoke:v648'));
-test('new prebuild smoke',()=>assert(pkg.scripts.prebuild.includes('test:smoke:v649')||pkg.scripts.prebuild.includes('test:smoke:v650')||pkg.scripts.prebuild.includes('test:smoke:v651')));
+test('new prebuild smoke',()=>{const {isInReleaseGate}=require('./helpers/release-coverage-v651.cjs');assert(isInReleaseGate('test:smoke:v656'),'prebuild must transitively reach latest smoke chain');});
 test('new expanded verification',()=>has(pkg.scripts['verify:v649'],'check:architecture'));
 test('older preflight checks preserved',()=>has(pkg.scripts['build:preflight'],'npm run test:v568'));
 test('current architecture reference',()=>assert(/\*\*Dokumentationsstand:\*\* V6(?:49|[5-9]\d)/.test(architecture)));
