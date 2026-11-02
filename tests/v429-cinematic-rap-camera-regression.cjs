@@ -61,8 +61,17 @@ const view=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');
 const dancer=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
 const panel=fs.readFileSync('components/visualizer/ExpressiveRapDirectorPanelV425.tsx','utf8');
 for(const token of ['rapCameraBlockedV429','authoredCueV400','timelineCue?.active','shotV377.active',
-  'showCue?.cameraEnabled','studioProfileV398.enabled','rapCameraHoldV429','composeRapCameraV429','guardAutomaticCameraV351(naturalFramedV655'])
+  'showCue?.cameraEnabled','studioProfileV398.enabled','rapCameraHoldV429','composeRapCameraV429','guardAutomaticCameraV351(framedV848,composition)'])
   assert(stage.includes(token),`camera precedence: ${token}`);
+// V865.11: the V429 overlay remains upstream of all later camera stages.
+// The LAST V351 guard applies to V848, not the long-retired V655 final pose.
+const rapOverlay=stage.indexOf('const rapFramedV429=composeRapCameraV429(');
+const finalPose=stage.indexOf('const framedV848=composeCinematicCameraDirectorV848(');
+const finalGuard=stage.indexOf('const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(framedV848,composition):to;');
+assert(rapOverlay>=0 && finalPose>rapOverlay && finalGuard>finalPose,
+  'V429 overlay must precede V848 and the final V351 lyrics guard');
+assert(stage.includes('const rapCameraBlockedV429=!automaticShot||!!timelineCue?.active||'),
+  'authored/manual camera priority must still gate V429');
 for(const token of ['rapCameraCueV429','rapCameraEnabledV429','rapCameraStrengthV429'])assert(view.includes(token));
 assert(dancer.includes('props.lipSync?.rapCameraArmedV429===true'));
 assert(view.includes('rapCameraArmedV429=!!preferences.rapCameraEnabledV429'));

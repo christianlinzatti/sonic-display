@@ -67,25 +67,29 @@ const avatar=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
 for(const symbol of ['planNaturalDanceMotionV485({','GroupDanceMotionContextV485.Provider',
   'stepLeftV485','stepRightV485'])
  assert(avatar.includes(symbol),`runtime integration ${symbol}`);
-// V494 scales only optional V486 offsets after checking planted-foot drift.
-// Accept the original wiring or the newer V494 safe forwarding without weakening
-// the requirement that the real V486 planner still feeds the visible root target.
+// V865.10: The V524/V684 group output passes through the V839 grounded-foot
+// guard before V494 adjusts optional travel. Verify the actual renderer module
+// (split from ThreeAvatar) and keep the original source-offset invariant.
+const groupCode=fs.readFileSync('components/visualizer/GroupDancersV326SceneV492.tsx','utf8');
 const groundingSource=fs.readFileSync('components/visualizer/realisticGlbFootContactV494.ts','utf8');
+const protectedGroup=groupCode.includes('footwork:advancedFootworkV486,')&&
+ groupCode.includes('stepNaturalFullBodyV524(naturalBodyStateV524.current')&&
+ groupCode.includes('refineGroupFootworkV684(stabilizedBodyV524.footwork')&&
+ groupCode.includes('refineGroupFootworkV839(footworkStateV839.current,naturalFootworkV524')&&
+ groupCode.includes('const finalFootworkV839=footworkResultV839.footwork')&&
+ groupCode.includes('footwork:finalFootworkV839.slots[i]')&&
+ groupCode.includes('Object.assign(footworkV486.current[i].current,finalFootworkV839.slots[i])');
 for(const axis of ['X','Z']){
- const original=avatar.includes(`advancedFootworkV486.slots[i].offset${axis}`);
- const protectedV524=avatar.includes('const naturalFootworkV524=stabilizedBodyV524.footwork')&&
-  avatar.includes('footwork:advancedFootworkV486,')&&
-  fs.readFileSync('components/visualizer/naturalFullBodyDanceV524.ts','utf8').includes(`offset${axis}:source.offset${axis}`)&&
-  avatar.includes('stepNaturalFullBodyV524(naturalBodyStateV524.current');
- const forwarded=avatar.includes(`groundDecisionsV494[i].offset${axis}`)&&
-  (avatar.includes('footwork:advancedFootworkV486.slots[i]')||
-   (avatar.includes('footwork:naturalFootworkV524.slots[i]')&&protectedV524))&&
-  groundingSource.includes(`offset${axis}:f.offset${axis}*gain`);
- assert(original||forwarded,`V486 ${axis} optional travel forwarding must stay wired`);
+ const preserved=fs.readFileSync('components/visualizer/naturalFullBodyDanceV524.ts','utf8').includes(`offset${axis}:source.offset${axis}`)&&
+  fs.readFileSync('components/visualizer/naturalDanceFootworkV839.ts','utf8').includes('return {...slot,liftLeft:');
+ assert(protectedGroup&&preserved&&groupCode.includes(`groundDecisionsV494[i].offset${axis}`)&&
+  groundingSource.includes(`offset${axis}:f.offset${axis}*gain`),
+  `V486 ${axis} optional travel forwarding must stay wired through V839`);
 }
 const moduleSource=fs.readFileSync('components/visualizer/naturalDanceMotionStudioV485.ts','utf8');
 assert(!/\b(fetch|setInterval|setTimeout|requestAnimationFrame|Math\.random|Date\.now|new THREE)\b/.test(moduleSource),'pure deterministic planner');
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1])>=485);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v485 && npm run test:v485:types'));
+assert.equal(pkg.scripts['test:v485'],'node tests/v485-natural-dance-motion-studio-regression.cjs');
+assert(pkg.scripts['test:v485:types'].includes('tsc -p tests/tsconfig.v485-core.json')); // historical test is runnable; not necessarily in today's bounded prebuild gate
 console.log('PASS V485: automatic near-pass, procedural step, rejoin, low-drop, lyrics/manual/IK guards, collision centers, seek, 33-min simulation');

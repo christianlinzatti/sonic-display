@@ -1,0 +1,13 @@
+"use strict";
+const assert = require("node:assert/strict");
+const {assertModernPrebuildQualityGate: check} = require("./helpers/prebuild-gate-v8659.cjs");
+const scripts = require("../package.json").scripts;
+const clone=()=>({...scripts});
+assert(check(scripts).length>1);
+assert.throws(()=>check({...clone(),prebuild:"npm run check:fast"}),/No version regression/);
+assert.throws(()=>check({...clone(),prebuild:"npm run check:fast && npm run test:v865"}),/end in check:fast/);
+assert.throws(()=>check({...clone(),prebuild:"npm run test:v865 && npm run build && npm run check:fast"}),/Unexpected or bypassing/);
+assert.throws(()=>check({...clone(),prebuild:"npm run test:v864 && npm run check:fast"}),/at least V865/);
+assert.throws(()=>check({...clone(),"check:fast":"npm run lint"}),/complete production TypeScript/);
+assert.throws(()=>check({...clone(),"check:release":"npm run lint"}),/Release gate/);
+console.log("PASS V865.9 prebuild safety guard: current + six negative tests");

@@ -65,8 +65,12 @@ for(const style of ['Deutschrap','Hardstyle','Hardtekk','Pop']){
 const group=fs.readFileSync('components/visualizer/GroupDancersV326SceneV492.tsx','utf8');
 const proc=fs.readFileSync('components/visualizer/ProceduralDancerAvatarV492.tsx','utf8');
 assert(group.includes('stepNaturalFullBodyV524(naturalBodyStateV524.current')&&group.includes('naturalBodyStateV524.current=stabilizedBodyV524.state'));
-assert(group.includes('const naturalFootworkV524=refineGroupFootworkV684(stabilizedBodyV524.footwork')&&group.includes('footwork:naturalFootworkV524.slots[i]')&&group.includes('naturalFootworkV524.slots[i].rootSpeed'));
-assert(group.includes('Object.assign(footworkV486.current[i].current,naturalFootworkV524.slots[i])'));
+assert(group.includes('const naturalFootworkV524=refineGroupFootworkV684(stabilizedBodyV524.footwork'));
+assert(group.includes('const footworkResultV839=refineGroupFootworkV839(footworkStateV839.current,naturalFootworkV524'));
+assert(group.includes('const finalFootworkV839=footworkResultV839.footwork'));
+assert(group.includes('footwork:finalFootworkV839.slots[i]'));
+assert(group.includes('finalFootworkV839.slots[i].rootSpeed'));
+assert(group.includes('Object.assign(footworkV486.current[i].current,finalFootworkV839.slots[i])'));
 assert(proc.includes('groupFootworkV486?.current.liftLeft')&&proc.includes('planNaturalFullBodyV488({'));
 const engine=fs.readFileSync('components/visualizer/naturalFullBodyDanceV524.ts','utf8');
 assert(!/\b(requestAnimationFrame|setInterval|setTimeout|fetch|localStorage|Date\.now|Math\.random)\b/.test(engine),'no hidden loop, network or nondeterminism');

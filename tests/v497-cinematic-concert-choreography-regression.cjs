@@ -82,12 +82,21 @@ assert(active>100000&&maxFov<40&&large===0,'30-minute continuous live display re
 const src=file=>fs.readFileSync('components/visualizer/'+file,'utf8');
 for(const [file,tokens] of Object.entries({
  'ThreeAvatar.tsx':['planCinematicConcertV497(','cinematicCueV497={cinematicCueV497}','compositionV497','<Lyrics3DScene','cameraEnabled:props.lipSync?.rapDuetCameraV416!==false','vocalTimeEnabledV496===true && props.lipSync.vocalTimeSegmentsV496?.length'],
- 'StageCameraDirectorV289.tsx':['composeCinematicConcertCameraV497(','authored:!automaticShot','guardAutomaticCameraV351(concertFramedV497,composition)'],
+ 'StageCameraDirectorV289.tsx':['composeCinematicConcertCameraV497(','authored:!automaticShot','guardAutomaticCameraV351(framedV848,composition)'],
  'DynamicStage.tsx':['concertLightMultiplierV497(','authored:authoredLightsV386','cinematicKeyV497','cinematicBeamV497','lightFocusV497','timelineCue.blackout>0'],
 }))for(const token of tokens)assert(src(file).includes(token),`${file}: missing ${token}`);
 assert(src('ThreeAvatar.tsx').includes('manualVocalPriority:props.lipSync?.manualVocalEnabledV385'));
+// V865.11: V497 remains upstream, with V848 as the final automatic pose.
+const cameraStages=src('StageCameraDirectorV289.tsx');
+const cinematicV497=cameraStages.indexOf('const concertFramedV497=composeCinematicConcertCameraV497(');
+const cinematicV848=cameraStages.indexOf('const framedV848=composeCinematicCameraDirectorV848(');
+const lyricsGuardV351=cameraStages.indexOf('const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(framedV848,composition):to;');
+assert(cinematicV497>=0&&cinematicV848>cinematicV497&&lyricsGuardV351>cinematicV848,
+  'V497 must precede V848 and the final V351 lyrics safety');
 assert(src('StageCameraDirectorV289.tsx').includes('!!authoredCueV400'));
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=497);
-assert(pkg.scripts['build:preflight'].includes('npm run test:v497 && npm run test:v497:types && npm run test:v496'));
+require('./helpers/release-coverage-v651.cjs').assertIncluded('test:v497');
+assert(pkg.scripts['verify:historical'].includes('npm run test:v497 && npm run test:v497:types && npm run test:v496'),
+  'V497, its types and the V496 predecessor must remain in the historical verification gate');
 console.log('PASS V497: joined solo/duet/hook camera & lights, lyric and manual priority, 30-minute simulation');

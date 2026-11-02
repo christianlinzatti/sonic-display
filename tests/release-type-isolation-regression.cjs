@@ -1,4 +1,5 @@
 'use strict';
+const {assertModernPrebuildQualityGate}=require('./helpers/prebuild-gate-v8659.cjs');
 /** Run on every release, even before TypeScript executes. Test-only ambient declarations
  * must not shadow project-wide real types when the root TypeScript configuration includes all source files.
  */
@@ -31,7 +32,7 @@ function walk(dir){for(const ent of fs.readdirSync(dir,{withFileTypes:true})){
 walk(path.join(root,'tests'));
 assert(ambientModules.length>0,'Missing test shadowing fixtures (guard must not be a no-op)');
 assert(pkg.scripts['check:release']?.includes('npm run typecheck'),'Release gate requires full application typecheck');
-assert.equal(pkg.scripts.prebuild,'npm run check:fast','Production build must execute bounded V680 quick gate automatically');
+assertModernPrebuildQualityGate(pkg.scripts);
 assert(pkg.scripts['check:fast']?.includes('npm run typecheck'),'Quick gate must run full TypeScript checks');
 assert(pkg.scripts['test:quick']?.includes('test:module-case'),'Quick gate must retain case collision protection');
 assert(pkg.scripts['check:release']?.includes('test:module-case'),'Release gate must include case collision protection');

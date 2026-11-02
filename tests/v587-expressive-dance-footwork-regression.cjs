@@ -60,10 +60,25 @@ test('integration uses V524 before V587, V545 before rig, then single IK',()=>{
  const glb=fs.readFileSync('components/visualizer/GltfDancerAvatarV492.tsx','utf8');
  assert(a.includes('input.expressiveV587?refineExpressiveFootworkV587('));
  assert(group.includes('expressiveV587:{cueSeconds:settings.cues.find'));
- assert(group.includes('footwork:naturalFootworkV524.slots[i]'));
- assert(glb.indexOf('const motionV545=refineNaturalDanceMotionV545(')<glb.indexOf('refineExpressiveRigV587(motionV545'));
- assert(glb.indexOf('refineExpressiveRigV587(motionV545')<glb.indexOf('applyAvatarRigMotion(rigTargets.current, debugMotion'));
- assert(glb.indexOf('applyAvatarRigMotion(rigTargets.current, debugMotion')<glb.indexOf('updateFootGrounding({delta'));
+ assert(group.includes('const footworkResultV839=refineGroupFootworkV839(footworkStateV839.current,naturalFootworkV524'));
+ assert(group.includes('const finalFootworkV839=footworkResultV839.footwork'));
+ assert(group.includes('footwork:finalFootworkV839.slots[i]'));
+ // V865.10: V587 feeds subsequent footwork stages before the final V839 rig overlay.
+ const ordered=[
+  'const motionV545=refineNaturalDanceMotionV545(',
+  'refineExpressiveRigV587(motionV545',
+  'stepGlbFootworkQualityV596(footworkQualityV596.current,expressiveMotionV587',
+  'refineNaturalFootworkRigV839(naturalFootworkV839.current,debugMotion',
+  'applyAvatarRigMotion(rigTargets.current, footworkV839.motion',
+  'updateFootGrounding({delta',
+ ];
+ let previous=-1;
+ for(const token of ordered){
+  const position=glb.indexOf(token);
+  assert(position>=0&&position>previous,`GLB rig stage missing or out of order: ${token}`);
+  previous=position;
+ }
+ assert.equal((glb.match(/updateFootGrounding\(\{/g)||[]).length,1);
 });
 test('no extra loop, scheduler or new contact solver',()=>{
  const code=fs.readFileSync('components/visualizer/expressiveDanceFootworkV587.ts','utf8');

@@ -48,7 +48,19 @@ test('bottom lyrics protected',()=>{const r=compose(pose,{...ready,motif:'stage-
 test('no invented singers',()=>assert(!run(initial(),{}, {...cue,leadSlot:3}).cue.active));
 test('10k frames no jitter or unbounded state',()=>{let s=initial(),changes=0;for(let ms=2000;ms<200000;ms+=19.8){const r=run(s,{progressMs:ms});if(r.state.serial!==s.serial)changes++;assert(r.state.history.length<=3);assert(r.cue.cameraRate>=.7&&r.cue.cameraRate<=1);s=r.state;}assert(changes<35);});
 test('existing V655 runs before V682 chooser',()=>{const src=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');assert(src.indexOf('const naturalV655=advanceNaturalCameraV655(')<src.indexOf('const cameraVarietyV682=advanceCameraVarietyV682('));});
-test('V682 is before V655 finishing and V351 final guard',()=>{const src=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');assert(src.indexOf('const varietyFramedV682=')<src.indexOf('const naturalFramedV655=')&&src.indexOf('const naturalFramedV655=')<src.indexOf('const framedV747=')&&(src.includes('guardAutomaticCameraV351(framedV747,composition)')||src.includes('guardAutomaticCameraV351(framedV792,composition)')));});
+test('V682 precedes every later camera pass and final V351 guard',()=>{
+  const src=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');
+  const stages=['varietyFramedV682','naturalFramedV655','framedV747','framedV792','framedV797','framedV806','framedV809','framedV838','framedV848'];
+  let previous=-1;
+  for(const stage of stages){
+    const position=src.indexOf(`const ${stage}=`);
+    assert(position>previous,`${stage} must follow the preceding camera composition`);
+    previous=position;
+  }
+  const finalGuard='const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(framedV848,composition):to;';
+  assert(src.includes(finalGuard),'V351 must guard the final V848 automatic frame, not an earlier intermediate frame');
+  assert(src.indexOf(finalGuard)>previous,'V351 guard must run after all camera effects');
+});
 test('all authored camera safeguards kept',()=>{const src=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');const clause=src.slice(src.indexOf('const cameraVarietyV682='),src.indexOf('cameraVarietyStateV682.current=cameraVarietyV682.state'));for(const guard of ['authoredCameraV528','cameraNarrativeV605?.manualCamera','timelineCue?.active','authoredCueV400','editingPose','cameraManualStagePriorityV377'])assert(clause.includes(guard),guard);});
 test('no extra render loop, timers, random camera picks, or persistence',()=>{const src=fs.readFileSync('components/visualizer/cinematicCameraVarietyV682.ts','utf8');assert(!/fetch\(|setInterval\(|setTimeout\(|requestAnimationFrame\(|Math\.random\(|Date\.now\(|localStorage|sessionStorage|WebSocket|useFrame\(/.test(src));});
 test('existing camera can slow transitions but never add cut',()=>{const src=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');assert(src.includes('cameraVarietyV682.cue.cameraRate'));assert(!fs.readFileSync('components/visualizer/cinematicCameraVarietyV682.ts','utf8').includes('camera.position'));});

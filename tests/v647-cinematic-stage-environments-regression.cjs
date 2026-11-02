@@ -72,7 +72,11 @@ test('seek stability with no history',()=>{const x=P(4);for(let i=0;i<8;i++)P(i)
 test('no object mutations across planner',()=>{const x=core(),f=foundation(x),base=stage({...x,foundation:f}),before=JSON.stringify({x,base});plan({...x,base});assert.equal(JSON.stringify({x,base}),before);});
 test('bounded across all verified acts',()=>{for(let i=0;i<8;i++)bounded(P(i));});
 test('output only controls the EXISTING plane',()=>{const s=fs.readFileSync('components/visualizer/DynamicStage.tsx','utf8');
- for(const token of ['planCinematicStageEnvironmentV647(', 'LED_WALL_FRAGMENT_V647','uArchitecture.value=','uDepth.value=','uMotion.value=','ledBudgetV640'])assert(s.includes(token),token);
+ for(const token of ['planCinematicStageEnvironmentV647(', 'LED_WALL_FRAGMENT_V842','uArchitecture.value=','uDepth.value=','uMotion.value=','ledBudgetV640'])assert(s.includes(token),token);
+ assert(s.includes('fragmentShader={LED_WALL_FRAGMENT_V842}'),'latest shader must still use the existing LED wall');
+ assert(fs.readFileSync('components/visualizer/ledWallExperienceShaderV842.ts','utf8').includes('LED_WALL_FRAGMENT_V821'),'V842 must extend V821');
+ assert(fs.readFileSync('components/visualizer/ledWallExperienceShaderV821.ts','utf8').includes('LED_WALL_FRAGMENT_V812'),'V821 must extend V812');
+ assert(fs.readFileSync('components/visualizer/reactiveLedWallV812.ts','utf8').includes('LED_WALL_FRAGMENT_V647'),'V812 must retain V647 architecture');
  assert(s.includes('ref={ledWallV635}'));assert(!s.includes('new WebGLRenderer('));});
 test('shader is texture-free and single-plane',()=>{for(const token of ['uSceneStyle','uVariation','uArchitecture','uDepth','uMotion','uOpacity','uPattern','dotMask','vUv','vignette','gl_FragColor'])assert(shader.includes(token),token);
  for(const token of ['sampler2D','texture2D','discard','gl_FragDepth','for(','while('])assert(!shader.includes(token),token);});

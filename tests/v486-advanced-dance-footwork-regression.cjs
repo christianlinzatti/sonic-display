@@ -76,25 +76,27 @@ const avatar=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
 for(const token of ['planAdvancedDanceFootworkV486({','GroupFootSupportContextV486.Provider',
  'GroupFootworkContextV486.Provider','groupSupportV486.current.leftPlanted',
  'groupSupportV486.current.rightPlanted','groupFootworkV486?.current.liftLeft',
- 'naturalFootworkV524.slots[i].rootSpeed']){
+ 'groupFootworkV486?.current.liftRight']){
  assert(avatar.includes(token),`live R3F integration missing ${token}`);
 }
-// V494 scales only optional V486 offsets after checking planted-foot drift.
-// Accept the original wiring or the newer V494 safe forwarding without weakening
-// the requirement that the real V486 planner still feeds the visible root target.
+// V865.10: GroupDancers owns the V486->V524->V684->V839->V494 chain.
+// The ThreeAvatar component still supplies its measured support and runtime contexts.
+const groupCode=fs.readFileSync('components/visualizer/GroupDancersV326SceneV492.tsx','utf8');
 const groundingSource=fs.readFileSync('components/visualizer/realisticGlbFootContactV494.ts','utf8');
+const footworkSource=fs.readFileSync('components/visualizer/naturalDanceFootworkV839.ts','utf8');
 for(const axis of ['X','Z']){
- const original=avatar.includes(`advancedFootworkV486.slots[i].offset${axis}`);
- const protectedV524=avatar.includes('const naturalFootworkV524=refineGroupFootworkV684(stabilizedBodyV524.footwork')&&
-  fs.readFileSync('components/visualizer/naturalDanceEvolutionV684.ts','utf8').includes('return {...s,liftLeft:')&&
-  avatar.includes('footwork:advancedFootworkV486,')&&
+ const passed=groupCode.includes('footwork:advancedFootworkV486,')&&
+  groupCode.includes('stepNaturalFullBodyV524(naturalBodyStateV524.current')&&
+  groupCode.includes('refineGroupFootworkV684(stabilizedBodyV524.footwork')&&
+  groupCode.includes('refineGroupFootworkV839(footworkStateV839.current,naturalFootworkV524')&&
+  groupCode.includes('const finalFootworkV839=footworkResultV839.footwork')&&
+  groupCode.includes('footwork:finalFootworkV839.slots[i]')&&
+  groupCode.includes(`groundDecisionsV494[i].offset${axis}`)&&
+  groupCode.includes(`finalFootworkV839.slots[i].rootSpeed`)&&
+  footworkSource.includes('return {...slot,liftLeft:')&&
   fs.readFileSync('components/visualizer/naturalFullBodyDanceV524.ts','utf8').includes(`offset${axis}:source.offset${axis}`)&&
-  avatar.includes('stepNaturalFullBodyV524(naturalBodyStateV524.current');
- const forwarded=avatar.includes(`groundDecisionsV494[i].offset${axis}`)&&
-  (avatar.includes('footwork:advancedFootworkV486.slots[i]')||
-   (avatar.includes('footwork:naturalFootworkV524.slots[i]')&&protectedV524))&&
   groundingSource.includes(`offset${axis}:f.offset${axis}*gain`);
- assert(original||forwarded,`V486 ${axis} optional travel forwarding must stay wired`);
+ assert(passed,`V486 ${axis} optional travel forwarding must stay wired through final V839`);
 }
 assert(!avatar.includes('Math.sin(state.clock.elapsedTime*5+workloadSlot*.7)'),'V485 unscoped renderer clock must not drive step');
 const source=fs.readFileSync('components/visualizer/advancedDanceFootworkV486.ts','utf8');

@@ -1026,7 +1026,7 @@
     "test:v656": "node tests/v656-production-stability-regression.cjs && node tests/v656-production-gate-regression.cjs",
     "test:smoke:v656": "npm run test:v656 && npm run test:smoke:v655",
     "verify:v656": "npm run build",
-    "verify:historical": "npm run test:v528 && npm run test:v528:types && npm run test:v540 && npm run test:v540:types && npm run test:v550 && npm run test:v550:types && npm run test:v572 && npm run test:v591 && npm run test:v593 && npm run verify:offline:fast && npm run test:module-case && npm run check:syntax && npm run check:architecture",
+    "verify:historical": "npm run test:v497 && npm run test:v497:types && npm run test:v496 && npm run test:v528 && npm run test:v528:types && npm run test:v540 && npm run test:v540:types && npm run test:v550 && npm run test:v550:types && npm run test:v572 && npm run test:v591 && npm run test:v593 && npm run verify:offline:fast && npm run test:module-case && npm run check:syntax && npm run check:architecture",
     "test:v657": "node tests/v657-portable-backup-regression.cjs",
     "test:v657:types": "tsc -p tests/tsconfig.v657-core.json --noEmit",
     "test:smoke:v657": "npm run test:v657 && npm run test:v657:types && npm run test:smoke:v656",
@@ -1695,7 +1695,16 @@
     "test:v864:ui-types": "tsc -p tests/tsconfig.v864-ui.json --noEmit",
     "test:v865": "node tests/v865-smart-history-fusion-regression.cjs",
     "test:v865:types": "tsc --noEmit --strict --target es2022 --moduleResolution node --skipLibCheck --lib es2022,dom lib/smart-history-fusion-v865.ts",
-    "test:v865:ui-types": "tsc -p tests/tsconfig.v865-ui.json --noEmit"
+    "test:v865:ui-types": "tsc -p tests/tsconfig.v865-ui.json --noEmit",
+    "test:smoke:v649:flat": "node scripts/run-npm-chain-flat-v86512.cjs test:smoke:v649",
+    "test:smoke:v665:flat": "node scripts/run-npm-chain-flat-v86512.cjs test:smoke:v665",
+    "test:smoke:v671:flat": "node scripts/run-npm-chain-flat-v86512.cjs test:smoke:v671",
+    "check:release:flat": "node scripts/run-npm-chain-flat-v86512.cjs check:release",
+    "check:fast:flat": "node scripts/run-npm-chain-flat-v86512.cjs check:fast",
+    "build:flat": "node scripts/run-npm-chain-flat-v86512.cjs prebuild --build",
+    "test:v86512:flat": "node tests/v86512-flat-npm-chain-regression.cjs",
+    "test:v86512:probe:chain": "npm run test:v649 && npm run test:v650",
+    "test:v86512:probe:flat": "node scripts/run-npm-chain-flat-v86512.cjs test:v86512:probe:chain"
   },
   "engines": {
     "node": ">=20.9.0"

@@ -1,0 +1,70 @@
+{
+  "format": "sonic-v695-release-evidence",
+  "schema": 1,
+  "release": "0.1.0-v865",
+  "checkedAt": "2026-11-02T13:59:06.319Z",
+  "environment": {
+    "node": "v24.19.0",
+    "lockStatus": "valid",
+    "missingDependencies": [],
+    "modelFilesIncluded": 0
+  },
+  "status": "blocked",
+  "approved": false,
+  "humanReviewRequired": true,
+  "gates": [
+    {
+      "id": "lockfile",
+      "status": "passed",
+      "detail": "Abhängigkeiten und Root-Metadaten stimmen überein.",
+      "source": "V571-Manifest-/Lockfile-Prüfung"
+    },
+    {
+      "id": "dependencies",
+      "status": "passed",
+      "detail": "18/18 direkte npm-Abhängigkeiten installiert",
+      "source": "V571-Abhängigkeitsprüfung"
+    },
+    {
+      "id": "typescript",
+      "status": "failed",
+      "detail": "spawnSync npm ENOENT",
+      "source": "npm run typecheck"
+    },
+    {
+      "id": "next-build",
+      "status": "blocked",
+      "detail": "TypeScript-Projektprüfung gescheitert; Build nicht freigegeben",
+      "source": "V695-Laufzeit-Gate"
+    },
+    {
+      "id": "qa-browser",
+      "status": "not-run",
+      "detail": "Nur mit real gestarteter App und explizitem --url wird der QA-Browsercheck versucht.",
+      "source": "V695-Realbrowser"
+    },
+    {
+      "id": "webgl",
+      "status": "not-run",
+      "detail": "WebGL-Rendering der realen App nicht geprüft.",
+      "source": "V695-Realbrowser"
+    },
+    {
+      "id": "glb-live",
+      "status": "blocked",
+      "detail": "Keine eingebundenen GLB-/GLTF-Modelle im Projektpaket; importierte Benutzer-Avatare sind separat. Kein V592-Live-Bericht übergeben.",
+      "source": "V592-Chromium-Live-Benchmark"
+    },
+    {
+      "id": "visual-review",
+      "status": "manual-required",
+      "detail": "Sichtabnahme: reale GLB-Tänze/Lip-Sync, Lyrics in Strophe/Hook, Moving Heads, Gobo/Nebel und Kamera; zusätzlich Browserneustart und Backups auf echtem Profil.",
+      "source": "Manuelle QA"
+    }
+  ],
+  "passCount": 2,
+  "limitations": [
+    "Realistic GLB choreography, actual vocal/lip synchronization, face readability, moving light beams and perceived lyrics legibility require manual viewing.",
+    "No Raspberry Pi / long-run temperature / GPU claims without measurements on target hardware."
+  ]
+}

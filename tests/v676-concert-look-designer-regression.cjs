@@ -2,13 +2,14 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
+const {TextEncoder}=require('node:util');
 const ts=require('./typescript-loader.cjs');
 function load(file,deps={}){
  const source=fs.readFileSync(file,'utf8');
  const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX},reportDiagnostics:true});
  assert.equal(compiled.diagnostics.length,0,`Syntax errors in ${file}`);
  const exports={};
- vm.runInNewContext(compiled.outputText,{exports,require:key=>{assert(key in deps,`Unexpected import ${key}`);return deps[key];},Object,Array,Set,Map,Number,Math,Date,String,JSON,RegExp,Error},{filename:file});
+ vm.runInNewContext(compiled.outputText,{exports,require:key=>{assert(key in deps,`Unexpected import ${key}`);return deps[key];},Object,Array,Set,Map,Number,Math,Date,String,JSON,RegExp,Error,TextEncoder},{filename:file});
  return exports;
 }
 const registry=load('config/musicGenres.ts');

@@ -1,3 +1,4 @@
+const {assertModernPrebuildQualityGate}=require('./helpers/prebuild-gate-v8659.cjs');
 require('./helpers/threeAvatarSourcesV492.cjs').install();
 'use strict';
 const assert=require('node:assert/strict');
@@ -65,7 +66,7 @@ assert(!/fetch\(|setInterval\(/.test(fs.readFileSync('components/visualizer/inte
 const pkg=require('../package.json');
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1])>=481, 'V481 behavior must persist in V482+');
 // Since V656, release validation is an explicit smoke chain rather than the historical prebuild chain.
-assert(pkg.scripts.prebuild==='npm run check:fast');
+assertModernPrebuildQualityGate(pkg.scripts);
 assert(((pkg.scripts['check:release'].includes('npm run test:smoke:v667') || ((pkg.scripts['check:release'].includes('npm run test:smoke:v668') || ((pkg.scripts['check:release'].includes('npm run test:smoke:v669') || ((pkg.scripts['check:release'].includes('npm run test:smoke:v670') || (pkg.scripts['check:release'].includes('npm run test:smoke:v671') && pkg.scripts['test:smoke:v671'].includes('npm run test:smoke:v670'))) && pkg.scripts['test:smoke:v670'].includes('npm run test:smoke:v669'))) && pkg.scripts['test:smoke:v669'].includes('npm run test:smoke:v668'))) && pkg.scripts['test:smoke:v668'].includes('npm run test:smoke:v667'))) && pkg.scripts['test:smoke:v667'].includes('npm run test:smoke:v6661') && pkg.scripts['test:smoke:v6661'].includes('npm run test:smoke:v666')) && pkg.scripts['test:smoke:v666'].includes('npm run test:smoke:v665'), 'V665 remains reachable from production release gate');
 assert(pkg.scripts['test:smoke:v665'].includes('npm run test:v481'));
 assert(pkg.scripts['test:smoke:v665'].includes('npm run test:v481:types'));

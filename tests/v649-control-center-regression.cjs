@@ -101,10 +101,10 @@ test('original root touch gate untouched',()=>has(screen,'const touchClassV648=k
 test('no animated background work on hidden panel',()=>assert(!panel.includes('setInterval')));
 test('new versioned package',()=>assert(/^0\.1\.0-v\d+$/.test(pkg.version)&&Number(pkg.version.split('-v')[1])>=649));
 test('new smoke script',()=>has(pkg.scripts['test:smoke:v649'],'test:smoke:v648'));
-test('new prebuild smoke',()=>{const {isInReleaseGate}=require('./helpers/release-coverage-v651.cjs');assert(isInReleaseGate('test:smoke:v656'),'prebuild must transitively reach latest smoke chain');});
+test('legacy smoke remains in explicit release gate',()=>{const {isInReleaseGate}=require('./helpers/release-coverage-v651.cjs');assert(isInReleaseGate('test:smoke:v656','check:release'),'release gate must reach the V656 smoke chain');assert(isInReleaseGate('check:fast'),'prebuild must retain fast checks');});
 test('new expanded verification',()=>has(pkg.scripts['verify:v649'],'check:architecture'));
 test('older preflight checks preserved',()=>has(pkg.scripts['build:preflight'],'npm run test:v568'));
-test('current architecture reference',()=>assert(/\*\*Dokumentationsstand:\*\* V6(?:49|[5-9]\d)/.test(architecture)));
+test('current architecture reference',()=>assert(architecture.includes(`**Dokumentationsstand:** V${pkg.version.split('-v')[1]}`)));
 test('release documentation exists',()=>has(doc,'# V649 – Interactive Concert Control Center'));
 // Deterministic randomized numeric validation with no browser or GPU required.
 let seed=649;function rnd(){seed=(1664525*seed+1013904223)>>>0;return seed/4294967296;}

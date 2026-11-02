@@ -10,7 +10,9 @@ const arch=fs.readFileSync('ARCHITECTURE.md','utf8');
 const release=/^0\.1\.0-v(\d+)$/.exec(pkg.version);
 assert(release && Number(release[1])>=656, 'Release must use a supported V656+ semantic version');
 assert.equal(script.verify,'npm run build');
-assert.equal(script.prebuild,'npm run check:fast');
+assert(script.prebuild.trim().endsWith('npm run check:fast'),'prebuild must finish with fast quality gate');
+assert(script.prebuild.includes('npm run test:v865'),'newer V865 regression must precede fast gate');
+assert(!script.prebuild.includes('npm run build'),'prebuild must not recurse into production build');
 assert.equal(script['test:smoke:v656'],'npm run test:v656 && npm run test:smoke:v655');
 const gate=script['check:release'];
 for(const requirement of ['test:smoke:v656','check:syntax','check:architecture','test:module-case',

@@ -102,7 +102,7 @@ test('release version',()=>assert(Number(pkg.version.match(/-v(\d+)$/)?.[1])>=65
 test('isolated V649 test types excluded from application typecheck',()=>{
  const rootConfig=JSON.parse(read('tsconfig.json'));
  const isolatedConfig=JSON.parse(read('tests/tsconfig.v649-core.json'));
- assert(rootConfig.exclude.includes('tests/v649-ui-preferences.d.ts'));
+ assert(rootConfig.exclude.includes('tests/v649-ui-preferences.d.ts') || rootConfig.exclude.includes('tests') || rootConfig.exclude.includes('tests/**/*'), 'root TypeScript excludes test-only V649 shim by explicit file or entire tests directory');
  assert(isolatedConfig.files.includes('v649-ui-preferences.d.ts'));
  assert(fs.existsSync('types/music.ts'));
 });

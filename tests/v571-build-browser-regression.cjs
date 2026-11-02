@@ -1,4 +1,5 @@
 'use strict';
+const {assertModernPrebuildQualityGate}=require('./helpers/prebuild-gate-v8659.cjs');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
@@ -43,12 +44,16 @@ try{
  fs.rmSync(path.join(dummy,'package-lock.json'));
  t('missing lock does not prevent reading other statuses',()=>assert.equal(inspect(dummy).dependencyStatus,'installed'));
  t('V571 or later version valid',()=>assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1]??0)>=571));
- t('quick prebuild is independent from legacy slow preflight',()=>{assert.equal(pkg.scripts.prebuild,'npm run check:fast');assert(!pkg.scripts['check:fast'].includes('verify:offline:fast'));});
+ t('quick prebuild is independent from legacy slow preflight',()=>{assertModernPrebuildQualityGate(pkg.scripts);assert(!pkg.scripts['check:fast'].includes('verify:offline:fast'));});
  t('fast checks includes syntax',()=>assert.match(pkg.scripts['test:smoke:v571'],/check:syntax/));
  t('fast checks includes architecture',()=>assert.match(pkg.scripts['test:smoke:v571'],/check:architecture/));
  t('fast checks includes last release',()=>assert.match(pkg.scripts['test:smoke:v571'],/test:v570/));
  t('fast checks includes new release',()=>assert.match(pkg.scripts['test:smoke:v571'],/test:v571/));
- t('fast checks avoids repeating 200+ historical suites',()=>assert.ok(pkg.scripts.prebuild.length<60));
+ t('prebuild avoids historical smoke suites and stays shorter than full preflight',()=>{
+   assert(!pkg.scripts.prebuild.includes('test:smoke:'));
+   assert(!pkg.scripts.prebuild.includes('verify:offline'));
+   assert(pkg.scripts.prebuild.length<pkg.scripts['build:preflight'].length);
+ });
  t('legacy preflight retained with older suites',()=>assert.match(pkg.scripts['build:preflight'],/test:v486/));
  t('legacy preflight checks latest tests first',()=>assert.match(pkg.scripts['build:preflight'],/^npm run test:v(\d+) && npm run test:v\1:types/));
  t('release gate requires lock and dependencies',()=>assert.match(pkg.scripts['verify:release:v571'],/--require-lock --require-dependencies/));

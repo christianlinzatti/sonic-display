@@ -78,8 +78,24 @@ const hardNext=run(hardState,{seconds:1+1/60,genre:'Hardtekk',plantedLeft:true},
 assert(hardNext.hipSway<rapNext.hipSway,'hard-dance should react faster than rap-flow');
 const avatar=fs.readFileSync(path.join(root,'components/visualizer/GltfDancerAvatarV492.tsx'),'utf8');
 assert.match(avatar,/refineNaturalDanceMotionV545\(danceMotionV545\.current/);
-assert(avatar.indexOf('refineNaturalDanceMotionV545(danceMotionV545.current')<avatar.indexOf('applyAvatarRigMotion(rigTargets.current, debugMotion'));
-assert(avatar.indexOf('applyAvatarRigMotion(rigTargets.current, debugMotion')<avatar.indexOf('updateFootGrounding({delta'));
+// V865.10: The final rig receives V839's guarded motion, not the old debugMotion.
+// Require both the actual dataflow and a present, strictly ordered pipeline.
+for (const [from,to] of [
+ ['refineExpressiveRigV587(motionV545','stepGlbFootworkQualityV596(footworkQualityV596.current,expressiveMotionV587'],
+ ['stepGlbFootworkQualityV596(footworkQualityV596.current,expressiveMotionV587','stepRealisticGroundingV665(groundingV665.current,refinedFootworkV596.motion'],
+ ['stepRealisticGroundingV665(groundingV665.current,refinedFootworkV596.motion','stepGenreDanceV666(genreDanceV666.current,groundingV665Result.motion'],
+ ['stepGenreDanceV666(genreDanceV666.current,groundingV665Result.motion','stepDanceVarietyV759(varietyStateV759.current,genreV666Result.motion'],
+ ['stepDanceVarietyV759(varietyStateV759.current,genreV666Result.motion','refineNaturalDanceRigV684(varietyV759.motion'],
+ ['refineNaturalDanceRigV684(varietyV759.motion','refineAdvancedRapRigV685(evolvedMotionV684'],
+ ['refineAdvancedRapRigV685(evolvedMotionV684','filterMotionDebugLayers(advancedRapV685'],
+ ['filterMotionDebugLayers(advancedRapV685','refineNaturalFootworkRigV839(naturalFootworkV839.current,debugMotion'],
+ ['refineNaturalFootworkRigV839(naturalFootworkV839.current,debugMotion','applyAvatarRigMotion(rigTargets.current, footworkV839.motion'],
+ ['applyAvatarRigMotion(rigTargets.current, footworkV839.motion','updateFootGrounding({delta'],
+]) {
+ const first=avatar.indexOf(from),second=avatar.indexOf(to);
+ assert(first>=0&&second>=0&&first<second,`missing or out-of-order GLB pass: ${from} -> ${to}`);
+}
+assert.equal((avatar.match(/updateFootGrounding\(\{/g)||[]).length,1,'exactly one authoritative foot-IK pass');
 assert.match(avatar,/!!activeSequence\|\|!!activeLoop\|\|timelineEnabled\|\|avatarBlendEnabled/);
 const controls=fs.readFileSync(path.join(root,'components/visualizer/NaturalDanceControlsV320.tsx'),'utf8');
 assert.match(controls,/V545 · Natural Dance Motion/);assert.match(controls,/writeNaturalDanceMotionV545/);

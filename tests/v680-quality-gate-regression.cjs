@@ -18,8 +18,8 @@ function installDummy(root, name) {const p=path.join(root,'node_modules',...name
 
 test('Release version V680 or newer',()=>assert(Number(pkg.version.match(/-v(\d+)$/)[1])>=680));
 test('Production command remains real Next.js build',()=>assert.equal(s.build,'next build'));
-test('Prebuild invokes only quick gate',()=>assert.equal(s.prebuild,'npm run check:fast'));
-test('Quick gate requires preflight before unit checks and TypeScript',()=>assert.equal(s['check:fast'],'npm run check:dependencies && npm run test:quick && npm run typecheck'));
+test('Prebuild ends with the quick gate after versioned tests',()=>{assert(s.prebuild.trim().endsWith('npm run check:fast'));assert(s.prebuild.includes('npm run test:v865'));assert(!s.prebuild.includes('npm run build'));});
+test('Quick gate orders dependency check, unit tests, and TypeScript',()=>{const cmd=s['check:fast'];const d=cmd.indexOf('npm run check:dependencies'),q=cmd.indexOf('npm run test:quick'),t=cmd.lastIndexOf('npm run typecheck');assert(d>=0&&q>d&&t>q,'dependency check, quick suite, typecheck must run in that order');assert(!cmd.includes('npm run build'));});
 test('Dependency diagnostic is runnable without Next.js',()=>assert.equal(s['check:dependencies'],'node scripts/build-dependencies-v680.cjs'));
 test('Quick suite includes V680 through V669',()=>{for(let i=669;i<=680;i++)assert(s['test:quick'].includes(`npm run test:v${i}`));});
 test('Quick suite contains syntax, architecture, case, test-types and OAuth import regression',()=>{for(const t of ['check:syntax','check:architecture','test:module-case','check:test-types','test:env:spotify-build'])assert(s['test:quick'].includes(`npm run ${t}`),t);});

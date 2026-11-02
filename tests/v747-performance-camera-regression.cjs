@@ -117,7 +117,12 @@ const source=fs.readFileSync('components/visualizer/performanceCameraDirectorV74
 ok(!/Date\.now\(|Math\.random\(|setTimeout\(|setInterval\(|localStorage|fetch\(/.test(source),'deterministic pure director');
 const camera=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');
 for(const symbol of ['advancePerformanceCameraV747','composePerformanceCameraV747','performanceCameraStateV747','performanceCameraV747.cue.cameraRate'])ok(camera.includes(symbol),'camera integration '+symbol);
-ok(camera.indexOf('composePerformanceCameraV747')<camera.indexOf('const stageFramed=automaticShot') && (camera.includes('guardAutomaticCameraV351(framedV747,composition)') || camera.includes('guardAutomaticCameraV351(framedV792,composition)') || (camera.includes('guardAutomaticCameraV351(framedV797,composition)') || (camera.includes('composeIntelligentEnsembleCameraV806(framedV797,vocalSpotlightV797') && camera.includes('guardAutomaticCameraV351(framedV809,composition)')))), 'final V351 guard remains after V747');
+ok(camera.indexOf('const framedV747=')>=0 &&
+  camera.indexOf('const framedV747=')<camera.indexOf('const framedV848=') &&
+  camera.indexOf('const framedV848=')<camera.indexOf('const stageFramed=automaticShot') &&
+  camera.includes('const framedV848=composeCinematicCameraDirectorV848(framedV838,sceneV528,') &&
+  camera.includes('const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(framedV848,composition):to;'),
+  'final V351 guard must protect the newest V848 frame after V747');
 const registry=fs.readFileSync('components/visualizer/registry.tsx','utf8');ok(registry.includes('performanceCameraV747?:'));
 const visual=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');ok(visual.includes('performanceCameraV747:coordinatedCameraV750')&&visual.includes('normalizePerformanceCameraV747(preferences.avatarPerformanceCameraV747)')&&visual.includes('scaleAutomaticPercentV750(cameraSettingsV750.strength,applyTuneMultiplierV755(qualityV750.camera'), 'V750 camera budget retains V747 settings and source');
 const prefs=fs.readFileSync('context/UiPreferencesContext.tsx','utf8');ok(prefs.includes('avatarPerformanceCameraV747:'));

@@ -72,7 +72,22 @@ for(const sec of ['verse','hook','build','drop','break',null]){
 }
 const three=fs.readFileSync(path.resolve(__dirname,'../components/visualizer/gltfVocalPerformanceV492.ts'),'utf8')+'\n'+fs.readFileSync(path.resolve(__dirname,'../components/visualizer/ProceduralDancerAvatarV492.tsx'),'utf8');
 assert.equal((three.match(/composeRapRhythmStageV407\(/g)||[]).length,2,'both avatar pipelines must be wired');
-assert(/applyVocalStageOverlayV371\(rigTargets.current,\s*addAdvancedVocalHeadV459\(addExpressiveHeadV453\(rapBodyV510/.test(three),'GLTF overlay uses the final cue');
+// V746 and V757 now refine the V510 rap body before the SAME rig overlay.
+const gltf=fs.readFileSync(path.resolve(__dirname,'../components/visualizer/gltfVocalPerformanceV492.ts'),'utf8');
+const sequence=[
+  'const rapBodyV510=composeExpressiveRapStageV510(',
+  'const baseVocalBodyV746=addAdvancedVocalHeadV459(addExpressiveHeadV453(rapBodyV510',
+  'const vocalPerformanceV746=directVocalPerformanceV746(',
+  'body:vocalPerformanceV746.body,role:roleV746',
+  'applyVocalStageOverlayV371(rigTargets.current,syncedBodyV757.body',
+];
+let previous=-1;
+for(const fragment of sequence){
+  const index=gltf.indexOf(fragment);
+  assert(index>previous,`GLTF vocal stage must preserve the ordered V510 → V746 → V757 → V371 pipeline: ${fragment}`);
+  previous=index;
+}
+
 assert(three.includes('rapBodyV453.headPitch')&&three.includes('composeConcertStageV503(rapBodyV407,concertV503)'),'procedural avatar uses the final cue');
 const pkg=require('../package.json');
 require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(407);

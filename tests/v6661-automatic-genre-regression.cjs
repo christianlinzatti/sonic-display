@@ -1,4 +1,5 @@
 'use strict';
+const {assertModernPrebuildQualityGate}=require('./helpers/prebuild-gate-v8659.cjs');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {load}=require('./helpers/ts-loader-v404.cjs');
@@ -42,7 +43,7 @@ test('production regression chain reaches V666.1 and original V666',()=>{
   }
   assert(found,'V666.1 must remain reachable through the release smoke chain');
   assert(scripts['test:smoke:v6661'].includes('npm run test:smoke:v666'));
-  assert.equal(scripts.prebuild,'npm run check:fast');
+  assertModernPrebuildQualityGate(scripts);
 });
 test('12k auto frames across five genres are bounded',()=>{let state=a.newGenreDanceStateV666();const names=['Deutschrap','Hardstyle','Hardtekk','Rock','Pop'];for(let i=0;i<12000;i++){const m=makeMotion(),r=a.stepGenreDanceV666(state,m,input({genre:names[Math.floor(i/2400)],seconds:5+i/60,section:i%3===0?'hook':i%3===1?'verse':'drop'}));state=r.state;assert(r.active);for(const key of ['headNod','shoulderRoll','chestPulse','armSwing','hipSway'])assert(Math.abs(r.motion[key])<=Math.abs(m[key])*1.16+1e-9);assert.equal(r.motion.expressionJaw,m.expressionJaw);assert.equal(r.motion.footStep,m.footStep);}});
 console.log('PASS V666.1 automatic genre dance:',tests,'tests, 12,000 frames');
