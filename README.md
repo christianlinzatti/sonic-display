@@ -1,3 +1,76 @@
+> **Aktuelle Vollversion: V880 – Smart Concert Experience 5.0.**
+> Installation, Funktionen und Tests: [V880-FULL-RELEASE-README.md](V880-FULL-RELEASE-README.md).
+> Kein manuelles Anwenden früherer Upgrade-Dateien erforderlich.
+
+## V873 – Cinematic Lyrics 10.0
+
+Neuer rein visueller Lyrics-Polish: höherer Kontrast für die aktive Zeile,
+kurze animierte Übergänge bei echten Rap-Wortzeiten und moderat vergrößerte
+Hook-Projektionen auf der vorhandenen V813-Bühnenwand. Die Einstellungen stehen
+im Concert FX Studio. Keine zusätzlichen Renderobjekte, keine unverifizierten
+Lyrics-Zeitmarken und kein Eingriff in manuelle Kameras oder Lyrics-Positionen.
+
+`npm run test:v873`, `npm run test:v873:types`; für die Freigabe zusätzlich
+`npm ci` und `npm run verify:production:v867` auf Windows und Linux.
+
+## V871 – Festival FX 4.0 (gemeinsamer Effekt-Sichtschutz)
+
+V871 ergänzt `components/visualizer/festivalFxCoordinationV871.ts` als reine,
+deterministische Koordination **nach** allen bestehenden V817/V823/V825/
+V844–V850-Sicherheits- und Performance-Gates. CO₂, Schaum, Seifenblasen,
+Luftschlangen und Finale-Effekte werden nicht neu gestartet, sondern
+konservativ nach bereits bestätigten Musikabschnitten gewichtet.
+
+Manuelle V823-Effektspuren werden bitgenau bewahrt, opt-in Full-Stage-Flashes
+nicht verändert. Der Sichtschutz wirkt stärker bei Lyrics, Vocal-Fokus,
+Nahaufnahmen und größeren Ensembles. Er erzeugt weder neuen Renderpass noch
+neues Timing, keine echten GPU-Messwerte oder simulierte Beats. Das bestehende
+`components/visualizer/DynamicStage.tsx` übernimmt nur reduzierte Cues;
+`components/visualizer/ConcertFxStudioPanelV810.tsx` bietet Ein/Aus und
+0–100 % Klarheitsgrad mit explizit **simulierter** Vorschau.
+
+Siehe `V871-FESTIVAL-FX-4.md` und `V871-VERIFICATION.md`.
+
+## V870 – LED Wall Experience: dynamische Muster und Drop-Fokus
+
+V870 erweitert die **bereits vorhandene** V842-LED-Rückwand um frequenzreaktive
+Equalizer-Säulen, konzentrische Prismengeometrie und begrenzte Bassringe bei
+**verifizierten** Drops/Finales. Ein einziger Shader, ein Mesh und eine
+vorhandene V810-Musikphase bleiben maßgeblich. Keine unabhängigen Timings,
+zusätzlichen Lichtquellen, WebGL-Pässe oder Vollbildblitze.
+
+`components/visualizer/ledWallMotifDirectorV870.ts` verwendet ausschließlich
+V810/V821/V842-bestätigte Musik-Cues. Bei Blackout, Pausen, Reduced Motion,
+Low-Tier, manuellen V823-LED-Spuren, gesperrter Lichtregie oder festem
+V821/V842-Look bleiben die Ergänzungen ausgeschaltet. Aktive Lyrics,
+Vocal-Fokus, mehrere Avatare und manuelle Kamera-/Nahaufnahme-Situationen
+dimmen die zusätzliche LED-Intensität. Der Shader begrenzt ihren Zusatzbeitrag
+auf .09 und erhält die bestehende finale Alpha-Grenze von .15.
+
+Im `ConcertFxStudioPanelV810` lassen sich zusätzliche Muster, Stärke und
+Kameradimmung einstellen. Das Dashboard zeigt eine **simulierte** Vorschau
+statt echter Spotify- oder Mikrofondaten. Die Änderungen sind in den
+Versions-Regressionen, den isolierten TypeScript-Core-Prüfungen und den
+Windows-/Ubuntu-CI-Gates integriert.
+
+Details: `V870-LED-WALL-MOTIFS.md` und `V870-VERIFICATION.md`.
+
+## V869 – Advanced Deutschrap Lip-Sync 6.0
+
+Schnellere, aber behutsame Reaktionszeiten für bestätigte Rap-Wortgrenzen.
+Ausdrücklich zugewiesene V632-Adlibs und Duett-Partner werden getrennt
+behandelt, ohne Lyrics als erfundene Stimmen oder Phoneme zu interpretieren.
+V869 übernimmt keine eigenen Animationen und respektiert die bisherigen
+Autoren-/Audio-Prioritäten. Details: `V869-ADVANCED-DEUTSCHRAP-LIP-SYNC-6.md`.
+
+## V866 – Genre-Aware Concert Show
+
+Die bestehende automatische Festivalregie passt den **Vordergrund**
+an verifizierte Musikabschnitte und Genre an, ohne neue Effekte zu starten.
+Deutschrap schützt den Vocal-Fokus; Hardtekk/Hardstyle betonen Drop-Looks;
+Rock/Pop variieren die Hook. Manuelle V823-Effekte und Sicherheitseinstellungen
+haben weiterhin Vorrang. Details: `V866-GENRE-AWARE-CONCERT-SHOW.md`.
+
 ## V865 – Smart History Fusion 2.0
 
 Im Bereich **Statistiken / Entdeckungen** die Datenquelle **Gemeinsam** auswählen. Die neue Übersicht erklärt mögliche Spotify-/Last.fm-Dopplungen, quellenexklusive Einträge und Tage ohne archivierte Daten über 30, 90 oder 365 Tage. Tagesbalken lassen sich auf Touchdisplays öffnen. Die 90-Sekunden-Zuordnung bleibt eine Heuristik und ist kein Nachweis identischer Wiedergaben. Die Funktion verwendet lokale Daten; die Originalarchive bleiben getrennt. Details und Tests in `V865-SMART-HISTORY-FUSION.md`.

@@ -72,7 +72,7 @@ for(let ms=1000;ms<155000;ms+=37){
 assert(transitions<35,'camera cannot change shot on every frame');
 const src=fs.readFileSync('components/visualizer/naturalConcertCameraV655.ts','utf8');
 assert(!/fetch\(|setTimeout\(|setInterval\(|requestAnimationFrame\(|Math\.random\(|Date\.now\(|localStorage/.test(src));
-const camera=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');
+const camera=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8').replace(/\r\n?/g,'\n');
 assert(camera.includes('advanceNaturalCameraV655(')&&camera.includes('composeNaturalCameraV655('));
 assert(camera.includes('composePerformanceCameraV747(\n      naturalFramedV655,') &&
   camera.includes('const framedV848=composeCinematicCameraDirectorV848(framedV838,sceneV528,') &&

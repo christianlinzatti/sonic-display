@@ -67,7 +67,7 @@ const filenames=['sonic-performer-v3.glb' ,'sonic-pulsebot-v1.glb','sonic-nova-v
  assert(!sameSharedMotionV531({fingerprint:'a',rigFingerprint:'b',clips:20},{fingerprint:'c',rigFingerprint:'b',clips:20}));
  assert(!sameSharedMotionV531({fingerprint:'a',rigFingerprint:'b',clips:20},{fingerprint:'a',rigFingerprint:'c',clips:20}));
  await assert.rejects(()=>inspectSharedMotionV531(new File(['garbage'],'bad.glb')),/GLB/);
- const root=path.join(__dirname,'..');const dancer=fs.readFileSync(path.join(root,'components/visualizer/GltfDancerAvatarV492.tsx'),'utf8');
+ const root=path.join(__dirname,'..');const dancer=fs.readFileSync(path.join(root,'components/visualizer/GltfDancerAvatarV492.tsx'),'utf8').replace(/\r\n?/g,'\n');
  assert(dancer.includes('SharedEmbeddedAvatarV531'),'stage must mount shared animation source');
  const installer=fs.readFileSync(path.join(root,'components/CharacterMotionBatchInstaller.tsx'),'utf8');
  for(const s of ['inspectSharedMotionV531','stripDuplicateAnimationsV531','sharedMotionUrl','sharedMotionFingerprint','installedSharedUrl'])assert(installer.includes(s),`installer ${s} missing`);

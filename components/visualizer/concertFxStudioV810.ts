@@ -10,13 +10,27 @@ export interface ConcertFxSettingsV810 {
   ledExperienceV821:boolean;ledEqualizerV821:boolean;ledGeometryV821:boolean;ledDropVisualsV821:boolean;
   ledLookV821:'auto'|'equalizer'|'geometry'|'waves'|'tunnel';ledIntensityV821:number;
   ledExperienceV842:boolean;ledDepthStrengthV842:number;ledDepthStyleV842:'auto'|'geometry'|'tunnel';ledLightSyncV842:boolean;
+  ledMotifsV870:boolean;ledMotifStrengthV870:number;ledMotifStyleV870:'auto'|'equalizer'|'prism'|'shockwave';ledCameraProtectionV870:boolean;
   lyricsProjection:boolean;rhymeAccents:boolean;projectionSurface:'wall'|'floor';
+  cinematicLyricsV873:boolean;cinematicLyricsStrengthV873:number;hookProjectionSizeV873:number;lyricsCameraGuardV873:boolean;
   atmosphericFx:boolean;floorHaze:boolean;lightShafts:boolean;
   virtualCrowd:boolean;crowdPhones:boolean;crowdIntensity:number;crowdDensity:'sparse'|'balanced'|'arena';
+  crowdExperienceV874:boolean;crowdArmWaveV874:boolean;crowdPhoneWaveV874:boolean;
+  smartFestivalAtmosphereV875:boolean;festivalCrowdWavesV875:boolean;festivalWristbandsV875:boolean;festivalAtmosphereStrengthV875:number;festivalAtmosphereStyleV875:'subtle'|'balanced'|'immersive';
+  crowdChoreographyV876:boolean;crowdSectorSyncV876:boolean;crowdChoreographyStrengthV876:number;crowdChoreographyStyleV876:'natural'|'concert'|'festival';
+  crowdInteractionV877:boolean;crowdCallResponseV877:boolean;crowdFollowPerformerV877:boolean;crowdDanceEchoV877:boolean;crowdInteractionStrengthV877:number;crowdInteractionStyleV877:'subtle'|'balanced'|'lively';
+  crowdEmotionDirectorV878:boolean;crowdEmotionWavesV878:boolean;crowdEmotionContrastV878:boolean;crowdEmotionStrengthV878:number;crowdEmotionStyleV878:'cinematic'|'balanced'|'responsive';
+  crowdCameraHarmonyV879:boolean;crowdCameraStrengthV879:number;crowdLyricsGuardV879:boolean;
+  crowdPerformerPriorityV879:boolean;crowdTransitionSofteningV879:boolean;
+  crowdCameraStyleV879:'cinematic'|'balanced'|'festival';
+  smartConcertExperienceV880:boolean;smartConcertStrengthV880:number;smartConcertContrastV880:boolean;
+  smartConcertHeroRotationV880:boolean;smartConcertPerformerGuardV880:boolean;
+  smartConcertStyleV880:'cinematic'|'balanced'|'festival';
   reactiveParticles:boolean;particleSparks:boolean;particleShards:boolean;particleConfetti:boolean;particleEnergyRings:boolean;
   particleIntensity:number;particleDensity:'subtle'|'balanced'|'epic';
   kineticStage:boolean;kineticIntensity:number;foamCannon:boolean;foamIntensity:number;foamSide:'both'|'left'|'right';
   festivalFxV844:boolean;festivalIntensityV844:number;festivalStyleV844:'balanced'|'festival';
+  festivalCoordinationV871:boolean;festivalClarityV871:number;
   festivalCo2V844:boolean;festivalSparksV844:boolean;festivalConfettiV844:boolean;
   festivalStrobeV844:boolean;festivalStrobeIntensityV844:number;festivalStrobeRateV844:0.5|1|2;
   festivalSoapBubblesV8441:boolean;festivalBubblesIntensityV8441:number;
@@ -52,13 +66,25 @@ export const DEFAULT_CONCERT_FX_V810:Readonly<ConcertFxSettingsV810>={
   ledExperienceV821:true,ledEqualizerV821:true,ledGeometryV821:true,ledDropVisualsV821:true,
   ledLookV821:'auto',ledIntensityV821:75,
   ledExperienceV842:true,ledDepthStrengthV842:65,ledDepthStyleV842:'auto',ledLightSyncV842:true,
+  ledMotifsV870:true,ledMotifStrengthV870:60,ledMotifStyleV870:'auto',ledCameraProtectionV870:true,
   lyricsProjection:true,rhymeAccents:true,projectionSurface:'wall',
+  cinematicLyricsV873:true,cinematicLyricsStrengthV873:65,hookProjectionSizeV873:60,lyricsCameraGuardV873:true,
   atmosphericFx:true,floorHaze:true,lightShafts:true,
   virtualCrowd:true,crowdPhones:true,crowdIntensity:65,crowdDensity:'balanced',
+  crowdExperienceV874:true,crowdArmWaveV874:true,crowdPhoneWaveV874:true,
+  smartFestivalAtmosphereV875:true,festivalCrowdWavesV875:true,festivalWristbandsV875:true,festivalAtmosphereStrengthV875:65,festivalAtmosphereStyleV875:'balanced',
+  crowdChoreographyV876:true,crowdSectorSyncV876:true,crowdChoreographyStrengthV876:65,crowdChoreographyStyleV876:'concert',
+  crowdInteractionV877:true,crowdCallResponseV877:true,crowdFollowPerformerV877:true,crowdDanceEchoV877:true,crowdInteractionStrengthV877:65,crowdInteractionStyleV877:'balanced',
+  crowdEmotionDirectorV878:true,crowdEmotionWavesV878:true,crowdEmotionContrastV878:true,crowdEmotionStrengthV878:65,crowdEmotionStyleV878:'balanced',
+  crowdCameraHarmonyV879:true,crowdCameraStrengthV879:70,crowdLyricsGuardV879:true,
+  crowdPerformerPriorityV879:true,crowdTransitionSofteningV879:true,crowdCameraStyleV879:'balanced',
+  smartConcertExperienceV880:true,smartConcertStrengthV880:65,smartConcertContrastV880:true,
+  smartConcertHeroRotationV880:true,smartConcertPerformerGuardV880:true,smartConcertStyleV880:'balanced',
   reactiveParticles:true,particleSparks:true,particleShards:true,particleConfetti:true,particleEnergyRings:true,
   particleIntensity:65,particleDensity:'balanced',
   kineticStage:true,kineticIntensity:65,foamCannon:true,foamIntensity:65,foamSide:'both',
   festivalFxV844:true,festivalIntensityV844:65,festivalStyleV844:'balanced',
+  festivalCoordinationV871:true,festivalClarityV871:70,
   festivalCo2V844:true,festivalSparksV844:true,festivalConfettiV844:true,
   festivalStrobeV844:false,festivalStrobeIntensityV844:25,festivalStrobeRateV844:1,
   festivalSoapBubblesV8441:true,festivalBubblesIntensityV8441:60,festivalBubbleStyleV8441:'floating',
@@ -105,10 +131,18 @@ export function normalizeConcertFxV810(raw?:Partial<ConcertFxSettingsV810>|null)
  ledDepthStrengthV842:finite(raw?.ledDepthStrengthV842)?Math.round(clamp(raw.ledDepthStrengthV842,0,100)):d.ledDepthStrengthV842,
  ledDepthStyleV842:raw?.ledDepthStyleV842==='geometry'||raw?.ledDepthStyleV842==='tunnel'?raw.ledDepthStyleV842:'auto',
  ledLightSyncV842:typeof raw?.ledLightSyncV842==='boolean'?raw.ledLightSyncV842:d.ledLightSyncV842,
+ ledMotifsV870:typeof raw?.ledMotifsV870==='boolean'?raw.ledMotifsV870:d.ledMotifsV870,
+ ledMotifStrengthV870:finite(raw?.ledMotifStrengthV870)?Math.round(clamp(raw.ledMotifStrengthV870,0,100)):d.ledMotifStrengthV870,
+ ledMotifStyleV870:raw?.ledMotifStyleV870==='equalizer'||raw?.ledMotifStyleV870==='prism'||raw?.ledMotifStyleV870==='shockwave'?raw.ledMotifStyleV870:'auto',
+ ledCameraProtectionV870:typeof raw?.ledCameraProtectionV870==='boolean'?raw.ledCameraProtectionV870:d.ledCameraProtectionV870,
  protectLyrics:typeof raw?.protectLyrics==='boolean'?raw.protectLyrics:d.protectLyrics,
  lyricsProjection:typeof raw?.lyricsProjection==='boolean'?raw.lyricsProjection:d.lyricsProjection,
  rhymeAccents:typeof raw?.rhymeAccents==='boolean'?raw.rhymeAccents:d.rhymeAccents,
  projectionSurface:raw?.projectionSurface==='floor'?'floor':'wall',
+ cinematicLyricsV873:typeof raw?.cinematicLyricsV873==='boolean'?raw.cinematicLyricsV873:d.cinematicLyricsV873,
+ cinematicLyricsStrengthV873:finite(raw?.cinematicLyricsStrengthV873)?Math.round(clamp(raw.cinematicLyricsStrengthV873,0,100)):d.cinematicLyricsStrengthV873,
+ hookProjectionSizeV873:finite(raw?.hookProjectionSizeV873)?Math.round(clamp(raw.hookProjectionSizeV873,0,100)):d.hookProjectionSizeV873,
+ lyricsCameraGuardV873:typeof raw?.lyricsCameraGuardV873==='boolean'?raw.lyricsCameraGuardV873:d.lyricsCameraGuardV873,
  atmosphericFx:typeof raw?.atmosphericFx==='boolean'?raw.atmosphericFx:d.atmosphericFx,
  floorHaze:typeof raw?.floorHaze==='boolean'?raw.floorHaze:d.floorHaze,
  lightShafts:typeof raw?.lightShafts==='boolean'?raw.lightShafts:d.lightShafts,
@@ -116,6 +150,41 @@ export function normalizeConcertFxV810(raw?:Partial<ConcertFxSettingsV810>|null)
  crowdPhones:typeof raw?.crowdPhones==='boolean'?raw.crowdPhones:d.crowdPhones,
  crowdIntensity:finite(raw?.crowdIntensity)?Math.round(clamp(raw.crowdIntensity,0,100)):d.crowdIntensity,
  crowdDensity:raw?.crowdDensity==='sparse'||raw?.crowdDensity==='arena'?raw.crowdDensity:'balanced',
+ crowdExperienceV874:typeof raw?.crowdExperienceV874==='boolean'?raw.crowdExperienceV874:d.crowdExperienceV874,
+ crowdArmWaveV874:typeof raw?.crowdArmWaveV874==='boolean'?raw.crowdArmWaveV874:d.crowdArmWaveV874,
+ crowdPhoneWaveV874:typeof raw?.crowdPhoneWaveV874==='boolean'?raw.crowdPhoneWaveV874:d.crowdPhoneWaveV874,
+ smartFestivalAtmosphereV875:typeof raw?.smartFestivalAtmosphereV875==='boolean'?raw.smartFestivalAtmosphereV875:d.smartFestivalAtmosphereV875,
+ festivalCrowdWavesV875:typeof raw?.festivalCrowdWavesV875==='boolean'?raw.festivalCrowdWavesV875:d.festivalCrowdWavesV875,
+ festivalWristbandsV875:typeof raw?.festivalWristbandsV875==='boolean'?raw.festivalWristbandsV875:d.festivalWristbandsV875,
+ festivalAtmosphereStrengthV875:finite(raw?.festivalAtmosphereStrengthV875)?Math.round(clamp(raw.festivalAtmosphereStrengthV875,0,100)):d.festivalAtmosphereStrengthV875,
+ festivalAtmosphereStyleV875:raw?.festivalAtmosphereStyleV875==='subtle'||raw?.festivalAtmosphereStyleV875==='immersive'?raw.festivalAtmosphereStyleV875:'balanced',
+ crowdChoreographyV876:typeof raw?.crowdChoreographyV876==='boolean'?raw.crowdChoreographyV876:d.crowdChoreographyV876,
+ crowdSectorSyncV876:typeof raw?.crowdSectorSyncV876==='boolean'?raw.crowdSectorSyncV876:d.crowdSectorSyncV876,
+ crowdChoreographyStrengthV876:finite(raw?.crowdChoreographyStrengthV876)?Math.round(clamp(raw.crowdChoreographyStrengthV876,0,100)):d.crowdChoreographyStrengthV876,
+ crowdChoreographyStyleV876:raw?.crowdChoreographyStyleV876==='natural'||raw?.crowdChoreographyStyleV876==='festival'?raw.crowdChoreographyStyleV876:'concert',
+ crowdInteractionV877:typeof raw?.crowdInteractionV877==='boolean'?raw.crowdInteractionV877:d.crowdInteractionV877,
+ crowdCallResponseV877:typeof raw?.crowdCallResponseV877==='boolean'?raw.crowdCallResponseV877:d.crowdCallResponseV877,
+ crowdFollowPerformerV877:typeof raw?.crowdFollowPerformerV877==='boolean'?raw.crowdFollowPerformerV877:d.crowdFollowPerformerV877,
+ crowdDanceEchoV877:typeof raw?.crowdDanceEchoV877==='boolean'?raw.crowdDanceEchoV877:d.crowdDanceEchoV877,
+ crowdInteractionStrengthV877:finite(raw?.crowdInteractionStrengthV877)?Math.round(clamp(raw.crowdInteractionStrengthV877,0,100)):d.crowdInteractionStrengthV877,
+ crowdInteractionStyleV877:raw?.crowdInteractionStyleV877==='subtle'||raw?.crowdInteractionStyleV877==='lively'?raw.crowdInteractionStyleV877:'balanced',
+ crowdEmotionDirectorV878:typeof raw?.crowdEmotionDirectorV878==='boolean'?raw.crowdEmotionDirectorV878:d.crowdEmotionDirectorV878,
+ crowdEmotionWavesV878:typeof raw?.crowdEmotionWavesV878==='boolean'?raw.crowdEmotionWavesV878:d.crowdEmotionWavesV878,
+ crowdEmotionContrastV878:typeof raw?.crowdEmotionContrastV878==='boolean'?raw.crowdEmotionContrastV878:d.crowdEmotionContrastV878,
+ crowdEmotionStrengthV878:finite(raw?.crowdEmotionStrengthV878)?Math.round(clamp(raw.crowdEmotionStrengthV878,0,100)):d.crowdEmotionStrengthV878,
+ crowdEmotionStyleV878:raw?.crowdEmotionStyleV878==='cinematic'||raw?.crowdEmotionStyleV878==='responsive'?raw.crowdEmotionStyleV878:'balanced',
+ crowdCameraHarmonyV879:typeof raw?.crowdCameraHarmonyV879==='boolean'?raw.crowdCameraHarmonyV879:d.crowdCameraHarmonyV879,
+ crowdCameraStrengthV879:finite(raw?.crowdCameraStrengthV879)?Math.round(clamp(raw.crowdCameraStrengthV879,0,100)):d.crowdCameraStrengthV879,
+ crowdLyricsGuardV879:typeof raw?.crowdLyricsGuardV879==='boolean'?raw.crowdLyricsGuardV879:d.crowdLyricsGuardV879,
+ crowdPerformerPriorityV879:typeof raw?.crowdPerformerPriorityV879==='boolean'?raw.crowdPerformerPriorityV879:d.crowdPerformerPriorityV879,
+ crowdTransitionSofteningV879:typeof raw?.crowdTransitionSofteningV879==='boolean'?raw.crowdTransitionSofteningV879:d.crowdTransitionSofteningV879,
+ crowdCameraStyleV879:raw?.crowdCameraStyleV879==='cinematic'||raw?.crowdCameraStyleV879==='festival'?raw.crowdCameraStyleV879:'balanced',
+ smartConcertExperienceV880:typeof raw?.smartConcertExperienceV880==='boolean'?raw.smartConcertExperienceV880:d.smartConcertExperienceV880,
+ smartConcertStrengthV880:finite(raw?.smartConcertStrengthV880)?Math.round(clamp(raw.smartConcertStrengthV880,0,100)):d.smartConcertStrengthV880,
+ smartConcertContrastV880:typeof raw?.smartConcertContrastV880==='boolean'?raw.smartConcertContrastV880:d.smartConcertContrastV880,
+ smartConcertHeroRotationV880:typeof raw?.smartConcertHeroRotationV880==='boolean'?raw.smartConcertHeroRotationV880:d.smartConcertHeroRotationV880,
+ smartConcertPerformerGuardV880:typeof raw?.smartConcertPerformerGuardV880==='boolean'?raw.smartConcertPerformerGuardV880:d.smartConcertPerformerGuardV880,
+ smartConcertStyleV880:raw?.smartConcertStyleV880==='cinematic'||raw?.smartConcertStyleV880==='festival'?raw.smartConcertStyleV880:'balanced',
  reactiveParticles:typeof raw?.reactiveParticles==='boolean'?raw.reactiveParticles:d.reactiveParticles,
  particleSparks:typeof raw?.particleSparks==='boolean'?raw.particleSparks:d.particleSparks,
  particleShards:typeof raw?.particleShards==='boolean'?raw.particleShards:d.particleShards,
@@ -129,6 +198,8 @@ export function normalizeConcertFxV810(raw?:Partial<ConcertFxSettingsV810>|null)
  foamIntensity:finite(raw?.foamIntensity)?Math.round(clamp(raw.foamIntensity,0,100)):d.foamIntensity,
  foamSide:raw?.foamSide==='left'||raw?.foamSide==='right'?raw.foamSide:'both',
  festivalFxV844:typeof raw?.festivalFxV844==='boolean'?raw.festivalFxV844:d.festivalFxV844,
+ festivalCoordinationV871:typeof raw?.festivalCoordinationV871==='boolean'?raw.festivalCoordinationV871:d.festivalCoordinationV871,
+ festivalClarityV871:finite(raw?.festivalClarityV871)?Math.round(clamp(raw.festivalClarityV871,0,100)):d.festivalClarityV871,
  festivalIntensityV844:finite(raw?.festivalIntensityV844)?Math.round(clamp(raw.festivalIntensityV844,0,100)):d.festivalIntensityV844,
  festivalStyleV844:raw?.festivalStyleV844==='festival'?'festival':'balanced',
  festivalCo2V844:typeof raw?.festivalCo2V844==='boolean'?raw.festivalCo2V844:d.festivalCo2V844,

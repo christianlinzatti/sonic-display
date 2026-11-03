@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.v842-core.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "files": [
+    "../components/visualizer/ledWallMotifDirectorV870.ts",
+    "../components/visualizer/ledWallExperienceShaderV842.ts",
+    "v414-music-types.d.ts",
+    "stubs/v415-three-types.d.ts",
+    "stubs/v569-react-types.d.ts",
+    "stubs/v508-three-types.d.ts",
+    "stubs/v837-rig-three-types.d.ts"
+  ]
+}

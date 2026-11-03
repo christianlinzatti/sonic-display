@@ -4397,3 +4397,19 @@
 .history-fusion-details-v865>p{font-size:.78rem;color:#b9c8dc}.history-fusion-details-v865 ol{padding:0;list-style:none;display:grid;gap:4px;max-height:350px;overflow-y:auto}.history-fusion-details-v865 li{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid rgba(148,163,184,.15);padding:7px 0}.history-fusion-details-v865 li>div{min-width:0;overflow-wrap:anywhere}.history-fusion-details-v865 li small{display:block;color:#adc0d4;font-size:.75rem}.history-fusion-details-v865 li>span{white-space:nowrap;align-self:center;font-size:.72rem;color:#b9d8ff}
 @media(max-width:700px){.history-fusion-v865{padding:11px}.history-fusion-metrics-v865{grid-template-columns:repeat(2,minmax(0,1fr))}.history-fusion-day-v865{min-width:25px;flex:0 0 25px}.history-fusion-details-v865 li{flex-wrap:wrap}.history-fusion-toolbar-v865 small{width:100%}}
 @media(prefers-reduced-motion:reduce){.history-fusion-v865 *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* V873 – keep readable captions above busy stage visuals; no duplicated text,
+   no changed word karaoke timings, no camera positions or constant strobing. */
+.lyrics.v873-cinematic-lyrics .lyric.active {
+  overflow-wrap:anywhere;
+  text-shadow: 0 .06em .2em rgba(0,0,0,.75), 0 0 .38em rgba(0,0,0,var(--v873-contrast,.3));
+}
+.lyrics.v873-cinematic-lyrics .lyric.active::before {
+  opacity: max(var(--v873-plate,.7),var(--v748-plate,0),var(--v688-plate,0));
+}
+.lyrics.v873-cinematic-lyrics .lyric.active .kinetic-word {
+  transition: text-shadow var(--v873-word-transition-ms,0ms) ease-out;
+}
+@media(prefers-reduced-motion:reduce) {
+  .lyrics.v873-cinematic-lyrics .lyric.active .kinetic-word {transition:none!important;animation:none!important}
+}

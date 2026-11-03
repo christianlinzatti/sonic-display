@@ -115,7 +115,7 @@ for(const bad of [[],[anchors[0],anchors[0]],[{...anchors[0],x:NaN}],
 const orig=JSON.stringify([pose,anchors,after.cue]);compose(pose,after.cue,anchors,{aspect:16/9,lyricsProtected:false});eq(JSON.stringify([pose,anchors,after.cue]),orig);
 const source=fs.readFileSync('components/visualizer/performanceCameraDirectorV747.ts','utf8');
 ok(!/Date\.now\(|Math\.random\(|setTimeout\(|setInterval\(|localStorage|fetch\(/.test(source),'deterministic pure director');
-const camera=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');
+const camera=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8').replace(/\r\n?/g,'\n');
 for(const symbol of ['advancePerformanceCameraV747','composePerformanceCameraV747','performanceCameraStateV747','performanceCameraV747.cue.cameraRate'])ok(camera.includes(symbol),'camera integration '+symbol);
 ok(camera.indexOf('const framedV747=')>=0 &&
   camera.indexOf('const framedV747=')<camera.indexOf('const framedV848=') &&

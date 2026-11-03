@@ -1,0 +1,16 @@
+{
+ "extends":"./tsconfig.v876-core.json",
+ "compilerOptions":{"incremental":false},
+ "files":[
+   "../components/visualizer/intelligentCrowdInteractionV877.ts",
+   "../components/visualizer/dynamicFestivalCrowdChoreographyV876.ts",
+   "../components/visualizer/smartFestivalAtmosphereV875.ts",
+   "../components/visualizer/intelligentAudienceExperienceV874.ts",
+   "../components/visualizer/virtualConcertCrowdPlannerV815.ts",
+   "../components/visualizer/concertFxStudioV810.ts",
+   "v414-music-types.d.ts",
+   "stubs/v415-three-types.d.ts",
+   "stubs/v569-react-types.d.ts",
+   "stubs/v508-three-types.d.ts"
+ ]
+}

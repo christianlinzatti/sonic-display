@@ -22,8 +22,28 @@ jobs:
           cache: npm
       - name: Reproducible dependency installation
         run: npm ci --no-audit --no-fund
+      - name: V873 Cinematic Lyrics 10.0 and TypeScript core
+        run: npm run test:v873 && npm run test:v873:types
+      - name: V872 natural dance continuity and TypeScript core
+        run: npm run test:v872 && npm run test:v872:types
+      - name: V871 Festival FX coordination and TypeScript core
+        run: npm run test:v871 && npm run test:v871:types
+      - name: V870 LED motif safety and TypeScript core
+        run: npm run test:v870 && npm run test:v870:types
+      - name: V869 Deutschrap vocal safety and TypeScript core
+        run: npm run test:v869 && npm run test:v869:types
+      - name: Portable Windows line-ending regression
+        run: npm run test:v86513:windows-eol
+      - name: Flat npm-chain regression
+        run: npm run test:v86512:flat
+      - name: Windows V665 smoke (flattened, complete)
+        if: runner.os == 'Windows'
+        run: npm run test:smoke:v665:flat
       - name: Full regressions, TypeScript, real production build
-        run: npm run verify:production:v831
+        run: npm run verify:production:v867
+      - name: Create offline dashboard even when the gate was skipped
+        if: always()
+        run: node scripts/v867-release-dashboard.cjs --from-report --platform ${{ matrix.os }}
       - name: Upload technical gate output even on failure
         if: always()
         uses: actions/upload-artifact@v4
@@ -32,5 +52,36 @@ jobs:
           path: |
             v831-production-gate-result.json
             v831-build-readiness-result.json
+            v867-release-dashboard.json
+            v867-release-dashboard.html
           if-no-files-found: warn
 # Browser/WebGL/GPU and real GLB concert-playthroughs require separate observed acceptance.
+
+  release-matrix-dashboard:
+    name: V867 Windows + Linux release overview
+    if: always()
+    needs: [full-technical-gate]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - name: Download per-OS technical reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: v832-*-technical-report
+          path: v867-artifacts
+          merge-multiple: false
+      - name: Build fail-closed cross-platform release dashboard
+        if: always()
+        run: node scripts/v867-release-dashboard.cjs --aggregate --input v867-artifacts
+      - name: Upload Windows/Linux overview
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v867-windows-linux-release-dashboard
+          path: |
+            v867-release-matrix.json
+            v867-release-matrix.html
+          if-no-files-found: error
+# Matrices and dashboards report technical status only, never a production release.

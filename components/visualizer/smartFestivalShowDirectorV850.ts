@@ -3,8 +3,10 @@
  * V824/V828 shape the original cues; V850 only reduces their automatic lanes.
  * No inferred song sections, camera cuts, dance clips, flashes, renders or timers.
  */
-import type {ConcertFxCueV810,ConcertFxSettingsV810,ConcertFxSectionV810} from './concertFxStudioV810';
+import type {ConcertFxCueV810,ConcertFxSettingsV810,ConcertFxSectionV810,ConcertFxGenreV810} from './concertFxStudioV810';
 import type {FxTimelineLaneV823} from './visualFxTimelineV823';
+import {inspectSongArcV868,shapeSongArcGainsV868} from './concertSongArcDirectorV868';
+import type {VerifiedSongArcV868} from './concertSongArcDirectorV868';
 export type FestivalFocusV850='rest'|'vocals'|'led'|'laser'|'particles';
 export type FestivalShowStyleV850='cinematic'|'balanced'|'festival';
 export type FestivalShowGainsV850=Record<FxTimelineLaneV823,number>&{festival:number;ambience:number};
@@ -20,12 +22,16 @@ export interface FestivalShowInputV850{
  blackout:boolean;lyricsProtected:boolean;vocalFocus:boolean;groupCount:number;
  tier:'low'|'balanced'|'high';budget:number;
  authoredLanes?:readonly FxTimelineLaneV823[];
+ /** Optional verified V604 plan, never inferred from audio/position. */
+ songArcV868?:VerifiedSongArcV868|null;
 }
 const finite=(n:unknown):n is number=>typeof n==='number'&&Number.isFinite(n);
 const clamp=(n:number)=>Math.max(0,Math.min(1,n));
 const smooth=(n:number)=>{const t=clamp(n);return t*t*(3-2*t);};
 const round=(n:number)=>Math.round(n*1000000)/1000000;
 const names:Record<ConcertFxSectionV810,string>={intro:'Auftakt',verse:'Strophe',hook:'Hook',build:'Spannungsaufbau',drop:'Drop',break:'Ruhepunkt',finale:'Finale'};
+const arcNamesV868={setup:'Auftakt',development:'Entwicklung',respite:'Ruhephase',
+  anticipation:'Drop-Vorbereitung',payoff:'Höhepunkt',finale:'Finale'} as const;
 const lanes:readonly FxTimelineLaneV823[]=['laser','led','particles','foam','transition'];
 const neutral=():FestivalShowGainsV850=>({laser:1,led:1,particles:1,foam:1,transition:1,festival:1,ambience:1});
 const sectionBase:Record<ConcertFxSectionV810,FestivalShowGainsV850>={
@@ -42,12 +48,57 @@ function seed(trackId:string):number{
  for(let i=0;i<trackId.length;i++)h=Math.imul(h^trackId.charCodeAt(i),16777619);
  return h>>>0;
 }
+/** V866 – genre-aware foreground rotation on *already verified* song acts.
+ * A focus only DIMs competing automatic FX. It never fires new light, foam,
+ * strobe, flash or camera cues, and never changes lyrics or authored timelines.
+ */
+const genreRotationV866:Partial<Record<ConcertFxGenreV810,Partial<Record<ConcertFxSectionV810,
+ readonly [FestivalFocusV850,FestivalFocusV850,FestivalFocusV850]>>>>={
+ rap:{
+  verse:['vocals','vocals','vocals'],
+  hook:['vocals','led','vocals'],
+  build:['vocals','led','laser'],
+  drop:['led','vocals','particles'],
+  finale:['vocals','led','particles'],
+ },
+ hardtekk:{
+  verse:['led','particles','laser'],
+  hook:['laser','led','particles'],
+  build:['laser','led','particles'],
+  drop:['laser','particles','led'],
+  finale:['particles','laser','led'],
+ },
+ hardstyle:{
+  verse:['led','laser','particles'],
+  hook:['particles','laser','led'],
+  build:['laser','led','particles'],
+  drop:['particles','laser','led'],
+  finale:['laser','particles','led'],
+ },
+ rock:{
+  verse:['vocals','vocals','led'],
+  hook:['vocals','led','particles'],
+  build:['led','laser','vocals'],
+  drop:['particles','led','laser'],
+  finale:['vocals','led','particles'],
+ },
+ pop:{
+  verse:['vocals','led','vocals'],
+  hook:['led','vocals','particles'],
+  build:['led','vocals','particles'],
+  drop:['led','particles','vocals'],
+  finale:['led','vocals','particles'],
+ },
+};
 /** A song's verified act index rotates the emphasis; repeated motifs need not repeat. */
-export function focusForActV850(trackId:string,actIndex:number,section:ConcertFxSectionV810):{
+export function focusForActV850(trackId:string,actIndex:number,section:ConcertFxSectionV810,
+ genre:ConcertFxGenreV810='neutral'):{
  focus:FestivalFocusV850;variation:0|1|2;
 }{
  const variation=((seed(trackId)+actIndex)%3) as 0|1|2;
  if(section==='break'||section==='intro')return {variation,focus:'rest'};
+ const genreFocus=genreRotationV866[genre]?.[section]?.[variation];
+ if(genreFocus)return {variation,focus:genreFocus};
  if(section==='verse')return {variation,focus:'vocals'};
  if(section==='build')return {variation,focus:variation===1?'led':'laser'};
  if(section==='hook')return {variation,focus:variation===0?'led':variation===1?'laser':'vocals'};
@@ -73,7 +124,7 @@ export function planSmartFestivalShowV850(i:FestivalShowInputV850):FestivalShowC
  const style:FestivalShowStyleV850=s?.festivalDirectorStyleV850==='cinematic'||s?.festivalDirectorStyleV850==='festival'?s.festivalDirectorStyleV850:'balanced';
  if(!intensity)return off('disabled');
  const section=i.fx.section;
- const {focus,variation}=focusForActV850(i.trackId,i.actIndex,section);
+ const {focus,variation}=focusForActV850(i.trackId,i.actIndex,section,i.fx.genre);
  // A stable verified act clock: fade to neutral at BOTH boundaries, including seeks.
  const edge=Math.min(i.progressMs-i.actStartMs,i.actEndMs-i.progressMs);
  const fade=smooth(edge/Math.min(1350,(i.actEndMs-i.actStartMs)*.22));
@@ -103,8 +154,14 @@ export function planSmartFestivalShowV850(i:FestivalShowInputV850):FestivalShowC
   if(lane==='laser'||lane==='festival'||lane==='particles')gain*=1-(1-readability)*blend*.34;
   gains[lane]=round(clamp(gain));
  }
+ const arcInputV868={arc:i.songArcV868,trackId:i.trackId,index:i.actIndex,
+   startMs:i.actStartMs,endMs:i.actEndMs,progressMs:i.progressMs,section,
+   lyricsProtected:i.lyricsProtected,vocalFocus:i.vocalFocus,authoredLanes:i.authoredLanes};
+ const arcV868=inspectSongArcV868(arcInputV868);
+ const shapedV868=shapeSongArcGainsV868(gains,arcInputV868,arcV868,blend);
  return {active:blend>.0005,reason:blend>.0005?'music':'protected',section,focus,variation,
-  sceneLabel:`${names[section]} · ${focus}`,blend,gains};
+  sceneLabel:arcV868.verified?`${names[section]} · ${focus} · ${arcNamesV868[arcV868.chapter!]}`:
+    `${names[section]} · ${focus}`,blend,gains:shapedV868};
 }
 /** Authored lanes always retain their original V823 result; this helper never boosts. */
 export function dimFestivalLaneV850(value:number,gain:number,manual:boolean):number{

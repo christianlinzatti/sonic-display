@@ -41,7 +41,10 @@ assert(parent.includes('loadAndMigrateHistoryV713'),'Persistent Last.fm archive 
 assert(parent.includes('if(!history||history.events.length===0)'),'Empty archive explained even if local mirror missing');
 assert(!/fetch\s*\(|localStorage|indexedDB|sessionStorage/.test(ui),'V865 UI does not fetch or mutate stored archives');
 assert(css.includes('.history-fusion-v865')&&css.includes('@media(max-width:700px)'));
-const p=require('../package.json'),lock=require('../package-lock.json');assert.equal(p.version,'0.1.0-v865');assert.equal(lock.version,p.version);assert.equal(lock.packages[''].version,p.version);
+const p=require('../package.json'),lock=require('../package-lock.json');
+const release=Number(p.version.match(/^0\.1\.0-v(\d+)$/)?.[1]);
+assert(Number.isInteger(release)&&release>=865,'V865 regression must remain active in V865+ releases');
+assert.equal(lock.version,p.version);assert.equal(lock.packages[''].version,p.version);
 for(const task of ['test:v865','test:v865:types','test:v865:ui-types'])assert(p.scripts[task]);
 for(const task of ['build:preflight','prebuild','check:fast','check:release'])assert(p.scripts[task].includes('npm run test:v865 && npm run test:v865:types && npm run test:v865:ui-types &&'),`${task} must retain V865 gate`);
 console.log('PASS V865: UTC day source audit, 1:1 pairs, 30/90/365, observed-span gaps, DST, immutable sources, UI integration, archive fallback, release chain');

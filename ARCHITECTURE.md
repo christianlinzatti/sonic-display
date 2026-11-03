@@ -1,3 +1,166 @@
+## V880 – Smart Concert Experience 5.0 (ein gemeinsamer Show-Spannungsbogen)
+
+`components/visualizer/smartConcertExperienceV880.ts` nutzt ausschließlich den
+verifizierten musikalischen V810-Akt, die Songposition und die bereits vorhandenen
+Audio-, Kamera- und Lyrics-Signale. Die sieben Kapitel (Opening, Narrative,
+Singalong, Anticipation, Impact, Breathing, Finale) gewichten vorhandene
+Publikums-, Partikel-, Festival-, Schaum-, LED- und Laser-Cues in einer
+zusammenhängenden Dramaturgie. Die Priorität eines Höhepunkts rotiert
+*deterministisch* und stabil in 18-Sekunden-Fenstern; das ist keine Tempo- oder
+Gesangserkennung. Ein geglätteter Energieverlauf wird bei Seek, Trackwechsel,
+Pause und Ausfall der Musikautorität zurückgesetzt.
+
+Die finale Koordination in `components/visualizer/DynamicStage.tsx` erfolgt
+**nach** V825-Performance-Governor, V871-Festival-Sichtschutz und
+V879-Publikums-Kamera-Harmonie. Sie kann bestehende Effekte **nur reduzieren**:
+keine zusätzlichen Instanzen, Lichter, Flashes, Strobes, Kameras oder Timer.
+Explizit bearbeitete V823-FX-Spuren sowie manuelle Kamera-/Lichtregie bleiben
+unverändert. Die vorhandene Tänzer-/Kamera-Choreografie bleibt Eigentum der
+bisherigen Regisseure; V880 führt keine neue Bewegungs- oder Singer-KI ein.
+Das `components/visualizer/ConcertFxStudioPanelV810.tsx` bietet sechs neue
+Einstellungen und eine ausdrücklich simulierte Vorschau.
+
+Tests: `tests/v880-smart-concert-experience-regression.cjs`,
+`tests/tsconfig.v880-core.json` und `scripts/verify-v880-windows.ps1`.
+Vollständige Veröffentlichung: `V880-FULL-RELEASE-README.md`.
+
+## V873 – Cinematic Lyrics 10.0 (einzelne Textautorität)
+
+`cinematicLyricsPolishV873.ts` optimiert die **bestehenden** V688/V748-Lyrics
+und die V813-Rückwand-/Bodenprojektion auf Grundlage echter Zeilen- und
+Wort-Zeitstempel. Kurze Rap-Wörter erhalten kürzere CSS-Übergänge, niemals
+neue Wortmarken, Phoneme oder künstliche gesprochene Wörter. Die V813-Textur
+wird weiterverwendet; nur die Größe ihrer vorhandenen Rückwand-Geometrie
+ändert sich bis maximal 1,3× bei verifiziertem Hook. Manuell gewählte
+Kameraperspektiven und Projektionseinstellungen bleiben maßgeblich.
+
+Bei unbestätigten Daten, Pausen, Kameranahaufnahmen, mehreren Performern und
+Reduced Motion werden neue Akzente unterdrückt oder gedimmt. Der bestehende
+Lyrics-Renderer ist einziger Besitzer der eigentlichen Untertitel. Kein neuer
+Renderpass, keine neuen Timer und kein automatischer Kamerawechsel.
+
+Siehe `V873-CINEMATIC-LYRICS-10.md` und `V873-VERIFICATION.md`.
+
+## V871 – Festival FX 4.0 (gemeinsamer Effekt-Sichtschutz)
+
+V871 ergänzt `components/visualizer/festivalFxCoordinationV871.ts` als reine,
+deterministische Koordination **nach** allen bestehenden V817/V823/V825/
+V844–V850-Sicherheits- und Performance-Gates. CO₂, Schaum, Seifenblasen,
+Luftschlangen und Finale-Effekte werden nicht neu gestartet, sondern
+konservativ nach bereits bestätigten Musikabschnitten gewichtet.
+
+Manuelle V823-Effektspuren werden bitgenau bewahrt, opt-in Full-Stage-Flashes
+nicht verändert. Der Sichtschutz wirkt stärker bei Lyrics, Vocal-Fokus,
+Nahaufnahmen und größeren Ensembles. Er erzeugt weder neuen Renderpass noch
+neues Timing, keine echten GPU-Messwerte oder simulierte Beats. Das bestehende
+`components/visualizer/DynamicStage.tsx` übernimmt nur reduzierte Cues;
+`components/visualizer/ConcertFxStudioPanelV810.tsx` bietet Ein/Aus und
+0–100 % Klarheitsgrad mit explizit **simulierter** Vorschau.
+
+Siehe `V871-FESTIVAL-FX-4.md` und `V871-VERIFICATION.md`.
+
+## V870 – LED Wall Experience: dynamische Muster und Drop-Fokus
+
+V870 erweitert die **bereits vorhandene** V842-LED-Rückwand um frequenzreaktive
+Equalizer-Säulen, konzentrische Prismengeometrie und begrenzte Bassringe bei
+**verifizierten** Drops/Finales. Ein einziger Shader, ein Mesh und eine
+vorhandene V810-Musikphase bleiben maßgeblich. Keine unabhängigen Timings,
+zusätzlichen Lichtquellen, WebGL-Pässe oder Vollbildblitze.
+
+`components/visualizer/ledWallMotifDirectorV870.ts` verwendet ausschließlich
+V810/V821/V842-bestätigte Musik-Cues. Bei Blackout, Pausen, Reduced Motion,
+Low-Tier, manuellen V823-LED-Spuren, gesperrter Lichtregie oder festem
+V821/V842-Look bleiben die Ergänzungen ausgeschaltet. Aktive Lyrics,
+Vocal-Fokus, mehrere Avatare und manuelle Kamera-/Nahaufnahme-Situationen
+dimmen die zusätzliche LED-Intensität. Der Shader begrenzt ihren Zusatzbeitrag
+auf .09 und erhält die bestehende finale Alpha-Grenze von .15.
+
+Im `ConcertFxStudioPanelV810` lassen sich zusätzliche Muster, Stärke und
+Kameradimmung einstellen. Das Dashboard zeigt eine **simulierte** Vorschau
+statt echter Spotify- oder Mikrofondaten. Die Änderungen sind in den
+Versions-Regressionen, den isolierten TypeScript-Core-Prüfungen und den
+Windows-/Ubuntu-CI-Gates integriert.
+
+Details: `V870-LED-WALL-MOTIFS.md` und `V870-VERIFICATION.md`.
+
+## V869 – Advanced Deutschrap Lip-Sync 6.0
+
+`components/visualizer/deutschrapVocalDirectorV869.ts` erweitert die bereits
+verifizierte Wort-Reaktion V837 in der **einzigen** existierenden
+`VocalRigV368.tsx`-Mundinterpolation. Unter 265 ms kurze, zusammenhängende
+Rap-Wörter erhalten eine kleine zusätzliche Attack-/Release-Skalierung.
+Explizit angelegte V632-Adlib-Begleitstimmen bekommen statt der Hauptwort-Taktung
+eine zurückhaltende, szenengebundene Interpolation: V597/V686/V837-Worttempo
+wird nur für diese Rolle ausgesetzt. Keine zusätzlichen Phoneme/Mundziele,
+Stimmen oder Audioquellen werden inferiert. Authoring, reduzierte Bewegung,
+Stems, Viseme, Bewegung/IK und Low-Tier gehen vor. Siehe
+`V869-ADVANCED-DEUTSCHRAP-LIP-SYNC-6.md` und
+`V869-VERIFICATION.md`.
+
+## V868 – Concert Director 5.0 (verifizierter Song-Spannungsbogen)
+
+Die Version erweitert ausschließlich den bestehenden V850 Smart Festival Show Director.
+`components/visualizer/concertSongArcDirectorV868.ts` liest einen **verifizierten V604/V600-Gesamtplan**,
+prüft Track-ID, Gesamtdauer, Aktindex, Abschnitt, monotone Aktgrenzen sowie den aktuellen Wiedergabezeitpunkt.
+Ungültige, fremde, zu alte oder nicht vorhandene Songpläne fallen exakt auf das vorhandene V850-Verhalten zurück.
+Unverifizierte Drops oder Finales werden **nicht** anhand einer Songposition erfunden.
+
+`components/visualizer/DynamicStage.tsx` reicht den bereits vorhandenen verifizierten V604-Plan an
+`components/visualizer/smartFestivalShowDirectorV850.ts` weiter. Die Planung der Regie berücksichtigt
+Ruhephasen, bewiesene Build→Drop-Übergänge, wiederholte Hooks und das im V604-Plan
+bestätigte Schlusskapitel. Änderungen erfolgen ausschließlich über **begrenzte Multiplikatoren**
+für bereits genehmigte automatische Effekte (LED, Laser, Partikel, Übergänge, Ambience/Festival).
+Bestehende manuellen V823-Spuren werden nicht verändert. Blackouts, Lyrics-Schutz,
+Reduced-Motion, low-tier und V850-Entscheidungen behalten ihre Priorität.
+Die vorhandene Kamera-Regie V848/V351 bleibt zuständig für Bildausschnitt und Lyrics-Sicherheit;
+V868 erzwingt **keine** zusätzlichen Schnitte, führt **keinen** Timer und schafft **keinen** Renderer.
+
+Prüfung: `npm run test:v868` und `npm run test:v868:types` sowie Regressionen
+V850/V866/V867, Syntax, Architektur und die bestehende Windows-/Linux-Release-Pipeline.
+Der vollständige TypeScript-Check, Next.js-Build und visuelle reale Konzertabnahme
+sind weiterhin vor einer Produktionsfreigabe erforderlich.
+
+## V867 – Cross-Platform Release-Dashboard und Fehlerdiagnose
+
+Das unveränderte verbindliche V831-Production-Gate läuft unter `npm run verify:production:v867`
+über den beobachtenden Wrapper `scripts/v867-verify-production.cjs`.
+Der Wrapper zeigt alle Original-Logs, erfasst nur einen begrenzten Diagnose-Ausschnitt und
+schreibt `v867-release-dashboard.json` sowie eine lokal lesbare, barrierearme
+`v867-release-dashboard.html` mit Stufenstatus, Dauer, Fehlerschwerpunkt und
+zielgerichtetem Prüfhinweis. Vor dem Lauf werden **alte Reports entfernt**;
+auch ein fehlendes Ergebnis oder ein fehlerhafter Exitcode blockiert den technischen Status.
+Keine Browser- oder GPU-Abnahme wird durch die HTML-Seite ersetzt.
+
+Die reinen Funktionen in `scripts/v867-release-dashboard.cjs` aggregieren Windows-
+und Ubuntu-Reports aus GitHub Actions in `v867-release-matrix.json` / `.html`.
+Ein fehlender oder unvollständiger OS-Bericht ist immer **blockiert**. Der
+V832-Workflow lädt beide Einzelberichte als Build-Artefakte hoch und erstellt
+bei jedem Lauf – einschließlich fehlgeschlagener Läufe – eine Gesamtübersicht.
+Der manuelle V831-Workflow erzeugt dieselben individuellen Dashboard-Dateien.
+Der Status `productionReleased` bleibt grundsätzlich `false` (keine fiktive Freigabe).
+Logs werden nur gekürzt und bei der Anzeige HTML-escaped / nach typischen Secrets
+redigiert; die Dateien dürfen trotzdem nicht als Sicherheitsarchiv für Rohlogs gelten.
+
+Befehle: `npm run test:v867`, `npm run verify:production:v867`,
+`npm run dashboard:release:v867` und `npm run dashboard:release:v867:matrix`.
+Die Veröffentlichung bleibt ohne vollständigen TypeScript-Check, Next.js-Build sowie
+reale Konzert-, Lippen-, Lyrics-, Kamera-, Browser- und GPU-Abnahme blockiert.
+
+## V866 – Genre-Aware Concert Show (automatische Bühnenvariation)
+
+Der bestehende, rein deterministische V850-Festival-Show-Director in
+`components/visualizer/smartFestivalShowDirectorV850.ts` erweitert seine
+Fokusrotation nach V810-verifiziertem Genre: Deutschrap priorisiert Sänger
+und Lyrics; Hardtekk/Hardstyle rotieren Laser-, LED- und Partikelfokus;
+Rock und Pop variierten Hook- und Finale-Akzente. Der V850-Effektregler
+kann weiterhin **nur vorhandene automatische FX abdunkeln** – keine neuen
+Licht-/Strobe-/Flash-/Schaum-/Kamerasignale aktivieren. Die Stufen V823
+(manuell) und V831 (Release-Gate) behalten ihre Autorität. Unverifizierte
+Songabschnitte, Blackout, manuelles Licht und Reduced Motion bleiben geschützt.
+Tests: `tests/v866-genre-show-variety-regression.cjs` und
+`tests/tsconfig.v866-core.json` (Genre, Fade, Seek, Overrides, Readability).
+Vor Freigabe: vollständiger TypeScript-Check, Next-Build und reale Browserabnahme.
+
 ## V865 – Smart History Fusion 2.0
 
 Der bestehende Vergleich `components/ListeningSourceDashboardV707.tsx` zeigt in der gemeinsamen Quellenansicht nun `components/SmartHistoryFusionPanelV865.tsx`. Die reine Auswertung `lib/smart-history-fusion-v865.ts` baut auf der unveränderten, heuristischen 90-Sekunden-/1:1-Paarbildung von V707 auf und vergleicht pro UTC-Tag Spotify-/Last.fm-Ereignisse, mögliche Paare, quellenexklusive Ereignisse und Tage ohne archivierten Eintrag. Nur leere Tage **zwischen** erstem und letztem Archivzeitpunkt werden als mögliche Lücken im beobachteten Zeitfenster gezählt – nicht als nachgewiesene fehlende Wiedergaben. Das Panel ist lesend und enthält weder neue API-Aufrufe noch Schreibzugriffe. Der Quellendialog kann ein vorhandenes IndexedDB-Langzeitarchiv auch dann laden, wenn kein älterer localStorage-Spiegel mehr existiert. Tests: `tests/v865-smart-history-fusion-regression.cjs`, `tests/tsconfig.v865-ui.json`. Vollständiger TypeScript-Check, Next.js-Build und Browserabnahme bleiben Freigabegates.
@@ -328,7 +491,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V865
+**Dokumentationsstand:** V880
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -2848,3 +3011,7 @@ Beim Genre-Kompass werden bekannte Genre-Wiedergaben gegen die *abgedeckten* Wie
 - `lib/spotify-playlist-taste-v864.ts` vergleicht Playlist-Songs lokal anhand streng normalisierter Hauptkünstler-/Titelschlüssel mit Scrobbles (Remix/Live werden nicht zu anderen Versionen umgedeutet), fasst doppelte Titel zusammen und gibt Künstleranteile, Lieblingssongs und Archivtreffer zurück. Kein Anspruch, nie gespielte Titel zweifelsfrei festzustellen.
 - Last.fm-Daten stammen ausschließlich aus dem kontogebundenen IndexedDB-Langzeitarchiv; bei technischen Problemen kann der vorhandene lokale Kurzzeit-Spiegel gelesen werden und wird deutlich gekennzeichnet. Kein neuer Last.fm- oder Spotify-OAuth-Scope, kein lokales Speichern der Vergleichsauswertung.
 - V864-Regression, gezielte TypeScript-/UI-Prüfung, Syntax-/Architektur-/Windows-Modulkollisionsprüfung. Vollständiger `npm ci`, `npm run typecheck`, `npm run build` und tatsächlicher Browser-/Premium-Test weiterhin vor Freigabe.
+
+## V872 natural dance continuity
+
+Existing V738/V743 sampled hip channels pass through `naturalDanceContinuityV872` in the V492 live GLB renderer and AvatarEditor preview before V740/V758 body dynamics and final Foot-IK. Authored GLB clips, manual timelines, explicit hip modes and reduced-motion requests bypass the layer. No bones, animation assets or root transforms are written. V872 uses song time and existing stance flags only; it does not infer foot contacts or invent beats.

@@ -35,7 +35,7 @@ test('live stage DOM probe registers only at loopback and does not override show
 test('Canvas probe operates in real live R3F tree and only reads geometry',()=>{
  const src=fs.readFileSync('components/visualizer/LiveStageCanvasProbeV592.tsx','utf8');
  for(const marker of ['useThree','useFrame','scene.traverse','userData?.sonicV592GlbActor','Box3','gl.info.render.calls','gl.info.render.triangles','window.__sonicV592Canvas'])assert(src.includes(marker),marker);
- const tree=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
+ const tree=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8').replace(/\r\n?/g,'\n');
  assert(tree.includes('<LiveStageCanvasBridgeV301 />\n      <LiveStageCanvasProbeV592 />'));
  const glb=fs.readFileSync('components/visualizer/GltfDancerAvatarV492.tsx','utf8');
  assert(glb.includes('userData={{sonicV592GlbActor:true}}'));

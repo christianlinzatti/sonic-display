@@ -13,8 +13,7 @@
     "../components/visualizer/VisualConcertInspectorPanelV754.tsx",
     "../components/visualizer/RealConcertBenchmarkPanelV753.tsx",
     "../components/visualizer/concertDashboardStoreV751.ts",
-    "stubs/v701-react-jsx.d.ts",
-    "stubs/v751-react-external-store.d.ts"
+    "../global.d.ts"
   ],
   "include": [],
   "exclude": []

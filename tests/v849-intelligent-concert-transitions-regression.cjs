@@ -88,7 +88,13 @@ check('camera accepts coordinator scene',()=>assert(three.includes('transitionV7
 check('stage accepts same coordinator scene',()=>assert(three.includes('transitionV791={coordinatedTransitionV849.seam??undefined} transitionV849={coordinatedTransitionV849}')));
 check('old camera smooth V791 authority retained',()=>assert(camera.includes('transitionV791.cameraRate')));
 check('stage light V791 retained',()=>assert(stage.includes('transitionV791.lightingRate')));
-check('LED 821 uses same scene gain',()=>assert(stage.includes('wallV821.power*ledGainV823*(authoredFxV823')));
+check('LED 821 keeps V849 scene gain and authored LED priority',()=>{
+ const line=stage.split(/\r?\n/).find(s=>s.includes('led.uniforms.uLed21Power.value='));
+ assert(line,'V821 LED power assignment missing');
+ assert(line.includes('wallV821.power*ledGainV823*'),'V821 LED power must use V823 gain');
+ assert(line.includes('(authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001?1:ledBlendV849)'),
+   'Authored LED settings must bypass V849 scene dimming');
+});
 check('LED 842 depth uses same scene gain',()=>assert(stage.includes('u.uLed42Power.value=wallDepthV842.power*')));
 check('laser scene gain only on V823 automatic lanes',()=>assert(stage.includes('laserBlendV849)')));
 check('festival scene gain only reduces existing instances',()=>assert(stage.includes('special.co2Count*festivalBlendV849')));

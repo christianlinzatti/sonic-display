@@ -7,7 +7,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const ts = require('typescript');
-const source = fs.readFileSync(path.join(__dirname, '..', 'components/visualizer/RapRealAvatarPreviewV409.tsx'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '..', 'components/visualizer/RapRealAvatarPreviewV409.tsx'), 'utf8').replace(/\r\n?/g,'\n');
 const start = source.indexOf('  const clip=useMemo(()=>{');
 const end = source.indexOf('\n  useEffect(()=>{', start);
 assert(start !== -1 && end > start, 'locate the original clip selection');

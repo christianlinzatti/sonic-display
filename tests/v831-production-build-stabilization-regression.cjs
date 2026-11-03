@@ -88,14 +88,14 @@ try{
    'exit code must reflect readiness, not production approval');
  });
  check('project case collisions absent',()=>assert.deepEqual(doctor.scanCaseCollisions(root),[]));
- check('production gate always uses full release suite',()=>assert(fs.readFileSync(path.join(root,'scripts/v831-production-gate.cjs'),'utf8').includes("['run','check:release']")));
+ check('production gate always uses full release suite',()=>assert(fs.readFileSync(path.join(root,'scripts/v831-production-gate.cjs'),'utf8').includes("['run','check:release:flat']")));
  check('production gate always does full typecheck',()=>assert(fs.readFileSync(path.join(root,'scripts/v831-production-gate.cjs'),'utf8').includes("['run','typecheck']")));
  check('production gate launches actual local Next CLI',()=>assert(fs.readFileSync(path.join(root,'scripts/v831-production-gate.cjs'),'utf8').includes("'node_modules','next','dist','bin','next'")));
  check('production gate does not perform npm run build and repeat prebuild',()=>assert(!fs.readFileSync(path.join(root,'scripts/v831-production-gate.cjs'),'utf8').includes("['run','build']")));
  check('prebuild remains protected',()=>assert(pkg.scripts.prebuild.endsWith('npm run check:fast') && pkg.scripts.prebuild.includes('npm run test:v865 && npm run test:v865:types &&'), 'prebuild muss neue Versions- und check:fast-Pruefungen beibehalten'));
  check('old V830 release gate retained',()=>assert(pkg.scripts['verify:production:v830'].includes('v830-production-gate.cjs')));
  check('V831 checks first in release, fast and preflight chains',()=>{for(const key of ['check:fast','check:release','build:preflight'])assert(pkg.scripts[key].includes('npm run test:v831 && npm run test:v831:types &&'),key)});
- check('on-demand CI is not duplicated on every push',()=>{const txt=fs.readFileSync(path.join(root,'.github/workflows/v831-production-on-demand.yml'),'utf8');assert.match(txt,/workflow_dispatch:/);assert(!txt.includes('  push:'));assert(txt.includes('npm ci --no-audit --no-fund'));assert(txt.includes('npm run verify:production:v831'));assert(txt.includes('windows-latest'));assert(txt.includes('ubuntu-24.04'))});
+ check('on-demand CI is not duplicated on every push',()=>{const txt=fs.readFileSync(path.join(root,'.github/workflows/v831-production-on-demand.yml'),'utf8');assert.match(txt,/workflow_dispatch:/);assert(!txt.includes('  push:'));assert(txt.includes('npm ci --no-audit --no-fund'));assert(txt.includes('npm run verify:production:v831') || (txt.includes('npm run verify:production:v867') && fs.readFileSync(path.join(root,'scripts/v867-verify-production.cjs'),'utf8').includes('verify:production:v831')));assert(txt.includes('windows-latest'));assert(txt.includes('ubuntu-24.04'))});
  check('real live evidence still required',()=>assert(gate.executeV831({root:fixture}).report.productionReleased===false));
  console.log(`PASS V831 production build stabilization: ${n} test groups`);
 }finally{fs.rmSync(fixture,{recursive:true,force:true})}

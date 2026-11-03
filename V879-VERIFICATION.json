@@ -1,0 +1,41 @@
+{
+  "version": "V879",
+  "base": "V873 full project with V874–V878 upgrades and V879 implementation",
+  "date": "2026-11-03",
+  "new_tests": {
+    "passed": 28,
+    "total": 28
+  },
+  "successful_selected_regression_versions": [
+    810,
+    815,
+    825,
+    868,
+    873,
+    874,
+    875,
+    876,
+    877,
+    878,
+    879
+  ],
+  "targeted_typecheck_versions": [
+    810,
+    815,
+    825,
+    868,
+    873,
+    874,
+    875,
+    876,
+    877,
+    878,
+    879
+  ],
+  "source_syntax_files": 1282,
+  "module_case_files": 2189,
+  "global_typecheck": "failed: dependencies unavailable",
+  "next_production_build": "not completed: next executable unavailable",
+  "dependencies": "npm registry DNS EAI_AGAIN, offline cache incomplete",
+  "release_status": "full source package; not production-build validated"
+}

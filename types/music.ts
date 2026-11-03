@@ -234,6 +234,7 @@ export interface UiPreferences {
   avatarBeatBassV743?: import("@/components/visualizer/beatBassHipMotionV743").BeatBassSettingsV743;
   avatarSmartHipV744?: import("@/components/visualizer/smartHipChoreographyV744").SmartHipSettingsV744;
   avatarEnsembleHipV745?: import("@/components/visualizer/multiAvatarHipSyncV745").EnsembleHipSettingsV745;
+  avatarDanceContinuityV872?: import("@/components/visualizer/naturalDanceContinuityV872").NaturalContinuitySettingsV872;
   concertFxV810?: import("@/components/visualizer/concertFxStudioV810").ConcertFxSettingsV810;
   scenicLightingV762?: import("@/components/visualizer/cinematicScenicLightingV762").DynamicStageLightingSettingsV762;
   cinematicScenicLightingV762?: import("@/components/visualizer/cinematicScenicLightingV762").StageLightingSettingsV762;

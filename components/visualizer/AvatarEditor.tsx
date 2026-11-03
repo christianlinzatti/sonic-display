@@ -15,6 +15,7 @@ import {createNaturalDanceStateV758,directNaturalDanceV758,type NaturalDanceSett
 import {directGenreHipV742, type GenreHipSettingsV742} from './genreHipIntelligenceV742';
 import {createSmartHipStateV744,directSmartHipV744,type SmartHipSettingsV744} from './smartHipChoreographyV744';
 import {createEnsembleHipStateV745,directEnsembleHipV745,type EnsembleHipSettingsV745} from './multiAvatarHipSyncV745';
+import {createNaturalContinuityStateV872,refineNaturalContinuityV872,normalizeNaturalContinuityV872,type NaturalContinuitySettingsV872} from './naturalDanceContinuityV872';
 import {createBeatBassStateV743,sampleBeatBassV743,type BeatBassSettingsV743} from './beatBassHipMotionV743';
 import {sampleNaturalBodyV740,blendNaturalBodyV740,type NaturalBodySettingsV740} from './naturalBodyDynamicsV740';
 import {collectGluteRigV741,createGluteOverlayV741,applyGluteRigV741,sampleGluteV741,describeGluteRigV741,supportsGluteDriverV741,normalizeGluteSettingsV741,type GluteSettingsV741} from './advancedGluteRigV741';
@@ -39,7 +40,7 @@ function ProceduralPreview({ pulse, intensity }: { pulse: number; intensity: num
   </group>;
 }
 
-function GltfPreview({ url, clip, playing, pulse, intensity, onClips, hipMode, hipStrength, hipSpeed, hipStudio, naturalBodyV740, naturalDanceV758, varietyV759, gluteV741, genreHipV742, beatBassV743, smartHipV744, ensembleHipV745, previewSlotV745, previewCountV745, demoBeatV743, audioSignalsV743, hipBpm, hipGenre, hipSection, onFootReport, onRigReport }: {
+function GltfPreview({ url, clip, playing, pulse, intensity, onClips, hipMode, hipStrength, hipSpeed, hipStudio, naturalBodyV740, naturalDanceV758, varietyV759, gluteV741, genreHipV742, beatBassV743, smartHipV744, ensembleHipV745, danceContinuityV872, previewSlotV745, previewCountV745, demoBeatV743, audioSignalsV743, hipBpm, hipGenre, hipSection, onFootReport, onRigReport }: {
   url: string;
   clip: string | null;
   playing: boolean;
@@ -58,6 +59,7 @@ function GltfPreview({ url, clip, playing, pulse, intensity, onClips, hipMode, h
   beatBassV743:Partial<BeatBassSettingsV743> | undefined;
   smartHipV744:Partial<SmartHipSettingsV744> | undefined;
   ensembleHipV745:Partial<EnsembleHipSettingsV745> | undefined;
+  danceContinuityV872:Partial<NaturalContinuitySettingsV872> | undefined;
   previewSlotV745:number;previewCountV745:number;
   demoBeatV743:boolean;
   audioSignalsV743:{kick?:number|null;beat?:number|null;bass?:number|null;attack?:number|null};
@@ -80,6 +82,7 @@ function GltfPreview({ url, clip, playing, pulse, intensity, onClips, hipMode, h
   const beatStateV743=useRef(createBeatBassStateV743());
   const smartStateV744=useRef(createSmartHipStateV744());
   const ensembleStateV745=useRef(createEnsembleHipStateV745());
+  const continuityStateV872=useRef(createNaturalContinuityStateV872());
   const danceStateV758=useRef(createNaturalDanceStateV758());
   const varietyStateV759=useRef(createDanceVarietyStateV759());
   const lastFootStatusV738=useRef('');
@@ -135,7 +138,15 @@ function GltfPreview({ url, clip, playing, pulse, intensity, onClips, hipMode, h
       plantedRight:footIK.current.right?.contact.phase==='planted',
       ...demo,
     });
-    const hip=v743.pose;
+    const hip=refineNaturalContinuityV872(continuityStateV872.current,{
+      pose:v743.pose,mode:hipFrameV738.mode,settings:danceContinuityV872,
+      trackId:url,seconds:elapsed.current,delta,playing:playing&&!!hipMode,
+      reducedMotion:false,manualPriority:!!clip,autoMode:hipMode==='auto',
+      footIKEnabled:true,contactKnown:!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+      slot:previewSlotV745,count:previewCountV745,section:hipSection,
+    }).pose;
     // Use the same additive controller as the live stage. No GLB asset edits.
     const neutral:AvatarRigMotion={headNod:0,headTurn:0,spineSway:0,hipSway:0,
       shoulderRoll:0,followThrough:0,headLag:0,chestPulse:0,armSwing:0,
@@ -250,7 +261,7 @@ export function AvatarEditor() {
           {model.url ? <GltfPreview url={model.url} clip={studioPreviewV738!=='off'?null:clip} playing={playing} pulse={pulse} intensity={preferences.avatarAnimationIntensity} onClips={onClipsV739}
             hipMode={studioPreviewV738!=='off'?studioPreviewV738:proceduralV739}
             hipStrength={preferences.avatarHipDanceStrengthV735??45} hipSpeed={preferences.avatarHipDanceSpeedV735??100}
-            hipStudio={preferences.avatarHipStudioV738} naturalBodyV740={preferences.avatarNaturalBodyV740} naturalDanceV758={preferences.avatarNaturalDanceV758} varietyV759={preferences.avatarDanceVarietyV759} gluteV741={preferences.avatarGluteRigV741} genreHipV742={preferences.avatarGenreHipV742} beatBassV743={preferences.avatarBeatBassV743} smartHipV744={preferences.avatarSmartHipV744} ensembleHipV745={preferences.avatarEnsembleHipV745} previewSlotV745={previewSlotV745} previewCountV745={previewCountV745} demoBeatV743={demoBeatV743} audioSignalsV743={{kick:audio.kickAccentIntensity,beat:audio.beatStrength,bass:audio.bass,attack:audio.attack}} hipBpm={studioBpmV738} hipGenre={studioGenreV738} hipSection={studioSectionV742} onFootReport={setFootStatusV738} onRigReport={onRigReportV739}/>
+            hipStudio={preferences.avatarHipStudioV738} naturalBodyV740={preferences.avatarNaturalBodyV740} naturalDanceV758={preferences.avatarNaturalDanceV758} varietyV759={preferences.avatarDanceVarietyV759} gluteV741={preferences.avatarGluteRigV741} genreHipV742={preferences.avatarGenreHipV742} beatBassV743={preferences.avatarBeatBassV743} smartHipV744={preferences.avatarSmartHipV744} ensembleHipV745={preferences.avatarEnsembleHipV745} danceContinuityV872={preferences.avatarDanceContinuityV872} previewSlotV745={previewSlotV745} previewCountV745={previewCountV745} demoBeatV743={demoBeatV743} audioSignalsV743={{kick:audio.kickAccentIntensity,beat:audio.beatStrength,bass:audio.bass,attack:audio.attack}} hipBpm={studioBpmV738} hipGenre={studioGenreV738} hipSection={studioSectionV742} onFootReport={setFootStatusV738} onRigReport={onRigReportV739}/>
             : <ProceduralPreview pulse={pulse} intensity={preferences.avatarAnimationIntensity} />}
         </Suspense>
       </Canvas>
@@ -307,6 +318,17 @@ export function AvatarEditor() {
         <label>V745 Performer testen <select value={previewSlotV745} onChange={e=>setPreviewSlotV745(Number(e.target.value))} disabled={!model.url}>
           {Array.from({length:previewCountV745},(_,i)=><option key={i} value={i}>Avatar {i+1}</option>)}
         </select></label>
+        <fieldset><legend>V872 · Natural Dance Continuity</legend>
+          <label><input type="checkbox" checked={preferences.avatarDanceContinuityV872?.enabled!==false}
+            onChange={e=>updatePreferences({avatarDanceContinuityV872:{...normalizeNaturalContinuityV872(preferences.avatarDanceContinuityV872),enabled:e.target.checked}})}/>
+            Automatische Übergänge &amp; Bodenkontakt-Schutz</label>
+          {([['smoothness','Übergänge glätten'],['contactSafety','Bodenkontakt schützen'],['ensembleBalance','Gruppenbalance']] as const).map(([key,label])=><label key={key}>
+            {label} ({preferences.avatarDanceContinuityV872?.[key]??({smoothness:65,contactSafety:80,ensembleBalance:55}[key])} %)
+            <input type="range" min="0" max="100" step="5" value={preferences.avatarDanceContinuityV872?.[key]??({smoothness:65,contactSafety:80,ensembleBalance:55}[key])}
+              onChange={e=>updatePreferences({avatarDanceContinuityV872:{...normalizeNaturalContinuityV872(preferences.avatarDanceContinuityV872),[key]:Number(e.target.value)}})}/>
+          </label>)}
+          <p role="status">Wirkt nur auf automatische Hüftbewegungen. Authored GLB-Clips, manuelle Bewegungen und Foot-IK bleiben maßgeblich.</p>
+        </fieldset>
         <p role="status">V745 Multi-Avatar Dance Sync: Diese Einzelavatar-Vorschau simuliert die Rolle von Avatar {previewSlotV745+1} in einer {previewCountV745}er-Gruppe, nicht die gesamte Bühne. Aktuelle Konfiguration: {preferences.avatarEnsembleHipV745?.mode??'auto'}.</p>
         <p role="status">V744 Smart Choreography: {preferences.avatarSmartHipV744?.enabled===false?'ausgeschaltet':'aktiv bei V742-Auto-Modus'}. Die Vorschau verwendet gewählten BPM, Genre und Songabschnitt.</p>
         <p role="status">V742: Genre Dance Intelligence {preferences.avatarGenreHipV742?.enabled===false?'ausgeschaltet':'aktiv bei Auto-Modus'}.

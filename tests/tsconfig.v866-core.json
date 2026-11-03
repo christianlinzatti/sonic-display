@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.v850-core.json",
+  "compilerOptions": { "incremental": false }
+}

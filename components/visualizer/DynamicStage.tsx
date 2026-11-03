@@ -9,6 +9,7 @@ import type {ConcertFxSettingsV810,ConcertFxSectionV810} from "./concertFxStudio
 import {LASER_MATRIX_VERTEX_V811,LASER_MATRIX_FRAGMENT_V811} from "./laserMatrixShaderV811";
 import {LED_WALL_FRAGMENT_V842} from "./ledWallExperienceShaderV842";
 import {planLedWallExperienceV842} from "./ledWallExperiencePlannerV842";
+import {planLedWallMotifsV870} from "./ledWallMotifDirectorV870";
 import {planLedWallExperienceV821} from "./ledWallExperiencePlannerV821";
 import {planBeatAccentDirectorV822} from "./beatAccentDirectorV822";
 import {evaluateFxTimelineV823,fxTimelineMultiplierV823} from "./visualFxTimelineV823";
@@ -26,12 +27,30 @@ import {recordAcceptanceV829,getAcceptanceV829} from "./concertAcceptanceV829";
 import {recordCastWindowV830} from "./concertProductionEvidenceV830";
 import {createConcertQualityMonitorV826,accumulateConcertFrameV826,completeConcertQualityV826,publishConcertQualityV826,clearConcertQualityV826} from "./concertQualityTelemetryV826";
 import {planLyricsProjectionV813} from "./lyricsProjectionV813";
+import {planCinematicProjectionV873} from "./cinematicLyricsPolishV873";
 import {planAtmosphericConcertFxV814} from "./atmosphericConcertFxV814";
 import {ATMOSPHERE_VERTEX_V814,ATMOSPHERE_FRAGMENT_V814} from "./atmosphereShaderV814";
 import {VirtualConcertCrowdV815} from "./VirtualConcertCrowdV815";
+import {planIntelligentAudienceV874} from "./intelligentAudienceExperienceV874";
+import {IntelligentAudienceArmsV874} from "./IntelligentAudienceArmsV874";
+import {planSmartFestivalAtmosphereV875} from "./smartFestivalAtmosphereV875";
+import type {AudienceCueV874} from "./intelligentAudienceExperienceV874";
+import {FestivalWristbandsV875} from "./FestivalWristbandsV875";
+import {planDynamicFestivalCrowdChoreographyV876} from "./dynamicFestivalCrowdChoreographyV876";
+import {planIntelligentCrowdInteractionV877} from "./intelligentCrowdInteractionV877";
+import {planSmartAudienceEmotionV878} from "./smartAudienceEmotionDirectorV878";
+import {planCrowdCameraStageHarmonyV879} from "./crowdCameraStageHarmonyV879";
+import {planSmartConcertExperienceV880,applyConcertArcCrowdV880,applyConcertArcParticlesV880,applyConcertArcFestivalV880,applyConcertArcFoamV880,concertArcLaneGainV880} from "./smartConcertExperienceV880";
+import type {ConcertArcStateV880} from "./smartConcertExperienceV880";
+import type {CrowdHarmonyCueV879} from "./crowdCameraStageHarmonyV879";
+import type {AudienceEmotionStateV878} from "./smartAudienceEmotionDirectorV878";
+import type {CrowdInteractionCueV877} from "./intelligentCrowdInteractionV877";
+import type {CrowdChoreographyCueV876} from "./dynamicFestivalCrowdChoreographyV876";
+import type {FestivalAtmosphereCueV875} from "./smartFestivalAtmosphereV875";
 import {planVirtualConcertCrowdV815,CROWD_OFF_V815} from "./virtualConcertCrowdPlannerV815";
 import type {VirtualCrowdCueV815} from "./virtualConcertCrowdPlannerV815";
 import {planFestivalSpecialFxV844,mergeFestivalParticlesV844,coordinateFestivalFoamV844,FESTIVAL_OFF_V844} from './festivalSpecialFxPlannerV844';
+import {coordinateFestivalFxV871} from './festivalFxCoordinationV871';
 import type {FestivalCueV844} from './festivalSpecialFxPlannerV844';
 import {FestivalCo2V844} from './FestivalCo2V844';
 import {planSoapBubblesV8441,planFullStageFlashV8441,BUBBLES_OFF_V8441,FLASH_OFF_V8441} from './festivalBubblesFlashPlannerV8441';
@@ -195,7 +214,9 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
   const autoQualityStateV827=useRef(createAutoQualityV827());
   const qualityMonitorV826=useRef(createConcertQualityMonitorV826());
   const qualityPublishedV826=useRef(false);
+  const concertArcStateV880=useRef<ConcertArcStateV880|null>(null);
   const crowdCueV815=useRef<VirtualCrowdCueV815>({...CROWD_OFF_V815});
+  const audienceEmotionStateV878=useRef<AudienceEmotionStateV878|null>(null);
   const festivalCueV844=useRef<FestivalCueV844>({...FESTIVAL_OFF_V844});
   const soapBubbleCueV8441=useRef<SoapBubbleCueV8441>({...BUBBLES_OFF_V8441});
   const fullStageFlashCueV8441=useRef<FullStageFlashCueV8441>({...FLASH_OFF_V8441});
@@ -552,7 +573,11 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
       lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
       groupCount:groupCountV542,tier,budget:getVisualFactorsV640().led,
-      authoredLanes:authoredLanesV850});
+      authoredLanes:authoredLanesV850,
+      songArcV868:cameraNarrativeV605?.plan.source==='verified-v600'&&
+        cameraNarrativeV605.plan.trackId===playback.trackId&&
+        cameraNarrativeV605.plan.durationMs===playback.durationMs
+          ?cameraNarrativeV605.plan:null});
     // V828: visual staging of this verified musical act. Alternating motifs,
     // negative space and background atmosphere, without any new draw calls,
     // camera cuts, guessed drops or bypass of V823 user-authored cues.
@@ -608,9 +633,18 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542});
     // V813: copies only confirmed, timestamped synchronized lyrics onto a BACKWALL
     // or a FLOOR decal. Regular 3D lyrics are unchanged and always remain in front.
-    const lyricsCueV813=planLyricsProjectionV813({fx:fxCueV810,
+    const rawLyricsCueV813=planLyricsProjectionV813({fx:fxCueV810,
       settings:normalizeConcertFxV810(concertFxV810),lyrics:lyricsV813,progressMs:playback.positionMs,
       verifiedSong:fxCueV810.reason==='music',lyricsVisible:lyricsVisibleV813,groupCount:groupCountV542});
+    // V873 refines ONLY this existing confirmed V813 cue. The projection canvas,
+    // materials and timestamps remain V813-owned. No new meshes or word inference.
+    const cinematicProjectionV873=planCinematicProjectionV873({base:rawLyricsCueV813,
+      settings:normalizeConcertFxV810(concertFxV810),fx:fxCueV810,
+      playing:isPlaying&&playback.playing,reducedMotion,lyricsProtected:lyricsProtectedV542,
+      cameraCloseup:concertLipSyncV386?.cinematicSceneV528?.active===true&&vocalFocusV542,
+      manualCamera:cameraNarrativeV605?.manualCamera===true,groupCount:groupCountV542});
+    const lyricsCueV813=cinematicProjectionV873.cue;
+    if(lyricsWallV813.current)lyricsWallV813.current.scale.setScalar(cinematicProjectionV873.scale);
     const showWallV813=lyricsCueV813.active&&lyricsCueV813.surface==='wall'&&!!lyricsTextureV813.current;
     const showFloorV813=lyricsCueV813.active&&lyricsCueV813.surface==='floor'&&!!lyricsTextureV813.current;
     if(lyricsCueV813.active&&lyricsDrawnV813.current!==lyricsCueV813.text){
@@ -757,6 +791,73 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
         movement:c.movement*g,phoneOpacity:c.phoneOpacity*g,lightGain:c.lightGain*g,
         active:g>.001&&Math.floor(c.count*g)>=2};
     }
+    // V874 only reshapes the already-authorized V815 cue after the V825 governor.
+    crowdCueV815.current=planIntelligentAudienceV874({base:crowdCueV815.current,
+      fx:fxCueV810,settings:normalizeConcertFxV810(concertFxV810),
+      tier,energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,reducedMotion});
+    // V875 reads only the performance-governed V874 crowd. No new FX authority.
+    crowdCueV815.current=planSmartFestivalAtmosphereV875({
+      base:crowdCueV815.current as AudienceCueV874,
+      fx:fxCueV810,settings:normalizeConcertFxV810(concertFxV810),
+      energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,tier,
+      playing:isPlaying&&playback.playing&&reactive,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,reducedMotion});
+    // V876 is downstream of the verified V810 cue, V825 budget and V875 mood.
+    crowdCueV815.current=planDynamicFestivalCrowdChoreographyV876({
+      base:crowdCueV815.current as FestivalAtmosphereCueV875,
+      fx:fxCueV810,settings:normalizeConcertFxV810(concertFxV810),
+      energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,tier,
+      playing:isPlaying&&playback.playing&&reactive,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,reducedMotion});
+    // V877: verified music, optional synced lyric and verified performer-slot focus.
+    // Always AFTER V825 governor and V876; may only reduce/add tiny bounded motion.
+    crowdCueV815.current=planIntelligentCrowdInteractionV877({
+      base:crowdCueV815.current as CrowdChoreographyCueV876,
+      fx:fxCueV810,settings:normalizeConcertFxV810(concertFxV810),
+      tier,playing:isPlaying&&playback.playing&&reactive,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      reducedMotion,lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+      groupCount:groupCountV542,
+      focusSlot:vocalSpotlightV797?.leadSlot??null,
+      focusVerified:vocalSpotlightV797?.lightingActive===true,
+      lyrics:lyricsV813,lyricsVisible:lyricsVisibleV813,progressMs:playback.positionMs});
+    // V878 – smooth mood changes using *song position*, reset on seek/track change.
+    // The director only dims existing FX gains and adds bounded existing-mesh motion.
+    const audienceEmotionV878=planSmartAudienceEmotionV878({
+      base:crowdCueV815.current as CrowdInteractionCueV877,
+      fx:fxCueV810,settings:normalizeConcertFxV810(concertFxV810),
+      previous:audienceEmotionStateV878.current,trackId:playback.trackId??null,
+      positionMs:playback.positionMs,energy:audio.energyEnvelope??0,
+      kick:audio.kickAccentIntensity??0,tier,
+      playing:isPlaying&&playback.playing&&reactive,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      reducedMotion,lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542});
+    audienceEmotionStateV878.current=audienceEmotionV878.state;
+    // V879: stage- and camera-aware attenuation, downstream of the V825 budget.
+    // Manual cameras remain in charge; lyrics protection never creates new effects.
+    crowdCueV815.current=planCrowdCameraStageHarmonyV879({
+      base:audienceEmotionV878.cue,settings:normalizeConcertFxV810(concertFxV810),
+      verifiedCamera:fxCueV810.active&&fxCueV810.reason==='music'&&
+        cinematicCueV761?.active===true&&cinematicCueV761.reason==='verified-act',
+      cameraIntent:cinematicCueV761?.intent??null,
+      manualCamera:cameraNarrativeV605?.manualCamera===true,
+      lyricsVisible:lyricsVisibleV813,lyricsProtected:lyricsProtectedV542,
+      vocalFocus:vocalFocusV542,performerVerified:vocalSpotlightV797?.lightingActive===true,
+      groupCount:groupCountV542,
+      transitionActive:transitionV791?.active===true,
+      transitionProximity:transitionV791?.proximity??0,
+      playing:isPlaying&&playback.playing&&reactive,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false,
+      reducedMotion,tier});
     particlesCueV816.current=mergeFestivalParticlesV844(particlesCueV816.current,
       festivalCueV844.current,normalizeConcertFxV810(concertFxV810));
     if(particlesCueV816.current.active&&beatV822.particles>0){
@@ -817,6 +918,26 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
         lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542,
       })};
     }
+    // V871 Festival FX 4.0: final visibility pass after ALL legacy authority,
+    // authored-lane, V823 timeline and V825 performance gates. Reduction ONLY.
+    // One shared phase from verified V810; never a competing audio/FX controller.
+    const coordinatedV871=coordinateFestivalFxV871({
+      settings:normalizeConcertFxV810(concertFxV810),fx:fxCueV810,
+      festival:festivalCueV844.current,foam:foamCueV817.current,
+      bubbles:soapBubbleCueV8441.current,streamers:paperStreamersCueV846.current,
+      finale:festivalFinaleCueV847.current,flash:fullStageFlashCueV8441.current,
+      playing:isPlaying&&playback.playing&&reactive,reducedMotion,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      manualLighting:authoredLightsV386||manualLightingV763||showCue?.lightingEnabled===false,
+      lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,
+      cameraCloseup:concertLipSyncV386?.cinematicSceneV528?.active===true&&vocalFocusV542,
+      groupCount:groupCountV542,tier,authoredLanes:authoredLanesV850});
+    festivalCueV844.current=coordinatedV871.festival;
+    foamCueV817.current=coordinatedV871.foam;
+    soapBubbleCueV8441.current=coordinatedV871.bubbles;
+    paperStreamersCueV846.current=coordinatedV871.streamers;
+    festivalFinaleCueV847.current=coordinatedV871.finale;
+    fullStageFlashCueV8441.current=coordinatedV871.flash;
     kineticCueV817.current=planKineticStageV817({fx:fxCueV810,
       settings:normalizeConcertFxV810(concertFxV810),tier,
       lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542,
@@ -873,6 +994,38 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       vocalFxCueV820.current={...c,leadOpacity:c.leadOpacity*g,
         adlibOpacity:c.adlibOpacity*g};
     }
+    // V880: final cross-system musical arc, AFTER V825 performance / V871 festival
+    // coordination. This is NOT a second camera or dancer controller: verified
+    // camera intent and performance focus inform visual restraint only.
+    const concertArcV880=planSmartConcertExperienceV880({
+      settings:normalizeConcertFxV810(concertFxV810),fx:fxCueV810,
+      previous:concertArcStateV880.current,trackId:playback.trackId??null,
+      positionMs:playback.positionMs,durationMs:playback.durationMs,
+      energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+      cameraVerified:cinematicCueV761?.active===true&&cinematicCueV761.reason==='verified-act'&&
+        fxCueV810.active&&fxCueV810.reason==='music',
+      cameraIntent:cinematicCueV761?.intent??null,
+      manualCamera:cameraNarrativeV605?.manualCamera===true,
+      lyricsProtected:lyricsProtectedV542||lyricsVisibleV813,
+      vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+      transitionActive:transitionV791?.active===true,
+      playing:isPlaying&&playback.playing&&reactive,reducedMotion,tier,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+    });
+    concertArcStateV880.current=concertArcV880.state;
+    if(concertArcV880.cue.active){
+      crowdCueV815.current=applyConcertArcCrowdV880(
+        crowdCueV815.current as CrowdHarmonyCueV879,concertArcV880.cue);
+      if(!authoredLanesV850.includes('particles'))
+        particlesCueV816.current=applyConcertArcParticlesV880(particlesCueV816.current,concertArcV880.cue);
+      if(!authoredLanesV850.includes('particles'))
+        festivalCueV844.current=applyConcertArcFestivalV880(festivalCueV844.current,concertArcV880.cue);
+      if(!authoredLanesV850.includes('foam'))
+        foamCueV817.current=applyConcertArcFoamV880(foamCueV817.current,concertArcV880.cue);
+    }
+    const concertArcLedGainV880=concertArcLaneGainV880(concertArcV880.cue,'led',authoredLanesV850.includes('led'));
+    const concertArcLaserGainV880=concertArcLaneGainV880(concertArcV880.cue,'laser',authoredLanesV850.includes('laser'));
     // V826: read-only instrumentation uses the post-budget render cues, not theoretical
     // maxima. Only publish every >=500ms; never set React state inside the R3F loop.
     // WebGLRenderer.info counters describe a renderer snapshot, not GPU timings.
@@ -941,8 +1094,8 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     const laser=laserMaterialV811.current;
     if(laser){
       const alpha=1-Math.exp(-Math.min(Math.max(delta,0),.1)*7);
-      laser.uniforms.uOpacity.value+=(Math.min(.20,fxCueV810.laserOpacity*(1+beatV822.laser*.22)*laserGainV823*(authoredFxV823.laser.boost>.001||authoredFxV823.laser.mute>.001?1:laserBlendV849))-laser.uniforms.uOpacity.value)*alpha;
-      laser.uniforms.uRibbons.value=Math.min(.35,fxCueV810.ribbonGain*(1+beatV822.laser*.18)*laserGainV823);
+      laser.uniforms.uOpacity.value+=(Math.min(.20,fxCueV810.laserOpacity*(1+beatV822.laser*.22)*laserGainV823*concertArcLaserGainV880*(authoredFxV823.laser.boost>.001||authoredFxV823.laser.mute>.001?1:laserBlendV849))-laser.uniforms.uOpacity.value)*alpha;
+      laser.uniforms.uRibbons.value=Math.min(.35,fxCueV810.ribbonGain*(1+beatV822.laser*.18)*laserGainV823*concertArcLaserGainV880);
       laser.uniforms.uLaserOn.value=concertFxV810?.lasers!==false?1:0;
       laser.uniforms.uPhase.value=fxCueV810.phase;
       laser.uniforms.uMode.value=fxCueV810.ledStyle;
@@ -960,12 +1113,12 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       led.uniforms.uBeat22Kick.value=wallV821.active?beatV822.kick:0;
       led.uniforms.uBeat22Snare.value=wallV821.active?beatV822.snareLike:0;
       led.uniforms.uBeat22Peak.value=wallV821.active?beatV822.peak:0;
-      led.uniforms.uLed21Power.value=Math.min(.38,wallV821.power*ledGainV823*(authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001?1:ledBlendV849));
+      led.uniforms.uLed21Power.value=Math.min(.38,wallV821.power*ledGainV823*concertArcLedGainV880*(authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001?1:ledBlendV849));
       led.uniforms.uLed21Look.value=wallV821.look;
       led.uniforms.uLed21Bass.value=wallV821.bass;
       led.uniforms.uLed21Mids.value=wallV821.mids;
       led.uniforms.uLed21Highs.value=wallV821.highs;
-      led.uniforms.uLed21Drop.value=Math.min(.8,wallV821.dropAccent*ledGainV823*(authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001?1:ledBlendV849));
+      led.uniforms.uLed21Drop.value=Math.min(.8,wallV821.dropAccent*ledGainV823*concertArcLedGainV880*(authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001?1:ledBlendV849));
       led.uniforms.uLed21Phase.value=wallV821.phase;
       led.uniforms.uLed21Tempo.value=wallV821.tempo;
       led.uniforms.uLed21Variation.value=wallV821.variation+(experienceV828.active?experienceV828.signature*.18:0);
@@ -973,7 +1126,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       if(experienceV828.active&&led.uniforms.uStageMorph){
         led.uniforms.uStageMorph.value=Math.min(.75,led.uniforms.uStageMorph.value+experienceV828.architectureMotion);
       }
-      led.uniforms.uFxPower.value=Math.min(1,fxCueV810.ledGain*ledGainV823*(authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001?1:ledBlendV849));
+      led.uniforms.uFxPower.value=Math.min(1,fxCueV810.ledGain*ledGainV823*concertArcLedGainV880*(authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001?1:ledBlendV849));
       if(fxCueV810.ledGain>.001){
         (led.uniforms.uPrimary.value as Color).set(fxCueV810.primary);
         (led.uniforms.uSecondary.value as Color).set(fxCueV810.secondary);
@@ -1088,6 +1241,29 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       u.uLed42Phase.value=wallDepthV842.phase;
       u.uLed42Flow.value=wallDepthV842.flow;
       u.uLed42LightLink.value=wallDepthV842.lightLink;
+    }
+    // V870: the same verified V810/V821/V842 evidence; no independent phase/mesh.
+    const wallMotifV870=planLedWallMotifsV870({
+      fx:fxCueV810,wall:wallV821,depth:wallDepthV842,settings:concertFxV810,
+      section:fxCueV810.section,playing:isPlaying&&playback.playing,reducedMotion,tier,
+      budget:ledBudgetV640,timelineGain:Math.min(1,Math.max(0,ledGainV823)),
+      manualLed:authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false||
+        timelineGainV354!==1,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0,
+      lyricsProtected:lyricsProtectedV542,lyricsVisible:lyricsVisibleV813,
+      vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+      cameraCloseup:concertLipSyncV386?.cinematicSceneV528?.active===true&&vocalFocusV542,
+      manualCamera:cameraNarrativeV605?.manualCamera===true,
+    });
+    if(led){
+      const u=led.uniforms;
+      u.uLed70Power.value=wallMotifV870.power*(authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001?1:ledBlendV849);
+      u.uLed70Mode.value=wallMotifV870.mode;
+      u.uLed70Phase.value=wallMotifV870.phase;
+      u.uLed70Bass.value=wallMotifV870.bass;
+      u.uLed70Mids.value=wallMotifV870.mids;
+      u.uLed70Camera.value=wallMotifV870.camera;
     }
     // Explicit scenic settings have priority over the automatic V841 floor Gobo.
     if(goboMaterialV762.current){
@@ -1327,6 +1503,8 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     <ambientLight intensity={theme === "minimal" ? 1.2 : 0.9}/>
     {/* V789: one instanced architectural backdrop, read-only to playback and authored cues. */}
     <VirtualConcertCrowdV815 cueRef={crowdCueV815}/>
+    <IntelligentAudienceArmsV874 cueRef={crowdCueV815}/>
+    <FestivalWristbandsV875 cueRef={crowdCueV815}/>
     <ReactiveParticleStudioV816 cueRef={particlesCueV816}/>
     <FestivalCo2V844 cueRef={festivalCueV844}/>
     <SoapBubblesV8441 cueRef={soapBubbleCueV8441}/>
@@ -1370,6 +1548,8 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
           uLed42Power:{value:0},uLed42Mode:{value:0},uLed42Depth:{value:0},
           uLed42Geometry:{value:0},uLed42Tunnel:{value:0},uLed42Phase:{value:0},
           uLed42Flow:{value:0},uLed42LightLink:{value:0},
+          uLed70Power:{value:0},uLed70Mode:{value:0},uLed70Phase:{value:0},
+          uLed70Bass:{value:0},uLed70Mids:{value:0},uLed70Camera:{value:0},
           uBeat22Kick:{value:0},uBeat22Snare:{value:0},uBeat22Peak:{value:0},
           uFxPower:{value:0},uFxStyle:{value:0},uAudioBass:{value:0},uAudioMids:{value:0},uAudioHighs:{value:0},
           uPrimary:{value:new Color(palette.primary)},uSecondary:{value:new Color(palette.secondary)}}}/>

@@ -8,6 +8,7 @@ import {composeConcertLyricsV623,type ConcertDramaturgyCueV623} from "./visualiz
 import {planCinematicLyricsPerformanceV619,cinematicLyricWordAccentV619} from "./visualizer/cinematicLyricsPerformanceV619";
 import {planConcertLyricsHarmonyV606,lyricHarmonyWordAccentV606} from "./visualizer/concertLyricsPerformerHarmonyV606";
 import type {NarrativeCueV604} from "./visualizer/fullSongConcertDramaturgyV604";
+import {planCinematicLyricCueV873} from "./visualizer/cinematicLyricsPolishV873";
 import {planLyricReadabilityV578} from "./visualizer/beautifulLyricsV578";
 import { planBeautifulLyricsExperienceV598, planBeautifulLyricsWordV598, type BeautifulLyricsSectionV598 } from "./visualizer/beautifulLyricsExperienceV598";
 import {planConcertDetailsV555,splitRhymeEndV555} from './visualizer/concertDetailEffectsV555';
@@ -134,6 +135,15 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
     existingWidthCh:lyricPolishV634.widthCh,existing3DWidth:lyricPolishV634.max3DWidth,
     existingPlateOpacity:lyricPolishV634.plateOpacity,intensity,
   });
+  // V873 uses only the existing playback clock and confirmed word boundaries.
+  // The readable caption stays the single text owner; no layout/camera overrides.
+  const lyricV873=planCinematicLyricCueV873({line:activeLine,
+    nextLineStart:lines[activeIndex+1]?.startMs,progressMs,playing,
+    synchronized,reducedMotion:reduced,immersive,castCount:avatarCountV477,
+    wordHighlight:preferences.lyricsWordHighlight??true,
+    hookConfirmed:sectionCueV598==='hook',cameraFocus:cinematicSceneV528?.active===true,
+    existingPlateOpacity:Math.max(lyricPolishV634.plateOpacity,lyricCinemaV688.plateOpacity),
+    intensity});
   const nextActiveStart = lines[activeIndex+1]?.startMs;
   const activeLineEnd = activeLine ? Math.min(
     activeLine.endMs != null && activeLine.endMs > activeLine.startMs ? activeLine.endMs : Infinity,
@@ -161,7 +171,9 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
   const wordsEnabled = (kinetic || cinematic || neon) && (preferences.lyricsWordHighlight ?? true) && synchronized;
 
   if (!lines.length) return <section className="lyrics"><p className="empty">Keine Lyrics für diesen Titel gefunden.</p></section>;
-  return <section className={`lyrics v461-cinematic-lyrics v477-beautiful-lyrics v501-cinematic-lyrics v502-concert-lyrics v525-cinematic-lyrics v525-${activePlanV525?.textClass??"standard"} v541-cinematic-lyrics v549-cinematic-lyrics v578-lyrics-readable v578-${readabilityV578.mode} ${studioV748.enabled?`v748-performance-studio v748-${studioV748.safety}`:""} v598-beautiful-lyrics v598-${activePlanV598.mode} v598-${activePlanV598.density} v606-harmony v606-${harmonyV606.mode} v619-cinematic-lyrics v619-${concertLyricsV619.mode} v634-beautiful-lyrics v634-${lyricPolishV634.mood} v688-cinematic-lyrics v688-${lyricCinemaV688.mode} v501-cast-${activePlanV501?.cast??1} ${immersive ? "v461-stage-lyrics" : ""} ${focus ? "lyrics-focus-v367" : ""} lyrics-studio-position-${preferences.lyricsPosition ?? "center"} ${kinetic ? "lyrics-kinetic" : cinematic ? "lyrics-cinematic" : neon ? "lyrics-neon" : "lyrics-classic"} ${kineticStyleV382?"v382-kinetic-active v382-preset-"+kineticStyleV382:""}`} aria-label="Songtext" style={{ "--v688-width-ch":lyricCinemaV688.widthCh,"--v688-plate":lyricCinemaV688.plateOpacity,"--v688-line-height":lyricCinemaV688.lineHeight,"--v688-transition-ms":`${lyricCinemaV688.transitionMs}ms`,"--v634-width-ch":lyricPolishV634.widthCh,"--v634-plate":lyricPolishV634.plateOpacity,"--v634-line-height":lyricPolishV634.lineHeight,"--v634-transition-ms":`${lyricPolishV634.wordTransitionMs}ms`,"--v619-width-ch":concertLyricsV619.maxWidthCh,"--v619-plate":concertLyricsV619.plateOpacity,"--v619-hook-underline":concertLyricsV619.hookUnderline,"--v606-width-ch":Math.min(activePlanV598.widthCh,harmonyV606.widthCh),"--v606-plate-boost":harmonyV606.plateBoost,"--v606-hook-accent":harmonyV606.hookAccent,"--v598-width-ch":activePlanV598.widthCh,"--v598-plate":activePlanV598.plateOpacity,
+  return <section className={`lyrics v461-cinematic-lyrics v477-beautiful-lyrics v501-cinematic-lyrics v502-concert-lyrics v525-cinematic-lyrics v525-${activePlanV525?.textClass??"standard"} v541-cinematic-lyrics v549-cinematic-lyrics v578-lyrics-readable v578-${readabilityV578.mode} ${studioV748.enabled?`v748-performance-studio v748-${studioV748.safety}`:""} v598-beautiful-lyrics v598-${activePlanV598.mode} v598-${activePlanV598.density} v606-harmony v606-${harmonyV606.mode} v619-cinematic-lyrics v619-${concertLyricsV619.mode} v634-beautiful-lyrics v634-${lyricPolishV634.mood} v688-cinematic-lyrics v688-${lyricCinemaV688.mode} ${lyricV873.active&&(kinetic||cinematic||neon)?`v873-cinematic-lyrics v873-${lyricV873.mode}`:""} v501-cast-${activePlanV501?.cast??1} ${immersive ? "v461-stage-lyrics" : ""} ${focus ? "lyrics-focus-v367" : ""} lyrics-studio-position-${preferences.lyricsPosition ?? "center"} ${kinetic ? "lyrics-kinetic" : cinematic ? "lyrics-cinematic" : neon ? "lyrics-neon" : "lyrics-classic"} ${kineticStyleV382?"v382-kinetic-active v382-preset-"+kineticStyleV382:""}`} aria-label="Songtext" style={{ "--v873-plate":lyricV873.plateOpacity,"--v873-contrast":lyricV873.contrast,
+    "--v873-word-transition-ms":`${lyricV873.wordTransitionMs}ms`,
+    "--v688-width-ch":lyricCinemaV688.widthCh,"--v688-plate":lyricCinemaV688.plateOpacity,"--v688-line-height":lyricCinemaV688.lineHeight,"--v688-transition-ms":`${lyricCinemaV688.transitionMs}ms`,"--v634-width-ch":lyricPolishV634.widthCh,"--v634-plate":lyricPolishV634.plateOpacity,"--v634-line-height":lyricPolishV634.lineHeight,"--v634-transition-ms":`${lyricPolishV634.wordTransitionMs}ms`,"--v619-width-ch":concertLyricsV619.maxWidthCh,"--v619-plate":concertLyricsV619.plateOpacity,"--v619-hook-underline":concertLyricsV619.hookUnderline,"--v606-width-ch":Math.min(activePlanV598.widthCh,harmonyV606.widthCh),"--v606-plate-boost":harmonyV606.plateBoost,"--v606-hook-accent":harmonyV606.hookAccent,"--v598-width-ch":activePlanV598.widthCh,"--v598-plate":activePlanV598.plateOpacity,
     "--v748-plate":studioV748.plateOpacity,"--v748-max-width":`${studioV748.maxWidthCh}ch`,"--v748-hook-glow":studioV748.hookGlow,"--v748-hook-shadow":`${studioV748.hookGlow*44}px`,"--v748-outline":studioV748.outlineBonus,"--v748-word-glow":studioV748.wordGlow,"--v598-line-height":activePlanV598.lineHeight,"--v598-contrast":activePlanV598.contrast,
     "--v598-hook-accent":activePlanV598.hookAccent,"--v578-width-ch": readabilityV578.maxWidthCh, "--v578-plate": readabilityV578.plateOpacity, "--v578-glow-gain": readabilityV578.glowGain, "--studio-font-family": family, "--studio-font-scale": fontSize, "--studio-glow": glow, "--v502-concert-accent": !reduced && playing ? Math.max(0,Math.min(.12,concertLyricAccentV502)) : 0, "--studio-speed": 1 / speed, "--studio-color-from": gradientFrom, "--studio-color-to": gradientTo, "--reactive-kick": kick, "--reactive-bass": bass, "--reactive-drop": drop } as CSSProperties}>
     <p className="lyrics-source">{lyrics?.provider}{synchronized ? " · zeilensynchronisiert" : " · ohne Zeitmarken"}{wordsEnabled ? hasTrueWordTiming ? " · echte Wort-Zeitstempel" : " · Zeilenfortschritt (keine Wort-Zeitstempel)" : ""}</p>
@@ -212,7 +224,7 @@ export function KineticLyrics({ lyrics, progressMs, activeIndex, playing, genre 
           "--v501-glow":active?v501.glow:0,
           "--v501-offset":active?`${v501.lineOffsetPx.toFixed(2)}px`:"0px",
           "--v501-plate":Math.min(1,v525.plateOpacity+lyricsDirectionV528.plateBoost),
-          "--v501-word-motion":v501.wordMotion*v526.wordMotionGain*lyricsDirectionV528.motionGain*v549.wordMotionGain*(active?harmonyV606.motionGain:1),
+          "--v501-word-motion":v501.wordMotion*v526.wordMotionGain*lyricsDirectionV528.motionGain*v549.wordMotionGain*(active?harmonyV606.motionGain*lyricV873.motionGain:1),
           "--v541-contrast":v541.lineContrast,"--v541-plate":Math.max(v525.plateOpacity,v549.plateOpacity),
           "--v549-handoff":v549.handoffEmphasis,"--v549-glow":v549.wordGlowGain,
           "--v455-motion-scale": v455.motionScale, "--v455-word-spacing": `${v455.wordSpacingEm}em`, "--v461-motion-scale":v461.motionScale, "--v461-stagger-ms":`${v477.entranceDelayMs}ms` } as CSSProperties} aria-current={active ? "true" : undefined}>

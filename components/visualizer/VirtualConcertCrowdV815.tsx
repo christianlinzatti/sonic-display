@@ -4,6 +4,10 @@ import {useFrame} from '@react-three/fiber';
 import {Color,Object3D} from 'three';
 import type {InstancedMesh,MeshBasicMaterial} from 'three';
 import {createVirtualCrowdLayoutV815,CROWD_MAX_V815} from './virtualConcertCrowdPlannerV815';
+import {sampleCrowdChoreographyV876,createCrowdMotionScratchV876} from './dynamicFestivalCrowdChoreographyV876';
+import {applyCrowdInteractionMotionV877} from './intelligentCrowdInteractionV877';
+import {applyAudienceEmotionMotionV878} from './smartAudienceEmotionDirectorV878';
+import {applyCrowdCameraHarmonyMotionV879} from './crowdCameraStageHarmonyV879';
 import type {VirtualCrowdCueV815} from './virtualConcertCrowdPlannerV815';
 
 /** Three capped instanced draw calls, not individual animated avatar rigs.
@@ -13,6 +17,7 @@ import type {VirtualCrowdCueV815} from './virtualConcertCrowdPlannerV815';
 export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCueV815}}){
  const people=useMemo(createVirtualCrowdLayoutV815,[]);
  const dummy=useMemo(()=>new Object3D(),[]);
+ const choreographyMotion=useMemo(createCrowdMotionScratchV876,[]);
  const heads=useRef<InstancedMesh>(null),bodies=useRef<InstancedMesh>(null);
  const phones=useRef<InstancedMesh>(null);
  const silhouetteMat=useRef<MeshBasicMaterial>(null),headMat=useRef<MeshBasicMaterial>(null);
@@ -59,14 +64,21 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
     const p=people[index];
     const wave=Math.sin(cue.phase*(cue.movement>.14?6:3)+p.phase);
     const lift=Math.max(-.07,Math.min(.12,wave*cue.movement));
-    dummy.position.set(p.x,p.y+.36*p.scale+lift,p.z);
-    dummy.rotation.set(0,0,wave*cue.movement*.18);
+    sampleCrowdChoreographyV876(index,p,cue,choreographyMotion);
+   applyCrowdInteractionMotionV877(index,p,cue,choreographyMotion);
+   applyAudienceEmotionMotionV878(index,p,cue,choreographyMotion);
+   applyCrowdCameraHarmonyMotionV879(index,p,cue,choreographyMotion);
+    const visualLift=lift+choreographyMotion.bob;
+    dummy.position.set(p.x+choreographyMotion.horizontal,p.y+.36*p.scale+visualLift,p.z);
+    dummy.rotation.set(0,0,wave*cue.movement*.18+choreographyMotion.tilt);
     dummy.scale.set(.32*p.scale,.65*p.scale,.20*p.scale);
     dummy.updateMatrix();body.setMatrixAt(index,dummy.matrix);
-    dummy.position.set(p.x,p.y+.8*p.scale+lift,p.z);
+    dummy.position.set(p.x+choreographyMotion.horizontal,p.y+.8*p.scale+visualLift,p.z);
     dummy.scale.set(.155*p.scale,.17*p.scale,.14*p.scale);
     dummy.updateMatrix();head.setMatrixAt(index,dummy.matrix);
-    dummy.position.set(p.x+.14*p.scale,p.y+1.03*p.scale+lift,p.z+.03);
+    const phoneWave=(cue as {phoneWave?:number}).phoneWave??0;
+    const phoneSway=phoneWave*Math.sin(cue.phase*5+p.phase)*.13*p.scale;
+    dummy.position.set(p.x+choreographyMotion.horizontal+.14*p.scale,p.y+1.03*p.scale+visualLift+phoneSway,p.z+.03);
     dummy.rotation.set(0,0,0);dummy.scale.set(p.phone?.075*p.scale:0,p.phone?.115*p.scale:0,.018);
     dummy.updateMatrix();phone.setMatrixAt(index,dummy.matrix);
    }

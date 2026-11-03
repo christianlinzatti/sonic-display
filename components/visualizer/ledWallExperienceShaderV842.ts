@@ -23,4 +23,27 @@ export const LED_WALL_FRAGMENT_V842=LED_WALL_FRAGMENT_V821
   float led42=clamp(motif42*clamp(uLed42Power,0.0,.14)*linked42,0.0,.14)*rim;
   backdrop+=led21*clamp(uLed21Power,0.0,.38)*rim*.92+led42*.7;`)
  .replace('float ledAlpha=led21*clamp(uLed21Power,0.0,.38)*rim*vignette*.32;',
-          'float ledAlpha=(led21*clamp(uLed21Power,0.0,.38)+led42)*rim*vignette*.32;');
+          'float ledAlpha=(led21*clamp(uLed21Power,0.0,.38)+led42)*rim*vignette*.32;')
+ // V870: three additional bounded LED motifs on the SAME V842 shader, not an extra plane.
+ .replace('uniform float uLed42Power;', `uniform float uLed70Power;uniform float uLed70Mode;
+ uniform float uLed70Phase;uniform float uLed70Bass;uniform float uLed70Mids;
+ uniform float uLed70Camera;
+ uniform float uLed42Power;`)
+ .replace('backdrop+=led21*clamp(uLed21Power,0.0,.38)*rim*.92+led42*.7;', `// V870: bars, concentric prism facets, or gentle radial bass-rings.
+  // The measured V810 cue provides the ONLY phase and energy source.
+  float lane70=floor(vUv.x*32.0);
+  float level70=.10+uLed70Mids*.62*(.78+.22*sin(lane70*1.79+uLed70Phase*.62));
+  float eq70=step(vUv.y,level70)*step(.15,fract(vUv.x*32.0))*step(fract(vUv.x*32.0),.81);
+  float prismDist70=max(abs(p.x),abs(p.y)*1.12);
+  float prism70=(1.0-smoothstep(.025,.11,abs(fract(prismDist70*4.7+
+    sin(angle*5.0+uLed70Phase*.15)*.10)-.5)))*(.36+.64*uLed70Mids);
+  float ringDist70=length(p);
+  float ring70=(1.0-smoothstep(.035,.12,abs(fract(ringDist70*4.5-
+    uLed70Phase*.11)-.5)))*(.30+.70*uLed70Bass);
+  float motif70=uLed70Mode<1.5?eq70:uLed70Mode<2.5?prism70:ring70;
+  float led70=clamp(motif70*clamp(uLed70Power,0.0,.09)*
+    clamp(uLed70Camera,0.0,1.0)*rim,0.0,.09);
+  // No full-screen flash: the inherited vignette, perimeter and alpha .15 cap remain.
+  backdrop+=led21*clamp(uLed21Power,0.0,.38)*rim*.92+led42*.7+led70*.67;`)
+ .replace('float ledAlpha=(led21*clamp(uLed21Power,0.0,.38)+led42)*rim*vignette*.32;',
+          'float ledAlpha=(led21*clamp(uLed21Power,0.0,.38)+led42+led70)*rim*vignette*.32;');

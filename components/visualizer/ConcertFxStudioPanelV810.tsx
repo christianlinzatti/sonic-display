@@ -13,9 +13,17 @@ import {applyCameraAwarePerformanceV834} from './cameraAwarePerformanceV834';
 import {CONCERT_FX_PALETTES_V810,normalizeConcertFxV810,planConcertFxV810} from './concertFxStudioV810';
 import type {ConcertFxGenreV810,ConcertFxSectionV810,ConcertFxSettingsV810} from './concertFxStudioV810';
 import {planVirtualConcertCrowdV815} from './virtualConcertCrowdPlannerV815';
+import {planIntelligentAudienceV874} from './intelligentAudienceExperienceV874';
+import {planSmartFestivalAtmosphereV875} from './smartFestivalAtmosphereV875';
+import {planDynamicFestivalCrowdChoreographyV876} from './dynamicFestivalCrowdChoreographyV876';
+import {planIntelligentCrowdInteractionV877} from './intelligentCrowdInteractionV877';
+import {planSmartAudienceEmotionV878} from './smartAudienceEmotionDirectorV878';
+import {planCrowdCameraStageHarmonyV879} from './crowdCameraStageHarmonyV879';
+import {planSmartConcertExperienceV880} from './smartConcertExperienceV880';
 import {planReactiveParticlesV816} from './reactiveParticlePlannerV816';
 import {planFoamCannonV817} from './foamCannonPlannerV817';
 import {planFestivalSpecialFxV844} from './festivalSpecialFxPlannerV844';
+import {coordinateFestivalFxV871} from './festivalFxCoordinationV871';
 import {planSoapBubblesV8441,planFullStageFlashV8441} from './festivalBubblesFlashPlannerV8441';
 import {planPaperStreamersV846} from './festivalPaperStreamersPlannerV846';
 import {planFestivalFinaleV847} from './festivalFinalePlannerV847';
@@ -56,6 +64,33 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
  const cameraSummaryV834=applyCameraAwarePerformanceV834(cameraPreviewV834,{settings:s,fx:preview,intent:'portrait',verifiedCamera:true,manualCamera:false,groupCount:2});
  const palette=s.palette==='custom'?{primary:s.primary,secondary:s.secondary}:CONCERT_FX_PALETTES_V810[genre];
  const crowdPreview=planVirtualConcertCrowdV815({fx:preview,settings:s,tier:'high',lyricsProtected:false,vocalFocus:false,groupCount:1,energy:.86,kick:.92,crowdBudget:1});
+ const audienceV874=planIntelligentAudienceV874({base:crowdPreview,fx:preview,settings:s,
+   tier:'high',lyricsProtected:false,vocalFocus:false,reducedMotion:false,energy:.86,kick:.92});
+ const atmosphereV875=planSmartFestivalAtmosphereV875({base:audienceV874,fx:preview,settings:s,
+   energy:.86,kick:.92,tier:'high',playing:true,manualLighting:false,blackout:false,
+   lyricsProtected:false,vocalFocus:false,reducedMotion:false});
+ const choreographyV876=planDynamicFestivalCrowdChoreographyV876({base:atmosphereV875,fx:preview,
+   settings:s,energy:.86,kick:.92,tier:'high',playing:true,manualLighting:false,
+   blackout:false,lyricsProtected:false,vocalFocus:false,reducedMotion:false});
+ const interactionV877=planIntelligentCrowdInteractionV877({base:choreographyV876,
+   fx:preview,settings:s,energy:.86,kick:.92,tier:'high',playing:true,
+   manualLighting:false,blackout:false,lyricsProtected:false,vocalFocus:false,
+   reducedMotion:false,groupCount:2,focusSlot:0,focusVerified:true,
+   lyrics:undefined,lyricsVisible:false,progressMs:5000});
+ const emotionV878=planSmartAudienceEmotionV878({base:interactionV877,fx:preview,settings:s,
+   previous:null,trackId:'preview',positionMs:5000,energy:.86,kick:.92,
+   playing:true,manualLighting:false,blackout:false,reducedMotion:false,
+   lyricsProtected:false,vocalFocus:false,tier:'high'});
+ const harmonyPreviewV879=planCrowdCameraStageHarmonyV879({base:emotionV878.cue,settings:s,
+   verifiedCamera:true,cameraIntent:'portrait',manualCamera:false,
+   lyricsVisible:true,lyricsProtected:false,vocalFocus:true,performerVerified:true,
+   groupCount:2,transitionActive:true,transitionProximity:.7,playing:true,
+   blackout:false,manualLighting:false,reducedMotion:false,tier:'high'});
+ const concertPreviewV880=planSmartConcertExperienceV880({
+   settings:s,fx:preview,previous:null,trackId:'preview',positionMs:5000,durationMs:10000,
+   energy:.86,kick:.92,cameraVerified:true,cameraIntent:'wide',manualCamera:false,
+   lyricsProtected:false,vocalFocus:false,groupCount:2,transitionActive:false,
+   playing:true,blackout:false,reducedMotion:false,manualLighting:false,tier:'high'}).cue;
  const particlePreview=planReactiveParticlesV816({fx:preview,settings:s,tier:'high',lyricsProtected:false,
   vocalFocus:false,groupCount:1,energy:.86,kick:.92,bass:.85,highs:.64,particleBudget:1});
  const foamPreview=planFoamCannonV817({fx:preview,settings:s,tier:'high',lyricsProtected:false,
@@ -107,7 +142,13 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
    playing:true,reactive:true,reducedMotion:false,manualLighting:false,
    blackout:false,lyricsProtected:false,vocalFocus:false,groupCount:1,
    tier:'high',budget:1});
- return <fieldset><legend>V810–V850 · Concert FX Studio 2.0</legend>
+ const coordinationPreviewV871=coordinateFestivalFxV871({settings:s,fx:preview,
+   festival:festivalPreviewV844,foam:foamPreview,bubbles:bubblePreviewV8441,
+   streamers:streamerPreviewV846,finale:finalePreviewV847,flash:flashPreviewV8441,
+   playing:true,reducedMotion:false,blackout:false,manualLighting:false,
+   lyricsProtected:false,vocalFocus:false,cameraCloseup:false,groupCount:1,tier:'high',
+   authoredLanes:[]});
+ return <fieldset><legend>V810–V871 · Concert FX Studio 4.0</legend>
   <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
    <legend>V850 · Smart Festival Show Director 4.0</legend>
    <label className="setting-check"><input type="checkbox" checked={s.festivalDirectorV850}
@@ -147,6 +188,21 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
   </fieldset>
   <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
    <legend>V844 · Festival Special FX 3.0 + Strobolicht</legend>
+   <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+    <legend>V871 · Festival FX 4.0 – intelligente Koordination</legend>
+    <label className="setting-check"><input type="checkbox" checked={s.festivalCoordinationV871}
+      disabled={!s.festivalFxV844} onChange={e=>patch({festivalCoordinationV871:e.target.checked})}/>
+      Automatische Abstimmung von CO₂, Schaum, Seifenblasen und Luftschlangen</label>
+    <label>Sichtschutz für Performer ({s.festivalClarityV871} %)
+      <input type="range" min="0" max="100" step="5" value={s.festivalClarityV871}
+        disabled={!s.festivalFxV844||!s.festivalCoordinationV871}
+        onChange={e=>patch({festivalClarityV871:+e.target.value})}/></label>
+    <small>Simulierte Vorschau: Schwerpunkt {coordinationPreviewV871.hero} · Effekt-Dichte
+      {` ${Math.round(coordinationPreviewV871.coverageBefore*100)} → ${Math.round(coordinationPreviewV871.coverageAfter*100)} %`}.
+      Die Dichte ist ein normierter Planungswert, keine gemessene Bildschirmabdeckung.
+      Bereits ausgeschaltete Effekte, manuelle Effektspuren und explizit aktivierte Blitze bleiben unverändert;
+      nur zugelassene automatische Effekte werden gedimmt.</small>
+   </fieldset>
    <label className="setting-check"><input type="checkbox" checked={s.festivalFxV844} onChange={e=>patch({festivalFxV844:e.target.checked})}/> Automatische, koordinierte Festival-Effekte</label>
    <label>Stil <select value={s.festivalStyleV844} disabled={!s.festivalFxV844} onChange={e=>patch({festivalStyleV844:e.target.value as ConcertFxSettingsV810['festivalStyleV844']})}>
      <option value="balanced">Ausgewogen</option><option value="festival">Festival / Hardtekk</option>
@@ -394,6 +450,31 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
     Mit manueller LED-Timeline, festem V821-Look, Pausen, Blackout oder Reduced Motion inaktiv.</small>
   </fieldset>
   <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+   <legend>V870 · LED Wall – neue Muster und Drop-Reaktionen</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.ledMotifsV870}
+    disabled={!s.ledWall||!s.ledExperienceV821||!s.ledExperienceV842}
+    onChange={e=>patch({ledMotifsV870:e.target.checked})}/> Dynamische Equalizer, Prismengeometrie und Bassringe</label>
+   <label>Muster <select value={s.ledMotifStyleV870}
+    disabled={!s.ledMotifsV870||!s.ledWall||!s.ledExperienceV842}
+    onChange={e=>patch({ledMotifStyleV870:e.target.value as ConcertFxSettingsV810['ledMotifStyleV870']})}>
+    <option value="auto">Automatisch nach Songabschnitt</option>
+    <option value="equalizer">Equalizer-Säulen</option><option value="prism">Prismen-Geometrie</option>
+    <option value="shockwave">Bass-Schockwellen (nur Drop/Finale)</option>
+   </select></label>
+   <label>Zusätzliche Musterstärke ({s.ledMotifStrengthV870} %)
+    <input type="range" min="0" max="100" step="5" value={s.ledMotifStrengthV870}
+     disabled={!s.ledMotifsV870||!s.ledWall||!s.ledExperienceV842}
+     onChange={e=>patch({ledMotifStrengthV870:+e.target.value})}/></label>
+   <label className="setting-check"><input type="checkbox" checked={s.ledCameraProtectionV870}
+    onChange={e=>patch({ledCameraProtectionV870:e.target.checked})}/> LED-Wand bei Kamera-Nahaufnahmen sanfter darstellen</label>
+   <small>Genre- und abschnittsabhängige Vorschau (simuliert): {s.ledMotifsV870?
+    (s.ledMotifStyleV870==='auto'?(section==='drop'||section==='finale'?'Bass-Schockwellen':
+      section==='hook'||section==='build'?'Prismengeometrie':'Equalizer-Säulen'):s.ledMotifStyleV870):'Aus'}.
+    Bestehende LED-Fläche ohne zusätzliche Draw-Calls. Manuelle LED-Spuren, feste V821/V842-Looks,
+    verifizierte Musikabschnitte, Reduced Motion, Blackout, Lyrics und Low-Tier behalten Vorrang.
+    Kein Vollbildblitz, keine zusätzliche Lichtquelle.</small>
+  </fieldset>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
    <legend>V822 · Advanced Beat Accent Director</legend>
    <label className="setting-check"><input type="checkbox" checked={s.beatAccentV822} onChange={e=>patch({beatAccentV822:e.target.checked})}/> Gemessene Beat-Akzente auf FX verteilen</label>
    <label>Intensität ({s.beatAccentIntensityV822} %)<input type="range" min="0" max="100" step="5" disabled={!s.beatAccentV822} value={s.beatAccentIntensityV822} onChange={e=>patch({beatAccentIntensityV822:+e.target.value})}/></label>
@@ -410,6 +491,13 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
   <label className="setting-check"><input type="checkbox" checked={s.rhymeAccents} onChange={e=>patch({rhymeAccents:e.target.checked})}/> V813 · Wort- und Reim-Endakzente bei vorhandenen Wort-Zeitmarken</label>
   <label>V813 · Projektionsfläche<select value={s.projectionSurface} onChange={e=>patch({projectionSurface:e.target.value as 'wall'|'floor'})}>
     <option value="wall">Bühnenrückwand (hinter den Performern)</option><option value="floor">Bühnenboden</option></select></label>
+  <fieldset className="fx-studio-v873"><legend>V873 · Cinematic Lyrics 10.0</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.cinematicLyricsV873} onChange={e=>patch({cinematicLyricsV873:e.target.checked})}/> Cinematic Hook-Projektion auf bestehender Lyrics-Fläche</label>
+   <label>Projektions-Akzent ({s.cinematicLyricsStrengthV873} %)<input type="range" min="0" max="100" step="5" disabled={!s.cinematicLyricsV873||!s.lyricsProjection} value={s.cinematicLyricsStrengthV873} onChange={e=>patch({cinematicLyricsStrengthV873:+e.target.value})}/></label>
+   <label>Hook-Größe ({s.hookProjectionSizeV873} %)<input type="range" min="0" max="100" step="5" disabled={!s.cinematicLyricsV873||!s.lyricsProjection} value={s.hookProjectionSizeV873} onChange={e=>patch({hookProjectionSizeV873:+e.target.value})}/></label>
+   <label className="setting-check"><input type="checkbox" checked={s.lyricsCameraGuardV873} onChange={e=>patch({lyricsCameraGuardV873:e.target.checked})}/> Bei Nahaufnahmen / dichten Lyrics dimmen</label>
+   <small>Nur bestätigte Wort- und Hook-Zeitmarken. Keine zusätzlichen Textobjekte, Phoneme, Trigger oder Kamerawechsel. Die lesbaren Lyrics bleiben vorn; die Projektion erfordert weiterhin den V813-Schalter.</small>
+  </fieldset>
   <label className="setting-check"><input type="checkbox" checked={s.atmosphericFx} onChange={e=>patch({atmosphericFx:e.target.checked})}/> V814 · Atmosphärische Konzert-Effekte</label>
   <label className="setting-check"><input type="checkbox" checked={s.floorHaze} onChange={e=>patch({floorHaze:e.target.checked})}/> V814 · Animierte Bodennebel-Bänke</label>
   <label className="setting-check"><input type="checkbox" checked={s.lightShafts} onChange={e=>patch({lightShafts:e.target.checked})}/> V814 · Dezente Lichtkegel hinter den Performern</label>
@@ -418,6 +506,170 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
   <label>V815 · Publikumsreaktion ({s.crowdIntensity} %)<input type="range" min="0" max="100" step="5" disabled={!s.virtualCrowd} value={s.crowdIntensity} onChange={e=>patch({crowdIntensity:+e.target.value})}/></label>
   <label>V815 · Publikumsdichte<select value={s.crowdDensity} disabled={!s.virtualCrowd} onChange={e=>patch({crowdDensity:e.target.value as ConcertFxSettingsV810['crowdDensity']})}>
    <option value="sparse">Klein – 40 %</option><option value="balanced">Mittel – 70 %</option><option value="arena">Arena – 100 %</option></select></label>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}><legend>V874 · Intelligent Audience Experience 2.0</legend>
+    <label className="setting-check"><input type="checkbox" checked={s.crowdExperienceV874} disabled={!s.virtualCrowd} onChange={e=>patch({crowdExperienceV874:e.target.checked})}/> Automatische Reaktionen auf Hooks, Drops und Genre</label>
+    <label className="setting-check"><input type="checkbox" checked={s.crowdArmWaveV874} disabled={!s.virtualCrowd||!s.crowdExperienceV874} onChange={e=>patch({crowdArmWaveV874:e.target.checked})}/> Synchrone Armbewegungen und Publikumswellen</label>
+    <label className="setting-check"><input type="checkbox" checked={s.crowdPhoneWaveV874} disabled={!s.virtualCrowd||!s.crowdPhones||!s.crowdExperienceV874} onChange={e=>patch({crowdPhoneWaveV874:e.target.checked})}/> Rhythmische Handylicht-Wellen</label>
+    <span style={{fontSize:12,opacity:.75}}>Simulierte Vorschau · Stil {audienceV874.style} · Armbewegung {Math.round(audienceV874.armLift*100)} % · Handylicht {Math.round(audienceV874.phoneWave*100)} %</span>
+  </fieldset>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+    <legend>V875 · Smart Festival Atmosphere 3.0</legend>
+    <label className="setting-check"><input type="checkbox" checked={s.smartFestivalAtmosphereV875}
+      disabled={!s.virtualCrowd||!s.crowdExperienceV874}
+      onChange={e=>patch({smartFestivalAtmosphereV875:e.target.checked})}/>
+      Automatische Festival-Stimmungen nach Musikabschnitt</label>
+    <label className="setting-check"><input type="checkbox" checked={s.festivalCrowdWavesV875}
+      disabled={!s.smartFestivalAtmosphereV875||!s.crowdArmWaveV874||!s.virtualCrowd}
+      onChange={e=>patch({festivalCrowdWavesV875:e.target.checked})}/>
+      La-Ola- und Festival-Wellen im Publikum</label>
+    <label className="setting-check"><input type="checkbox" checked={s.festivalWristbandsV875}
+      disabled={!s.smartFestivalAtmosphereV875||!s.virtualCrowd}
+      onChange={e=>patch({festivalWristbandsV875:e.target.checked})}/>
+      Synchronisierte virtuelle LED-Armbänder</label>
+    <label>Festival-Stimmung ({s.festivalAtmosphereStrengthV875} %)
+      <input type="range" min="0" max="100" step="5" value={s.festivalAtmosphereStrengthV875}
+       disabled={!s.smartFestivalAtmosphereV875||!s.virtualCrowd}
+       onChange={e=>patch({festivalAtmosphereStrengthV875:+e.target.value})}/></label>
+    <label>Festival-Stil <select value={s.festivalAtmosphereStyleV875}
+       disabled={!s.smartFestivalAtmosphereV875||!s.virtualCrowd}
+       onChange={e=>patch({festivalAtmosphereStyleV875:e.target.value as ConcertFxSettingsV810['festivalAtmosphereStyleV875']})}>
+      <option value="subtle">Dezent</option><option value="balanced">Ausgewogen</option>
+      <option value="immersive">Immersives Festival</option></select></label>
+    <small>Simulierte Vorschau: {atmosphereV875.festivalMood} · Welle {Math.round(atmosphereV875.festivalWave*100)} % · LED-Bänder {Math.round(atmosphereV875.wristbandGlow*100)} %. Kein Strobo oder Vollbildblitz. Blackout, manuelle Regie, Lyrics und FPS haben Vorrang.</small>
+  </fieldset>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+   <legend>V876 · Dynamic Festival Crowd Choreography</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.crowdChoreographyV876}
+     disabled={!s.virtualCrowd||!s.crowdExperienceV874||!s.smartFestivalAtmosphereV875}
+     onChange={e=>patch({crowdChoreographyV876:e.target.checked})}/> Natürliche Publikums-Choreografien automatisch steuern</label>
+   <label className="setting-check"><input type="checkbox" checked={s.crowdSectorSyncV876}
+     disabled={!s.crowdChoreographyV876||!s.virtualCrowd}
+     onChange={e=>patch({crowdSectorSyncV876:e.target.checked})}/> Sechs Publikumssektoren synchronisieren</label>
+   <label>Bewegungsstärke ({s.crowdChoreographyStrengthV876} %)
+     <input type="range" min="0" max="100" step="5" value={s.crowdChoreographyStrengthV876}
+      disabled={!s.crowdChoreographyV876||!s.virtualCrowd}
+      onChange={e=>patch({crowdChoreographyStrengthV876:+e.target.value})}/></label>
+   <label>Choreografie-Stil <select value={s.crowdChoreographyStyleV876}
+      disabled={!s.crowdChoreographyV876||!s.virtualCrowd}
+      onChange={e=>patch({crowdChoreographyStyleV876:e.target.value as ConcertFxSettingsV810['crowdChoreographyStyleV876']})}>
+     <option value="natural">Natürlich</option><option value="concert">Konzert</option>
+     <option value="festival">Festival / Rave</option></select></label>
+   <small>Simulierte Vorschau: {choreographyV876.choreographyMode} · Reaktionsstärke {Math.round(choreographyV876.choreographyStrength*100)} % · Sektorsynchronisation {choreographyV876.choreographySectorSync?'an':'aus'}. Keine neuen Meshes oder Lichtquellen; Lyrics, Blackout, manuelle Regie und Performance-Limits gehen vor.</small>
+  </fieldset>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+   <legend>V877 · Intelligent Crowd Interaction 4.0</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.crowdInteractionV877}
+    disabled={!s.virtualCrowd||!s.crowdExperienceV874||!s.smartFestivalAtmosphereV875||!s.crowdChoreographyV876}
+    onChange={e=>patch({crowdInteractionV877:e.target.checked})}/> Publikum interaktiv auf Songmomente reagieren lassen</label>
+   <label className="setting-check"><input type="checkbox" checked={s.crowdCallResponseV877}
+    disabled={!s.crowdInteractionV877} onChange={e=>patch({crowdCallResponseV877:e.target.checked})}/>
+    Mitsing- und Rap-Antworten (nur synchronisierte Lyrics)</label>
+   <label className="setting-check"><input type="checkbox" checked={s.crowdFollowPerformerV877}
+    disabled={!s.crowdInteractionV877} onChange={e=>patch({crowdFollowPerformerV877:e.target.checked})}/>
+    Geprüftem Lead-Performer-Fokus folgen</label>
+   <label className="setting-check"><input type="checkbox" checked={s.crowdDanceEchoV877}
+    disabled={!s.crowdInteractionV877} onChange={e=>patch({crowdDanceEchoV877:e.target.checked})}/>
+    Rhythmische Ensemble-Echos</label>
+   <label>Interaktionsstärke ({s.crowdInteractionStrengthV877} %)
+    <input type="range" min="0" max="100" step="5" value={s.crowdInteractionStrengthV877}
+     disabled={!s.crowdInteractionV877} onChange={e=>patch({crowdInteractionStrengthV877:+e.target.value})}/></label>
+   <label>Interaktionsstil <select value={s.crowdInteractionStyleV877}
+    disabled={!s.crowdInteractionV877}
+    onChange={e=>patch({crowdInteractionStyleV877:e.target.value as ConcertFxSettingsV810['crowdInteractionStyleV877']})}>
+    <option value="subtle">Dezent</option><option value="balanced">Ausgewogen</option>
+    <option value="lively">Lebendig</option></select></label>
+   <small>Simulierte Vorschau: {interactionV877.interactionModeV877} · Stärke {Math.round(interactionV877.interactionStrengthV877*100)} %. Echte Rap-/Mitsingreaktionen benötigen gültige Lyrics-Zeitmarken. Es werden keine Tänzer-Posen erkannt. Vorhandenes Publikum, Blackout, manuelle Show und FPS-Limit behalten Vorrang.</small>
+  </fieldset>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+   <legend>V878 · Smart Audience Emotion &amp; Energy Director</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.crowdEmotionDirectorV878}
+    disabled={!s.virtualCrowd||!s.crowdExperienceV874||!s.smartFestivalAtmosphereV875||!s.crowdChoreographyV876}
+    onChange={e=>patch({crowdEmotionDirectorV878:e.target.checked})}/>
+    Intelligenten Spannungsbogen für das Publikum aktivieren</label>
+   <label className="setting-check"><input type="checkbox" checked={s.crowdEmotionWavesV878}
+    disabled={!s.crowdEmotionDirectorV878||!s.crowdArmWaveV874}
+    onChange={e=>patch({crowdEmotionWavesV878:e.target.checked})}/>
+    Sanfte Wellenbewegungen bei Stimmungswechseln</label>
+   <label className="setting-check"><input type="checkbox" checked={s.crowdEmotionContrastV878}
+    disabled={!s.crowdEmotionDirectorV878}
+    onChange={e=>patch({crowdEmotionContrastV878:e.target.checked})}/>
+    Ruhige Momente und große Höhepunkte stärker voneinander abheben</label>
+   <label>Emotionale Intensität ({s.crowdEmotionStrengthV878} %)
+    <input type="range" min="0" max="100" step="5" value={s.crowdEmotionStrengthV878}
+     disabled={!s.crowdEmotionDirectorV878}
+     onChange={e=>patch({crowdEmotionStrengthV878:+e.target.value})}/></label>
+   <label>Reaktionsgeschwindigkeit <select value={s.crowdEmotionStyleV878}
+     disabled={!s.crowdEmotionDirectorV878}
+     onChange={e=>patch({crowdEmotionStyleV878:e.target.value as ConcertFxSettingsV810['crowdEmotionStyleV878']})}>
+     <option value="cinematic">Cinematisch / weich</option><option value="balanced">Ausgewogen</option>
+     <option value="responsive">Direkt / lebendig</option></select></label>
+   <small>Simulierte Vorschau: {emotionV878.cue.emotionMoodV878} · Energie {Math.round(emotionV878.cue.emotionEnergyV878*100)} %.
+    Stimmungswechsel folgen überprüften Songabschnitten, mit Hysterese und Glättung über die Songposition.
+    Kein Audio-KI-Emotionsdetektor: die Regie verwendet vorhandene Musikdaten und reaktiviert keine deaktivierten Effekte.</small>
+  </fieldset>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+   <legend>V879 · Intelligent Crowd Camera &amp; Stage Harmony</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.crowdCameraHarmonyV879}
+    disabled={!s.virtualCrowd||!s.crowdEmotionDirectorV878}
+    onChange={e=>patch({crowdCameraHarmonyV879:e.target.checked})}/>
+    Publikum und Kameraperspektiven automatisch abstimmen</label>
+   <label className="setting-check"><input type="checkbox" checked={s.crowdLyricsGuardV879}
+    disabled={!s.crowdCameraHarmonyV879}
+    onChange={e=>patch({crowdLyricsGuardV879:e.target.checked})}/>
+    Bei sichtbaren Lyrics Armbewegungen und Lichtakzente zurücknehmen</label>
+   <label className="setting-check"><input type="checkbox" checked={s.crowdPerformerPriorityV879}
+    disabled={!s.crowdCameraHarmonyV879}
+    onChange={e=>patch({crowdPerformerPriorityV879:e.target.checked})}/>
+    Sänger und Lead-Performer bei Nahaufnahmen priorisieren</label>
+   <label className="setting-check"><input type="checkbox" checked={s.crowdTransitionSofteningV879}
+    disabled={!s.crowdCameraHarmonyV879}
+    onChange={e=>patch({crowdTransitionSofteningV879:e.target.checked})}/>
+    Publikumsreaktionen bei verifizierten Kameraübergängen abmildern</label>
+   <label>Schutzintensität ({s.crowdCameraStrengthV879} %)
+    <input type="range" min="0" max="100" step="5" value={s.crowdCameraStrengthV879}
+     disabled={!s.crowdCameraHarmonyV879}
+     onChange={e=>patch({crowdCameraStrengthV879:+e.target.value})}/></label>
+   <label>Filmstil <select value={s.crowdCameraStyleV879}
+     disabled={!s.crowdCameraHarmonyV879}
+     onChange={e=>patch({crowdCameraStyleV879:e.target.value as ConcertFxSettingsV810['crowdCameraStyleV879']})}>
+     <option value="cinematic">Cinematisch</option><option value="balanced">Ausgewogen</option>
+     <option value="festival">Festival / dynamisch</option></select></label>
+   <small>Simulierte Nahaufnahme mit Lyrics: {harmonyPreviewV879.harmonyModeV879} ·
+    Publikums-Gain {Math.round(harmonyPreviewV879.harmonyGainV879*100)} %.
+    Die Regie verwendet nur vorhandene, verifizierte Kamera-Hinweise und vorhandene
+    Publikumsinstanzen. Keine pixelgenaue Verdeckungsprüfung oder neuen Kameras.</small>
+  </fieldset>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+   <legend>V880 · Smart Concert Experience 5.0</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.smartConcertExperienceV880}
+     onChange={e=>patch({smartConcertExperienceV880:e.target.checked})}/>
+     Zusammenhängende Konzertdramaturgie über den ganzen Song</label>
+   <label className="setting-check"><input type="checkbox" checked={s.smartConcertContrastV880}
+     disabled={!s.smartConcertExperienceV880}
+     onChange={e=>patch({smartConcertContrastV880:e.target.checked})}/>
+     Bewusste Ruhephasen und Kontraste zwischen Hook, Verse und Drop</label>
+   <label className="setting-check"><input type="checkbox" checked={s.smartConcertHeroRotationV880}
+     disabled={!s.smartConcertExperienceV880}
+     onChange={e=>patch({smartConcertHeroRotationV880:e.target.checked})}/>
+     Visuelle Höhepunkte zwischen Publikum, LED-Wand und Festival-FX abwechseln</label>
+   <label className="setting-check"><input type="checkbox" checked={s.smartConcertPerformerGuardV880}
+     disabled={!s.smartConcertExperienceV880}
+     onChange={e=>patch({smartConcertPerformerGuardV880:e.target.checked})}/>
+     Lyrics und Sänger bei verifizierten Nahaufnahmen schützen</label>
+   <label>Show-Dramaturgie ({s.smartConcertStrengthV880} %)
+    <input type="range" min="0" max="100" step="5" value={s.smartConcertStrengthV880}
+     disabled={!s.smartConcertExperienceV880}
+     onChange={e=>patch({smartConcertStrengthV880:+e.target.value})}/></label>
+   <label>Show-Stil <select value={s.smartConcertStyleV880}
+     disabled={!s.smartConcertExperienceV880}
+     onChange={e=>patch({smartConcertStyleV880:e.target.value as ConcertFxSettingsV810['smartConcertStyleV880']})}>
+     <option value="cinematic">Cinematisch</option><option value="balanced">Ausgewogen</option>
+     <option value="festival">Festival / Energie</option></select></label>
+   <small>Simulierte Vorschau: {concertPreviewV880.role} · Schwerpunkt {concertPreviewV880.hero} ·
+     LED {Math.round(concertPreviewV880.gains.led*100)} % · Publikum {Math.round(concertPreviewV880.gains.crowd*100)} %.
+     Vorhandene Kameras und Tänzer bleiben eigenständig gesteuert; V880 stimmt nur die
+     freigegebenen Bühneneffekte mit dem Songverlauf ab.</small>
+  </fieldset>
   <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}><legend>V816 · Reactive Particle Studio</legend>
     <label className="setting-check"><input type="checkbox" checked={s.reactiveParticles} onChange={e=>patch({reactiveParticles:e.target.checked})}/> Musiksynchrone Partikel aktivieren</label>
     <label className="setting-check"><input type="checkbox" checked={s.particleSparks} disabled={!s.reactiveParticles} onChange={e=>patch({particleSparks:e.target.checked})}/> Seitliche Funken</label>

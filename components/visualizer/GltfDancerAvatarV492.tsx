@@ -121,6 +121,7 @@ import {createBeatBassStateV743,sampleBeatBassV743} from "./beatBassHipMotionV74
 import {directGenreHipV742} from "./genreHipIntelligenceV742";
 import {createSmartHipStateV744,directSmartHipV744} from "./smartHipChoreographyV744";
 import {createEnsembleHipStateV745,directEnsembleHipV745} from "./multiAvatarHipSyncV745";
+import {createNaturalContinuityStateV872,refineNaturalContinuityV872} from "./naturalDanceContinuityV872";
 import {createNaturalDanceStateV758,directNaturalDanceV758} from "./naturalDanceMotionV758";
 import {createDanceVarietyStateV759,stepDanceVarietyV759} from "./intelligentDanceVarietyV759";
 import {sampleNaturalBodyV740,blendNaturalBodyV740} from "./naturalBodyDynamicsV740";
@@ -252,6 +253,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   const beatBassV743=useRef(createBeatBassStateV743());
   const smartHipV744=useRef(createSmartHipStateV744());
   const ensembleHipV745=useRef(createEnsembleHipStateV745());
+  const continuityV872=useRef(createNaturalContinuityStateV872());
   const reviewCadenceV314=useRef(0);
   const danceSongClockV307 = useRef(createDanceSongClock());
   const ikQualitySampler = useRef(createIKQualitySampler());
@@ -1046,7 +1048,21 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       plantedLeft:footIK.current.left?.contact.phase==='planted',
       plantedRight:footIK.current.right?.contact.phase==='planted',
     });
-    const hipDanceV735=beatBassFrameV743.pose;
+    // V872: refine existing hip channels after V743, BEFORE V740/V758 and IK.
+    // No authored GLB or manually selected hip sequence is modified.
+    const hipDanceV735=refineNaturalContinuityV872(continuityV872.current,{
+      settings:groovePreferences.avatarDanceContinuityV872,
+      pose:beatBassFrameV743.pose,mode:hipStudioFrameV738.mode,
+      trackId:track?.id,seconds:typeof cameraDirectorProgressMs==='number'&&Number.isFinite(cameraDirectorProgressMs)
+        ?Math.max(0,cameraDirectorProgressMs/1000):state.clock.elapsedTime,
+      delta,playing:isPlaying,reducedMotion,manualPriority:hipManualPriorityV735,
+      autoMode:hipSettingsV735.mode==='auto',
+      footIKEnabled:avatarFootIKEnabled,contactKnown:!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+      slot:workloadSlot,count:ensembleCountV745??Math.max(workloadSlot+1,propsLipSyncV367?.ensembleCountV374??1),
+      section:performance.section,
+    }).pose;
     const debugSettingsV735=getRuntimeMotionSettings();
     const hipTorsoGainV735=debugSettingsV735.layers.torso?(debugSettingsV735.weights?.torso??1):0;
     const hipLegGainV735=debugSettingsV735.layers.legs?(debugSettingsV735.weights?.legs??1):0;

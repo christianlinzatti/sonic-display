@@ -1,0 +1,35 @@
+{
+  "release": "Sonic Display V880 Hotfix 1",
+  "base": "sonic-display-v880-smart-concert-experience-5-full.zip",
+  "fixes": [
+    "GltfPreview prop destructuring for danceContinuityV872",
+    "V849 LED regression updated for V880 concertArcLedGainV880 while preserving authored LED override"
+  ],
+  "passed": [
+    "test:v849 (109)",
+    "test:v849:types",
+    "test:v872 (121)",
+    "test:v872:types",
+    "test:v880 (44)",
+    "test:v880:types",
+    "test:v848 through test:v838 (each plus focused types)",
+    "test:v873 through test:v879 (each plus focused types)",
+    "check:syntax (1283 TS/TSX files)",
+    "test:module-case (2191 files)"
+  ],
+  "not_validated": {
+    "full_typescript": "Unable to complete: Next.js, React, and Node.js type dependencies not installed in verification environment; user local run required",
+    "next_production_build": "Not completed in environment because npm dependencies are not installed (and registry access not available)"
+  },
+  "how_to_verify": [
+    "npm ci",
+    "npm run test:v849",
+    "npm run test:v849:types",
+    "npm run test:v872",
+    "npm run test:v872:types",
+    "npm run test:v880",
+    "npm run test:v880:types",
+    "npx tsc --noEmit",
+    "npm run build"
+  ]
+}

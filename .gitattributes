@@ -1,0 +1,11 @@
+# Make line-ending-sensitive source inspections consistent on Windows and Linux.
+# Embedded Windows CRLF data/CSV fixtures are unchanged.
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.cjs text eol=lf
+*.mjs text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf

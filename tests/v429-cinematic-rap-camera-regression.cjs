@@ -56,7 +56,7 @@ assert.equal(advance(state,hook,'B',1350,true).shot,'hook-push');
 assert.equal(advance(state,response,'B',1350,false).active,false);
 assert.equal(state.trackId,'');
 // Wire into shared R3F camera, track gated, and browser preferences; no second Canvas.
-const stage=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');
+const stage=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8').replace(/\r\n?/g,'\n');
 const view=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');
 const dancer=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
 const panel=fs.readFileSync('components/visualizer/ExpressiveRapDirectorPanelV425.tsx','utf8');

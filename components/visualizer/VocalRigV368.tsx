@@ -26,6 +26,7 @@ import {refineVocalFacialRealismV617,vocalFacialRateV617} from "./advancedVocalF
 import {planAdvancedVocalLipSyncV631,vocalMouthRateV631} from "./advancedVocalLipSyncV631";
 import {planVocalTimingPrecisionV686,vocalTimingRateV686} from "./vocalTimingPrecisionV686";
 import {planAdvancedDeutschrapLipSyncV837,deutschrapLipRateV837} from "./advancedDeutschrapLipSyncV837";
+import {planDeutschrapVocalV869,deutschrapVocalRateV869,deutschrapVocalExpressionV869} from "./deutschrapVocalDirectorV869";
 import {multiArtistMouthTargetV632} from "./multiArtistVocalDirectorV632";
 import {sampleLiveVocalEnvelopeV661,refineVocalJawV661,getLiveVocalEnvelopeV661} from "./vocalAnalysisStudioV661";
 import {sampleLiveVisemeV644,getLiveVisemeV644} from "./phonemeLipSyncV644";
@@ -455,6 +456,16 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
       !!protectedMouthV686||!!manualVisemeV644||
       !!lipSync?.rapSyllableEditsEnabledV420&&!!editsV453?.length||
       !!lipSync?.rapAudioEnabledV423&&lipSync.rapAudioTrackIdV423===trackId);
+    // V869: verified rapid lead words and explicitly authored V632 adlib roles.
+    // No backing word/phoneme inference. Manual and stem mouth sources win.
+    const vocalCueV869=planDeutschrapVocalV869(optionsV538,{
+      tier:getActivePerformanceTier(),trackId,slot:avatarSlot,
+      count:lipSync?.ensembleCountV374??1,confirmedSinger:castVerifiedV581,
+      protectedSource:!!protectedMouthV686||!!manualVisemeV644||
+        !!lipSync?.rapSyllableEditsEnabledV420&&!!editsV453?.length||
+        !!lipSync?.rapAudioEnabledV423&&lipSync.rapAudioTrackIdV423===trackId,
+      wordCue:articulationV837,vocalScene:sharedVocalSceneV632,
+    });
     // V798: only boost the response speed of existing targets when the word,
     // singer and avatar's actual mouth controls are verified. Never fabricate
     // visemes, override authored events or alter a hand-authored face preview.
@@ -495,8 +506,9 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
       // Explicit V644 visemes and existing lip closure remain fully authoritative.
       const finalTargetV645=artistCueV645.active&&
         (c==='brow'||c==='cheek'||c==='squint')?expressiveArtistFaceV645.face[c]:finalTargetV617;
+      const expressiveTargetV869=deutschrapVocalExpressionV869(vocalCueV869,c,finalTargetV645);
       const directedTargetV632=multiArtistMouthTargetV632(sharedVocalSceneV632?.trackId===trackId?sharedVocalSceneV632:null,
-        avatarSlot,c,finalTargetV645,demoV370!=='off'||!!previewPoseV370||!!previewTargetV383||
+        avatarSlot,c,expressiveTargetV869,demoV370!=='off'||!!previewPoseV370||!!previewTargetV383||
         authoredPriorityV499||!!lipSync?.rapSyllableEditsEnabledV420&&!!editsV453?.length||
         !!lipSync?.rapAudioEnabledV423&&!!lipSync.rapAudioDocumentV423&&
           lipSync.rapAudioTrackIdV423===lipSync.rapAudioDocumentV423.trackId);
@@ -524,14 +536,21 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
       const tunedSpeedV662=advancedVisemeV662&&(c==='jaw'||c==='wide'||c==='round'||c==='lipsClosed')
         ?Math.max(speed,advancedVisemeV662.mode==='rap'?48:31):speed;
       const attackingV581=finalTargetV546>current.current[c];
-      const cadenceSpeedV572=tunedSpeedV662*(mouthDynamicsV572?rapMouthRateV572(mouthDynamicsV572,c,attackingV581):1)*
-        coherentRapRateV581(coherentCueV581,c,attackingV581)*
-        rapLipFlowRateV597(lipV597,c,attackingV581);
-      current.current[c]+=(finalMouthTargetV644-current.current[c])*(1-Math.exp(-cadenceSpeedV572*expressiveVocalRateV612(expressiveVocalV612,c,attackingV581)*vocalFacialRateV617(facialRealismV617,c,attackingV581)*
-        vocalMouthRateV631(mouthContinuityV631,c,attackingV581,current.current[c],finalMouthTargetV644)*
-        vocalTimingRateV686(precisionV686,c,current.current[c],finalMouthTargetV644)*
-        deutschrapLipRateV837(articulationV837,c,current.current[c],finalMouthTargetV644)*
-        rapMouthRateV798(precisionV798,c,finalMouthTargetV644>current.current[c])*delta));
+      // A V632-backed adlib has an authored time interval, but NOT the lead's
+      // timed syllables. Suppress lead-word cadence multipliers for that slot.
+      const authoredAdlibV869=vocalCueV869.mode==='authored-adlib';
+      const cadenceSpeedV572=tunedSpeedV662*
+        (authoredAdlibV869?1:mouthDynamicsV572?rapMouthRateV572(mouthDynamicsV572,c,attackingV581):1)*
+        (authoredAdlibV869?1:coherentRapRateV581(coherentCueV581,c,attackingV581))*
+        (authoredAdlibV869?1:rapLipFlowRateV597(lipV597,c,attackingV581));
+      current.current[c]+=(finalMouthTargetV644-current.current[c])*(1-Math.exp(-cadenceSpeedV572*
+        (authoredAdlibV869?1:expressiveVocalRateV612(expressiveVocalV612,c,attackingV581))*
+        (authoredAdlibV869?1:vocalFacialRateV617(facialRealismV617,c,attackingV581))*
+        (authoredAdlibV869?1:vocalMouthRateV631(mouthContinuityV631,c,attackingV581,current.current[c],finalMouthTargetV644))*
+        (authoredAdlibV869?1:vocalTimingRateV686(precisionV686,c,current.current[c],finalMouthTargetV644))*
+        (authoredAdlibV869?1:deutschrapLipRateV837(articulationV837,c,current.current[c],finalMouthTargetV644))*
+        deutschrapVocalRateV869(vocalCueV869,c,current.current[c],finalMouthTargetV644)*
+        (authoredAdlibV869?1:rapMouthRateV798(precisionV798,c,finalMouthTargetV644>current.current[c]))*delta));
     }
     // V562 is opt-in per-avatar; keep solo morph audition unmodified.
     // The same post-filter applies to live show and real-GLB close-up preview.

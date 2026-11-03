@@ -1,0 +1,7 @@
+{
+  "components/visualizer/AvatarEditor.tsx": "aaa384d90fc717044af80270bbec312327127b809867f2a5359c8621ce5cb377",
+  "tests/v849-intelligent-concert-transitions-regression.cjs": "644731471fb48a1074ea39ca779155cbdcc82cd7ee9d5b1d6cf5a4199024911c",
+  "tests/v872-natural-dance-continuity-regression.cjs": "93aad7a0d159e53089b86a76adc2ea5f190a101d3ae3d8bf89700706ff15c2b5",
+  "V880-HOTFIX1-README.md": "12ffe25440a4ff29de9c32ca93696747bfe8fb3b56e32e1e9a253489e855faca",
+  "scripts/verify-v880-hotfix1-windows.ps1": "afad1a0c139f6f648689560a64f84f12dfdb529d2f1d6163b7515961cf2c0465"
+}

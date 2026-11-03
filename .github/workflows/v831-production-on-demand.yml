@@ -21,7 +21,10 @@ jobs:
       - name: Exact dependency installation
         run: npm ci --no-audit --no-fund
       - name: Full regressions, full TypeScript and real Next.js build (no bypass)
-        run: npm run verify:production:v831
+        run: npm run verify:production:v867
+      - name: Render release dashboard even if the gate was skipped
+        if: always()
+        run: node scripts/v867-release-dashboard.cjs --from-report --platform ${{ matrix.os }}
       - name: Save gate report even on failure
         if: always()
         uses: actions/upload-artifact@v4
@@ -30,5 +33,7 @@ jobs:
           path: |
             v831-production-gate-result.json
             v831-build-readiness-result.json
+            v867-release-dashboard.json
+            v867-release-dashboard.html
           if-no-files-found: warn
 # Real browser/GPU tests and nine witnessed live concerts remain manual acceptance gates.

@@ -30,7 +30,7 @@ function executeV831(opts={}) {
  const npm=process.platform==='win32'?'npm.cmd':'npm';
  const nextBin=path.join(root,'node_modules','next','dist','bin','next');
  const commands=[
-  {name:'check:release',bin:npm,args:['run','check:release'],maxMs:45*60*1000},
+  {name:'check:release',bin:npm,args:['run','check:release:flat'],maxMs:45*60*1000},
   {name:'typecheck',bin:npm,args:['run','typecheck'],maxMs:15*60*1000},
   {name:'next-build',bin:process.execPath,args:[nextBin,'build'],maxMs:30*60*1000}
  ];

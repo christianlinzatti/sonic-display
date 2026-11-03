@@ -1,8 +1,8 @@
 {
   "format": "sonic-v695-release-evidence",
   "schema": 1,
-  "release": "0.1.0-v865",
-  "checkedAt": "2026-11-02T13:59:06.319Z",
+  "release": "0.1.0-v880",
+  "checkedAt": "2026-11-03T09:54:56.135Z",
   "environment": {
     "node": "v24.19.0",
     "lockStatus": "valid",

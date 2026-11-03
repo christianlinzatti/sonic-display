@@ -79,7 +79,7 @@ for(let t=0;t<108000;t++){
   maxFov=Math.max(maxFov,f.fov);if(Math.abs(f.fov-base.fov)>1.5)large++;}
 }
 assert(active>100000&&maxFov<40&&large===0,'30-minute continuous live display remains bounded');
-const src=file=>fs.readFileSync('components/visualizer/'+file,'utf8');
+const src=file=>fs.readFileSync('components/visualizer/'+file,'utf8').replace(/\r\n?/g,'\n');
 for(const [file,tokens] of Object.entries({
  'ThreeAvatar.tsx':['planCinematicConcertV497(','cinematicCueV497={cinematicCueV497}','compositionV497','<Lyrics3DScene','cameraEnabled:props.lipSync?.rapDuetCameraV416!==false','vocalTimeEnabledV496===true && props.lipSync.vocalTimeSegmentsV496?.length'],
  'StageCameraDirectorV289.tsx':['composeCinematicConcertCameraV497(','authored:!automaticShot','guardAutomaticCameraV351(framedV848,composition)'],

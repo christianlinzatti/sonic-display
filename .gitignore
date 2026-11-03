@@ -19,3 +19,10 @@ out
 # V831 local status reports (never a source-controlled certification)
 v831-build-readiness-result.json
 v831-production-gate-result.json
+
+# V867 generated CI/local release dashboards (never commit machine status)
+v867-release-dashboard.json
+v867-release-dashboard.html
+v867-release-matrix.json
+v867-release-matrix.html
+v867-artifacts/
