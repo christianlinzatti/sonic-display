@@ -22,6 +22,8 @@ jobs:
           cache: npm
       - name: Reproducible dependency installation
         run: npm ci --no-audit --no-fund
+      - name: V929 Smart Govee Troubleshooting Assistant (regression and isolated type checks)
+        run: npm run test:v929 && npm run test:v929:types && npm run test:v929:ui-types
       - name: V873 Cinematic Lyrics 10.0 and TypeScript core
         run: npm run test:v873 && npm run test:v873:types
       - name: V872 natural dance continuity and TypeScript core
