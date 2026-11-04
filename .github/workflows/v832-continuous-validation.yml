@@ -23,6 +23,48 @@ jobs:
       - name: Reproducible dependency installation
         run: npm ci --no-audit --no-fund
       - name: V929 Smart Govee Troubleshooting Assistant (regression and isolated type checks)
+      - name: V928 regression and available isolated type checks
+        run: npm run test:v928 && npm run test:v928:types && npm run test:v928:ui-types
+      - name: V927 regression and available isolated type checks
+        run: npm run test:v927 && npm run test:v927:types && npm run test:v927:ui-types
+      - name: V926 regression and available isolated type checks
+        run: npm run test:v926 && npm run test:v926:types && npm run test:v926:ui-types
+      - name: V925 regression and available isolated type checks
+        run: npm run test:v925 && npm run test:v925:types && npm run test:v925:ui-types
+      - name: V924 regression and available isolated type checks
+        run: npm run test:v924 && npm run test:v924:types && npm run test:v924:ui-types
+      - name: V923 regression and available isolated type checks
+        run: npm run test:v923 && npm run test:v923:types && npm run test:v923:ui-types
+      - name: V922 regression and available isolated type checks
+        run: npm run test:v922 && npm run test:v922:types && npm run test:v922:ui-types
+      - name: V921 regression and available isolated type checks
+        run: npm run test:v921 && npm run test:v921:types && npm run test:v921:ui-types
+      - name: V920 regression and available isolated type checks
+        run: npm run test:v920 && npm run test:v920:types && npm run test:v920:ui-types
+      - name: V919 regression and available isolated type checks
+        run: npm run test:v919 && npm run test:v919:types && npm run test:v919:ui-types
+      - name: V918 regression and available isolated type checks
+        run: npm run test:v918 && npm run test:v918:types && npm run test:v918:ui-types
+      - name: V917 regression and available isolated type checks
+        run: npm run test:v917 && npm run test:v917:types && npm run test:v917:ui-types
+      - name: V916 regression and available isolated type checks
+        run: npm run test:v916 && npm run test:v916:types && npm run test:v916:ui-types
+      - name: V915 regression and available isolated type checks
+        run: npm run test:v915 && npm run test:v915:types
+      - name: V914 regression and available isolated type checks
+        run: npm run test:v914 && npm run test:v914:types
+      - name: V913 regression and available isolated type checks
+        run: npm run test:v913 && npm run test:v913:types
+      - name: V912 regression and available isolated type checks
+        run: npm run test:v912 && npm run test:v912:types
+      - name: V911 regression and available isolated type checks
+        run: npm run test:v911 && npm run test:v911:types
+      - name: V910 regression and available isolated type checks
+        run: npm run test:v910
+      - name: V909 regression and available isolated type checks
+        run: npm run test:v909 && npm run test:v909:types
+      - name: V908 regression and available isolated type checks
+        run: npm run test:v908 && npm run test:v908:types && npm run test:v908:ui-types
         run: npm run test:v929 && npm run test:v929:types && npm run test:v929:ui-types
       - name: V873 Cinematic Lyrics 10.0 and TypeScript core
         run: npm run test:v873 && npm run test:v873:types
