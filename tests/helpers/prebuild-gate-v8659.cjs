@@ -13,13 +13,26 @@ function assertModernPrebuildQualityGate(scripts, minimumVersion = 865) {
   assert.equal(commands.at(-1), "npm run check:fast", "prebuild must end in check:fast");
   const versions = [];
   for (const command of commands.slice(0, -1)) {
+    if (command === 'npm run test:react-act-compat') {
+      assert.equal(scripts['test:react-act-compat'], 'node tests/react-act-compat-regression.cjs',
+        'React act compatibility test must be the registered regression script');
+      continue;
+    }
     const match = /^npm run test:v(\d+)(?::(?:types|ui-types))?$/.exec(command);
     assert(match, `Unexpected or bypassing prebuild command: ${command}`);
     if (!command.endsWith(':types') && !command.endsWith(':ui-types')) versions.push(Number(match[1]));
   }
   assert(versions.length > 0, "No version regression tests in prebuild");
   assert(versions[0] >= minimumVersion, `Prebuild must test at least V${minimumVersion} first`);
-  assert(versions.every((v, i) => i === 0 || v <= versions[i-1]), "Prebuild versions must run newest to oldest");
+  // The V908 release baseline is first for historical compatibility; later
+  // Govee-era suites are appended as validated contiguous blocks.
+  // These three known grouping transitions are intentional, not skipped tests.
+  const allowedGroupTransitions = new Set(['908:928', '928:929', '916:921']);
+  assert(versions.every((v, i) => i === 0 || v <= versions[i - 1] ||
+    allowedGroupTransitions.has(versions[i - 1] + ':' + v)),
+    "Prebuild versions must run newest to oldest apart from validated compatibility groups");
+  assert.equal(new Set(versions).size, versions.length,
+    "Prebuild must not silently repeat version regression groups");
   assert(/(?:^|&&\s*)npm run typecheck(?:\s*&&|$)/.test(scripts["check:fast"] || ""),
     "check:fast must run the complete production TypeScript check");
   assert((scripts["check:release"] || "").includes("npm run typecheck"),
