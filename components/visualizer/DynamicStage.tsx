@@ -813,7 +813,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       settings:liveSignalV882.fogSettingsV887??DEFAULT_FOG_V887,
       plan:liveSignalV882.atmospherePlan,base:hazeV814,
       trackId:playback.trackId,durationMs:playback.durationMs,positionMs:playback.positionMs,
-      genre,playing:isPlaying&&playback.playing&&reactive,autoEnabled:liveSignalV882.enabled,
+      genre:genre??'',playing:isPlaying&&playback.playing&&reactive,autoEnabled:liveSignalV882.enabled,
       reducedMotion,seekBlocked:playback.positionMs<(liveSignalV882.atmosphereSeekBlockedUntilMs??0),
       blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
       manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false,
@@ -1191,7 +1191,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       manualFx:!!liveSignalV882.manual,
       lyricsProtected:lyricsProtectedV542,lyricsVisible:lyricsVisibleV813,
       vocalFocus:vocalFocusV542,manualCamera:cameraNarrativeV605?.manualCamera===true,
-      genre,energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+      genre:genre??'',energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
     });
     // V889: final reduction-only artistic mix after V871 and V880, applied to the
     // existing 3D particle/foam emitters. Authored timelines and stage safety win.
