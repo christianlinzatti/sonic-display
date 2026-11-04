@@ -29,6 +29,7 @@ import {loadConcertRoadmapV958,CONCERT_ROADMAP_EVENT_V958,CONCERT_ROADMAP_KEY_V9
  composeConcertSceneV958,mixConcertRoomLookV937,resolveConcertRoleV935,recoveryDelayV930,safeFallbackV934,CONCERT_SIGNAL_EVENT_V933,
  type ConcertSettingsV958,type ConcertPhaseV958} from '@/lib/ultimateConcertRoadmapV958';
 import {previousVerifiedConcertSceneV960,applyConcertContinuityV960} from '@/lib/concertContinuityV960';
+import {governConcertLookV961} from '@/lib/goveeConcertGovernorV961';
 import {readTrackAnalysisV318,ANALYSIS_EVENT_V318,ANALYSIS_STORAGE_KEY_V318,
  type TrackAnalysisV318} from '@/services/musicAnalysis/trackAnalysisV318';
 /** Client-mounted on the Vercel page. Commands go only to the Raspberry Pi's localhost Bridge.
@@ -401,8 +402,13 @@ export function GoveeMusicSyncV909(){
        :festivalDeliveredLook;
       // V934: a lamp that just reconnected gets ONE calm, dimmed recovery look.
       // This is opt-in and never interferes with existing V912 shows or manual input.
-      const finalLook=recoveringDevices.has(ip)&&roadmapSettings.enabled&&roadmapSettings.hardwareSync&&!show&&stage?.source!=='authored'
+      const recoveryLookV961=recoveringDevices.has(ip)&&roadmapSettings.enabled&&roadmapSettings.hardwareSync&&!show&&stage?.source!=='authored'
        ?easeGoveeLookV911(previous,safeFallbackV934(plannedLook)):plannedLook;
+      const finalLook=governConcertLookV961(previous,recoveryLookV961,{
+       enabled:roadmapSettings.enabled&&roadmapSettings.hardwareSync&&roadmapSettings.lightGovernorV961,
+       playing:state.isPlaying,verified:Boolean(roadmapScene?.verified),
+       savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
+       recovering:recoveringDevices.has(ip)}).look;
       if(!changedGoveeLookV911(previous,finalLook))continue;
       await goveeBridgeRequestV909(config,'/command','POST',{ip,action:'look',value:finalLook});
       if(!cancelled){

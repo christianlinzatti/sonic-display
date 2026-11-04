@@ -1942,7 +1942,12 @@
     "test:v960": "node tests/v960-concert-continuity-regression.cjs",
     "test:v960:types": "tsc -p tests/tsconfig.v960-core.json --noEmit",
     "verify:v960:focused": "npm run test:v960 && npm run test:v960:types && npm run test:v958 && npm run test:v929",
-    "verify:v960:production": "node scripts/v960-production-verify.cjs"
+    "verify:v960:production": "node scripts/v960-production-verify.cjs",
+    "test:v961": "node tests/v961-govee-concert-governor-regression.cjs",
+    "test:v961:types": "tsc -p tests/tsconfig.v961-core.json --noEmit",
+    "verify:v961:focused": "npm run test:v961 && npm run test:v961:build-hotfix && npm run test:v961:types && npm run test:v960 && npm run test:v958",
+    "verify:v961:production": "node scripts/v961-production-verify.cjs",
+    "test:v961:build-hotfix": "node tests/v961-build-hotfix-regression.cjs"
   },
   "engines": {
     "node": ">=20.9.0"
@@ -1970,5 +1975,5 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v960"
+  "sonicRoadmapRelease": "v961"
 }

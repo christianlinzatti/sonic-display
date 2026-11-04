@@ -2063,3 +2063,7 @@ npm run verify:v959:production    # volle Prüfung nach npm ci
 ```
 
 Details: `V959-AUTOMATIC-PARALLEL-PRODUCTION-VALIDATION.md`.
+
+## V961 – Govee Concert Light Governor
+
+Optionaler sanfter Lichtwechsel für automatisch gesteuerte Govee-LAN-Leuchten. 21 neue Testgruppen und 5.000 deterministische Szenarien; 30/30 fokussierte parallele Regressionen bestanden. Gespeicherte V912-Lichtshows, manuelle V354-Bühnencues und Wiederverbindungs-Fallback bleiben unangetastet. Vollständiger TypeScript-/Next.js-Produktionsbuild auf GitHub erforderlich (lokal nicht ausgeführt).

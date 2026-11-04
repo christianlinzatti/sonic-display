@@ -1,0 +1,41 @@
+{
+  "release": "v961",
+  "developmentStatus": "focused-tests-passed",
+  "productionCertified": false,
+  "source": "local-validation",
+  "checks": {
+    "v961-regression": {
+      "passed": true,
+      "groups": 21,
+      "deterministicCases": 5000
+    },
+    "v961-isolated-tsc": {
+      "passed": true
+    },
+    "v959-regression-pool": {
+      "passed": true,
+      "suites": 30
+    },
+    "source-syntax": {
+      "passed": true,
+      "files": 1370
+    },
+    "source-preflight": {
+      "passed": true
+    },
+    "full-tsc": {
+      "passed": false,
+      "executed": false,
+      "reason": "npm ci --offline failed: uncached zustand-5.0.16.tgz"
+    },
+    "next-production-build": {
+      "passed": false,
+      "executed": false,
+      "reason": "npm dependencies unavailable"
+    },
+    "v961-build-hotfix": {
+      "passed": true,
+      "groups": 6
+    }
+  }
+}
