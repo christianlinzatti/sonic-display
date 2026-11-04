@@ -3,7 +3,9 @@ on:
   push:
     branches: [master]
     paths:
+      - 'releases/SonicDisplay-V959.zip'
       - 'releases/sonic-display-v959-parallel-production-validation-full.zip'
+      - '.github/workflows/v959-project-archive-import.yml'
   workflow_dispatch:
 permissions:
   contents: write
