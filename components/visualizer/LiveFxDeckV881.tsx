@@ -855,13 +855,13 @@ export function LiveFxDeckV881({trackId,durationMs,progressMs,genre,playing,redu
       <label className="live-fx-check-v881"><input type="checkbox" checked={spotlightSettingsV890.softTransitions}
        onChange={(e:{target:{checked:boolean;value:string}})=>updateSpotlightV890({softTransitions:e.target.checked})}/>Weiche Lichtwechsel</label>
       <label className="live-fx-style-v881">Licht-Choreografie <select value={spotlightSettingsV890.style}
-       onChange={(e:{target:{checked:boolean;value:string}})=>updateSpotlightV890({style:e.target.value as SpotlightSettingsV890['style']})}>
+       onChange={(e:{target:{value:string}})=>updateSpotlightV890({style:e.target.value as SpotlightSettingsV890['style']})}>
        <option value="auto">Automatisch nach Songabschnitt</option><option value="portrait">Portrait · ruhig</option>
        <option value="follow">Follow-Spot · Künstler</option><option value="fan">Lichtfächer · Hook</option>
        <option value="cross">Kreuzlicht · Build</option>
       </select></label>
       <label className="live-fx-style-v881">Genre-Look <select value={spotlightSettingsV890.mood}
-       onChange={(e:{target:{checked:boolean;value:string}})=>updateSpotlightV890({mood:e.target.value as SpotlightSettingsV890['mood']})}>
+       onChange={(e:{target:{value:string}})=>updateSpotlightV890({mood:e.target.value as SpotlightSettingsV890['mood']})}>
        <option value="auto">Automatisch</option><option value="noir">Noir · Deutschrap</option>
        <option value="electric">Electric · Hardtekk</option><option value="arena">Arena · Deutschrock</option>
        <option value="dream">Dream · Pop</option>
