@@ -1,0 +1,43 @@
+name: V960 Import Complete Project ZIP
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'releases/SonicDisplay-V960.zip'
+      - '.github/workflows/v960-project-archive-import.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: v960-project-import-master
+  cancel-in-progress: false
+jobs:
+  import-v960:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out exact triggering revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Validate full V960 ZIP and import 4,388 source files
+        run: python3 scripts/v960-project-archive-import.py
+      - name: Commit verified sources while preserving protected workflow files
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- . ':(exclude).github/workflows/**'
+          if git diff --cached --quiet; then
+            echo 'No changes to commit'
+          else
+            git commit -m 'chore: import complete Sonic Display V960 project'
+            git push origin HEAD:master
+          fi
+      - name: Start V960 parallel Windows/Linux production CI on updated master
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run v960-concert-continuity.yml --ref master
