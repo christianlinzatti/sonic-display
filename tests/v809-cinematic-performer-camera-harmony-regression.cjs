@@ -130,8 +130,10 @@ test('live camera chain runs V809 after V806 before V351',()=>{
  const b=camera.indexOf('const framedV809=composeCinematicPerformerHarmonyV809(framedV806');
  const c=camera.indexOf('const framedV838=vocalDuetV838?composeIntelligentVocalDuetCameraV838(');
  const d=camera.indexOf('const framedV848=composeCinematicCameraDirectorV848(');
- const e=camera.indexOf('guardAutomaticCameraV351(framedV848,composition)');
- assert(a>0&&b>a&&c>b&&d>c&&e>d);
+ const e=camera.indexOf('const cinematicCameraV897=sampleCinematicCameraV897(');
+ const v898=camera.indexOf('const danceCameraV898=sampleDanceCameraV898(');
+ const f=camera.indexOf('guardAutomaticCameraV351(danceCameraV898.pose,composition)');
+ assert(a>0&&b>a&&c>b&&d>c&&e>d&&v898>e&&f>v898);
 });
 test('same measured V377 stage roots (V808 travel is already represented)',()=>assert(
  camera.includes('sceneV528,duetAnchorSampleV377.current.anchors,frameOptionsV809')));

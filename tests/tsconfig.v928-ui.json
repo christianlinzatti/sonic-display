@@ -1,0 +1,5 @@
+{
+ "extends":"./tsconfig.v927-ui.json",
+ "files":["../components/GoveeRoomPerformanceDashboardV928.tsx","../lib/goveeRoomDashboardV928.ts",
+  "stubs/v881-react-jsx.d.ts","stubs/v916-govee-ui-events.d.ts"]
+}

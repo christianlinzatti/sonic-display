@@ -1,3 +1,468 @@
+## V908 – Live Avatar & FX Benchmark Verification
+
+`components/visualizer/liveStageBenchmarkProofV908.ts` erhält exakt die **gleiche**
+V826-Renderer-Publikation, die in `components/visualizer/DynamicStage.tsx`
+zusammen mit `inspectVisibleCastV830` überprüft wird. Der V830-Beleg zählt nur
+sichtbare **SkinnedMeshes innerhalb benannter Bühnen-Performer-Slots**, nicht
+vermeintliche GLB-Dateien oder Bühnen-Dekoration. Der V826-Beleg beschreibt
+**beobachtete** nicht-null FX-Partikel/Publikum/Schaum/Kinetik/Spektral-Elemente;
+laser/LED/Licht-Renderqualität und das vom Nutzer deklarierte V907-FX-Preset
+werden dadurch nicht vollständig verifiziert. Keine automatische FX-Umstellung.
+
+`components/visualizer/GuidedConcertBenchmarkPanelV905.tsx` führt die Belege
+pro **tatsächlich akzeptiertem Messfenster** zusammen und zeigt sie im
+`components/visualizer/LiveStageBenchmarkVerificationPanelV908.tsx` an.
+Nicht bestätigte Slots, veraltete V826-Snapshot-Objekte oder fehlende Fenster
+führen zu **unvollständiger Verifikation**, nie zu einer scheinbaren Bestätigung.
+Belege sind auf 18 RAM-Durchläufe begrenzt; beim expliziten Löschen werden sie
+mit entfernt. Der JSON-Export enthält keine Song-IDs, Zeitstempel oder Frames.
+Kein neuer RAF, Poller, Telemetrie-Abonnent oder Three.js-Objekt.
+
+Tests: `tests/v908-live-avatar-fx-verification-regression.cjs`,
+`tests/tsconfig.v908-core.json`, `tests/tsconfig.v908-ui.json`,
+`scripts/verify-v908-windows.ps1` und CI.
+
+## V907 – Performance Profile Comparison Studio
+
+`performanceProfileComparisonV907.ts` vergleicht ausschließlich **abgeschlossene**
+V905-Benchmarkläufe. GLB-Anzahl (2–4) und FX-Aufbau sind ausdrücklich
+**vom Nutzer angegeben**, nicht automatisch ermittelt. Die Annotation wird
+beim manuellen Benchmarkstart festgehalten, niemals rückwirkend angepasst.
+Die bisherigen V905-Start-/Invalidierungsregeln, V906-Berichte und die einzelne
+V826-Telemetrie-Subscription bleiben unverändert. Paarvergleiche werden nur
+bei identischem Song, verifizierter Szene, Messpreset und FPS-Ziel gezeigt;
+eine Rangfolge nur bei mindestens drei wiederholten, stabilen Läufen je
+Konfiguration. Der Advisor ändert **keine** Stage-Settings. Kein 3D-Overhead.
+
+## V906 – Concert Benchmark Report Studio
+
+Der neue **pure Reportkern** `components/visualizer/concertBenchmarkReportV906.ts`
+verwendet ausschließlich bereits abgeschlossene und von V905 validierte
+Messläufe. Die Gruppengrenzen (private Songkennung, bestätigte Szene, Preset,
+FPS-Ziel, Performance-Profil) bleiben unangetastet. Der Bericht enthält
+FPS-Median/Spannweite/IQR, Framebudget, mittlere V826-P95-Fenster,
+FX-Regeldruck, Laufvergleiche und transparente Hinweise. Kein Hardware- oder
+GPU-Modell wird erfasst; **keine Raspberry-Pi-Prognose**.
+
+`ConcertBenchmarkReportPanelV906.tsx` erhält ausschließlich den RAM-Verlauf
+aus `GuidedConcertBenchmarkPanelV905.tsx`, der über das V901-Panel von der
+bestehenden V826-Telemetrie gespeist wird. Kein weiterer Listener/Timer/RAF,
+keine automatische Showeinstellung und keine neuen Three.js-Objekte. Die
+Exports als JSON/Markdown entfernen Track-IDs, individuelle Run-IDs,
+Zeitstempel, Wiedergabepositionen und rohe Framefenster.
+
+Tests: `tests/v906-concert-benchmark-report-regression.cjs`, getrennte
+`tests/tsconfig.v906-{core,ui}.json`, Windows-Gates und CI.
+
+## V905 – Guided Concert Benchmark Studio (manuelle, echte V826-Messläufe)
+
+`components/visualizer/guidedConcertBenchmarkV905.ts` definiert den reinen, deterministischen
+Benchmark-State-Machine-Kern. Start ausschließlich auf ausdrücklichen Klick mit neuer,
+valider V826-Publikation in einer aktiven, bestätigten Songszene. Zwei zusätzliche
+Renderer-Fenster werden als Stabilisierung verworfen; danach werden je Preset
+5, 8 oder 12 **verschiedene** V826-Fenster erfasst. FPS-Median, FPS-Bereich,
+Median-Framezeit, Durchschnitt der P95-Framefenster und FX-Druck stammen
+nur aus diesen realen Messungen. Pause, Seek, Szeneanpassung, anderes FPS-Ziel,
+Performance-Tier oder Telemetrieausfall machen einen laufenden Vergleich ungültig.
+
+`GuidedConcertBenchmarkPanelV905.tsx` erhält die bestehende V826-Telemetrie **nur
+als Props** von `ConcertQualityIntelligencePanelV901.tsx`. Es gibt weder
+zweites Subscription-/Timer-/RAF-System noch neue WebGL-Objekte.
+Maximal 18 abgeschlossene Durchläufe werden im Arbeitsspeicher behalten. Nur
+dieselbe private Songkennung, bestätigte Szene, FPS-Ziel, Tier und dasselbe
+Messpreset können eine Wiederholungsgruppe bilden. Ab 3 Läufen werden
+schwankende Ergebnisse und wiederholte Zielverfehlung vorsichtig markiert;
+keine statistische oder kausale Garantie. Export enthält nur Aggregate:
+**keine Trackkennung, Playback-Zeit, Rohfenster oder Zeitstempel**. Löschung
+nur nach zwei expliziten Klicks. Kein automatischer V902-Patch, keine
+Änderung an Kamera-/Tanz-/FX-Einstellungen oder V903-Rollback.
+
+Tests: `tests/v905-guided-concert-benchmark-regression.cjs`,
+`tests/tsconfig.v905-core.json`, `tests/tsconfig.v905-ui.json`,
+`scripts/verify-v905-windows.ps1`; CI ergänzt. Vollständige
+App-Typprüfung, Produktionsbuild und WebGL-Browsertest separat durchführen.
+
+## V904 – Concert Quality Regression Guard (read-only, session-only)
+
+`components/visualizer/concertQualityRegressionV904.ts` erstellt aus **nur
+abgeschlossenen V903-Messungen** begrenzte, flache Kopien der Durchschnitts-
+fenster. Der bestehende `ConcertQualityIntelligencePanelV901.tsx` archiviert
+die Daten einmal je bestätigter V903-Messung; React-StrictMode-Duplikate
+werden anhand der Review-ID abgelehnt. Eine Gruppe erfordert denselben
+privaten Songschlüssel, den verifizierten Szenenindex, eine identische
+V902-Einstellungsänderung, FPS-Ziel und Performance-Tier. Die individuelle
+Songkennung ist ausschließlich im Arbeitsspeicher und niemals im Export.
+Drei unabhängige Vorher-/Nachher-Durchläufe bilden die Mindestmenge; Median,
+Durchschnitt, Vorzeichenwechsel und Spreizung der FPS-Differenzen führen zu
+vorsichtigen Zuständen `insufficient`, `unstable`, `no-benefit`,
+`possible-benefit`, `regression`. Dies ist **keine statistische
+Kausalitätsprüfung**. Es findet keinerlei automatische Änderung statt.
+
+`ConcertQualityRegressionPanelV904.tsx` zeigt diese Diagnosen unter V901,
+exportiert nur aggregierte Ergebnisse und löscht den Verlauf nur nach zwei
+Klicks. Die Integration nutzt das existierende V826-`useSyncExternalStore`-
+Abonnement, verursacht weder zusätzliche Renderer-Fenster noch neue GPU-
+Objekte, Timer, Netzwerkanfragen oder Speicherpersistenz. Die bisherigen
+V902-Bestätigungs- und V903-Rücksetzgates bleiben unverändert. Tests:
+`tests/v904-concert-quality-regression-guard-regression.cjs`,
+`tests/tsconfig.v904-core.json`, `tests/tsconfig.v904-ui.json`, CI und
+`scripts/verify-v904-windows.ps1`. Build/Browser-Freigabe weiterhin offen.
+
+## V903 – Concert Quality Before/After Review
+
+`components/visualizer/concertQualityReviewV903.ts` ist die pure, deterministische V903-Review- und Undo-State-Machine. Sie verarbeitet ausschließlich getrennte, tatsächlich von `components/visualizer/concertQualityTelemetryV826.ts` gelieferte V826-Messfenster. Drei vor dem konkreten V902-Klick publizierte Frames bilden die Baseline, zwei neue Frames nach Bestätigung dienen zur Beruhigung und mindestens drei weitere bilden den Nachher-Vergleich. Mittelwerte der Framezeit, FPS, P95-Fenster und FX-Druck werden beobachtend verglichen, ohne fälschlich GPU-Zeiten, optische Qualität oder kausale Optimierung zu behaupten. Bei anderem Songabschnitt, pausierter Show, verändertem FPS-Ziel, anderem Performance-Tier oder manuell verändertem Zielwert gilt der Vergleich als ungültig. Fehlende Baseline liefert ausdrücklich `unavailable`.
+
+`components/visualizer/ConcertQualityIntelligencePanelV901.tsx` nutzt die bestehende `useSyncExternalStore`-Subscription für V826 auch für V903; es kommen keine weiteren Intervalle, RAFs, Speicherschreibvorgänge, GPU-Abfragen oder Renderobjekte hinzu. `components/visualizer/ConcertQualityReviewPanelV903.tsx` zeigt Messfenster, Differenzen, Unsicherheitsgrenzen und die zweiteilige Rücksetz-Bestätigung. In `components/visualizer/LiveFxDeckV881.tsx` werden nur genau die ursprünglichen, explizit über V902 bestätigten Felder mit einem zweiten Wertgleichheits- und Aktivierungscheck zurückgesetzt. Das ersetzt keine manuellen Kameras, Timelines oder Choreografie. Session-Verlauf ist nur transient; JSON-Export enthält keine Spotify-/Songkennung.
+
+Gates: `tests/v903-concert-quality-review-regression.cjs`, `tests/tsconfig.v903-core.json`, `tests/tsconfig.v903-ui.json`, `scripts/verify-v903-windows.ps1`, `V903-VERIFICATION.md`.
+
+## V900 – Ultimate Concert Experience 5.0 (ein gemeinsamer, verifizierter Show-Bogen)
+
+`components/visualizer/ultimateConcertExperienceV900.ts` erzeugt **deterministisch**
+aus den vorhandenen, bestätigten V895/V604-Szenen einen vollständigen visuellen
+Konzertplan. Er klassifiziert jeden Songabschnitt als Intro, Entwicklung,
+Höhepunkt oder Schlussinszenierung und vergibt optische Motive (Portrait,
+Lyrics-Ruhe, Bühnenaufbau, Ensemble, Drop, Finale). Wiederholte Motive erhalten
+abwechselnde virtuelle Bildbreiten; frühere Höhepunkte sind leicht gedämpft,
+damit spätere Drops und Finales mehr relative Wirkung erhalten. Weder Songabschnitte
+noch Beats, Singer-Slots oder Animationsclips werden erfunden.
+
+Die vorhandene `components/visualizer/concertStageSyncV882.ts`-Bridge transportiert
+nur einen überprüften, immutablen, Track- und Laufzeit-gebundenen Szenenplan.
+`components/visualizer/LiveFxDeckV881.tsx` bietet separate Regler für Kamera,
+Tanz, Beleuchtung, LED-Wall und Bühne, Stil (Cinematic/Balanced/Festival),
+Lyrics-Schutz, sanfte Übergänge und exportierbaren JSON-Plan.
+
+Die V900-Laufzeitfunktion sampelt vorhandene **V896-Energie nur dann**, wenn diese
+normalisiert, song-/zeitbezogen und hinreichend aktuell ist; sonst bleibt der
+Storyboard-basierte Look unverändert. Der Modulator **dämpft ausschließlich**
+vorhandene Leistungen mit Faktoren ≤ 1, erstellt keine neuen Shader, Objekte,
+Lichter, Kameras oder Renderloops. Er wird innerhalb der bestehenden Pipeline
+aufgerufen: `components/visualizer/DynamicStage.tsx` für Bühne/LED/Spotlights,
+`components/visualizer/StageCameraDirectorV289.tsx` für bestehende Kamera-Easing
+**vor** finalen Framing-Schutzsystemen V540/V550/V351,
+`components/visualizer/VisualizerStage.tsx` für vorhandene automatische
+Tanzintensität. Manuelle Kamera, Choreografie, Licht-/FX-Lanes, Blackouts,
+Pausen, Spulen, Reduced Motion, Lyrics-Fokus und Low-Tier haben Vorrang.
+V900 greift nicht in GLB-Skelette, IK, Rollen oder manuelle Timelines ein.
+
+**Qualitätstore:** `tests/v900-ultimate-concert-regression.cjs`, isolierte
+TypeScript-Kontrollen `tests/tsconfig.v900-{core,ui}.json`, GitHub Actions und
+`scripts/verify-v900-windows.ps1`. Das ersetzt weder voll installierte
+App-Typechecks noch Next.js-Builds und reale WebGL-/Avatarprüfungen.
+
+## V899 – Advanced Dance Show Director (V604/V895/V896/V898, sichere Duettformationen)
+
+`components/visualizer/advancedDanceShowDirectorV899.ts` ist ein deterministischer,
+reiner Koordinator für **bestätigte** Songabschnitte aus V604/V895. In Strophen
+wählt er bei zwei sichtbaren Bühnenfiguren engere, bei Hooks/Drops/Finales breitere
+Aufstellungen; im Aufbau können vorsichtige diagonale Versätze eingesetzt werden.
+Übergänge sind am Beginn und Ende jeder Szene begrenzt, maximal rund 22 cm
+seitlich und 16 cm in Bühnentiefe vor der Intensitätsdämpfung.
+
+Der Director verwendet im V492-Duettpfad ausschließlich die **vorhandenen**
+Group-Targets **vor** V324-Kollisions- und Balance-Korrekturen.
+Die V326-Gruppe mit drei oder vier Bühnenfiguren bekommt beim bestätigten Hook
+nur eine geringe **Außenverbreiterung** auf vorhandenen X-Lanes;
+`components/visualizer/GroupDancersV326SceneV492.tsx` verweigert diese
+bei benutzerdefinierten V326-Cues, Fußsperren, Kollisionsrisiken oder
+unbestätigtem Songbezug. Enge Gruppenszenen werden **nie** komprimiert. Er verändert weder
+GLB-Mixer noch IK, Animationsclips, Gesichts- oder Sängerzuweisungen. Manuelle
+V325-Timelines, Show-Formationen, Choreografie-Modus, V322-Fußsperren, Blackouts,
+reduzierte Bewegung, Low-Tier und Lyrics-Close-ups haben Vorrang.
+Für Solo-Avatare werden keine fiktiven Partner versetzt. Bereits vorhandene
+V896-Energiemessungen dürfen die kleinen Gruppendistanzen nur moderat modulieren;
+bei fehlender Audio-Evidenz bleibt die Regie neutral hinsichtlich Energie.
+
+Die V899-Stufe in `components/visualizer/StageCameraDirectorV289.tsx` justiert
+lediglich das Easing der einen vorhandenen Kamera, **nach V898**; der letzte
+Bildschutzzugriff bleibt V351. Der vorhandene V882-Bridge-Snapshot verteilt die
+per `components/visualizer/LiveFxDeckV881.tsx` lokal gespeicherten Einstellungen.
+`tests/v899-advanced-dance-show-regression.cjs` prüft alle Schutzregeln,
+Szenenkanten, Kamerapriorität und Audio-Validierung.
+
+**Status:** fokussierte TypeScript- und Regressionstests sind separat ausführbar.
+Vollständiger TypeScript-Check/Next.js-Build sowie echter Browser-/WebGL- und
+Avatar-Fußkontakt-Test sind **nicht** durch isolierte Tests ersetzt.
+
+## V898 – Dance & Camera Coordination (V377/V604, eine Kamera)
+
+`components/visualizer/danceCameraCoordinationV898.ts` ist ein rein
+funktionaler, konservativer Szenen-/Bildausschnittplaner. Die bestätigte
+V895/V604-Songpartitur ist die Zeitquelle, die vorhandenen V377-Stage-Roots
+sind die einzige gültige Quelle für tatsächliche Performer-Positionen.
+Die bestehende Kamera erhält V898 nach V897 und vor dem finalen V351-Guard;
+vorher und nachher prüfen V550/V540 den **Kopf-, Fuß- und horizontalen
+Lyrics-Sicherheitsbereich aller real sichtbaren Performer**. V898 nutzt die
+bereits alle ~180 ms entnommenen Anchor-Samples und kann keine zweite Kamera,
+zusätzlichen Draw Call oder weiteren Render-Loop erzeugen. Keine Identität,
+Beat, Fußkontakt oder Choreografie wird geschätzt. Die Bridge V882 speichert
+und vergleicht die neuen Einstellungen; die Oberfläche V881 persistiert nur
+vom Nutzer gesetzte Optionen. CI und Windows behalten volle Produktionsgates.
+
+## V897 – Cinematic Camera 4.0 (ein R3F-Kamerapfad)
+
+`components/visualizer/cinematicCameraDirectorV897.ts` wählt aus der einzigen
+bestätigten V604/V895-Szenen-Partitur verschiedene Perspektiven und begrenzt
+Positions-, Blickrichtungs- und FOV-Abweichungen. Keine zweite Kamera,
+GL-Objekte, Schnitte, erfundenen Gesangsrollen oder Audioereignisse.
+`StageCameraDirectorV289.tsx` wendet die Kameraabweichungen **nach V848**
+Künstlerframing, aber **vor V351** Lyrics-/Projektionsschutz an. Autorisierte
+manuelle Kamera-Timelines, gespeicherte Keyframes, Live-Editor und Presets
+haben Vorrang. `LiveFxDeckV881.tsx` speichert die Optionen isoliert und exportiert
+nur echte Szenenzeiten. `concertStageSyncV882.ts` transportiert die normalisierten
+Optionen ohne einen zweiten Frame-Loop. Tests: `tests/v897-cinematic-camera-4-regression.cjs`,
+`tests/tsconfig.v897-core.json`; eine vollständige UI-/App-Typprüfung und der
+Next.js-Produktionsbuild sind separate, obligatorische CI-/Windows-Gates.
+
+## V896 – Musical Energy Intelligence (gemessene Live-Energie)
+
+`components/visualizer/musicalEnergyIntelligenceV896.ts` validiert normalisierte
+`AudioFeatures`-Messwerte und erzeugt zwei geglättete, adaptive Energiespuren.
+Der neue Regiekern erzeugt keine Songabschnitte: erst die bestätigte V604-/V895-
+Partitur autorisiert begrenzte Änderungen. `DynamicStage.tsx` sammelt die Messwerte
+im bestehenden R3F-Loop; ein song- und zeitgebundener Speicher ermöglicht
+`StageCameraDirectorV289.tsx` und `VisualizerStage.tsx` den Zugriff ohne neue
+React-Updates. `LiveFxDeckV881.tsx` speichert getrennte Einstellungen und zeigt
+einen aktuellen Audio-Messpunkt. `concertStageSyncV882.ts` leitet ausschließlich
+normalisierte Konfiguration weiter. Stop, Seek, Blackout, manuelle Kamera/Licht/
+Tanzsteuerung, Lyrics, Low-Tier und Reduced Motion sind harte Schutzregeln.
+Keine zusätzlichen GPU-Objekte, Hardwaresteuerung, neue Beats oder generative KI.
+Prüfungen: `tests/v896-musical-energy-intelligence-regression.cjs`,
+`tests/tsconfig.v896-core.json` und `tests/tsconfig.v896-ui.json`.
+
+## V895 – AI Concert Director 3.0 (regelbasierte Song-Regie)
+
+`components/visualizer/aiConcertDirectorV895.ts` erstellt eine deterministische
+Szenen-Partitur ausschließlich aus bestätigten V604-/V885-Songabschnitten.
+Sie balanciert Fokus auf Sänger, Lyrics, Ensemble, Bühnenaufbau und Höhepunkte.
+Die Regie steuert **nur begrenzte Multiplikatoren** bereits aktiver Renderpfade.
+`LiveFxDeckV881.tsx` verwaltet getrennte Schalter, Intensität, Profil, sichere
+lokale Speicherung und JSON-Export. Die trackgebundene V882-Bridge speist
+`DynamicStage.tsx`, `StageCameraDirectorV289.tsx` und `VisualizerStage.tsx`.
+Manuelle Kamera-, Licht- und Tanz-Timelines haben stets Vorrang. Keine neue
+GPU-Geometrie, Stroboskop-Automatik, Hardwarekontrolle, Speaker-Diarization
+oder externe generative KI: der Name bezeichnet den automatischen Regieplaner.
+Prüfungen: `tests/v895-ai-concert-director-regression.cjs` sowie isolierte
+`tests/tsconfig.v895-core.json` und `tests/tsconfig.v895-ui.json`.
+
+## V894 – Ultimate Genre Stage (vier virtuelle Konzertarchitekturen)
+
+`components/visualizer/ultimateGenreStageV894.ts` erstellt einen ausschließlich
+auf verifizierten V604/V885-Szenen basierenden, trackgebundenen Regieplan.
+Der Plan wird über `components/visualizer/concertStageSyncV882.ts` in den
+vorhandenen `components/visualizer/DynamicStage.tsx` übertragen. Vier Bühnenlooks
+(Deutschrap Skyline, Hardtekk Reactor, Deutschrock Arena, Pop Prism) werden im
+`components/visualizer/GenreStageArchitectureV894.tsx` als **ein optionales
+InstancedMesh** hinter den Künstlern dargestellt; maximal 32 statische Instanzen,
+ein zusätzlicher Draw Call, keine weiteren Leuchten, Schatten oder Downloads.
+
+Die vorhandenen automatischen Licht- und LED-Wall-Farbuniforms erhalten nur
+begrenzte Farbakzente. Gespeicherte Licht- und FX-Timelines, manuelle LED-Lanes,
+Blackouts, Stopp/Seek, Low-Tier, Minimal-Stage und Reduced Motion haben Vorrang.
+Der neue, getrennt deaktivierbare Live-FX-Abschnitt unter
+`components/visualizer/LiveFxDeckV881.tsx` bietet Genrewahl, Übergang, Intensität,
+Lyrics-Schutz, getrennte Architektur- und Lichtkanäle sowie JSON-Export.
+Regressionen: `tests/v894-ultimate-genre-stage-regression.cjs`,
+`tests/tsconfig.v894-core.json` und `tests/tsconfig.v894-ui.json`.
+Browser-/WebGL-Test und vollständige Produktionsfreigabe bleiben separate Gates.
+
+## V893 – Arena Crowd Atmosphere (virtuelles Publikum ohne Extra-Draw-Calls)
+
+`components/visualizer/arenaCrowdAtmosphereV893.ts` ordnet vorhandenen V815-
+Publikumsinstanzen anhand bestätigter V604-/V885-Szenen dezente Handylichter,
+Publikumswellen und Silhouetten-Aufhellung zu. Die Regie nutzt denselben
+publizierten Songstatus aus `components/visualizer/concertStageSyncV882.ts`.
+`components/visualizer/DynamicStage.tsx` greift erst nach den bestehenden
+Crowd-Regeln V815/V825/V879/V880 ein, und `components/visualizer/VirtualConcertCrowdV815.tsx`
+recycelt die bisherigen maximal 72 Instanzen. Per-Instance-Phone-Farben werden
+höchstens 20-mal pro Sekunde aktualisiert. Keine zusätzliche Geometrie,
+Lichtquelle, Audioerkennung oder Publikumsdaten.
+
+Manuelle Regie, Blackouts, unbekannte Songstruktur, Pause, Spulen, Reduced
+Motion, Performer- und Lyrics-Fokus sowie Low-Tier stoppen die automatischen
+Akzente. Deaktivierte Handylichter, Animationen oder Publikumsobjekte bleiben
+deaktiviert. Der Bereich `components/visualizer/LiveFxDeckV881.tsx` enthält
+Genre-/Stilwahl, Intensität, drei Kanalschalter, Szenenübersicht und JSON-Export.
+Regressionsprüfungen: `tests/v893-arena-crowd-atmosphere-regression.cjs` und
+isolierte `tests/tsconfig.v893-core.json` / `tests/tsconfig.v893-ui.json`.
+Ein vollständiger Browser-/WebGL-Test und Produktionsbuild bleiben getrennte
+Freigabeschritte.
+
+## V892 – Epic Drop Experience (gemeinsame Drop-Regie)
+
+`components/visualizer/epicDropExperienceV892.ts` baut aus den bereits
+**verifizierten V883/V604-Höhepunkten** einen höchstens sechs Einträge großen,
+trackgebundenen Drop-/Finale-Plan. Drei sanfte Phasen (Impact, Drive, Release)
+modulieren ausschließlich **bereits aktive** V882-/V886-/V888-/V890-/V891-
+Effekte. Der Plan wird über `components/visualizer/concertStageSyncV882.ts`
+transportiert; `components/visualizer/DynamicStage.tsx` verändert nur bestehende
+GPU-Uniforms, Ring-Opacity und optionale Pyro-Cues. Keine neue Lichtquelle,
+Geometrie, Hardware-Schnittstelle oder Stroboskop-Steuerung.
+
+`components/visualizer/StageCameraDirectorV289.tsx` ändert bei bestätigten
+Drops nur die vorhandene automatische Kamera-Dämpfung. In
+`components/visualizer/VisualizerStage.tsx` werden nur automatische Tänzer
+minimal verstärkt, bis zur schon bestehenden V882-Grenze. Manuelle Kamera,
+Tänzer-Timelines, FX- und Beleuchtungsregie, Pause/Seek, Blackouts, Reduced
+Motion, Low-Tier und fehlende verifizierte Timeline behalten Vorrang. Bei Lyrics-
+Schutz bleiben Kamera und Künstler-Spotlights neutral.
+
+Das `components/visualizer/LiveFxDeckV881.tsx` zeigt Stil, Stärke, einzelne
+Kanalschalter, geplante Drops, aktive Phase und JSON-Export. Konfiguration:
+`sonic-epic-drop-experience-v892` im lokalen Browser. Tests:
+`tests/v892-epic-drop-experience-regression.cjs`,
+`tests/tsconfig.v892-core.json`, `tests/tsconfig.v892-ui.json`.
+Anleitung: `V892-EPIC-DROP-EXPERIENCE-README.md`.
+
+## V891 – Virtual Pyrotechnics (rein digitale 3D-Bühneneffekte)
+
+Der datengestützte `components/visualizer/virtualPyrotechnicsV891.ts` wählt
+kurze, begrenzte virtuelle Flammen, CO₂-Wolken oder Funkenfontänen anhand
+bestätigter V604/V885-Abschnitte. Die vorhandene Bridge
+`components/visualizer/concertStageSyncV882.ts` liefert den verifizierten,
+trackgebundenen Plan und lokal gespeicherte Opt-in-Einstellungen.
+`components/visualizer/DynamicStage.tsx` prüft Blackouts, manuelle Timelines,
+Lyrics/Performer-Schutz, Seek- und Pausenstatus sowie die Performance-Stufe.
+Der `components/visualizer/VirtualPyroStageV891.tsx` zeichnet höchstens drei
+instanzierte 3D-Meshgruppen (6 Flammen, 14 CO₂-Puffs, 18 Funken) und
+verwendet keine zusätzlichen Lichtquellen, Shader-Postpasses, Audio-Abfragen
+oder Timer. Bestehende aktive V844-CO₂-Jets werden nicht verdoppelt.
+
+V891 ist **standardmäßig ausgeschaltet** und lässt sich in
+`components/visualizer/LiveFxDeckV881.tsx` getrennt einstellen.
+Nur bestätigte Songteile können Akzente auslösen; dabei entstehen keine
+Stroboskope oder Hardware-Kommandos. Geprüft mit
+`tests/v891-virtual-pyrotechnics-regression.cjs` und isolierten
+`tests/tsconfig.v891-core.json`, `tests/tsconfig.v891-ui.json`.
+Gesamt-Typecheck, Next.js-Produktionsbuild und WebGL-Sichtprüfung bleiben
+separate Freigabeschritte.
+
+## V890 – Professional Spotlight Show (bestehende 3D-Spots)
+
+`components/visualizer/professionalSpotlightShowV890.ts` plant vier zurückhaltende
+Spotlight-Looks anhand der **verifizierten** V885/V604-Szenen. Die vorhandenen
+zwei realen Spotlights und ihre Cone-Meshes werden ausschließlich in der
+bisherigen Frame-Schleife des `components/visualizer/ConcertAtmosphereRendererV308.tsx`
+gesteuert. `components/visualizer/concertStageSyncV882.ts` gibt lokale
+V890-Einstellungen nur für den jeweils aktiven Track weiter. Das
+`components/visualizer/LiveFxDeckV881.tsx` bietet Künstlerfokus, Genrelook,
+Intensität, Lyrics-Schutz, fließende Übergänge und JSON-Szenenexport.
+
+**Sicherheits- und Leistungsregeln:** keine neuen Lichtquellen, keine neuen
+Shader/Geometrien, keine Blitze, keine Hardwaresteuerung; Beleuchtungsgewinne
+maximal 1× der alten Lichtbudgets. Fehlende Timeline, Pause, Seek, Blackout,
+manuelle Timelines, reduzierter Bewegungsmodus und Low-Tier schalten die
+V890-Modulation aus. Follow-Spot verwendet ausschließlich zuvor bestätigte
+V551-Performerpositionen – keine Schätzung von Leadsängeridentitäten.
+
+Regression und isolierte Typen: `tests/v890-professional-spotlight-show-regression.cjs`,
+`tests/tsconfig.v890-core.json`, `tests/tsconfig.v890-ui.json`. Release-Hinweise:
+`PROFESSIONAL_SPOTLIGHT_SHOW_V890.md`.
+
+## V889 – Advanced Particle FX (gemeinsamer, ressourcensparender Effekt-Mix)
+
+`components/visualizer/advancedParticleDirectorV889.ts` verbindet vier bereits vorhandene
+Partikelarten – Schaum, Seifenblasen, Papier-Luftschlangen und Konfetti – unter
+Verwendung **bestätigter** V604/V885-Abschnitte. Die Regie reduziert die Sichtbarkeit
+konkurrierender, bereits autorisierter Effekte. Sie darf keinen abgeschalteten Effekt
+aktivieren, keine Partikel hinzu erzeugen und keine laufende Partikel-/Schaum-Timeline
+überschreiben. `components/visualizer/DynamicStage.tsx` wendet die neue
+Mischung nach den bisherigen Budgets (V823/V825), dem Festival-FX-Koordinator
+(V871) und dem dramaturgischen Bogen (V880) an. Keine zusätzlichen Meshes,
+Lichter, Shader, Audioanalysen oder Hardware-Effekte.
+
+Das `components/visualizer/LiveFxDeckV881.tsx` enthält den konfigurierbaren
+V889-Bereich mit Mischprofil, Genrelook, bevorzugtem Partikeleffekt,
+Einzelschaltern und einem JSON-Prioritätenplan. Die Einstellungen gelangen über
+`components/visualizer/concertStageSyncV882.ts` zum bestehenden 3D-Renderer.
+Sicherheitsgrenzen: manuelle FX-Spuren, Songwechsel, Seek, reduzierte Bewegung,
+Lyrics, Blackouts, Pausen, unbestätigte Timelines, Low-Tier und Render-Budgets.
+Prüfung mit `tests/v889-advanced-particle-director-regression.cjs`,
+`tests/tsconfig.v889-core.json` und `tests/tsconfig.v889-ui.json`.
+Siehe `ADVANCED_PARTICLE_FX_V889.md`.
+
+## V886 – LED Wall Creative Director (vier neue szenengesteuerte Muster)
+
+`components/visualizer/ledWallCreativeDirectorV886.ts` plant aus den
+verifizierten V810-Songabschnitten und gemessenen Audio-Frequenzwerten die
+Looks Skyline, Kaleidoskop, Chevrons und Drop-Vortex. Der neue
+`components/visualizer/ledWallCreativeShaderV886.ts` erweitert den
+bisherigen V812→V821→V842→V870-Shader auf derselben V635-LED-Wand
+in `components/visualizer/DynamicStage.tsx`. Keine weitere WebGL-Fläche,
+Materialinstanz oder Zeitquelle. `components/visualizer/concertFxStudioV810.ts`
+normalisiert die neuen Schalter; `components/visualizer/ConcertFxStudioPanelV810.tsx`
+bietet Genre-/Abschnitts-Vorschau, Musterwahl, Stärke, Tempo und Kameraschutz.
+
+Manuelle FX-/Licht-Timelines, Blackouts, Lyric- und Performer-Schutz,
+Reduced Motion und Low-Tier haben Vorrang; ein unbestätigter Abschnitt
+erzeugt keinen Drop. Tests unter `tests/v886-led-wall-creative-director-regression.cjs`
+und Windows-Gate `scripts/verify-v886-windows.ps1`. Weitere Details in
+`V886-LED-WALL-CREATIVE-DIRECTOR-README.md` und `V886-VERIFICATION.md`.
+
+## V884 – Cinematic Concert Transitions (berechnete Szenen-Überblendungen)
+
+`components/visualizer/cinematicConcertTransitionsV884.ts` plant an **direkt
+aneinandergrenzenden, verifizierten** V763/V604-Szenenwechseln deterministische,
+zeitlich begrenzte Übergänge. Abweichende Song-IDs, Pausen, Seeks,
+reduzierte Bewegung und unbestätigte Timelines liefern keinen Übergang.
+Ruhige, gesprächsartige oder Breath-Szenen werden besonders dezent behandelt.
+Die Übergänge sind visuelle Empfehlungen, keine neue Beat- oder Gesangserkennung.
+
+Im `components/visualizer/LiveFxDeckV881.tsx` gibt es einen V884-Einstellungsblock
+mit *Sanft / Cinematic / Arena*, getrennten Kamera-/Licht-/Overlay-Schaltern,
+Zeitpunkt-Liste und JSON-Export. Einstellungen werden unter
+`sonic-cinematic-transitions-v884` gespeichert. Der vorhandene
+`components/visualizer/concertStageSyncV882.ts` dämpft nur den bestehenden
+Spotlight-Kanal; `components/visualizer/StageCameraDirectorV289.tsx` passt nur
+an geeigneten **automatischen** Kamera-Shots die vorhandene Interpolation an.
+Manuelle Kamera, Keyframes, Show-Cuts, explizite Licht-Timelines, Blackouts,
+Lyrics-Schutzzonen, Low-GPU-Stufe und Live-FX behalten Vorrang. Es entstehen
+weder zusätzliche Three.js-Lichter noch zusätzliche Kameras, Strobes oder
+per-Frame-React-State-Updates.
+
+Prüfpfad: `tests/v884-cinematic-concert-transitions-regression.cjs`,
+`tests/tsconfig.v884-core.json`, `tests/tsconfig.v884-ui.json`,
+`scripts/verify-v884-windows.ps1`; CI: V832 Windows/Ubuntu.
+Siehe `V885-DYNAMIC-CONCERT-ATMOSPHERE-README.md`, `V884-CINEMATIC-CONCERT-TRANSITIONS-README.md`, `V884-VERIFICATION.md`, `V885-VERIFICATION.md`.
+
+## V883 – Intelligent Concert Moments (sparsame dramaturgische Show-Highlights)
+
+`components/visualizer/intelligentConcertMomentsV883.ts` leitet aus der
+**verifizierten** V763/V604-Bühnentimeline höchstens sechs zeitlich verteilte
+Momente ab: Build-up, Hook, Drop und optional ein bewusst zurückhaltendes
+Finale im letzten tatsächlich bestätigten Abschnitt. Zwischen zwei Akzenten
+liegen mindestens 18,5 Sekunden, und pro Songviertel werden höchstens zwei
+geplant. Dies ist eine **regelbasierte visuelle Inszenierung**, kein Modell
+zur Audio-/Tempo-/Gesangserkennung; die Intro-/Outro-Momentanpassung ist
+eine Empfehlung, kein verifizierter Beat.
+
+`components/visualizer/LiveFxDeckV881.tsx` bietet jetzt einen opt-in
+Moment-Schalter, drei Intensitätsprofile, Countdown, Moment-Liste und einen
+separaten JSON-Export. Die Daten werden unter `sonic-concert-moments-v883`
+lokal gespeichert. `components/visualizer/concertStageSyncV882.ts` übernimmt
+die vorab validierten Ereignisse in den **bestehenden** 3D-Ring-, Konfetti-,
+Licht- und Tanzkanälen. Kein zusätzliches WebGL-Objekt, kein Licht-Flash,
+Strobe, Kamera-Eingriff oder fremdgeschriebene Tanz-Timeline. Blackout,
+Reduzierte Bewegung, manuelle Licht-/Tanzpriorität, Lyrics-Schutz, GPU-Low-Tier,
+Pause, Seek und Songwechsel sind geschützt.
+
+Prüfpfad: `tests/v883-intelligent-concert-moments-regression.cjs`,
+`tests/tsconfig.v883-core.json`, `tests/tsconfig.v883-ui.json` und
+`scripts/verify-v883-windows.ps1`. Siehe `V883-INTELLIGENT-CONCERT-MOMENTS-README.md`
+sowie `V883-VERIFICATION.md`.
+
+## V882 – 3D Concert Sync / V881 – Live FX Deck
+
+Das Live-FX-Deck bezieht seinen verifizierten Zeitplan aus
+`components/visualizer/concertTimelineBridgeV763.ts` und aktiviert bei Bedarf
+manuelle Bass-Welle, Sweep und Konfetti. V882 verbindet diese Steuerung mit
+der R3F-Avatar-Bühne unter Wahrung bestehender Regie- und Sicherheitsgrenzen.
+`components/visualizer/ConcertStageFxV882.tsx` zeichnet einen Ring und ein
+wiederverwendetes instanziertes Konfetti-Mesh. Die 3D-Kanäle können einzeln
+deaktiviert werden. Andere Visualizer-Modi behalten ihr leichtes 2D-Overlay.
+Siehe `V881-LIVE-FX-DECK-README.md`, `V882-CONCERT-STAGE-SYNC-README.md`.
+
 ## V880 – Smart Concert Experience 5.0 (ein gemeinsamer Show-Spannungsbogen)
 
 `components/visualizer/smartConcertExperienceV880.ts` nutzt ausschließlich den
@@ -491,7 +956,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V880
+**Dokumentationsstand:** V908
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -3015,3 +3480,60 @@ Beim Genre-Kompass werden bekannte Genre-Wiedergaben gegen die *abgedeckten* Wie
 ## V872 natural dance continuity
 
 Existing V738/V743 sampled hip channels pass through `naturalDanceContinuityV872` in the V492 live GLB renderer and AvatarEditor preview before V740/V758 body dynamics and final Foot-IK. Authored GLB clips, manual timelines, explicit hip modes and reduced-motion requests bypass the layer. No bones, animation assets or root transforms are written. V872 uses song time and existing stance flags only; it does not infer foot contacts or invent beats.
+
+
+## V887 – Cinematic Fog & Haze (3. November 2026)
+
+Die vorhandenen V814-Shaderflächen für Bodennebel und Lichtkegel werden in
+`components/visualizer/DynamicStage.tsx` mit dem songgebundenen Kern
+`components/visualizer/cinematicFogDirectorV887.ts` und dem V814-kompatiblen
+`components/visualizer/cinematicFogShaderV887.ts` angesteuert. Keine weiteren
+Meshes/Lichter oder WebGL-Renderpasses. Die V885-Szenenplanung liefert nur
+verifizierte Abschnitte; keine eigene Beat- oder Gesangserkennung.
+
+Settings liegen unter `sonic-cinematic-fog-haze-v887` und werden im
+`components/visualizer/LiveFxDeckV881.tsx` eingestellt. Der gemeinsame
+`components/visualizer/concertStageSyncV882.ts`-Snapshot übergibt sie ohne
+zusätzliche Frame-Schleife. Blackouts, gespeicherte Licht-Timelines, Lyrics-
+Fokus, Songwechsel, Pausen, Spulen, reduzierte Bewegung und GPU-Limits
+verhindern die neue Nebelregie. Deaktivieren stellt das V814-Legacy-Verhalten
+wieder her. Quellcode-Prüfung `tests/v887-cinematic-fog-regression.cjs`;
+`tests/tsconfig.v887-core.json`, `tests/tsconfig.v887-ui.json` und
+`scripts/verify-v887-windows.ps1`. Ein vollständiger Next-Build bleibt ein
+separat erforderliches Release-Gate.
+
+
+## V888 – Laser Show Director (3. November 2026)
+
+Die vier virtuellen Muster `fan`, `tunnel`, `cross` und `prism` sind eine
+optionale Erweiterung des **einen bestehenden V811-Laser-Shader-Meshes**.
+`components/visualizer/laserShowShaderV888.ts` ergänzt die Shader-Uniforms
+und bewahrt die `.14`-Alpha-Grenze und den Performer-Rand.
+`components/visualizer/laserShowDirectorV888.ts` wählt Muster über
+bestätigte V885/V604-Szenen (Verse/Fan, Build/Cross, Hook/Prism, Drop/Tunnel).
+Die V810-Laserfreigabe und die V823-Timeline bleiben unangetastet.
+Blackouts, gespeicherte Lichter oder Laser-Autorenschaft, Pausen, Seeks,
+Songwechsel, Low-Tier, reduzierte Bewegung und der Lyrics-Fokus stoppen
+**nur V888**, niemals erzwungen das bisherige V811. Keine Laserhardware,
+Blitze, neuen Renderpasses oder GPU-Objekte.
+
+Die lokalen Einstellungen und der JSON-Export sind im
+`components/visualizer/LiveFxDeckV881.tsx` integriert und werden durch
+`components/visualizer/concertStageSyncV882.ts` ohne eigene RAF-Schleife
+an `components/visualizer/DynamicStage.tsx` übergeben. Die isolierten
+Prüfungen `tests/v888-laser-show-director-regression.cjs` und die
+TypeScript-Konfigurationen `tests/tsconfig.v888-core.json` bzw.
+`tests/tsconfig.v888-ui.json` gehören zum Release. Windows-Gate:
+`scripts/verify-v888-windows.ps1`. npm ci, vollständige TypeScript-
+Prüfung, Next.js-Produktionsbuild und echte WebGL-Shaderkompilierung bleiben
+zusätzliche Freigabeprüfungen.
+
+## V901 – Concert Quality Intelligence 2.0
+
+Reine Diagnose-Funktion `concertQualityIntelligenceV901.ts`, read-only Bedienfeld `ConcertQualityIntelligencePanelV901.tsx` im V881 LIVE FX Deck. Nutzt die bestätigte V900-Partitur und V826-Renderer-Telemetrie (Abonnements maximal ungefähr zweimal pro Sekunde). Getrennte Auswertung von **tatsächlich gemessenen Renderer-Frames** und **nur konfigurierten** Kamera-/Lyrics-/Tanz-/Licht-/FX-Regelpfaden. Keine erdachten Quality Scores, Vocal-Erkennung oder tatsächliche visuelle Bild-/Lyrics-/Tanzbewertung. Kein WebGL-Draw Call und keine verändernde Steuerung. Schutz bei unbestätigten/stale Song-Daten, Pausen und deaktivierter Automatik. Isolierte Typprüfung und Regression `tests/v901-concert-quality-intelligence-regression.cjs`, technische Grenzen in `V901-VERIFICATION.md`.
+
+## V902 – Automatic Concert Quality Advisor
+
+`concertQualityAdvisorV902.ts` derives deterministic opt-in suggestions from V901 warnings, confirmed V900 scenes, V826 frame telemetry and **existing automatic** V888/V889/V890/V897/V899/V900 setting snapshots. Only when renderer evidence is valid and current may the Advisor suggest lowering an already enabled effect's intensity. Other suggestions are limited to enabling optional **protective** flags (lyrics/floor contacts) already provided by these systems. The advisor never enables a disabled effect, invents a singer or a quality score, overwrites manual timeline content, or claims a measurable FPS increase.
+
+V902 is embedded under the V901 live dashboard using `ConcertQualityAdvisorPanelV902.tsx`. User action 1 selects a proposal and displays a before/after preview. User action 2 explicitly confirms that specific change. `confirmConcertAdviceV902()` **recomputes** the proposal against the current report, scene, enablement and original setting. The parent `LiveFxDeckV881.tsx` then applies only the allowlisted setting through the existing normalized React state setters, with a second current-value guard. No new renderer, network request, telemetry subscription, persistent opt-in or autonomous background work. Test: `tests/v902-automatic-concert-quality-advisor-regression.cjs`, isolated TS configs `tests/tsconfig.v902-*`, `V902-VERIFICATION.md`.

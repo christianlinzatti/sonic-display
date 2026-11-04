@@ -1,0 +1,4 @@
+{
+ "extends":"./tsconfig.v912-core.json",
+ "files":["../lib/goveeLanV909.ts","../lib/goveeConcertDirectorV911.ts","../lib/goveeLightShowV912.ts","../lib/goveeColorHarmonyV913.ts","../types/audio.ts","../services/musicAnalysis/trackAnalysisV318.ts"]
+}

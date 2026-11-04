@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.v921-ui.json",
+  "files": [
+    "../components/GoveeShockwaveStudioV922.tsx",
+    "../lib/goveeShockwaveV922.ts",
+    "stubs/v881-react-jsx.d.ts",
+    "stubs/v916-govee-ui-events.d.ts"
+  ]
+}

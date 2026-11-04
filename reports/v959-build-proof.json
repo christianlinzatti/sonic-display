@@ -1,0 +1,71 @@
+{
+  "schema": "sonic-v959-build-proof-v1",
+  "startedAt": "2026-11-04T17:43:07.904Z",
+  "finishedAt": "2026-11-04T17:43:07.922Z",
+  "version": "0.1.0-v908",
+  "node": "v22.16.0",
+  "platform": "linux",
+  "passed": false,
+  "error": "READINESS_FAILED",
+  "readiness": {
+    "schema": "sonic-v959-readiness-v1",
+    "passed": false,
+    "checks": [
+      {
+        "id": "lockfile-version",
+        "passed": true,
+        "detail": "0.1.0-v908"
+      },
+      {
+        "id": "build-scripts",
+        "passed": true,
+        "detail": "build, typecheck and V931 mandatory gate"
+      },
+      {
+        "id": "source:scripts/v931-production-gate.cjs",
+        "passed": true,
+        "detail": "scripts/v931-production-gate.cjs"
+      },
+      {
+        "id": "source:tests/v931-build-gate-regression.cjs",
+        "passed": true,
+        "detail": "tests/v931-build-gate-regression.cjs"
+      },
+      {
+        "id": "source:tests/v958-concert-roadmap-regression.cjs",
+        "passed": true,
+        "detail": "tests/v958-concert-roadmap-regression.cjs"
+      },
+      {
+        "id": "source:tests/check-source-syntax.cjs",
+        "passed": true,
+        "detail": "tests/check-source-syntax.cjs"
+      },
+      {
+        "id": "source:.github/workflows/v958-ultimate-concert-validation.yml",
+        "passed": true,
+        "detail": ".github/workflows/v958-ultimate-concert-validation.yml"
+      },
+      {
+        "id": "windows-case-collisions",
+        "passed": true,
+        "detail": "no case-insensitive path conflicts"
+      },
+      {
+        "id": "dependency:node_modules/typescript/bin/tsc",
+        "passed": false,
+        "detail": "node_modules/typescript/bin/tsc"
+      },
+      {
+        "id": "dependency:node_modules/next/dist/bin/next",
+        "passed": false,
+        "detail": "node_modules/next/dist/bin/next"
+      }
+    ],
+    "summary": {
+      "passed": 8,
+      "failed": 2
+    }
+  },
+  "production": null
+}

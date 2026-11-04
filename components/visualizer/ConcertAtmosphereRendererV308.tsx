@@ -34,6 +34,8 @@ import {resolveOverdrawBudgetV773,allowOverdrawLayerV773} from "./adaptiveOverdr
 import {readPiConcertBudgetV479} from "./piConcertRuntimeV479";
 import {shouldDrawTransparentV552,needsSpotTargetMatrixV552} from "./piConcertDrawBudgetV552";
 import { getLightingPlayback } from "./lightingPlayback";
+import {readConcertStageSyncV882} from "./concertStageSyncV882";
+import {planSpotlightV890} from "./professionalSpotlightShowV890";
 import type {ScenicLightingCueV762} from "./cinematicScenicLightingV762";
 import { useSceneDetail, sceneDetailFlags } from "./scenePerformanceControls";
 import { CONCERT_ATMOSPHERE_EVENT, DEFAULT_CONCERT_ATMOSPHERE, evaluateConcertAtmosphereV308, readConcertAtmosphereSettings } from "./concertAtmosphereV308";
@@ -262,6 +264,27 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
     const beamGainV387=combinedV394.beamGain;
     const hazeGainV387=combinedV394.hazeGain;
     const sweepGainV387=combinedV394.sweepGain;
+    // V890: one song-scoped, evidence-bound layer on the EXISTING two spotlights.
+    // Only reduce intensity or gently change their existing angles/aims.
+    const signalV890=readConcertStageSyncV882();
+    const spotlightV890=planSpotlightV890({
+      settings:signalV890.spotlightSettingsV890??{
+        enabled:false,style:'auto',mood:'auto',intensity:0,
+        followArtists:true,protectLyrics:true,softTransitions:true},
+      plan:signalV890.atmospherePlan,trackId:playback.trackId??'',
+      durationMs:playback.durationMs??0,positionMs:playback.positionMs??-1,
+      genre:genreV462??'',playing:isPlaying&&playback.playing,
+      autoEnabled:signalV890.enabled&&signalV890.sync.lights&&signalV890.trackId===playback.trackId,
+      reducedMotion,tier:nowTier,seekBlocked:!!signalV890.atmosphereSeekBlockedUntilMs&&
+        playback.positionMs<(signalV890.atmosphereSeekBlockedUntilMs??0),
+      blackout:timelineGainRef.current<.001||!showLightingAllowed,
+      manualLighting:authoredLightingV387||!reactive,manualFx:!!signalV890.manual,
+      lyricsProtected:lyricsProtectedV542||vocalFocusV542,
+      groupCount:Math.max(1,Math.min(4,Math.round(groupCountV542)||1)),
+      stageSpots:settings.enabled&&settings.stageSpots&&sceneFlags.extraLights,
+      beams:settings.enabled&&settings.beams&&sceneFlags.beamSweep,
+      existingGain:timelineGainRef.current,
+    });
     const alpha=1-Math.exp(-Math.min(.1,Math.max(0,delta))*5.5*Math.min(lightingBlendV609.lightingRate,!(authoredLightingV387||!showLightingAllowed||!reactive||timelineGainRef.current<.001)&&transitionV791?.active?transitionV791.lightingRate:1));
     // Change only the Fog instance installed by V308, and ease toward its normal
     // density-dependent distances when V551 becomes inactive (e.g. on pause).
@@ -302,8 +325,8 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
       o.value+=(opacity-o.value)*alpha;
       (material.uniforms.uColor.value as Color).lerp(color,alpha);
     };
-    move(leftBeam.current,Math.min(.3,frame.leftOpacity*decorationV640.beams*beamGainV387*lightingV462.beamGain*lightingV542.beamGain*lightingV551.beamGain*lightingV608.beam*lightingV621.beam*concertGenreV610.beam*concertContinuityV611.beam*professionalLightV636.beam*coordinatedLightV689.beam),desiredPrimary.current);
-    move(rightBeam.current,Math.min(.3,frame.rightOpacity*decorationV640.beams*beamGainV387*lightingV462.beamGain*lightingV542.beamGain*lightingV551.beamGain*lightingV608.beam*lightingV621.beam*concertGenreV610.beam*concertContinuityV611.beam*professionalLightV636.beam*coordinatedLightV689.beam),desiredSecondary.current);
+    move(leftBeam.current,Math.min(.3,frame.leftOpacity*decorationV640.beams*beamGainV387*lightingV462.beamGain*lightingV542.beamGain*lightingV551.beamGain*lightingV608.beam*lightingV621.beam*concertGenreV610.beam*concertContinuityV611.beam*professionalLightV636.beam*coordinatedLightV689.beam*spotlightV890.beamGain),desiredPrimary.current);
+    move(rightBeam.current,Math.min(.3,frame.rightOpacity*decorationV640.beams*beamGainV387*lightingV462.beamGain*lightingV542.beamGain*lightingV551.beamGain*lightingV608.beam*lightingV621.beam*concertGenreV610.beam*concertContinuityV611.beam*professionalLightV636.beam*coordinatedLightV689.beam*spotlightV890.beamGain),desiredSecondary.current);
     move(floorHaze.current,Math.min(.15,frame.floorHaze*(scenicCueRefV762?.current.hazeGain??1)*decorationV640.haze*hazeGainV387*lightingV462.hazeGain*lightingV542.hazeGain*lightingV551.hazeGain*lightingV608.haze*lightingV621.haze*concertGenreV610.haze*concertContinuityV611.haze*professionalLightV636.haze*coordinatedLightV689.haze),desiredPrimary.current);
     move(backHaze.current,Math.min(.15,frame.backHaze*decorationV640.haze*hazeGainV387*lightingV462.hazeGain*lightingV542.hazeGain*lightingV551.hazeGain*lightingV608.haze*lightingV621.haze*concertGenreV610.haze*concertContinuityV611.haze*professionalLightV636.haze*coordinatedLightV689.haze),desiredSecondary.current);
     // V552: transparent objects consume GPU draw calls even at zero alpha.
@@ -339,18 +362,33 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
       dancer.getWorldPosition(singerWorldV551.current);
       if(!Number.isFinite(singerWorldV551.current.x))return fallback;
       const x=Math.max(-2.2,Math.min(2.2,singerWorldV551.current.x));
-      return fallback+(x-fallback)*Math.min(.75,lightingV551.focusStrength+lightingV608.focusBoost);
+      return fallback+(x-fallback)*Math.min(spotlightV890.follow?.88:.75,lightingV551.focusStrength+lightingV608.focusBoost+(spotlightV890.follow?.12:0));
     };
     const leftAimV551=spotlightAimV551(lightingV551.leftSingerSlot,
       Math.max(-3,Math.min(3,(-.65+(frame.targetLeftX+.65)*lightingV462.sweepGain*lightingV542.sweepGain*lightingV551.sweepGain*lightingV608.sweep*lightingV621.sweep*concertGenreV610.sweep*concertContinuityV611.sweep*professionalLightV636.sweep*coordinatedLightV689.sweep)*sweepGainV387+(lightingV551.leftSingerSlot===null?professionalLightV636.aimOffset+coordinatedLightV689.aimOffset:0))));
     const rightAimV551=spotlightAimV551(lightingV551.rightSingerSlot,
       Math.max(-3,Math.min(3,(.65+(frame.targetRightX-.65)*lightingV462.sweepGain*lightingV542.sweepGain*lightingV551.sweepGain*lightingV608.sweep*lightingV621.sweep*concertGenreV610.sweep*concertContinuityV611.sweep*professionalLightV636.sweep*coordinatedLightV689.sweep)*sweepGainV387-(lightingV551.rightSingerSlot===null?professionalLightV636.aimOffset+coordinatedLightV689.aimOffset:0))));
+    const leftAimV890=Math.max(-3,Math.min(3,leftAimV551+
+      (lightingV551.leftSingerSlot===null?spotlightV890.leftShift:0)));
+    const rightAimV890=Math.max(-3,Math.min(3,rightAimV551+
+      (lightingV551.rightSingerSlot===null?spotlightV890.rightShift:0)));
+    // Smooth one existing cone/spot footprint; no additional geometries.
+    const coneEaseV890=spotlightV890.active?alpha:Math.min(1,alpha*2);
+    const widthV890=spotlightV890.angle/.30;
+    const coneLeftV890=leftBeamMeshV552.current;
+    const coneRightV890=rightBeamMeshV552.current;
+    if(coneLeftV890){coneLeftV890.scale.x+=(widthV890-coneLeftV890.scale.x)*coneEaseV890;
+      coneLeftV890.scale.z+=(widthV890-coneLeftV890.scale.z)*coneEaseV890;}
+    if(coneRightV890){coneRightV890.scale.x+=(widthV890-coneRightV890.scale.x)*coneEaseV890;
+      coneRightV890.scale.z+=(widthV890-coneRightV890.scale.z)*coneEaseV890;}
+    if(leftSpot.current)leftSpot.current.angle+=(spotlightV890.angle-leftSpot.current.angle)*coneEaseV890;
+    if(rightSpot.current)rightSpot.current.angle+=(spotlightV890.angle-rightSpot.current.angle)*coneEaseV890;
     if(leftGroup.current){
-      leftDirection.current.set(leftAimV551-(-2.55),-1.72-3.15,.25-(-1.25)).normalize();
+      leftDirection.current.set(leftAimV890-(-2.55),-1.72-3.15,.25-(-1.25)).normalize();
       leftGroup.current.quaternion.setFromUnitVectors(DOWN,leftDirection.current);
     }
     if(rightGroup.current){
-      rightDirection.current.set(rightAimV551-2.55,-1.72-3.15,.25-(-1.25)).normalize();
+      rightDirection.current.set(rightAimV890-2.55,-1.72-3.15,.25-(-1.25)).normalize();
       rightGroup.current.quaternion.setFromUnitVectors(DOWN,rightDirection.current);
     }
     const setSpot=(spot:SpotLight|null,intensity:number,color:Color,targetX:number)=>{
@@ -364,8 +402,8 @@ export function ConcertAtmosphereRendererV308({ audio, isPlaying, reactive, redu
         previousX.current=targetX;
       }
     };
-    setSpot(leftSpot.current,Math.min(3,frame.leftLight*beamGainV387*lightingV462.spotGain*lightingV542.spotGain*lightingV551.spotGain*lightingV608.spot*lightingV621.spot*concertGenreV610.spot*concertContinuityV611.spot*professionalLightV636.spot*coordinatedLightV689.spot),desiredPrimary.current,leftAimV551);
-    setSpot(rightSpot.current,Math.min(3,frame.rightLight*beamGainV387*lightingV462.spotGain*lightingV542.spotGain*lightingV551.spotGain*lightingV608.spot*lightingV621.spot*concertGenreV610.spot*concertContinuityV611.spot*professionalLightV636.spot*coordinatedLightV689.spot),desiredSecondary.current,rightAimV551);
+    setSpot(leftSpot.current,Math.min(3,frame.leftLight*beamGainV387*lightingV462.spotGain*lightingV542.spotGain*lightingV551.spotGain*lightingV608.spot*lightingV621.spot*concertGenreV610.spot*concertContinuityV611.spot*professionalLightV636.spot*coordinatedLightV689.spot*spotlightV890.leftGain),desiredPrimary.current,leftAimV890);
+    setSpot(rightSpot.current,Math.min(3,frame.rightLight*beamGainV387*lightingV462.spotGain*lightingV542.spotGain*lightingV551.spotGain*lightingV608.spot*lightingV621.spot*concertGenreV610.spot*concertContinuityV611.spot*professionalLightV636.spot*coordinatedLightV689.spot*spotlightV890.rightGain),desiredSecondary.current,rightAimV890);
   });
   const beamVisible=settings.enabled&&settings.beams&&tier!=="low"&&sceneFlags.beamSweep;
   const hazeVisible=settings.enabled&&settings.haze&&tier!=="low";

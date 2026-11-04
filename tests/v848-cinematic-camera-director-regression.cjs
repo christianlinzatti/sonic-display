@@ -155,7 +155,7 @@ for(const x of [0,.5,.7,1.4])test(`no projection regression at ${x}m lead`,()=>{
 });
 const stage=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');
 test('V848 stage compositor wired after V838',()=>assert(stage.indexOf('const framedV848=composeCinematicCameraDirectorV848(')>stage.indexOf('const framedV838=')));
-test('final V351 lyrics safety follows V848',()=>assert(stage.includes('guardAutomaticCameraV351(framedV848,composition)')));
+test('final V351 lyrics safety follows V848 and V897',()=>assert(stage.includes('sampleCinematicCameraV897({')&&stage.includes('guardAutomaticCameraV351(danceCameraV898.pose,composition)')&&stage.indexOf('const framedV848=')<stage.indexOf('const cinematicCameraV897=')&&stage.indexOf('const cinematicCameraV897=')<stage.indexOf('const danceCameraV898=')&&stage.indexOf('const danceCameraV898=')<stage.indexOf('guardAutomaticCameraV351(danceCameraV898.pose,composition)')));
 test('manual/authoring gates are propagated',()=>assert(stage.includes('authored:authoredCameraV528||')));
 test('V848 uses only sampled stage roots',()=>assert(stage.includes('choreographyV792,duetAnchorSampleV377.current.anchors')));
 test('no extra camera frame loop',()=>assert.equal((stage.match(/useFrame\(/g)||[]).length,1));

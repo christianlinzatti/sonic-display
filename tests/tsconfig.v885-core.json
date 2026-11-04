@@ -1,0 +1,6 @@
+{
+ "extends":"../tsconfig.json",
+ "compilerOptions":{"incremental":false,"plugins":[],"moduleResolution":"node"},
+ "files":["../components/visualizer/dynamicConcertAtmosphereV885.ts","../components/visualizer/concertStageSyncV882.ts","../components/visualizer/cinematicConcertTransitionsV884.ts","../components/visualizer/intelligentConcertMomentsV883.ts"],
+ "include":[],"exclude":[]
+}

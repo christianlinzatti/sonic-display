@@ -1,5 +1,5 @@
 'use strict';
-const assert=require('node:assert/strict'),loader=require('./helpers/loader-v733.cjs'),React=require('react'),{act,create}=require('react-test-renderer');globalThis.IS_REACT_ACT_ENVIRONMENT=true;
+const assert=require('node:assert/strict'),loader=require('./helpers/loader-v733.cjs'),React=require('react'),{create}=require('react-test-renderer'),{act}=React;globalThis.IS_REACT_ACT_ENVIRONMENT=true;
 let count=0;const check=(name,fn)=>{try{fn();count++;}catch(e){e.message=name+': '+e.message;throw e;}};const flush=()=>new Promise(r=>setImmediate(r));
 async function playback(){let api,view,options,now=1000,calls=0,resolvePlayback,resolveLyrics,signal;const RealDate=Date;class Clock extends RealDate{static now(){return now;}}
  let response=()=>Promise.reject(Object.assign(Error('rate'),{status:429,retryAfter:600}));

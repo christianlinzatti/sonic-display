@@ -1,0 +1,7 @@
+{
+ "extends":"./tsconfig.v928-ui.json",
+ "files":["../components/GoveeTroubleshootingAssistantV929.tsx",
+  "../components/GoveeRoomPerformanceDashboardV928.tsx",
+  "../lib/goveeTroubleshootingV929.ts","../lib/goveeRoomDashboardV928.ts",
+  "stubs/v881-react-jsx.d.ts","stubs/v916-govee-ui-events.d.ts"]
+}

@@ -1,0 +1,5 @@
+{
+ "extends":"./tsconfig.v925-core.json",
+ "files":["../lib/goveeSpatialDirectorV926.ts","../lib/goveeFestivalFxV925.ts",
+  "../lib/goveeLanV909.ts","../lib/goveeConcertDirectorV911.ts","../types/audio.ts"]
+}

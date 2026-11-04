@@ -1,4 +1,4 @@
-const assert=require('node:assert/strict'),loader=require('./helpers/loader-v733.cjs'),React=require('react'),{act,create}=require('react-test-renderer');
+const assert=require('node:assert/strict'),loader=require('./helpers/loader-v733.cjs'),React=require('react'),{create}=require('react-test-renderer'),{act}=React;
 globalThis.IS_REACT_ACT_ENVIRONMENT=true;let count=0;const check=(name,fn)=>{fn();console.log('PASS '+name);count++;};const flush=async()=>{for(let i=0;i<8;i++)await Promise.resolve();};
 function clock(){let id=0;const jobs=new Map();return {jobs,setTimeout(fn,ms){jobs.set(++id,{fn,ms});return id;},clearTimeout(i){jobs.delete(i);},fire(){const [i,j]=jobs.entries().next().value;jobs.delete(i);j.fn();}};}
 async function clients(){for(const [file,method,args,ms] of [['services/spotify/client','fetchCurrentTrack',[],15000],['services/lyrics/client','fetchLyrics',[{id:'one',title:'A',artist:'B',album:'C',durationMs:1000}],20000]]){

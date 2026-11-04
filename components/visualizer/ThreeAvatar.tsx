@@ -35,10 +35,16 @@ import { VISUAL_FX_EVENT_V353, readVisualFxV353, decideVisualFxV353 } from "@/se
 import {planConcertDetailsV555,DEFAULT_CONCERT_DETAILS_V555} from './concertDetailEffectsV555';
 import {ConcertDetailStageV555} from './ConcertDetailStageV555';
 import { StageVisualEffectsV353 } from "./StageVisualEffectsV353";
+import {ConcertFestivalFxV958} from "./ConcertFestivalFxV958";
 import { LongRunStabilityControllerV355 } from "./LongRunStabilityV355";
 import { useStabilityCapV355, stabilityEffectFactorV355 } from "@/services/monitoring/performanceStabilityV355";
 import {autoLoadConcertSongV764} from "@/services/stageContent/concertTimelineAutomationV764";
 import { SHOW_TIMELINE_EVENT_V354, readTimelineV354, evaluateTimelineV354 } from "@/services/stageContent/showTimelineV354";
+import {GOVEE_STAGE_CUE_EVENT_V921,makeGoveeStageCueV921,type GoveeStageSourceV921} from "@/lib/goveeConcertSyncV921";
+import {readTrackAnalysisV318,ANALYSIS_EVENT_V318,ANALYSIS_STORAGE_KEY_V318,type TrackAnalysisV318} from '@/services/musicAnalysis/trackAnalysisV318';
+import {resolveGoveePhaseV911} from '@/lib/goveeConcertDirectorV911';
+import {loadConcertRoadmapV958,composeConcertSceneV958,overlayConcertStageV958,
+ CONCERT_ROADMAP_EVENT_V958,CONCERT_ROADMAP_KEY_V958,type ConcertPhaseV958} from '@/lib/ultimateConcertRoadmapV958';
 import { AUTONOMOUS_SHOW_EVENT_V356, readAutoShowV356, planAutonomousShowV356 } from "@/services/stageContent/autonomousShowV356";
 import { SHOW_QUALITY_EVENT_V357, readShowQualityV357, refineShowQualityV357 } from "@/services/stageContent/showQualityV357";
 import { SHOW_LEARNING_EVENT_V358, readShowLearningSettingsV358, readShowLearningHistoryV358, recordShowLearningV358, storeShowLearningHistoryV358, refineLearnedShowV358, type ShowLearningContextV358, type ShowLearningObservationV358 } from "@/services/stageContent/adaptiveShowLearningV358";
@@ -93,6 +99,22 @@ function resolveConcertLineIndexV555(lyrics:import('@/types/music').Lyrics|null|
 }
 export function ThreeAvatar(props: VisualizerProps) {
   const piConcertBudgetV479=usePiConcertBudgetV479();
+  // V958 shares verified V318 song markers with the Govee loop, read-only.
+  // No independent soundtrack clock, network polling or interval.
+  const [concertSettingsV958,setConcertSettingsV958]=useState(loadConcertRoadmapV958);
+  const [concertAnalysisV958,setConcertAnalysisV958]=useState<TrackAnalysisV318|null>(null);
+  useEffect(()=>{
+    const refresh=()=>setConcertSettingsV958(loadConcertRoadmapV958());
+    const storage=(event:StorageEvent)=>{if(!event.key||event.key===CONCERT_ROADMAP_KEY_V958)refresh();};
+    window.addEventListener(CONCERT_ROADMAP_EVENT_V958,refresh);window.addEventListener('storage',storage);
+    return()=>{window.removeEventListener(CONCERT_ROADMAP_EVENT_V958,refresh);window.removeEventListener('storage',storage);};
+  },[]);
+  useEffect(()=>{
+    const refresh=()=>setConcertAnalysisV958(readTrackAnalysisV318(props.track?.id??''));
+    const storage=(event:StorageEvent)=>{if(!event.key||event.key===ANALYSIS_STORAGE_KEY_V318)refresh();};
+    refresh();window.addEventListener(ANALYSIS_EVENT_V318,refresh);window.addEventListener('storage',storage);
+    return()=>{window.removeEventListener(ANALYSIS_EVENT_V318,refresh);window.removeEventListener('storage',storage);};
+  },[props.track?.id]);
   // V466: voluntary, read-only live QA – no extra sampling while closed.
   const [qualityInspectorEnabledV466,setQualityInspectorEnabledV466]=useState(false);
   useEffect(()=>{const enable=()=>setQualityInspectorEnabledV466(true);
@@ -205,7 +227,25 @@ export function ThreeAvatar(props: VisualizerProps) {
   });
   const autoCueV357=learnedResultV358.active?learnedResultV358.cue:qualityResultV357.active?qualityResultV357.cue:autoPlanV356.cue;
   // Authored V354 scores win globally. V356/V357 only fill in when no matching score is enabled.
-  const timelineCueV354=authoredCueV354.active?authoredCueV354:autoPlanV356.active?autoCueV357:authoredCueV354;
+  const automaticCueV354=authoredCueV354.active?authoredCueV354:autoPlanV356.active?autoCueV357:authoredCueV354;
+  const progress958=props.cameraDirectorProgressMs??props.lyricsScene?.progressMs??-1;
+  const track958=props.track?.id??'';
+  const phase958=resolveGoveePhaseV911(concertAnalysisV958,track958,progress958);
+  const marker958=concertAnalysisV958?.trackId===track958?concertAnalysisV958.sections.findIndex(s=>
+    s.startMs<=progress958&&progress958<s.startMs+s.durationMs):-1;
+  const source958=marker958>=0?concertAnalysisV958?.sections[marker958]:undefined;
+  const scene958=concertSettingsV958.enabled&&props.isPlaying&&phase958.verified&&source958
+   ?composeConcertSceneV958({trackId:track958,progressMs:progress958,
+    durationMs:props.track?.durationMs??concertAnalysisV958?.durationMs??0,
+    phase:phase958.phase as ConcertPhaseV958,sectionIndex:marker958,sectionStartMs:source958.startMs,
+    verified:true,genre:String(props.genre??''),energy:props.audio?.energyEnvelope??0,
+    bass:props.audio?.bass??0,lyricsVisible:lyricsActiveV356,reducedMotion:props.reducedMotion},concertSettingsV958)
+   :null;
+  // V354 authored clips always win. Explicit avatar groups and manual duo setups are excluded.
+  const timelineCueV354=overlayConcertStageV958(automaticCueV354,scene958,{
+    enabled:concertSettingsV958.enabled,authored:authoredCueV354.active,
+    manualFormation:authoredEnabled||groupOnV326||multiSettings.enabled||props.duoDirectorEnabled===true||
+      (props.multiAvatarMode??'solo')!=='solo'||props.showCue?.formationsEnabled===true});
   const manualFormationV354=!!timelineCueV354.danceFormation&&!groupOnV326&&!multiSettings.enabled&&!authoredEnabled&&
     (props.multiAvatarMode??'solo')==='solo'&&!props.duoDirectorEnabled;
   const multiEnabled=multiSettings.enabled;
@@ -217,6 +257,28 @@ export function ThreeAvatar(props: VisualizerProps) {
     && !multiEnabled && (props.duoDirectorEnabled === true || (props.multiAvatarMode ?? "solo") === "solo");
   const auto = !multiEnabled && !intelligentEnabled && props.duoDirectorEnabled === true;
   const mode = manualFormationV354 ? timelineCueV354.danceFormation! : authoredEnabled ? "sync" : multiEnabled ? (choreography?.scene ?? "sync") : intelligentEnabled ? (intelligentCue?.scene ?? props.showCue!.formation) : auto ? autoScene : showFormation ? props.showCue!.formation : (props.multiAvatarMode ?? "solo");
+  // V921 publishes the EXISTING stage's show decision, never a second camera/
+  // choreographer plan. Live Govee listeners require fresh matching-track events.
+  // A single 1.4s heartbeat keeps a static (non-changing) camera cue fresh.
+  const sharedStageCueV921=useRef({trackId:props.track?.id,progressMs:props.cameraDirectorProgressMs,
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,lyricsVisible:lyricsActiveV356,
+    source:(authoredCueV354.active?'authored':autoPlanV356.active||Boolean(scene958)?'automatic':'none') as GoveeStageSourceV921,
+    cue:timelineCueV354,danceFormation:String(mode)});
+  sharedStageCueV921.current={trackId:props.track?.id,progressMs:props.cameraDirectorProgressMs,
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,lyricsVisible:lyricsActiveV356,
+    source:authoredCueV354.active?'authored':autoPlanV356.active||Boolean(scene958)?'automatic':'none',
+    cue:timelineCueV354,danceFormation:String(mode)};
+  useEffect(()=>{
+    const publish=()=>{
+      const live=sharedStageCueV921.current;
+      window.dispatchEvent(new CustomEvent(GOVEE_STAGE_CUE_EVENT_V921,{detail:makeGoveeStageCueV921({...live,capturedAt:Date.now()})}));
+    };
+    publish();const id=window.setInterval(publish,1400);
+    return()=>{window.clearInterval(id);
+      const live=sharedStageCueV921.current;
+      window.dispatchEvent(new CustomEvent(GOVEE_STAGE_CUE_EVENT_V921,{detail:makeGoveeStageCueV921({...live,playing:false,capturedAt:Date.now()})}));
+    };
+  },[]);
   const dual = groupOnV326 || mode !== "solo";
   // V351: stage-wide cues are computed once and shared by camera, lighting, lyrics and media.
   const [smartStageSettingsV351,setSmartStageSettingsV351]=useState(readSmartStageV351);
@@ -444,6 +506,11 @@ export function ThreeAvatar(props: VisualizerProps) {
         cameraNarrativeV605={props.cameraNarrativeV605} vocalFocusV621={Boolean(props.lipSync?.playing&&props.lipSync?.enabled)}
         energyV621={props.audio?.energyEnvelope??props.audio?.bass??0} kickV621={props.audio?.kickAccentIntensity??0}/></Suspense>
       <StageVisualEffectsV353 cue={visualFxCueV355}/>
+      <ConcertFestivalFxV958 trackId={props.track?.id??''} progressMs={props.cameraDirectorProgressMs??props.lyricsScene?.progressMs??0}
+       durationMs={props.track?.durationMs??0} genre={String(props.genre??'')}
+       energy={props.audio?.energyEnvelope??0} bass={props.audio?.bass??0}
+       playing={props.isPlaying} reducedMotion={props.reducedMotion}
+       lyricsVisible={lyricsActiveV356}/>
       {props.stageScreenSettingsV330?.enabled && props.stageLayoutEnabledV333 && <StageContentScreensV333 screens={props.stageScreensV333??[]} slides={props.stageSlidesV333??[]} push={props.stageLivePushV333??null} index={props.stageRotationIndexV333??0} settings={props.stageScreenSettingsV330} playing={props.isPlaying} reducedMotion={props.reducedMotion} albumCoverUrl={props.track?.albumCoverUrl??null} section={props.cameraDirectorSection??"verse"} beatAccent={props.audio?.kickAccentIntensity??0} genre={props.genre??undefined} lyricsActive={props.lyricsSignalV350?.active??hasActiveLyricsV350(props.lyricsScene?.lyrics,props.lyricsScene?.activeIndex,props.lyricsScene?.progressMs)} lyricsSide={props.lyricsSignalV350?.side??props.lyricsScene?.side??null} composition={compositionV354} genreCue={genreCueV352} fxCue={visualFxCueV355} lipSyncActive={Boolean(props.lipSync?.playing&&props.lipSync?.enabled)} concertFlowV654={props.concertFlowV654}/>}
       {props.stageScreenSettingsV330?.enabled && !props.stageLayoutEnabledV333 && <StageContentScreenV330 content={props.stageScreenV330??null} settings={props.stageScreenSettingsV330} playing={props.isPlaying} reducedMotion={props.reducedMotion} albumCoverUrl={props.track?.albumCoverUrl??null} section={props.cameraDirectorSection??"verse"} beatAccent={props.audio?.kickAccentIntensity??0} genre={props.genre??undefined} lyricsActive={props.lyricsSignalV350?.active??hasActiveLyricsV350(props.lyricsScene?.lyrics,props.lyricsScene?.activeIndex,props.lyricsScene?.progressMs)} lyricsSide={props.lyricsSignalV350?.side??props.lyricsScene?.side??null} composition={compositionV354} genreCue={genreCueV352} fxCue={visualFxCueV355} lipSyncActive={Boolean(props.lipSync?.playing&&props.lipSync?.enabled)} concertFlowV654={props.concertFlowV654}/>}
       <ProceduralShaderEnvironmentV468 mode={piConcertEffectsV479.automaticShader?props.shaderEnvironmentV468??'auto':'off'} theme={directedThemeV352} audio={props.audio} playing={props.isPlaying} reducedMotion={props.reducedMotion} color={directedPaletteV352?.primary}/>

@@ -1,0 +1,25 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": [],
+    "jsx": "preserve",
+    "noEmit": true,
+    "paths": {
+      "@/context/AudioAnalysisContext": [
+        "./stubs/v917-audio-context.d.ts"
+      ],
+      "@/*": [
+        "../*"
+      ]
+    }
+  },
+  "files": [
+    "../components/GoveeBassStudioV917.tsx",
+    "../lib/goveeBassReactiveV917.ts",
+    "stubs/v881-react-jsx.d.ts",
+    "stubs/v916-govee-ui-events.d.ts"
+  ],
+  "include": [],
+  "exclude": []
+}

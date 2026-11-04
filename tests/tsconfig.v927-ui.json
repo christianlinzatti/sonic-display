@@ -1,0 +1,6 @@
+{
+ "extends":"./tsconfig.v926-ui.json",
+ "files":["../components/GoveeRoomCalibrationStudioV927.tsx","../lib/goveeRoomCalibrationV927.ts",
+  "../services/musicAnalysis/trackAnalysisV318.ts",
+  "stubs/v881-react-jsx.d.ts","stubs/v916-govee-ui-events.d.ts"]
+}

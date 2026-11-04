@@ -1,6 +1,15 @@
 "use client";
 
 import {composeConcertSceneCameraV528} from "./cinematicConcertCoordinationV528";
+import {readConcertStageSyncV882} from './concertStageSyncV882';
+import {sampleDirectorV895,DEFAULT_DIRECTOR_V895} from './aiConcertDirectorV895';
+import {sampleUltimateV900,DEFAULT_ULTIMATE_V900} from './ultimateConcertExperienceV900';
+import {sampleEnergyV896,readEnergyV896,DEFAULT_ENERGY_V896} from './musicalEnergyIntelligenceV896';
+import {sampleCinematicCameraV897,DEFAULT_CAMERA_V897} from './cinematicCameraDirectorV897';
+import {sampleDanceCameraV898,measureAnchorMotionV898,DEFAULT_DANCE_CAMERA_V898} from './danceCameraCoordinationV898';
+import {sampleDanceShowV899,DEFAULT_DANCE_SHOW_V899} from './advancedDanceShowDirectorV899';
+import {sampleEpicDropV892,DEFAULT_EPIC_DROP_V892} from './epicDropExperienceV892';
+import {sampleCinematicTransitionV884,DEFAULT_CINEMATIC_TRANSITIONS_V884} from './cinematicConcertTransitionsV884';
 import {composeMultiVocalSpotlightCameraV797,type MultiVocalSpotlightCueV797} from "./multiVocalSpotlightDirectorV797";
 import {composeIntelligentEnsembleCameraV806} from "./intelligentEnsembleCameraV806";
 import {composeCinematicPerformerHarmonyV809} from "./cinematicPerformerCameraHarmonyV809";
@@ -110,6 +119,7 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
   const studioProfileV398=useMemo(()=>normalizeCameraStudioV398(lipSync?.cameraStudioV398),[lipSync?.cameraStudioV398]);
   const cameraTimelineV400=useMemo(()=>normalizeCameraTimelineV400(lipSync?.cameraTimelineV400),[lipSync?.cameraTimelineV400]);
   const duetAnchorSampleV377=useRef<{remaining:number;anchors:CameraAnchorV377[];trackId:string}>({remaining:0,anchors:[],trackId:""});
+  const danceMotionV898=useRef<{trackId:string;positionMs:number;motion:number;lastSampleMs:number}>({trackId:"",positionMs:-1,motion:0,lastSampleMs:-1});
   const anchorPositionV377=useRef(new Vector3());
   const library = useRef(readCameraPresets());
   const liveEnabled = useRef(readLiveCameraKeyframesEnabled());
@@ -301,9 +311,18 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
     const anchorTrackV806=lipSync?.manualVocalTrackIdV385??"";
     if(duetAnchorSampleV377.current.trackId!==anchorTrackV806){
       duetAnchorSampleV377.current={remaining:0,anchors:[],trackId:anchorTrackV806};
+      danceMotionV898.current={trackId:anchorTrackV806,positionMs:-1,motion:0,lastSampleMs:-1};
+    }
+    // V898 also resets the motion snapshot when V604's actual song ID changes,
+    // even if no manual V385 vocalist track ID is available.
+    const coordTrackV898=cameraNarrativeV605?.plan.trackId??'';
+    if(danceMotionV898.current.trackId!==coordTrackV898){
+      danceMotionV898.current={trackId:coordTrackV898,positionMs:-1,motion:0,lastSampleMs:-1};
+      duetAnchorSampleV377.current.remaining=0;
+      duetAnchorSampleV377.current.anchors=[];
     }
     duetAnchorSampleV377.current.remaining-=Math.max(0,dt);
-    if((shotV377.active||visualPlanV397.active||authoredCueV400||vocalPlanV401.active||lipSync?.cinematicSceneV528?.active||cameraNarrativeV605?.cue.active)&&duetAnchorSampleV377.current.remaining<=0){
+    if((shotV377.active||visualPlanV397.active||authoredCueV400||vocalPlanV401.active||lipSync?.cinematicSceneV528?.active||cameraNarrativeV605?.cue.active||readConcertStageSyncV882().danceCameraSettingsV898?.enabled)&&duetAnchorSampleV377.current.remaining<=0){
       duetAnchorSampleV377.current.remaining=.18;
       const anchors:CameraAnchorV377[]=[];
       for(let i=0;i<Math.min(4,castV377);i++){
@@ -320,6 +339,15 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
         const visible=root.visible&&Math.abs(root.scale.x)>.12;
         anchors.push({slot:i,x:anchorPositionV377.current.x,y:anchorPositionV377.current.y,z:anchorPositionV377.current.z,visible});
       }
+      // V898: compare only snapshots of the SAME real avatar roots and track.
+      // A seek, time reversal, or missing root is neutral, never fabricated motion.
+      const priorV898=danceMotionV898.current;
+      const elapsedV898=progressMs-priorV898.positionMs;
+      const continuousV898=priorV898.trackId===coordTrackV898&&elapsedV898>=80&&elapsedV898<=1000;
+      const actualMotionV898=measureAnchorMotionV898(
+        duetAnchorSampleV377.current.anchors,anchors,elapsedV898,continuousV898);
+      danceMotionV898.current={trackId:coordTrackV898,positionMs:progressMs,
+        lastSampleMs:progressMs,motion:actualMotionV898};
       duetAnchorSampleV377.current.anchors=anchors;
     }
     const lyricShot=automaticShot&&playing&&!reducedMotion&&lipSync?.enabled
@@ -771,8 +799,76 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
         ...frameOptionsV809,section,authored:authoredCameraV528||
           !!cameraNarrativeV605?.manualCamera,
     });
+    // V897: one camera, verified full-song scenes, small continuous cinematography.
+    // V848 anchors remain authoritative; V351's final lyrics/frame guard still runs LAST.
+    const cameraSignalV897=readConcertStageSyncV882();
+    const cinematicCameraV897=sampleCinematicCameraV897({
+      pose:framedV848,plan:cameraSignalV897.directorPlanV895,
+      settings:cameraSignalV897.cameraSettingsV897??DEFAULT_CAMERA_V897,
+      trackId:cameraNarrativeV605?.plan.trackId??'',durationMs:cameraSignalV897.durationMs,
+      positionMs:progressMs,playing,autoEnabled:cameraSignalV897.enabled&&automaticShot&&shotGuardV792,
+      directorEnabled:!!cameraSignalV897.directorSettingsV895?.enabled,
+      directorCameraEnabled:!!cameraSignalV897.directorSettingsV895?.camera,
+      reducedMotion,tier:lipSync?.visualDirectorTierV397??'balanced',aspect:camera.aspect,
+      authored:!!(editingPose||userHasPreset||authoredCameraV528||
+       cameraNarrativeV605?.manualCamera||!automaticShot),
+      manualFx:!!cameraSignalV897.manual,
+      seekBlocked:progressMs<(cameraSignalV897.atmosphereSeekBlockedUntilMs??0),
+      lyricsProtected:!!composition?.protectLyrics||!!lyricsPlanV378.active,
+      lyricsVisible:!!lipSync?.cinematicLyricsVisibleV378,
+      closeup:!!(sceneV528?.active&&sceneV528.focus==='lead'),duo,
+    });
+    // V898: sampled V377 roots, verified V604 section, safe V550/V540 head + foot framing.
+    // Retains V897's single camera; V351 remains the LAST protection stage.
+    const confirmedV528=sceneV528?.active&&sceneV528.trackId===cameraNarrativeV605?.plan.trackId&&
+      progressMs>=sceneV528.cueStartMs&&progressMs<sceneV528.cueEndMs;
+    const danceCameraV898=sampleDanceCameraV898({
+      pose:cinematicCameraV897.pose,plan:cameraSignalV897.directorPlanV895,
+      settings:cameraSignalV897.danceCameraSettingsV898??DEFAULT_DANCE_CAMERA_V898,
+      trackId:cameraNarrativeV605?.plan.trackId??'',durationMs:cameraSignalV897.durationMs,
+      positionMs:progressMs,playing,autoEnabled:cameraSignalV897.enabled&&shotGuardV792,
+      directorEnabled:!!cameraSignalV897.directorSettingsV895?.enabled,
+      cameraEnabled:!!cameraSignalV897.directorSettingsV895?.camera,
+      danceEnabled:!!cameraSignalV897.sync.dance&&!!cameraSignalV897.directorSettingsV895?.dance,
+      reducedMotion,tier:lipSync?.visualDirectorTierV397??'balanced',aspect:camera.aspect,
+      anchors:duetAnchorSampleV377.current.anchors,
+      anchorAgeMs:progressMs-danceMotionV898.current.lastSampleMs,
+      motion:danceMotionV898.current.motion,
+      manualFx:!!cameraSignalV897.manual,
+      manualCamera:!!(editingPose||userHasPreset||authoredCameraV528||
+       cameraNarrativeV605?.manualCamera||!automaticShot||timelineCue?.active||authoredCueV400),
+      manualDance:!!lipSync?.cameraManualStagePriorityV377,
+      seekBlocked:progressMs<(cameraSignalV897.atmosphereSeekBlockedUntilMs??0),
+      lyricsProtected:!!composition?.protectLyrics||!!lyricsPlanV378.active,
+      lyricsVisible:!!lipSync?.cinematicLyricsVisibleV378,
+      lyricsSide:lipSync?.cinematicLyricsVisibleV378?lipSync?.cinematicLyricsSideV378:null,
+      faceY:faceSampleV369.current.value,
+      verifiedLeadSlot:confirmedV528?sceneV528.leadSlot:null,
+      verifiedSingingSlots:confirmedV528?sceneV528.singingSlots:null,
+    });
+    // V899 affects only the camera's existing easing rate. Framing remains
+    // V898 -> final V351, and authored/manually chosen cameras never move.
+    const danceShowCameraV899=sampleDanceShowV899({
+      settings:cameraSignalV897.danceShowSettingsV899??DEFAULT_DANCE_SHOW_V899,
+      plan:cameraSignalV897.directorPlanV895,
+      trackId:cameraNarrativeV605?.plan.trackId??'',durationMs:cameraSignalV897.durationMs,
+      positionMs:progressMs,playing,autoEnabled:cameraSignalV897.enabled&&shotGuardV792,
+      directorEnabled:!!cameraSignalV897.directorSettingsV895?.enabled,
+      danceEnabled:!!cameraSignalV897.directorSettingsV895?.dance&&cameraSignalV897.sync.dance,
+      cameraEnabled:!!cameraSignalV897.directorSettingsV895?.camera,
+      duo:duetAnchorSampleV377.current.anchors.filter(a=>a.visible).length>=2,
+      count:Math.max(1,duetAnchorSampleV377.current.anchors.filter(a=>a.visible).length),
+      tier:lipSync?.visualDirectorTierV397??'balanced',reducedMotion,
+      manualCamera:!!(editingPose||userHasPreset||authoredCameraV528||cameraNarrativeV605?.manualCamera||
+        !automaticShot||timelineCue?.active||authoredCueV400),
+      manualDance:!!lipSync?.cameraManualStagePriorityV377,
+      manualFx:!!cameraSignalV897.manual,
+      seekBlocked:progressMs<(cameraSignalV897.atmosphereSeekBlockedUntilMs??0),
+      lyricsVisible:!!lipSync?.cinematicLyricsVisibleV378||!!lyricsPlanV378.active,
+      energy:readEnergyV896(cameraNarrativeV605?.plan.trackId??'',cameraSignalV897.durationMs,progressMs),
+    });
     const stageFramed=automaticShot
-      ?guardAutomaticCameraV351(framedV848,composition):to;
+      ?guardAutomaticCameraV351(danceCameraV898.pose,composition):to;
     // Explicit edits must exactly match the pose that will be saved; no smoothing while editing.
     const liveCueV400=authoredCueV400&&cameraTimelineFramedV400!==festivalFramedV394?authoredCueV400:null;
     const cameraCueKeyV400=liveCueV400?`${liveCueV400.trackId}:${liveCueV400.cue.id}`:"";
@@ -793,13 +889,75 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
       !authoredCameraV528 && !cameraNarrativeV605?.manualCamera && automaticShot &&
       concertFlowV654.act===cameraNarrativeV605?.cue.act && concertFlowV654.section===section
       ?concertFlowV654.cameraRate:1;
+    // V884: slow ONLY the existing automatic interpolation at verified seams;
+    // never modify manual shots, live camera edits, keyframes, stored cuts or lyrics guards.
+    const v884Signal=readConcertStageSyncV882();
+    const v884Camera=sampleCinematicTransitionV884({
+      plan:v884Signal.transitionPlan,trackId:cameraNarrativeV605?.plan.trackId??'',
+      durationMs:v884Signal.durationMs,positionMs:progressMs,playing,
+      reducedMotion,settings:v884Signal.transitionSettings??DEFAULT_CINEMATIC_TRANSITIONS_V884,
+      autoEnabled:v884Signal.enabled&&automaticShot&&!!cameraNarrativeV605?.plan.trackId,
+      seekBlocked:progressMs<(v884Signal.transitionSeekBlockedUntilMs??0),
+      manualCamera:!!(editingPose||cutToCameraCueV400||liveCueV400||authoredCameraV528||
+        cameraNarrativeV605?.manualCamera||!automaticShot),
+      lyricsProtected:!!composition?.protectLyrics||!!lyricsPlanV378.active,
+      tier:lipSync?.visualDirectorTierV397??'balanced',
+      manualFx:!!v884Signal.manual,
+    });
+    const v892Camera=sampleEpicDropV892({
+      plan:v884Signal.epicPlanV892,settings:v884Signal.epicSettingsV892??DEFAULT_EPIC_DROP_V892,
+      trackId:cameraNarrativeV605?.plan.trackId??'',durationMs:v884Signal.durationMs,
+      positionMs:progressMs,playing,autoEnabled:v884Signal.enabled,reducedMotion,
+      tier:lipSync?.visualDirectorTierV397??'balanced',
+      seekBlocked:progressMs<(v884Signal.atmosphereSeekBlockedUntilMs??0),
+      manualFx:!!v884Signal.manual,
+      manualCamera:!!(editingPose||cutToCameraCueV400||liveCueV400||authoredCameraV528||
+        cameraNarrativeV605?.manualCamera||!automaticShot),
+      lyricsProtected:!!composition?.protectLyrics||!!lyricsPlanV378.active,
+    });
+    const directorCameraV895=sampleDirectorV895({
+      plan:v884Signal.directorPlanV895,settings:v884Signal.directorSettingsV895??DEFAULT_DIRECTOR_V895,
+      trackId:cameraNarrativeV605?.plan.trackId??'',durationMs:v884Signal.durationMs,
+      positionMs:progressMs,playing,autoEnabled:v884Signal.enabled&&automaticShot,
+      reducedMotion,tier:lipSync?.visualDirectorTierV397??'balanced',
+      seekBlocked:progressMs<(v884Signal.atmosphereSeekBlockedUntilMs??0),
+      manualFx:!!v884Signal.manual,
+      manualCamera:!!(editingPose||cutToCameraCueV400||liveCueV400||authoredCameraV528||
+        cameraNarrativeV605?.manualCamera||!automaticShot),
+      lyricsProtected:!!composition?.protectLyrics||!!lyricsPlanV378.active,
+    });
+    const ultimateCameraV900=sampleUltimateV900({
+      plan:v884Signal.ultimatePlanV900,settings:v884Signal.ultimateSettingsV900??DEFAULT_ULTIMATE_V900,
+      trackId:cameraNarrativeV605?.plan.trackId??'',durationMs:v884Signal.durationMs,
+      positionMs:progressMs,playing,autoEnabled:v884Signal.enabled&&automaticShot,
+      directorEnabled:!!v884Signal.directorSettingsV895?.enabled,reducedMotion,
+      tier:lipSync?.visualDirectorTierV397??'balanced',
+      seekBlocked:progressMs<(v884Signal.atmosphereSeekBlockedUntilMs??0),manualFx:!!v884Signal.manual,
+      manualCamera:!!(editingPose||cutToCameraCueV400||liveCueV400||authoredCameraV528||
+        cameraNarrativeV605?.manualCamera||!automaticShot),
+      lyricsProtected:!!composition?.protectLyrics||!!lyricsPlanV378.active,
+      energy:readEnergyV896(cameraNarrativeV605?.plan.trackId??'',v884Signal.durationMs,progressMs),
+    });
+    const energyCameraV896=sampleEnergyV896({
+      state:readEnergyV896(cameraNarrativeV605?.plan.trackId??'',v884Signal.durationMs,progressMs),
+      plan:v884Signal.directorPlanV895,settings:v884Signal.energySettingsV896??DEFAULT_ENERGY_V896,
+      trackId:cameraNarrativeV605?.plan.trackId??'',durationMs:v884Signal.durationMs,
+      positionMs:progressMs,playing,autoEnabled:v884Signal.enabled&&automaticShot,
+      directorEnabled:!!v884Signal.directorSettingsV895?.enabled,
+      reducedMotion,tier:lipSync?.visualDirectorTierV397??'balanced',
+      seekBlocked:progressMs<(v884Signal.atmosphereSeekBlockedUntilMs??0),
+      manualFx:!!v884Signal.manual,
+      manualCamera:!!(editingPose||cutToCameraCueV400||liveCueV400||authoredCameraV528||
+        cameraNarrativeV605?.manualCamera||!automaticShot),
+      lyricsProtected:!!composition?.protectLyrics||!!lyricsPlanV378.active,
+    });
     const alpha = editingPose||cutToCameraCueV400 ? 1 : liveCueV400
       ?1-Math.exp(-Math.min(.1,Math.max(0,dt))*4000/liveCueV400.cue.transitionMs)
       :1-Math.exp(-Math.min(.1,Math.max(0,dt))*(framedV606!==framedV605?1.65:framedV605!==duetFramedV585?1.75:duetFramedV585!==concertFramedV550?1.85:concertFramedV550!==concertFramedV540?(sceneV528?.focus==='handoff'?1.85:1.6):concertFramedV540!==sceneFramedV528?1.5:sceneFramedV528!==concertFramedV497?1.65:concertHeldV454.active?2.15:2.8)*Math.min(sceneBlendV609.cameraRate,automaticShot&&!authoredCameraV528&&!cameraNarrativeV605?.manualCamera&&transitionV791?.active?transitionV791.cameraRate:1)*concertGenreV610.cameraRate*concertContinuityV611.cameraRate*concertFlowRateV654*
         (cinematicIntentV633.active?cinematicIntentV633.cameraRate:1)*
         (naturalV655.cue.active?naturalV655.cue.cameraRate:1)*
         (cameraVarietyV682.cue.active?cameraVarietyV682.cue.cameraRate:1)*
-        (performanceCameraV747.cue.active?performanceCameraV747.cue.cameraRate:1));
+        (performanceCameraV747.cue.active?performanceCameraV747.cue.cameraRate:1)*v884Camera.cameraRate*v892Camera.cameraRate*directorCameraV895.cameraRate*energyCameraV896.cameraRate*cinematicCameraV897.cameraRate*danceCameraV898.cameraRate*danceShowCameraV899.cameraRate*ultimateCameraV900.cameraRate);
     camera.position.x += (stageFramed.x-camera.position.x)*alpha;
     camera.position.y += (stageFramed.y-camera.position.y)*alpha;
     camera.position.z += (stageFramed.z-camera.position.z)*alpha;

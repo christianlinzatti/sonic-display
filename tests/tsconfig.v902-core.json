@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": [],
+    "moduleResolution": "node"
+  },
+  "files": [
+    "../components/visualizer/concertQualityAdvisorV902.ts",
+    "../components/visualizer/concertQualityIntelligenceV901.ts"
+  ],
+  "include": [],
+  "exclude": []
+}

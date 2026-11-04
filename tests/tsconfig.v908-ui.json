@@ -1,0 +1,37 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": [],
+    "jsx": "preserve",
+    "noEmit": true
+  },
+  "files": [
+    "../components/visualizer/LiveStageBenchmarkVerificationPanelV908.tsx",
+    "../components/visualizer/liveStageBenchmarkProofV908.ts",
+    "../components/visualizer/performanceProfileComparisonV907.ts",
+    "../components/visualizer/PerformanceProfileComparisonPanelV907.tsx",
+    "../components/visualizer/concertBenchmarkReportV906.ts",
+    "../components/visualizer/ConcertBenchmarkReportPanelV906.tsx",
+    "../components/visualizer/guidedConcertBenchmarkV905.ts",
+    "../components/visualizer/GuidedConcertBenchmarkPanelV905.tsx",
+    "../components/visualizer/concertQualityRegressionV904.ts",
+    "../components/visualizer/ConcertQualityRegressionPanelV904.tsx",
+    "../components/visualizer/concertQualityReviewV903.ts",
+    "../components/visualizer/ConcertQualityReviewPanelV903.tsx",
+    "../components/visualizer/concertQualityAdvisorV902.ts",
+    "../components/visualizer/ConcertQualityAdvisorPanelV902.tsx",
+    "../components/visualizer/concertQualityIntelligenceV901.ts",
+    "../components/visualizer/ConcertQualityIntelligencePanelV901.tsx",
+    "../components/visualizer/ultimateConcertExperienceV900.ts",
+    "../components/visualizer/LiveFxDeckV881.tsx",
+    "../components/visualizer/concertStageSyncV882.ts",
+    "stubs/v881-react-jsx.d.ts",
+    "stubs/v882-three-jsx.d.ts",
+    "stubs/v891-three-jsx.d.ts",
+    "stubs/v893-react-three.d.ts",
+    "stubs/v886-react-external-store.d.ts"
+  ],
+  "include": [],
+  "exclude": []
+}

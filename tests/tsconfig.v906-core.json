@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": [],
+    "moduleResolution": "node"
+  },
+  "files": [
+    "../components/visualizer/concertBenchmarkReportV906.ts",
+    "../components/visualizer/guidedConcertBenchmarkV905.ts",
+    "../components/visualizer/concertQualityRegressionV904.ts",
+    "../components/visualizer/concertQualityReviewV903.ts",
+    "../components/visualizer/concertQualityAdvisorV902.ts",
+    "../components/visualizer/concertQualityIntelligenceV901.ts"
+  ],
+  "include": [],
+  "exclude": []
+}

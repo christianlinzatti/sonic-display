@@ -74,7 +74,7 @@ test('shader bounded transparence by inherited fragment',()=>assert(read('compon
 test('no new renderer in shader',()=>assert(!/new\s+(?:Mesh|ShaderMaterial|WebGLRenderer)\b/.test(shader)));
 test('new shader shows perspective tunnel',()=>assert(shader.includes('log2(1.0+depth42')));
 const stage=read('components/visualizer/DynamicStage.tsx');
-test('V842 shader used on original LED plane',()=>assert(stage.includes('fragmentShader={LED_WALL_FRAGMENT_V842}')));
+test('V842 shader used on original LED plane',()=>assert((stage.includes('fragmentShader={LED_WALL_FRAGMENT_V842}') || (stage.includes('fragmentShader={LED_WALL_FRAGMENT_V886}') && fs.readFileSync('components/visualizer/ledWallCreativeShaderV886.ts','utf8').includes('LED_WALL_FRAGMENT_V842')))));
 test('V841 plan before V842 plan',()=>assert(stage.indexOf('planLedWallExperienceV842({')>stage.indexOf('planProfessionalLightingV841({')));
 test('authored LED lane respected',()=>assert(stage.includes('manualLed:authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001')));
 test('author lighting respected',()=>assert(stage.includes('manualLighting:manualLightingV763||authoredLightsV386')));

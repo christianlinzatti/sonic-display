@@ -9,6 +9,7 @@ import {applyCrowdInteractionMotionV877} from './intelligentCrowdInteractionV877
 import {applyAudienceEmotionMotionV878} from './smartAudienceEmotionDirectorV878';
 import {applyCrowdCameraHarmonyMotionV879} from './crowdCameraStageHarmonyV879';
 import type {VirtualCrowdCueV815} from './virtualConcertCrowdPlannerV815';
+import type {ArenaCrowdCueV893} from './arenaCrowdAtmosphereV893';
 
 /** Three capped instanced draw calls, not individual animated avatar rigs.
  * Small crowds live on left/right wings, leaving a wide center sightline.
@@ -24,7 +25,9 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
  const phoneMat=useRef<MeshBasicMaterial>(null);
  const mainColor=useMemo(()=>new Color('#0c1020'),[]);
  const accent=useMemo(()=>new Color(),[]);
- const previous=useRef({phase:0,count:-1});
+ const phoneColor=useMemo(()=>new Color('#ffffff'),[]);
+ const phoneSecondary=useMemo(()=>new Color(),[]);
+ const previous=useRef({phase:0,count:-1,arenaColored:false});
  useLayoutEffect(()=>{
   // Matrices are set before any animated render; no invisible/zero initial bounds.
   for(let index=0;index<CROWD_MAX_V815;index++){
@@ -52,7 +55,10 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
   if(!active){previous.current.count=-1;return;}
   const n=Math.max(0,Math.min(CROWD_MAX_V815,cue.count));
   head.count=body.count=n;phone.count=n;
-  if(silhouetteMat.current)silhouetteMat.current.opacity=.55+cue.lightGain*.35;
+  const arenaCue=cue as ArenaCrowdCueV893;
+  const arenaPulse=arenaCue.arenaActiveV893?arenaCue.arenaPhonePulseV893:0;
+  const arenaWave=arenaCue.arenaActiveV893?arenaCue.arenaWaveV893:0;
+  if(silhouetteMat.current)silhouetteMat.current.opacity=Math.min(.95,.55+cue.lightGain*.35+(arenaCue.arenaSilhouetteV893??0));
   if(headMat.current)headMat.current.opacity=.65+cue.lightGain*.20;
   if(phoneMat.current){phoneMat.current.opacity=cue.phoneOpacity;accent.set(cue.primary);
     phoneMat.current.color.copy(mainColor).lerp(accent,.82);}
@@ -60,6 +66,7 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
   previous.current.phase+=Math.min(.1,Math.max(0,dt));
   if(previous.current.phase>=.05||previous.current.count!==n){
    previous.current.phase=0;previous.current.count=n;
+   const resetPhoneColors=arenaPulse<=0&&previous.current.arenaColored;
    for(let index=0;index<n;index++){
     const p=people[index];
     const wave=Math.sin(cue.phase*(cue.movement>.14?6:3)+p.phase);
@@ -68,7 +75,9 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
    applyCrowdInteractionMotionV877(index,p,cue,choreographyMotion);
    applyAudienceEmotionMotionV878(index,p,cue,choreographyMotion);
    applyCrowdCameraHarmonyMotionV879(index,p,cue,choreographyMotion);
-    const visualLift=lift+choreographyMotion.bob;
+    // Bounded V893 arena ripple uses existing instanced silhouettes.
+    const arenaRipple=arenaWave*Math.sin((arenaCue.arenaPhaseV893??0)*1.8+Math.floor(index/12)*.72+p.phase*.13);
+    const visualLift=lift+choreographyMotion.bob+Math.max(-.012,Math.min(.012,arenaRipple*.05));
     dummy.position.set(p.x+choreographyMotion.horizontal,p.y+.36*p.scale+visualLift,p.z);
     dummy.rotation.set(0,0,wave*cue.movement*.18+choreographyMotion.tilt);
     dummy.scale.set(.32*p.scale,.65*p.scale,.20*p.scale);
@@ -77,12 +86,22 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
     dummy.scale.set(.155*p.scale,.17*p.scale,.14*p.scale);
     dummy.updateMatrix();head.setMatrixAt(index,dummy.matrix);
     const phoneWave=(cue as {phoneWave?:number}).phoneWave??0;
-    const phoneSway=phoneWave*Math.sin(cue.phase*5+p.phase)*.13*p.scale;
+    const phoneSway=phoneWave*Math.sin(cue.phase*5+p.phase)*.13*p.scale+
+      arenaPulse*Math.sin((arenaCue.arenaPhaseV893??0)*2.4+p.phase)*.028*p.scale;
     dummy.position.set(p.x+choreographyMotion.horizontal+.14*p.scale,p.y+1.03*p.scale+visualLift+phoneSway,p.z+.03);
     dummy.rotation.set(0,0,0);dummy.scale.set(p.phone?.075*p.scale:0,p.phone?.115*p.scale:0,.018);
     dummy.updateMatrix();phone.setMatrixAt(index,dummy.matrix);
+    // 20 Hz deterministic handset tint, no per-frame Color allocations.
+    if(arenaPulse>0){
+     phoneSecondary.set(cue.secondary);
+     const ratio=.20+.60*(.5+.5*Math.sin((arenaCue.arenaPhaseV893??0)*1.9+index*.71));
+     phoneColor.copy(accent).lerp(phoneSecondary,ratio*arenaPulse);
+     phone.setColorAt(index,phoneColor);
+    }else if(resetPhoneColors){phoneColor.set('#ffffff');phone.setColorAt(index,phoneColor);}
    }
    for(const mesh of [head,body,phone])mesh.instanceMatrix.needsUpdate=true;
+   if((arenaPulse>0||resetPhoneColors)&&phone.instanceColor)phone.instanceColor.needsUpdate=true;
+   previous.current.arenaColored=arenaPulse>0;
   }
  });
  return <group name="v815-virtual-concert-crowd" frustumCulled={false}>

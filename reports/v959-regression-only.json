@@ -1,0 +1,252 @@
+{
+  "schema": "v959-regression-only-v1",
+  "passed": true,
+  "startedAt": "2026-11-04T17:42:58.485Z",
+  "tests": [
+    {
+      "label": "V958 concert regression",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 355,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/01-v958-concert-regression.log"
+    },
+    {
+      "label": "V931 gate regression",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 30,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/02-v931-gate-regression.log"
+    },
+    {
+      "label": "V959 production validation",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 73,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/03-v959-production-validation.log"
+    },
+    {
+      "label": "V959 parallel runner regression",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 4519,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/04-v959-parallel-runner-regression.log"
+    },
+    {
+      "label": "v908-live-avatar-fx-verification",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 366,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/05-v908-live-avatar-fx-verification.log"
+    },
+    {
+      "label": "v909-govee-lan",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 691,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/06-v909-govee-lan.log"
+    },
+    {
+      "label": "v910-pi-kiosk-govee",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 2199,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/07-v910-pi-kiosk-govee.log"
+    },
+    {
+      "label": "v911-govee-concert-director",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 367,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/08-v911-govee-concert-director.log"
+    },
+    {
+      "label": "v912-govee-light-show-editor",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 453,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/09-v912-govee-light-show-editor.log"
+    },
+    {
+      "label": "v913-govee-color-harmony",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 659,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/10-v913-govee-color-harmony.log"
+    },
+    {
+      "label": "v914-govee-transitions",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 804,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/11-v914-govee-transitions.log"
+    },
+    {
+      "label": "v915-govee-device-groups",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 624,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/12-v915-govee-device-groups.log"
+    },
+    {
+      "label": "v916-govee-preset-library",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 707,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/13-v916-govee-preset-library.log"
+    },
+    {
+      "label": "v917-govee-bass-reactive",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 518,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/14-v917-govee-bass-reactive.log"
+    },
+    {
+      "label": "v918-govee-beat-prediction",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 515,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/15-v918-govee-beat-prediction.log"
+    },
+    {
+      "label": "v919-govee-section-director",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 677,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/16-v919-govee-section-director.log"
+    },
+    {
+      "label": "v920-govee-genre-light",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 713,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/17-v920-govee-genre-light.log"
+    },
+    {
+      "label": "v921-govee-cinematic-sync",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 524,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/18-v921-govee-cinematic-sync.log"
+    },
+    {
+      "label": "v922-govee-shockwave",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 600,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/19-v922-govee-shockwave.log"
+    },
+    {
+      "label": "v923-govee-neon-pulse",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 492,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/20-v923-govee-neon-pulse.log"
+    },
+    {
+      "label": "v924-govee-light-energy",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 636,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/21-v924-govee-light-energy.log"
+    },
+    {
+      "label": "v925-govee-festival-fx",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 536,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/22-v925-govee-festival-fx.log"
+    },
+    {
+      "label": "v926-govee-spatial",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 884,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/23-v926-govee-spatial.log"
+    },
+    {
+      "label": "v927-govee-room-calibration",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 625,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/24-v927-govee-room-calibration.log"
+    },
+    {
+      "label": "v928-govee-room-performance",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 668,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/25-v928-govee-room-performance.log"
+    },
+    {
+      "label": "v929-govee-troubleshooting",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 819,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/26-v929-govee-troubleshooting.log"
+    },
+    {
+      "label": "Source syntax + duplicate imports",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 2235,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/27-source-syntax-duplicate-imports.log"
+    }
+  ],
+  "finishedAt": "2026-11-04T17:43:07.182Z",
+  "concurrency": 3
+}

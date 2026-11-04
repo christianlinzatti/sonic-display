@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": [],
+    "moduleResolution": "node"
+  },
+  "files": [
+    "../components/visualizer/laserShowDirectorV888.ts",
+    "../components/visualizer/laserShowShaderV888.ts",
+    "../components/visualizer/concertStageSyncV882.ts"
+  ],
+  "include": [],
+  "exclude": []
+}

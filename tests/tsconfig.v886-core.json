@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": [],
+    "moduleResolution": "node",
+    "noEmit": true,
+    "types": []
+  },
+  "files": [
+    "../components/visualizer/ledWallCreativeDirectorV886.ts",
+    "../components/visualizer/ledWallCreativeShaderV886.ts"
+  ],
+  "include": [],
+  "exclude": []
+}

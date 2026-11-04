@@ -1,0 +1,7 @@
+{
+ "extends":"./tsconfig.v928-core.json",
+ "files":["../lib/goveeTroubleshootingV929.ts","../lib/goveeRoomDashboardV928.ts",
+  "../lib/goveeRoomCalibrationV927.ts","../lib/goveeSpatialDirectorV926.ts",
+  "../lib/goveeLanV909.ts","../lib/goveeConcertDirectorV911.ts",
+  "../lib/goveeDeviceGroupsV915.ts","../services/musicAnalysis/trackAnalysisV318.ts","../types/audio.ts"]
+}

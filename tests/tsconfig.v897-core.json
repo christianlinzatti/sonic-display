@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": [],
+    "moduleResolution": "node"
+  },
+  "files": [
+    "../components/visualizer/cinematicCameraDirectorV897.ts"
+  ],
+  "include": [],
+  "exclude": []
+}

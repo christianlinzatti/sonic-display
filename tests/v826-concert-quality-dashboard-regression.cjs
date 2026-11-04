@@ -79,7 +79,7 @@ check('diagnostics tab contains live dashboard',()=>assert(settings.includes('<C
 check('FPS, P95 and draw calls are displayed',()=>{for(let s of ['FPS','p95FrameMs','rendererCalls','foamBubbles'])assert(ui.includes(s),s)});
 check('UI honestly labels estimated effect cost',()=>assert(ui.includes('Schaetzungen')||ui.includes('Kostenprognose')));
 check('no network or storage writes',()=>{for(let s of ['fetch(','localStorage','sessionStorage','XMLHttpRequest','WebSocket','sendBeacon'])assert(!core.includes(s),s)});
-check('clear on stage unmount',()=>assert(stage.includes('useEffect(()=>()=>clearConcertQualityV826(),[])')));
+check('clear on stage unmount',()=>assert(/useEffect\(\(\)=>\(\)=>\{[^}]*clearConcertQualityV826\(\)[^}]*\},\[\]\)/.test(stage)));
 check('performance feature toggle avoids measurement',()=>assert(stage.includes('qualityDashboardV826!==false')));
 check('no dashboards rendered within R3F group',()=>assert(!stage.includes('<ConcertQualityDashboardV826')));
 console.log('PASS V826 Concert Quality Dashboard:',groups,'test groups');

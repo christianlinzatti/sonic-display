@@ -1,0 +1,5 @@
+{
+ "extends":"./tsconfig.v924-ui.json",
+ "files":["../components/GoveeFestivalFxStudioV925.tsx","../lib/goveeFestivalFxV925.ts",
+  "stubs/v881-react-jsx.d.ts","stubs/v916-govee-ui-events.d.ts"]
+}

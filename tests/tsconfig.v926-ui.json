@@ -1,0 +1,5 @@
+{
+ "extends":"./tsconfig.v925-ui.json",
+ "files":["../components/GoveeSpatialStudioV926.tsx","../lib/goveeSpatialDirectorV926.ts",
+  "stubs/v881-react-jsx.d.ts","stubs/v916-govee-ui-events.d.ts"]
+}

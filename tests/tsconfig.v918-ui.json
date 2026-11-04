@@ -1,0 +1,10 @@
+{
+  "extends":"../tsconfig.json",
+  "compilerOptions":{
+    "incremental":false,"plugins":[],"jsx":"preserve","noEmit":true,
+    "paths":{"@/context/AudioAnalysisContext":["./stubs/v918-audio-context.d.ts"],"@/*":["../*"]}
+  },
+  "files":["../components/GoveeBeatStudioV918.tsx","../lib/goveeBeatPredictionV918.ts",
+    "stubs/v881-react-jsx.d.ts","stubs/v916-govee-ui-events.d.ts"],
+  "include":[],"exclude":[]
+}

@@ -1,0 +1,7 @@
+{
+ "extends":"./tsconfig.v923-core.json",
+ "files":["../lib/goveeLightEnergyV924.ts","../lib/goveeGenreLightV920.ts",
+  "../lib/goveeSectionDirectorV919.ts","../lib/goveeLanV909.ts",
+  "../lib/goveeConcertDirectorV911.ts","../services/musicAnalysis/trackAnalysisV318.ts",
+  "../types/audio.ts"]
+}

@@ -59,7 +59,7 @@ check('large filtered archive',()=>{const large=Array.from({length:20000},(_,i)=
 
 async function interactions(){
  globalThis.IS_REACT_ACT_ENVIRONMENT=true;
- const React=require('react'),{create,act}=require('react-test-renderer');
+ const React=require('react'),{create}=require('react-test-renderer'),{act}=React;
  const storage=new Map(),downloads=[],clicks=[];let failRead=false,failWrite=false;
  const localStorage={getItem:key=>{if(failRead)throw Error('blocked');return storage.get(key)??null;},setItem:(key,value)=>{if(failWrite)throw Error('quota');storage.set(key,value);}};
  const globals={window:{localStorage,setTimeout:fn=>fn()},document:{createElement:()=>({click(){clicks.push(this.download);},remove(){}}),body:{appendChild(){}}},URL:{createObjectURL:blob=>{downloads.push(blob);return 'blob:test';},revokeObjectURL(){}}};

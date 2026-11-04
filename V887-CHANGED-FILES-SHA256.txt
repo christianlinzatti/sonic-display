@@ -1,0 +1,18 @@
+V887 changed/new files vs V886 project zip
+MODIFIED ab7f1532d017c1a249971b03e4a2d2aaf5327801a47cf6812ea599e9807d5902  .github/workflows/v832-continuous-validation.yml
+MODIFIED 19184997924b262afd04f915793957f7c165645b4e5e30896f80b2a88c7accb1  ARCHITECTURE.md
+NEW      75eaa28bd6f100519a68b1e0ab681b8aa04e55dfad5cf27c30525c8f35b0dc2f  components/visualizer/cinematicFogDirectorV887.ts
+NEW      9b40b7c656096a9b7feef2d9363cbf496218c3ebe6bdcd40d8bd4b3bbdf13621  components/visualizer/cinematicFogShaderV887.ts
+MODIFIED f3e0431b276600b273c7572c83c06df2cb46eb97c3a99fb5dc2aed0b54264cc3  components/visualizer/concertStageSyncV882.ts
+MODIFIED 563b8cdca1ea33f7b7bab975475461f0ec074faa2a152643d9d9de293aeef89d  components/visualizer/DynamicStage.tsx
+MODIFIED cd6968170c6c8da40e7ba821cf01713a99ff79157ad674a234287e160a29c939  components/visualizer/LiveFxDeckV881.tsx
+MODIFIED c1b6b73cfc7c64f13700cabee1e0e8289ccf02368c24c9a87a7fed2584da32c7  package-lock.json
+MODIFIED 2756b24b4a350d1d9408fae34dfa1f6f22176ef3721fd7606d8f4b51b503ab81  package.json
+MODIFIED 796d437ceb20cb361e8e41902785dae48417ee4bc0f5e74699e63b54edd6f469  README.md
+NEW      efdbf50ce9c8b4addf6c5dc27b3e59fb42a07357ebae3c2f6c69218872a1ca97  scripts/verify-v887-windows.ps1
+NEW      a7b968fbf2e6371152f104e0d2c12fd89c4a2c16d727d0ab876f14243e2b2125  tests/tsconfig.v887-core.json
+NEW      6e9b43031d89ac61989cf6e0bcbcd2f5cb6fc86c4b5cbd7e3811b5cf3a0456ca  tests/tsconfig.v887-ui.json
+MODIFIED 9b917b8f2598740c7719b1da5367464c5203df2887e3600feff4757b4a27d74c  tests/v886-led-wall-creative-director-regression.cjs
+NEW      f169e11a5b2c72803ed92e4ed3618ee6f427978e74a53a9c8f10f04b4f2dd7db  tests/v887-cinematic-fog-regression.cjs
+NEW      b86109090409179ba0d1a1786c3b654c1dab8b7dc4aa292c7ccd42a677eef72a  V887-CINEMATIC-FOG-HAZE-README.md
+NEW      97e119996429b672918fce1ffe0d29efaadc27d6f4c5ad82167a919922de6d16  V887-VERIFICATION.md

@@ -11,6 +11,9 @@ export interface ConcertFxSettingsV810 {
   ledLookV821:'auto'|'equalizer'|'geometry'|'waves'|'tunnel';ledIntensityV821:number;
   ledExperienceV842:boolean;ledDepthStrengthV842:number;ledDepthStyleV842:'auto'|'geometry'|'tunnel';ledLightSyncV842:boolean;
   ledMotifsV870:boolean;ledMotifStrengthV870:number;ledMotifStyleV870:'auto'|'equalizer'|'prism'|'shockwave';ledCameraProtectionV870:boolean;
+  ledCreativeV886:boolean;ledCreativeStrengthV886:number;
+  ledCreativeStyleV886:'auto'|'skyline'|'kaleidoscope'|'chevrons'|'vortex';
+  ledCreativeMotionV886:'calm'|'balanced'|'dynamic';ledCreativeCameraGuardV886:boolean;
   lyricsProjection:boolean;rhymeAccents:boolean;projectionSurface:'wall'|'floor';
   cinematicLyricsV873:boolean;cinematicLyricsStrengthV873:number;hookProjectionSizeV873:number;lyricsCameraGuardV873:boolean;
   atmosphericFx:boolean;floorHaze:boolean;lightShafts:boolean;
@@ -67,6 +70,8 @@ export const DEFAULT_CONCERT_FX_V810:Readonly<ConcertFxSettingsV810>={
   ledLookV821:'auto',ledIntensityV821:75,
   ledExperienceV842:true,ledDepthStrengthV842:65,ledDepthStyleV842:'auto',ledLightSyncV842:true,
   ledMotifsV870:true,ledMotifStrengthV870:60,ledMotifStyleV870:'auto',ledCameraProtectionV870:true,
+  ledCreativeV886:true,ledCreativeStrengthV886:55,ledCreativeStyleV886:'auto',
+  ledCreativeMotionV886:'balanced',ledCreativeCameraGuardV886:true,
   lyricsProjection:true,rhymeAccents:true,projectionSurface:'wall',
   cinematicLyricsV873:true,cinematicLyricsStrengthV873:65,hookProjectionSizeV873:60,lyricsCameraGuardV873:true,
   atmosphericFx:true,floorHaze:true,lightShafts:true,
@@ -135,6 +140,12 @@ export function normalizeConcertFxV810(raw?:Partial<ConcertFxSettingsV810>|null)
  ledMotifStrengthV870:finite(raw?.ledMotifStrengthV870)?Math.round(clamp(raw.ledMotifStrengthV870,0,100)):d.ledMotifStrengthV870,
  ledMotifStyleV870:raw?.ledMotifStyleV870==='equalizer'||raw?.ledMotifStyleV870==='prism'||raw?.ledMotifStyleV870==='shockwave'?raw.ledMotifStyleV870:'auto',
  ledCameraProtectionV870:typeof raw?.ledCameraProtectionV870==='boolean'?raw.ledCameraProtectionV870:d.ledCameraProtectionV870,
+ ledCreativeV886:typeof raw?.ledCreativeV886==='boolean'?raw.ledCreativeV886:d.ledCreativeV886,
+ ledCreativeStrengthV886:finite(raw?.ledCreativeStrengthV886)?Math.round(clamp(raw.ledCreativeStrengthV886,0,100)):d.ledCreativeStrengthV886,
+ ledCreativeStyleV886:raw?.ledCreativeStyleV886==='skyline'||raw?.ledCreativeStyleV886==='kaleidoscope'||
+  raw?.ledCreativeStyleV886==='chevrons'||raw?.ledCreativeStyleV886==='vortex'?raw.ledCreativeStyleV886:'auto',
+ ledCreativeMotionV886:raw?.ledCreativeMotionV886==='calm'||raw?.ledCreativeMotionV886==='dynamic'?raw.ledCreativeMotionV886:'balanced',
+ ledCreativeCameraGuardV886:typeof raw?.ledCreativeCameraGuardV886==='boolean'?raw.ledCreativeCameraGuardV886:d.ledCreativeCameraGuardV886,
  protectLyrics:typeof raw?.protectLyrics==='boolean'?raw.protectLyrics:d.protectLyrics,
  lyricsProjection:typeof raw?.lyricsProjection==='boolean'?raw.lyricsProjection:d.lyricsProjection,
  rhymeAccents:typeof raw?.rhymeAccents==='boolean'?raw.rhymeAccents:d.rhymeAccents,

@@ -130,7 +130,7 @@ test('Pure and deterministic across repeated samples and backward seeks',()=>{
 test('V822 uses existing V821 shader and uniforms, no new draw calls',()=>{
  const stage=fs.readFileSync('components/visualizer/DynamicStage.tsx','utf8');
  assert(stage.includes('planBeatAccentDirectorV822('));
- assert(stage.includes('fragmentShader={LED_WALL_FRAGMENT_V842}') &&
+ assert((stage.includes('fragmentShader={LED_WALL_FRAGMENT_V842}') || (stage.includes('fragmentShader={LED_WALL_FRAGMENT_V886}') && fs.readFileSync('components/visualizer/ledWallCreativeShaderV886.ts','utf8').includes('LED_WALL_FRAGMENT_V842'))) &&
   fs.readFileSync('components/visualizer/ledWallExperienceShaderV842.ts','utf8').includes('LED_WALL_FRAGMENT_V821'));
  for(const u of ['uBeat22Kick','uBeat22Snare','uBeat22Peak']){
   assert(stage.includes(`led.uniforms.${u}.value=`));assert(stage.includes(`${u}:{value:0}`));

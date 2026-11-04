@@ -1,0 +1,5 @@
+{
+ "extends":"./tsconfig.v920-core.json",
+ "files":["../lib/goveeConcertSyncV921.ts","../services/stageContent/showTimelineV354.ts",
+  "../lib/goveeConcertDirectorV911.ts","../lib/goveeLanV909.ts","../types/audio.ts"]
+}

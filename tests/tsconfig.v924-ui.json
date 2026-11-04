@@ -1,0 +1,5 @@
+{
+ "extends":"./tsconfig.v923-ui.json",
+ "files":["../components/GoveeLightEnergyStudioV924.tsx","../lib/goveeLightEnergyV924.ts",
+  "stubs/v881-react-jsx.d.ts","stubs/v916-govee-ui-events.d.ts"]
+}

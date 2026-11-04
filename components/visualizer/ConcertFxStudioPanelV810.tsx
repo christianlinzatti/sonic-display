@@ -34,6 +34,7 @@ import {planSpectralMusicV818} from './spectralMusicPlannerV818';
 import {planCinematicTransitionV819} from './cinematicTransitionPlannerV819';
 import {planLedWallExperienceV821} from './ledWallExperiencePlannerV821';
 import {planLedWallExperienceV842} from './ledWallExperiencePlannerV842';
+import {planLedWallCreativeV886,LED_CREATIVE_NAMES_V886} from './ledWallCreativeDirectorV886';
 import {planBeatAccentDirectorV822} from './beatAccentDirectorV822';
 import {planVocalAdlibFxV820} from './vocalAdlibFxPlannerV820';
 const genres: {value:ConcertFxGenreV810;label:string}[]=[
@@ -118,6 +119,10 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
    section,playing:true,reducedMotion:false,tier:'high',budget:1,timelineGain:1,
    manualLed:false,manualLighting:false,blackout:false,lyricsProtected:false,
    vocalFocus:false,groupCount:1});
+ const creativePreviewV886=planLedWallCreativeV886({fx:preview,wall:wallPreview,settings:s,
+   section,playing:true,reducedMotion:false,tier:'high',budget:1,timelineGain:1,
+   manualLed:false,manualLighting:false,blackout:false,lyricsProtected:false,
+   lyricsVisible:false,vocalFocus:false,cameraCloseup:false,manualCamera:false,groupCount:1});
  const festivalPreviewV844=planFestivalSpecialFxV844({fx:preview,settings:s,playing:true,
    reducedMotion:false,manualLighting:false,blackout:false,lyricsProtected:false,vocalFocus:false,
    groupCount:1,tier:'high',energy:.86,kick:.92,particleBudget:1,foamBudget:1,timelineGain:1,performanceGain:1});
@@ -473,6 +478,40 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
     Bestehende LED-Fläche ohne zusätzliche Draw-Calls. Manuelle LED-Spuren, feste V821/V842-Looks,
     verifizierte Musikabschnitte, Reduced Motion, Blackout, Lyrics und Low-Tier behalten Vorrang.
     Kein Vollbildblitz, keine zusätzliche Lichtquelle.</small>
+  </fieldset>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+   <legend>V886 · LED Wall Creative Director</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.ledCreativeV886}
+    disabled={!s.ledWall||!s.ledExperienceV821}
+    onChange={e=>patch({ledCreativeV886:e.target.checked})}/> Vier neue LED-Looks auf der vorhandenen Wand aktivieren</label>
+   <label>Animation <select value={s.ledCreativeStyleV886}
+    disabled={!s.ledCreativeV886||!s.ledWall||!s.ledExperienceV821}
+    onChange={e=>patch({ledCreativeStyleV886:e.target.value as ConcertFxSettingsV810['ledCreativeStyleV886']})}>
+    <option value="auto">Automatisch – Verse / Hook / Build / Drop</option>
+    <option value="skyline">Skyline Equalizer – dynamische Frequenzsäulen</option>
+    <option value="kaleidoscope">Kaleidoskop – rotierende Facetten</option>
+    <option value="chevrons">Kinetic Chevrons – laufende Winkel</option>
+    <option value="vortex">Drop Vortex – spiralförmiger Tunnel (nur Drop/Finale)</option>
+   </select></label>
+   <label>Stärke ({s.ledCreativeStrengthV886} %)<input type="range" min="0" max="100" step="5"
+    value={s.ledCreativeStrengthV886} disabled={!s.ledCreativeV886||!s.ledWall}
+    onChange={e=>patch({ledCreativeStrengthV886:+e.target.value})}/></label>
+   <label>Animationsgeschwindigkeit <select value={s.ledCreativeMotionV886}
+    disabled={!s.ledCreativeV886||!s.ledWall}
+    onChange={e=>patch({ledCreativeMotionV886:e.target.value as ConcertFxSettingsV810['ledCreativeMotionV886']})}>
+    <option value="calm">Ruhig</option><option value="balanced">Ausgewogen</option>
+    <option value="dynamic">Dynamisch</option>
+   </select></label>
+   <label className="setting-check"><input type="checkbox" checked={s.ledCreativeCameraGuardV886}
+    disabled={!s.ledCreativeV886}
+    onChange={e=>patch({ledCreativeCameraGuardV886:e.target.checked})}/>
+    Bei Kamera-Nahaufnahmen und manueller Kamera abdunkeln</label>
+   <small>Live-Vorschau aus simuliertem Songabschnitt „{section}": {creativePreviewV886.active?
+    `${LED_CREATIVE_NAMES_V886[creativePreviewV886.mode]} · Stärke ${Math.round(creativePreviewV886.power*1000)/10} %`:
+    creativePreviewV886.reason==='protected'?'manuelle Vorgaben haben Vorrang':'aus'}.
+    Eine zusätzliche, sehr schwache Shader-Schicht ohne neues LED-Mesh, Textur oder GPU-Pass.
+    Keine erfundenen Drops, keine Stroboskop-Blitze; Song-Timeline, Lyrics, Pausen,
+    manuelle Licht-/LED-Spuren und Reduced Motion haben Vorrang.</small>
   </fieldset>
   <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
    <legend>V822 · Advanced Beat Accent Director</legend>

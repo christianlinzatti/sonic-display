@@ -13,6 +13,9 @@ import { advanceChoreographyV312, initialChoreographyV312, type ChoreographySett
 import { advanceInteraction, initialInteractionState } from "./multiAvatarInteractionV274";
 import { advanceDuoDirector, createDuoDirectorState, type DuoScene } from "./duoChoreographyDirector";
 import { duoFormationTargets, formationApproach } from "./duoFormationEngine";
+import {readConcertStageSyncV882} from './concertStageSyncV882';
+import {readEnergyV896} from './musicalEnergyIntelligenceV896';
+import {sampleDanceShowV899,DEFAULT_DANCE_SHOW_V899} from './advancedDanceShowDirectorV899';
 import { advanceEnsembleBalanceV324, createEnsembleStateV324, readEnsembleBalanceV324, refreshEnsembleBalanceV324, ENSEMBLE_BALANCE_EVENT_V324, ENSEMBLE_BALANCE_DIAGNOSTIC_V324 } from "./adaptiveEnsembleBalanceV324";
 import { readEnsembleTimelineV325, canPlayEnsembleTimelineV325, evaluateEnsembleTimelineV325, ENSEMBLE_TIMELINE_EVENT_V325 } from "./ensembleChoreographyV325";
 import { partnerCue, separatePartners } from "./avatarPartnerAwareness";
@@ -238,6 +241,34 @@ export function FormationDancers({props, mode, choreography}: {props: Visualizer
     if (mode !== "solo" && formation === "wide") { leadTarget[0] -= .34; partnerTarget[0] += .34; }
     if(manualPose){leadTarget[0]=manualPose.lead[0];leadTarget[1]=manualPose.lead[1];leadTarget[2]=manualPose.lead[2];
       partnerTarget[0]=manualPose.partner[0];partnerTarget[1]=manualPose.partner[1];partnerTarget[2]=manualPose.partner[2];}
+    // V899 runs after automatic V230 targets and before existing V324 collision/foot ownership.
+    // Authored V325, selected V312 choreography, 3D show formations and V322 foot locks
+    // always take priority. No direct joint/clip/IK transformations.
+    const showSignalV899=readConcertStageSyncV882();
+    const clockV899=props.cameraDirectorProgressMs??-1;
+    const songIdV899=props.track?.id??'';
+    const showDanceV899=sampleDanceShowV899({
+      settings:showSignalV899.danceShowSettingsV899??DEFAULT_DANCE_SHOW_V899,
+      plan:showSignalV899.directorPlanV895,trackId:songIdV899,
+      durationMs:showSignalV899.durationMs,positionMs:clockV899,playing:props.isPlaying,
+      autoEnabled:showSignalV899.enabled&&showSignalV899.sync.dance,
+      directorEnabled:!!showSignalV899.directorSettingsV895?.enabled,
+      danceEnabled:!!showSignalV899.directorSettingsV895?.dance,
+      duo:mode!=='solo',count:mode==='solo'?1:2,tier:getActivePerformanceTier(),
+      reducedMotion:props.reducedMotion,manualDance:props.avatarMotionMode==='choreography'||
+        !!props.smartDanceOverride,manualFormation:!!manualPose||!!manualActive||
+        props.showCue?.formationsEnabled===true||mode==='solo',
+      footLocked:readFootLockV322().enabled,collisionRisk:false,
+      seekBlocked:clockV899<(showSignalV899.atmosphereSeekBlockedUntilMs??0),
+      manualFx:!!showSignalV899.manual,blackout:!showSignalV899.playing,
+      lyricsVisible:!!props.lipSync?.cinematicLyricsVisibleV378,
+      cameraEnabled:!!showSignalV899.directorSettingsV895?.camera,
+      energy:readEnergyV896(songIdV899,showSignalV899.durationMs,clockV899),
+    });
+    if(showDanceV899.active){
+      leadTarget[0]-=showDanceV899.spacing;partnerTarget[0]+=showDanceV899.spacing;
+      leadTarget[2]-=showDanceV899.depth;partnerTarget[2]+=showDanceV899.depth;
+    }
     const safe = separatePartners(leadTarget, partnerTarget, 1.35);
     const ensemble=advanceEnsembleBalanceV324(ensembleState.current,{
       trackId:props.track?.id??'',lead:safe.lead,partner:safe.partner,

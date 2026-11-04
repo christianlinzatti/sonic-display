@@ -1,0 +1,7 @@
+{
+ "extends":"../tsconfig.json",
+ "compilerOptions":{"incremental":false,"plugins":[],"moduleResolution":"node"},
+ "files":["../components/visualizer/liveFxDeckPlannerV881.ts"],
+ "include":[],
+ "exclude":[]
+}

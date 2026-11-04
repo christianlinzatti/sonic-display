@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.v921-core.json",
+  "files": [
+    "../lib/goveeShockwaveV922.ts",
+    "../lib/goveeBassReactiveV917.ts",
+    "../lib/goveeLanV909.ts",
+    "../lib/goveeConcertDirectorV911.ts",
+    "../types/audio.ts"
+  ]
+}

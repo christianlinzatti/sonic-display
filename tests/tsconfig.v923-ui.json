@@ -1,0 +1,5 @@
+{
+ "extends":"./tsconfig.v922-ui.json",
+ "files":["../components/GoveeNeonPulseStudioV923.tsx","../lib/goveeNeonPulseV923.ts",
+  "stubs/v881-react-jsx.d.ts","stubs/v916-govee-ui-events.d.ts"]
+}

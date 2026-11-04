@@ -1,0 +1,19 @@
+V888 changed/new files vs original V887 project ZIP
+MODIFIED e91e8d63c3e53a01d7aaa0021a7ddb7cf876ef23fc12f87491ba80201b2a92db  .github/workflows/v832-continuous-validation.yml
+MODIFIED 99573f1963e341532ef32f95ee28e0b5dd2c6155e85effeb4e4a38eb25a38a3e  ARCHITECTURE.md
+MODIFIED fdf49b2a2c8c7c1894d75ff35f3346984d7e1f831889ab78812c93ab170be259  components/visualizer/concertStageSyncV882.ts
+MODIFIED 4c77c245dad2895e33f15d8bf1b191fd048d5e5291f069534703ada46673cbb1  components/visualizer/DynamicStage.tsx
+NEW      a17e00dcff71fa8654f9d8cd0374a8793ba0d699d7d0e7887258c2539dac8882  components/visualizer/laserShowDirectorV888.ts
+NEW      a2528150d61d58aab4cef79984d4aebb185ccdc5310b7379f731f1e74dfb79ba  components/visualizer/laserShowShaderV888.ts
+MODIFIED f5fcbc6b580fd5546365142177d34e231703ce4e1813302e6f27394fa85f6846  components/visualizer/LiveFxDeckV881.tsx
+NEW      f5607b88a572a627fc93d381d2511e370516ecaad99afe8ebd36b82befb5dcc9  LASER_SHOW_DIRECTOR_V888.md
+MODIFIED 6ec23c9264b614a450e5abe578c44815882a5a795c6cc093fdf1784dbb7acb1b  package-lock.json
+MODIFIED f8c4c180049764ff15a1fce783b2ad7e70919ce23c79ba0f67686f8988b03719  package.json
+MODIFIED 0bc485d21f1157412ea6f64cf3c723ad72f0ebdc5ec8f6d0a240d075461bbd26  README.md
+NEW      abc62cb0492de8ff1c51131f02dce0060070d8e8953d6c9f6979f391e3c3ea35  scripts/verify-v888-windows.ps1
+NEW      fe0f33085959eb3d8b76399f0579f3bb2fe74393318c9ef34430e7f300713ce2  tests/tsconfig.v888-core.json
+NEW      daa0ec33fa02e68e9a005f85b85729ca94c5b39af607e2e0400e585fdd52e871  tests/tsconfig.v888-ui.json
+MODIFIED 63d80d5968f9ed365d9836368388659904f49862a1816bbf9ca5a9e5f121e9d1  tests/v886-led-wall-creative-director-regression.cjs
+MODIFIED 329b6855da5f4f45b8e77b0fac2de29b592af0288a06a508050dc6e9d6be102d  tests/v887-cinematic-fog-regression.cjs
+NEW      f5701f7399ae81c5f04e6326af027e68a66a65825afb53a752774c9b052b4099  tests/v888-laser-show-director-regression.cjs
+NEW      4e66b571508cd4a0c5b3514c498b08972f685398f3bca990834646f14d995cc3  V888-VERIFICATION.md

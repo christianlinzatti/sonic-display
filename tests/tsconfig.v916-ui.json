@@ -1,0 +1,6 @@
+{
+ "extends":"../tsconfig.json",
+ "compilerOptions":{"incremental":false,"plugins":[],"jsx":"preserve","noEmit":true},
+ "files":["../components/GoveePresetStudioV916.tsx","../components/GoveeLightShowEditorV912.tsx","stubs/v881-react-jsx.d.ts","stubs/v916-govee-ui-events.d.ts"],
+ "include":[],"exclude":[]
+}

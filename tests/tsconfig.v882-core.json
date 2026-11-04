@@ -1,0 +1,6 @@
+{
+ "extends":"../tsconfig.json",
+ "compilerOptions":{"incremental":false,"plugins":[],"moduleResolution":"node"},
+ "files":["../components/visualizer/concertStageSyncV882.ts"],
+ "include":[],"exclude":[]
+}

@@ -50,15 +50,15 @@ test('10k frames no jitter or unbounded state',()=>{let s=initial(),changes=0;fo
 test('existing V655 runs before V682 chooser',()=>{const src=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8').replace(/\r\n?/g,'\n');assert(src.indexOf('const naturalV655=advanceNaturalCameraV655(')<src.indexOf('const cameraVarietyV682=advanceCameraVarietyV682('));});
 test('V682 precedes every later camera pass and final V351 guard',()=>{
   const src=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8').replace(/\r\n?/g,'\n');
-  const stages=['varietyFramedV682','naturalFramedV655','framedV747','framedV792','framedV797','framedV806','framedV809','framedV838','framedV848'];
+  const stages=['varietyFramedV682','naturalFramedV655','framedV747','framedV792','framedV797','framedV806','framedV809','framedV838','framedV848','cinematicCameraV897','danceCameraV898'];
   let previous=-1;
   for(const stage of stages){
     const position=src.indexOf(`const ${stage}=`);
     assert(position>previous,`${stage} must follow the preceding camera composition`);
     previous=position;
   }
-  const finalGuard='const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(framedV848,composition):to;';
-  assert(src.includes(finalGuard),'V351 must guard the final V848 automatic frame, not an earlier intermediate frame');
+  const finalGuard='const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(danceCameraV898.pose,composition):to;';
+  assert(src.includes(finalGuard),'V351 must guard final V898 after V897 and V848, not an earlier intermediate frame');
   assert(src.indexOf(finalGuard)>previous,'V351 guard must run after all camera effects');
 });
 test('all authored camera safeguards kept',()=>{const src=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8').replace(/\r\n?/g,'\n');const clause=src.slice(src.indexOf('const cameraVarietyV682='),src.indexOf('cameraVarietyStateV682.current=cameraVarietyV682.state'));for(const guard of ['authoredCameraV528','cameraNarrativeV605?.manualCamera','timelineCue?.active','authoredCueV400','editingPose','cameraManualStagePriorityV377'])assert(clause.includes(guard),guard);});

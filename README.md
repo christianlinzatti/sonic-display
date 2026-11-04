@@ -1,4 +1,242 @@
-> **Aktuelle Vollversion: V880 – Smart Concert Experience 5.0.**
+## V908 – Live Avatar & FX Benchmark Verification
+
+Das V905/V907 Benchmark-Studio prüft jetzt pro realem V826-Messfenster
+zusätzlich die sichtbaren **geriggten Avatar-Slots (V830)** und tatsächlich
+beobachtete V826-Effekte. Fehlende Szenen-Evidenz führt ausdrücklich zu
+**nicht bestätigt**. Das bisherige V907-Label für **FX reduziert / Standard / stark**
+bleibt eine Nutzerangabe und wird nicht als automatisch verifiziert ausgegeben.
+Keine neuen Renderer, Listener oder automatischen Einstellungsänderungen.
+
+`npm run verify:v908:focused` prüft V908 und frühere Versionen. Der vollständige
+Produktionsbuild benötigt installierte npm-Abhängigkeiten.
+
+## V922 – Bass Shockwave Room FX
+
+Neue optionale, per V917-Mikrofonerkennung ausgelöste Govee-Raumwelle: vier Richtungen,
+getrennte Verzögerung je Lampenposition, Ausklang und Intensitätsgrenzen. Ein einziger
+vorhandener LAN-Sender, keine zusätzlichen RGBIC- oder Stroboskop-Befehle; V915-Gruppendimmung
+bleibt maßgeblich. Bedienung unter **Govee LAN → V922** mit Offline-Vorschau.
+Anleitung: `V922-BASS-SHOCKWAVE-ROOM-FX.md`; Tests: `npm run test:v922`,
+`npm run test:v922:types`, `npm run test:v922:ui-types`.
+Der vollständige Next.js-Produktionsbuild muss vor Veröffentlichung bestätigt werden.
+
+## V921 – Cinematic Concert Light Synchronization
+
+Zusätzliche opt-in Govee-Regie für dieselben aktiven V354-/V356-Kamera-, Tanz-,
+Bühnenlicht- und Lyrics-Cues, die Sonic Display auf der 3D-Bühne verwendet.
+Rollenabhängige, sanft begrenzte Helligkeitsänderungen, keine neuen LAN-Kommandos.
+V915-Gruppendimmung behält Vorrang; fremde/alte Track-Cues werden verworfen.
+Einstellungsoberfläche unter **Govee LAN → V921** mit Offline-Vorschau.
+Anleitung: `V921-CINEMATIC-CONCERT-LIGHT-SYNCHRONIZATION.md`.
+Tests: `npm run test:v921`, `test:v921:types`, `test:v921:ui-types`.
+Ein vollständiger Next.js-Produktionsbuild benötigt installierte Abhängigkeiten.
+
+
+## V907 – Performance Profile Comparison Studio
+
+- Ergänzt V905/V906 um einen kontrollierten Profilvergleich verschiedener
+  Performance-Tiers, **selbst deklarierter** 2/3/4 GLB-Avatare und FX-Aufbauten.
+- Anwender stellt Bühne und Avatarzahl **selbst** um und etikettiert den
+  Benchmark vor dessen Start; die Etiketten werden nicht technisch verifiziert.
+- Echte V826-Renderer-Messwerte und V905-Messfenster, mindestens drei
+  abgeschlossene Wiederholungen je Konfiguration für vorsichtige Vergleiche.
+- Datenstrikte Song-/Szenen-/FPS-Ziel-/Preset-Trennung und datensparsamer
+  JSON-Export ohne private Spotify-IDs. Keine automatische Performance-Tuning-
+  Aktion, keine GPU-/WebGL-Neuobjekte und keine Raspberry-Pi-Prognose.
+- `npm run verify:v907:focused`, `test:v907:types`, `test:v907:ui-types`;
+  vollständiger Build weiterhin nur nach erfolgreichem `npm ci` verifizierbar.
+
+## V906 – Concert Benchmark Report Studio
+
+V906 erstellt aus den abgeschlossenen, echten V905-Messläufen einen detaillierten,
+**datensparsamen Benchmarkbericht**: FPS-Median, Spannweite, IQR, Framezeit,
+mittleres V826-P95-Fenster, FX-Druck und konkrete vorsichtige Hinweise.
+Ein Report kann als JSON oder Markdown exportiert werden. V906 vergleicht
+niemals unterschiedliche Songs, Szenen, FPS-Ziele, Messpresets oder
+Performance-Profile und kann die Leistung eines Raspberry Pi **nicht** aus
+den Messungen eines anderen Geräts vorhersagen.
+
+Details: `V906-CONCERT-BENCHMARK-REPORT-README.md`, `V906-VERIFICATION.md`.
+
+## V905 – Guided Concert Benchmark Studio
+
+Neu in **✦ LIVE FX → Concert Quality Intelligence**: echte, manuell gestartete
+Benchmarks mit drei Messumfängen, kontrollierter Stabilisierung, schützender
+Song-/Szenen-/Profilkontrolle, FPS/Framezeit/FX-Druck, gruppierter Wiederholung
+und privatem JSON-Export. Keine automatische Änderung der Show. Siehe
+`V905-GUIDED-CONCERT-BENCHMARK-STUDIO-README.md` und `V905-VERIFICATION.md`.
+
+## V904 – Concert Quality Regression Guard
+
+**Neu:** Wiederholte, vollständige V903-Vorher/Nachher-Vergleiche derselben
+Songszene und exakt derselben Einstellungsänderung werden als vorsichtige
+Performance-Tendenz ausgewertet. Das neue Dashboard unter **LIVE FX → V901
+Concert Quality Intelligence → V904 Regression Guard** zeigt den Median der
+FPS-/Framezeit-Differenzen, die Spannweite der FPS-Ergebnisse und Warnungen
+bei schwankenden, negativen oder nicht nachvollziehbaren Verbesserungen.
+
+**Mindestens drei** eigene V902-Anwenden/V903-Nachmessen-Durchläufe sind für
+eine Tendenz nötig. Nur gleicher Song, bestätigter Szenenindex, identischer
+Patch, FPS-Ziel und Performance-Tier werden verglichen. Unvollständige,
+pausierte und ungültige Messungen werden nicht aufgenommen. Alle Werte sind
+beobachtete Renderer-Frameabstände, **keine GPU-Zeit und kein Kausalbeweis**.
+Der Verlauf ist auf 24 Messungen im Arbeitsspeicher begrenzt; Export der
+Zusammenfassung ohne Track-ID, Löschen ausschließlich nach zweiter
+Bestätigung. **Keine automatische Einstellungskorrektur**, keine neuen
+Draw Calls, Abonnements, Timer oder Netzwerkzugriffe.
+
+Details: `V904-CONCERT-QUALITY-REGRESSION-GUARD-README.md`,
+`V904-VERIFICATION.md`. Für eine Produktionsfreigabe fehlen weiterhin der
+vollständige TypeScript-Check, Next.js-Build und ein realer WebGL-Test.
+
+## V903 – Concert Quality Before/After Review
+
+V903 ergänzt den V902 Quality Advisor um einen **echten, beobachtenden Vorher/Nachher-Vergleich** aus den vorhandenen V826-Renderer-Framefenstern. Nach einer ausdrücklich bestätigten Vorschlagsübernahme werden mindestens drei frische Vorher-Messfenster mit drei Nachher-Fenstern verglichen. Zwei Nachher-Fenster werden als Übergangszeit verworfen. Nur gleicher Songabschnitt, FPS-Ziel und Performance-Profil gelten als vergleichbar. Pausen, Szenenwechsel, fehlende Daten oder ein abweichendes Profil machen den Vergleich ungültig; es wird kein FPS-Gewinn versprochen.
+
+Die bisherige Einstellung kann über **Rücksetzen prüfen → Jetzt ausdrücklich zurücksetzen** wiederhergestellt werden, solange derselbe optimierte Wert aktiv ist. Nachträgliche manuelle Änderungen bleiben geschützt. Session-Daten bleiben im Arbeitsspeicher und JSON-Exporte enthalten **keine Track-IDs**. Keine neuen WebGL-Objekte, GPU-Abfragen, Polling-Timer oder automatischen Änderungen. Mehr: `V903-CONCERT-QUALITY-REVIEW-README.md` und `V903-VERIFICATION.md`.
+
+**Noch kein Produktionsbuild:** npm-Abhängigkeiten müssen vollständig installiert sein, bevor Gesamt-Typecheck, Next.js-Build und Browser/WebGL-Test nachgewiesen werden können.
+
+## V902 – Automatic Concert Quality Advisor
+
+Neu: Transparente, datenbasierte Qualitätsvorschläge mit **Vorschau, Ist-/Soll-Werten und ausdrücklicher Bestätigung** unter LIVE FX → V901 Concert Quality Intelligence. Nur bestätigte V900-Szenen, vorhandene V826-Renderermessungen und bestehende automatische Regieoptionen; **keine stillen Änderungen**, keine neuen Renderobjekte. Infos: `V902-AUTOMATIC-CONCERT-QUALITY-ADVISOR-README.md` und `V902-VERIFICATION.md`.
+
+## V901 – Concert Quality Intelligence 2.0
+
+Neu: read-only Live-Regie-Dashboard in LIVE FX mit V826-FPS/Framezeit/FX-Druck, bestätigten V900-Szenen und konkreten Schutz- und Konfigurationshinweisen. Bewertet **keine** optisch ungemessene Kamera-, Tanz- oder Lyricsqualität. Details: `V901-CONCERT-QUALITY-INTELLIGENCE-README.md`, `V901-VERIFICATION.md`.
+
+## V900 – Ultimate Concert Experience 5.0
+
+Die neue durchgängige Regie-Partitur koordiniert bestehende Bühne, LED-Wall,
+Scheinwerfer, automatische Kamera und Tanzenergie über den gesamten Song.
+Verifizierte V604/V895-Szenen steuern unterschiedliche Motive und Akte,
+abwechslungsreiches Pacing, ruhige Strophen, sanften Bühnenaufbau und
+nach hinten stärkere Höhepunkte. Optional fließen echte V896-Audiomesswerte ein.
+
+Unter **✦ LIVE FX → V900 Ultimate Concert Experience 5.0** lassen sich
+Kontrast, Übergänge, Intensität, Lyrics-Schutz und die fünf Kanäle getrennt
+konfigurieren. Ein JSON-Export enthält die gesamte bestätigte Partitur.
+V900 aktiviert keine vorher deaktivierten Effekte und verändert keine
+manuellen Timelines, GLB-Animationen oder Sängerzuweisungen.
+
+**Entwicklungsfassung:** Die Produktionsfreigabe erfordert `npm ci`,
+`npm run verify:v900:focused`, `npm run typecheck`, `npm run build` und einen
+realen Browser/WebGL-Test. Isolierte Typ- und Regressionstests ersetzen
+keinen Next.js-Produktionsbuild.
+
+[Details](V900-ULTIMATE-CONCERT-EXPERIENCE-README.md) · [Prüfstatus](V900-VERIFICATION.md).
+
+## V899 – Advanced Dance Show Director
+
+Die neue, optionale Show-Regie koordiniert sanfte Duettaufstellungen und
+dezente, nicht komprimierende 3-/4-Personen-Gruppenaufstellungen in
+bestätigten V604-Szenen, nutzt optional echte V896-Audioenergie und stimmt
+Kamera-Übergänge in der vorhandenen V898/V351-Pipeline ab. Sie schützt
+manuelle Timelines, Fußkontakt und Lyrics. Einstellungen:
+**✦ LIVE FX → V899 Advanced Dance Show Director**. Der JSON-Export enthält
+nur den verifizierten Szenenplan und Regieeinstellungen, keine erzeugten
+Tänzer-Motionclips.
+
+**Release-Status:** Technische Entwicklungsfassung. Für die Freigabe unter
+Windows/Linux bitte `npm ci`, `npm run verify:v899:focused`,
+`npm run typecheck`, `npm run build` und eine echte WebGL-/Avatarsichtprüfung
+ausführen. Isolierte Typ- und Regessionstests sind kein vollständiger Build.
+
+## V898 – Intelligent Dance & Camera Coordination
+
+Solo-, Zwei-Personen- und Ensemble-Kamerabilder auf Basis tatsächlich sichtbarer
+3D-Bühnenpositionen und der bestätigten Songstruktur. Nutzt weiterhin die
+bestehende R3F-Kamera; V550/V540 schützen Kopf-, Fuß- und Lyrics-Framing.
+**✦ LIVE FX → V898 Intelligent Dance & Camera Coordination**.
+[Details](V898-DANCE-CAMERA-COORDINATION-README.md) · [Tests](V898-VERIFICATION.md).
+
+## Neu in V897: Cinematic Camera 4.0
+
+Fünf filmische Perspektiven auf der **bestehenden R3F-Kamera**: Portrait,
+Orbit, Dolly, Kranfahrt und Weitwinkel. V895/V604-bestätigte Abschnitte
+wählen die Perspektive deterministisch und blenden kurze, begrenzte
+Kamerabewegungen weich ein. Gespeicherte Kamera-Presets, Keyframes,
+Live-Editor, V848-Künstlerframing und V351-Lyrics-Schutz bleiben maßgeblich.
+**✦ LIVE FX → V897 Cinematic Camera 4.0**.
+[Details](V897-CINEMATIC-CAMERA-4-README.md) · [Prüfstatus](V897-VERIFICATION.md).
+
+## Neu in V896: Musical Energy Intelligence
+
+Gemessene Audio-Energie, Bass und Anschlagimpulse steuern **dezent** die vorhandene
+Konzertregie, automatische Kamera, Tänzer, Spotlights und LED-Wall innerhalb
+bestätigter Songabschnitte. Zwei geglättete Energiepegel liefern einen
+adaptiven Trend – kein neuer Drop-Detektor und keine externe generative KI.
+**✦ LIVE FX → V896 Musical Energy Intelligence.**
+[Details](V896-MUSICAL-ENERGY-INTELLIGENCE-README.md) · [Prüfstatus](V896-VERIFICATION.md).
+Gesamt-TypeScript/Next.js-Produktionsbuild und WebGL-Browserprüfung sind noch offen.
+
+## Neu in V895: AI Concert Director 3.0
+
+Regelbasierte, durchgehende Konzert-Partitur für **Künstler, Lyrics, Ensemble, Bühne und Drops**.
+Der Director balanciert die **bestehenden** Kamera-, Tanz-, Spotlight-, LED-Wall- und
+3D-Bühneneffekte über bestätigte Songabschnitte. **✦ LIVE FX → V895 AI Concert Director 3.0.**
+[Details](V895-AI-CONCERT-DIRECTOR-README.md) · [Prüfstatus](V895-VERIFICATION.md).
+Kein externes generatives KI-Modell; vollständiger Next.js-Produktionsbuild bleibt offen.
+
+## Neu in V894: Ultimate Genre Stage
+
+Vier virtuelle Bühnenwelten für Deutschrap, Hardtekk, Deutschrock und Pop.
+Die bestehende Bühne erhält optionale Instancing-Architektur und dezente,
+genreabhängige Licht-/LED-Farbakzente nur bei bestätigten Songabschnitten.
+**✦ LIVE FX → V894 Ultimate Genre Stage.**
+[Details](V894-ULTIMATE-GENRE-STAGE-README.md) · [Prüfstatus](V894-VERIFICATION.md).
+
+## Neu in V893: Arena Crowd Atmosphere
+
+Aktualisierte virtuelle Handylichter, Publikumswellen und Silhouetten-Glow
+basierend auf bestätigten Songabschnitten – ohne zusätzliche Draw Calls.
+**✦ LIVE FX → V893 Arena Crowd Atmosphere**.
+[Details](V893-ARENA-CROWD-ATMOSPHERE-README.md) · [Prüfstatus](V893-VERIFICATION.md).
+
+## Neu in V892: Epic Drop Experience
+
+Die neue gemeinsame Drop-Regie verbindet bestehende Bass-Schockwellen,
+LED-Wall, Laser, Spotlights, rein virtuelle Pyro, Kamera-Dämpfung und automatische
+Tänzer-Akzente in den sanften Phasen **Impact → Drive → Release**.
+Nur bestätigte V883/V604-Showmomente werden verwendet; manuelle Steuerung,
+Lyrics und Performance-Budgets bleiben geschützt.
+Konfiguration: **✦ LIVE FX → V892 Epic Drop Experience**.
+[Details](V892-EPIC-DROP-EXPERIENCE-README.md) · [Prüfstatus](V892-VERIFICATION.md).
+
+## Neu in V891: Virtual Pyrotechnics
+
+Drei rein digitale 3D-Bühneneffekte – **virtuelle Flammen, CO₂-Jets und
+Funkenfontänen** – als kurze, bestätigte Show-Momente. Einstellbar unter
+**LIVE FX DECK → V891 Virtual Pyrotechnics**. Standardmäßig ausgeschaltet.
+Keine Geräteansteuerung, kein Stroboskop, kein zusätzlicher Audio-Analysator.
+Anleitung: [`VIRTUAL_PYROTECHNICS_V891.md`](VIRTUAL_PYROTECHNICS_V891.md),
+Prüfstatus: [`V891-VERIFICATION.md`](V891-VERIFICATION.md).
+
+## Neu in V889: Advanced Particle FX
+
+V889 erweitert das **Live FX Deck** um eine genre- und szenenabhängige Partikelregie
+für bereits vorhandene Seifenblasen, Schaumkanonen, Papier-Luftschlangen und
+Konfetti. Die 3D-Emitter bleiben dieselben; vorhandene Budget-, manuelle FX-
+und Lyrics-Schutzregeln haben Vorrang. Details: `ADVANCED_PARTICLE_FX_V889.md`
+und `V889-VERIFICATION.md`. **Gesamt-Typecheck und Next.js-Produktionsbuild sind noch offen.**
+
+> **V888 · Laser Show Director**: Vier szenengesteuerte, virtuelle Laser-Looks auf dem vorhandenen V811-Shader – mit Schutz für Lyrics, manuelle Lichtregie und Blackouts. [Details](LASER_SHOW_DIRECTOR_V888.md).
+
+> **V887 · Cinematic Fog & Haze**: Cinematic Nebel-Looks auf den vorhandenen V814-Flächen. [Details](V887-CINEMATIC-FOG-HAZE-README.md).
+
+> **Neu in V886:** [LED Wall Creative Director](V886-LED-WALL-CREATIVE-DIRECTOR-README.md)
+> mit vier neuen, szenengebundenen Shader-Animationen auf der vorhandenen LED-Wand.
+> [Prüfstatus und Build-Einschränkungen](V886-VERIFICATION.md).
+
+> **Neu in V885:** [Dynamic Concert Atmosphere](V885-DYNAMIC-CONCERT-ATMOSPHERE-README.md)
+> mit genre- und szenenabhängigen Bühnenfarben, Live-FX-Reglern und JSON-Export.
+> [Prüfstatus und Build-Einschränkungen](V885-VERIFICATION.md).
+
+> **Neu in V882:** 3D Concert Sync, 3D-Bass-Welle, instanziertes Konfetti,
+> Spotlight- und automatische Tänzer-Akzente. Details: [V882-CONCERT-STAGE-SYNC-README.md](V882-CONCERT-STAGE-SYNC-README.md).
+> Der vollständige Produktionsbuild ist mangels installierter Dependencies hier nicht bestätigt.
+
+> **Aktuelle Vollversion: V895 – AI Concert Director 3.0.**
 > Installation, Funktionen und Tests: [V880-FULL-RELEASE-README.md](V880-FULL-RELEASE-README.md).
 > Kein manuelles Anwenden früherer Upgrade-Dateien erforderlich.
 
@@ -1648,3 +1886,180 @@ Im Last.fm-History-Bereich neu: „Dein Musik-Radar“ mit Anteilsveränderungen
 Im Last.fm-Hörverlauf erscheint nach dem Archiv-/Importbereich das neue Music Discovery Dashboard. Es nutzt lokal gespeicherte, kontoabhängige Scrobbles und zeigt Monatsvergleich, 12-Monats-Grafik, Top-Künstler und Links zu Künstler-Explorer, Genre-Kompass und Wiederentdeckungen. Die neue Übersicht verwendet bewusst **das ganze Archiv** unabhängig vom gemeinsamen V726-Detailfilter; die vorhandenen Auswertungen und Filter bleiben separat nutzbar. Keine zusätzlichen Spotify-/Last.fm-Berechtigungen oder API-Aufrufe.
 
 Für die lokale Freigabe: `npm ci`, `npm run doctor:v858`, `npm run typecheck`, `npm run build`. Der gezielte Test ist `npm run test:v858`, der UI-Typcheck `npm run test:v858:ui-types`.
+
+
+## Govee LAN Lichtsteuerung (V909)
+
+Lokale Govee-Beleuchtung mit Geräteerkennung, Farbauswahl, Helligkeit und optionaler musikreaktiver Synchronisierung. Für einen Vercel-Deployment läuft eine lokale Node.js-Bridge (`npm run govee:bridge`) auf dem Display-Gerät. Vollständige Einrichtung und Sicherheitsinformationen: [GOVEE_LAN_V909.md](GOVEE_LAN_V909.md).
+
+## V910 – Raspberry Pi Vercel Kiosk & Govee LAN AutoStart
+
+Vercel hostet die Sonic-Display-Web-App; Raspberry Pi OS Desktop/labwc öffnet diese im Chromium-Kiosk. Eine lokale Govee-Bridge auf dem Pi startet als automatisch neu gestarteter `systemd --user`-Dienst, scannt das LAN nach dem Start und alle zwei Minuten erneut und zeigt Verbindungs-/Gerätestatus in den Govee-Einstellungen an. Automatische Farbsteuerung bleibt opt-in. **Einrichtung:** [V910-RASPBERRY-PI-VERCEL-GOVEE-README.md](V910-RASPBERRY-PI-VERCEL-GOVEE-README.md). V910 ist ohne physisches Pi/Govee-Gerät und ohne vollständigen Produktionsbuild nur teilweise verifiziert.
+
+## V911 – Govee Concert Light Director
+
+Opt-in device-specific light direction for H6063, H610B, H61A2 and H6051 via the existing local Pi Bridge. Select a light role under **Einstellungen → Govee LAN**, activate both music sync and the V911 director. Phase-specific cues require imported and labeled V318 track analysis; otherwise only ambient music lighting is used (no invented drops). See `V911-GOVEE-CONCERT-LIGHT-DIRECTOR.md`.
+
+
+---
+
+> **Neu: V912 – Visual Govee Light Show Editor.** In Einstellungen → Govee LAN eigene pro-Gerät-/Songphase-Lichtshows gestalten, speichern, als JSON exportieren/importieren. Siehe [V912-GOVEE-LIGHT-SHOW-EDITOR.md](V912-GOVEE-LIGHT-SHOW-EDITOR.md). Der Produktionsbuild ist ohne vollständige npm-Abhängigkeiten noch nicht verifiziert.
+
+
+## V913 – Smart Color Harmony 2.0
+
+Die neue Farbharmonie ist im V912 Govee-Lichtshow-Editor integriert: fünf Farbschemata, genreabhängige Hauptfarben-Empfehlungen, unabhängige Rollenfarben für H6063/H610B/H61A2/H6051, Vorschau ohne LAN-Kommandos und explizites Übernehmen für eine oder alle Songphasen. Änderungen wirken erst nach dem Speichern der V912-Show. Siehe [V913-SMART-COLOR-HARMONY.md](V913-SMART-COLOR-HARMONY.md).
+
+## V914 – Advanced Light Transitions
+
+Die bestehenden V912-Govee-Lichtshows erhalten sechs wählbare Übergangskurven, sanfte Helligkeitsbewegungen und eine Vorschau mit Kurvenanzeige. Pro Leuchte und Songphase einstellbar, ohne den V910-Raspberry-Pi-Bridge-Dienst zu verändern. Alte Shows bleiben kompatibel. Details: [V914-ADVANCED-LIGHT-TRANSITIONS.md](V914-ADVANCED-LIGHT-TRANSITIONS.md).
+
+## V915 – Govee Device Group Studio
+
+Unter **Einstellungen → Govee LAN → V915 Device Group Studio** können die ausgewählten Leuchten in Gruppen organisiert, synchron oder individuell zur Musik gesteuert, gemeinsam gedimmt und bei Bedarf manuell geschaltet werden. Einstellungen sind standardmäßig deaktiviert, werden lokal gespeichert und lassen sich ohne Bridge-Token exportieren. [V915-Anleitung](V915-GOVEE-DEVICE-GROUP-STUDIO.md).
+
+## V916 – Smart Light Preset Library
+
+- Acht Konzertlicht-Vorlagen für Deutschrap, Hardtekk, Hardstyle und Deutschrock, mit Favoriten und Genre-Filter.
+- Vorschau aller sechs Songphasen für H6063, H610B, H61A2 und H6051, ohne LAN-Befehle.
+- Vorlagen in eigene V912-Shows übernehmen (nur eine Phase oder alle Phasen), inklusive V914-Übergänge. V915-Gruppen bleiben kompatibel.
+- Nur opt-in: Keine automatische Aktivierung, keine Änderung an der V910-Raspberry-Pi-Bridge.
+- [V916 Dokumentation](V916-SMART-LIGHT-PRESET-LIBRARY.md); `npm run verify:v916:focused` prüft V916 und die bestehende Govee-Regressionskette.
+
+
+## V917 – Bass Reactive Lighting 3.0
+
+V917 ergänzt die optional zuschaltbare, mikrofonbasierte Bass-Hüllkurve für Govee LAN. H610B/Rhythmus erhält kräftigere, H6051/Ambient dezentere Akzente. Die bestehende V916-Preset-Bibliothek, V915-Gruppen und V914-Übergänge bleiben erhalten. Ohne aktives Mikrofon gibt es keine V917-Kickreaktion; die Vorschau sendet keine LAN-Befehle.
+
+Details: `V917-GOVEE-BASS-REACTIVE-LIGHTING.md` und `V917-VERIFICATION.md`. Der vollständige Next.js-Build und Raspberry-Pi-Hardwaretests stehen noch aus.
+
+
+## V918 – Intelligent Beat Prediction
+
+V918 ergänzt die optionale, phasensynchronisierte Govee-Beat-Vorhersage. Bei aktiver
+Mikrofonanalyse und hoher BPM-/Phasensicherheit werden die langsamen LAN-Befehle
+mit einem **manuell kalibrierbaren Vorlauf** geplant. Die tatsächliche Lampen-Latenz
+ist nicht automatisch messbar; die Govee-LAN-Bridge quittiert keine physische Lichtreaktion.
+Ohne sichere/aktuelle Beatphase fällt V918 auf die bestehende V917-/Ambient-Automatik zurück.
+Mindestens 900 ms zwischen Befehlsdurchläufen, kein Stroboskop, keine automatischen Power-Befehle.
+V912–V917-Lichtshows bleiben unverändert. Details: `V918-INTELLIGENT-BEAT-PREDICTION.md`;
+Tests: `npm run verify:v918:focused`. Der vollständige Next.js-Build muss in CI verifiziert werden.
+
+
+## V919 – Verse Hook Drop Lighting Director
+
+Die optionale V919-Dramaturgie verändert ausschließlich die Helligkeit bereits bestehender
+Govee-Lichtshows. Verse bleiben zurückhaltend, Hooks kräftiger, verifizierte Builds
+steigen an und verifizierte Drops werden kurz akzentuiert. Ein Pre-Drop-Anstieg
+erfordert zwei unmittelbar aufeinanderfolgende, vertrauenswürdige V318-Marker.
+Ohne bestätigte Songabschnitte bleibt V919 wirkungslos. Kein Stroboskop, keine
+automatischen Power-Befehle, keine Änderungen an V912–V918-Speichern.
+
+Details: `V919-VERSE-HOOK-DROP-LIGHTING-DIRECTOR.md`.
+Test: `npm run verify:v919:focused`. Vollständiger Typecheck/Next.js-Produktionsbuild
+erst mit installierten npm-Abhängigkeiten und erfolgreicher CI verifiziert.
+
+
+## V920 – Genre Adaptive Light Intelligence
+
+V920 ergänzt die vorhandene V919-Govee-Lichtregie um vier abgestimmte Helligkeitsdramaturgien:
+**Deutschrap**, **Hardtekk**, **Hardstyle** und **Deutschrock**. Bestehende Farben,
+V912–V916-Lichtshows, Gruppen und sanfte Übergänge werden nicht überschrieben.
+Die Funktion ist standardmäßig aus und erfordert aktive Govee-Musiksteuerung,
+V911 und V919 sowie sicher markierte, zum Track gehörende V318-Songabschnitte.
+
+Einstellungen unter **Govee LAN → V920 Genre Adaptive Light Intelligence**; die
+Vorschau ist rein visuell und sendet keine Netzwerkbefehle. Für nicht erkannte
+Genres wird keine zusätzliche V920-Lichtdynamik ausgeführt. Die Versandfrequenz
+bleibt unverändert, und der V910-Raspberry-Pi-Bridge-Dienst benötigt kein Update.
+
+Neue Checks: `npm run test:v920`, `npm run test:v920:types`,
+`npm run test:v920:ui-types` und `npm run verify:v920:focused`.
+Details: `V920-GOVEE-GENRE-ADAPTIVE-LIGHT-INTELLIGENCE.md`.
+
+
+## V923 – Govee Neon Pulse Experience
+
+V923 ergänzt eine **standardmäßig deaktivierte** Neon-Lichtebene im vorhandenen Govee-LAN-Sendedurchlauf.
+Modi: langsamer Farblauf (`flow`), sanftes Lichtatmen (`breathe`) sowie **nur gemessene** frische Mikrofon-Bassimpulse (`bass`).
+Standardmäßig reagiert nur die Neon-Rolle (H61A2); optional alle ausgewählten Govee-Leuchten.
+Genre-Paletten für Deutschrap, Hardtekk, Hardstyle und Deutschrock, einstellbare Wellenlänge,
+Versatz, Farbmischung und maximale zusätzliche Helligkeit. Die V915-Gruppendimmung
+wird **zuletzt** angewendet, V911 begrenzt RGB-/Helligkeitssprünge. Keine RGBIC-Segmentsteuerung,
+kein Stroboskop, keine separaten LAN-Timer oder Ein-/Aus-Kommandos.
+
+**Bedienung:** Einstellungen → Govee LAN → V923 Neon Pulse Experience.
+**Prüfung:** `npm run test:v923`, `npm run test:v923:types`, `npm run test:v923:ui-types`.
+Siehe `V923-NEON-PULSE-EXPERIENCE.md` und `V923-VERIFICATION.md`.
+
+## V924 – Intelligent Light Energy Director
+
+Opt-in Helligkeitsdramaturgie über verifizierte V318/V919-Songphasen: drei Regiestile,
+Peak-Dämpfung nach wiederholten Hooks/Drops, Erholung in ruhigen Passagen,
+Genreanpassung und Offline-Vorschau. V915-Gruppendimmung und V911-Glättung
+bleiben maßgeblich; die vorhandene V909-LAN-Bridge wird unverändert genutzt.
+Bedienung: **Govee LAN → V924**. Anleitung: `V924-INTELLIGENT-LIGHT-ENERGY-DIRECTOR.md`.
+Tests: `npm run test:v924`, `test:v924:types`, `test:v924:ui-types`,
+`verify:v924:focused`. Produktionsbuild vor Veröffentlichung weiterhin separat prüfen.
+
+## V925 – Festival Lighting FX Studio
+
+Neue opt-in-Govee-Konzertmuster: Arena Sweep, Symmetric Wave, Color Front und bestätigtes Drop Finale. Die Muster laufen über ganze Geräte, nutzen die aktuelle V318-/V919-Songphase und verwenden den bestehenden LAN-Sendedurchlauf. V915-Gruppendimmung bleibt erhalten. Einstellungen und lokale vier-Leuchten-Vorschau unter **Govee LAN → V925 Festival Lighting FX Studio**.
+
+Details: [V925-FESTIVAL-LIGHTING-FX-STUDIO.md](V925-FESTIVAL-LIGHTING-FX-STUDIO.md) · [V925-VERIFICATION.md](V925-VERIFICATION.md).
+
+## V926 · Smart Spatial Light Director (Govee LAN)
+
+V926 ergänzt zur V925 Festival Lighting FX Studio die opt-in **räumliche Govee-Anordnung**. Unter `Einstellungen → Govee LAN → V926 Smart Spatial Light Director` lassen sich bis zu 32 LAN-Leuchten in einem 2D-Raumplan positionieren (Bühne oben, Publikum unten); Raumvorlagen: Vier Ecken, Bühne → Publikum, Kreis. Wellenrichtungen: links/rechts, rechts/links, Bühne/Publikum, Publikum/Bühne, im oder gegen den Uhrzeigersinn. Eine lokale Vorschau zeigt die Wirkung ohne LAN-Kommandos. Erst der ausdrückliche Klick auf **Raumaufstellung speichern** macht Positionen für die Live-Steuerung verfügbar.
+
+Bei aktivierter Funktion übernehmen V922 Bass-Schockwellen, V923 Neonbewegungen und V925 Festivaleffekte die räumliche Geräte-Reihenfolge. Zusätzlich kann eine langsame, sanfte Raumwelle genreabhängige Farb-/Helligkeitsakzente über die tatsächlichen relativen Positionen verteilen. Die V915-Gruppendimmung bleibt die letzte Helligkeitsbegrenzung vor V911-Glättung; kein zusätzlicher Timer oder LAN-Befehl und keine LED-Segmentsteuerung. Standard: **aus**. Einzelheiten: [`V926-SMART-SPATIAL-LIGHT-DIRECTOR.md`](V926-SMART-SPATIAL-LIGHT-DIRECTOR.md), Prüfstatus: [`V926-VERIFICATION.md`](V926-VERIFICATION.md). Nach Installation der npm-Abhängigkeiten prüfen: `npm run test:v926`, `npm run test:v926:types`, `npm run test:v926:ui-types` und vor Produktion die vollständige CI/den Next.js-Build.
+
+## V927 – Intelligent Room Light Calibration (Govee LAN)
+
+V927 ergänzt eine **standardmäßig ausgeschaltete** manuelle Kalibrierung der *sichtbaren* Reaktionszeit jeder ausgewählten Govee-Leuchte. Einstellbar sind 0–500 ms pro Gerät sowie ein globaler maximaler Vorlauf; V922-/V923-/V925-/V926-Wellenphasen werden ohne neuen LAN-Sendedurchlauf entsprechend vorausberechnet. Verifizierte V318-Songphasen werden durch den Vorlauf **nicht** vorzeitig in die nächste Hook oder einen Drop verschoben. Die V915-Gruppendimmung bleibt maßgeblich.
+
+Unter **Einstellungen → Govee LAN → V927 Intelligent Room Light Calibration** kannst du Offsets ansehen, testen, **explizit speichern oder verwerfen**. Eine manuell gestartete, rein lesende dreifache Bridge-`/status`-Abfrage steht als Diagnose zur Verfügung, wenn die Musik-Auto-Synchronisierung ausgeschaltet ist. Die in der Bridge fest eingebaute Wartezeit von ca. 350 ms bedeutet, dass diese Werte **keine optischen LED-Reaktionszeiten** messen. Nur visuell bestimmte Offsets werden für den Ausgleich verwendet. Es gibt keine automatische Netz-/Hardware-Kalibrierung und keine Garantie für framegenaue Lichtwellen.
+
+Details: [`V927-INTELLIGENT-ROOM-LIGHT-CALIBRATION.md`](V927-INTELLIGENT-ROOM-LIGHT-CALIBRATION.md) · Prüfstatus: [`V927-VERIFICATION.md`](V927-VERIFICATION.md). Lokale Checks: `npm run test:v927`, `npm run test:v927:types`, `npm run test:v927:ui-types`, `npm run verify:v927:focused`. Vollständige CI und Next.js-Produktionsbuild vor Deployment separat erfolgreich nachweisen.
+
+## V928 – Room Light Performance Dashboard (Govee LAN)
+
+V928 ergänzt ein **rein lesendes, lokales Betriebsdashboard** unter `Einstellungen → Govee LAN`. Es zeigt Bridge-Status, Zeitpunkt der letzten erfolgreichen Geräteabfrage, ausschließlich zuletzt per UDP gesehene ausgewählte Leuchten, eingeschaltete Lichtmodule (V911–V927) und die für automatische Musiksteuerung konfigurierten Voraussetzungen. Pro Leuchte sind V915-Gruppe, optischer V927-Zeitversatz, separate HTTP-Statusdiagnose und optionale V926-Raumkoordinaten sichtbar. Ein Status älter als 30 s wird als *veraltet* gekennzeichnet, eine alte oder nie erhaltene Geräteantwort **nicht** als online.
+
+Der Button **Bridge und Geräte jetzt aktualisieren** verwendet die bestehenden V909-Leseendpunkte, ohne zusätzliches Polling; der Button **Diagnosebericht kopieren** erstellt einen anonymisierten JSON-Bericht ohne Token, Bridge-Adresse, IPs, Gerätenamen oder Koordinaten. V928 sendet keine Lichtbefehle und verändert keine gespeicherten Lichtshows oder Gruppen.
+
+Dokumentation: [`V928-ROOM-LIGHT-PERFORMANCE-DASHBOARD.md`](V928-ROOM-LIGHT-PERFORMANCE-DASHBOARD.md). Prüfstatus: [`V928-VERIFICATION.md`](V928-VERIFICATION.md). Tests: `npm run test:v928`, `npm run test:v928:types`, `npm run test:v928:ui-types`, `npm run verify:v928:focused`. Vollständigen npm-Installations-, TypeScript- und Next.js-Produktionsbuild vor dem Deployment in der CI nachweisen.
+
+
+### V929 – Smart Govee Troubleshooting Assistant
+
+Im **Govee LAN → V928 Room Light Performance Dashboard** sind jetzt die V929-Fehlerdiagnosen integriert: Bridge/Token/UDP, Geräteerkennung, Auto-Sync, V912-Shows, V911-Abhängigkeiten sowie ausdrücklich unbestätigte Mikrofon- und Optiklaufzeiten. Der Assistent zeigt Prioritäten, anklickbare Lösungsschritte und vier Symptom-Checklisten. **Er schaltet selbst nichts um, sendet keine LAN-Kommandos, erzeugt keinen weiteren Poller und exportiert keine IPs oder Zugangsdaten.**
+
+Tests: `npm run test:v929`, `npm run test:v929:types`, `npm run test:v929:ui-types`. Anleitung: `V929-SMART-GOVEE-TROUBLESHOOTING-ASSISTANT.md`. Prüfbericht: `V929-VERIFICATION.md`. Der vollständige Next.js-Produktionsbuild ist noch **nicht** verifiziert und muss vor Deployment in der CI durchlaufen.
+
+
+## V930–V958 · Ultimate Concert Experience (integrierter Entwicklungsstand)
+
+Die auf V929 aufbauende Konzertregie umfasst Govee-Wiederverbindung, Raumrollen, opt-in Prioritätsmixer, synthetische Probe, Track-Cue-Editor, bestätigte V318-Konzertregie und leichte virtuelle 3D-Effekte. Das neue Studio befindet sich im Govee-LAN-Bereich. Einzelheiten, Versionstabelle und die noch offene vollständige Build-Freigabe: **[`V958-ULTIMATE-CONCERT-EXPERIENCE-ROADMAP.md`](V958-ULTIMATE-CONCERT-EXPERIENCE-ROADMAP.md)**.
+
+```bash
+node tests/v958-concert-roadmap-regression.cjs
+node scripts/v931-production-gate.cjs  # verlangt vorher npm ci; ohne full Next build kein Release
+```
+
+
+## V959 – Parallele Tests und automatischer Produktionsnachweis
+
+Die 27 neueren Govee-, Konzert-, Build-Gate- und Syntax-Regressionen laufen mit
+bis zu drei parallelen Node-Prozessen (`SONIC_TEST_CONCURRENCY=1..4`).
+Jeder Test schreibt ein eigenes Log; Fehler schlagen im Gesamtresultat durch.
+Auf GitHub Actions laufen Ubuntu und Windows als getrennte Matrix-Jobs.
+Die vollständigen TypeScript- und Next.js-Buildprüfungen laufen aus Stabilitätsgründen
+anschließend **nacheinander**. Kein grüner Release ohne tatsächlich erfolgreichen Build.
+
+```bash
+npm run test:v959:parallel        # reine Regressionen, parallel
+npm run verify:v959:production    # volle Prüfung nach npm ci
+```
+
+Details: `V959-AUTOMATIC-PARALLEL-PRODUCTION-VALIDATION.md`.

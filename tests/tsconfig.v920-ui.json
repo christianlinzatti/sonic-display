@@ -1,0 +1,8 @@
+{
+ "extends":"../tsconfig.json",
+ "compilerOptions":{"incremental":false,"plugins":[],"jsx":"preserve","noEmit":true,
+ "paths":{"@/context/MusicContext":["./stubs/v920-music-context.d.ts"],"@/*":["../*"]}},
+ "files":["../components/GoveeGenreStudioV920.tsx","../lib/goveeGenreLightV920.ts",
+ "stubs/v881-react-jsx.d.ts","stubs/v916-govee-ui-events.d.ts"],
+ "include":[],"exclude":[]
+}

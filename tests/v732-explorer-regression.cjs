@@ -24,7 +24,7 @@ check('collection merge',()=>assert.equal(c.mergeSavedV732(raw,[]).length,1));ch
 for(const value of ['bad','{}','null',JSON.stringify({format:'sonic-collections-v732',version:2,items:[]}),JSON.stringify({format:'sonic-collections-v732',version:1,items:[null]})])check('bad backup '+value,()=>assert.throws(()=>c.mergeSavedV732(value,[])));
 check('capacity',()=>assert.throws(()=>c.parseSavedV732(JSON.stringify(Array.from({length:301},(_,i)=>({...saved,name:String(i)}))))));
 async function run(){await assert.rejects(c.readBackupV732({size:200001,text:async()=>''}));count++;assert.equal(await c.readBackupV732({size:2,text:async()=>'{}'}),'{}');count++;
- globalThis.IS_REACT_ACT_ENVIRONMENT=true;const React=require('react'),{create,act}=require('react-test-renderer');let data=null,fail=false;const storage={getItem:()=>data,setItem:(k,v)=>{if(fail)throw Error('quota');data=v;}};
+ globalThis.IS_REACT_ACT_ENVIRONMENT=true;const React=require('react'),{create}=require('react-test-renderer'),{act}=React;let data=null,fail=false;const storage={getItem:()=>data,setItem:(k,v)=>{if(fail)throw Error('quota');data=v;}};
  const load=createLoader({localStorage:storage,window:{localStorage:storage,setTimeout:f=>f()},document:{createElement:()=>({click(){},remove(){}}),body:{appendChild(){}}}}),Collections=load('components/LastFmCollectionsV732.tsx').LastFmCollectionsV732,Insights=load('components/LastFmInsightsV732.tsx').LastFmInsightsV732;let view;
  const button=name=>view.root.findAllByType('button').find(b=>b.props.children===name);const click=async name=>{assert(button(name),name);await act(async()=>button(name).props.onClick());};
  await act(async()=>{view=create(React.createElement(Collections,{account:'alice',events,onSelect(){}}));});
