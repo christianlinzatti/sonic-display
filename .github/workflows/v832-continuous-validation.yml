@@ -66,6 +66,60 @@ jobs:
         run: npm run test:v909 && npm run test:v909:types
       - name: V908 regression and available isolated type checks
         run: npm run test:v908 && npm run test:v908:types && npm run test:v908:ui-types
+      - name: V907 Performance Profile Comparison Studio (regression and isolated type checks)
+        run: npm run test:v907 && npm run test:v907:types && npm run test:v907:ui-types
+      - name: V906 Concert Benchmark Report Studio (regression and isolated type checks)
+        run: npm run test:v906 && npm run test:v906:types && npm run test:v906:ui-types
+      - name: V905 Guided Concert Benchmark Studio (regression and isolated type checks)
+        run: npm run test:v905 && npm run test:v905:types && npm run test:v905:ui-types
+      - name: V904 Concert Quality Regression Guard (regression and isolated type checks)
+        run: npm run test:v904 && npm run test:v904:types && npm run test:v904:ui-types
+      - name: V903 Concert Quality Before/After Review (regression and isolated type checks)
+        run: npm run test:v903 && npm run test:v903:types && npm run test:v903:ui-types
+      - name: V902 Automatic Concert Quality Advisor (regression and isolated type checks)
+        run: npm run test:v902 && npm run test:v902:types && npm run test:v902:ui-types
+      - name: V901 Concert Quality Intelligence 2.0 (regression and isolated type checks)
+        run: npm run test:v901 && npm run test:v901:types && npm run test:v901:ui-types
+      - name: V900 Ultimate Concert Experience 5.0 (regression and isolated type checks)
+        run: npm run test:v900 && npm run test:v900:types && npm run test:v900:ui-types
+      - name: V899 Advanced Dance Show Director (regression and isolated type checks)
+        run: npm run test:v899 && npm run test:v899:types && npm run test:v899:ui-types
+      - name: V898 Dance & Camera Coordination (regression and isolated type checks)
+        run: npm run test:v898 && npm run test:v898:types && npm run test:v898:ui-types
+      - name: V897 Cinematic Camera 4.0 (regression and isolated type checks)
+        run: npm run test:v897 && npm run test:v897:types && npm run test:v897:ui-types
+      - name: V896 Musical Energy Intelligence (regression and isolated type checks)
+        run: npm run test:v896 && npm run test:v896:types && npm run test:v896:ui-types
+      - name: V895 AI Concert Director 3.0 (regression and isolated type checks)
+        run: npm run test:v895 && npm run test:v895:types && npm run test:v895:ui-types
+      - name: V894 Ultimate Genre Stage (regression and isolated type checks)
+        run: npm run test:v894 && npm run test:v894:types && npm run test:v894:ui-types
+      - name: V893 Arena Crowd Atmosphere (regression and isolated type checks)
+        run: npm run test:v893 && npm run test:v893:types && npm run test:v893:ui-types
+      - name: V892 Epic Drop Experience (regression and isolated type checks)
+        run: npm run test:v892 && npm run test:v892:types && npm run test:v892:ui-types
+      - name: V891 Virtual Pyrotechnics (regression and isolated type checks)
+        run: npm run test:v891 && npm run test:v891:types && npm run test:v891:ui-types
+      - name: V890 Professional Spotlight Show (regression, core and isolated UI types)
+        run: npm run test:v890 && npm run test:v890:types && npm run test:v890:ui-types
+      - name: V889 Advanced Particle FX (regression, core and isolated UI types)
+        run: npm run test:v889 && npm run test:v889:types && npm run test:v889:ui-types
+      - name: V888 Laser Show Director (regression, core and isolated UI types)
+        run: npm run test:v888 && npm run test:v888:types && npm run test:v888:ui-types
+      - name: V887 Cinematic Fog & Haze (regression, core and isolated UI types)
+        run: npm run test:v887 && npm run test:v887:types && npm run test:v887:ui-types
+      - name: V886 LED Wall Creative Director (regression, core and isolated UI types)
+        run: npm run test:v886 && npm run test:v886:types && npm run test:v886:ui-types
+      - name: V885 Dynamic Concert Atmosphere (regression, core and isolated UI types)
+        run: npm run test:v885 && npm run test:v885:types && npm run test:v885:ui-types
+      - name: V884 Cinematic Concert Transitions (regression, core and isolated UI types)
+        run: npm run test:v884 && npm run test:v884:types && npm run test:v884:ui-types
+      - name: V883 Intelligent Concert Moments (regression, core and isolated UI types)
+        run: npm run test:v883 && npm run test:v883:types && npm run test:v883:ui-types
+      - name: V882 Concert Stage Sync (regression, core and isolated UI types)
+        run: npm run test:v882 && npm run test:v882:types && npm run test:v882:ui-types
+      - name: V881 Live FX Deck (regression, core and isolated UI types)
+        run: npm run test:v881 && npm run test:v881:types && npm run test:v881:ui-types
       - name: V873 Cinematic Lyrics 10.0 and TypeScript core
         run: npm run test:v873 && npm run test:v873:types
       - name: V872 natural dance continuity and TypeScript core

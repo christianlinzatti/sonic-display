@@ -96,8 +96,8 @@ for(const token of ['stepGlbGroundingV494','newGlbGroundStateV494','GLB_GROUND_R
  'calibrationsV494.current[modelId]','footLocked:footLock','GroupGroundObservationContextV487.Provider'])
  assert(scene.includes(token),`missing live V494: ${token}`);
 assert.equal((scene.match(/useFrame\(/g)||[]).length,1,'same group frame loop, no extra loop');
-for(const unchanged of ['targetX+(crewV458.slots[i]?.offsetX??0)','targetZ+(crewV458.slots[i]?.offsetZ??0)',
- 'groundTravelV487[i]??1','g.position.y=0'])assert(scene.includes(unchanged),'unchanged stage target: '+unchanged);
+for(const unchanged of ['targetX+Math.sign(i-(settings.count-1)/2)*groupSpreadV899+(crewV458.slots[i]?.offsetX??0)*accentScaleV506+groundDecisionsV494[i].offsetX','targetZ+(crewV458.slots[i]?.offsetZ??0)*accentScaleV506+groundDecisionsV494[i].offsetZ',
+ 'groundTravelV487[i]??1','g.position.y=0'])assert(scene.includes(unchanged),'preserved contact-aware stage formation target: '+unchanged);
 const ui=fs.readFileSync('components/visualizer/GlbGroundingCalibrationPanelV494.tsx','utf8');
 const controls=fs.readFileSync('components/visualizer/StageDirectorControlsV287.tsx','utf8');
 assert(controls.includes('<GlbGroundingCalibrationPanelV494 />'));
