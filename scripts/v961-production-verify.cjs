@@ -14,6 +14,7 @@ const checks=Object.fromEntries(required.map(key=>[key,gate?.tests?.some(t=>t.la
 const passed=run.status===0&&!run.error&&gate?.passed===true&&v960?.passed===true&&Object.values(checks).every(Boolean);
 fs.writeFileSync(file,JSON.stringify({schema:'sonic-v961-production-proof-v1',platform:process.platform,
  startedAt,finishedAt:new Date().toISOString(),passed:Boolean(passed),checks,
- error:passed?null:(run.error?.code||v960?.error||'PRODUCTION_GATE_NOT_CERTIFIED')},null,2)+'\n');
+ error:passed?null:(run.error?.code||v960?.error||'PRODUCTION_GATE_NOT_CERTIFIED')},null,2)+'
+');
 console.log('V961 '+(passed?'PASS production verified':'FAIL production not certified'));
 if(!passed)process.exitCode=1;
