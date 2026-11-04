@@ -1,0 +1,52 @@
+name: V961 Govee Concert Light Governor Production Gate
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v961-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  v961-production-gate:
+    name: V961 regression + full TypeScript + Next.js / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      SONIC_TEST_CONCURRENCY: '3'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Verify source paths and lockfile
+        run: node scripts/v959-source-preflight.cjs
+      - name: Install dependencies from lockfile
+        run: npm ci --no-audit --no-fund
+      - name: V961 parallel regressions and serial production gate
+        run: node scripts/v961-production-verify.cjs
+      - name: Finalize truthful build report, even on failure
+        if: always()
+        run: node scripts/v959-ci-finalize.cjs
+      - name: Upload per-OS evidence, even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v961-${{ matrix.os }}-production-report
+          path: |
+            reports/v961-production-proof.json
+            reports/v960-production-proof.json
+            reports/v959-build-proof.json
+            reports/v959-build-summary.md
+            reports/v931-production-gate.json
+            reports/v959-regression-logs/*.log
+          if-no-files-found: warn
+          retention-days: 30
