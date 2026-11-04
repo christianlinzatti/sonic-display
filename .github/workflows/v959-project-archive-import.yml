@@ -1,0 +1,37 @@
+name: V959 Import Complete Project ZIP
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'releases/sonic-display-v959-parallel-production-validation-full.zip'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: v959-project-import-master
+  cancel-in-progress: false
+jobs:
+  import-v959:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out exact triggering revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Validate and import 4,352 source files
+        run: python3 scripts/v959-project-archive-import.py
+      - name: Commit the verified project to master
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No changes to commit'
+          else
+            git commit -m 'chore: import complete Sonic Display V959 project'
+            git push origin HEAD:master
+          fi
