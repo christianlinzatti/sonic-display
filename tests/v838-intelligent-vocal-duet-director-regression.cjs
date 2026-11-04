@@ -104,7 +104,7 @@ test('one plan in ThreeAvatar',()=>assert(three.includes('planIntelligentVocalDu
 test('camera receives plan',()=>assert(three.includes('vocalDuetV838={vocalDuetV838}')));
 test('group receives plan',()=>assert(three.includes('settings={effectiveGroupSettingsV442} vocalDuetV838={vocalDuetV838}')));
 test('lighting uses V797 budget',()=>assert(three.includes('vocalSpotlightV797={directedSpotlightV838}')));
-test('camera uses V838 after V809',()=>assert(stage.includes('const framedV838=vocalDuetV838?composeIntelligentVocalDuetCameraV838(')&&stage.includes('guardAutomaticCameraV351(framedV848,composition)')&&stage.includes('const framedV848=composeCinematicCameraDirectorV848(')));
+test('camera uses V838 after V809',()=>assert(stage.includes('const framedV838=vocalDuetV838?composeIntelligentVocalDuetCameraV838(')&&stage.includes('pose:framedV848')&&stage.includes('pose:cinematicCameraV897.pose')&&stage.includes('guardAutomaticCameraV351(danceCameraV898.pose,composition)')&&stage.includes('const framedV848=composeCinematicCameraDirectorV848(')));
 test('group uses V838 AFTER V807',()=>assert(group.includes('const directedInteractionV838=vocalDuetV838?refineIntelligentDuetLooksV838(')));
 test('no resource allocation in planner',()=>{const src=read('components/visualizer/intelligentVocalDuetDirectorV838.ts');for(const forbidden of ['new WebGL','new THREE.','setInterval(','setTimeout(','dispatchEvent(','fetch(','localStorage'])assert(!src.includes(forbidden),forbidden)});
 test('git automation preserved',()=>assert(fs.existsSync(path.join(dir,'.github/workflows/v832-continuous-validation.yml'))));

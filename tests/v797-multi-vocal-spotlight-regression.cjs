@@ -70,7 +70,7 @@ const cam=fs.readFileSync(path.join(root,'components/visualizer/StageCameraDirec
 const light=fs.readFileSync(path.join(root,'components/visualizer/DynamicStage.tsx'),'utf8');
 for(const v of ['planMultiVocalSpotlightV797','scene:props.lipSync?.cinematicSceneV528','vocalSpotlightV797={directedSpotlightV838}'])
  assert(stage.includes(v),'ThreeAvatar missing '+v);
-for(const v of ['composeMultiVocalSpotlightCameraV797','guardAutomaticCameraV351(framedV848,composition)','authored:authoredCameraV528'])
+for(const v of ['composeMultiVocalSpotlightCameraV797','guardAutomaticCameraV351(danceCameraV898.pose,composition)','authored:authoredCameraV528'])
  assert(cam.includes(v),'camera missing '+v);
 for(const v of ['vocalSafeV797','!authoredLightsV386','timelineCue.blackout<=0','vocalKeyV797','vocalFillV797',
  'followPerformerLightV557(state.scene,(vocalSafeV797?'])
