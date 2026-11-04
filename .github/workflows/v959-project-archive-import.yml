@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: v959-project-import-master
   cancel-in-progress: false
@@ -35,3 +36,7 @@ jobs:
             git commit -m 'chore: import complete Sonic Display V959 project'
             git push origin HEAD:master
           fi
+      - name: Start real V959 CI after importing the project
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run v959-parallel-build.yml --ref master
