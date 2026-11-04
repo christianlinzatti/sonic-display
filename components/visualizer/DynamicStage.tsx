@@ -1198,7 +1198,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     const particleMixV889=directParticlesV889({
       settings:liveSignalV882.particleSettingsV889??DEFAULT_PARTICLE_V889,
       plan:liveSignalV882.atmospherePlan,trackId:playback.trackId,
-      durationMs:playback.durationMs,positionMs:playback.positionMs,genre,
+      durationMs:playback.durationMs,positionMs:playback.positionMs,genre:genre??'',
       playing:isPlaying&&playback.playing&&reactive,autoEnabled:liveSignalV882.enabled,
       reducedMotion,seekBlocked:playback.positionMs<(liveSignalV882.atmosphereSeekBlockedUntilMs??0),
       blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
