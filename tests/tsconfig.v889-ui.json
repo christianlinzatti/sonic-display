@@ -1,11 +1,16 @@
 {
- "extends": "../tsconfig.json",
- "compilerOptions": {"incremental":false,"plugins":[],"jsx":"preserve","noEmit":true},
- "files": [
-  "../components/visualizer/LiveFxDeckV881.tsx",
-  "../components/visualizer/ConcertStageFxV882.tsx",
-  "../components/visualizer/advancedParticleDirectorV889.ts",
-  "stubs/v881-react-jsx.d.ts","stubs/v882-three-jsx.d.ts"
- ],
- "include": [],"exclude": []
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": [],
+    "jsx": "preserve",
+    "noEmit": true
+  },
+  "files": [
+    "../components/visualizer/LiveFxDeckV881.tsx",
+    "../components/visualizer/ConcertStageFxV882.tsx",
+    "../components/visualizer/advancedParticleDirectorV889.ts"
+  ],
+  "include": [],
+  "exclude": []
 }

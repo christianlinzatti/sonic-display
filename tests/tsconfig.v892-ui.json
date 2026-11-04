@@ -9,10 +9,7 @@
   "files": [
     "../components/visualizer/LiveFxDeckV881.tsx",
     "../components/visualizer/epicDropExperienceV892.ts",
-    "../components/visualizer/concertStageSyncV882.ts",
-    "stubs/v881-react-jsx.d.ts",
-    "stubs/v882-three-jsx.d.ts",
-    "stubs/v891-three-jsx.d.ts"
+    "../components/visualizer/concertStageSyncV882.ts"
   ],
   "include": [],
   "exclude": []

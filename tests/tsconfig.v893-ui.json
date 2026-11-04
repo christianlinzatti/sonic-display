@@ -10,11 +10,7 @@
     "../components/visualizer/LiveFxDeckV881.tsx",
     "../components/visualizer/VirtualConcertCrowdV815.tsx",
     "../components/visualizer/arenaCrowdAtmosphereV893.ts",
-    "../components/visualizer/concertStageSyncV882.ts",
-    "stubs/v881-react-jsx.d.ts",
-    "stubs/v882-three-jsx.d.ts",
-    "stubs/v891-three-jsx.d.ts",
-    "stubs/v893-react-three.d.ts"
+    "../components/visualizer/concertStageSyncV882.ts"
   ],
   "include": [],
   "exclude": []

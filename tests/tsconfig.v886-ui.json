@@ -11,10 +11,7 @@
   "files": [
     "../components/visualizer/ConcertFxStudioPanelV810.tsx",
     "../components/visualizer/ledWallCreativeDirectorV886.ts",
-    "../components/visualizer/ledWallCreativeShaderV886.ts",
-    "stubs/v881-react-jsx.d.ts",
-    "stubs/v882-three-jsx.d.ts",
-    "stubs/v886-react-external-store.d.ts"
+    "../components/visualizer/ledWallCreativeShaderV886.ts"
   ],
   "include": [],
   "exclude": []

@@ -9,9 +9,7 @@
   "files": [
     "../components/visualizer/LiveFxDeckV881.tsx",
     "../components/visualizer/ConcertStageFxV882.tsx",
-    "../components/visualizer/laserShowDirectorV888.ts",
-    "stubs/v881-react-jsx.d.ts",
-    "stubs/v882-three-jsx.d.ts"
+    "../components/visualizer/laserShowDirectorV888.ts"
   ],
   "include": [],
   "exclude": []
