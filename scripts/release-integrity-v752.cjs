@@ -33,10 +33,24 @@ function inspectRelease(root, { ci = false } = {}) {
     }
   }
   const gatedVersion = /^npm run test:v(\d+) &&/.exec(pkg.scripts?.['check:fast'] || '')?.[1];
-  add('release:version', !!gatedVersion && pkg.version === `0.1.0-v${gatedVersion}` && Number(gatedVersion) >= 752, 'Package version must match the current fast-gate version');
+  // New roadmap versions retain the tested V908 package/lockfile baseline while
+  // check:fast can begin with an earlier compatible regression (currently V906).
+  // Enforce monotonic versions and a real release identity; never accept a fake
+  // or downgraded package version just because lockfile values match.
+  const packageVersion = /^0\\.1\\.0-v(\\d+)$/.exec(pkg.version || '')?.[1];
+  const roadmapVersion = /^v(\\d+)$/i.exec(pkg.sonicRoadmapRelease || '')?.[1];
+  const validVersion = Boolean(packageVersion && gatedVersion &&
+    Number(packageVersion) >= 752 && Number(gatedVersion) >= 752 &&
+    Number(packageVersion) >= Number(gatedVersion) &&
+    (!roadmapVersion || Number(roadmapVersion) >= Number(packageVersion)));
+  add('release:version', validVersion,
+    'Package baseline must be valid, not older than fast gate, and not newer than roadmap');
   // V858: newer releases may run explicit recent regressions before the same mandatory fast gate.
   const prebuild = pkg.scripts?.prebuild || '';
-  const prebuildRunsFast = prebuild === 'npm run check:fast' || (Boolean(gatedVersion) && prebuild.startsWith(`npm run test:v${gatedVersion} &&`) && prebuild.endsWith(' && npm run check:fast'));
+  const prebuildRunsFast = prebuild === 'npm run check:fast' ||
+    (Boolean(packageVersion) && prebuild.startsWith(`npm run test:v${packageVersion} &&`) &&
+      prebuild.includes(`npm run test:v${gatedVersion} &&`) &&
+      prebuild.endsWith(' && npm run check:fast'));
   add('scripts:prebuild', prebuildRunsFast, 'Keep the automatic production prebuild gate after recent release regressions');
   add('scripts:typecheck', pkg.scripts?.typecheck === 'tsc --noEmit', 'Full application typecheck must not be replaced by isolated tests');
   add('scripts:build', pkg.scripts?.build === 'next build', 'Must retain the real Next.js production build');
