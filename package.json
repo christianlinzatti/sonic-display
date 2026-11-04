@@ -1938,7 +1938,11 @@
     "verify:v959:production": "node scripts/v959-production-verify.cjs",
     "test:v959": "node tests/v959-production-validation-regression.cjs",
     "verify:v959:source": "node scripts/v959-source-preflight.cjs",
-    "test:v959:parallel": "node scripts/v959-regressions-only.cjs"
+    "test:v959:parallel": "node scripts/v959-regressions-only.cjs",
+    "test:v960": "node tests/v960-concert-continuity-regression.cjs",
+    "test:v960:types": "tsc -p tests/tsconfig.v960-core.json --noEmit",
+    "verify:v960:focused": "npm run test:v960 && npm run test:v960:types && npm run test:v958 && npm run test:v929",
+    "verify:v960:production": "node scripts/v960-production-verify.cjs"
   },
   "engines": {
     "node": ">=20.9.0"
@@ -1966,5 +1970,5 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v959"
+  "sonicRoadmapRelease": "v960"
 }

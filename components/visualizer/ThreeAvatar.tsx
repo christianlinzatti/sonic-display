@@ -36,6 +36,7 @@ import {planConcertDetailsV555,DEFAULT_CONCERT_DETAILS_V555} from './concertDeta
 import {ConcertDetailStageV555} from './ConcertDetailStageV555';
 import { StageVisualEffectsV353 } from "./StageVisualEffectsV353";
 import {ConcertFestivalFxV958} from "./ConcertFestivalFxV958";
+import {previousVerifiedConcertSceneV960,applyConcertContinuityV960} from "@/lib/concertContinuityV960";
 import { LongRunStabilityControllerV355 } from "./LongRunStabilityV355";
 import { useStabilityCapV355, stabilityEffectFactorV355 } from "@/services/monitoring/performanceStabilityV355";
 import {autoLoadConcertSongV764} from "@/services/stageContent/concertTimelineAutomationV764";
@@ -241,8 +242,17 @@ export function ThreeAvatar(props: VisualizerProps) {
     verified:true,genre:String(props.genre??''),energy:props.audio?.energyEnvelope??0,
     bass:props.audio?.bass??0,lyricsVisible:lyricsActiveV356,reducedMotion:props.reducedMotion},concertSettingsV958)
    :null;
+  const previousSceneV960=scene958&&concertSettingsV958.transitionsV960?previousVerifiedConcertSceneV960({
+    analysis:concertAnalysisV958,trackId:track958,sectionIndex:marker958,
+    durationMs:props.track?.durationMs??concertAnalysisV958?.durationMs??0,
+    genre:String(props.genre??''),energy:props.audio?.energyEnvelope??0,bass:props.audio?.bass??0,
+    lyricsVisible:lyricsActiveV356,reducedMotion:props.reducedMotion,settings:concertSettingsV958}):null;
+  const continuousSceneV960=scene958?applyConcertContinuityV960(scene958,previousSceneV960,
+    progress958-(source958?.startMs??progress958),concertSettingsV958,{
+    manualStage:authoredCueV354.active||authoredEnabled,
+    reducedMotion:props.reducedMotion}).scene:null;
   // V354 authored clips always win. Explicit avatar groups and manual duo setups are excluded.
-  const timelineCueV354=overlayConcertStageV958(automaticCueV354,scene958,{
+  const timelineCueV354=overlayConcertStageV958(automaticCueV354,continuousSceneV960,{
     enabled:concertSettingsV958.enabled,authored:authoredCueV354.active,
     manualFormation:authoredEnabled||groupOnV326||multiSettings.enabled||props.duoDirectorEnabled===true||
       (props.multiAvatarMode??'solo')!=='solo'||props.showCue?.formationsEnabled===true});

@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
 import {useMusic} from '@/context/MusicContext';
+import {concertContinuityAuditV960} from '@/lib/concertContinuityV960';
 import type {GoveeConfigV909,GoveeDeviceV909} from '@/lib/goveeLanV909';
 import {loadGoveeSpatialV926,saveGoveeSpatialV926} from '@/lib/goveeSpatialDirectorV926';
 import {loadGoveeCalibrationV927} from '@/lib/goveeRoomCalibrationV927';
@@ -51,6 +52,7 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
  [settings,track?.id,previewAt,duration,phase,position,genre]);
  const rehearsal=useMemo(()=>settings?rehearseConcertV938(track?.id||'rehearsal',duration,String(genre||''),settings):null,
   [settings,track?.id,duration,genre]);
+ const continuity=useMemo(()=>rehearsal?concertContinuityAuditV960(rehearsal.scenes,true):null,[rehearsal]);
  const realQuality=useMemo(()=>settings?qualityImportedConcertV957(actualAnalysis,String(genre||''),settings):null,
   [actualAnalysis,genre,settings]);
  const addPreset=()=>{if(!settings||!config.selectedIps.length)return;
@@ -87,6 +89,10 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
    <label><input type="checkbox" checked={settings.enabled} onChange={e=>save({enabled:e.target.checked})}/> Intelligente Konzertregie aktivieren</label>
    <label><input type="checkbox" checked={settings.virtualFx} disabled={!settings.enabled} onChange={e=>save({virtualFx:e.target.checked})}/> Virtuelle 3D-Bühneneffekte aktivieren</label>
    <label><input type="checkbox" checked={settings.hardwareSync} disabled={!settings.enabled} onChange={e=>save({hardwareSync:e.target.checked})}/> Konzert-Cues zusätzlich dezent an Govee-LAN übertragen (opt-in)</label>
+   <label><input type="checkbox" checked={settings.transitionsV960} disabled={!settings.enabled}
+    onChange={e=>save({transitionsV960:e.target.checked})}/> V960: Sanfte Verse/Hook/Drop-Übergänge (nur bestätigte Abschnitte)</label>
+   <label><input type="checkbox" checked={settings.compactFxV960} disabled={!settings.enabled||!settings.virtualFx}
+    onChange={e=>save({compactFxV960:e.target.checked})}/> V960: Kompaktes 3D-FX-Profil (maximal zwei Effekte)</label>
    <label>Einfluss {settings.strength}% <input type="range" min={0} max={100} value={settings.strength} onChange={e=>save({strength:Number(e.target.value)})}/></label>
   </div>
   {settings.hardwareSync&&<p className="settings-note" role="status">Neue Govee-Cues werden nur bei aktivem Auto-Sync und echten bestätigten Songphasen berücksichtigt. Gespeicherte Shows und manuell gesetzte Kameracues bleiben unverändert. Keine Strobe-/Power-Kommandos.</p>}
@@ -106,6 +112,13 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
   <p className="settings-note">{realQuality?.available
    ?`V957 echte V318-Songabschnitte: ${realQuality.scenes.length} · Qualitätswert ${realQuality.quality.score}/100 · Szenenwiederholungen ${realQuality.quality.repetitions}`
    :'V957: Für den aktuellen Titel liegen keine bestätigten V318-Songabschnitte vor; die Qualitätsprobe oben ist ausschließlich synthetisch.'}</p>
+  <h4>V960 · Concert Continuity Intelligence</h4>
+  <p className="settings-note">Opt-in: echte benachbarte V318-Abschnitte werden ohne zusätzliche Netzwerk- oder Render-Schleife überblendet.
+   V912-Lichtshows, eigene V354-Regie-Cues und manuelle Einstellungen behalten Vorrang.</p>
+  <p className="settings-note">Synthetischer Ablauf: {continuity?.phaseChanges??0} Phasenwechsel,
+   {continuity?.repeated??0} aufeinanderfolgende Kamera-/Formation-Wiederholungen.
+   {realQuality?.available?` Importierte Songabschnitte: ${concertContinuityAuditV960(realQuality.scenes).phaseChanges} bestätigte Phasenwechsel.`
+    :' Keine bestätigte Songanalyse – keine Hardware-Übergänge.'}</p>
   <h4>V948 · Professional Timeline Studio</h4>
   <p className="settings-note">Zusätzliche manuelle Cues für den aktuellen Song. Keine automatische Änderung von V354 oder gespeicherten V912-Shows.</p>
   <div className="govee-v958-settings"><label>Kamera <select value={camera} onChange={e=>setCamera(e.target.value as ConcertCameraV940)}>{cameraOptions.map(v=><option key={v}>{v}</option>)}</select></label>

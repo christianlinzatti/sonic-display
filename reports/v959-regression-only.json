@@ -1,252 +1,261 @@
 {
   "schema": "v959-regression-only-v1",
   "passed": true,
-  "startedAt": "2026-11-04T17:42:58.485Z",
+  "startedAt": "2026-11-04T21:03:32.798Z",
   "tests": [
+    {
+      "label": "V960 concert continuity regression",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 1366,
+      "timeout": false,
+      "logFile": "reports/v959-regression-logs/01-v960-concert-continuity-regression.log"
+    },
     {
       "label": "V958 concert regression",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 355,
+      "elapsedMs": 1449,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/01-v958-concert-regression.log"
+      "logFile": "reports/v959-regression-logs/02-v958-concert-regression.log"
     },
     {
       "label": "V931 gate regression",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 30,
+      "elapsedMs": 98,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/02-v931-gate-regression.log"
+      "logFile": "reports/v959-regression-logs/03-v931-gate-regression.log"
     },
     {
       "label": "V959 production validation",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 73,
+      "elapsedMs": 733,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/03-v959-production-validation.log"
+      "logFile": "reports/v959-regression-logs/04-v959-production-validation.log"
     },
     {
       "label": "V959 parallel runner regression",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 4519,
+      "elapsedMs": 4785,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/04-v959-parallel-runner-regression.log"
+      "logFile": "reports/v959-regression-logs/05-v959-parallel-runner-regression.log"
     },
     {
       "label": "v908-live-avatar-fx-verification",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 366,
+      "elapsedMs": 464,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/05-v908-live-avatar-fx-verification.log"
+      "logFile": "reports/v959-regression-logs/06-v908-live-avatar-fx-verification.log"
     },
     {
       "label": "v909-govee-lan",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 691,
+      "elapsedMs": 917,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/06-v909-govee-lan.log"
+      "logFile": "reports/v959-regression-logs/07-v909-govee-lan.log"
     },
     {
       "label": "v910-pi-kiosk-govee",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 2199,
+      "elapsedMs": 2313,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/07-v910-pi-kiosk-govee.log"
+      "logFile": "reports/v959-regression-logs/08-v910-pi-kiosk-govee.log"
     },
     {
       "label": "v911-govee-concert-director",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 367,
+      "elapsedMs": 645,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/08-v911-govee-concert-director.log"
+      "logFile": "reports/v959-regression-logs/09-v911-govee-concert-director.log"
     },
     {
       "label": "v912-govee-light-show-editor",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 453,
+      "elapsedMs": 737,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/09-v912-govee-light-show-editor.log"
+      "logFile": "reports/v959-regression-logs/10-v912-govee-light-show-editor.log"
     },
     {
       "label": "v913-govee-color-harmony",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 659,
+      "elapsedMs": 818,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/10-v913-govee-color-harmony.log"
+      "logFile": "reports/v959-regression-logs/11-v913-govee-color-harmony.log"
     },
     {
       "label": "v914-govee-transitions",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 804,
+      "elapsedMs": 1527,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/11-v914-govee-transitions.log"
+      "logFile": "reports/v959-regression-logs/12-v914-govee-transitions.log"
     },
     {
       "label": "v915-govee-device-groups",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 624,
+      "elapsedMs": 1050,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/12-v915-govee-device-groups.log"
+      "logFile": "reports/v959-regression-logs/13-v915-govee-device-groups.log"
     },
     {
       "label": "v916-govee-preset-library",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 707,
+      "elapsedMs": 2816,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/13-v916-govee-preset-library.log"
+      "logFile": "reports/v959-regression-logs/14-v916-govee-preset-library.log"
     },
     {
       "label": "v917-govee-bass-reactive",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 518,
+      "elapsedMs": 723,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/14-v917-govee-bass-reactive.log"
+      "logFile": "reports/v959-regression-logs/15-v917-govee-bass-reactive.log"
     },
     {
       "label": "v918-govee-beat-prediction",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 515,
+      "elapsedMs": 759,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/15-v918-govee-beat-prediction.log"
+      "logFile": "reports/v959-regression-logs/16-v918-govee-beat-prediction.log"
     },
     {
       "label": "v919-govee-section-director",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 677,
+      "elapsedMs": 1214,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/16-v919-govee-section-director.log"
+      "logFile": "reports/v959-regression-logs/17-v919-govee-section-director.log"
     },
     {
       "label": "v920-govee-genre-light",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 713,
+      "elapsedMs": 1499,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/17-v920-govee-genre-light.log"
+      "logFile": "reports/v959-regression-logs/18-v920-govee-genre-light.log"
     },
     {
       "label": "v921-govee-cinematic-sync",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 524,
+      "elapsedMs": 1177,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/18-v921-govee-cinematic-sync.log"
+      "logFile": "reports/v959-regression-logs/19-v921-govee-cinematic-sync.log"
     },
     {
       "label": "v922-govee-shockwave",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 600,
+      "elapsedMs": 1349,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/19-v922-govee-shockwave.log"
+      "logFile": "reports/v959-regression-logs/20-v922-govee-shockwave.log"
     },
     {
       "label": "v923-govee-neon-pulse",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 492,
+      "elapsedMs": 828,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/20-v923-govee-neon-pulse.log"
+      "logFile": "reports/v959-regression-logs/21-v923-govee-neon-pulse.log"
     },
     {
       "label": "v924-govee-light-energy",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 636,
+      "elapsedMs": 990,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/21-v924-govee-light-energy.log"
+      "logFile": "reports/v959-regression-logs/22-v924-govee-light-energy.log"
     },
     {
       "label": "v925-govee-festival-fx",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 536,
+      "elapsedMs": 804,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/22-v925-govee-festival-fx.log"
+      "logFile": "reports/v959-regression-logs/23-v925-govee-festival-fx.log"
     },
     {
       "label": "v926-govee-spatial",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 884,
+      "elapsedMs": 1400,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/23-v926-govee-spatial.log"
+      "logFile": "reports/v959-regression-logs/24-v926-govee-spatial.log"
     },
     {
       "label": "v927-govee-room-calibration",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 625,
+      "elapsedMs": 1206,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/24-v927-govee-room-calibration.log"
+      "logFile": "reports/v959-regression-logs/25-v927-govee-room-calibration.log"
     },
     {
       "label": "v928-govee-room-performance",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 668,
+      "elapsedMs": 1424,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/25-v928-govee-room-performance.log"
+      "logFile": "reports/v959-regression-logs/26-v928-govee-room-performance.log"
     },
     {
       "label": "v929-govee-troubleshooting",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 819,
+      "elapsedMs": 1674,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/26-v929-govee-troubleshooting.log"
+      "logFile": "reports/v959-regression-logs/27-v929-govee-troubleshooting.log"
     },
     {
       "label": "Source syntax + duplicate imports",
       "ok": true,
       "exitCode": 0,
       "signal": null,
-      "elapsedMs": 2235,
+      "elapsedMs": 5298,
       "timeout": false,
-      "logFile": "reports/v959-regression-logs/27-source-syntax-duplicate-imports.log"
+      "logFile": "reports/v959-regression-logs/28-source-syntax-duplicate-imports.log"
     }
   ],
-  "finishedAt": "2026-11-04T17:43:07.182Z",
+  "finishedAt": "2026-11-04T21:03:49.048Z",
   "concurrency": 3
 }

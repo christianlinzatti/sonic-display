@@ -1,0 +1,21 @@
+{
+  "release": "v960",
+  "base_release": "v959",
+  "verification": "development, not production certified",
+  "local_tests": {
+    "parallel_regression_suites": "28/28 PASS",
+    "v960_groups": "45 PASS",
+    "deterministic_scenarios": 5000,
+    "v960_isolated_types": "PASS (tsc 5.8.3)",
+    "windows_crlf": "10 PASS"
+  },
+  "not_verified": [
+    "Full application tsc --noEmit with installed project dependencies",
+    "Next.js production build on Ubuntu/Windows",
+    "physical Govee LAN/ Raspberry Pi hardware"
+  ],
+  "github_notes": [
+    "V959 GitHub checks failed before V960 fixes",
+    "Uploading ZIP alone does not replace full project without updated importer"
+  ]
+}

@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {useFrame} from '@react-three/fiber';
+import {previousVerifiedConcertSceneV960,applyConcertContinuityV960} from '@/lib/concertContinuityV960';
 import type {Group} from 'three';
 import {readTrackAnalysisV318,ANALYSIS_EVENT_V318} from '@/services/musicAnalysis/trackAnalysisV318';
 import {loadConcertRoadmapV958,composeConcertSceneV958,CONCERT_ROADMAP_EVENT_V958,
@@ -29,10 +30,13 @@ export function ConcertFestivalFxV958({trackId,progressMs,durationMs,genre,energ
  const verified=Boolean(section&&section.label&&section.confidence>=.5);
  const scene=useMemo(()=>{
   if(!settings.enabled||!settings.virtualFx||!playing||!trackId||!verified||!section?.label)return null;
-  return composeConcertSceneV958({trackId,progressMs,durationMs,genre,
+  const original=composeConcertSceneV958({trackId,progressMs,durationMs,genre,
    phase:section.label as ConcertPhaseV958,sectionIndex:active??0,sectionStartMs:section.startMs,
    verified:true,energy,bass,lyricsVisible,reducedMotion},settings);
- },[settings,playing,trackId,progressMs,durationMs,genre,verified,section,active,energy,bass,lyricsVisible,reducedMotion]);
+  const previous=settings.transitionsV960?previousVerifiedConcertSceneV960({analysis,trackId,
+    sectionIndex:active??0,durationMs,genre,energy,bass,lyricsVisible,reducedMotion,settings}):null;
+  return applyConcertContinuityV960(original,previous,progressMs-section.startMs,settings,{reducedMotion}).scene;
+ },[analysis,settings,playing,trackId,progressMs,durationMs,genre,verified,section,active,energy,bass,lyricsVisible,reducedMotion]);
  useFrame((_state,delta)=>{if(rotation.current&&playing&&!reducedMotion&&scene){
   rotation.current.rotation.y+=Math.min(.02,Math.max(0,delta))*.20;
  }

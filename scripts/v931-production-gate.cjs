@@ -11,6 +11,7 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V960 concert continuity regression', 'tests/v960-concert-continuity-regression.cjs'],
   ['V958 concert regression', 'tests/v958-concert-roadmap-regression.cjs'],
   ['V931 gate regression', 'tests/v931-build-gate-regression.cjs'],
   ['V959 production validation', 'tests/v959-production-validation-regression.cjs'],
@@ -32,6 +33,7 @@ const regressions = [
   ['Source syntax + duplicate imports', 'tests/check-source-syntax.cjs'],
 ];
 const productionChecks = [
+  ['V960 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p', 'tests/tsconfig.v960-core.json']],
   ['V958 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p', 'tests/tsconfig.v958-core.json']],
   ['Full TypeScript', 'node_modules/typescript/bin/tsc', ['--noEmit']],
   ['Next.js production build', 'node_modules/next/dist/bin/next', ['build']],
