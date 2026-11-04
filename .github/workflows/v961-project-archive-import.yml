@@ -24,6 +24,8 @@ jobs:
           persist-credentials: true
       - name: Validate archive safety and import V961 source files
         run: python3 scripts/v961-project-archive-import.py
+      - name: Preserve organized changelogs and repair version-doc test references
+        run: node scripts/organize-version-docs.cjs
       - name: Commit verified sources to master, preserving protected workflows
         shell: bash
         run: |
