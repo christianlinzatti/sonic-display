@@ -12,7 +12,7 @@ import stat
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-ARCHIVE = ROOT / "releases/sonic-display-v959-parallel-production-validation-full.zip"
+ARCHIVE = ROOT / "releases/SonicDisplay-V959.zip"
 REQUIRED = {
     "package.json",
     "package-lock.json",
