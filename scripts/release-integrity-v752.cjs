@@ -37,8 +37,8 @@ function inspectRelease(root, { ci = false } = {}) {
   // check:fast can begin with an earlier compatible regression (currently V906).
   // Enforce monotonic versions and a real release identity; never accept a fake
   // or downgraded package version just because lockfile values match.
-  const packageVersion = /^0\\.1\\.0-v(\\d+)$/.exec(pkg.version || '')?.[1];
-  const roadmapVersion = /^v(\\d+)$/i.exec(pkg.sonicRoadmapRelease || '')?.[1];
+  const packageVersion = /^0\.1\.0-v(\d+)$/.exec(pkg.version || '')?.[1];
+  const roadmapVersion = /^v(\d+)$/i.exec(pkg.sonicRoadmapRelease || '')?.[1];
   const validVersion = Boolean(packageVersion && gatedVersion &&
     Number(packageVersion) >= 752 && Number(gatedVersion) >= 752 &&
     Number(packageVersion) >= Number(gatedVersion) &&
