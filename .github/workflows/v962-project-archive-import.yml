@@ -1,0 +1,44 @@
+name: V962 Import Complete Project ZIP
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'releases/SonicDisplay-V962.zip'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: v962-project-import-master
+  cancel-in-progress: false
+jobs:
+  import-v962:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out uploaded source ZIP
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Validate archive safety and import V962 source files
+        run: python3 scripts/v962-project-archive-import.py
+      - name: Preserve organized changelogs and repair version-doc test references
+        run: node scripts/organize-version-docs.cjs
+      - name: Commit verified sources to master, preserving protected workflows
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- . ':(exclude).github/workflows/**'
+          if git diff --cached --quiet; then
+            echo 'No changes to commit'
+          else
+            git commit -m 'chore: import full Sonic Display V962 project'
+            git push origin HEAD:master
+          fi
+      - name: Run V962 Windows/Linux production gate on imported revision
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run v962-narrative-production-validation.yml --ref master
