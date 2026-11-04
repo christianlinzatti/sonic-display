@@ -1,0 +1,50 @@
+name: V959 Automatic Production Build Validation
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: sonic-v959-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  production-build:
+    name: Full TypeScript and Next.js / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      SONIC_TEST_CONCURRENCY: '3' # independent regressions; max 4, lower to 1 if runners are memory constrained
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Verify lockfile and source paths (before install)
+        run: node scripts/v959-source-preflight.cjs
+      - name: Install exactly from lockfile
+        run: npm ci --no-audit --no-fund
+      - name: Bounded parallel regressions, then serial TypeScript and Next.js production build
+        run: node scripts/v959-production-verify.cjs
+      - name: Write explicit build evidence even on failure
+        if: always()
+        run: node scripts/v959-ci-finalize.cjs
+      - name: Publish build evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v959-${{ matrix.os }}-build-proof
+          path: |
+            reports/v959-build-proof.json
+            reports/v959-build-summary.md
+            reports/v931-production-gate.json
+            reports/v959-regression-logs/*.log
+          if-no-files-found: error
+          retention-days: 30
