@@ -46,7 +46,7 @@ assert.ok(scene.includes('previewVisibleV388'),'V388 pauses invisible preview');
 assert.ok(!scene.includes('useMusic'),'independent preview cannot control Spotify');
 assert.ok(!scene.includes('new AudioContext'),'preview cannot trigger audio');
 assert.ok(read('app/globals.css').includes('.v380-view'));
-assert.ok(read('README.md').includes('V380-REAL-3D-LYRICS-STUDIO.md'));
+assert.ok(read('README.md').includes('docs/versions/V380-REAL-3D-LYRICS-STUDIO.md'));
 const pkg=JSON.parse(read('package.json'));
 require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(380);
 assert.ok(pkg.scripts['verify:offline'].includes('test:v380'));

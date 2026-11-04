@@ -43,7 +43,7 @@ const required={
  'components/visualizer/MultiAvatarCameraCanvasV399.tsx':['Canvas','cloneSkinnedScene','OrbitControls','DancerV399','onStart','reducedMotion'],
  'components/SettingsPanel.tsx':['LiveMultiAvatarCameraStudioV399','cameraStudioOpenV399','activeAvatar={currentAvatar}'],
  'app/globals.css':['.v399-multi-avatar-camera-studio'],
- 'V399-LIVE-MULTI-AVATAR-CAMERA-STUDIO.md':['V399'],
+ 'docs/versions/V399-LIVE-MULTI-AVATAR-CAMERA-STUDIO.md':['V399'],
 };
 for(const [file,parts] of Object.entries(required))for(const part of parts)assert.ok(read(file).includes(part),`${file}: missing ${part}`);
 const pkg=JSON.parse(read('package.json'));require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(399);assert.ok(pkg.scripts['verify:offline'].includes('test:v399'));

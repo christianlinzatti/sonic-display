@@ -84,5 +84,5 @@ assert.ok(read('types/music.ts').includes('lyricsFontFamilyV379?:'));
 const pkg=require('../package.json');
 require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(379);
 assert.ok(pkg.scripts['verify:offline'].includes('test:v379'));
-assert.ok(read('README.md').includes('V379-VISUAL-LYRICS-STUDIO.md'));
+assert.ok(read('README.md').includes('docs/versions/V379-VISUAL-LYRICS-STUDIO.md'));
 console.log('PASS V379 demo timing, preview plans, presets, sources, safe zones, typography, accessibility, state wiring and Spotify read-only');

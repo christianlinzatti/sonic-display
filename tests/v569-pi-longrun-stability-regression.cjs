@@ -216,6 +216,6 @@ test('release metadata and regression chain updated',()=>{
  assert.ok(pkg.scripts['build:preflight'].includes('npm run test:v569 && npm run test:v569:types'));
  assert.match(pkg.scripts['verify:v569'],/verify:v568/);
  assert.match(read('ARCHITECTURE.md'),/Dokumentationsstand:\*\* V(?:569|5[7-9][0-9]|[6-9][0-9]{2})/);
- assert.match(read('V569-RASPBERRY-PI-LONG-RUN-STABILITY.md'),/Motion-Bibliothek/);
+ assert.match(read('docs/versions/V569-RASPBERRY-PI-LONG-RUN-STABILITY.md'),/Motion-Bibliothek/);
 });
 console.log(`PASS V569: ${tests} regression cases; reusable per-frame buffers, active cross-LOD handoff, memory cleanup, no artificial clip limit`);

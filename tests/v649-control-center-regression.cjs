@@ -10,7 +10,7 @@ const css=read('app/globals.css');
 const pkg=JSON.parse(read('package.json'));
 const architecture=read('ARCHITECTURE.md');
 const screen=read('components/SonicDisplay.tsx');
-const doc=read('V649-INTERACTIVE-CONCERT-CONTROL-CENTER.md');
+const doc=read('docs/versions/V649-INTERACTIVE-CONCERT-CONTROL-CENTER.md');
 let groups=0,positions=0;
 function test(name,fn){try{fn();groups++;}catch(e){e.message=`V649 ${name}: ${e.message}`;throw e;}}
 const has=(src,part)=>assert(src.includes(part),`Missing ${part}`);

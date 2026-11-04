@@ -65,4 +65,4 @@ Die V909-Tests prüfen Protokollpakete, IP-Validierung, Kommando-Validierung, Ty
 
 ## V910 – Erweiterung für Raspberry Pi + Vercel
 
-Der Bridge-Dienst kann jetzt mit dem idempotenten Installer `node scripts/pi/install-v910.cjs --url https://DEINE-VERCEL-DOMAIN` als systemd-Benutzerdienst und labwc-Chromium-Kiosk eingerichtet werden. Unter V910 wird der Token bei systemd-Starts nicht in das Journal geschrieben; mit `npm run pi:token` wird er einmalig im privaten Terminal angezeigt. Mehr unter [V910-RASPBERRY-PI-VERCEL-GOVEE-README.md](V910-RASPBERRY-PI-VERCEL-GOVEE-README.md).
+Der Bridge-Dienst kann jetzt mit dem idempotenten Installer `node scripts/pi/install-v910.cjs --url https://DEINE-VERCEL-DOMAIN` als systemd-Benutzerdienst und labwc-Chromium-Kiosk eingerichtet werden. Unter V910 wird der Token bei systemd-Starts nicht in das Journal geschrieben; mit `npm run pi:token` wird er einmalig im privaten Terminal angezeigt. Mehr unter [V910-RASPBERRY-PI-VERCEL-GOVEE-README.md](docs/versions/V910-RASPBERRY-PI-VERCEL-GOVEE-README.md).

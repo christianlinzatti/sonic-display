@@ -17,6 +17,6 @@ const checks=[
  ui.includes('Import-Vorschau'),ui.includes('Konflikte ersetzen'),ui.includes('window.confirm'),ui.includes('URL.revokeObjectURL'),
  ui.includes('Ausgewählte Einstellungen wiederherstellen'),ui.includes('JSON-Sicherung importieren'),
  panel.includes('<UnifiedSettingsBackup />'),
- read('V184-UNIFIED-SETTINGS-BACKUP.md').includes('nicht verschlüsselt')];
+ read('docs/versions/V184-UNIFIED-SETTINGS-BACKUP.md').includes('nicht verschlüsselt')];
 checks.forEach((ok,i)=>assert.ok(ok,'V184 check '+(i+1)));
 console.log(`V184 Unified Backup: ${checks.length} Prüfungen bestanden`);

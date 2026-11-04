@@ -55,7 +55,7 @@ export function StageContentPluginSettingsV330(){
         <input type="text" value={draft[name]} placeholder={`/api/stage-content/${name}?artist={artist}`} onChange={e=>{setDraft(prev=>({...prev,[name]:e.target.value}));setMessage("");}}/>
       </label>)}
       <button type="button" onClick={saveEndpoints}>API-Pfade speichern</button>{message&&<small role="status">{message}</small>}
-      <small>API-Schlüssel gehören ausschließlich in serverseitige Next.js-Routen und Umgebungsvariablen, niemals hierher. Es werden keine externen URLs direkt vom Browser als API-Endpunkt abgefragt. JSON-Beispiele stehen in V330-STAGE-CONTENT-PLUGINS.md.</small>
+      <small>API-Schlüssel gehören ausschließlich in serverseitige Next.js-Routen und Umgebungsvariablen, niemals hierher. Es werden keine externen URLs direkt vom Browser als API-Endpunkt abgefragt. JSON-Beispiele stehen in docs/versions/V330-STAGE-CONTENT-PLUGINS.md.</small>
     </fieldset>
     {settings.enabled&&<div className="stage-content-v330-live-preview">
       <strong>Aktueller Titel – Leinwand-Vorschau</strong>

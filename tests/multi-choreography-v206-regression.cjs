@@ -30,7 +30,7 @@ const checks=[
  ['role gain integrated',/choreography\?\.leadGain/.test(scene)],
  ['previous automation precedence',/!multiEnabled && props.duoDirectorEnabled/.test(scene)],
  ['track reset',/props.track\?\.id/.test(scene)],
- ['doc',/V206/.test(read('V206-MULTI-AVATAR-CHOREOGRAPHY.md'))]
+ ['doc',/V206/.test(read('docs/versions/V206-MULTI-AVATAR-CHOREOGRAPHY.md'))]
 ];
 for(const [name,ok] of checks){assert.ok(ok,`FAIL: ${name}`);console.log('✓',name)}
 console.log(`${checks.length} V206 checks passed`);

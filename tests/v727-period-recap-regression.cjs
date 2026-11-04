@@ -93,8 +93,8 @@ test('accessible focus',()=>assert(css.includes('.lastfm-recap-v727 button:focus
 test('mobile layout',()=>assert(css.includes('@media(max-width:640px){.lastfm-recap-kpis-v727')));
 test('no network, storage writes, scrobble',()=>assert(!/\bfetch\s*\(|\blocalStorage\b|\bindexedDB\b|api\/lastfm|\/scrobble/i.test(source+ui)));
 test('README',()=>assert(fs.readFileSync('README.md','utf8').includes('V727')));
-test('docs',()=>assert(fs.existsSync('V727-WEEKLY-MONTHLY-RECAP.md')));
-test('verification',()=>assert(fs.existsSync('V727-VERIFICATION.md')));
+test('docs',()=>assert(fs.existsSync('docs/versions/V727-WEEKLY-MONTHLY-RECAP.md')));
+test('verification',()=>assert(fs.existsSync('docs/versions/V727-VERIFICATION.md')));
 test('package version',()=>require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(727));
 test('quick start',()=>assert(require('../package.json').scripts['test:quick'].includes('npm run test:v727 && npm run test:v727:types && npm run test:v727:ui-types &&')));
 console.log(`PASS: V727 Weekly & Monthly Music Recap – ${count} checks.`);

@@ -103,7 +103,7 @@ test('source tests enforce correct version',()=>{let p=JSON.parse(read('package.
 test('release scripts registered',()=>{let s=JSON.parse(read('package.json')).scripts;assert(s['verify:v905:focused'].includes('verify:v904:focused'));assert(/npm run test:v90[567]/.test(s.prebuild));assert(/npm run test:v90[567]/.test(s['build:preflight']))});
 test('CI coverage included',()=>assert(read('.github/workflows/v832-continuous-validation.yml').includes('test:v905')));
 test('Windows technical gate included',()=>assert(read('scripts/verify-v905-windows.ps1').includes('verify:v905:focused')));
-test('docs and architecture updated',()=>{assert(read('README.md').includes('V905'));assert(read('ARCHITECTURE.md').includes('Dokumentationsstand:** V908'));assert(read('V905-VERIFICATION.md').includes('zustand'))});
+test('docs and architecture updated',()=>{assert(read('README.md').includes('V905'));assert(read('ARCHITECTURE.md').includes('Dokumentationsstand:** V908'));assert(read('docs/versions/V905-VERIFICATION.md').includes('zustand'))});
 for(let i=0;i<500;i++)test(`deterministic active benchmark sweep ${i}`,()=>{
  const fps=35+(i%43),pressure=(i%10)/10,tier=['low','balanced','high'][i%3],preset=['quick','standard','thorough'][i%3];
  let s=start(i+1,preset,context(),telemetry({performanceTier:tier,fps,pressure}));

@@ -71,5 +71,5 @@ assert.match(source('context/UiPreferencesContext.tsx'),/avatarAdaptivePerforman
 const pkg=require('../package.json');
 assert.ok(Number(pkg.version.match(/v(\d+)$/)?.[1])>=375, "version newer than v375");
 assert.match(pkg.scripts['verify:offline'],/test:v375/);
-assert.match(source('V375-ADAPTIVE-PERFORMANCE-DIRECTOR.md'),/authored/);
+assert.match(source('docs/versions/V375-ADAPTIVE-PERFORMANCE-DIRECTOR.md'),/authored/);
 console.log('PASS V375 adaptive performance director: scene changes, manual overrides, seek safety, settings, inspector and wiring');

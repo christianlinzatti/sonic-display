@@ -78,7 +78,7 @@ try{
  t('preview modal marks real dialog',()=>assert.match(read('components/visualizer/StagePreviewModal.tsx'),/data-v571-preview-root="true" role="dialog"/));
  t('audit has deterministic IDs on DOM nodes',()=>assert.match(read('components/visualizer/StagePreviewModal.tsx'),/data-v571-audit-id=\{item.id\}/));
  t('CI job exists',()=>assert.ok(fs.existsSync(path.join(root,'.github/workflows/concert-validation-v571.yml'))));
- t('manual visual protocol exists',()=>assert.ok(fs.existsSync(path.join(root,'V571-PRODUCTION-AND-BROWSER-VALIDATION.md'))));
+ t('manual visual protocol exists',()=>assert.ok(fs.existsSync(path.join(root,'docs/versions/V571-PRODUCTION-AND-BROWSER-VALIDATION.md'))));
  t('retains previous V570 audit tests',()=>assert.match(pkg.scripts['verify:v571'],/verify:v570/));
  t('environment audit CLI exists',()=>assert.match(pkg.scripts['audit:v571:environment'],/v571-build-readiness\.cjs/));
  t('test suite never runs remote dependencies',()=>assert.ok(!pkg.scripts['test:smoke:v571'].includes('npm install')));

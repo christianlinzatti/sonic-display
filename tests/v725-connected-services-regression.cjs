@@ -110,7 +110,7 @@ test('settings labelled correctly',()=>assert(settings.includes('label: "Dienste
 test('settings retains dashboard tab id',()=>assert(settings.includes('id: "dashboard", label: "Dienste & Status"')));
 test('settings mounts old parent',()=>assert(settings.includes('<ServiceStatusDashboardV667 onNavigate={setTab} />')));
 test('existing source docs retained',()=>assert(docs.includes('V724')));
-test('new documentation',()=>assert(fs.existsSync('V725-CONNECTED-SERVICES-MONITOR.md')));
-test('new verification',()=>assert(fs.existsSync('V725-VERIFICATION.md')));
+test('new documentation',()=>assert(fs.existsSync('docs/versions/V725-CONNECTED-SERVICES-MONITOR.md')));
+test('new verification',()=>assert(fs.existsSync('docs/versions/V725-VERIFICATION.md')));
 test('package scripts',()=>{const p=require('../package.json');require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(725);assert(p.scripts['test:quick'].includes('npm run test:v725 && npm run test:v725:types && npm run test:v725:ui-types &&'));});
 console.log(`PASS: V725 Connected Services Monitor – ${count} checks.`);

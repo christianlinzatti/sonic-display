@@ -116,8 +116,8 @@ for(const [file,needle] of [
  ['scripts/verify-v902-windows.ps1','verify:v902:focused'],
  ['ARCHITECTURE.md','**Dokumentationsstand:** V908'],
  ['README.md','Automatic Concert Quality Advisor'],
- ['V902-AUTOMATIC-CONCERT-QUALITY-ADVISOR-README.md','V902'],
- ['V902-VERIFICATION.md','V902']
+ ['docs/versions/V902-AUTOMATIC-CONCERT-QUALITY-ADVISOR-README.md','V902'],
+ ['docs/versions/V902-VERIFICATION.md','V902']
 ])check(`wiring ${file}`,()=>assert(read(file).includes(needle)));
 check('pkg and lock correct',()=>{const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));assert.match(pkg.version,/^0\.1\.0-v(?:902|903|904|905|906|907|908)$/);assert.equal(pkg.version,lock.version);assert.equal(pkg.version,lock.packages[''].version);assert(pkg.scripts['verify:v902:focused'].includes('verify:v901:focused'))});
 console.log(`PASS V902 Automatic Concert Quality Advisor: ${checks} checks`);

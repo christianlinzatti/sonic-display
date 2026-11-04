@@ -60,7 +60,7 @@ test('version lock consistent',()=>{let p=JSON.parse(read('package.json'));let l
 test('focused chain includes previous version',()=>{let p=JSON.parse(read('package.json')).scripts;assert(p['verify:v906:focused'].includes('verify:v905:focused'));assert((p.prebuild.startsWith('npm run test:v908')||p.prebuild.startsWith('npm run test:v907'))||(p.prebuild.startsWith('npm run test:v908')||p.prebuild.startsWith('npm run test:v906')));});
 test('CI wired',()=>assert(read('.github/workflows/v832-continuous-validation.yml').includes('test:v906')));
 test('Windows gates wired',()=>assert(read('scripts/verify-v906-windows.ps1').includes('verify:v906:focused')));
-test('documentation exists',()=>{assert(read('README.md').includes('## V906'));assert(read('ARCHITECTURE.md').includes('Dokumentationsstand:** V908'));assert(read('V906-VERIFICATION.md').includes('zustand'));});
+test('documentation exists',()=>{assert(read('README.md').includes('## V906'));assert(read('ARCHITECTURE.md').includes('Dokumentationsstand:** V908'));assert(read('docs/versions/V906-VERIFICATION.md').includes('zustand'));});
 for(let i=0;i<600;i++)test(`repeatable report sweep ${i}`,()=>{
  const target=i%2?30:60,base=target*.85+(i%10)/10,tier=['low','balanced','high'][i%3];
  const data=[make(1,{targetFps:target,tier,fpsMedian:base}),make(2,{targetFps:target,tier,fpsMedian:base+1}),make(3,{targetFps:target,tier,fpsMedian:base+.5})];

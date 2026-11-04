@@ -80,5 +80,5 @@ const pkg=JSON.parse(read('package.json'));
 const version = /^0\.1\.0-v(\d+)$/.exec(pkg.version);
 assert.ok(version && Number(version[1]) >= 382, 'V382 feature must survive future releases');
 assert.ok(pkg.scripts['verify:offline'].includes('test:v382'));
-assert.ok(read('README.md').includes('V382-ADVANCED-KINETIC-LYRICS.md'));
+assert.ok(read('README.md').includes('docs/versions/V382-ADVANCED-KINETIC-LYRICS.md'));
 console.log('PASS V382 synchronized word envelopes, estimates, reduced motion, pause, rap/festival/cinematic, measured drop gates, 2D+3D and settings');

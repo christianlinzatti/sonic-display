@@ -61,5 +61,5 @@ assert.ok(read('app/globals.css').includes('.v383-rig-panel'));
 const pkg=JSON.parse(read('package.json'));
 assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=383,'V383 features must remain usable in subsequent releases');
 assert.ok(pkg.scripts['verify:offline'].includes('test:v383'));
-assert.ok(read('README.md').includes('V383-ADVANCED-FACIAL-RIG.md'));
+assert.ok(read('README.md').includes('docs/versions/V383-ADVANCED-FACIAL-RIG.md'));
 console.log('PASS V383 diagnosis, VRM/Oculus, channel collisions, safe calibration, isolated morph audition, portable profiles, UI integration');

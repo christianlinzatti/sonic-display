@@ -62,7 +62,7 @@ for(const [file,needles] of Object.entries({
  'components/visualizer/CinematicCameraTimelinePanelV400.tsx':['useMusic','MultiAvatarCameraCanvasV399','v400-timeline-track','setPlayingPreview','editCameraCuesV400','Aktuelle Songposition'],
  'components/SettingsPanel.tsx':['CinematicCameraTimelineV400','cameraTimelineOpenV400'],
  'app/globals.css':['.v400-camera-timeline'],
- 'V400-CINEMATIC-CAMERA-TIMELINE.md':['V400']
+ 'docs/versions/V400-CINEMATIC-CAMERA-TIMELINE.md':['V400']
 }))for(const needle of needles)assert.ok(read(file).includes(needle),file+': missing '+needle);
 const pkg=JSON.parse(read('package.json'));assert.ok((Number(String(pkg.version).match(/^0\.1\.0-v(\d+)$/)?.[1]) >= 400));assert.ok(pkg.scripts['verify:offline'].includes('test:v400'));
 console.log('PASS V400 – bounded per-track cues, ordering, seek/track guards, visible cast, lyric protection, editor and live camera wiring');

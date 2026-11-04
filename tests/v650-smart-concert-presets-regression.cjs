@@ -108,7 +108,7 @@ test('no GLB assets or WebGL render loop',()=>{for(const s of [panel,manager])fo
 test('release scripts registered',()=>{for(const t of ['test:v650','test:v650:types','test:smoke:v650','verify:v650'])assert(pkg.scripts[t],t)});
 test('version updated',()=>assert(Number(pkg.version.match(/-v(\d+)$/)?.[1])>=651,'release must be V651 or newer'));
 test('architecture current version',()=>has(rd('ARCHITECTURE.md'),`**Dokumentationsstand:** V${pkg.version.match(/-v(\d+)$/)?.[1]}`));
-test('documentation available',()=>has(rd('V650-SMART-CONCERT-PRESETS.md'),'# V650'));
+test('documentation available',()=>has(rd('docs/versions/V650-SMART-CONCERT-PRESETS.md'),'# V650'));
 let seed=650;function rand(){seed=(Math.imul(1664525,seed)+1013904223)>>>0;return seed/2**32;}
 test('12k simulated profile captures, import roundtrip and undo',()=>{
  for(let i=0;i<12000;i++){

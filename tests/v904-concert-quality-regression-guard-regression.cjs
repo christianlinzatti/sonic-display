@@ -70,7 +70,7 @@ test('clear requires explicit second click',()=>{let ui=read('components/visuali
 test('release version consistent',()=>{let p=JSON.parse(read('package.json')),l=JSON.parse(read('package-lock.json'));assert.match(p.version,/^0\.1\.0-v(?:904|905|906|907|908)$/);assert.equal(l.version,p.version);assert.equal(l.packages[''].version,p.version)});
 test('release scripts and CI registered',()=>{let p=JSON.parse(read('package.json'));assert(p.scripts['verify:v904:focused'].includes('verify:v903:focused'));assert((((p.scripts.prebuild.startsWith('npm run test:v908')||p.scripts.prebuild.startsWith('npm run test:v905'))||(p.scripts.prebuild.startsWith('npm run test:v908')||p.scripts.prebuild.startsWith('npm run test:v907'))||(p.scripts.prebuild.startsWith('npm run test:v908')||p.scripts.prebuild.startsWith('npm run test:v906')))||p.scripts.prebuild.startsWith('npm run test:v904')));assert(read('.github/workflows/v832-continuous-validation.yml').includes('test:v904'))});
 test('Windows verifier registered',()=>assert(read('scripts/verify-v904-windows.ps1').includes('verify:v904:focused')));
-test('architecture and docs updated',()=>{assert(read('README.md').includes('V904'));assert(read('ARCHITECTURE.md').includes('Dokumentationsstand:** V908'));assert(read('V904-VERIFICATION.md').includes('zustand'))});
+test('architecture and docs updated',()=>{assert(read('README.md').includes('V904'));assert(read('ARCHITECTURE.md').includes('Dokumentationsstand:** V908'));assert(read('docs/versions/V904-VERIFICATION.md').includes('zustand'))});
 // Deterministic fuzz: no cross-song merging and finite, bounded aggregate metrics.
 for(let i=0;i<500;i++)test(`bounded repeat sweep ${i}`,()=>{
  const base=.3+(i%27)/4,values=Array.from({length:3+(i%5)},(_,j)=>base+(j%3-1)*.1);

@@ -123,7 +123,7 @@ test('release wiring',()=>{
  const p=require('../package.json');assert(/^0\.1\.0-v(69[0-9]|[7-9][0-9]{2})$/.test(p.version));
  assert(p.scripts['test:quick'].includes('npm run test:v690 &&'));
  assert(p.scripts['check:release'].includes('npm run test:v690:types'));
- assert(fs.existsSync('V690-ADAPTIVE-STAGE-TRANSFORMATION.md'));
+ assert(fs.existsSync('docs/versions/V690-ADAPTIVE-STAGE-TRANSFORMATION.md'));
  assert(fs.readFileSync('ARCHITECTURE.md','utf8').includes(`**Dokumentationsstand:** V${require('../package.json').version.split('-v')[1]}`));
 });
 console.log(`PASS V690 Adaptive Stage Transformation: ${groups} groups, ${samples} samples`);

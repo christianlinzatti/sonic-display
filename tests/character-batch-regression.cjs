@@ -27,6 +27,6 @@ const checks=[
 ['unique filenames',()=>assert.match(api,/randomUUID\(\)/)],
 ['metadata saved',()=>assert.match(api,/writeAvatarConfig\(metadata\)/)],
 ['object URL lifecycle',()=>assert.match(ui,/URL.revokeObjectURL/)],
-['documentation',()=>assert.ok(fs.existsSync(path.join(root,'V188-CHARACTER-MOTION-BATCH-INSTALLER.md')))],
+['documentation',()=>assert.ok(fs.existsSync(path.join(root,'docs/versions/V188-CHARACTER-MOTION-BATCH-INSTALLER.md')))],
 ];for(const [name,fn] of checks){try{fn();console.log('PASS',name);}catch(e){console.error('FAIL',name,e.message);process.exitCode=1;}}
 console.log(`${checks.length} checks`);

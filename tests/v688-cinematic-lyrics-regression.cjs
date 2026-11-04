@@ -70,5 +70,5 @@ for(let i=0;i<12000;i++){
   samples++;
 }
 test('12000 bounded samples',()=>assert.equal(samples,12000));
-test('release version and docs',()=>{const p=require('../package.json');assert(Number(p.version.split('-v')[1])>=688);assert(p.scripts['test:quick'].includes('npm run test:v688 &&')); assert(p.scripts['check:release'].includes('npm run test:v688:types'));assert(fs.existsSync('V688-CINEMATIC-LYRICS-2.md'));assert(fs.readFileSync('ARCHITECTURE.md','utf8').includes(`**Dokumentationsstand:** V${p.version.split('-v')[1]}`));});
+test('release version and docs',()=>{const p=require('../package.json');assert(Number(p.version.split('-v')[1])>=688);assert(p.scripts['test:quick'].includes('npm run test:v688 &&')); assert(p.scripts['check:release'].includes('npm run test:v688:types'));assert(fs.existsSync('docs/versions/V688-CINEMATIC-LYRICS-2.md'));assert(fs.readFileSync('ARCHITECTURE.md','utf8').includes(`**Dokumentationsstand:** V${p.version.split('-v')[1]}`));});
 console.log(`PASS V688 Cinematic Lyrics 2.0: ${total} regression groups, ${samples} sampled timeline positions`);

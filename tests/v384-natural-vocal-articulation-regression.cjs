@@ -83,5 +83,5 @@ assert.ok(rig.includes('current.current.jaw=Math.min(current.current.jaw'),'prot
 assert.ok(read('components/visualizer/VocalSyncInspectorV373.tsx').includes('v384-articulation-diagnostic'));
 const pkg=JSON.parse(read('package.json'));
 assert.ok(Number(String(pkg.version).match(/^0\.1\.0-v(\d+)$/)?.[1])>=384);assert.ok(pkg.scripts['verify:offline'].includes('test:v384'));
-assert.ok(read('README.md').includes('V384-NATURAL-VOCAL-ARTICULATION.md'));
+assert.ok(read('README.md').includes('docs/versions/V384-NATURAL-VOCAL-ARTICULATION.md'));
 console.log('PASS V384 natural articulation: B/P/M closure, rap jaw stabilization, vowel continuity, fallback, reduced motion, deterministic seek, V383 profile compatibility and settings');

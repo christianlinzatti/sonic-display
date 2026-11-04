@@ -58,7 +58,7 @@ for(const [file,needles] of Object.entries({
  'components/visualizer/ThreeAvatar.tsx':['props.lipSync?.visualDirectorModeV397'],
  'components/visualizer/StageCameraDirectorV289.tsx':['advanceVisualDirectorV397','composeVisualPerformanceV397','existingCamera:shotV377.active'],
  'components/SettingsPanel.tsx':['v397-visual-performance-director-settings','avatarVisualDirectorStrengthV397'],
- 'V397-VISUAL-PERFORMANCE-DIRECTOR.md':['V397']
+ 'docs/versions/V397-VISUAL-PERFORMANCE-DIRECTOR.md':['V397']
  }))for(const part of needles)assert.ok(read(file).includes(part),file+': '+part);
 const pkg=JSON.parse(read('package.json'));assert.ok(Number(pkg.version.match(/^0\.1\.0-v(\d+)$/)?.[1])>=398);assert.ok(pkg.scripts['verify:offline'].includes('test:v397'));
 console.log('PASS V397 – timed lyric close-ups, duet handoffs, chorus group, visible anchors, protected manual framing, seeks, budgets');

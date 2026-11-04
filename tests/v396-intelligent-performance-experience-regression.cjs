@@ -50,7 +50,7 @@ for(const [f,strings] of Object.entries({
  'components/visualizer/VisualizerStage.tsx':['advanceExperienceV396','chooseExperienceModeV396','experienceCueV396={sharedExperienceCueV402}','hasActiveLyricsV350'],
  'components/visualizer/ThreeAvatar.tsx':['resolveEnsembleSettingsV396(readEnsembleV392(),props.experienceCueV396)'],
  'components/SettingsPanel.tsx':['V396 · Intelligent Performance Experience','avatarExperienceStrengthV396','v396-performance-experience-settings'],
- 'V396-INTELLIGENT-PERFORMANCE-EXPERIENCE.md':['V396']
+ 'docs/versions/V396-INTELLIGENT-PERFORMANCE-EXPERIENCE.md':['V396']
 }))for(const needle of strings)assert.ok(read(f).includes(needle),f+': '+needle);
 const pkg=JSON.parse(read('package.json'));require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(396);assert.ok(pkg.scripts['verify:offline'].includes('test:v396'));
 console.log('PASS V396 – synchronized show/ensemble/vocals, user priority, seek and pause safety, device budget');

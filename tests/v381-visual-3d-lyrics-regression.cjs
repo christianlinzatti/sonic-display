@@ -54,5 +54,5 @@ assert.ok(read('types/music.ts').includes('lyricsSpatialLayoutV381?:'));
 assert.ok(read('app/globals.css').includes('v381-face-zone'));
 require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(381);
 assert.ok(JSON.parse(read('package.json')).scripts['verify:offline'].includes('test:v381'));
-assert.ok(read('README.md').includes('V381-VISUAL-3D-LYRICS-EDITOR.md'));
+assert.ok(read('README.md').includes('docs/versions/V381-VISUAL-3D-LYRICS-EDITOR.md'));
 console.log('PASS V381 spatial drag, scale, limits, projected collision math, auto-layout, persistent presets and shared 3D stage wiring');

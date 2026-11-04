@@ -39,7 +39,7 @@ const checks={
  'components/SonicDisplay.tsx':['trackId={track?.id??""}'],
  'app/globals.css':['.v389-calibration','max-height','touch-action:pan-y','prefers-reduced-motion'],
  'package.json':['test:v389','v389-display-calibration-regression'],
- 'V389-SMART-DISPLAY-CALIBRATION.md':['echte','2 Aufwärmwerte','10 aktuelle'],
+ 'docs/versions/V389-SMART-DISPLAY-CALIBRATION.md':['echte','2 Aufwärmwerte','10 aktuelle'],
 };
 for(const [file,tokens] of Object.entries(checks))for(const token of tokens)assert.ok(fs.readFileSync(file,'utf8').includes(token),`${file}: missing ${token}`);
 const ui=fs.readFileSync('components/DisplayCalibrationStudioV389.tsx','utf8');

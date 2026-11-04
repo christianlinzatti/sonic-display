@@ -109,7 +109,7 @@ test('isolated V649 test types excluded from application typecheck',()=>{
 
 test('release documentation',()=>has(read('ARCHITECTURE.md'),`**Dokumentationsstand:** V${pkg.version.match(/-v(\d+)$/)?.[1]}`));
 test('readme new version',()=>has(read('README.md'),'V651'));
-test('new release description',()=>has(read('V651-SMART-PRESET-AUTOMATION.md'),'# V651'));
+test('new release description',()=>has(read('docs/versions/V651-SMART-PRESET-AUTOMATION.md'),'# V651'));
 let seed=651;function rnd(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/2**32;}
 test('12k simulated genre timing and manual-boundary inputs',()=>{
  for(let i=0;i<12000;i++){

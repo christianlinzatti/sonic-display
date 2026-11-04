@@ -28,7 +28,7 @@ const checks=[
  ['binary glb export',()=>assert.match(inspector,/binary: true/)],
  ['no missing clip export',()=>assert.match(inspector,/Animationsclip nicht gefunden/)],
  ['clean output file',()=>assert.match(inspector,/replace\(\/\[\^a-zA-Z0-9_-\]/)],
- ['docs',()=>assert.ok(fs.existsSync(path.join(root,'V189-MOTION-BROWSER.md')))],
+ ['docs',()=>assert.ok(fs.existsSync(path.join(root,'docs/versions/V189-MOTION-BROWSER.md')))],
 ];
 for(const [name,check] of checks){try{check();console.log('PASS',name)}catch(e){console.error('FAIL',name,e.message);process.exitCode=1}}
 console.log(checks.length+' V189 checks');

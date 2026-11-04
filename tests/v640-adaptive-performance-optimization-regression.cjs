@@ -63,7 +63,7 @@ test('V308 portrait spotlights not attenuated',()=>{const s=fs.readFileSync('com
 test('V555 authored light programs skip budget',()=>{const s=fs.readFileSync('components/visualizer/ConcertDetailStageV555.tsx','utf8');assert(s.includes('manualLighting?{led:1,gobo:1,haze:1,beams:1}:getVisualFactorsV640()'));});
 test('V308 authored lighting skips budget',()=>{const s=fs.readFileSync('components/visualizer/ConcertAtmosphereRendererV308.tsx','utf8');assert(s.includes('authoredLightingV387?{led:1,gobo:1,haze:1,beams:1}:getVisualFactorsV640()'));});
 test('existing metric history includes p99 and draw calls',()=>{const s=fs.readFileSync('components/visualizer/adaptivePerformance.tsx','utf8');assert(s.includes('recordPiStudioV518('));assert(s.includes('p99FrameMs:p99FrameMsV522'));assert(s.includes('drawCalls:info.render.calls'));});
-test('full browser bundle not claimed by test runner',()=>{const s=fs.readFileSync('V640-ADAPTIVE-PERFORMANCE-OPTIMIZATION.md','utf8');assert(s.includes('Produktionsbuild'));});
+test('full browser bundle not claimed by test runner',()=>{const s=fs.readFileSync('docs/versions/V640-ADAPTIVE-PERFORMANCE-OPTIMIZATION.md','utf8');assert(s.includes('Produktionsbuild'));});
 let samples=0;let state=initial();for(let i=0;i<12000;i++){
  const high=(i%600)<175,low=(i%600)>=350;
  const window=high?{...bad,drawCalls:190}:low?good:{...good,fps:53,p95FrameMs:24,slowRatio:.12};

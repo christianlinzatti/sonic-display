@@ -47,7 +47,7 @@ for(const [file,parts] of Object.entries({
  'components/SettingsPanel.tsx':['CameraPerformanceStudioV398','cameraStudioOpenV398'],
  'components/visualizer/CameraPerformanceStudioPanelV398.tsx':['CameraLivePreviewV291','profileFromPreviewPoseV398','showPreview&&'],
  'app/globals.css':['.camera-performance-studio-v398'],
- 'V398-CAMERA-PERFORMANCE-STUDIO.md':['V398']
+ 'docs/versions/V398-CAMERA-PERFORMANCE-STUDIO.md':['V398']
  }))for(const part of parts)assert.ok(read(file).includes(part),file+': '+part);
 const pkg=JSON.parse(read('package.json'));require('./helpers/project-version-v651.cjs').assertProjectVersionAtLeast(398);assert.ok(pkg.scripts['verify:offline'].includes('test:v398'));
 console.log('PASS V398 – validated section shots, no false speakers, orbit preview, bounded pose, lyrics protection and wiring');
