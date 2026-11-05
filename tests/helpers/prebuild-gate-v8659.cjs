@@ -18,9 +18,13 @@ function assertModernPrebuildQualityGate(scripts, minimumVersion = 865) {
         'React act compatibility test must be the registered regression script');
       continue;
     }
-    const match = /^npm run test:v(\d+)(?::(?:types|ui-types))?$/.exec(command);
+    const match = /^npm run test:v(\d+)(?::(?:types|ui-types|api))?$/.exec(command);
     assert(match, `Unexpected or bypassing prebuild command: ${command}`);
-    if (!command.endsWith(':types') && !command.endsWith(':ui-types')) versions.push(Number(match[1]));
+    if (command.endsWith(':api')) {
+      assert(typeof scripts[`test:v${match[1]}:api`] === 'string',
+        'API prebuild test must be a registered script');
+    }
+    if (!/:(?:types|ui-types|api)$/.test(command)) versions.push(Number(match[1]));
   }
   assert(versions.length > 0, "No version regression tests in prebuild");
   assert(versions[0] >= minimumVersion, `Prebuild must test at least V${minimumVersion} first`);
