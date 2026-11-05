@@ -113,7 +113,7 @@ check('shader references bounded .09 only',()=>assert(shader.includes('clamp(uLe
 check('shader no shader-defined clock',()=>assert(!shader.includes('uLed70Time')));
 const stage=read('components/visualizer/DynamicStage.tsx');
 check('stage same LED mesh',()=>assert.equal((stage.match(/ref=\{ledWallV635\}/g)||[]).length,1));
-check('stage original shader preserved',()=>assert((stage.includes('fragmentShader={LED_WALL_FRAGMENT_V842}') || (stage.includes('fragmentShader={LED_WALL_FRAGMENT_V886}') && fs.readFileSync('components/visualizer/ledWallCreativeShaderV886.ts','utf8').includes('LED_WALL_FRAGMENT_V842')))));
+check('stage original shader preserved',()=>assert((stage.includes('fragmentShader={LED_WALL_FRAGMENT_V842}') || ((stage.includes('fragmentShader={LED_WALL_FRAGMENT_V886}') || (stage.includes('fragmentShader={LED_WALL_FRAGMENT_V990}') && fs.readFileSync('components/visualizer/livingLedWallShaderV990.ts','utf8').includes('LED_WALL_FRAGMENT_V886'))) && fs.readFileSync('components/visualizer/ledWallCreativeShaderV886.ts','utf8').includes('LED_WALL_FRAGMENT_V842')))));
 check('V870 after V842',()=>assert(stage.indexOf('planLedWallMotifsV870({')>stage.indexOf('planLedWallExperienceV842({')));
 check('manual LED lane inherited',()=>assert(stage.includes('manualLed:authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001')));
 check('camera close-up observed',()=>assert(stage.includes('cameraCloseup:concertLipSyncV386?.cinematicSceneV528?.active===true&&vocalFocusV542')));

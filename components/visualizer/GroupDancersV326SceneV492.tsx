@@ -23,6 +23,7 @@ import { planArtistSpotlightV443 } from "./artistSpotlightV443";
 import { planMultiArtistInteractionV444 } from "./multiArtistInteractionV444";
 import {planNaturalMultiArtistStageV807} from "./naturalMultiArtistStageInteractionV807";
 import {refineIntelligentDuetLooksV838,type VocalDuetPlanV838} from "./intelligentVocalDuetDirectorV838";
+import {refineDuetEnsembleV995} from "./duetEnsembleDirectorV995";
 import {planNaturalPerformerPositioningV808,canRepositionWithGroundV808,canRepositionWithObservationV808} from "./naturalPerformerPositioningV808";
 import {createStageBlockingStateV840,refineDynamicStageBlockingV840,readStageBlockingV840} from "./dynamicPerformerStageBlockingV840";
 import { planCrewAccentsV452, combineCrewGesturesV452, combineCrewLooksV452 } from "./advancedMultiAvatarPerformanceV452";
@@ -912,9 +913,29 @@ export function GroupDancersV326({props,settings,vocalDuetV838}:{props:Visualize
     !!settings.trackId||!!manualCueV385.active||props.avatarMotionMode==='choreography',
     multiArtistVocalRefV632.current
   ):stageInteractionV807;
-  if(directedInteractionV838.active){
+  // V995: verified duet/reply/hook gestures are a tiny overlay on the SAME
+  // V807/V838 look/gesture plan; singer roles, IK, GLB clips and camera stay owned.
+  const duetSignalV995=readConcertStageSyncV882();
+  const interactionV995=refineDuetEnsembleV995(directedInteractionV838,vocalDuetV838,{
+    settings:duetSignalV995.duetSettingsV995,
+    trackId:props.track?.id??'',
+    cueTrackId:timeCueV496.active?props.lipSync?.vocalTimeTrackIdV496??'':props.lipSync?.rapDuetTrackIdV416??'',
+    cue:rapDuetCueV416,progressMs:props.lipSync?.progressMs??-1,count:settings.count,
+    positions:refs.current.slice(0,settings.count).map(ref=>ref?
+      [ref.position.x,ref.position.y,ref.position.z] as [number,number,number]:
+      [NaN,NaN,NaN] as [number,number,number]),
+    playing:props.isPlaying&&duetSignalV995.playing&&duetSignalV995.trackId===props.track?.id,
+    reducedMotion:props.reducedMotion,automatic:duetSignalV995.enabled&&duetSignalV995.sync.dance,
+    manualPriority:!!settings.trackId||settings!==props.autoMultiArtistGroupV442||
+      !!manualCueV385.active||props.avatarMotionMode==='choreography'||
+      props.artistBubblePlanV441?.source==='manual-stage'||props.showCue?.formationsEnabled===true,
+    lyricsVisible:Boolean(props.lyricsScene?.lyrics?.synced),
+    tier:getActivePerformanceTier(),collisionRisk:collisionSlotsV508.map(s=>s?.risk),
+  });
+  const finalInteractionV995=interactionV995.stage;
+  if(finalInteractionV995.active){
     for(let i=0;i<settings.count;i++){
-      const accent=directedInteractionV838.slots[i];
+      const accent=finalInteractionV995.slots[i];
       Object.assign(looksV444.current[i].current,
         combineCrewLooksV452(looksV444.current[i].current,accent.look));
       Object.assign(gesturesV444.current[i].current,

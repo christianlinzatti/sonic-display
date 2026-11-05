@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {"types": ["node"], "incremental": false, "noEmit": true},
+  "files": [
+    "../components/visualizer/vocalPerformanceIntelligenceV994.ts",
+    "../components/visualizer/concertStageSyncV882.ts",
+    "../components/visualizer/VocalRigV368.tsx",
+    "../components/visualizer/ProceduralDancerAvatarV492.tsx",
+    "../components/visualizer/LiveFxDeckV881.tsx"
+  ]
+}

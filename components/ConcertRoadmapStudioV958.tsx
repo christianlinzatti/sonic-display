@@ -113,6 +113,24 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
    <label>V966 Immersion: {settings.immersiveStrengthV966}% <input type="range" min={0} max={100} step={5}
     value={settings.immersiveStrengthV966} disabled={!settings.enabled||!settings.virtualFx||!settings.immersiveV966}
     onChange={e=>save({immersiveStrengthV966:Number(e.target.value)})}/></label>
+   <h4>V988 · Holographic Stage Portal</h4>
+   <label><input type="checkbox" checked={settings.portalV988}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.immersiveV966}
+    onChange={e=>save({portalV988:e.target.checked})}/>
+    Holografisches Bühnenportal und räumlichen Lichttunnel aktivieren (nur virtuelle, bestätigte Songszenen)</label>
+   <label>V988 · Portalstil <select aria-label="V988 Portalstil" value={settings.portalModeV988}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.immersiveV966||!settings.portalV988}
+    onChange={e=>save({portalModeV988:e.target.value as ConcertSettingsV958['portalModeV988']})}>
+    <option value="auto">Dynamisch nach Songphase</option><option value="arch">Holografische Bögen</option>
+    <option value="tunnel">3D-Lichttunnel</option>
+   </select></label>
+   <label>V988 · Intensität {settings.portalStrengthV988}% <input type="range" min={0} max={100} step={5}
+    value={settings.portalStrengthV988}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.immersiveV966||!settings.portalV988}
+    onChange={e=>save({portalStrengthV988:Number(e.target.value)})}/></label>
+   <p className="settings-note">Das Portal bleibt hinter Künstlern und LED-Bühnenwand, pausiert bei manuellen
+    Szenen oder Performance-Sparprofilen und zeigt bei reduzierter Bewegung nur ruhige Formen.
+    Keine Blitze, keine zusätzlichen Lampen oder Govee-Befehle.</p>
    <label><input type="checkbox" checked={settings.energyArcV975} disabled={!settings.enabled||!settings.virtualFx}
     onChange={e=>save({energyArcV975:e.target.checked})}/> V975: Adaptive Konzert-Energiekurve (nur virtuelle Bühne und bestätigte Songabschnitte)</label>
    <label>V975 · Dynamik <select value={settings.energyArcModeV975} disabled={!settings.energyArcV975||!settings.enabled||!settings.virtualFx}
@@ -204,6 +222,26 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
     <option value="balanced">Balanced – 7 Ebenen</option>
     <option value="cinematic">Cinematic – 10 Ebenen</option>
    </select></label>
+   <h4>V989 · Volumetric Atmosphere 2.0</h4>
+   <label><input type="checkbox" checked={settings.depthAtmosphereV989}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.immersiveV966||!settings.volumetricV972}
+    onChange={e=>save({depthAtmosphereV989:e.target.checked})}/>
+    V989: Zusätzliche sanfte Lichtkegel und 3D-Bodennebel aktivieren (nur virtuelle Bühne)</label>
+   <label>V989 · Tiefenmodus <select aria-label="V989 Tiefenmodus" value={settings.depthStyleV989}
+    disabled={!settings.depthAtmosphereV989||!settings.volumetricV972||!settings.enabled||!settings.virtualFx}
+    onChange={e=>save({depthStyleV989:e.target.value as ConcertSettingsV958['depthStyleV989']})}>
+    <option value="auto">Automatisch nach bestätigter Songphase</option>
+    <option value="soft-beams">Weiche räumliche Lichtkegel</option>
+    <option value="ground-fog">Tiefliegender Bodennebel</option>
+   </select></label>
+   <label>V989 · Tiefe {settings.depthStrengthV989}% <input type="range" min={0} max={100} step={5}
+    value={settings.depthStrengthV989}
+    disabled={!settings.depthAtmosphereV989||!settings.volumetricV972||!settings.enabled||!settings.virtualFx}
+    onChange={e=>save({depthStrengthV989:Number(e.target.value)})}/></label>
+   <p className="settings-note">V989 ergänzt V972 nur nach manueller Aktivierung: Eco 2, Balanced 4,
+    Cinematic 6 zusätzliche transparente Ebenen. Auf langsamer Hardware und bei manuell
+    inszenierten Szenen bleibt V989 automatisch aus; reduzierte Bewegung friert die Atmosphäre ein.
+    Diese Grafik nutzt weiche Shader-Ebenen statt aufwendigem Raymarching. Keine Gerätebefehle oder Blitze.</p>
    <label>Einfluss {settings.strength}% <input type="range" min={0} max={100} value={settings.strength} onChange={e=>save({strength:Number(e.target.value)})}/></label>
   </div>
   {settings.hardwareSync&&<p className="settings-note" role="status">Neue Govee-Cues werden nur bei aktivem Auto-Sync und echten bestätigten Songphasen berücksichtigt. Gespeicherte Shows und manuell gesetzte Kameracues bleiben unverändert. Keine Strobe-/Power-Kommandos.</p>}

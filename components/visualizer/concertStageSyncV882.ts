@@ -16,8 +16,14 @@ import {normalizeArenaCrowdV893,type ArenaCrowdSettingsV893,type ArenaCrowdPlanV
 import {normalizeDirectorV895,type DirectorSettingsV895,type DirectorPlanV895} from './aiConcertDirectorV895';
 import {normalizeEnergyV896,type EnergySettingsV896} from './musicalEnergyIntelligenceV896';
 import {normalizeCinematicCameraV897,type CinematicCameraSettingsV897} from './cinematicCameraDirectorV897';
+import {normalizeCinemaV992,type CinemaSettingsV992} from './cinematicCameraDirectorV992';
 import {normalizeDanceCameraV898,type DanceCameraSettingsV898} from './danceCameraCoordinationV898';
 import {normalizeDanceShowV899,type DanceShowSettingsV899} from './advancedDanceShowDirectorV899';
+import {normalizeChoreographyV993,type ChoreographySettingsV993} from './aiChoreographyDirectorV993';
+import {normalizeVocalV994,type VocalSettingsV994} from './vocalPerformanceIntelligenceV994';
+import {normalizeDuetV995,type DuetSettingsV995} from './duetEnsembleDirectorV995';
+import {normalizeCrowdExperienceV996,type CrowdExperienceSettingsV996} from './virtualCrowdExperienceV996';
+import {validateFlowV997,type FlowHandoverV997} from './continuousConcertFlowV997';
 import {normalizeUltimateV900,type UltimateSettingsV900,type UltimatePlanV900} from './ultimateConcertExperienceV900';
 import {normalizeGenreStageV894,type GenreStageSettingsV894,type GenreStagePlanV894} from './ultimateGenreStageV894';
 import {DEFAULT_CINEMATIC_TRANSITIONS_V884,normalizeCinematicTransitionsV884,
@@ -65,10 +71,22 @@ export interface ConcertStageSignalV882 {
  ultimateSettingsV900?:UltimateSettingsV900;ultimatePlanV900?:UltimatePlanV900|null;
  /** V899: scene-bound dance spacing and coordinated camera pace. */
  danceShowSettingsV899?:DanceShowSettingsV899;
+ /** V993: optional verified-scene upper-body choreography, no clip/IK replacement. */
+ choreographySettingsV993?:ChoreographySettingsV993;
+ /** V994: song-bound, opt-in verified-word vocal microphrasing. */
+ vocalSettingsV994?:VocalSettingsV994;
+ /** V995: verified vocal-cast only, opt-in upper-body duet/hook overlays. */
+ duetSettingsV995?:DuetSettingsV995;
+ /** V996: opt-in, verified-scenes-only virtual audience response. */
+ crowdSettingsV996?:CrowdExperienceSettingsV996;
+ /** V997: observed song-bound, opt-in visual-only transition. */
+ flowCueV997?:FlowHandoverV997|null;
  /** V898: coordinates only visible stage-root groups with the ONE camera. */
  danceCameraSettingsV898?:DanceCameraSettingsV898;
  /** V897: single-camera, evidence-gated cinematography on the verified V895 scene plan. */
  cameraSettingsV897?:CinematicCameraSettingsV897;
+ /** V992: optional post-V897 micro-composition of the same verified camera. */
+ cameraSettingsV992?:CinemaSettingsV992;
  /** V896: measured live audio gain sensitivity. No fake musical events. */
  energySettingsV896?:EnergySettingsV896;
  /** V895: single verified full-song coordinated direction; never overrides manual authoring. */
@@ -138,8 +156,14 @@ export function publishConcertStageSyncV882(input:ConcertStageSignalV882|null):v
    directorSettingsV895:normalizeDirectorV895(input.directorSettingsV895),
    energySettingsV896:normalizeEnergyV896(input.energySettingsV896),
    cameraSettingsV897:normalizeCinematicCameraV897(input.cameraSettingsV897),
+   cameraSettingsV992:normalizeCinemaV992(input.cameraSettingsV992),
    danceCameraSettingsV898:normalizeDanceCameraV898(input.danceCameraSettingsV898),
    danceShowSettingsV899:normalizeDanceShowV899(input.danceShowSettingsV899),
+   choreographySettingsV993:normalizeChoreographyV993(input.choreographySettingsV993),
+   vocalSettingsV994:normalizeVocalV994(input.vocalSettingsV994),
+   duetSettingsV995:normalizeDuetV995(input.duetSettingsV995),
+   crowdSettingsV996:normalizeCrowdExperienceV996(input.crowdSettingsV996),
+   flowCueV997:active?validateFlowV997(input.flowCueV997,input.trackId):null,
    ultimateSettingsV900:normalizeUltimateV900(input.ultimateSettingsV900),
    ultimatePlanV900:active&&source==='verified'&&input.ultimatePlanV900?.source==='verified-v604'&&
     input.ultimatePlanV900.trackId===input.trackId&&input.ultimatePlanV900.durationMs===input.durationMs
@@ -237,6 +261,40 @@ export function publishConcertStageSyncV882(input:ConcertStageSignalV882|null):v
   snapshot.ultimateSettingsV900?.lights===next.ultimateSettingsV900?.lights&&
   snapshot.ultimateSettingsV900?.led===next.ultimateSettingsV900?.led&&
   snapshot.ultimateSettingsV900?.stage===next.ultimateSettingsV900?.stage&&
+  snapshot.flowCueV997?.fromTrackId===next.flowCueV997?.fromTrackId&&
+  snapshot.flowCueV997?.toTrackId===next.flowCueV997?.toTrackId&&
+  snapshot.flowCueV997?.startedAtMs===next.flowCueV997?.startedAtMs&&
+  snapshot.flowCueV997?.durationMs===next.flowCueV997?.durationMs&&
+  snapshot.flowCueV997?.style===next.flowCueV997?.style&&
+  snapshot.flowCueV997?.intensity===next.flowCueV997?.intensity&&
+  snapshot.crowdSettingsV996?.enabled===next.crowdSettingsV996?.enabled&&
+  snapshot.crowdSettingsV996?.style===next.crowdSettingsV996?.style&&
+  snapshot.crowdSettingsV996?.intensity===next.crowdSettingsV996?.intensity&&
+  snapshot.crowdSettingsV996?.glowsticks===next.crowdSettingsV996?.glowsticks&&
+  snapshot.crowdSettingsV996?.waves===next.crowdSettingsV996?.waves&&
+  snapshot.crowdSettingsV996?.reactions===next.crowdSettingsV996?.reactions&&
+  snapshot.crowdSettingsV996?.protectLyrics===next.crowdSettingsV996?.protectLyrics&&
+  snapshot.duetSettingsV995?.enabled===next.duetSettingsV995?.enabled&&
+  snapshot.duetSettingsV995?.style===next.duetSettingsV995?.style&&
+  snapshot.duetSettingsV995?.intensity===next.duetSettingsV995?.intensity&&
+  snapshot.duetSettingsV995?.partnerGaze===next.duetSettingsV995?.partnerGaze&&
+  snapshot.duetSettingsV995?.handoffGestures===next.duetSettingsV995?.handoffGestures&&
+  snapshot.duetSettingsV995?.sharedHooks===next.duetSettingsV995?.sharedHooks&&
+  snapshot.duetSettingsV995?.protectLyrics===next.duetSettingsV995?.protectLyrics&&
+  snapshot.vocalSettingsV994?.enabled===next.vocalSettingsV994?.enabled&&
+  snapshot.vocalSettingsV994?.style===next.vocalSettingsV994?.style&&
+  snapshot.vocalSettingsV994?.intensity===next.vocalSettingsV994?.intensity&&
+  snapshot.vocalSettingsV994?.mouthTiming===next.vocalSettingsV994?.mouthTiming&&
+  snapshot.vocalSettingsV994?.phraseExpression===next.vocalSettingsV994?.phraseExpression&&
+  snapshot.vocalSettingsV994?.headAccents===next.vocalSettingsV994?.headAccents&&
+  snapshot.choreographySettingsV993?.enabled===next.choreographySettingsV993?.enabled&&
+  snapshot.choreographySettingsV993?.style===next.choreographySettingsV993?.style&&
+  snapshot.choreographySettingsV993?.intensity===next.choreographySettingsV993?.intensity&&
+  snapshot.choreographySettingsV993?.ensembleSync===next.choreographySettingsV993?.ensembleSync&&
+  snapshot.choreographySettingsV993?.smoothTransitions===next.choreographySettingsV993?.smoothTransitions&&
+  snapshot.choreographySettingsV993?.energyAccents===next.choreographySettingsV993?.energyAccents&&
+  snapshot.choreographySettingsV993?.protectLyrics===next.choreographySettingsV993?.protectLyrics&&
+  snapshot.choreographySettingsV993?.protectFootwork===next.choreographySettingsV993?.protectFootwork&&
   snapshot.danceShowSettingsV899?.enabled===next.danceShowSettingsV899?.enabled&&
   snapshot.danceShowSettingsV899?.style===next.danceShowSettingsV899?.style&&
   snapshot.danceShowSettingsV899?.intensity===next.danceShowSettingsV899?.intensity&&
@@ -256,6 +314,12 @@ export function publishConcertStageSyncV882(input:ConcertStageSignalV882|null):v
   snapshot.danceCameraSettingsV898?.motionFollow===next.danceCameraSettingsV898?.motionFollow&&
   snapshot.danceCameraSettingsV898?.protectLyrics===next.danceCameraSettingsV898?.protectLyrics&&
   snapshot.danceCameraSettingsV898?.protectDuets===next.danceCameraSettingsV898?.protectDuets&&
+  snapshot.cameraSettingsV992?.enabled===next.cameraSettingsV992?.enabled&&
+  snapshot.cameraSettingsV992?.mode===next.cameraSettingsV992?.mode&&
+  snapshot.cameraSettingsV992?.intensity===next.cameraSettingsV992?.intensity&&
+  snapshot.cameraSettingsV992?.accents===next.cameraSettingsV992?.accents&&
+  snapshot.cameraSettingsV992?.protectLyrics===next.cameraSettingsV992?.protectLyrics&&
+  snapshot.cameraSettingsV992?.protectDuets===next.cameraSettingsV992?.protectDuets&&
   snapshot.cameraSettingsV897?.enabled===next.cameraSettingsV897?.enabled&&
   snapshot.cameraSettingsV897?.style===next.cameraSettingsV897?.style&&
   snapshot.cameraSettingsV897?.preference===next.cameraSettingsV897?.preference&&

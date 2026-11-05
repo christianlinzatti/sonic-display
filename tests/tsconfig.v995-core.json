@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "incremental": false,
+    "noEmit": true
+  },
+  "files": [
+    "../components/visualizer/duetEnsembleDirectorV995.ts",
+    "../components/visualizer/concertStageSyncV882.ts",
+    "../components/visualizer/GroupDancersV326SceneV492.tsx",
+    "../components/visualizer/LiveFxDeckV881.tsx"
+  ]
+}

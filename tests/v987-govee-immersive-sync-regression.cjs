@@ -140,8 +140,8 @@ test('all changed TS/TSX files parse using project TypeScript',()=>{
 });
 test('build and release metadata include V987 before V986',()=>{
  const pkg=JSON.parse(read('package.json'));
- assert.equal(pkg.sonicRoadmapRelease,'v987');
- assert(pkg.scripts.prebuild.startsWith('npm run test:v987 && npm run test:v987:types &&'));
+ assert(Number(pkg.sonicRoadmapRelease.slice(1))>=987);
+ assert(pkg.scripts.prebuild.includes('npm run test:v987 && npm run test:v987:types &&'));
  assert(pkg.scripts['test:v987']);assert(pkg.scripts['test:v987:types']);
  assert(read('scripts/vercel-production-build.cjs').includes('V987 Govee Immersive Sync 2.0'));
  assert(read('.github/workflows/v832-continuous-validation.yml').includes('V987 Govee Immersive Sync 2.0'));

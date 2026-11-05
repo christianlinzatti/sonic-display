@@ -11,6 +11,9 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V990 Living LED Wall 3.0','tests/v990-living-led-wall-regression.cjs'],
+  ['V989 Volumetric Atmosphere 2.0','tests/v989-volumetric-atmosphere-regression.cjs'],
+  ['V988 Holographic Stage Portal','tests/v988-holographic-stage-portal-regression.cjs'],
   ['V981 Concert Performance Intelligence 2.0','tests/v981-concert-performance-intelligence-regression.cjs'],
   ['V980 Concert Quality & Performance Director','tests/v980-concert-quality-director-regression.cjs'],
   ['V979 Intelligent Live Show Director 3.0','tests/v979-intelligent-live-show-director-regression.cjs'],
@@ -61,6 +64,9 @@ const regressions = [
   ['Source syntax + duplicate imports', 'tests/check-source-syntax.cjs'],
 ];
 const productionChecks = [
+  ['V990 Living LED Wall 3.0 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v990-core.json']],
+  ['V989 Volumetric Atmosphere 2.0 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v989-core.json']],
+  ['V988 Holographic Stage Portal core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v988-core.json']],
   ['V981 Performance Intelligence core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v981-core.json']],
   ['V980 Concert Quality Director core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v980-core.json']],
   ['V979 Intelligent Live Show Director 3.0 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v979-core.json']],

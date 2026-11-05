@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "incremental": false,
+    "noEmit": true
+  },
+  "files": [
+    "../components/visualizer/livingLedWallDirectorV990.ts",
+    "../components/visualizer/livingLedWallShaderV990.ts",
+    "../components/visualizer/DynamicStage.tsx",
+    "../components/visualizer/ConcertFxStudioPanelV810.tsx"
+  ]
+}

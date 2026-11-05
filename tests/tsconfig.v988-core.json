@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {"types": ["node"], "incremental": false, "noEmit": true},
+  "files": [
+    "../lib/holographicStagePortalV988.ts",
+    "../components/visualizer/HolographicStagePortalV988.tsx",
+    "../components/visualizer/ConcertFestivalFxV958.tsx",
+    "../components/ConcertRoadmapStudioV958.tsx"
+  ]
+}

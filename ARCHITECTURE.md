@@ -1,3 +1,116 @@
+## V1003 – Auto-Improvement Director (2026-11-05)
+
+- `components/visualizer/autoImprovementDirectorV1003.ts` erstellt **ausschließlich** nach
+  bestätigter V801-Songbindung und frischen V466-Frame-Messungen begrenzte Vorschläge,
+  wenn V1002 eine schlechte Bildrate oder hohe P95-Framezeit meldet. Die Vorschläge
+  reduzieren nur **bereits aktivierte** virtuelle V1000-Bühnen- und V885-Lichtintensitäten;
+  Kameras, Tanz, Lyrics, Songzeit, Govee und manuelle Timelines werden nicht angepasst.
+- `components/visualizer/AutoImprovementDirectorV1003.tsx` nutzt die gemeinsame
+  V1001-Änderungsleitung im `components/visualizer/LiveFxDeckV881.tsx`.
+  Review → Freigabe mit 20-s-TTL, Track-/Seek-/Konfliktprüfung → Compare-and-swap Undo.
+  Weder KI-Text noch planbasierte Hinweise erzeugen ausführbare Befehle.
+- Die **optionale** KI-Einordnung verwendet den vorhandenen authentifizierten
+  `/api/ai/concert-qa`-Endpunkt nur mit aggregierten V1002-Messwerten. Es gehen
+  weder Songtitel, Tokens, Lyrics oder Audiodaten noch lokale Reglerwerte nach außen.
+- `tests/v1003-auto-improvement-regression.cjs` und
+  `tests/tsconfig.v1003-core.json` prüfen die Kernlogik; CI verlangt zusätzlich
+  vollständigen TypeScript- und Next.js-Produktionsbuild auf Node 24.
+
+## V999 Intelligent Performance Governor (2026-11-05)
+
+## V1002 – Evidence-scoped Concert Quality Assurance
+
+- `components/visualizer/concertQualityAssuranceV1002.ts` ist ein rein funktionaler, deterministischer
+  Reviewer. Er nutzt nur die bestätigte V801-Planstruktur und die freiwillige, frische V466-WebGL-Probe.
+  Planwerte und Frame-Intervallwerte werden nie zu einem behaupteten Gesamt-KI-Score vermischt;
+  fehlende, pausierte und veraltete Daten bleiben `null` / „Nicht gemessen“.
+- `ConcertQualityAssurancePanelV1002.tsx` ist in das bestehende
+  `ConcertQualityDashboardV751.tsx` integriert. Es nutzt den vorhandenen 1-s-Tick und
+  `useSyncExternalStore`-Snapshots, keine neue Renderer-Schleife oder eigene Messhistorie.
+- Optionaler `/api/ai/concert-qa`-Endpunkt: same-origin, authentifizierte Spotify-Session,
+  Byte-Limit, Fünf-Anfragen-pro-fünf-Minuten-Limit, endliche Whitelist von
+  Diagnosecodes/Werten und JSON-Schema für reine **textuelle Empfehlungen**.
+  Es werden keine Song-Metadaten, Lyrics, Spotify-Tokens, Geräte-IDs oder Audio-Daten
+  an den KI-Anbieter übertragen. Selbst bei falschen KI-Aussagen verändert das
+  System keine Cues/Regler.
+- V999-Governor und bisherige Bühnen-/Kamera-/Tanz-/Lip-Sync-/Govee-Module bleiben
+  eigenständige, vorrangige Steuerungen. Read-only-Diagnose ersetzt keine echte
+  Sichtprüfung und behauptet keine Phonem-, GPU- oder Konzertstimmungs-Erkennung.
+- Prüfungen: `tests/v1002-concert-quality-assurance-regression.cjs`,
+  `tests/tsconfig.v1002-core.json` sowie Node-24-Produktionstests in Vercel und
+  `.github/workflows/v1002-quality-assurance-validation.yml`.
+
+
+- Eine zusätzliche **reduktionsbasierte** Dekorationsqualität nutzt die bestehenden R3F-Messfenster (FPS, P95, Slow Frames); keine weitere RAF-Schleife und keine GPU-Timestamp-Messung.
+- Progressive Reduktion der optionalen V989-Nebeltiefe, V996-Publikumslichtstäbe, V990-LED-Akzente und V991-Bass-Bodenwellen. Bestehende V640-, V825- und V835-Regler bleiben zuständig und werden nicht ersetzt.
+- Der Quality-Dashboard-Schalter ist nur im Auto-Modus wirksam; Zielwerte 30/45/60 FPS, Stufen 0–3, Hysterese/Cooldown und stale-/pause-/hidden-fail-open. Keine Änderung von Lyrics, Tanz, Lip-Sync, Kamera, GLB-Materialien, Govee oder Spotify.
+- Keine garantierten FPS oder automatische Reduktion von Avataranzahlen. Der vollständige Produktionsbuild muss mit Node 24, npm ci, TypeScript und Next.js in CI bestätigt werden.
+
+## V998 – Live AI Concert Assistant
+
+V998 extends the existing Live FX Deck with an **explicitly approved live-language virtual control preview**. The standalone `lib/liveConcertAssistantV998.ts` whitelists only V885 atmosphere, V894 stage, V992 camera and a downward-only V881 FX cap. `components/visualizer/LiveConcertAssistantV998.tsx` presents before/after diffs, local no-network fallback and fail-closed undo bound to a single song; `app/api/ai/live-concert/route.ts` authenticates Spotify sessions, validates origin, limits traffic and validates structured AI output. No music playback, hardware/Govee commands, new camera or automatic event prediction. See `docs/versions/V998-LIVE-AI-CONCERT-ASSISTANT.md`. Local tests are not a substitute for full Node 24 / Next.js CI.
+
+## V997 – Continuous Concert Flow
+
+V997 adds a **visual-only** 1.8–2.7-second handover on plausible observed Spotify end→start title changes. The user explicitly enables it in Concert Studio. The cross-song cue is bound to the new track, validated in the V882 stage bridge, and rendered as two dim rings in the existing R3F loop. It performs no audio crossfade, playlist prediction, manual timeline edits, camera takeover or Govee commands. Pauses, seeks, missing metadata, manual interventions and reduced motion fail closed; a manual skip very near the end cannot be distinguished from natural advance. See `docs/versions/V997-CONTINUOUS-CONCERT-FLOW.md`. Full Node 24/Next production verification is required before claiming production readiness.
+
+# Sonic Display – Systemarchitektur
+
+## V1000 – Gemeinsame immersive Konzertkoordination
+
+`components/visualizer/immersiveConcertDirectorV1000.ts` bewertet ausschließlich bereits bestätigte Szenen aus V882 und erzeugt dekorative, auf 100 % begrenzte Multiplikatoren für die vorhandenen V990-LED-, V991-Bass- und V996-Publikumskanäle. Die optionalen Einstellungen werden in `components/visualizer/immersiveConcertStoreV1000.ts` gespeichert und über `components/visualizer/ImmersiveConcertPanelV1000.tsx` im Qualitäts-Dashboard bedient. `components/visualizer/DynamicStage.tsx` wendet die Multiplikatoren innerhalb der bestehenden R3F-Schleife **nach** den vorhandenen Sicherheits- und V999-Performance-Budgets an. Kein Ersatz für KI-Planer, reale Govee-Steuerung, Spotify-Wiedergabe, Lippen-/Tanzsynchronisation, manuelle Licht-/Kameracues oder bestätigte Songzeiten. Bei fehlender Evidenz wird neutral durchgereicht. Validierung: `tests/v1000-immersive-coordination-regression.cjs`. Produktionsfreigabe erfordert Node 24, npm ci, kompletten TypeScript-Check und Next.js-Build.
+
+
+### V993 – Scene-gated, genre-specific avatar choreography
+
+`components/visualizer/aiChoreographyDirectorV993.ts` is a pure, opt-in
+multiplicative upper-body rig modifier. V895 supplies verified V604 scene
+boundaries. The V882 bridge owns validated settings. `LiveFxDeckV881` persists
+user preferences and publishes them; `GltfDancerAvatarV492` applies V993
+**after** V666 grounding/genre expression and **before** V759 phrase variety,
+with no extra timers, render loops, GLBs or device calls. Manual clips and
+V492 Foot IK retain their authoritative positions. Unverified sections, unknown
+auto genres, poor performance, reduced motion, Lyrics focus, pauses/seeks,
+and authoring conflicts bypass this layer. Live amplitude requires V896's
+fresh track-scoped measured audio record. Additional instrumentation:
+`tests/v993-ai-choreography-director-regression.cjs`.
+
+# V992 – Cinematic Camera Director 3.0
+
+- A new **opt-in** camera director in the existing Live FX / Concert Studio, preserving the V897 camera and V898 dance-coordination pipeline.
+- Three cinematic languages: Songgeschichte, Künstler-Nähe, Festival-Arena. Deterministic, conservative framing changes per confirmed V604 scene, without hard cuts, new Canvas, or 3D allocations.
+- Only a real V433 live-normalized kick transient can trigger a very short, bounded camera accent in verified hook/drop/finale scenes. Requires a quiet-to-loud edge. No audio means no accent.
+- Pause, seeks, track changes, authored timelines, manual camera, blackout, low tier, reduced motion and guarded lyrics block and reset the new director. Final V351 framing protection remains downstream.
+- Save/reload normalized settings locally, publish through the existing V882 signal, show confirmed scene preview. Default OFF.
+- V992 regressions, isolated TypeScript check, Vercel gate and V832 CI task are included. GitHub importer may protect workflow changes; deploy the workflow separately.
+- **Build status:** Complete TypeScript and Next.js production build must still be verified in Node 24 CI; locally unavailable if npm dependencies are absent.
+
+---
+
+## V991 – Bass Impact Physics
+
+- `bassImpactDirectorV991.ts`: nur V810-bestätigter Song + V822-gemessene Transienten; songgebundene Impulsdauer mit Reset bei Seek, Stop und Songwechsel; reine Planungsberechnung und begrenzter Zustand.
+- `bassImpactShaderV991.ts`: einzelnes Boden-Mesh, örtliche ringförmige Alpha-Maske (max. 0.14) statt einer globalen Lichtblitz-Animation; keine weiteren Timer/Lichter/Partikelinstanzen.
+- V816-Ringe werden nach V825/V880/V889 nur innerhalb bestehender Caps verstärkt. V823-Authoring und manuelle Shows gewinnen.
+- Standard AUS; reduzierte Bewegung, Low-Tier, manuelles Licht, Blackout und Lyrics-Schutz deaktivieren den Effekt.
+- `tests/v991-bass-impact-physics-regression.cjs` und `tests/tsconfig.v991-core.json` sind im Prebuild, V832-CI und Vercel-Gate hinterlegt.
+
+## V990 – Living LED Wall 3.0
+
+- `components/visualizer/livingLedWallDirectorV990.ts`: bestätigte V810-Abschnittsdaten und V821/V886-Schutzzustände, reine deterministische Visual-Cues; alle manuellen Vorgaben bleiben vorrangig.
+- `components/visualizer/livingLedWallShaderV990.ts`: geprüfte Source-Injektion in den vorhandenen V886-Shader auf **demselben** V635-Mesh; höchstens 0,022 zusätzlicher Shaderanteil, Alpha weiterhin höchstens 0,15.
+- `components/visualizer/ConcertFxStudioPanelV810.tsx`: normalisierte optionale Einstellungen und simulierte Vorschau. Standardmäßig aus und bei Low-Tier/Reduced Motion/Blackout deaktiviert.
+- `tests/v990-living-led-wall-regression.cjs`: Schutzgates, Shader-Vererbung, 10.000 Szenarien, Source-Regressionsprüfungen.
+
+## V988 – Holographic Stage Portal (neues virtuelles Tiefenelement)
+
+- Pure Funktion `lib/holographicStagePortalV988.ts` plant aus dem bereits validierten V966-Cue deterministische Portalringe und Tiefenlinien. Keine eigenen Audio-, KI-, Gerätedaten- oder Timeline-Abfragen.
+- `components/visualizer/HolographicStagePortalV988.tsx` zeichnet geometrische, additive, unbeleuchtete Meshes im bestehenden `ConcertFestivalFxV958`-Canvas, hinter dem Cast (z -5.3 bis -7.04). Keine zusätzliche Render-Schleife.
+- Gates: explizites `portalV988` und `immersiveV966` + `enabled` + `virtualFx`, verifiziertes Scene-Objekt, keine Manual-/Timeline-Overrides, kein lowPerformance, gültige Farb-/Opacitydaten, zulässige Alexa-Hintergrundzone.
+- Opt-in gespeichert über den bereits existierenden normalisierten `ConcertSettingsV958`-Store: `portalV988`, `portalModeV988` und `portalStrengthV988`. Default off. On/off, Stil, Intensität sind im Concert Studio erreichbar.
+- Höchstens acht geometrische Elemente, opacity ≤ .085 (Ringe) / ≤ .045 (Linien), ohne Blitze, Schatten, zusätzliche Canvas oder Gerätebefehle. `reducedMotion` erzwingt statische Varianten.
+- Abgedeckt von `tests/v988-holographic-stage-portal-regression.cjs`, `tests/tsconfig.v988-core.json`, Vercel-Produktionsgates, V931 Release-Gate und GitHub V832 CI. Das ZIP kann wegen des Importerschutzes keine bestehenden CI-Workflow-Dateien überschreiben: entsprechende Workflow-Änderungen sind separat auf GitHub anzuwenden.
+
 ## V987 – Govee Immersive Sync 2.0
 
 - Nach ausdrücklicher Freigabe aus dem V986 Atmosphere Designer kann die
@@ -1051,7 +1164,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V908
+**Dokumentationsstand:** V1003
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -3711,3 +3824,81 @@ Keine physische Lichtsteuerung, neuen Renderer oder automatisches Timing.
 Regression: `tests/v986-ai-atmosphere-designer-regression.cjs`;
 Type-Gate: `tests/tsconfig.v986-core.json`. Nach Installation vollständiger
 TypeScript- und Next.js-Produktionsbuild erforderlich.
+
+
+### V989 Volumetric Atmosphere 2.0
+
+`planVolumetricAtmosphereV989` produces a pure bounded render plan from the
+V972 approved cue, V958 verified scene and explicit user settings.
+`VolumetricDepthV989` adds 2/4/6 shader-backed planes in the existing canvas,
+with no new render loop, postprocessing pass, light or hardware command.
+Manual/lowPerformance/reducedMotion protections are inherited and re-checked.
+
+
+### V990 – Living LED Wall 3.0 architecture
+
+`livingLedWallDirectorV990.ts` reuses V886 confirmed-song gating and V821 budget. `livingLedWallShaderV990.ts` extends the same V886 shader via checked string anchors. Existing `DynamicStage.tsx` uniforms are set from the verified cue; zero new draw loops or lights. V990 opt-in defaults off and cannot command Govee.
+
+
+## V994 – Vocal Performance Intelligence (05.11.2026)
+
+- `components/visualizer/vocalPerformanceIntelligenceV994.ts`: opt-in, reine wortzeitbasierte Rap-Phrasen-Verfeinerung. V415 liefert die tatsächlichen synchronisierten Wortmarken; V538 verifiziert aktive Wörter und Sängerrollen. Es gibt keine Phonem- oder Stimmen-Erkennung und keine KI-Behauptung für nicht gemessene Daten.
+- `components/visualizer/VocalRigV368.tsx` verfeinert nur vorhandene Mund-Filterraten, begrenzte Gesichts- und Kopfbewertungen. V644/V662 Viseme, V661 Stems, V420/V423 manuelle Audiospuren, Vorschauen und Originalclips haben Vorrang; keine zweite Render-Schleife.
+- `components/visualizer/ProceduralDancerAvatarV492.tsx`: derselbe Cue für den prozeduralen Avatar ohne zusätzliche Meshes oder Audio-Hooks.
+- `components/visualizer/LiveFxDeckV881.tsx` und `components/visualizer/concertStageSyncV882.ts`: standardmäßig deaktivierte Einstellungen; aktuelle Song-ID, Wiedergabe- und Regie-Zustand müssen übereinstimmen.
+- `tests/v994-vocal-performance-intelligence-regression.cjs`, `tests/tsconfig.v994-core.json`: 13 Regressionstestgruppen mit 10.000 simulierten Zuständen. TypeScript-/Next.js-Produktionsbuild muss mit Node 24 in CI erfolgen.
+
+
+### V995 – Duet & Ensemble 3.0
+
+`components/visualizer/duetEnsembleDirectorV995.ts` ergänzt nach V807/V838
+eine opt-in, bestätigte Song-/Sängerrollen-begrenzte Look/Gesture-Schicht.
+`components/visualizer/GroupDancersV326SceneV492.tsx` integriert sie im bereits
+vorhandenen R3F-Frame. `components/visualizer/LiveFxDeckV881.tsx` schreibt
+validierte Einstellungen in `components/visualizer/concertStageSyncV882.ts`.
+Keine neuen Frame-Loops, Kamera-Controller oder Audioaufnahmen.
+`tests/v995-duet-ensemble-regression.cjs` prüft Rollenbindung, Abstände,
+manuelle Autorität, Grenzen und 10.000 deterministische Konfigurationen.
+
+
+### V996 – Virtual Crowd Experience (opt-in)
+
+`virtualCrowdExperienceV996.ts` ergänzt die bereits V825-gebremste V815-Publikums-Cue
+**nach** V893 und V973. Ausschließlich auf den aktuellen Song und die Dauer
+bezogene, bestätigte V604-Szenen dürfen eine Publikumswelle aktivieren. Die
+Publikumsreaktion benötigt zusätzlich echte Kick-Energie. Es gibt keine neue
+Audioschätzung, keinen AI-/Netzwerkzugriff und keine physische Govee-Steuerung.
+
+In `VirtualConcertCrowdV815.tsx` werden die existierenden Instanz-Silhouetten
+minimal vertikal moduliert. Für optionale virtuelle Lichtstäbe entsteht **eine**
+zusätzliche instanzierte Geometrie mit maximal 24 Stäben (Balanced: 12),
+Update höchstens 20 Hz, keine Schatten oder echte Lights; deaktiviert unsichtbar.
+V996 besitzt eigene lokale Opt-in-Einstellungen im Concert Studio, publiziert
+über V882 und respektiert manuelle Show/Cues, Lyrics, Pause, Seek, Blackout,
+reduzierte Bewegung und Low-Tier-Geräte. Kein Stroboskop oder Vollbildblitz.
+
+`tests/v996-virtual-crowd-experience-regression.cjs` prüft 13 Testgruppen
+inklusive 10.000 deterministischen Samples und der verdrahteten Stage/UI-Brücke.
+`test:v996:types` gehört zum Produktions-Gate; vollständiger TypeScript-/Next.js-
+Build benötigt installierte Projektpakete unter Node 24.
+
+
+### V1001 – Interactive Concert Control
+
+Die optionale Touch-Konsole `components/visualizer/InteractiveConcertControlV1001.tsx`
+lebt im bestehenden `components/visualizer/LiveFxDeckV881.tsx` (kein weiterer
+Canvas oder Renderer). Der reine, deterministische Planer
+`components/visualizer/interactiveConcertControlV1001.ts` erzeugt nur
+Differenzen für Intensität bereits aktivierter virtueller Regler V1000
+(Bühnenregie), V992 (Kamera), V993 (Tanz) und V885 (Licht).
+Keine Govee-/Alexa-/Spotify-Kommandos, kein LLM-Netzwerkzugriff, keine
+Änderung an Effektschaltern und keine geschätzten Songzeitpunkte.
+
+Eine Übernahme erfordert bestätigte V604-Szenen und aktive Wiedergabe sowie
+manuell freigegebene Automatik. Änderungen erfolgen erst nach gesonderter
+Vorschau; vor Freigabe und Rückgängig wird der ganze vorherige Zustand auf
+zwischenzeitliche Änderungen geprüft. Ein Songwechsel remountet die Konsole.
+Touch-Ziele ab 44px, Screenreader-Beschriftungen und Reduced-Motion-CSS;
+keine zusätzlichen render loops. `tests/v1001-interactive-concert-control-regression.cjs`
+und `tests/tsconfig.v1001-core.json` prüfen Planungs- und Schutzlogik.
+Der vollständige Next.js-Build braucht Node 24 und installierte Abhängigkeiten.

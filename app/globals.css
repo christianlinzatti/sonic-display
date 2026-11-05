@@ -4866,3 +4866,23 @@
 .concert-story-energy-v984 i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#77cae4,#cc9dfb)}
 .concert-story-acts-v984 p{margin:8px 0;overflow-wrap:anywhere}
 @media(prefers-reduced-motion:reduce){.concert-story-v984 *{animation:none!important;transition:none!important}}
+
+/* V1001 – touch-friendly virtual concert controller; no stage render layer. */
+.concert-touch-v1001{margin:1rem 0;padding:1rem;border:1px solid rgba(125,166,213,.45);border-radius:14px;background:rgba(12,20,34,.85);color:#f1f5fb;min-width:0}
+.concert-touch-v1001 legend{font-weight:750;font-size:1.05rem;padding:0 .35rem}
+.concert-touch-v1001 button{min-height:44px;min-width:70px;border-radius:9px;cursor:pointer;padding:.6rem .8rem}
+.concert-touch-v1001 button:disabled{opacity:.5;cursor:not-allowed}
+.concert-touch-presets-v1001,.concert-touch-actions-v1001{display:flex;flex-wrap:wrap;gap:.5rem;margin:.75rem 0}
+.concert-touch-presets-v1001 button[aria-pressed="true"]{outline:2px solid #5eead4;outline-offset:1px}
+.concert-touch-master-v1001{display:grid;gap:.4rem;font-weight:600}
+.concert-touch-master-v1001 input{width:100%;min-height:32px;accent-color:#5eead4}
+.concert-touch-lanes-v1001{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem}
+.concert-touch-lane-v1001{display:flex;align-items:center;gap:.7rem;min-height:52px;padding:.5rem;border:1px solid #50617e;border-radius:8px}
+.concert-touch-lane-v1001 input{width:21px;height:21px;flex-shrink:0;accent-color:#5eead4}
+.concert-touch-lane-v1001 span{display:grid;gap:.15rem;font-weight:650}
+.concert-touch-lane-v1001 small{font-size:.75rem;font-weight:400}
+.concert-touch-preview-v1001{margin:.8rem 0;padding:.8rem;border:1px solid #5eead4;border-radius:9px}
+.concert-touch-help-v1001{font-size:.85rem;color:#d5dfed}
+.concert-touch-v1001 :focus-visible{outline:3px solid #5eead4;outline-offset:2px}
+@media(max-width:560px){.concert-touch-lanes-v1001{grid-template-columns:1fr}.concert-touch-actions-v1001 button{flex:1 1 100%}}
+@media(prefers-reduced-motion:reduce){.concert-touch-v1001 *{scroll-behavior:auto;animation:none!important;transition:none!important}}

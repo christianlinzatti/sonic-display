@@ -23,7 +23,7 @@ assert(Array.isArray(config.crons)&&config.crons.some(x=>x.path==='/api/cron/rel
 assert.equal(pkg.scripts.build,'next build','Keep local next build unchanged');
 assert.equal(pkg.scripts['build:vercel'],config.buildCommand);
 assert.equal(pkg.scripts['test:vercel:parity'],'node tests/vercel-production-parity-regression.cjs');
-assert(pkg.scripts.prebuild.startsWith('npm run test:v908 &&'), 'Preserve historical local CI prebuild');
+assert(pkg.scripts.prebuild.includes('npm run test:v908 &&'), 'Preserve historical local CI prebuild');
 assert(pkg.scripts.prebuild.endsWith(' && npm run check:fast'),'Keep complete local CI gate');
 for(const single of ['releases/SonicDisplay-V963.zip','releases/SonicDisplay-V964.zip'])
   assert(shouldSkipForPaths([single]),'Skip ZIP-only commit: '+single);

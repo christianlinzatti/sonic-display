@@ -19,6 +19,7 @@ import { initialPerformanceDecision, advancePerformanceDecision } from "./perfor
 import {initialVisualBudgetV640,stepVisualBudgetV640,measuredPressureV640,setVisualLevelV640,getVisualLevelV640} from "./adaptiveVisualBudgetV640";
 import { useAudioWorkerTelemetry } from "./audioWorkerTelemetry";
 import { recordQualityDecision } from "./qualityDecisionHistoryV255";
+import {sampleConcertGovernorV999,resetConcertGovernorV999} from "./concertPerformanceGovernorStoreV999";
 
 type QualityMode = "auto" | "high" | "balanced" | "low";
 type QualityState = { mode: QualityMode; tier: "high" | "balanced" | "low"; dpr: number; reason: string };
@@ -96,7 +97,10 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
     } catch { /* storage unavailable */ }
   }, []);
   useEffect(() => {
-    const clearFrameWindow=()=>{diagnostic.current={elapsed:0,frames:0,slow:0,frameSeconds:0,durations:[]};};
+    resetConcertGovernorV999(); // Revoke visual discounts on a manual-mode switch.
+  },[mode]);
+  useEffect(() => {
+    const clearFrameWindow=()=>{diagnostic.current={elapsed:0,frames:0,slow:0,frameSeconds:0,durations:[]};if(document.hidden)resetConcertGovernorV999();};
     document.addEventListener("visibilitychange",clearFrameWindow);
     const resetPi=()=>{if(document.hidden)samplePiConcertV479({at:Date.now(),fps:NaN,p95FrameMs:NaN,avatarCount,playing,visible:false});};
     document.addEventListener("visibilitychange",resetPi);
@@ -181,6 +185,10 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
     // hidden or scene-transition frame cannot be counted as performance evidence.
     // Manual modes always bypass automatic decorative throttling.
     const transitioningV640=isPiQualityTransitionV463(nowV518);
+    // V999: reuses this measured R3F window. No extra RAF or synthetic FPS.
+    sampleConcertGovernorV999({fps,p95FrameMs,slowRatio,elapsed,drawCalls:info.render.calls,
+      triangles:info.render.triangles,avatarCount,playing,visible:true,
+      transitioning:transitioningV640,auto:mode==='auto'},nowV518);
     const visualWindowV640={fps,p95FrameMs,slowRatio,elapsed,
       drawCalls:info.render.calls,triangles:info.render.triangles,
       playing,visible:true,transitioning:transitioningV640};

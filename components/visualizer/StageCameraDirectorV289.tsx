@@ -6,6 +6,7 @@ import {sampleDirectorV895,DEFAULT_DIRECTOR_V895} from './aiConcertDirectorV895'
 import {sampleUltimateV900,DEFAULT_ULTIMATE_V900} from './ultimateConcertExperienceV900';
 import {sampleEnergyV896,readEnergyV896,DEFAULT_ENERGY_V896} from './musicalEnergyIntelligenceV896';
 import {sampleCinematicCameraV897,DEFAULT_CAMERA_V897} from './cinematicCameraDirectorV897';
+import {sampleCinemaV992,createCinemaStateV992,DEFAULT_CINEMA_V992} from './cinematicCameraDirectorV992';
 import {sampleDanceCameraV898,measureAnchorMotionV898,DEFAULT_DANCE_CAMERA_V898} from './danceCameraCoordinationV898';
 import {sampleDanceShowV899,DEFAULT_DANCE_SHOW_V899} from './advancedDanceShowDirectorV899';
 import {sampleEpicDropV892,DEFAULT_EPIC_DROP_V892} from './epicDropExperienceV892';
@@ -91,6 +92,7 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
     return ()=>window.removeEventListener(LIVE_CAMERA_EDIT_COMMAND_EVENT,onCommand);
   },[]);
   const scene = useThree(state => state.scene);
+  const cinemaStateV992=useRef(createCinemaStateV992());
   const trackingEnabled = useRef(false);
   const manualMode = useRef<ManualCameraMode>("auto");
   const statusInterval = useRef(0);
@@ -818,12 +820,31 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
       lyricsVisible:!!lipSync?.cinematicLyricsVisibleV378,
       closeup:!!(sceneV528?.active&&sceneV528.focus==='lead'),duo,
     });
+    // V992: single existing R3F camera, verified V604 acts and optional measured
+    // V433 bass onset. Preserve V897 framing; V898 coordination and V351 final guard follow.
+    const cinemaV992=sampleCinemaV992({
+      pose:cinematicCameraV897.pose,plan:cameraSignalV897.directorPlanV895,
+      settings:cameraSignalV897.cameraSettingsV992??DEFAULT_CINEMA_V992,
+      trackId:cameraNarrativeV605?.plan.trackId??'',durationMs:cameraSignalV897.durationMs,
+      positionMs:progressMs,playing,autoEnabled:cameraSignalV897.enabled&&automaticShot&&shotGuardV792,
+      directorEnabled:!!cameraSignalV897.directorSettingsV895?.enabled,
+      directorCameraEnabled:!!cameraSignalV897.directorSettingsV895?.camera,
+      reducedMotion,tier:lipSync?.visualDirectorTierV397??'balanced',aspect:camera.aspect,
+      authored:!!(editingPose||userHasPreset||authoredCameraV528||authoredCueV400||
+       timelineCue?.active||cameraNarrativeV605?.manualCamera||!automaticShot),
+      manualFx:!!cameraSignalV897.manual,
+      seekBlocked:progressMs<(cameraSignalV897.atmosphereSeekBlockedUntilMs??0),
+      lyricsProtected:!!composition?.protectLyrics||!!lyricsPlanV378.active,
+      lyricsVisible:!!lipSync?.cinematicLyricsVisibleV378,
+      vocalCloseup:!!(sceneV528?.active&&sceneV528.focus==='lead'),
+      duo,measuredKick:lipSync?.rapCameraKickV433,
+    },cinemaStateV992.current);
     // V898: sampled V377 roots, verified V604 section, safe V550/V540 head + foot framing.
     // Retains V897's single camera; V351 remains the LAST protection stage.
     const confirmedV528=sceneV528?.active&&sceneV528.trackId===cameraNarrativeV605?.plan.trackId&&
       progressMs>=sceneV528.cueStartMs&&progressMs<sceneV528.cueEndMs;
     const danceCameraV898=sampleDanceCameraV898({
-      pose:cinematicCameraV897.pose,plan:cameraSignalV897.directorPlanV895,
+      pose:cinemaV992.pose,plan:cameraSignalV897.directorPlanV895,
       settings:cameraSignalV897.danceCameraSettingsV898??DEFAULT_DANCE_CAMERA_V898,
       trackId:cameraNarrativeV605?.plan.trackId??'',durationMs:cameraSignalV897.durationMs,
       positionMs:progressMs,playing,autoEnabled:cameraSignalV897.enabled&&shotGuardV792,
@@ -957,7 +978,7 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
         (cinematicIntentV633.active?cinematicIntentV633.cameraRate:1)*
         (naturalV655.cue.active?naturalV655.cue.cameraRate:1)*
         (cameraVarietyV682.cue.active?cameraVarietyV682.cue.cameraRate:1)*
-        (performanceCameraV747.cue.active?performanceCameraV747.cue.cameraRate:1)*v884Camera.cameraRate*v892Camera.cameraRate*directorCameraV895.cameraRate*energyCameraV896.cameraRate*cinematicCameraV897.cameraRate*danceCameraV898.cameraRate*danceShowCameraV899.cameraRate*ultimateCameraV900.cameraRate);
+        (performanceCameraV747.cue.active?performanceCameraV747.cue.cameraRate:1)*v884Camera.cameraRate*v892Camera.cameraRate*directorCameraV895.cameraRate*energyCameraV896.cameraRate*cinematicCameraV897.cameraRate*cinemaV992.cameraRate*danceCameraV898.cameraRate*danceShowCameraV899.cameraRate*ultimateCameraV900.cameraRate);
     camera.position.x += (stageFramed.x-camera.position.x)*alpha;
     camera.position.y += (stageFramed.y-camera.position.y)*alpha;
     camera.position.z += (stageFramed.z-camera.position.z)*alpha;

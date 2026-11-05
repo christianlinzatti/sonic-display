@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "incremental": false,
+    "noEmit": true
+  },
+  "files": [
+    "../components/visualizer/bassImpactDirectorV991.ts",
+    "../components/visualizer/bassImpactShaderV991.ts",
+    "../components/visualizer/DynamicStage.tsx",
+    "../components/visualizer/ConcertFxStudioPanelV810.tsx"
+  ]
+}

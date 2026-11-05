@@ -28,6 +28,8 @@ import {refineDeutschrapLipFlowV597,rapLipFlowRateV597} from "./advancedDeutschr
 import {refineExpressiveVocalFaceV612,expressiveVocalRateV612} from "./expressiveVocalFaceV612";
 import {refineVocalFacialRealismV617,vocalFacialRateV617} from "./advancedVocalFacialRealismV617";
 import {planAdvancedVocalLipSyncV631,vocalMouthRateV631} from "./advancedVocalLipSyncV631";
+import {planVocalPerformanceV994,vocalRateV994} from "./vocalPerformanceIntelligenceV994";
+import {readConcertStageSyncV882} from "./concertStageSyncV882";
 import {multiArtistMouthTargetV632} from "./multiArtistVocalDirectorV632";
 import {coordinateRapFaceV526,coordinateRapDanceV526} from "./unifiedConcertPerformanceV526";
 import {sampleWordConcertV567,coordinateWordFaceV567,coordinateWordDanceV567} from "./wordSyncedConcertV567";
@@ -326,6 +328,15 @@ export function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genre
     const expressiveVocalV612=refineExpressiveVocalFaceV612(lipV597.frame,optionsV538,getActivePerformanceTier());
     const facialRealismV617=refineVocalFacialRealismV617(expressiveVocalV612.frame,optionsV538,getActivePerformanceTier());
     const mouthContinuityV631=planAdvancedVocalLipSyncV631(facialRealismV617.frame,optionsV538,getActivePerformanceTier());
+    const signalV994=readConcertStageSyncV882();
+    const vocalV994=planVocalPerformanceV994(optionsV538,{
+      settings:signalV994.vocalSettingsV994,trackId:track?.id??'',activeTrackId:signalV994.trackId,
+      signalPlaying:signalV994.playing,signalEnabled:signalV994.enabled,
+      tier:getActivePerformanceTier(),face:facialRealismV617.frame.face,
+      protectedMouth:!!lipSync?.rapSyllableEditsEnabledV420&&!!optionsV538.editedWords?.length||
+       !!lipSync?.rapAudioEnabledV423&&lipSync.rapAudioTrackIdV423===track?.id||
+       avatarMotionMode==='choreography',
+    });
     const rapBodyV453=addAdvancedVocalHeadV459(addExpressiveHeadV453(rapBodyV510,lipV453),unifiedLipV526.activeV523?{...lipV510,headPitchExtra:unifiedLipV526.headPitchExtra,headYawExtra:unifiedLipV526.headYawExtra}:lipV510);
     if (mouth.current) {
       const mouthFaceV499=lipV510.face;
@@ -350,11 +361,11 @@ export function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genre
         energy:audio.mids,strength:lipSync?.expression,slot:workloadSlot,
       });
       mouth.current.scale.y += ((.32 + directedMouthV632.jaw * 1.9 - mouthFaceV612.lipsClosed*.16) - mouth.current.scale.y) * Math.min(1,delta*(lipV459.rapid?27:18)*rapLipFlowRateV597(lipV597,'jaw',true)*expressiveVocalRateV612(expressiveVocalV612,'jaw',true)*vocalFacialRateV617(facialRealismV617,'jaw',true)*
-        vocalMouthRateV631(mouthContinuityV631,'jaw',directedMouthV632.jaw>(mouth.current.scale.y-.32)/1.9,Math.max(0,Math.min(1,(mouth.current.scale.y-.32)/1.9)),directedMouthV632.jaw));
+        vocalMouthRateV631(mouthContinuityV631,'jaw',directedMouthV632.jaw>(mouth.current.scale.y-.32)/1.9,Math.max(0,Math.min(1,(mouth.current.scale.y-.32)/1.9)),directedMouthV632.jaw)*vocalRateV994(vocalV994,'jaw',directedMouthV632.jaw>(mouth.current.scale.y-.32)/1.9));
       mouth.current.scale.x += ((1 + directedMouthV632.wide*.34 - directedMouthV632.round*.50 - mouthFaceV612.lipsClosed*.25) - mouth.current.scale.x) * Math.min(1,delta*(lipV459.rapid?22:14)*rapLipFlowRateV597(lipV597,'wide',true)*expressiveVocalRateV612(expressiveVocalV612,'wide',true)*vocalFacialRateV617(facialRealismV617,'wide',true)*
-        vocalMouthRateV631(mouthContinuityV631,'wide',directedMouthV632.wide>(mouth.current.scale.x-1)/.34,Math.max(0,Math.min(1,(mouth.current.scale.x-1)/.34)),directedMouthV632.wide));
+        vocalMouthRateV631(mouthContinuityV631,'wide',directedMouthV632.wide>(mouth.current.scale.x-1)/.34,Math.max(0,Math.min(1,(mouth.current.scale.x-1)/.34)),directedMouthV632.wide)*vocalRateV994(vocalV994,'wide',directedMouthV632.wide>(mouth.current.scale.x-1)/.34));
       if (eyes.current) { eyes.current.scale.y += ((1-face.blink*.88-mouthFaceV499.squint*.30)-eyes.current.scale.y)*Math.min(1,delta*30); eyes.current.rotation.y += (rapBodyV503.eyeYaw-eyes.current.rotation.y)*Math.min(1,delta*12); }
-      if (browsV406.current) browsV406.current.position.y += ((.78 + Math.max(face.brow,mouthFaceV612.brow,mouthFaceV617.brow)*.10)-browsV406.current.position.y)*Math.min(1,delta*16);
+      if (browsV406.current) browsV406.current.position.y += ((.78 + Math.min(1,Math.max(face.brow,mouthFaceV612.brow,mouthFaceV617.brow)+vocalV994.brow)*.10)-browsV406.current.position.y)*Math.min(1,delta*16);
     }
     // Matching bounded vocal gestures for the procedural fallback avatar.
     const variationV474=resolveNaturalRapGestureV474(enhanceRapAccentV473(resolveVocalDanceAccentV472({lyrics:lipSync?.lyrics,progressMs:lipSync?.progressMs,
@@ -413,7 +424,7 @@ export function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genre
     const genreAccentV471=(genreMotionV471?.weight??0)*Math.min(1,audio.beatStrength??0)*.07;
     head.current.scale.y += (1 + (motion.beatImpulse + kickAccent * 0.55 + patternKick + learnedAccent) * 0.18 * (0.7 + danceAggression * 0.6) * intelligenceMultipliers.kick * performance.danceMultiplier * motionMix + performance.poseImpulse * 0.08 + performance.buildUp * 0.025 - preKick * 0.055 - head.current.scale.y) * smooth;
     head.current.rotation.z += (emotion.headTilt + rap.shoulder*.6 + performanceV391.expressionHeadTilt + rapBodyV510.headTilt + variationV474.headTilt - head.current.rotation.z) * smooth;
-    head.current.rotation.x += (rap.headNod + performanceV391.headNod + genreAccentV471*((genreMotionV471?.head??1)-.8) + (partnerLook?.current.pitch ?? 0) + emotion.gazePitch + rapBodyV453.headPitch + wordDanceV567.head - head.current.rotation.x) * smooth;
+    head.current.rotation.x += (rap.headNod + performanceV391.headNod + genreAccentV471*((genreMotionV471?.head??1)-.8) + (partnerLook?.current.pitch ?? 0) + emotion.gazePitch + rapBodyV453.headPitch + wordDanceV567.head + vocalV994.headPitch - head.current.rotation.x) * smooth;
     head.current.rotation.y += ((partnerLook?.current.yaw ?? 0) + emotion.gazeYaw + performanceV391.headTurn + rapBodyV510.headYaw + variationV474.headTurn+rapDynamicsV583.headTurn+(concertV586.pose?.headYaw??0) - head.current.rotation.y) * smooth;
     if (leftArm.current) leftArm.current.rotation.z += ((-0.25 + genreAccentV471*((genreMotionV471?.arms??1)-.6) + (partnerGesture?.current.leftLift ?? 0) + (performanceV391.leftArmAccent ?? 0) + (performanceV391.counterArm ?? 0) + rapBodyV510.leftArm + wordDanceV567.arms*Math.max(0,wordDanceV567.side)+Math.max(0,concertV586.pose?.armSwing??0)) - leftArm.current.rotation.z) * smooth;
     if (rightArm.current) rightArm.current.rotation.z += ((0.25 - genreAccentV471*((genreMotionV471?.arms??1)-.6) - (partnerGesture?.current.rightLift ?? 0) + (performanceV391.rightArmAccent ?? 0) - (performanceV391.counterArm ?? 0) + rapBodyV510.rightArm - wordDanceV567.arms*Math.max(0,-wordDanceV567.side)-Math.max(0,-(concertV586.pose?.armSwing??0))) - rightArm.current.rotation.z) * smooth;

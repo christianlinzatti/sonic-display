@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "incremental": false,
+    "noEmit": true
+  },
+  "files": [
+    "../lib/volumetricAtmosphereV989.ts",
+    "../components/visualizer/VolumetricDepthV989.tsx",
+    "../components/visualizer/ConcertFestivalFxV958.tsx",
+    "../components/ConcertRoadmapStudioV958.tsx"
+  ]
+}

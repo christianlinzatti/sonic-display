@@ -148,7 +148,7 @@ check('CI V897 and Windows gate registered',()=>{
  assert(read('scripts/verify-v897-windows.ps1').includes('verify:v897:focused'));
 });
 check('package and lockfile same V897 version',()=>{const p=JSON.parse(read('package.json')),l=JSON.parse(read('package-lock.json'));
- assert.match(p.version,/^0\.1\.0-v(?:897|898|899|900|901|902|903|904|905|906|907|908)$/);assert.equal(l.version,p.version);assert.equal(l.packages[''].version,p.version);
+ assert(Number(p.version.split('-v')[1])>=897);assert.equal(l.version,p.version);assert.equal(l.packages[''].version,p.version);
  assert(p.scripts['prebuild'].includes('test:v897'));assert(p.scripts['build:preflight'].includes('test:v897'));
 });
 console.log(`V897 Cinematic Camera 4.0 PASS: ${checks} checks`);

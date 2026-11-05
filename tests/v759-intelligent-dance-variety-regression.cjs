@@ -57,7 +57,7 @@ for(let i=0;i<30000;i++){
 }
 eq(original.headNod,.25,'input never mutated');
 const live=read('components/visualizer/GltfDancerAvatarV492.tsx'), preview=read('components/visualizer/AvatarEditor.tsx');
-ok(live.includes('stepDanceVarietyV759(varietyStateV759.current,genreV666Result.motion'),'live stage integrated after V666');
+ok(live.includes('stepDanceVarietyV759(varietyStateV759.current,choreographyV993.motion')&&live.includes('sampleChoreographyV993(genreV666Result.motion'),'live stage integrated after V666 through V993');
 ok(live.includes('refineNaturalDanceRigV684(varietyV759.motion'),'V684 reads variety');
 ok(live.indexOf('stepDanceVarietyV759(')<live.indexOf('updateFootGrounding('),'original IK still owns last stage');
 ok(preview.includes('stepDanceVarietyV759(varietyStateV759.current,previewMotionV758'),'GLB preview integrated');

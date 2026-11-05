@@ -94,7 +94,7 @@ test('Plan is seek-stable and input is never mutated',()=>{
 });
 test('One existing LED mesh and no added texture/renderer',()=>{
  const stage=fs.readFileSync('components/visualizer/DynamicStage.tsx','utf8');
- assert((stage.includes('fragmentShader={LED_WALL_FRAGMENT_V842}') || (stage.includes('fragmentShader={LED_WALL_FRAGMENT_V886}') && fs.readFileSync('components/visualizer/ledWallCreativeShaderV886.ts','utf8').includes('LED_WALL_FRAGMENT_V842'))) &&
+ assert((stage.includes('fragmentShader={LED_WALL_FRAGMENT_V842}') || ((stage.includes('fragmentShader={LED_WALL_FRAGMENT_V886}') || (stage.includes('fragmentShader={LED_WALL_FRAGMENT_V990}') && fs.readFileSync('components/visualizer/livingLedWallShaderV990.ts','utf8').includes('LED_WALL_FRAGMENT_V886'))) && fs.readFileSync('components/visualizer/ledWallCreativeShaderV886.ts','utf8').includes('LED_WALL_FRAGMENT_V842'))) &&
   fs.readFileSync('components/visualizer/ledWallExperienceShaderV842.ts','utf8').includes('LED_WALL_FRAGMENT_V821'));
  assert(stage.includes('planLedWallExperienceV821('));
  assert.equal((stage.match(/name="v821-led-wall"/g)||[]).length,0);

@@ -17,7 +17,10 @@ import {LASER_MATRIX_VERTEX_V811} from "./laserMatrixShaderV811";
 import {LASER_SHOW_FRAGMENT_V888} from "./laserShowShaderV888";
 import {planLaserShowV888,DEFAULT_LASER_SHOW_V888} from "./laserShowDirectorV888";
 import {directParticlesV889,DEFAULT_PARTICLE_V889} from "./advancedParticleDirectorV889";
-import {LED_WALL_FRAGMENT_V886} from "./ledWallCreativeShaderV886";
+import {LED_WALL_FRAGMENT_V990} from "./livingLedWallShaderV990";
+import {planLivingLedWallV990} from "./livingLedWallDirectorV990";
+import {createBassImpactStateV991,planBassImpactV991,enhanceBassImpactParticlesV991} from "./bassImpactDirectorV991";
+import {BASS_IMPACT_VERTEX_V991,BASS_IMPACT_FRAGMENT_V991} from "./bassImpactShaderV991";
 import {planLedWallExperienceV842} from "./ledWallExperiencePlannerV842";
 import {planLedWallMotifsV870} from "./ledWallMotifDirectorV870";
 import {planLedWallCreativeV886} from "./ledWallCreativeDirectorV886";
@@ -48,6 +51,7 @@ import {ATMOSPHERE_FRAGMENT_V887} from "./cinematicFogShaderV887";
 import {planCinematicFogV887,DEFAULT_FOG_V887} from "./cinematicFogDirectorV887";
 import {planArenaCrowdV893,DEFAULT_ARENA_CROWD_V893} from './arenaCrowdAtmosphereV893';
 import {VirtualConcertCrowdV815} from "./VirtualConcertCrowdV815";
+import {ConcertFlowBridgeV997} from './ConcertFlowBridgeV997';
 import {planIntelligentAudienceV874} from "./intelligentAudienceExperienceV874";
 import {IntelligentAudienceArmsV874} from "./IntelligentAudienceArmsV874";
 import {planSmartFestivalAtmosphereV875} from "./smartFestivalAtmosphereV875";
@@ -65,6 +69,7 @@ import type {CrowdInteractionCueV877} from "./intelligentCrowdInteractionV877";
 import type {CrowdChoreographyCueV876} from "./dynamicFestivalCrowdChoreographyV876";
 import type {FestivalAtmosphereCueV875} from "./smartFestivalAtmosphereV875";
 import {planLivingAudienceV973} from './livingAudienceDirectorV973';
+import {planCrowdExperienceV996} from './virtualCrowdExperienceV996';
 import {planVirtualConcertCrowdV815,CROWD_OFF_V815} from "./virtualConcertCrowdPlannerV815";
 import type {VirtualCrowdCueV815} from "./virtualConcertCrowdPlannerV815";
 import {planFestivalSpecialFxV844,mergeFestivalParticlesV844,coordinateFestivalFoamV844,FESTIVAL_OFF_V844} from './festivalSpecialFxPlannerV844';
@@ -155,6 +160,10 @@ import {planMusicMoodFusionV691} from "./musicMoodFusionV691";
 import {planDynamicConcertStagesV635,LED_WALL_VERTEX_V635} from "./dynamicConcertStagesV635";
 import {planCinematicStageEnvironmentV647} from "./cinematicStageEnvironmentsV647";
 import {getVisualFactorsV640,getVisualLevelV640} from "./adaptiveVisualBudgetV640";
+import {getConcertFactorsV999} from "./concertPerformanceGovernorStoreV999";
+import {getImmersiveSettingsV1000} from "./immersiveConcertStoreV1000";
+import {planImmersiveV1000} from "./immersiveConcertDirectorV1000";
+import {limitCrowdV999} from "./intelligentPerformanceGovernorV999";
 import {resolveLightingBudgetV772} from "./adaptiveLightingBudgetV772";
 import {planGenreConcertV610} from "./genreConcertExperienceV610";
 import {planContinuousConcertV611} from "./continuousConcertExperienceV611";
@@ -277,6 +286,9 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
   const goboMeshV762=useRef<Mesh>(null);
   const goboMaterialV762=useRef<import('three').ShaderMaterial>(null);
   const ledMaterialV635=useRef<import('three').ShaderMaterial>(null);
+  const bassImpactMatV991=useRef<import('three').ShaderMaterial>(null);
+  const bassImpactMeshV991=useRef<Mesh>(null);
+  const bassImpactStateV991=useRef(createBassImpactStateV991());
   // V558 cached neutral portrait temperatures; no per-frame Color allocations.
   const warmPortraitV558 = useRef(new Color('#ffe5d6'));
   const coolDuetV558 = useRef(new Color('#c3d9ff'));
@@ -386,6 +398,23 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     // V882 – shared real-show clock; no fabricated audio/transient analysis.
     // Respect saved light timelines, intentional blackouts and lyrics protection.
     const liveSignalV882=readConcertStageSyncV882();
+    // V1000: optional unified *reduction-only* score. Requires an observed,
+    // verified stage scene for this exact song. No new time, audio or device owner.
+    const immersiveCueV1000=planImmersiveV1000({
+      settings:getImmersiveSettingsV1000(),trackId:playback.trackId??'',
+      stageTrackId:liveSignalV882.trackId,durationMs:playback.durationMs,
+      sceneStartMs:liveSignalV882.sceneStartMs,section:liveSignalV882.section,
+      momentKind:liveSignalV882.momentKind,
+      verified:liveSignalV882.sceneSource==='verified',
+      playing:isPlaying&&playback.playing&&reactive,
+      autoEnabled:liveSignalV882.enabled&&liveSignalV882.sync.stage,
+      reducedMotion,manual:!!liveSignalV882.manual||manualLightingV763||authoredLightsV386||
+        showCue?.lightingEnabled===false,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      seekBlocked:playback.positionMs<(liveSignalV882.atmosphereSeekBlockedUntilMs??0),
+      lyricsProtected:lyricsProtectedV542||lyricsVisibleV813,
+      vocalFocus:vocalFocusV542,
+    });
     const liveCueV882=planConcertStageV882(liveSignalV882,{
       trackId:playback.trackId,durationMs:playback.durationMs,positionMs:playback.positionMs,
       playing:isPlaying&&playback.playing&&reactive,reducedMotion,tier,
@@ -774,6 +803,25 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       kickBand:audio.kick??0,snareBand:audio.snare??0,bass:audio.bass??0,
       energy:audio.energyEnvelope??0,attack:audio.attack??0,
       lyricsProtected:lyricsProtectedV542,vocalFocus:vocalFocusV542,groupCount:groupCountV542});
+    // V991: a measured V822 kick starts ONE seek-safe radial floor wave. The old
+    // song clock remains authoritative: no AI/BPM-derived onsets and no extra loop.
+    const bassImpactV991=planBassImpactV991({fx:fxCueV810,beat:beatV822,
+      settings:normalizeConcertFxV810(concertFxV810),trackId:playback.trackId??'',
+      positionMs:playback.positionMs,durationMs:playback.durationMs,
+      playing:isPlaying&&playback.playing&&reactive,reducedMotion,tier,
+      budget:getVisualFactorsV640().led*getConcertFactorsV999().bass*immersiveCueV1000.gains.bass,performanceGain:fxPerfV825.gains.particles,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false,
+      manualFx:!!liveSignalV882.manual,blackout:timelineCue.blackout>0||timelineCue.strobe>0||
+        timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:lyricsProtectedV542,lyricsVisible:lyricsVisibleV813,
+      vocalFocus:vocalFocusV542,groupCount:groupCountV542},bassImpactStateV991.current);
+    if(bassImpactMeshV991.current)bassImpactMeshV991.current.visible=bassImpactV991.active;
+    if(bassImpactMatV991.current){
+      const u=bassImpactMatV991.current.uniforms;
+      u.uPower.value=bassImpactV991.power;u.uRadius.value=bassImpactV991.radius;
+      u.uAge.value=bassImpactV991.age;u.uStyle.value=bassImpactV991.style;
+      if(bassImpactV991.active)(u.uColor.value as Color).set(fxCueV810.secondary);
+    }
     // V813: copies only confirmed, timestamped synchronized lyrics onto a BACKWALL
     // or a FLOOR decal. Regular 3D lyrics are unchanged and always remain in front.
     const rawLyricsCueV813=planLyricsProjectionV813({fx:fxCueV810,
@@ -1218,6 +1266,20 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       reducedMotion,lyricsProtected:lyricsProtectedV542||lyricsVisibleV813,
       vocalFocus:vocalFocusV542,groupCount:groupCountV542,
     });
+    // V996: optional audience depth, AFTER V825/V879/V893/V973 authority.
+    // Verified V604 scene and inherited V815 crowd are required; no external lighting.
+    crowdCueV815.current=limitCrowdV999(planCrowdExperienceV996({
+      base:crowdCueV815.current,plan:liveSignalV882.arenaPlanV893,fx:fxCueV810,
+      settings:liveSignalV882.crowdSettingsV996,trackId:playback.trackId,
+      durationMs:playback.durationMs,positionMs:playback.positionMs,
+      playing:isPlaying&&playback.playing&&reactive,autoEnabled:liveSignalV882.enabled,
+      tier,reducedMotion,seekBlocked:playback.positionMs<(liveSignalV882.atmosphereSeekBlockedUntilMs??0),
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false,
+      manualFx:!!liveSignalV882.manual,manualCamera:cameraNarrativeV605?.manualCamera===true,
+      lyricsProtected:lyricsProtectedV542||lyricsVisibleV813,vocalFocus:vocalFocusV542,
+      energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+    }),getConcertFactorsV999().crowd*immersiveCueV1000.gains.crowd);
     // V889: final reduction-only artistic mix after V871 and V880, applied to the
     // existing 3D particle/foam emitters. Authored timelines and stage safety win.
     const particleMixV889=directParticlesV889({
@@ -1236,6 +1298,9 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       festival:festivalCueV844.current,finale:festivalFinaleCueV847.current,
     });
     particlesCueV816.current=particleMixV889.particles;
+    // V991 reuses V816's existing capped rings AFTER V825/V880/V889 priorities.
+    particlesCueV816.current=enhanceBassImpactParticlesV991(particlesCueV816.current,
+      bassImpactV991,authoredLanesV850.includes('particles')||!!liveSignalV882.manual);
     foamCueV817.current=particleMixV889.foam;
     soapBubbleCueV8441.current=particleMixV889.bubbles;
     paperStreamersCueV846.current=particleMixV889.streamers;
@@ -1607,6 +1672,33 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       u.uLed86Motion.value=ledCreativeV886.motion;
       u.uLed86Camera.value=ledCreativeV886.camera;
     }
+    // V990: one extra genre-sensitive line motif on the existing wall. V886
+    // validates verified music and all guards; no separate clock or LED lane.
+    const livingLedV990=planLivingLedWallV990({
+      fx:fxCueV810,wall:wallV821,settings:concertFxV810,section:fxCueV810.section,
+      playing:isPlaying&&playback.playing,reducedMotion,tier,
+      budget:ledBudgetV640*getConcertFactorsV999().led*immersiveCueV1000.gains.led,timelineGain:Math.min(1,Math.max(0,ledGainV823)),
+      manualLed:authoredFxV823.led.boost>.001||authoredFxV823.led.mute>.001,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false||
+        timelineGainV354!==1,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0,
+      lyricsProtected:lyricsProtectedV542,lyricsVisible:lyricsVisibleV813,
+      vocalFocus:vocalFocusV542,groupCount:groupCountV542,
+      cameraCloseup:concertLipSyncV386?.cinematicSceneV528?.active===true&&vocalFocusV542,
+      manualCamera:cameraNarrativeV605?.manualCamera===true,
+    });
+    if(led){
+      const u=led.uniforms;
+      u.uLed90Power.value=livingLedV990.power*concertDirectorV895.ledGain*
+        energyCueV896.ledGain*ultimateStageV900.ledGain*ledBlendV849;
+      u.uLed90Mode.value=livingLedV990.mode;
+      u.uLed90Phase.value=livingLedV990.phase;
+      u.uLed90Motion.value=livingLedV990.motion;
+      u.uLed90Bass.value=livingLedV990.bass;
+      u.uLed90Mids.value=livingLedV990.mids;
+      u.uLed90Highs.value=livingLedV990.highs;
+      u.uLed90Accent.value=livingLedV990.accent;
+    }
     // V894: tint the EXISTING LED-wall color uniforms very gently as well.
     // Never change manually authored LED lanes or create a parallel shader.
     if(led&&genreStageCueV894.current.active&&genreStageCueV894.current.lightMix>0&&
@@ -1872,6 +1964,10 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
   });
   return <group>
     <ConcertStageFxV882 cueRef={liveStageV882}/>
+    {/* V997: decorative, opt-in observed-track handover; never takes camera/light ownership. */}
+    <ConcertFlowBridgeV997 allowed={isPlaying&&!reducedMotion&&!manualLightingV763&&!lyricsProtectedV542}
+      color={musicPalette?.secondary??palette.secondary}/>
+
     <VirtualPyroStageV891 cueRef={livePyroV891}/>
     <GenreStageArchitectureV894 cueRef={genreStageCueV894}/>
     <color attach="background" args={[palette.base]}/>
@@ -1914,7 +2010,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     <mesh ref={ledWallV635} visible={false} position={[0,0.05,-3.8]} renderOrder={-1}>
       <planeGeometry args={[6.2,3.35]}/>
       <shaderMaterial ref={ledMaterialV635} transparent depthWrite={false}
-        vertexShader={LED_WALL_VERTEX_V635} fragmentShader={LED_WALL_FRAGMENT_V886}
+        vertexShader={LED_WALL_VERTEX_V635} fragmentShader={LED_WALL_FRAGMENT_V990}
         uniforms={{uOpacity:{value:0},uPattern:{value:0},uPhase:{value:0},uSpeed:{value:0},
           uSceneStyle:{value:0},uStageMorph:{value:0},uVariation:{value:0},uArchitecture:{value:0},uDepth:{value:0},uMotion:{value:0},
           uLed21Power:{value:0},uLed21Look:{value:0},uLed21Bass:{value:0},
@@ -1928,9 +2024,22 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
           uLed86Power:{value:0},uLed86Mode:{value:0},uLed86Phase:{value:0},
           uLed86Bass:{value:0},uLed86Mids:{value:0},uLed86Highs:{value:0},
           uLed86Motion:{value:0},uLed86Camera:{value:0},
+          uLed90Power:{value:0},uLed90Mode:{value:0},uLed90Phase:{value:0},
+          uLed90Motion:{value:0},uLed90Bass:{value:0},uLed90Mids:{value:0},
+          uLed90Highs:{value:0},uLed90Accent:{value:0},
           uBeat22Kick:{value:0},uBeat22Snare:{value:0},uBeat22Peak:{value:0},
           uFxPower:{value:0},uFxStyle:{value:0},uAudioBass:{value:0},uAudioMids:{value:0},uAudioHighs:{value:0},
           uPrimary:{value:new Color(palette.primary)},uSecondary:{value:new Color(palette.secondary)}}}/>
+    </mesh>
+    {/* V991: opt-in single planar radial floor shader. No independent timer or flashes.
+        Low tier, manual shows, unknown timestamps and lyric focus all disable it. */}
+    <mesh ref={bassImpactMeshV991} name="v991-bass-impact-floor" visible={false}
+      position={[0,-1.902,-.20]} rotation={[-Math.PI/2,0,0]} renderOrder={1}>
+      <planeGeometry args={[5.8,5.8]}/>
+      <shaderMaterial ref={bassImpactMatV991} transparent depthWrite={false} depthTest
+        vertexShader={BASS_IMPACT_VERTEX_V991} fragmentShader={BASS_IMPACT_FRAGMENT_V991}
+        uniforms={{uColor:{value:new Color(palette.secondary)},uPower:{value:0},
+          uRadius:{value:0},uAge:{value:0},uStyle:{value:0}}}/>
     </mesh>
     {/* V811: one lightweight laser/ribbon shader behind all performers, no flashes. */}
     <mesh ref={laserMeshV811} name="v811-laser-matrix" visible={false} position={[0,0.05,-3.57]} renderOrder={-1}>

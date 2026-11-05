@@ -9,6 +9,9 @@ import {ConcertImprovementAssistantPanelV802} from './ConcertImprovementAssistan
 import type {StageEnvironmentId} from './stages';
 import type {PerformerPreviewV805} from './multiPerformerVisibilityV805';
 import {QualityAutoTunePanelV755} from './QualityAutoTunePanelV755';
+import {ConcertPerformanceGovernorPanelV999} from './ConcertPerformanceGovernorPanelV999';
+import {ImmersiveConcertPanelV1000} from './ImmersiveConcertPanelV1000';
+import {ConcertQualityAssurancePanelV1002} from './ConcertQualityAssurancePanelV1002';
 import {V751_OPEN_RENDER_QA_EVENT,useConcertDashboardV751} from './concertDashboardStoreV751';
 import {isConcertDashboardFreshV751,type ConcertPlanStateV751} from './concertDashboardProjectionV751';
 
@@ -60,11 +63,14 @@ export function ConcertQualityDashboardV751({avatarModelUrl,avatarChoicesV805,st
        'Messwerte erscheinen nur mit aktivierter V466-QA-Probe in der laufenden 3D-Bühne.'}</small>
      {renderFresh&&render.assessment?.warnings?.length?<ul>{render.assessment.warnings.map((w,i)=><li key={i}>{w}</li>)}</ul>:null}
    </div>
+   <ConcertQualityAssurancePanelV1002 now={now}/>
    <ConcertExperienceInspectorPanelV801/>
    <ConcertImprovementAssistantPanelV802 modelUrl={avatarModelUrl} avatarChoicesV805={avatarChoicesV805} stageTheme={stageTheme}/>
    <VisualConcertInspectorPanelV754/>
    <ConcertVisualQualityInspectorV836/>
    <QualityAutoTunePanelV755/>
+   <ConcertPerformanceGovernorPanelV999/>
+   <ImmersiveConcertPanelV1000/>
    <RealConcertBenchmarkPanelV753/>
    <p className="v751-hint">„Konfiguriert“ bedeutet hier: Das Modul hat gültige Einstellungen, nicht dass ein GLB-Rig oder externer Dienst geprüft wurde. „Automatisch vorgesehen“ bestätigt nur einen Plan, keine sichtbare Ausführung. Keine Speicherung von Titeln, Lyrics oder Messhistorie.</p>
  </section>;

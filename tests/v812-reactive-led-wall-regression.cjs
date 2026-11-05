@@ -5,7 +5,7 @@ const ui=fs.readFileSync('components/visualizer/ConcertFxStudioPanelV810.tsx','u
 const context=fs.readFileSync('context/UiPreferencesContext.tsx','utf8');
 for(const key of ['uAudioBass','uAudioMids','uAudioHighs','uFxPower','uFxStyle']){
  assert(stage.includes(key));assert(shader.includes(key));}
-assert((stage.includes('fragmentShader={LED_WALL_FRAGMENT_V842}') || (stage.includes('fragmentShader={LED_WALL_FRAGMENT_V886}') && fs.readFileSync('components/visualizer/ledWallCreativeShaderV886.ts','utf8').includes('LED_WALL_FRAGMENT_V842')))&&
+assert((stage.includes('fragmentShader={LED_WALL_FRAGMENT_V842}') || ((stage.includes('fragmentShader={LED_WALL_FRAGMENT_V886}') || (stage.includes('fragmentShader={LED_WALL_FRAGMENT_V990}') && fs.readFileSync('components/visualizer/livingLedWallShaderV990.ts','utf8').includes('LED_WALL_FRAGMENT_V886'))) && fs.readFileSync('components/visualizer/ledWallCreativeShaderV886.ts','utf8').includes('LED_WALL_FRAGMENT_V842')))&&
  fs.readFileSync('components/visualizer/ledWallExperienceShaderV842.ts','utf8').includes('LED_WALL_FRAGMENT_V821')||
  stage.includes('fragmentShader={LED_WALL_FRAGMENT_V812}')||
  stage.includes('fragmentShader={LED_WALL_FRAGMENT_V821}')&&

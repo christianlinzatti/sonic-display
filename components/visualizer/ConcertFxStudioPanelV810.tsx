@@ -36,6 +36,8 @@ import {planCinematicTransitionV819} from './cinematicTransitionPlannerV819';
 import {planLedWallExperienceV821} from './ledWallExperiencePlannerV821';
 import {planLedWallExperienceV842} from './ledWallExperiencePlannerV842';
 import {planLedWallCreativeV886,LED_CREATIVE_NAMES_V886} from './ledWallCreativeDirectorV886';
+import {planLivingLedWallV990,LIVING_LED_NAMES_V990} from './livingLedWallDirectorV990';
+import {planBassImpactV991,createBassImpactStateV991} from './bassImpactDirectorV991';
 import {planBeatAccentDirectorV822} from './beatAccentDirectorV822';
 import {planVocalAdlibFxV820} from './vocalAdlibFxPlannerV820';
 const genres: {value:ConcertFxGenreV810;label:string}[]=[
@@ -128,6 +130,14 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
    section,playing:true,reducedMotion:false,tier:'high',budget:1,timelineGain:1,
    manualLed:false,manualLighting:false,blackout:false,lyricsProtected:false,
    lyricsVisible:false,vocalFocus:false,cameraCloseup:false,manualCamera:false,groupCount:1});
+ const livingPreviewV990=planLivingLedWallV990({fx:preview,wall:wallPreview,settings:s,
+   section,playing:true,reducedMotion:false,tier:'high',budget:1,timelineGain:1,
+   manualLed:false,manualLighting:false,blackout:false,lyricsProtected:false,
+   lyricsVisible:false,vocalFocus:false,cameraCloseup:false,manualCamera:false,groupCount:1});
+ const bassPreviewV991=planBassImpactV991({fx:preview,beat:beatPreview,settings:s,
+   trackId:'simulated-preview',positionMs:5000,durationMs:10000,playing:true,reducedMotion:false,
+   tier:'high',budget:1,performanceGain:1,manualLighting:false,manualFx:false,blackout:false,
+   lyricsProtected:false,lyricsVisible:false,vocalFocus:false,groupCount:1},createBassImpactStateV991());
  const festivalPreviewV844=planFestivalSpecialFxV844({fx:preview,settings:s,playing:true,
    reducedMotion:false,manualLighting:false,blackout:false,lyricsProtected:false,vocalFocus:false,
    groupCount:1,tier:'high',energy:.86,kick:.92,particleBudget:1,foamBudget:1,timelineGain:1,performanceGain:1});
@@ -501,6 +511,65 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
     Bestehende LED-Fläche ohne zusätzliche Draw-Calls. Manuelle LED-Spuren, feste V821/V842-Looks,
     verifizierte Musikabschnitte, Reduced Motion, Blackout, Lyrics und Low-Tier behalten Vorrang.
     Kein Vollbildblitz, keine zusätzliche Lichtquelle.</small>
+  </fieldset>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+   <legend>V991 · Bass Impact Physics</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.bassImpactV991}
+     onChange={e=>patch({bassImpactV991:e.target.checked})}/>
+     Bass-Schockwellen auf dem virtuellen Bühnenboden aktivieren</label>
+   <label>Impulsstärke ({s.bassImpactStrengthV991} %)
+     <input type="range" min="0" max="100" step="5" value={s.bassImpactStrengthV991}
+       disabled={!s.bassImpactV991} onChange={e=>patch({bassImpactStrengthV991:Number(e.target.value)})}/></label>
+   <label>Effektstil <select value={s.bassImpactStyleV991} disabled={!s.bassImpactV991}
+     onChange={e=>patch({bassImpactStyleV991:e.target.value as ConcertFxSettingsV810['bassImpactStyleV991']})}>
+     <option value="ripple">Räumliche Wellen</option>
+     <option value="shockwave">Bass-Schockwelle</option>
+     <option value="subtle">Dezenter Bodenpuls</option>
+   </select></label>
+   <label className="setting-check"><input type="checkbox" checked={s.bassImpactParticlesV991}
+     disabled={!s.bassImpactV991||!s.reactiveParticles}
+     onChange={e=>patch({bassImpactParticlesV991:e.target.checked})}/>
+     Bestehende Partikelringe dezent verstärken</label>
+   <small>Nur bei nachweislich erkannten Bass-Transienten und bestätigter Songphase.
+     Vorschau (simulierter Impuls): {bassPreviewV991.active?
+       `Bodenwelle bis ${Math.round(bassPreviewV991.power*1000)/10} % Stärke`:'aus oder auf Impuls wartend'}.
+     Kein künstlicher Bass bei Spotify ohne Audiosignal. Keine neuen Blitze, keine Govee-Befehle.
+     Bei manueller Show, Pausen, Blackout, Lyrics-Schutz, Reduced Motion und Eco/Low-Tier aus.
+     Maximal ein zusätzlicher Boden-Draw-Call; Partikel verwenden vorhandene Instanzen.</small>
+  </fieldset>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+   <legend>V990 · Living LED Wall 3.0</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.livingLedWallV990}
+    disabled={!s.ledWall||!s.ledCreativeV886}
+    onChange={e=>patch({livingLedWallV990:e.target.checked})}/> Genreabhängige LED-Muster aktivieren</label>
+   <label>Visueller Stil <select value={s.livingLedStyleV990}
+    disabled={!s.livingLedWallV990||!s.ledWall}
+    onChange={e=>patch({livingLedStyleV990:e.target.value as ConcertFxSettingsV810['livingLedStyleV990']})}>
+    <option value="auto">Automatisch – Deutschrap / Hardtekk / Rock / Pop</option>
+    <option value="city">City Pulse – animierte Skyline</option>
+    <option value="matrix">Neon Matrix – geometrisches Raster</option>
+    <option value="arena">Arena Beams – große Lichtfächer</option>
+    <option value="prism">Prism Flow – geometrische Facetten</option>
+   </select></label>
+   <label>Stärke ({s.livingLedStrengthV990} %)<input type="range" min="0" max="100" step="5"
+    value={s.livingLedStrengthV990} disabled={!s.livingLedWallV990||!s.ledWall}
+    onChange={e=>patch({livingLedStrengthV990:Number(e.target.value)})}/></label>
+   <label>Bewegung <select value={s.livingLedMotionV990}
+    disabled={!s.livingLedWallV990||!s.ledWall}
+    onChange={e=>patch({livingLedMotionV990:e.target.value as ConcertFxSettingsV810['livingLedMotionV990']})}>
+    <option value="calm">Sanft</option><option value="balanced">Ausgewogen</option>
+    <option value="energetic">Dynamisch – ohne Blitz</option>
+   </select></label>
+   <label className="setting-check"><input type="checkbox" checked={s.livingLedCameraGuardV990}
+    disabled={!s.livingLedWallV990}
+    onChange={e=>patch({livingLedCameraGuardV990:e.target.checked})}/>
+    Lyrics und Kamera-Nahaufnahmen schützen</label>
+   <small>Vorschau (simulierte Songphase {section}): {livingPreviewV990.active?
+    `${LIVING_LED_NAMES_V990[livingPreviewV990.mode]} · Zusatzhelligkeit maximal ${Math.round(livingPreviewV990.power*10000)/100} %`:
+    livingPreviewV990.reason==='protected'?'manuelle Vorgaben geschützt':'aus'}.
+    Nur bestätigte Musikabschnitte aktivieren die echte Wand. Ein bestehender Shader und
+    eine LED-Fläche bleiben erhalten; keine zusätzlichen Draw-Calls, Govee-Kommandos,
+    Full-Stage-Blitze oder neue Timing-Quellen. Niedrige Leistungsstufe deaktiviert V990.</small>
   </fieldset>
   <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
    <legend>V886 · LED Wall Creative Director</legend>

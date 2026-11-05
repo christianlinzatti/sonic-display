@@ -13,8 +13,12 @@ import {planImmersiveConcertV966} from '@/lib/immersiveConcertEngineV966';
 import {applyAlexaVirtualSceneV968,maskAlexaImmersiveCueV968} from '@/lib/alexaConcertV968';
 import {applySmartConcertPresetV969} from '@/lib/smartConcertPresetsV969';
 import {ImmersiveConcertEnvironmentV966} from './ImmersiveConcertEnvironmentV966';
+import {planHolographicStagePortalV988} from '@/lib/holographicStagePortalV988';
+import {HolographicStagePortalV988} from './HolographicStagePortalV988';
 import {planVolumetricStageV972} from '@/lib/volumetricStageAtmosphereV972';
 import {VolumetricStageAtmosphereV972} from './VolumetricStageAtmosphereV972';
+import {planVolumetricAtmosphereV989} from '@/lib/volumetricAtmosphereV989';
+import {VolumetricDepthV989} from './VolumetricDepthV989';
 import {readTrackAnalysisV318,ANALYSIS_EVENT_V318} from '@/services/musicAnalysis/trackAnalysisV318';
 import {loadConcertRoadmapV958,composeConcertSceneV958,CONCERT_ROADMAP_EVENT_V958,
  type ConcertSettingsV958,type ConcertPhaseV958} from '@/lib/ultimateConcertRoadmapV958';
@@ -93,8 +97,17 @@ export function ConcertFestivalFxV958({trackId,progressMs,durationMs,genre,energ
   trackId,analysisTrackId:analysis?.trackId??'',positionMs:progressMs,durationMs,
   energy,bass,playing,reducedMotion,authoredStage,lyricsVisible,lowPerformance});
  const immersiveV966=maskAlexaImmersiveCueV968(immersiveBaseV966,settings);
+ // V988 reuses the verified, masked V966 cue and the existing stage canvas.
+ // No independent prediction, timers, new render pass or hardware output.
+ const portalV988=planHolographicStagePortalV988({cue:immersiveV966,scene,settings,
+  playing,reducedMotion,lyricsVisible,lowPerformance,
+  showBackdrop:!scene?.verified||scene.timelineOverride||lowPerformance||
+   settings.voiceZoneV968==='all'||settings.voiceZoneV968==='backdrop'});
  const volumetricV972=planVolumetricStageV972({immersive:immersiveV966,scene,settings,
   positionMs:progressMs,playing,authoredStage,lowPerformance,reducedMotion,lyricsVisible});
+ // V989 extends the masked V972 stage cue; no duplicate stage/beat detector.
+ const depthV989=planVolumetricAtmosphereV989({base:volumetricV972,scene,settings,
+  playing,authoredStage,lowPerformance,reducedMotion,lyricsVisible,positionMs:progressMs});
  const atmosphereV978=planConcertAtmosphereV978({scene,settings,trackId,analysisTrackId:analysis?.trackId??'',
   sectionLabel:section?.label??'',sectionConfidence:section?.confidence??0,
   positionMs:progressMs,durationMs,sectionStartMs:section?.startMs??-1,
@@ -113,7 +126,9 @@ export function ConcertFestivalFxV958({trackId,progressMs,durationMs,genre,energ
  const impact=scene.effects.includes('bass-impact');
  return <group name="UltimateConcertStageFxV958">
   <ImmersiveConcertEnvironmentV966 cue={immersiveV966}/>
+  <HolographicStagePortalV988 portal={portalV988}/>
   <VolumetricStageAtmosphereV972 cue={volumetricV972}/>
+  <VolumetricDepthV989 cue={depthV989}/>
   <ConcertGenreAtmosphereV978 cue={atmosphereDirectedV979}
    showStage={showStageV968} showAudience={voiceZonesEnabledV968&&
     (settings.voiceZoneV968==='all'||settings.voiceZoneV968==='audience')}/>

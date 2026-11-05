@@ -27,12 +27,20 @@ import {PYRO_STORAGE_KEY_V891,DEFAULT_PYRO_V891,normalizePyroV891,
  suggestedPyroV891,exportPyroPlanV891,type PyroSettingsV891} from './virtualPyrotechnicsV891';
 import {ULTIMATE_KEY_V900,DEFAULT_ULTIMATE_V900,normalizeUltimateV900,buildUltimatePlanV900,
  sampleUltimateV900,exportUltimatePlanV900,type UltimateSettingsV900} from './ultimateConcertExperienceV900';
+import {CHOREOGRAPHY_KEY_V993,DEFAULT_CHOREOGRAPHY_V993,normalizeChoreographyV993,previewChoreographyV993,
+ type ChoreographySettingsV993} from './aiChoreographyDirectorV993';
+import {VOCAL_KEY_V994,DEFAULT_VOCAL_V994,normalizeVocalV994,type VocalSettingsV994} from './vocalPerformanceIntelligenceV994';
+import {DUET_KEY_V995,DEFAULT_DUET_V995,normalizeDuetV995,type DuetSettingsV995} from './duetEnsembleDirectorV995';
+import {CROWD_EXPERIENCE_KEY_V996,DEFAULT_CROWD_EXPERIENCE_V996,normalizeCrowdExperienceV996,type CrowdExperienceSettingsV996} from './virtualCrowdExperienceV996';
+import {CONCERT_FLOW_KEY_V997,DEFAULT_FLOW_V997,EMPTY_FLOW_V997,normalizeFlowV997,advanceFlowV997,type FlowSettingsV997,type FlowHandoverV997} from './continuousConcertFlowV997';
 import {DANCE_SHOW_KEY_V899,DEFAULT_DANCE_SHOW_V899,normalizeDanceShowV899,exportDanceShowV899,
  type DanceShowSettingsV899} from './advancedDanceShowDirectorV899';
 import {DANCE_CAMERA_KEY_V898,DEFAULT_DANCE_CAMERA_V898,normalizeDanceCameraV898,exportDanceCameraV898,
  type DanceCameraSettingsV898} from './danceCameraCoordinationV898';
 import {CAMERA_KEY_V897,DEFAULT_CAMERA_V897,normalizeCinematicCameraV897,selectCameraShotV897,exportCinematicCameraV897,
  type CinematicCameraSettingsV897} from './cinematicCameraDirectorV897';
+import {CINEMA_KEY_V992,DEFAULT_CINEMA_V992,normalizeCinemaV992,previewCinemaV992,
+ type CinemaSettingsV992} from './cinematicCameraDirectorV992';
 import {ENERGY_KEY_V896,DEFAULT_ENERGY_V896,normalizeEnergyV896,readEnergyV896,exportEnergyV896,
  type EnergySettingsV896} from './musicalEnergyIntelligenceV896';
 import {DIRECTOR_KEY_V895,DEFAULT_DIRECTOR_V895,normalizeDirectorV895,buildDirectorPlanV895,
@@ -48,6 +56,13 @@ import {SPOTLIGHT_STORAGE_KEY_V890,DEFAULT_SPOTLIGHT_V890,normalizeSpotlightV890
  suggestedSpotlightV890,exportSpotlightPlanV890,type SpotlightSettingsV890} from './professionalSpotlightShowV890';
 import {ConcertQualityIntelligencePanelV901} from './ConcertQualityIntelligencePanelV901';
 import {ImmersiveAiDirectorV982} from './ImmersiveAiDirectorV982';
+import {LiveConcertAssistantV998} from './LiveConcertAssistantV998';
+import {InteractiveConcertControlV1001} from './InteractiveConcertControlV1001';
+import {AutoImprovementDirectorV1003} from './AutoImprovementDirectorV1003';
+import type {TouchValuesV1001,TouchContextV1001} from './interactiveConcertControlV1001';
+import {getImmersiveSettingsV1000,useImmersiveSettingsV1000,restoreImmersiveSettingsV1000,setImmersiveSettingsV1000} from './immersiveConcertStoreV1000';
+import {normalizeLivePlanV998,resolveLiveChangesV998,
+ type LivePlanV998,type LiveSnapshotV998} from '@/lib/liveConcertAssistantV998';
 import {SongIntelligencePanelV983} from './SongIntelligencePanelV983';
 import type {ImmersivePlanV982} from '@/lib/immersiveAiDirectorV982';
 import type {AdvisorPatchV902} from './concertQualityAdvisorV902';
@@ -56,15 +71,17 @@ import {CONCERT_SYNC_KEY_V882,DEFAULT_CONCERT_SYNC_V882,normalizeConcertSyncV882
  publishConcertStageSyncV882,type ConcertSyncSettingsV882} from './concertStageSyncV882';
 
 type Props={trackId:string;title:string;artist:string;durationMs:number;progressMs:number;genre:string;
- playing:boolean;reducedMotion:boolean;controlsVisible?:boolean};
+ playing:boolean;reducedMotion:boolean;lyricsProtected?:boolean;controlsVisible?:boolean};
 const fmt=(ms:number)=>`${Math.floor(ms/60000)}:${String(Math.floor(ms/1000)%60).padStart(2,'0')}`;
 const sparks=Array.from({length:12},(_,i)=>i);
 const effectLabels:Record<LiveFxManualV881,string>={shockwave:'Bass-Welle',sweep:'Arena Sweep',confetti:'Konfetti'};
 const sceneLabels:Record<string,string>={verse:'Verse',hook:'Hook',build:'Build-up',drop:'Drop',break:'Break'};
 const momentIcons:Record<string,string>={rise:'↗',hook:'✦',drop:'◎',finale:'★'};
 
-export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre,playing,reducedMotion,controlsVisible=true}:Props){
+export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre,playing,reducedMotion,lyricsProtected=false,controlsVisible=true}:Props){
  const [settings,setSettings]=useState<LiveFxSettingsV881>({...DEFAULT_LIVE_FX_V881});
+ const immersiveSettingsV1000=useImmersiveSettingsV1000();
+ useEffect(()=>{restoreImmersiveSettingsV1000();},[]);
  const [storageReady,setStorageReady]=useState(false);
  const [syncSettings,setSyncSettings]=useState<ConcertSyncSettingsV882>({...DEFAULT_CONCERT_SYNC_V882});
  const [syncReady,setSyncReady]=useState(false);
@@ -90,11 +107,25 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
  const [ultimateSettingsV900,setUltimateSettingsV900]=useState<UltimateSettingsV900>({...DEFAULT_ULTIMATE_V900});
  const [ultimateReadyV900,setUltimateReadyV900]=useState(false);
  const [danceShowSettingsV899,setDanceShowSettingsV899]=useState<DanceShowSettingsV899>({...DEFAULT_DANCE_SHOW_V899});
+ const [choreographySettingsV993,setChoreographySettingsV993]=useState<ChoreographySettingsV993>({...DEFAULT_CHOREOGRAPHY_V993});
+ const [choreographyReadyV993,setChoreographyReadyV993]=useState(false);
+ const [vocalSettingsV994,setVocalSettingsV994]=useState<VocalSettingsV994>({...DEFAULT_VOCAL_V994});
+ const [vocalReadyV994,setVocalReadyV994]=useState(false);
+ const [duetSettingsV995,setDuetSettingsV995]=useState<DuetSettingsV995>({...DEFAULT_DUET_V995});
+ const [duetReadyV995,setDuetReadyV995]=useState(false);
+ const [crowdSettingsV996,setCrowdSettingsV996]=useState<CrowdExperienceSettingsV996>({...DEFAULT_CROWD_EXPERIENCE_V996});
+ const [crowdReadyV996,setCrowdReadyV996]=useState(false);
+ const [flowSettingsV997,setFlowSettingsV997]=useState<FlowSettingsV997>({...DEFAULT_FLOW_V997});
+ const [flowReadyV997,setFlowReadyV997]=useState(false);
+ const [flowHandoverV997,setFlowHandoverV997]=useState<FlowHandoverV997|null>(null);
+ const flowStateV997=useRef(EMPTY_FLOW_V997);
  const [danceShowReadyV899,setDanceShowReadyV899]=useState(false);
  const [danceCameraSettingsV898,setDanceCameraSettingsV898]=useState<DanceCameraSettingsV898>({...DEFAULT_DANCE_CAMERA_V898});
  const [danceCameraReadyV898,setDanceCameraReadyV898]=useState(false);
  const [cameraSettingsV897,setCameraSettingsV897]=useState<CinematicCameraSettingsV897>({...DEFAULT_CAMERA_V897});
  const [cameraReadyV897,setCameraReadyV897]=useState(false);
+ const [cameraSettingsV992,setCameraSettingsV992]=useState<CinemaSettingsV992>({...DEFAULT_CINEMA_V992});
+ const [cameraReadyV992,setCameraReadyV992]=useState(false);
  const [energySettingsV896,setEnergySettingsV896]=useState<EnergySettingsV896>({...DEFAULT_ENERGY_V896});
  const [energyReadyV896,setEnergyReadyV896]=useState(false);
  const [directorSettingsV895,setDirectorSettingsV895]=useState<DirectorSettingsV895>({...DEFAULT_DIRECTOR_V895});
@@ -111,6 +142,13 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
   trackId:string;
   before:{atmosphere:AtmosphereSettingsV885;genreStage:GenreStageSettingsV894;fx:LiveFxSettingsV881};
   after:{atmosphere:AtmosphereSettingsV885;genreStage:GenreStageSettingsV894;fx:LiveFxSettingsV881};
+ }>(null);
+ const [liveUndoV998,setLiveUndoV998]=useState<null|{
+  trackId:string;
+  before:{atmosphere:AtmosphereSettingsV885;stage:GenreStageSettingsV894;
+   camera:CinemaSettingsV992;fx:LiveFxSettingsV881};
+  after:{atmosphere:AtmosphereSettingsV885;stage:GenreStageSettingsV894;
+   camera:CinemaSettingsV992;fx:LiveFxSettingsV881};
  }>(null);
  const [trigger,setTrigger]=useState<LiveFxTriggerV881|null>(null);
  const nextTrigger=useRef(0);
@@ -196,6 +234,62 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
   try{window.localStorage.setItem(ULTIMATE_KEY_V900,JSON.stringify(ultimateSettingsV900));}catch{setStorageError(true);}
  },[ultimateReadyV900,ultimateSettingsV900]);
  useEffect(()=>{
+  try{setChoreographySettingsV993(normalizeChoreographyV993(JSON.parse(window.localStorage.getItem(CHOREOGRAPHY_KEY_V993)??'null')));}
+  catch{setChoreographySettingsV993({...DEFAULT_CHOREOGRAPHY_V993});}
+  setChoreographyReadyV993(true);
+ },[]);
+ useEffect(()=>{
+  if(!choreographyReadyV993)return;
+  try{window.localStorage.setItem(CHOREOGRAPHY_KEY_V993,JSON.stringify(choreographySettingsV993));}catch{setStorageError(true);}
+ },[choreographyReadyV993,choreographySettingsV993]);
+ useEffect(()=>{
+  try{setVocalSettingsV994(normalizeVocalV994(JSON.parse(window.localStorage.getItem(VOCAL_KEY_V994)??'null')));}
+  catch{setVocalSettingsV994({...DEFAULT_VOCAL_V994});}
+  setVocalReadyV994(true);
+ },[]);
+ useEffect(()=>{
+  if(!vocalReadyV994)return;
+  try{window.localStorage.setItem(VOCAL_KEY_V994,JSON.stringify(vocalSettingsV994));}catch{setStorageError(true);}
+ },[vocalReadyV994,vocalSettingsV994]);
+ useEffect(()=>{
+  try{setDuetSettingsV995(normalizeDuetV995(JSON.parse(window.localStorage.getItem(DUET_KEY_V995)??'null')));}
+  catch{setDuetSettingsV995({...DEFAULT_DUET_V995});}
+  setDuetReadyV995(true);
+ },[]);
+ useEffect(()=>{
+  if(!duetReadyV995)return;
+  try{window.localStorage.setItem(DUET_KEY_V995,JSON.stringify(duetSettingsV995));}catch{setStorageError(true);}
+ },[duetReadyV995,duetSettingsV995]);
+ useEffect(()=>{
+  try{setCrowdSettingsV996(normalizeCrowdExperienceV996(JSON.parse(window.localStorage.getItem(CROWD_EXPERIENCE_KEY_V996)??'null')));}
+  catch{setCrowdSettingsV996({...DEFAULT_CROWD_EXPERIENCE_V996});}
+  setCrowdReadyV996(true);
+ },[]);
+ useEffect(()=>{
+  if(!crowdReadyV996)return;
+  try{window.localStorage.setItem(CROWD_EXPERIENCE_KEY_V996,JSON.stringify(crowdSettingsV996));}catch{setStorageError(true);}
+ },[crowdReadyV996,crowdSettingsV996]);
+ useEffect(()=>{
+  try{setFlowSettingsV997(normalizeFlowV997(JSON.parse(window.localStorage.getItem(CONCERT_FLOW_KEY_V997)??'null')));}
+  catch{setFlowSettingsV997({...DEFAULT_FLOW_V997});}
+  setFlowReadyV997(true);
+ },[]);
+ useEffect(()=>{
+  if(!flowReadyV997)return;
+  try{window.localStorage.setItem(CONCERT_FLOW_KEY_V997,JSON.stringify(flowSettingsV997));}catch{setStorageError(true);}
+ },[flowReadyV997,flowSettingsV997]);
+ // Observed Spotify snapshots, not a synthetic playlist or speculative next track.
+ useEffect(()=>{
+  if(!flowReadyV997)return;
+  const updated=advanceFlowV997(flowStateV997.current,{trackId,positionMs:progressMs,
+   durationMs,atMs:Date.now(),playing,autoEnabled:settings.enabled&&settings.auto,
+   reducedMotion:motionOff,manualOverride:!!trigger,
+   lyricsProtected,settings:flowSettingsV997});
+  flowStateV997.current=updated;
+  setFlowHandoverV997(old=>old===updated.handover?old:updated.handover);
+ },[flowReadyV997,trackId,durationMs,progressMs,playing,settings.enabled,settings.auto,
+   motionOff,trigger,lyricsProtected,flowSettingsV997]);
+ useEffect(()=>{
   try{setDanceShowSettingsV899(normalizeDanceShowV899(JSON.parse(window.localStorage.getItem(DANCE_SHOW_KEY_V899)??'null')));}
   catch{setDanceShowSettingsV899({...DEFAULT_DANCE_SHOW_V899});}
   setDanceShowReadyV899(true);
@@ -218,6 +312,15 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
   catch{setCameraSettingsV897({...DEFAULT_CAMERA_V897});}
   setCameraReadyV897(true);
  },[]);
+ useEffect(()=>{
+  try{setCameraSettingsV992(normalizeCinemaV992(JSON.parse(window.localStorage.getItem(CINEMA_KEY_V992)??'null')));}
+  catch{setCameraSettingsV992({...DEFAULT_CINEMA_V992});}
+  setCameraReadyV992(true);
+ },[]);
+ useEffect(()=>{
+  if(!cameraReadyV992)return;
+  try{window.localStorage.setItem(CINEMA_KEY_V992,JSON.stringify(cameraSettingsV992));}catch{setStorageError(true);}
+ },[cameraSettingsV992,cameraReadyV992]);
  useEffect(()=>{
   if(!cameraReadyV897)return;
   try{window.localStorage.setItem(CAMERA_KEY_V897,JSON.stringify(cameraSettingsV897));}catch{}
@@ -328,7 +431,7 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
   sync();window.addEventListener(CONCERT_TIMELINE_EVENT_V763,sync);
   return()=>window.removeEventListener(CONCERT_TIMELINE_EVENT_V763,sync);
  },[trackId]);
- useEffect(()=>{setTrigger(null);setOpen(false);setAiUndoV982(null);},[trackId]);
+ useEffect(()=>{setTrigger(null);setOpen(false);setAiUndoV982(null);setLiveUndoV998(null);},[trackId]);
  useEffect(()=>{
   const current={trackId,progressMs};
   if(resetManualLiveFxOnSeekV881(priorPlayback.current,current)){
@@ -388,7 +491,7 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
  useEffect(()=>{
   // Reuse V881's verified scene and manual trigger. No duplicate music analysis.
   // The R3F stage samples against its own song-scoped playback clock.
-  if(!storageReady||!syncReady||!momentsReady||!transitionsReady||!atmosphereReady||!fogReadyV887||!laserReadyV888||!particleReadyV889||!spotlightReadyV890||!pyroReadyV891||!epicReadyV892||!arenaReadyV893||!genreStageReadyV894||!directorReadyV895||!energyReadyV896||!cameraReadyV897||!danceCameraReadyV898||!danceShowReadyV899||!ultimateReadyV900)return;
+  if(!storageReady||!syncReady||!momentsReady||!transitionsReady||!atmosphereReady||!fogReadyV887||!laserReadyV888||!particleReadyV889||!spotlightReadyV890||!pyroReadyV891||!epicReadyV892||!arenaReadyV893||!genreStageReadyV894||!directorReadyV895||!energyReadyV896||!cameraReadyV897||!cameraReadyV992||!danceCameraReadyV898||!danceShowReadyV899||!choreographyReadyV993||!vocalReadyV994||!duetReadyV995||!crowdReadyV996||!flowReadyV997||!ultimateReadyV900)return;
   publishConcertStageSyncV882({trackId,durationMs,playing,reducedMotion:motionOff,
    enabled:settings.enabled,intensity:cue.intensity,sceneSource:cue.sceneSource,
    section:cue.section,look:cue.look,
@@ -415,15 +518,21 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
    directorSettingsV895:normalizeDirectorV895({...directorSettingsV895,enabled:directorSettingsV895.enabled&&settings.auto}),
    energySettingsV896:normalizeEnergyV896({...energySettingsV896,enabled:energySettingsV896.enabled&&settings.auto}),
    cameraSettingsV897:normalizeCinematicCameraV897({...cameraSettingsV897,enabled:cameraSettingsV897.enabled&&settings.auto}),
+   cameraSettingsV992:normalizeCinemaV992({...cameraSettingsV992,enabled:cameraSettingsV992.enabled&&settings.auto}),
    danceCameraSettingsV898:normalizeDanceCameraV898({...danceCameraSettingsV898,enabled:danceCameraSettingsV898.enabled&&settings.auto}),
    danceShowSettingsV899:normalizeDanceShowV899({...danceShowSettingsV899,enabled:danceShowSettingsV899.enabled&&settings.auto}),
+   choreographySettingsV993:normalizeChoreographyV993({...choreographySettingsV993,enabled:choreographySettingsV993.enabled&&settings.auto}),
+   vocalSettingsV994:normalizeVocalV994({...vocalSettingsV994,enabled:vocalSettingsV994.enabled&&settings.auto}),
+   duetSettingsV995:normalizeDuetV995({...duetSettingsV995,enabled:duetSettingsV995.enabled&&settings.auto}),
+   crowdSettingsV996:normalizeCrowdExperienceV996({...crowdSettingsV996,enabled:crowdSettingsV996.enabled&&settings.auto}),
+   flowCueV997:flowSettingsV997.enabled&&settings.auto&&!motionOff&&!trigger?flowHandoverV997:null,
    ultimateSettingsV900:normalizeUltimateV900({...ultimateSettingsV900,enabled:ultimateSettingsV900.enabled&&settings.auto}),
    ultimatePlanV900,
    directorPlanV895,
    atmospherePlan,atmosphereSettings:normalizeAtmosphereV885({...atmosphereSettings,
      enabled:atmosphereSettings.enabled&&settings.auto}),
    atmosphereSeekBlockedUntilMs:transitionSeekBlock.trackId===trackId?transitionSeekBlock.untilMs:0});
- },[storageReady,syncReady,momentsReady,transitionsReady,atmosphereReady,fogReadyV887,laserReadyV888,particleReadyV889,spotlightReadyV890,pyroReadyV891,epicReadyV892,arenaReadyV893,genreStageReadyV894,genreStageSettingsV894,genreStagePlanV894,directorReadyV895,directorSettingsV895,directorPlanV895,energyReadyV896,energySettingsV896,cameraReadyV897,cameraSettingsV897,danceCameraReadyV898,danceCameraSettingsV898,danceShowReadyV899,danceShowSettingsV899,ultimateReadyV900,ultimateSettingsV900,ultimatePlanV900,arenaSettingsV893,arenaPlanV893,epicSettingsV892,epicPlanV892,momentSettings.enabled,pyroSettingsV891,spotlightSettingsV890,particleSettingsV889,fogSettingsV887,laserSettingsV888,trackId,durationMs,playing,motionOff,settings.enabled,settings.auto,
+ },[storageReady,syncReady,momentsReady,transitionsReady,atmosphereReady,fogReadyV887,laserReadyV888,particleReadyV889,spotlightReadyV890,pyroReadyV891,epicReadyV892,arenaReadyV893,genreStageReadyV894,genreStageSettingsV894,genreStagePlanV894,directorReadyV895,directorSettingsV895,directorPlanV895,energyReadyV896,energySettingsV896,cameraReadyV897,cameraSettingsV897,cameraReadyV992,cameraSettingsV992,danceCameraReadyV898,danceCameraSettingsV898,danceShowReadyV899,danceShowSettingsV899,choreographyReadyV993,choreographySettingsV993,vocalReadyV994,vocalSettingsV994,duetReadyV995,duetSettingsV995,crowdReadyV996,crowdSettingsV996,flowReadyV997,flowSettingsV997,flowHandoverV997,ultimateReadyV900,ultimateSettingsV900,ultimatePlanV900,arenaSettingsV893,arenaPlanV893,epicSettingsV892,epicPlanV892,momentSettings.enabled,pyroSettingsV891,spotlightSettingsV890,particleSettingsV889,fogSettingsV887,laserSettingsV888,trackId,durationMs,playing,motionOff,settings.enabled,settings.auto,
   cue.intensity,cue.sceneSource,cue.section,cue.look,cue.sceneIndex,
   cue.manual,cue.manualId,scenes,trigger,syncSettings,
   momentCue.kind,momentCue.startMs,momentSettings.style,transitionPlan,transitionSettings,transitionSeekBlock,
@@ -497,17 +606,68 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
   setSettings(aiUndoV982.before.fx);
   setAiUndoV982(null);return true;
  };
+ /** V998 – preview and commit share ONE safe interpreter. No physical lights or playback operations. */
+ const snapshotLiveV998=():LiveSnapshotV998=>({
+  atmosphere:{enabled:atmosphereSettings.enabled,palette:atmosphereSettings.palette,intensity:atmosphereSettings.intensity},
+  stage:{enabled:genreStageSettingsV894.enabled,look:genreStageSettingsV894.look,intensity:genreStageSettingsV894.intensity},
+  camera:{enabled:cameraSettingsV992.enabled,mode:cameraSettingsV992.mode,intensity:cameraSettingsV992.intensity},
+  fx:{enabled:settings.enabled,auto:settings.auto,intensity:settings.intensity},
+ });
+ const previewLiveV998=(plan:LivePlanV998)=>
+  resolveLiveChangesV998(plan,snapshotLiveV998())?.diffs??[];
+ const applyLiveV998=(plan:LivePlanV998):boolean=>{
+  if(!normalizeLivePlanV998(plan)||!trackId||!playing||motionOff||
+   !settings.enabled||!settings.auto||!storageReady||!atmosphereReady||!genreStageReadyV894||
+   !cameraReadyV992||!controlsVisible)return false;
+  const result=resolveLiveChangesV998(plan,snapshotLiveV998());
+  if(!result?.diffs.length)return false;
+  const {after}=result;
+  const next={
+   atmosphere:normalizeAtmosphereV885({...atmosphereSettings,...after.atmosphere}),
+   stage:normalizeGenreStageV894({...genreStageSettingsV894,...after.stage}),
+   camera:normalizeCinemaV992({...cameraSettingsV992,...after.camera}),
+   fx:normalizeLiveFxSettingsV881({...settings,...after.fx}),
+  };
+  setLiveUndoV998({trackId,before:{atmosphere:atmosphereSettings,stage:genreStageSettingsV894,
+   camera:cameraSettingsV992,fx:settings},after:next});
+  setAtmosphereSettings(next.atmosphere);setGenreStageSettingsV894(next.stage);
+  setCameraSettingsV992(next.camera);setSettings(next.fx);
+  return true;
+ };
+ const undoLiveV998=():boolean=>{
+  const saved=liveUndoV998;
+  if(!saved||saved.trackId!==trackId||
+   JSON.stringify(atmosphereSettings)!==JSON.stringify(saved.after.atmosphere)||
+   JSON.stringify(genreStageSettingsV894)!==JSON.stringify(saved.after.stage)||
+   JSON.stringify(cameraSettingsV992)!==JSON.stringify(saved.after.camera)||
+   JSON.stringify(settings)!==JSON.stringify(saved.after.fx))return false;
+  setAtmosphereSettings(saved.before.atmosphere);setGenreStageSettingsV894(saved.before.stage);
+  setCameraSettingsV992(saved.before.camera);setSettings(saved.before.fx);
+  setLiveUndoV998(null);return true;
+ };
  const update=useCallback((patch:Partial<LiveFxSettingsV881>)=>setSettings(s=>normalizeLiveFxSettingsV881({...s,...patch})),[]);
  const updateSync=useCallback((patch:Partial<ConcertSyncSettingsV882>)=>setSyncSettings(s=>normalizeConcertSyncV882({...s,...patch})),[]);
  const updateMoments=useCallback((patch:Partial<ConcertMomentsSettingsV883>)=>setMomentSettings(s=>normalizeConcertMomentsV883({...s,...patch})),[]);
  const updateUltimateV900=useCallback((patch:Partial<UltimateSettingsV900>)=>
   setUltimateSettingsV900(s=>normalizeUltimateV900({...s,...patch})),[]);
+ const updateFlowV997=useCallback((patch:Partial<FlowSettingsV997>)=>
+  setFlowSettingsV997(s=>normalizeFlowV997({...s,...patch})),[]);
+ const updateCrowdV996=useCallback((patch:Partial<CrowdExperienceSettingsV996>)=>
+  setCrowdSettingsV996(s=>normalizeCrowdExperienceV996({...s,...patch})),[]);
+ const updateDuetV995=useCallback((patch:Partial<DuetSettingsV995>)=>
+  setDuetSettingsV995(s=>normalizeDuetV995({...s,...patch})),[]);
+ const updateVocalV994=useCallback((patch:Partial<VocalSettingsV994>)=>
+  setVocalSettingsV994(s=>normalizeVocalV994({...s,...patch})),[]);
+ const updateChoreographyV993=useCallback((patch:Partial<ChoreographySettingsV993>)=>
+  setChoreographySettingsV993(s=>normalizeChoreographyV993({...s,...patch})),[]);
  const updateDanceShowV899=useCallback((patch:Partial<DanceShowSettingsV899>)=>
   setDanceShowSettingsV899(s=>normalizeDanceShowV899({...s,...patch})),[]);
  const updateDanceCameraV898=useCallback((patch:Partial<DanceCameraSettingsV898>)=>
   setDanceCameraSettingsV898(s=>normalizeDanceCameraV898({...s,...patch})),[]);
  const updateCameraV897=useCallback((patch:Partial<CinematicCameraSettingsV897>)=>
   setCameraSettingsV897(s=>normalizeCinematicCameraV897({...s,...patch})),[]);
+ const updateCinemaV992=useCallback((patch:Partial<CinemaSettingsV992>)=>
+  setCameraSettingsV992(s=>normalizeCinemaV992({...s,...patch})),[]);
  const updateEnergyV896=useCallback((patch:Partial<EnergySettingsV896>)=>
   setEnergySettingsV896(s=>normalizeEnergyV896({...s,...patch})),[]);
  const updateDirectorV895=useCallback((patch:Partial<DirectorSettingsV895>)=>
@@ -671,6 +831,30 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
  };
  const activeEffect=cue.manual?effectLabels[cue.manual]:momentCue.kind?momentCue.label:transitionCue.active?'Szenenübergang':cue.look!=='none'?cue.look.toUpperCase():'Bereit';
  const stopped=!settings.enabled||motionOff||!playing||settings.intensity===0;
+ // V1001 and V1003 share one guarded write path to existing virtual controls.
+ const touchContextV1001:TouchContextV1001={trackId,durationMs,playing,
+  autoEnabled:settings.enabled&&settings.auto,
+  verified:directorPlanV895.source==='verified-v604'&&directorPlanV895.scenes.length>0,
+  reducedMotion:motionOff,manual:Boolean(cue.manual),
+  seekBlocked:transitionSeekBlock.trackId===trackId&&progressMs<transitionSeekBlock.untilMs,
+  controlsReady:controlsVisible&&storageReady&&atmosphereReady&&choreographyReadyV993&&cameraReadyV992};
+ const touchValuesV1001:TouchValuesV1001={
+  stage:{enabled:immersiveSettingsV1000.enabled,intensity:immersiveSettingsV1000.intensity},
+  camera:{enabled:cameraSettingsV992.enabled,intensity:cameraSettingsV992.intensity},
+  dance:{enabled:choreographySettingsV993.enabled,intensity:choreographySettingsV993.intensity},
+  lights:{enabled:atmosphereSettings.enabled,intensity:atmosphereSettings.intensity},
+ };
+ const applyTouchValuesV1001=(next:TouchValuesV1001)=>{
+  const prior=getImmersiveSettingsV1000();
+  if(prior.enabled&&prior.intensity!==next.stage.intensity)
+   setImmersiveSettingsV1000({...prior,intensity:next.stage.intensity});
+  if(cameraSettingsV992.enabled&&cameraSettingsV992.intensity!==next.camera.intensity)
+   updateCinemaV992({intensity:next.camera.intensity});
+  if(choreographySettingsV993.enabled&&choreographySettingsV993.intensity!==next.dance.intensity)
+   updateChoreographyV993({intensity:next.dance.intensity});
+  if(atmosphereSettings.enabled&&atmosphereSettings.intensity!==next.lights.intensity)
+   updateAtmosphere({intensity:next.lights.intensity});
+ };
  return <>
   <div className={`live-fx-stage-v881 fx-v881-style-${style} ${motionOff?'fx-v881-static':''}`}
    data-v881-look={cue.look} data-v881-manual={cue.manual??'none'} data-v881-evidence={cue.sceneSource}
@@ -720,6 +904,16 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
      {cue.manual&&<div className="live-fx-manual-progress-v881" role="status">{effectLabels[cue.manual]} aktiv
       <span><i style={{width:`${100*(1-cue.manualProgress)}%`}}/></span></div>}
     </div>
+    <InteractiveConcertControlV1001 key={`v1001-${trackId}`}
+     context={touchContextV1001} current={touchValuesV1001} onChange={applyTouchValuesV1001}/>
+    <AutoImprovementDirectorV1003 key={`v1003-${trackId}`}
+     context={touchContextV1001} current={touchValuesV1001}
+     onChange={applyTouchValuesV1001} progressMs={progressMs}/>
+    <LiveConcertAssistantV998 key={`v998-${trackId}`} trackId={trackId} genre={genre}
+     onPreview={previewLiveV998} onApply={applyLiveV998} onUndo={undoLiveV998}
+     undoAvailable={Boolean(liveUndoV998&&liveUndoV998.trackId===trackId)}
+     canApply={Boolean(trackId)&&playing&&!motionOff&&settings.enabled&&settings.auto&&
+      storageReady&&atmosphereReady&&genreStageReadyV894&&cameraReadyV992&&controlsVisible}/>
     <SongIntelligencePanelV983 key={trackId} trackId={trackId} title={title} artist={artist}
      durationMs={durationMs} genre={genre} onApply={applyImmersiveV982}
      canApply={settings.enabled&&settings.auto&&!motionOff}/>
@@ -1090,6 +1284,103 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
       <small>V899 verwendet vorhandene Gruppen-Roots, bestätigt getaktete Songabschnitte und optionale reale V896-Energiemesswerte.
        Die V324-Formation, manuelle V325-Timelines, V322-Fußsperren, Clips und V351-Kameraschutz behalten Vorrang.</small>
      </fieldset>
+     <fieldset className="concert-director-options-v895 concert-choreography-v993" aria-label="AI Choreography Director V993">
+      <legend>V993 · AI Choreography Director</legend>
+      <label className="live-fx-check-v881"><input type="checkbox" checked={choreographySettingsV993.enabled}
+       onChange={e=>updateChoreographyV993({enabled:e.target.checked})}/>Genre-Choreografie (Oberkörper) aktivieren</label>
+      <div className="concert-particle-toggles-v889">{(['ensembleSync','smoothTransitions','energyAccents','protectLyrics','protectFootwork'] as const).map(k=><label key={k} className="live-fx-check-v881">
+       <input type="checkbox" checked={choreographySettingsV993[k]} onChange={e=>updateChoreographyV993({[k]:e.target.checked})}/>
+       {({ensembleSync:'Gemeinsame Ensemble-Akzente',smoothTransitions:'Weiche Szenenübergänge',energyAccents:'Nur gemessene Audioakzente nutzen',protectLyrics:'Lyrics-Fokus schützen',protectFootwork:'Fuß- und Kollisionsschutz'} as const)[k]}
+      </label>)}</div>
+      <label className="live-fx-style-v881">Tanzstil <select value={choreographySettingsV993.style}
+       onChange={e=>updateChoreographyV993({style:e.target.value as ChoreographySettingsV993['style']})}>
+       <option value="auto">Automatisch (bestätigtes Genre)</option><option value="deutschrap">Deutschrap – Grooves</option>
+       <option value="hardtekk">Hardtekk – Drive</option><option value="hardstyle">Hardstyle – Pulse</option>
+       <option value="rock">Rock – Arena</option><option value="pop">Pop – Flow</option></select></label>
+      <label className="live-fx-range-v881">Choreografie-Stärke <strong>{choreographySettingsV993.intensity}%</strong>
+       <input type="range" min="0" max="100" step="5" value={choreographySettingsV993.intensity}
+        onChange={e=>updateChoreographyV993({intensity:Number(e.target.value)})}/></label>
+      <div className="concert-transition-status-v884" aria-live="polite">
+       {directorPlanV895.source==='verified-v604'
+        ? `${previewChoreographyV993(directorPlanV895,choreographySettingsV993,genre).length} bestätigte Szenen für die Choreografie-Vorschau`
+        : 'Keine bestätigte Songstruktur – Choreografie bleibt aus'}</div>
+      <small>Bestehende GLB-Clips, Fuß-IK, Bühnenaufstellung und manuelle Timelines behalten Vorrang.
+       Genre-Akzente sind regelbasiert und keine neu generierten Tanzclips. Ohne Live-Audio wird kein Beat behauptet.</small>
+     </fieldset>
+     <fieldset className="concert-director-options-v895 concert-vocal-v994" aria-label="V994 Vocal Performance Intelligence">
+      <legend>V994 · Vocal Performance Intelligence</legend>
+      <label className="live-fx-check-v881"><input type="checkbox" checked={vocalSettingsV994.enabled}
+       onChange={e=>updateVocalV994({enabled:e.target.checked})}/>Wortbasierte Rap-Phrasierung aktivieren</label>
+      <div className="concert-particle-toggles-v889">{(['mouthTiming','phraseExpression','headAccents'] as const).map(k=><label key={k} className="live-fx-check-v881">
+       <input type="checkbox" checked={vocalSettingsV994[k]} onChange={e=>updateVocalV994({[k]:e.target.checked})}/>
+       {({mouthTiming:'Mundübergänge sanfter gestalten',phraseExpression:'Dezente Gesichtsausdrücke',headAccents:'Natürliche Kopfakzente'} as const)[k]}
+      </label>)}</div>
+      <label className="live-fx-style-v881">Performance-Stil <select value={vocalSettingsV994.style}
+       onChange={e=>updateVocalV994({style:e.target.value as VocalSettingsV994['style']})}>
+       <option value="natural">Natürlich</option><option value="rap-flow">Schneller Rap-Flow</option>
+       <option value="stage">Bühnen-Performance</option></select></label>
+      <label className="live-fx-range-v881">Performance-Intensität <strong>{vocalSettingsV994.intensity}%</strong>
+       <input type="range" min="0" max="100" step="5" value={vocalSettingsV994.intensity}
+        onChange={e=>updateVocalV994({intensity:Number(e.target.value)})}/></label>
+      <small>Nur mit synchronisierten Wortzeiten und berechtigter Sängerrolle. Kein Phonem- oder Stimmen-Erkennen,
+       kein neues Mikrofon und keine künstlichen Rap-Silben. Manuelle Lippenformen, importierte Clips und
+       Gesichts-Previews behalten Vorrang. In niedriger Grafikqualität deaktiviert.</small>
+     </fieldset>
+     <fieldset className="concert-director-options-v895 concert-duet-v995" aria-label="V995 Duet & Ensemble 3.0">
+      <legend>V995 · Duet &amp; Ensemble 3.0</legend>
+      <label className="live-fx-check-v881"><input type="checkbox" checked={duetSettingsV995.enabled}
+       onChange={e=>updateDuetV995({enabled:e.target.checked})}/>Bestätigte Duette und gemeinsame Hook-Gesten hervorheben</label>
+      <div className="concert-particle-toggles-v889">{(['partnerGaze','handoffGestures','sharedHooks','protectLyrics'] as const).map(k=><label key={k} className="live-fx-check-v881">
+       <input type="checkbox" checked={duetSettingsV995[k]} onChange={e=>updateDuetV995({[k]:e.target.checked})}/>
+       {({partnerGaze:'Kurze gegenseitige Blicke',handoffGestures:'Gesten bei Lead-Wechseln',sharedHooks:'Gemeinsame Hook-Akzente',protectLyrics:'Bei eingeblendeten Lyrics zurückhalten'} as const)[k]}
+      </label>)}</div>
+      <label className="live-fx-style-v881">Interaktionsstil <select value={duetSettingsV995.style}
+       onChange={e=>updateDuetV995({style:e.target.value as DuetSettingsV995['style']})}>
+       <option value="natural">Natürlich</option><option value="responsive">Dialog &amp; Antwort</option>
+       <option value="arena">Arena &amp; große Hook</option></select></label>
+      <label className="live-fx-range-v881">Interaktionsstärke <strong>{duetSettingsV995.intensity}%</strong>
+       <input type="range" min="0" max="100" step="5" value={duetSettingsV995.intensity}
+        onChange={e=>updateDuetV995({intensity:Number(e.target.value)})}/></label>
+      <small>Nur bei bestätigter Song- und Sängerzuordnung. Keine Sprechererkennung oder neuen Animationen.
+       V807/V838 liefern Rollen und Blicksignale, V995 ergänzt kurze Oberkörperakzente.
+       Keine Eingriffe in Mund, Füße, importierte Clips, Kamera oder manuelle Shows.</small>
+     </fieldset>
+     <fieldset className="concert-director-options-v895 concert-crowd-v996" aria-label="V996 Virtual Crowd Experience">
+      <legend>V996 · Virtual Crowd Experience</legend>
+      <label className="live-fx-check-v881"><input type="checkbox" checked={crowdSettingsV996.enabled}
+       onChange={e=>updateCrowdV996({enabled:e.target.checked})}/>Virtuelles Publikum bei bestätigten Songmomenten verstärken</label>
+      <div className="concert-particle-toggles-v889">{(['glowsticks','waves','reactions','protectLyrics'] as const).map(k=><label key={k} className="live-fx-check-v881">
+       <input type="checkbox" checked={crowdSettingsV996[k]} onChange={e=>updateCrowdV996({[k]:e.target.checked})}/>
+       {({glowsticks:'Dezente virtuelle Lichtstäbe',waves:'Publikumswellen',reactions:'Reaktion auf gemessene Bassimpulse',protectLyrics:'Lyrics und Sängerfokus schützen'} as const)[k]}
+      </label>)}</div>
+      <label className="live-fx-style-v881">Publikumsstil <select value={crowdSettingsV996.style}
+       onChange={e=>updateCrowdV996({style:e.target.value as CrowdExperienceSettingsV996['style']})}>
+       <option value="subtle">Dezent</option><option value="festival">Festival</option><option value="arena">Arena</option></select></label>
+      <label className="live-fx-range-v881">Publikumsintensität <strong>{crowdSettingsV996.intensity}%</strong>
+       <input type="range" min="0" max="100" step="5" value={crowdSettingsV996.intensity}
+        onChange={e=>updateCrowdV996({intensity:Number(e.target.value)})}/></label>
+      <small>Nur virtuelle V815-Instanzen mit bestätigten V604-Songabschnitten und echtem Basssignal.
+       Keine zusätzliche Publikumssimulation, keine Govee-Befehle und kein Stroboskop.
+       Manuelle Regie, Lyrics, reduzierte Bewegung und niedrige Grafikqualität bleiben geschützt.</small>
+     </fieldset>
+     <fieldset className="concert-director-options-v895 concert-flow-v997" aria-label="V997 Continuous Concert Flow">
+      <legend>V997 · Continuous Concert Flow</legend>
+      <label className="live-fx-check-v881"><input type="checkbox" checked={flowSettingsV997.enabled}
+       onChange={e=>updateFlowV997({enabled:e.target.checked})}/>Sanfte virtuelle Übergänge bei beobachtetem Songwechsel</label>
+      <label className="live-fx-check-v881"><input type="checkbox" checked={flowSettingsV997.protectLyrics}
+       onChange={e=>updateFlowV997({protectLyrics:e.target.checked})}/>Lyrics bevorzugen</label>
+      <label className="live-fx-style-v881">Übergangsstil <select value={flowSettingsV997.style}
+       onChange={e=>updateFlowV997({style:e.target.value as FlowSettingsV997['style']})}>
+       <option value="subtle">Dezent</option><option value="cinematic">Filmisch</option>
+       <option value="festival">Festival</option></select></label>
+      <label className="live-fx-range-v881">Übergangsstärke <strong>{flowSettingsV997.intensity}%</strong>
+       <input type="range" min="0" max="100" step="5" value={flowSettingsV997.intensity}
+        onChange={e=>updateFlowV997({intensity:Number(e.target.value)})}/></label>
+      <small>Opt-in: maximal 2,7 Sekunden dezente Bühnenringe, wenn Spotify gegen Ende eines Songs
+       einen neuen laufenden Titel nahe dessen Beginn meldet. Kein Audio-Crossfade, keine
+       Playlist-Vorhersage, keine KI-Schätzung, keine Govee-Befehle und kein Überschreiben
+       manueller Regie. Nicht jeder manuelle Titelsprung lässt sich von Spotify unterscheiden.</small>
+     </fieldset>
      <fieldset className="concert-director-options-v895 concert-dance-camera-options-v898" aria-label="Intelligent Dance & Camera Coordination">
       <legend>V898 · Intelligent Dance &amp; Camera Coordination</legend>
       <label className="live-fx-check-v881"><input type="checkbox" checked={danceCameraSettingsV898.enabled}
@@ -1154,6 +1445,38 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
       </>}
       <small>Verwendet nur bestätigte V604-Szenen und die vorhandene R3F-Kamera. Manuelle Kamera-Presets, gespeicherte Fahrten,
        Live-Editor, Lyrics und bestehende Künstlerrahmung behalten Vorrang. Keine harten Schnitte oder zweite Kamera.</small>
+     </fieldset>
+     <fieldset className="concert-director-options-v895 concert-camera-options-v992" aria-label="V992 Cinematic Camera Director 3.0">
+      <legend>V992 · Cinematic Camera Director 3.0</legend>
+      <label className="live-fx-check-v881"><input type="checkbox" checked={cameraSettingsV992.enabled}
+       onChange={e=>updateCinemaV992({enabled:e.target.checked})}/>Zusätzliche filmische Kameraregie aktivieren</label>
+      <label className="live-fx-style-v881">Bildsprache <select value={cameraSettingsV992.mode}
+       disabled={!cameraSettingsV992.enabled}
+       onChange={e=>updateCinemaV992({mode:e.target.value as CinemaSettingsV992['mode']})}>
+       <option value="story">Songgeschichte · sanfte Wechsel</option>
+       <option value="performer">Künstler · nah und ruhig</option>
+       <option value="festival">Festival · weite Arena</option>
+      </select></label>
+      <label className="live-fx-range-v881">Kamera-Intensität <strong>{cameraSettingsV992.intensity}%</strong>
+       <input type="range" min="0" max="100" step="5" value={cameraSettingsV992.intensity}
+        disabled={!cameraSettingsV992.enabled}
+        onChange={e=>updateCinemaV992({intensity:Number(e.target.value)})}/></label>
+      <label className="live-fx-check-v881"><input type="checkbox" checked={cameraSettingsV992.accents}
+       disabled={!cameraSettingsV992.enabled}
+       onChange={e=>updateCinemaV992({accents:e.target.checked})}/>Kurze Akzente nur bei gemessenem Bass</label>
+      <label className="live-fx-check-v881"><input type="checkbox" checked={cameraSettingsV992.protectLyrics}
+       disabled={!cameraSettingsV992.enabled}
+       onChange={e=>updateCinemaV992({protectLyrics:e.target.checked})}/>Lyrics und Sänger-Close-ups schützen</label>
+      <label className="live-fx-check-v881"><input type="checkbox" checked={cameraSettingsV992.protectDuets}
+       disabled={!cameraSettingsV992.enabled}
+       onChange={e=>updateCinemaV992({protectDuets:e.target.checked})}/>Duette mit reduzierter Kamerabewegung</label>
+      {directorPlanV895.source==='verified-v604'?<ol className="concert-atmosphere-scenes-v885">
+       {previewCinemaV992(directorPlanV895,cameraSettingsV992).slice(0,8).map(x=><li key={x.index}>
+        <b>{fmt(x.startMs)}</b> {x.style} · {x.section}</li>)}</ol>
+       :<small>Keine bestätigten Songabschnitte: V992 bleibt aus und übernimmt keine geschätzten Zeitpunkte.</small>}
+      <small>Nur dieselbe vorhandene Kamera, keine Schnitte oder zusätzliche Render-Loop. Manuelle Timelines,
+       Lyrics, bestehendes V848/V897-Framing, V898-Tanzkamera und V351-Sicherheitsrahmen behalten Vorrang.
+       Bassakzente benötigen gemessene Kick-Flanken – Spotify-Metadaten allein reichen nicht.</small>
      </fieldset>
      <fieldset className="concert-director-options-v895" aria-label="Musical Energy Intelligence">
       <legend>V896 · Musical Energy Intelligence</legend>

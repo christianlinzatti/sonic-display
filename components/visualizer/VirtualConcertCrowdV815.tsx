@@ -12,6 +12,7 @@ import {sampleLivingAudienceV973,createLivingMotionScratchV973} from './livingAu
 import type {LivingAudienceCueV973} from './livingAudienceDirectorV973';
 import type {VirtualCrowdCueV815} from './virtualConcertCrowdPlannerV815';
 import type {ArenaCrowdCueV893} from './arenaCrowdAtmosphereV893';
+import type {CrowdExperienceCueV996} from './virtualCrowdExperienceV996';
 
 /** Three capped instanced draw calls, not individual animated avatar rigs.
  * Small crowds live on left/right wings, leaving a wide center sightline.
@@ -23,13 +24,14 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
  const choreographyMotion=useMemo(createCrowdMotionScratchV876,[]);
  const livingMotionV973=useMemo(createLivingMotionScratchV973,[]);
  const heads=useRef<InstancedMesh>(null),bodies=useRef<InstancedMesh>(null);
- const phones=useRef<InstancedMesh>(null);
+ const phones=useRef<InstancedMesh>(null),glowsticksV996=useRef<InstancedMesh>(null);
  const silhouetteMat=useRef<MeshBasicMaterial>(null),headMat=useRef<MeshBasicMaterial>(null);
- const phoneMat=useRef<MeshBasicMaterial>(null);
+ const phoneMat=useRef<MeshBasicMaterial>(null),glowMatV996=useRef<MeshBasicMaterial>(null);
  const mainColor=useMemo(()=>new Color('#0c1020'),[]);
  const accent=useMemo(()=>new Color(),[]);
  const phoneColor=useMemo(()=>new Color('#ffffff'),[]);
  const phoneSecondary=useMemo(()=>new Color(),[]);
+ const stickTintV996=useMemo(()=>new Color(),[]);
  const previous=useRef({phase:0,count:-1,arenaColored:false});
  useLayoutEffect(()=>{
   // Matrices are set before any animated render; no invisible/zero initial bounds.
@@ -51,11 +53,15 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
  },[people,dummy]);
  useFrame((_,dt)=>{
   const cue=cueRef.current;
-  const head=heads.current,body=bodies.current,phone=phones.current;
+  const head=heads.current,body=bodies.current,phone=phones.current,sticks=glowsticksV996.current;
   if(!head||!body||!phone)return;
+  const experience=cue as Partial<CrowdExperienceCueV996>;
+  const sticksCount=experience.crowdActiveV996&&Number.isFinite(experience.crowdSticksV996)?
+   Math.max(0,Math.min(24,Math.floor(experience.crowdSticksV996??0))):0;
+  if(sticks)sticks.visible=cue.active&&sticksCount>0;
   const active=cue.active&&cue.count>0;
   head.visible=body.visible=active;phone.visible=active&&cue.phoneOpacity>.003;
-  if(!active){previous.current.count=-1;return;}
+  if(!active){previous.current.count=-1;previous.current.phase=0;return;}
   const n=Math.max(0,Math.min(CROWD_MAX_V815,cue.count));
   head.count=body.count=n;phone.count=n;
   const arenaCue=cue as ArenaCrowdCueV893;
@@ -70,6 +76,9 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
   if(previous.current.phase>=.05||previous.current.count!==n){
    previous.current.phase=0;previous.current.count=n;
    const resetPhoneColors=arenaPulse<=0&&previous.current.arenaColored;
+   const crowdWaveV996=experience.crowdActiveV996?Math.min(.035,Math.max(0,experience.crowdWaveV996??0)):0;
+   const crowdReactionV996=experience.crowdActiveV996?Math.min(.03,Math.max(0,experience.crowdReactionV996??0)):0;
+   const crowdPhaseV996=experience.crowdActiveV996?(experience.crowdPhaseV996??0):0;
    for(let index=0;index<n;index++){
     const p=people[index];
     const wave=Math.sin(cue.phase*(cue.movement>.14?6:3)+p.phase);
@@ -81,7 +90,11 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
    sampleLivingAudienceV973(index,p,cue as LivingAudienceCueV973,choreographyMotion,livingMotionV973);
     // Bounded V893 arena ripple uses existing instanced silhouettes.
     const arenaRipple=arenaWave*Math.sin((arenaCue.arenaPhaseV893??0)*1.8+Math.floor(index/12)*.72+p.phase*.13);
-    const visualLift=lift+choreographyMotion.bob+Math.max(-.012,Math.min(.012,arenaRipple*.05));
+    // V996 wave is an overlay on the EXISTING audience; no root or foot motion.
+    const audienceWaveV996=crowdWaveV996*Math.sin(crowdPhaseV996*1.65-Math.floor(index/12)*.66+p.phase*.09);
+    const audienceResponseV996=crowdReactionV996*Math.max(0,Math.sin(crowdPhaseV996*3+p.phase));
+    const visualLift=lift+choreographyMotion.bob+Math.max(-.012,Math.min(.012,arenaRipple*.05))+
+      Math.max(-.035,Math.min(.035,audienceWaveV996+audienceResponseV996));
     dummy.position.set(p.x+choreographyMotion.horizontal,p.y+.36*p.scale+visualLift,p.z);
     dummy.rotation.set(0,0,wave*cue.movement*.18+choreographyMotion.tilt);
     dummy.scale.set(.32*p.scale,.65*p.scale,.20*p.scale);
@@ -104,6 +117,26 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
      phone.setColorAt(index,phoneColor);
     }else if(resetPhoneColors){phoneColor.set('#ffffff');phone.setColorAt(index,phoneColor);}
    }
+   // V996: ONE additional instanced draw call, up to 24 dim glowsticks, spread
+   // across the already-authorized side-lane spectators. No per-frame allocations.
+   if(sticks&&sticksCount>0){
+    sticks.count=sticksCount;
+    const glow=experience.crowdGlowV996??0;
+    if(glowMatV996.current)glowMatV996.current.opacity=Math.min(.32,Math.max(0,glow));
+    for(let slot=0;slot<sticksCount;slot++){
+     const index=Math.min(n-1,Math.floor((slot+.5)*n/sticksCount));
+     const p=people[index];
+     const sway=Math.sin(crowdPhaseV996*1.5+p.phase*.6)*.09;
+     dummy.rotation.set(0,0,sway);
+     dummy.position.set(p.x+.24*p.scale,p.y+(1.03+.10*Math.sin(crowdPhaseV996*1.6-slot*.38))*p.scale,p.z+.045);
+     dummy.scale.set(.028*p.scale,.27*p.scale,.028*p.scale);
+     dummy.updateMatrix();sticks.setMatrixAt(slot,dummy.matrix);
+     stickTintV996.set(slot%2===0?cue.primary:cue.secondary);
+     sticks.setColorAt(slot,stickTintV996);
+    }
+    sticks.instanceMatrix.needsUpdate=true;
+    if(sticks.instanceColor)sticks.instanceColor.needsUpdate=true;
+   }
    for(const mesh of [head,body,phone])mesh.instanceMatrix.needsUpdate=true;
    if((arenaPulse>0||resetPhoneColors)&&phone.instanceColor)phone.instanceColor.needsUpdate=true;
    previous.current.arenaColored=arenaPulse>0;
@@ -121,6 +154,11 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
    <instancedMesh ref={phones} args={[undefined,undefined,CROWD_MAX_V815]} visible={false} castShadow={false} receiveShadow={false} frustumCulled={false} renderOrder={0}>
     <boxGeometry args={[1,1,1]}/>
     <meshBasicMaterial ref={phoneMat} color="#7ea9ff" transparent opacity={0} depthWrite={false} toneMapped={false}/>
+   </instancedMesh>
+   <instancedMesh name="v996-virtual-crowd-glowsticks" ref={glowsticksV996}
+    args={[undefined,undefined,24]} visible={false} castShadow={false} receiveShadow={false} frustumCulled={false}>
+    <cylinderGeometry args={[1,1,1,5,1]}/>
+    <meshBasicMaterial ref={glowMatV996} color="#ffffff" transparent opacity={0} depthWrite={false} toneMapped={false}/>
    </instancedMesh>
   </group>;
 }

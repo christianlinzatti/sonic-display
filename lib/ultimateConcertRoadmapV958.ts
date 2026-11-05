@@ -20,6 +20,8 @@ export type ConcertTimelineCueV948={atMs:number;phase:ConcertPhaseV958;camera?:C
 export type ConcertRoomPresetV936={id:string;name:string;roles:Record<string,ConcertRoleV935>;positions:Record<string,{x:number;y:number}>};
 export type ConcertPresetIdV969='off'|'auto'|'arena'|'festival'|'club'|'cinematic'|'hardtekk'|'rock';
 export type AtmosphereQualityV972='eco'|'balanced'|'cinematic';
+export type PortalModeSettingV988='auto'|'arch'|'tunnel';
+export type AtmosphereDepthStyleV989='auto'|'soft-beams'|'ground-fog';
 export type EnergyArcModeV975='subtle'|'balanced'|'cinematic';
 export type TransitionStyleV976='gentle'|'balanced'|'dramatic';
 export type StorytellingModeV977='subtle'|'cinematic'|'festival';
@@ -30,7 +32,7 @@ export type VoiceMoodV968='auto'|'warm'|'cool'|'neon';
 export type VoiceFxV968='auto'|'off'|'beams'|'fog'|'confetti'|'streamers';
 export type ConcertSettingsV958={schema:'ultimate-concert-v958';enabled:boolean;hardwareSync:boolean;virtualFx:boolean;strength:number;
   roleOverrides:Record<string,ConcertRoleV935>;presets:ConcertRoomPresetV936[];timeline:Record<string,ConcertTimelineCueV948[]>;
-  transitionsV960:boolean;compactFxV960:boolean;lightGovernorV961:boolean;narrativeV962:boolean;bridgeV963:boolean;peakRecoveryV964:boolean;roomWaveV965:boolean;immersiveV966:boolean;immersiveStrengthV966:number;volumetricV972:boolean;volumetricStrengthV972:number;volumetricQualityV972:AtmosphereQualityV972;
+  transitionsV960:boolean;compactFxV960:boolean;lightGovernorV961:boolean;narrativeV962:boolean;bridgeV963:boolean;peakRecoveryV964:boolean;roomWaveV965:boolean;immersiveV966:boolean;immersiveStrengthV966:number;portalV988:boolean;portalModeV988:PortalModeSettingV988;portalStrengthV988:number;depthAtmosphereV989:boolean;depthStyleV989:AtmosphereDepthStyleV989;depthStrengthV989:number;volumetricV972:boolean;volumetricStrengthV972:number;volumetricQualityV972:AtmosphereQualityV972;
   voiceZoneV968:VoiceZoneV968;voiceMoodV968:VoiceMoodV968;voiceFxV968:VoiceFxV968;concertPresetV969:ConcertPresetIdV969;
   energyArcV975:boolean;energyArcModeV975:EnergyArcModeV975;energyArcStrengthV975:number;
   intelligentTransitionsV976:boolean;transitionStyleV976:TransitionStyleV976;transitionStrengthV976:number;cameraHandoffsV976:boolean;
@@ -39,7 +41,7 @@ export type ConcertSettingsV958={schema:'ultimate-concert-v958';enabled:boolean;
   atmosphereFogV978:boolean;atmosphereBeamsV978:boolean;atmosphereCrowdV978:boolean;
   liveShowDirectorV979:boolean;liveShowStyleV979:LiveShowStyleV979;liveShowStrengthV979:number};
 export const DEFAULT_CONCERT_V958:ConcertSettingsV958={schema:'ultimate-concert-v958',enabled:false,hardwareSync:false,virtualFx:false,
- strength:55,roleOverrides:{},presets:[],timeline:{},transitionsV960:false,compactFxV960:false,lightGovernorV961:false,narrativeV962:false,bridgeV963:false,peakRecoveryV964:false,roomWaveV965:false,immersiveV966:false,immersiveStrengthV966:60,volumetricV972:false,volumetricStrengthV972:55,volumetricQualityV972:'balanced',
+ strength:55,roleOverrides:{},presets:[],timeline:{},transitionsV960:false,compactFxV960:false,lightGovernorV961:false,narrativeV962:false,bridgeV963:false,peakRecoveryV964:false,roomWaveV965:false,immersiveV966:false,immersiveStrengthV966:60,portalV988:false,portalModeV988:'auto',portalStrengthV988:55,depthAtmosphereV989:false,depthStyleV989:'auto',depthStrengthV989:50,volumetricV972:false,volumetricStrengthV972:55,volumetricQualityV972:'balanced',
  voiceZoneV968:'all',voiceMoodV968:'auto',voiceFxV968:'auto',concertPresetV969:'off',
  energyArcV975:false,energyArcModeV975:'balanced',energyArcStrengthV975:55,
  intelligentTransitionsV976:false,transitionStyleV976:'balanced',transitionStrengthV976:65,cameraHandoffsV976:true,
@@ -95,6 +97,12 @@ export function normalizeConcertRoadmapV958(raw:unknown):ConcertSettingsV958{
   transitionsV960:o.transitionsV960===true,compactFxV960:o.compactFxV960===true,lightGovernorV961:o.lightGovernorV961===true,
   narrativeV962:o.narrativeV962===true,bridgeV963:o.bridgeV963===true,peakRecoveryV964:o.peakRecoveryV964===true,roomWaveV965:o.roomWaveV965===true,
   immersiveV966:o.immersiveV966===true,immersiveStrengthV966:Math.round(clamp(Number(o.immersiveStrengthV966??60),0,100)),
+  portalV988:o.portalV988===true,
+  portalModeV988:(['auto','arch','tunnel'] as unknown[]).includes(o.portalModeV988)?o.portalModeV988!:'auto',
+  portalStrengthV988:Math.round(clamp(Number(o.portalStrengthV988??55),0,100)),
+  depthAtmosphereV989:o.depthAtmosphereV989===true,
+  depthStyleV989:(['auto','soft-beams','ground-fog'] as unknown[]).includes(o.depthStyleV989)?o.depthStyleV989!:'auto',
+  depthStrengthV989:Math.round(clamp(Number(o.depthStrengthV989??50),0,100)),
   volumetricV972:o.volumetricV972===true,
   volumetricStrengthV972:Math.round(clamp(Number(o.volumetricStrengthV972??55),0,100)),
   volumetricQualityV972:(['eco','balanced','cinematic'] as unknown[]).includes(o.volumetricQualityV972)?o.volumetricQualityV972!:'balanced',

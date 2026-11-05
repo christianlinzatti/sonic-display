@@ -1,3 +1,151 @@
+## V1003 – AI Auto-Improvement Director (2026-11-05)
+
+Im **Live FX Deck** analysiert V1003 die aktuelle **V1002-Qualitätsdiagnose** und
+bietet prüfbare Verbesserungen an. Nur bestätigte Songpläne plus **frische V466-Messungen**
+mit unzureichender FPS/P95 können eine vorsichtige Reduktion *bereits aktivierter*
+Bühnen- und virtueller Lichtintensität vorschlagen. Kamera-Wiederholungen, fehlende
+Breaks, Lyrics-Lücken und Projektionwarnungen führen **nur zu manuellen Hinweisen**;
+es entstehen weder neue Szenenzeitpunkte noch Kameracues.
+
+Eine 20 Sekunden gültige Vorher/Nachher-Vorschau erfordert ausdrückliche Freigabe,
+aktuelle Songbindung, unveränderte Regler und fehlende Schutzsperren. Das Rückgängig
+überschreibt keine zwischenzeitlichen Änderungen. Der optionale KI-Knopf benutzt
+`/api/ai/concert-qa`, verarbeitet **nur aggregierte Befunde** und kann
+**keine Änderungen ausführen**. Offline-Vorschläge sind ohne API-Schlüssel verfügbar.
+
+Tests: `npm run test:v1003 && npm run test:v1003:types`;
+Regression: `npm run verify:v1003:focused`.
+**V1003 ist ohne Node-24-Produktionsbuild noch nicht produktionsvalidiert.**
+GitHub-Workflow-Dateien sind im ZIP-Importer geschützt und separat einzuspielen.
+Siehe `changelog/V1003.md`.
+
+## V1002 – AI Concert Quality Assurance (2026-11-05)
+
+Neu im **Concert Quality Dashboard**: eine read-only Qualitätsdiagnose, die die
+**bestätigte V801-Szenenstruktur** getrennt von **frischen V466-WebGL-Frame-Messungen**
+bewertet. Der Strukturindex ist kein gemessener visueller Qualitätswert. Prüfkriterien:
+Kamera-Intent-Vielfalt, wiederholte Perspektiven, Szenenabdeckung, Ruhephasen,
+Lyrics-Verifikation, gemessene FPS/P95 (nur bei aktivierter Probe) und Projektionswarnungen.
+Tanz, Lip-Sync, tatsächlich sichtbare Kameras, Bühnenwirkung und Govee bleiben explizit
+**nicht objektiv gemessen**.
+
+Auf ausdrücklichen Klick „KI-Empfehlungen anfordern“ sendet die neue
+`/api/ai/concert-qa`-Route **nur aggregierte Diagnosecodes und Kennzahlen** an die
+konfigurierte OpenAI-API. Ohne `OPENAI_API_KEY` stehen lokale, priorisierte Befunde
+vollständig bereit. Keine Titel, Song-IDs, Lyrics, Zugangsdaten, Audioanalyse,
+Hardwarebefehle oder automatische Änderungen an Cues. Der Endpunkt prüft Spotify-Login,
+Origin, Eingabegröße, erlaubte Diagnosecodes, Anfragelimit und strukturiertes Modelloutput.
+
+Tests: `npm run test:v1002 && npm run test:v1002:api && npm run test:v1002:types` sowie V1001/V801/V466-Regressionen.
+**Keine Produktionsfreigabe ohne kompletten TypeScript-Check und Next.js-Build mit Node 24.**
+Der ZIP-Importer schützt GitHub-Workflows; die V1002-CI-Datei muss gesondert eingebracht werden.
+
+## V1001 – Interactive Concert Control (Touch-Zentrale)
+
+Im **Live FX Deck** erscheint eine neue Touch-Konsole für die bereits aktivierten
+virtuellen Intensitätsregler **Bühnenregie (V1000), Kamera (V992), Tanz (V993)
+und Licht (V885)**. Vier Profile (Intim, Ausgewogen, Festival, Finale), ein
+Gesamtintensitätsregler und Kanal-Auswahl erzeugen erst eine **Vorschau**.
+Übernahme ist nur bei laufendem Song, bestätigten Songabschnitten und aktiver
+Automatik zulässig. Rückgängig prüft Songbindung und unveränderten Zustand.
+
+Deaktivierte Systeme bleiben aus. Keine Änderungen an Govee/Alexa, Audio,
+Spotify, Hardware oder manuellen Timelines. Für Textanweisungen weiterhin den
+Live AI Assistant V998 benutzen. V1001 ist lokale deterministische Steuerung,
+keine neue KI-API. Die Live-Ausgabe respektiert weiterhin die eigenen
+Sicherheits- und Performance-Gates der einzelnen Systeme.
+
+Prüfung: `npm run test:v1001 && npm run test:v1001:types`;
+volle Freigabe erst nach `npm run typecheck && npm run build:next` unter Node 24.
+Siehe `changelog/V1001.md`.
+
+## V1000 – Sonic Display Immersive 1.0
+
+Optionale und standardmäßig deaktivierte gemeinsame Konzertkoordination für **bestätigte** Songabschnitte: das Concert Quality Dashboard bietet Filmisch/Festival/Vocal-Fokus, Intensität und Lyrics-Schutz. V1000 reduziert oder lässt die bereits autorisierten LED-, Bass- und Publikumsakzente durch; niemals werden abgeschaltete Effekte aktiviert, neue Beat-Zeitpunkte geschätzt, Kamera-/Avatar-/Lip-Sync-Cues umgeschrieben oder Govee-/Spotify-Befehle versendet. V999-Performancegrenzen bleiben gültig. Keine zusätzliche Render-Schleife. Tests: `npm run verify:v1000:focused`; Produktion: Node 24 + `npm ci` + `npm run typecheck` + `npm run build:next`.
+
+## V999 Intelligent Performance Governor (2026-11-05)
+
+- Eine zusätzliche **reduktionsbasierte** Dekorationsqualität nutzt die bestehenden R3F-Messfenster (FPS, P95, Slow Frames); keine weitere RAF-Schleife und keine GPU-Timestamp-Messung.
+- Progressive Reduktion der optionalen V989-Nebeltiefe, V996-Publikumslichtstäbe, V990-LED-Akzente und V991-Bass-Bodenwellen. Bestehende V640-, V825- und V835-Regler bleiben zuständig und werden nicht ersetzt.
+- Der Quality-Dashboard-Schalter ist nur im Auto-Modus wirksam; Zielwerte 30/45/60 FPS, Stufen 0–3, Hysterese/Cooldown und stale-/pause-/hidden-fail-open. Keine Änderung von Lyrics, Tanz, Lip-Sync, Kamera, GLB-Materialien, Govee oder Spotify.
+- Keine garantierten FPS oder automatische Reduktion von Avataranzahlen. Der vollständige Produktionsbuild muss mit Node 24, npm ci, TypeScript und Next.js in CI bestätigt werden.
+
+## V998 – Live AI Concert Assistant (05.11.2026)
+
+**Neu:** Live-Regie per Text (KI optional / lokal offline), mit echten Vorher/Nachher-Diffs und ausdrücklicher Freigabe. Nur bereits aktive **virtuelle** Farb-/Bühnen-/Kamera-Parameter und eine ausschließlich absenkbare FX-Obergrenze werden angepasst. Spotify-Playback, Govee-Geräte, manuelle Szenen und Lyrics bleiben unberührt. Die letzte Übernahme kann rückgängig gemacht werden, wenn sich der aktuelle Song und die betroffenen Regler nicht verändert haben. Details: `docs/versions/V998-LIVE-AI-CONCERT-ASSISTANT.md`. Live-KI braucht `OPENAI_API_KEY` auf dem Server; Offline-Entwurf ohne API möglich.
+
+**Buildstatus:** Lokale isolierte Tests und Syntax-Checks sind nicht gleichbedeutend mit einer Produktionsfreigabe; vollständiges TypeScript und Next.js unter Node 24 in GitHub Actions noch erforderlich.
+
+## V997 – Continuous Concert Flow
+
+V997 adds a **visual-only** 1.8–2.7-second handover on plausible observed Spotify end→start title changes. The user explicitly enables it in Concert Studio. The cross-song cue is bound to the new track, validated in the V882 stage bridge, and rendered as two dim rings in the existing R3F loop. It performs no audio crossfade, playlist prediction, manual timeline edits, camera takeover or Govee commands. Pauses, seeks, missing metadata, manual interventions and reduced motion fail closed; a manual skip very near the end cannot be distinguished from natural advance. See `docs/versions/V997-CONTINUOUS-CONCERT-FLOW.md`. Full Node 24/Next production verification is required before claiming production readiness.
+
+## V994 – Vocal Performance Intelligence (05.11.2026)
+
+Neue, **standardmäßig ausgeschaltete** Rap-Phrasen-Performance im Concert Studio: sanftere Mund-Filtergeschwindigkeit, kleine Gesichts- und Kopfakzente für nachweislich synchronisierte Wörter und korrekt zugeordnete Sänger. Drei Stile (Natürlich, Rap-Flow, Bühne), Regler für Intensität und separate Schalter. Es werden keine neuen Stimmen, Phoneme, Silben, Animation-Clips oder Lippentargets generiert. GLB und prozedurale Avatare nutzen dieselbe geschützte V538/V415-Verarbeitung. Details: `docs/versions/V994-VOCAL-PERFORMANCE-INTELLIGENCE.md`.
+
+**Lokale Prüfung:** Neue V994-Regressionen (13 Gruppen inkl. 10.000 Zuständen) und V631/V837/V869 gezielt bestanden; die vollständige TypeScript-/Next.js-Produktion ist ohne Node 24 und npm-Abhängigkeiten nicht bestätigt.
+
+## V993 – AI Choreography Director (opt-in)
+
+V993 ergänzt die bestehende V666/V759-Avatar-Rig-Pipeline um eine regelbasierte,
+genreabhängige Choreografie-Inszenierung. Im Concert FX Studio lässt sich der
+Choreography Director aktivieren und für Deutschrap, Hardtekk, Hardstyle, Rock,
+Pop oder ein bekanntes Track-Genre konfigurieren. Features: gemeinsame
+Ensemble-Akzente, weiche Übergänge, opt-in-Messwerte aus V896 und
+Lyrik-/Fußschutz. V993 verändert **ausschließlich vorhandene additive
+Oberkörper-Rigkanäle**. Importierte Tanzclips, Morphs, Foot-IK, Positionen,
+Lyrics, Sängerzuordnung und manuelle Cues haben Vorrang. Standard: AUS.
+
+Voraussetzung für automatische Choreografie ist ein zu Track-ID und Dauer
+passender, bestätigter V604/V895-Szenenplan. Ohne diesen, bei Pause,
+Songwechsel, unbestätigtem Genre oder Low-Tier bleibt die Erweiterung inaktiv.
+Die Anzeigen im Concert Studio sind dramaturgische Vorschauen, keine KI-generierten
+Motion-Clips oder Beatmessungen. Live-Energie wird nur mit passender V896-Quelle
+berücksichtigt. Keine API-Abfrage während der laufenden 3D-Frames.
+
+Prüfungen: `npm run test:v993`, `npm run test:v993:types`,
+`npm run verify:v993:focused`, `npm run check:syntax`,
+`npm run check:architecture`, `npm run typecheck`, `npm run build:vercel`.
+Der vollständige TypeScript-/Next.js-Produktionsbuild benötigt Node 24 und
+installierte npm-Pakete; der Release ist bis zu grünem GitHub CI nicht
+produktionsfreigegeben. Für den ZIP-Importer `releases/SonicDisplay-V993.zip`
+hochladen; geschützte `.github/workflows`-Änderungen separat übernehmen.
+
+---
+
+# V992 – Cinematic Camera Director 3.0
+
+- A new **opt-in** camera director in the existing Live FX / Concert Studio, preserving the V897 camera and V898 dance-coordination pipeline.
+- Three cinematic languages: Songgeschichte, Künstler-Nähe, Festival-Arena. Deterministic, conservative framing changes per confirmed V604 scene, without hard cuts, new Canvas, or 3D allocations.
+- Only a real V433 live-normalized kick transient can trigger a very short, bounded camera accent in verified hook/drop/finale scenes. Requires a quiet-to-loud edge. No audio means no accent.
+- Pause, seeks, track changes, authored timelines, manual camera, blackout, low tier, reduced motion and guarded lyrics block and reset the new director. Final V351 framing protection remains downstream.
+- Save/reload normalized settings locally, publish through the existing V882 signal, show confirmed scene preview. Default OFF.
+- V992 regressions, isolated TypeScript check, Vercel gate and V832 CI task are included. GitHub importer may protect workflow changes; deploy the workflow separately.
+- **Build status:** Complete TypeScript and Next.js production build must still be verified in Node 24 CI; locally unavailable if npm dependencies are absent.
+
+---
+
+## V991 – Bass Impact Physics (2026-11-05)
+
+Neue optionale, gemessene Bass-Schockwellen auf dem virtuellen Bühnenboden. Seek-sicher am Songzeitpunkt, ohne neue Beat-Quelle; ergänzt vorhandene V816-Partikelringe, respektiert manuelle Shows, Lyrics, Blackouts, Low-Tier und Pausen. Siehe `docs/versions/V991-BASS-IMPACT-PHYSICS.md`. Standardmäßig deaktiviert. Der vollständige Node-24/TypeScript/Next.js-Produktionsbuild muss in CI bestätigt werden.
+
+## V990 – Living LED Wall 3.0 (2026-11-05)
+
+- Vier neue, genrespezifische LED-Muster auf der bestehenden Bühne: Deutschrap City Pulse, Hardtekk/Hardstyle Neon Matrix, Deutschrock Arena Beams und Pop Prism Flow. Automatik anhand bestätigter V810-Musikabschnitte.
+- **Concert FX Studio → V990**: eigener Opt-in-Schalter (standardmäßig aus), Look, Stärke, Bewegung und Lyrics-/Kameraschutz. Die Vorschau ist simuliert, nicht als gemessene Musik deklariert.
+- Wiederverwendeter V635/V886-Shader, keine zusätzliche Render-Schleife, kein neuer Draw-Call, keine Govee-Steuerung, kein Strobe. Low-Tier und manuelle Shows haben Vorrang.
+- Tests: `npm run test:v990`; CI: V832/V931 und Vercel (mit Node 24 und installierten Abhängigkeiten). Lokale Produktionsvalidierung erst nach vollständigem CI-Build.
+
+## V988 – Holographic Stage Portal (2026-11-05)
+
+- Neue **optionale** virtuelle Lichtbögen und holografische 3D-Lichttunnel im bestehenden React-Three-Fiber-Konzert-Canvas. Sichtbar bei bestätigten Songabschnitten, nicht aufgrund geschätzter KI-Timings.
+- **Concert Studio → V988**: Schalter, Stil `Dynamisch / Holografische Bögen / 3D-Lichttunnel` und Intensität 0–100 %. V988 ist standardmäßig **aus**, V966 Immersion muss zusätzlich aktiv sein.
+- Automatik wählt bei ruhigeren Passagen dezente Bögen, bei verifizierten Höhepunkten einen Lichttunnel. Reduzierte Bewegung zeigt nur zwei unbewegte Lichtbögen/Ringe, das Performance-Sparprofil unterdrückt den Effekt vollständig.
+- Portale liegen hinter den Avataren und der LED-Bühnenwand (`z ≤ -5.30`), nutzen bis zu vier glühende Ring-Meshes plus vier transparente Tiefenlinien, **keine zusätzlichen Lichter**, Timer, Shader-Pässe, Hardware-Ansteuerung oder stroboartige Spitzen.
+- Freigaben für V966, Alexa-Visual-Zonen, manuelle Bühnencues, vorhandene Timeline und Lyrics-Kontext bleiben erhalten. Bestehende Govee-Automation bleibt unverändert.
+- Automatisierte V988-Tests, TypeScript-Teilprüfung und GitHub/Vercel-Produktionsgates registriert. **Lokal**: Regressionen, Syntax/Architektur und ZIP-Importer verifiziert; **vollständiger TS-/Next-Build noch offen** (Node 24 sowie vollständige npm-Abhängigkeiten erforderlich).
+
 ## V987 – Govee Immersive Sync 2.0
 
 - Nach ausdrücklicher Freigabe aus dem V986 Atmosphere Designer kann die
@@ -2334,3 +2482,54 @@ und andere reale Hardware werden nicht angesteuert.
 Details: [`V986 – AI Atmosphere Designer`](docs/versions/V986-AI-ATMOSPHERE-DESIGNER.md).
 Tests: `npm run test:v986` und `npm run test:v986:types`;
 TypeScript- und Next.js-Produktionsbuild nach `npm ci` zusätzlich in der CI.
+
+
+## V989 — Volumetric Atmosphere 2.0
+
+V989 ergänzt die vorhandene V972-Atmosphäre um schwebende, weiche Lichtkegel und
+tiefe Bodennebel-Ebenen. **Nur virtuelle Bühne, explizit aktivierbar**, ausschließlich
+für bestätigte aktive Songabschnitte und ohne manuelle Shows zu überschreiben.
+Das Eco-Profil benötigt höchstens zwei zusätzliche transparente Shader-Ebenen;
+bei schwacher Hardware werden diese Erweiterungen automatisch abgeschaltet.
+Die Effekte sind günstige 3D-Illusionen, kein physikalisch korrektes Volumen.
+Details: [`V989`](docs/versions/V989-VOLUMETRIC-ATMOSPHERE-2.md).
+
+
+### V990 – Living LED Wall 3.0
+
+Four opt-in genre patterns on the existing verified LED wall: Deutschrap City Pulse, Hardtekk Neon Matrix, Rock Arena Beams, Pop Prism Flow. See `docs/versions/V990-LIVING-LED-WALL-3.md`.
+
+
+## V995 – Duet & Ensemble 3.0 (opt-in)
+
+Der neue, standardmäßig deaktivierte V995-Regler im Concert Studio verfeinert
+verifizierte Lead-Wechsel, Duette und gemeinsame Hook-Gesten. V416/V496/V528
+bleiben die alleinige Quelle für Sängerrollen und Songzeiten; V807/V838
+bleiben Eigentümer der Bühnen-/Blickregie. V995 ergänzt ausschließlich
+begrenzte Schulter-/Arm-/Blick-Akzente innerhalb des bestehenden 3D-Frames.
+Keine weiteren Kameras, Audioaufnahmen, Animationen, Fuß-IK-Eingriffe oder
+Govee-Kommandos. Bei manuellen Shows, zu geringen Abständen, niedrigem
+Performance-Tier, pausiertem Track oder fehlender Rollenbestätigung deaktiviert.
+Tests: `npm run test:v995`, `npm run test:v995:types` und
+`npm run verify:v995:focused`. Production: Node 24 + `npm ci` + `npm run build:vercel`.
+
+
+## V996 – Virtual Crowd Experience (opt-in)
+
+V996 lässt das vorhandene virtuelle Publikum auf **bestätigte** Songphasen
+reagieren: dezente Publikumswellen, stärkere Gruppendynamik und bis zu 24
+instanzierte virtuelle Lichtstäbe (Balanced: 12). Bassakzente erfordern
+zusätzlich ein **gemessenes** Kick-Signal – aus Spotify-Metadaten werden keine
+Audioereignisse erfunden. Im Concert Studio: Einschalten, drei Stile
+(Dezent/Festival/Arena), Intensität und drei separate Effektkanäle.
+
+Die Funktion ist standardmäßig aus, verwendet die vorhandenen V815/V893/V973-
+Instanzen und **eine** zusätzliche, begrenzte Draw-Call-Geometrie.
+Keine zusätzlichen Animation-Frames, Timer, physischen Lichtbefehle oder
+Render-Schleifen. Manuelle Regie, Lyrics, Blackout, Seek, Songwechsel,
+reduzierte Bewegung und schwache Hardware sperren die Automatik.
+
+Tests: `npm run test:v996`, `npm run test:v996:types` und
+`npm run verify:v996:focused`. Der vollständige Produktionsbuild benötigt
+Node 24, `npm ci` und `npm run build:vercel`; ein lokal fehlender Build ist
+**keine** CI-Freigabe. Der GitHub-Importer schützt `.github/workflows`.

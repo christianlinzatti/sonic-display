@@ -62,6 +62,9 @@ import {newGlbFootworkQualityStateV596,stepGlbFootworkQualityV596} from "./natur
 import {createNaturalFootworkClockV839,refineNaturalFootworkRigV839,readNaturalFootworkV839} from "./naturalDanceFootworkV839";
 import {newGroundingStateV665,stepRealisticGroundingV665,readGroundingSettingsV665} from "./realisticDanceGroundingV665";
 import {newGenreDanceStateV666,stepGenreDanceV666,readGenreDanceSettingsV666} from "./genreDancePerformanceV666";
+import {sampleChoreographyV993,DEFAULT_CHOREOGRAPHY_V993} from "./aiChoreographyDirectorV993";
+import {readConcertStageSyncV882} from "./concertStageSyncV882";
+import {readEnergyV896} from "./musicalEnergyIntelligenceV896";
 import { createNaturalDanceStateV320, refineNaturalDanceV320, readNaturalDanceV320 } from "./naturalDanceIntelligenceV320";
 import { MOTION_QUALITY_EVENT_V321, readMotionQualityV321, polishMotionClipV321 } from "./advancedMotionQualityV321";
 import { computeNaturalDanceCoordination } from "./naturalDanceCoordination";
@@ -932,9 +935,34 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       plantedRight:footIK.current.right?.contact.phase==='planted',
     });
     genreDanceV666.current=genreV666Result.state;
+    // V993 uses the same V895 verified score as V899/V992. Only additive
+    // upper-body channels are scaled; imported clips, legs, pelvis, lip-sync,
+    // and the ONE existing V492 Foot-IK stage remain untouched.
+    const choreographySignalV993=readConcertStageSyncV882();
+    const choreographyV993=sampleChoreographyV993(genreV666Result.motion,{
+      settings:choreographySignalV993.choreographySettingsV993??DEFAULT_CHOREOGRAPHY_V993,
+      plan:choreographySignalV993.directorPlanV895,
+      trackId:track?.id??'',durationMs:choreographySignalV993.durationMs,
+      positionMs:cameraDirectorProgressMs??-1,genre,playing:isPlaying,
+      autoEnabled:choreographySignalV993.enabled&&choreographySignalV993.sync.dance,
+      directorEnabled:!!choreographySignalV993.directorSettingsV895?.enabled,
+      danceEnabled:!!choreographySignalV993.directorSettingsV895?.dance,
+      tier:getActivePerformanceTier(),reducedMotion,
+      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+        !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride||!!clipChoiceV328||
+        !!phraseChoiceV329||!!rapLiveEnabledV412||!!lowClipV481&&selectedClip===lowClipV481,
+      manualFx:!!choreographySignalV993.manual,blackout:!choreographySignalV993.playing,
+      seekBlocked:(cameraDirectorProgressMs??-1)<(choreographySignalV993.atmosphereSeekBlockedUntilMs??0),
+      lyricsVisible:!!propsLipSyncV367?.cinematicLyricsVisibleV378,
+      footContactKnown:!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+      slot:Math.max(0,Math.min(3,workloadSlot??0)),count:Math.max(1,Math.min(4,ensembleCountV745??Math.max(workloadSlot+1,propsLipSyncV367?.ensembleCountV374??1))),
+      energy:readEnergyV896(track?.id??'',choreographySignalV993.durationMs,cameraDirectorProgressMs??-1),
+    });
     // V759 varies only EXISTING expressive rig scalars at musical phrase boundaries.
     // It never replaces GLB clips or touches feet, hips, root, lip sync or IK.
-    const varietyV759=stepDanceVarietyV759(varietyStateV759.current,genreV666Result.motion,{
+    const varietyV759=stepDanceVarietyV759(varietyStateV759.current,choreographyV993.motion,{
       settings:groovePreferences.avatarDanceVarietyV759,trackId:track?.id,modelId:avatarModelId??url,
       seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,
         progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
