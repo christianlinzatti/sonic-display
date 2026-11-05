@@ -20,6 +20,9 @@ jobs:
     timeout-minutes: 5
     env:
       VERCEL_DEPLOYMENT_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.deployment_url || github.event.deployment_status.environment_url }}
+      # Optional GitHub Actions secret from Vercel Project > Deployment Protection.
+      # Never echo this value or add it to the target URL.
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
