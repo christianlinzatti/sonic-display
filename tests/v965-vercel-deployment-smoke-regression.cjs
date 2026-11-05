@@ -2,7 +2,7 @@
 'use strict';
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
-const {normalizeDeploymentUrlV965,smokeV965}=require('../scripts/check-vercel-deployment-v965.cjs');
+const {normalizeDeploymentUrlV965,smokeV965,trustedAutomationHostV965}=require('../scripts/check-vercel-deployment-v965.cjs');
 const root=path.resolve(__dirname,'..');
 const valid='https://sonic-display-ojoy87064-spotify-now.vercel.app/';
 assert.equal(normalizeDeploymentUrlV965(valid),valid);
@@ -28,10 +28,42 @@ const response=(status=200,type='text/html; charset=utf-8',html='<!doctype html>
   const x=await smokeV965(valid,async()=>r);assert.equal(x.reason,reason);
  }
  assert.equal((await smokeV965(valid,async()=>{throw Error('connection refused')})).passed,false);
+ // A Vercel login redirect is NOT proof that the deployed app is ready.
+ const authRedirect={status:302,headers:{get:(name)=>name==='location'?'https://vercel.com/login?next=protected':'text/html'}};
+ assert.equal((await smokeV965(valid,async()=>authRedirect)).reason,'VERCEL_PROTECTION_AUTH_REQUIRED');
+ assert.equal((await smokeV965(valid,async()=>response(302))).reason,'HTTP_302');
+ assert.equal(trustedAutomationHostV965(valid),true);
+ assert.equal(trustedAutomationHostV965('https://sonic-display.vercel.app/'),false);
+ assert.equal(trustedAutomationHostV965('https://sonic-display-attacker.vercel.app/'),false);
+ assert.equal(trustedAutomationHostV965('https://sonic-display-test-other-team.vercel.app/'),false);
+ const secret='test-automation-token-123456';
+ let trustedCalls=0;
+ const tokenFetcher=async (_url,options)=>{
+  trustedCalls++;
+  assert.equal(options.headers['x-vercel-protection-bypass'],secret);
+  assert.equal(options.redirect,'manual');
+  return response();
+ };
+ const verified=await smokeV965(valid,tokenFetcher,{trustedEvent:true,bypassToken:secret});
+ assert.equal(verified.passed,true);assert.equal(trustedCalls,1);
+ assert.equal(JSON.stringify(verified).includes(secret),false);
+ for(const [url,options] of [
+  [valid,{trustedEvent:false,bypassToken:secret}],
+  ['https://sonic-display.vercel.app/',{trustedEvent:true,bypassToken:secret}],
+  [valid,{trustedEvent:true,bypassToken:'bad\nheader'}],
+  [valid,{trustedEvent:true,bypassToken:'short'}]
+ ]){
+  const result=await smokeV965(url,tokenFetcher,options);
+  assert.equal(result.passed,false);
+  assert.equal(result.reason,'BYPASS_NOT_AUTHORIZED');
+  assert.equal(trustedCalls,1,'Never send credentials to untrusted targets or events');
+ }
+
  const config=fs.readFileSync(path.join(root,'.github/workflows/v965-deployment-smoke.yml'),'utf8');
  assert(config.includes('deployment_status:'));assert(config.includes('workflow_dispatch:'));
  assert(config.includes('VERCEL_DEPLOYMENT_URL:'));
+ assert(config.includes("github.event_name == 'deployment_status' && secrets.VERCEL_AUTOMATION_BYPASS_SECRET"));
  assert(config.includes('node scripts/check-vercel-deployment-v965.cjs'));
  assert(config.includes('ubuntu-24.04'));
- console.log('PASS V965 public deployment smoke: strict host allowlist, no redirects, HTTP/HTML readiness and CI workflow');
+ console.log('PASS V965 deployment smoke: strict allowlist, protected redirects fail closed, opt-in CI token, HTML readiness and CI workflow');
 })().catch(e=>{console.error(e);process.exitCode=1});
