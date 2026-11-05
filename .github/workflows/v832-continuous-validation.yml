@@ -18,10 +18,18 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
-          node-version: '22'
+          node-version: '24'
           cache: npm
       - name: Reproducible dependency installation
         run: npm ci --no-audit --no-fund
+      - name: V998 Live AI Concert Assistant (regression and isolated type checks)
+        run: npm run test:v998 && npm run test:v998:types
+      - name: V990 Living LED Wall 3.0 (regression and isolated type checks)
+        run: npm run test:v990 && npm run test:v990:types
+      - name: V989 Volumetric Atmosphere 2.0 (regression and isolated type checks)
+        run: npm run test:v989 && npm run test:v989:types
+      - name: V988 Holographic Stage Portal (regression and isolated type checks)
+        run: npm run test:v988 && npm run test:v988:types
       - name: V929 Smart Govee Troubleshooting Assistant (regression and isolated type checks)
         run: npm run test:v929 && npm run test:v929:types && npm run test:v929:ui-types
       - name: V928 regression and available isolated type checks

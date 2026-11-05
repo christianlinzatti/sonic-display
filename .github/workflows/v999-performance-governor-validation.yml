@@ -1,0 +1,30 @@
+name: V999 Intelligent Performance Governor production validation
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - 'components/visualizer/intelligentPerformanceGovernorV999.ts'
+      - 'tests/v999-performance-governor-regression.cjs'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --include=dev --no-audit --no-fund
+      - run: node tests/v999-performance-governor-regression.cjs
+      - run: npm run test:v999:types
+      - run: npm run check:syntax
+      - run: npm run check:architecture
+      - run: npm run typecheck
+      - run: npm run build:next

@@ -45,7 +45,7 @@ try {
   mutateJson('package-lock.json', p => { delete p.packages['node_modules/zustand']; p.packages[''].dependencies.zustand = '^5.0.16'; }, 'lock:range:dependencies:zustand');
   mutateJson('package-lock.json', p => { delete p.packages['node_modules/next']; }, 'lock:entry:dependencies:next');
   mutateJson('package-lock.json', p => { delete p.packages['node_modules/react'].integrity; }, 'lock:integrity:dependencies:react');
-  mutateJson('package.json', p => { p.version = '0.1.0-v999'; }, 'release:version');
+  mutateJson('package.json', p => { p.version = '0.1.0-v' + (Number(String(p.sonicRoadmapRelease).replace(/^v/, '')) + 1); }, 'release:version');
   mutateJson('package.json', p => { p.scripts.prebuild = ''; }, 'scripts:prebuild');
   mutateJson('package.json', p => { p.scripts.typecheck = 'tsc -p tests/tsconfig.v751-core.json'; }, 'scripts:typecheck');
   mutateJson('package.json', p => { p.scripts.build = 'echo skipped'; }, 'scripts:build');
