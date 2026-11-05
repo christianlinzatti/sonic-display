@@ -1,0 +1,79 @@
+name: Sonic Display - Versioned Project ZIP Import
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'releases/SonicDisplay-V*.zip'
+  pull_request:
+    paths:
+      - '.github/workflows/project-archive-import.yml'
+      - 'scripts/project-archive-import.py'
+      - 'tests/test_project_archive_import.py'
+  workflow_dispatch:
+    inputs:
+      archive:
+        description: 'ZIP filename in releases/, e.g. SonicDisplay-V969.zip'
+        type: string
+        required: true
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: sonic-versioned-project-import-master
+  cancel-in-progress: false
+jobs:
+  importer-tests:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate versioned importer safety regressions
+        run: python3 -m unittest discover -v -s tests -p test_project_archive_import.py
+  import-project:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out exact uploaded revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Validate versioned importer safety regressions
+        run: python3 -m unittest discover -v -s tests -p test_project_archive_import.py
+      - name: Select the uploaded versioned ZIP (never an arbitrary old archive)
+        id: selection
+        env:
+          PUSH_BEFORE: ${{ github.event.before }}
+          MANUAL_ARCHIVE: ${{ inputs.archive }}
+        run: |
+          python3 scripts/project-archive-import.py --select \
+            --before "$PUSH_BEFORE" --head "$GITHUB_SHA" \
+            --manual "$MANUAL_ARCHIVE" --output "$GITHUB_OUTPUT"
+      - name: Validate and import project files (keep protected GitHub workflows)
+        id: imported
+        env:
+          ARCHIVE: ${{ steps.selection.outputs.archive }}
+        run: python3 scripts/project-archive-import.py --archive "$ARCHIVE" --output "$GITHUB_OUTPUT"
+      - name: Commit the imported project; remove imported ZIP
+        env:
+          ARCHIVE: ${{ steps.selection.outputs.archive }}
+          VERSION: ${{ steps.imported.outputs.version }}
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- . ':(exclude).github/**' ':(exclude)releases/**'
+          git add -u -- "releases/$ARCHIVE"
+          if git diff --cached --quiet; then
+            echo 'No source changes to commit'
+          else
+            git commit -m "chore: import full Sonic Display V$VERSION project"
+            git push origin HEAD:master
+          fi
+      - name: Trigger full Linux/Windows production validation
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run v965-room-wave-production.yml --ref master
