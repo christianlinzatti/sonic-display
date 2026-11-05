@@ -35,6 +35,8 @@ for(const changes of [[],['package.json'],['releases/README.md'],
   assert(!shouldSkipForPaths(changes),'Never skip non-archive or mixed commits: '+changes.join(','));
 const build=read('scripts/vercel-production-build.cjs');
 for(const src of ["NODE_ENV:'production'",'React 19 production/development parity',
+ 'V964 verified peak recovery','V964 isolated TypeScript',
+ 'Real Next.js emitted artifact verification',
  'V963 verified transition bridge','V962 narrative regression','V961 light governor regression',
  'Full TypeScript','Real Next.js production build','VERCEL_PRODUCTION_GATE FAIL'])
  assert(build.includes(src),'Vercel gate missing: '+src);

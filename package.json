@@ -1955,7 +1955,10 @@
     "test:v961:build-hotfix": "node tests/v961-build-hotfix-regression.cjs",
     "test:v963": "node tests/v963-verified-transition-bridge-regression.cjs",
     "test:v963:types": "tsc -p tests/tsconfig.v963-core.json --noEmit",
-    "verify:production:v963": "node scripts/v963-production-verify.cjs"
+    "verify:production:v963": "node scripts/v963-production-verify.cjs",
+    "test:v964": "node tests/v964-peak-recovery-regression.cjs",
+    "test:v964:types": "tsc -p tests/tsconfig.v964-core.json --noEmit",
+    "verify:v964:production": "node scripts/v964-production-verify.cjs"
   },
   "engines": {
     "node": "24.x"
@@ -1983,5 +1986,5 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v963"
+  "sonicRoadmapRelease": "v964"
 }

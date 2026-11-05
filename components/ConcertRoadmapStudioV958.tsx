@@ -99,6 +99,8 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
     onChange={e=>save({narrativeV962:e.target.checked})}/> V962: Songdramaturgie für Govee (Verse/Hook/Build/Drop/Break/Outro – nur bestätigte Abschnitte)</label>
    <label><input type="checkbox" checked={settings.bridgeV963} disabled={!settings.enabled||!settings.hardwareSync}
     onChange={e=>save({bridgeV963:e.target.checked})}/> V963: Spannungsaufbau vor bestätigten Hook-/Drop-Wechseln (keine zusätzlichen Govee-Befehle; manuelle Shows geschützt)</label>
+   <label><input type="checkbox" checked={settings.peakRecoveryV964} disabled={!settings.enabled||!settings.hardwareSync}
+    onChange={e=>save({peakRecoveryV964:e.target.checked})}/> V964: Kurze Erholungsphase nach bestätigten Hook-/Drop-Spitzen (nur automatische Govee-Cues)</label>
    <label>Einfluss {settings.strength}% <input type="range" min={0} max={100} value={settings.strength} onChange={e=>save({strength:Number(e.target.value)})}/></label>
   </div>
   {settings.hardwareSync&&<p className="settings-note" role="status">Neue Govee-Cues werden nur bei aktivem Auto-Sync und echten bestätigten Songphasen berücksichtigt. Gespeicherte Shows und manuell gesetzte Kameracues bleiben unverändert. Keine Strobe-/Power-Kommandos.</p>}

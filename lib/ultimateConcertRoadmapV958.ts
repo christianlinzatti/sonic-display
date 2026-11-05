@@ -20,9 +20,9 @@ export type ConcertTimelineCueV948={atMs:number;phase:ConcertPhaseV958;camera?:C
 export type ConcertRoomPresetV936={id:string;name:string;roles:Record<string,ConcertRoleV935>;positions:Record<string,{x:number;y:number}>};
 export type ConcertSettingsV958={schema:'ultimate-concert-v958';enabled:boolean;hardwareSync:boolean;virtualFx:boolean;strength:number;
   roleOverrides:Record<string,ConcertRoleV935>;presets:ConcertRoomPresetV936[];timeline:Record<string,ConcertTimelineCueV948[]>;
-  transitionsV960:boolean;compactFxV960:boolean;lightGovernorV961:boolean;narrativeV962:boolean;bridgeV963:boolean};
+  transitionsV960:boolean;compactFxV960:boolean;lightGovernorV961:boolean;narrativeV962:boolean;bridgeV963:boolean;peakRecoveryV964:boolean};
 export const DEFAULT_CONCERT_V958:ConcertSettingsV958={schema:'ultimate-concert-v958',enabled:false,hardwareSync:false,virtualFx:false,
- strength:55,roleOverrides:{},presets:[],timeline:{},transitionsV960:false,compactFxV960:false,lightGovernorV961:false,narrativeV962:false,bridgeV963:false};
+ strength:55,roleOverrides:{},presets:[],timeline:{},transitionsV960:false,compactFxV960:false,lightGovernorV961:false,narrativeV962:false,bridgeV963:false,peakRecoveryV964:false};
 export type ConcertInputV958={trackId:string;progressMs:number;durationMs:number;phase:ConcertPhaseV958;
  sectionIndex:number;sectionStartMs:number;verified:boolean;genre:string;energy:number;bass:number;lyricsVisible:boolean;
  reducedMotion:boolean;stageCamera?:ConcertCameraV940;stageFormation?:ConcertDanceV941;authoredStage?:boolean};
@@ -69,7 +69,7 @@ export function normalizeConcertRoadmapV958(raw:unknown):ConcertSettingsV958{
  return {schema:'ultimate-concert-v958',enabled:o.enabled===true,hardwareSync:o.hardwareSync===true,
   virtualFx:o.virtualFx===true,strength:Math.round(clamp(Number(o.strength??55),0,100)),roleOverrides:overrides,presets,timeline,
   transitionsV960:o.transitionsV960===true,compactFxV960:o.compactFxV960===true,lightGovernorV961:o.lightGovernorV961===true,
-  narrativeV962:o.narrativeV962===true,bridgeV963:o.bridgeV963===true};
+  narrativeV962:o.narrativeV962===true,bridgeV963:o.bridgeV963===true,peakRecoveryV964:o.peakRecoveryV964===true};
 }
 export function loadConcertRoadmapV958():ConcertSettingsV958{
  if(typeof window==='undefined')return normalizeConcertRoadmapV958(null);

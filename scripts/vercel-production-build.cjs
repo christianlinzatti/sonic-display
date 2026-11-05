@@ -33,13 +33,18 @@ try {
   }
   run('Source and lockfile preflight','scripts/v959-source-preflight.cjs');
   run('React 19 production/development parity','tests/react-act-compat-regression.cjs');
+  run('V964 verified peak recovery','tests/v964-peak-recovery-regression.cjs');
+  run('V964 Next.js artifact regression','tests/v964-next-build-artifact-regression.cjs');
   run('V963 verified transition bridge','tests/v963-verified-transition-bridge-regression.cjs');
   run('V962 narrative regression','tests/v962-concert-narrative-regression.cjs');
   run('V961 light governor regression','tests/v961-govee-concert-governor-regression.cjs');
   run('Vercel deployment configuration regression','tests/vercel-production-parity-regression.cjs');
+  run('V964 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v964-core.json','--noEmit']);
   run('V963 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v963-core.json','--noEmit']);
   run('Full TypeScript','node_modules/typescript/bin/tsc',['--noEmit']);
+  const buildStartedAt=Date.now();
   run('Real Next.js production build','node_modules/next/dist/bin/next',['build'],30*60*1000);
+  run('Real Next.js emitted artifact verification','scripts/check-next-build-v964.cjs',[String(buildStartedAt)]);
   report(true,null);
   console.log('VERCEL_PRODUCTION_GATE PASS: full TypeScript and Next.js output built');
 } catch(error) {

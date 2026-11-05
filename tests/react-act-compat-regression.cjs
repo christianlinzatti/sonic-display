@@ -49,8 +49,8 @@ if (installed) {
       encoding: 'utf8', timeout: 20000, windowsHide: true
     });
     assert.equal(result.status, 0,
-      'React runtime failed in '+mode+': '+(result.error?.message || result.stderr || result.stdout));
+      `React runtime failed in ${mode}: ${result.error?.message || result.stderr || result.stdout}`);
   }
   runtime = 'development React.act and production React import validated';
 }
-console.log('PASS React.act compatibility: '+tests.length+' renderer-based regression suites ('+runtime+')');
+console.log(`PASS React.act compatibility: ${tests.length} renderer-based regression suites (${runtime})`);
