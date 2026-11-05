@@ -4,6 +4,7 @@ Historische Sonic-Display-Releases, Funktionsbeschreibungen und technische Verif
 
 ## Neuere Versionen
 
+- [V963 – Verified Concert Transition Bridge](./V963-VERIFIED-CONCERT-TRANSITION-BRIDGE.md)
 - [V86514-REACT-TYPE-ISOLATION-FIX.md](./V86514-REACT-TYPE-ISOLATION-FIX.md)
 - [V86513-WINDOWS-TEST-FIX.md](./V86513-WINDOWS-TEST-FIX.md)
 - [V961-GOVEE-CONCERT-LIGHT-GOVERNOR.md](./V961-GOVEE-CONCERT-LIGHT-GOVERNOR.md)

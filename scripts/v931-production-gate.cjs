@@ -11,6 +11,7 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V963 verified bridge regression', 'tests/v963-verified-transition-bridge-regression.cjs'],
   ['V962 narrative light curve', 'tests/v962-concert-narrative-regression.cjs'],
   ['V961 TypeScript build hotfix', 'tests/v961-build-hotfix-regression.cjs'],
   ['V961 Govee concert governor regression', 'tests/v961-govee-concert-governor-regression.cjs'],
@@ -36,6 +37,7 @@ const regressions = [
   ['Source syntax + duplicate imports', 'tests/check-source-syntax.cjs'],
 ];
 const productionChecks = [
+  ['V963 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v963-core.json']],
   ['V962 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v962-core.json']],
   ['V961 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v961-core.json']],
   ['V960 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p', 'tests/tsconfig.v960-core.json']],

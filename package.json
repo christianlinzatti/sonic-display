@@ -1950,7 +1950,10 @@
     "test:v961:types": "tsc -p tests/tsconfig.v961-core.json --noEmit",
     "verify:v961:focused": "npm run test:v961 && npm run test:v961:build-hotfix && npm run test:v961:types && npm run test:v960 && npm run test:v958",
     "verify:v961:production": "node scripts/v961-production-verify.cjs",
-    "test:v961:build-hotfix": "node tests/v961-build-hotfix-regression.cjs"
+    "test:v961:build-hotfix": "node tests/v961-build-hotfix-regression.cjs",
+    "test:v963": "node tests/v963-verified-transition-bridge-regression.cjs",
+    "test:v963:types": "tsc -p tests/tsconfig.v963-core.json --noEmit",
+    "verify:production:v963": "node scripts/v963-production-verify.cjs"
   },
   "engines": {
     "node": ">=20.9.0"
@@ -1978,5 +1981,5 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v962"
+  "sonicRoadmapRelease": "v963"
 }

@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [],
+    "typeRoots": [
+      "./empty-types"
+    ],
+    "incremental": false,
+    "noEmit": true
+  },
+  "include": [],
+  "files": [
+    "../lib/concertBridgeV963.ts",
+    "../lib/concertNarrativeV962.ts",
+    "../lib/ultimateConcertRoadmapV958.ts"
+  ]
+}
