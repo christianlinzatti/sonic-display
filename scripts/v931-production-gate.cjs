@@ -11,6 +11,8 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V965 verified room wave', 'tests/v965-room-wave-regression.cjs'],
+  ['V965 public deployment smoke regression', 'tests/v965-vercel-deployment-smoke-regression.cjs'],
   ['V964 verified post-peak recovery', 'tests/v964-peak-recovery-regression.cjs'],
   ['V964 Next.js emitted output guard', 'tests/v964-next-build-artifact-regression.cjs'],
   ['V963 verified bridge regression', 'tests/v963-verified-transition-bridge-regression.cjs'],
@@ -39,6 +41,7 @@ const regressions = [
   ['Source syntax + duplicate imports', 'tests/check-source-syntax.cjs'],
 ];
 const productionChecks = [
+  ['V965 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v965-core.json']],
   ['V964 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v964-core.json']],
   ['V963 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v963-core.json']],
   ['V962 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v962-core.json']],

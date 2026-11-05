@@ -33,6 +33,7 @@ import {governConcertLookV961} from '@/lib/goveeConcertGovernorV961';
 import {planConcertNarrativeV962,dimConcertNarrativeLookV962} from '@/lib/concertNarrativeV962';
 import {planVerifiedConcertBridgeV963,dimConcertBridgeLookV963} from '@/lib/concertBridgeV963';
 import {planConcertPeakRecoveryV964,dimConcertPeakRecoveryLookV964} from '@/lib/concertPeakRecoveryV964';
+import {planConcertRoomWaveV965,dimConcertRoomWaveLookV965} from '@/lib/concertRoomWaveV965';
 import {readTrackAnalysisV318,ANALYSIS_EVENT_V318,ANALYSIS_STORAGE_KEY_V318,
  type TrackAnalysisV318} from '@/services/musicAnalysis/trackAnalysisV318';
 /** Client-mounted on the Vercel page. Commands go only to the Raspberry Pi's localhost Bridge.
@@ -280,6 +281,11 @@ export function GoveeMusicSyncV909(){
      state.track.id,sectionIndex,progress,{enabled:roadmapSettings.enabled&&roadmapSettings.hardwareSync&&roadmapSettings.peakRecoveryV964,
       playing:state.isPlaying,savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
       reducedMotion:stage?.reducedMotion??false});
+    // V965 is a pure, slow room wave computed ONCE per existing LAN batch.
+    const roomWaveV965=planConcertRoomWaveV965(narrativeSceneV962,analysis.current,
+     state.track.id,sectionIndex,progress,{enabled:roadmapSettings.enabled&&roadmapSettings.hardwareSync&&roadmapSettings.roomWaveV965,
+      playing:state.isPlaying,savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
+      reducedMotion:stage?.reducedMotion??false});
     const shared={genre:String(state.genre??''),progressMs:progress,durationMs:state.track.durationMs,
      metrics:state.metrics,microphoneActive:state.microphoneActive,config};
     for(const ip of config.selectedIps){
@@ -423,8 +429,10 @@ export function GoveeMusicSyncV909(){
       // V963 sits after V962 dimming and before V961's final rate-of-change cap.
       const bridgeLookV963=recoveringDevices.has(ip)?narrativeLookV962:dimConcertBridgeLookV963(narrativeLookV962,bridgeV963);
       const peakLookV964=recoveringDevices.has(ip)?bridgeLookV963:dimConcertPeakRecoveryLookV964(bridgeLookV963,peakRecoveryV964);
+      const roomWaveLookV965=recoveringDevices.has(ip)?peakLookV964:dimConcertRoomWaveLookV965(
+       peakLookV964,roomWaveV965,config.selectedIps.indexOf(sourceIp),config.selectedIps.length);
       const plannedLook=roadmapScene&&roadmapSettings.hardwareSync
-       ?easeGoveeLookV911(previous,{...peakLookV964,brightness:Math.min(festivalDeliveredLook.brightness,peakLookV964.brightness)})
+       ?easeGoveeLookV911(previous,{...peakLookV964,brightness:Math.min(festivalDeliveredLook.brightness,roomWaveLookV965.brightness)})
        :festivalDeliveredLook;
       // V934: a lamp that just reconnected gets ONE calm, dimmed recovery look.
       // This is opt-in and never interferes with existing V912 shows or manual input.

@@ -1958,7 +1958,9 @@
     "verify:production:v963": "node scripts/v963-production-verify.cjs",
     "test:v964": "node tests/v964-peak-recovery-regression.cjs",
     "test:v964:types": "tsc -p tests/tsconfig.v964-core.json --noEmit",
-    "verify:v964:production": "node scripts/v964-production-verify.cjs"
+    "verify:v964:production": "node scripts/v964-production-verify.cjs",
+    "test:v965": "node tests/v965-room-wave-regression.cjs",
+    "test:v965:types": "tsc -p tests/tsconfig.v965-core.json --noEmit"
   },
   "engines": {
     "node": "24.x"
@@ -1986,5 +1988,5 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v964"
+  "sonicRoadmapRelease": "v965"
 }

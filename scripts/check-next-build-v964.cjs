@@ -38,8 +38,10 @@ function inspectBuild(root,notBeforeMs){
  }
  return {passed:issues.length===0,issues,appPageCount:appPages};
 }
-/** A missing explicit timestamp must be recovered from a VERIFIED V964 build proof.
- * Fail closed on absent, failed, invalid or future proof instead of accepting old output. */
+/** When a caller omits a timestamp, recover the start of the SUCCESSFUL, fresh
+ * V964 production build. Never assume 0: that would let stale output pass.
+ * The verifier writes this proof during the same CI invocation.
+ */
 function resolveBuildStartV964(root,explicit){
  if(explicit!==undefined){
   const value=Number(explicit);
