@@ -96,5 +96,5 @@ check('UI exposes sliders and switches',()=>{const s=read('components/visualizer
 check('version and lock sync',()=>{const p=JSON.parse(read('package.json')),l=JSON.parse(read('package-lock.json'));assert.match(p.version,/^0\.1\.0-v(?:889|890|891|892|893|894|895|896|897|898|899|900|901|902|903|904|905|906|907|908)$/);assert.equal(l.version,p.version);assert.equal(l.packages[''].version,p.version);});
 check('CI gate',()=>assert(read('.github/workflows/v832-continuous-validation.yml').includes('npm run test:v889:ui-types')));
 check('Windows gate',()=>assert(read('scripts/verify-v889-windows.ps1').includes('verify:v889:focused')));
-check('release docs',()=>assert(read('ADVANCED_PARTICLE_FX_V889.md').includes('V889')));
+check('release docs',()=>assert(read('docs/features/stage/ADVANCED_PARTICLE_FX_V889.md').includes('V889')));
 console.log(`V889 Advanced Particle FX: PASS ${checks} checks`);

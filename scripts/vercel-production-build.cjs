@@ -33,6 +33,14 @@ try {
   }
   run('Source and lockfile preflight','scripts/v959-source-preflight.cjs');
   run('React 19 production/development parity','tests/react-act-compat-regression.cjs');
+  run('V969 Smart Concert Presets','tests/v969-smart-concert-presets-regression.cjs');
+  run('V969 signed Alexa intents','tests/v969-alexa-lambda-regression.cjs');
+  run('V968 Alexa focused concert visuals','tests/v968-alexa-concert-regression.cjs');
+  run('V968 authenticated Lambda intents','tests/v968-alexa-lambda-regression.cjs');
+  run('V967 Alexa virtual concert bridge','tests/v967-alexa-integration-regression.cjs');
+  run('V967 signed Alexa relay','tests/v967-alexa-relay-route-regression.cjs');
+  run('V966 immersive concert','tests/v966-immersive-concert-regression.cjs');
+  run('V966 clean project structure','tests/v966-project-structure-regression.cjs');
   run('V965 verified room wave','tests/v965-room-wave-regression.cjs');
   run('V965 deployment smoke regression','tests/v965-vercel-deployment-smoke-regression.cjs');
   run('V964 verified peak recovery','tests/v964-peak-recovery-regression.cjs');
@@ -41,6 +49,10 @@ try {
   run('V962 narrative regression','tests/v962-concert-narrative-regression.cjs');
   run('V961 light governor regression','tests/v961-govee-concert-governor-regression.cjs');
   run('Vercel deployment configuration regression','tests/vercel-production-parity-regression.cjs');
+  run('V969 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v969-core.json','--noEmit']);
+  run('V968 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v968-core.json','--noEmit']);
+  run('V967 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v967-core.json','--noEmit']);
+  run('V966 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v966-core.json','--noEmit']);
   run('V965 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v965-core.json','--noEmit']);
   run('V964 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v964-core.json','--noEmit']);
   run('V963 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v963-core.json','--noEmit']);

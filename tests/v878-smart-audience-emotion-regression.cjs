@@ -200,9 +200,15 @@ check('panel and both release gates registered',()=>{
  assert(scripts['build:preflight'].includes('test:v878:types'));
  assert(scripts.prebuild.includes('test:v878'));
 });
-check('upgrade payload directories excluded from production typecheck',()=>{
+check('retired upgrade payload directories are absent and active sources remain typed',()=>{
  const config=JSON.parse(fs.readFileSync('tsconfig.json','utf8'));
- for(const name of ['v874','v875','v876','v877','v878'])
-  assert(config.exclude.includes(name+'/**/*'),name);
+ for(const name of ['v874','v875','v876','v877','v878']){
+  assert(!fs.existsSync(name),name+' duplicated root staging directory');
+  assert(!config.exclude.includes(name+'/**/*'),name+' obsolete TypeScript exclusion');
+ }
+ for(const file of ['intelligentAudienceExperienceV874.ts','smartFestivalAtmosphereV875.ts',
+  'dynamicFestivalCrowdChoreographyV876.ts','intelligentCrowdInteractionV877.ts',
+  'smartAudienceEmotionDirectorV878.ts'])
+  assert(fs.existsSync('components/visualizer/'+file),file);
 });
 console.log(`PASS V878: ${checks} emotion, smoothing, safety, performance and integration tests`);

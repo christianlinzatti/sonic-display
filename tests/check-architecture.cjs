@@ -30,7 +30,7 @@ for (const ref of references) {
  assert(fs.existsSync(resolved), `ARCHITECTURE.md references missing source: ${ref}`);
 }
 assert(references.size >= 40, 'Too few checked architecture source references');
-for (const name of ['README.md','SPOTIFY_LOCAL_SETUP.md','docs/versions/V473.4-TYPESCRIPT-BUILD-HOTFIX.md','docs/versions/V473-AUTOMATIC-RAP-FLOW-ADLIBS.md','docs/versions/V456-ULTIMATE-AUTOMATIC-SHOW-DIRECTOR.md','docs/versions/V442-MULTI-ARTIST-STAGE-DIRECTOR.md','docs/versions/V453-EXPRESSIVE-LIP-SYNC-2.md','docs/versions/V463-RASPBERRY-PI-PERFORMANCE-STABILITY.md']) {
+for (const name of ['README.md','docs/setup/SPOTIFY_LOCAL_SETUP.md','docs/versions/V473.4-TYPESCRIPT-BUILD-HOTFIX.md','docs/versions/V473-AUTOMATIC-RAP-FLOW-ADLIBS.md','docs/versions/V456-ULTIMATE-AUTOMATIC-SHOW-DIRECTOR.md','docs/versions/V442-MULTI-ARTIST-STAGE-DIRECTOR.md','docs/versions/V453-EXPRESSIVE-LIP-SYNC-2.md','docs/versions/V463-RASPBERRY-PI-PERFORMANCE-STABILITY.md']) {
  assert(fs.existsSync(path.join(root, name)), `Missing referenced document: ${name}`);
 }
 console.log(`PASS architecture ${pkg.version}: ${references.size} current code references, 10 sections and linked documentation`);

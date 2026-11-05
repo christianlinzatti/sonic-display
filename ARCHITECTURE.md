@@ -1,3 +1,23 @@
+# V968 – Alexa Concert Commands 2.0
+
+Die virtuelle Konzertregie lässt sich jetzt pro Bühnenbereich (Bühne / LED-Wand / Publikum),
+Lichtpalette (Warm / Kühl / Neon / Genreautomatik) und gezieltem virtuellem Effekt
+(Lichtkegel, Nebel, Konfetti, Luftschlangen) über den privaten Alexa-Skill oder die
+lokalen Studio-Auswahllisten steuern. Manuelle Shows, Eco-Budget und verifizierte
+Songphasen bleiben maßgeblich; keine Spotify- oder Govee-Sprachsteuerung.
+
+**Details:** `docs/versions/V968-ALEXA-CONCERT-COMMANDS-2.md`
+
+---
+
+<!-- V967: Privat integrierte Alexa Custom Skill Lambda Bridge.
+Dateien: integrations/alexa/handler.cjs, integrations/alexa/interaction-model.de-DE.json,
+app/api/alexa/command/route.ts, app/api/alexa/pending/route.ts,
+lib/alexaConcertV967.ts, lib/alexaRedisV967.ts,
+components/AlexaConcertControlV967.tsx.
+Die bestehende Paketversion V908 wird wegen historischer Regressionen beibehalten.
+Anleitung: docs/versions/V967-ALEXA-ANBINDUNG.md. -->
+
 ## V908 – Live Avatar & FX Benchmark Verification
 
 `components/visualizer/liveStageBenchmarkProofV908.ts` erhält exakt die **gleiche**
@@ -3537,3 +3557,18 @@ Reine Diagnose-Funktion `concertQualityIntelligenceV901.ts`, read-only Bedienfel
 `concertQualityAdvisorV902.ts` derives deterministic opt-in suggestions from V901 warnings, confirmed V900 scenes, V826 frame telemetry and **existing automatic** V888/V889/V890/V897/V899/V900 setting snapshots. Only when renderer evidence is valid and current may the Advisor suggest lowering an already enabled effect's intensity. Other suggestions are limited to enabling optional **protective** flags (lyrics/floor contacts) already provided by these systems. The advisor never enables a disabled effect, invents a singer or a quality score, overwrites manual timeline content, or claims a measurable FPS increase.
 
 V902 is embedded under the V901 live dashboard using `ConcertQualityAdvisorPanelV902.tsx`. User action 1 selects a proposal and displays a before/after preview. User action 2 explicitly confirms that specific change. `confirmConcertAdviceV902()` **recomputes** the proposal against the current report, scene, enablement and original setting. The parent `LiveFxDeckV881.tsx` then applies only the allowlisted setting through the existing normalized React state setters, with a second current-value guard. No new renderer, network request, telemetry subscription, persistent opt-in or autonomous background work. Test: `tests/v902-automatic-concert-quality-advisor-regression.cjs`, isolated TS configs `tests/tsconfig.v902-*`, `docs/versions/V902-VERIFICATION.md`.
+
+
+## V966 – Root- und Versionsordner-Bereinigung
+
+Die frühere ZIP-Staging-Duplikation `v874/` bis `v878/` wurde nach
+Dateivergleich entfernt. Die aktiv verwendeten Audience- und Stage-Quellen
+liegen ausschließlich unter `components/visualizer/` und `tests/`.
+Thematische Dokumentation und historische Prüfartefakte sind über
+`docs/structure/README.md` auffindbar. Die vorhandene Release-Nummer
+bleibt wegen V908-Regressionskompatibilität unverändert; der V965-Importer
+führt die Strukturmigration automatisiert nach dem ZIP-Import aus.
+
+## V969 – Smart Concert Presets (virtual-only)
+
+`lib/smartConcertPresetsV969.ts` projects verified existing V958 scenes onto deterministic preset palettes, LED-wall styles, bounded FX and a verse/hook/build/drop intensity arc. `lib/alexaConcertV969.ts` supplies a strictly enumerated Alexa command extension and delegates to V968; the signed AWS Lambda and Redis transport are reused. The renderer in `components/visualizer/ConcertFestivalFxV958.tsx` composes V960 continuity → V969 smart preset → V968 manual voice mood/effects → V966 immersive cue. Authored shows, low-performance and reduced-motion gates keep priority. No additional network access or hardware dispatcher is introduced.

@@ -1,0 +1,257 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "sonic display",
+      "intents": [
+        {
+          "name": "ArenaIntent",
+          "samples": [
+            "starte Arena",
+            "aktiviere Arena",
+            "schalte auf Arena Modus",
+            "starte den Arena Modus"
+          ]
+        },
+        {
+          "name": "FestivalIntent",
+          "samples": [
+            "starte Festival",
+            "aktiviere Festival",
+            "starte den Festivalmodus",
+            "schalte auf Festival"
+          ]
+        },
+        {
+          "name": "ClubIntent",
+          "samples": [
+            "starte Club",
+            "aktiviere Club",
+            "schalte auf Clubmodus",
+            "starte den Club Modus"
+          ]
+        },
+        {
+          "name": "CalmIntent",
+          "samples": [
+            "starte eine ruhige Atmosphäre",
+            "ruhige Konzertatmosphäre",
+            "mach die Bühne ruhiger"
+          ]
+        },
+        {
+          "name": "StopShowIntent",
+          "samples": [
+            "beende die Konzertautomatik",
+            "stoppe die Bühnenautomatik",
+            "beende die Showautomatik"
+          ]
+        },
+        {
+          "name": "VirtualFxOnIntent",
+          "samples": [
+            "aktiviere virtuelle Effekte",
+            "schalte virtuelle Bühneneffekte ein",
+            "virtuelle Effekte an"
+          ]
+        },
+        {
+          "name": "VirtualFxOffIntent",
+          "samples": [
+            "deaktiviere virtuelle Effekte",
+            "schalte virtuelle Bühneneffekte aus",
+            "virtuelle Effekte aus"
+          ]
+        },
+        {
+          "name": "StageZoneIntent",
+          "samples": [
+            "beleuchte die Bühne",
+            "fokussiere auf die Bühne",
+            "nur die Bühne beleuchten",
+            "zeige den Bühnenbereich"
+          ]
+        },
+        {
+          "name": "BackdropZoneIntent",
+          "samples": [
+            "beleuchte den LED Hintergrund",
+            "fokussiere auf die LED Wand",
+            "nur die LED Wand beleuchten",
+            "zeige den Bühnenhintergrund"
+          ]
+        },
+        {
+          "name": "AudienceZoneIntent",
+          "samples": [
+            "beleuchte das Publikum",
+            "fokussiere auf das Publikum",
+            "zeige nur das Publikum",
+            "Publikumslicht aktivieren"
+          ]
+        },
+        {
+          "name": "AllZonesIntent",
+          "samples": [
+            "beleuchte die ganze Bühne",
+            "zeige alle Bühnenbereiche",
+            "alle Bühnenbereiche aktivieren",
+            "zeige die gesamte Konzertkulisse"
+          ]
+        },
+        {
+          "name": "WarmMoodIntent",
+          "samples": [
+            "starte warme Lichtfarben",
+            "mach das Licht warm",
+            "zeige warme Lichtstimmung",
+            "aktiviere warme Farben"
+          ]
+        },
+        {
+          "name": "CoolMoodIntent",
+          "samples": [
+            "starte kühle Lichtfarben",
+            "mach das Licht kühl",
+            "zeige kühle Lichtstimmung",
+            "aktiviere kühle Farben"
+          ]
+        },
+        {
+          "name": "NeonMoodIntent",
+          "samples": [
+            "aktiviere Neonfarben",
+            "starte Neonlicht",
+            "mach eine Neon Lichtshow",
+            "zeige Neonfarben"
+          ]
+        },
+        {
+          "name": "AutoMoodIntent",
+          "samples": [
+            "automatische Lichtfarben",
+            "aktiviere automatische Farben",
+            "nutze Genre Lichtfarben"
+          ]
+        },
+        {
+          "name": "BeamsEffectIntent",
+          "samples": [
+            "zeige virtuelle Lichtkegel",
+            "aktiviere Lichtstrahlen",
+            "zeige Lichtkegel auf der Bühne"
+          ]
+        },
+        {
+          "name": "FogEffectIntent",
+          "samples": [
+            "zeige virtuellen Nebel",
+            "starte Bodennebel",
+            "aktiviere virtuellen Nebel"
+          ]
+        },
+        {
+          "name": "ConfettiEffectIntent",
+          "samples": [
+            "zeige virtuelles Konfetti",
+            "aktiviere Konfetti auf der Bühne",
+            "starte virtuelle Konfettieffekte"
+          ]
+        },
+        {
+          "name": "StreamersEffectIntent",
+          "samples": [
+            "zeige virtuelle Luftschlangen",
+            "aktiviere Papierluftschlangen",
+            "starte Luftschlangen auf der Bühne"
+          ]
+        },
+        {
+          "name": "AutoEffectIntent",
+          "samples": [
+            "automatische Bühneneffekte",
+            "aktiviere automatische Bühneneffekte",
+            "lass die Effekte automatisch wechseln"
+          ]
+        },
+        {
+          "name": "EffectsOffIntent",
+          "samples": [
+            "keine zusätzlichen Bühneneffekte",
+            "schalte Zusatzeffekte aus",
+            "deaktiviere die speziellen Effekte"
+          ]
+        },
+        {
+          "name": "StatusIntent",
+          "samples": [
+            "wie ist der Status",
+            "ist Sonic Display bereit",
+            "was ist der Verbindungsstatus"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "RapPresetIntent",
+          "samples": [
+            "starte Deutschrap Konzert",
+            "starte Rap Bühne",
+            "aktiviere Deutschrap Konzert",
+            "starte Rap Modus"
+          ]
+        },
+        {
+          "name": "HardtekkPresetIntent",
+          "samples": [
+            "starte Hardtekk Reaktor",
+            "aktiviere Hardtekk Reaktor",
+            "starte die Hardtekk Bühne",
+            "starte Hardtekk Modus"
+          ]
+        },
+        {
+          "name": "RockPresetIntent",
+          "samples": [
+            "starte Rock Arena",
+            "aktiviere Rock Arena",
+            "starte die Rock Bühne",
+            "starte Rockkonzert"
+          ]
+        },
+        {
+          "name": "CinemaPresetIntent",
+          "samples": [
+            "starte Cinematic Night",
+            "aktiviere Kino Konzert",
+            "starte filmische Bühne",
+            "starte Cinematic Konzert"
+          ]
+        },
+        {
+          "name": "AutoPresetIntent",
+          "samples": [
+            "aktiviere Smart Konzert Automatik",
+            "starte automatische Konzertwelt",
+            "wähle passende Konzertwelt",
+            "starte Smart Preset"
+          ]
+        }
+      ],
+      "types": []
+    }
+  }
+}

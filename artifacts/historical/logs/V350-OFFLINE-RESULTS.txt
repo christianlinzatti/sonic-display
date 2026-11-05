@@ -1,0 +1,93 @@
+check:syntax: PASS PASS syntax: 444 TS/TSX source files
+test:v265: PASS V265 optimization impact regression: OK
+test:v264: PASS V264 optimization assistant regression: OK
+test:v263: PASS V263 Bottleneck Detector: PASS
+test:v266: PASS V266 regression OK
+test:v267: PASS V267 device profiles regression OK
+test:v268: PASS V268 profile backup regression OK
+test:v269: PASS V269 smart device auto selection regression OK
+test:v270: PASS V270 Benchmark integration PASS
+test:v271: PASS V271 Pi optimizer integration PASS
+test:v272: PASS V272 stability guard integration PASS
+test:v273: PASS V273 advanced music dance intelligence integration PASS
+test:v274: PASS V274 multi-avatar interaction integration PASS
+test:v275: PASS V275 Experience 2.0 integration PASS
+test:v277: PASS V277 modular stage environments PASS
+test:v278: PASS V278 stage settings preview PASS
+test:v279: PASS V279 live stage preview FX PASS
+test:v280: PASS V280 beat preview cards PASS
+test:v281: PASS V281 stage card 3D preview PASS
+test:v282: PASS PASS V282 orbitable stage preview modal
+test:stage-themes: PASS 13 V169 checks passed
+test:stage-lighting: PASS V139 reactive stage lighting: 11 behavior assertions + 4 integration checks passed
+test:runtime: PASS PASS runtime-structure: 943 checks across 444 source files
+test:touch-kiosk: PASS V166 touchscreen kiosk: 20 checks passed
+test:multi-avatar: PASS V140 multi-avatar integration: 14 assertions and JSX transpile checks passed
+test:v283: PASS V283 lazy stage preview PASS
+test:v284: PASS V284 bundle splitting regressions PASS
+test:v285: PASS V285 runtime performance instrumentation PASS
+test:v286: PASS V286 Stage Preset Library regression: OK
+test:v287: PASS V287 Stage Director integration regression passed
+test:v288: PASS V288 cinematic stage regression passed
+test:v289: PASS V289 real camera director regression passed
+test:v290: PASS V290 interactive camera preset regression passed
+test:v291: PASS V291 visual camera editor regression passed
+test:v292: PASS V292 installed-avatar camera preview regression passed
+test:v293: PASS V293 animated camera preview regression OK
+test:v294: PASS V294 motion timeline regression OK
+test:v295: PASS V295 camera keyframe regression OK
+test:v296: PASS V296 live camera keyframes regression OK
+test:v297: PASS V297 Smart Camera Tracking regression OK
+test:v298: PASS V298 Smart Camera Composer regression OK
+test:v299: PASS V299 camera director studio regression OK
+test:v300: PASS V300 visual camera dashboard projection, timeline and navigation regression OK
+test:v301: PASS V301 live stage preview regression passed
+test:v302: PASS V302 live camera editor, temporary control and persistence regression passed
+test:v303: PASS V303 gestures, orbit math, touch/wheel/keyboard controls, V302 saving integration and resource limits passed
+test:v304: PASS V304: 360-degree orbit, rear hemisphere, 3D panning, zoom, gesture validation, legacy migration, editor and keyframe integration passed
+test:v305: PASS V305: curved spherical camera paths, acceleration, time scaling, looping, local storage, 3D preview and live integration passed
+test:v306: PASS V306 Ultimate Show Director: deterministic show cues, transport safety, settings, camera, stage, FX and formations PASS
+test:v307: PASS V307 Dance Quality: style, section, phrase, GLB/procedural, storage, foot safety, pause/seek, controls PASS
+test:v308: PASS V308 Concert Atmosphere: shader, haze, stage lights, show sections, blackouts, performance tier, pause, reduced motion, storage + UI PASS
+test:v309: PASS V309 One-Click Show Presets: 4 coherent shows, original UI preserved, reversible snapshots, sanitized custom storage, studio + scene wiring PASS
+test:v310: PASS V310 Smart Show Quality: section/phrase variety, calm breaks, FX ceiling, settings, pause/seek, reduced motion, V309 persistence and UI PASS
+test:v311: PASS V311 Advanced Dance Performance: natural counterbalance, filtered reactive motion, foot protection, crossfade, playback safety, presets, UI/GLB integration PASS
+test:v312: PASS V312 Intelligent Choreography Director: musical duet role swaps, drop sync, partner response, pause/seek safety, reduced motion, manual precedence, controls and reversible presets PASS
+test:v313: PASS V313 Dance Show Evolution: track-long story arc, musical break precedence, peak/finale composition, pause/seek/reduced-motion guards, V312 duet pacing, controls and presets PASS
+test:v314: PASS PASS V314 session-only bounded telemetry, kick-motion proxy, foot contact, camera/FX diagnostics, skip/reset/record controls, exports, UI and scene wiring
+test:v315: PASS PASS V315 deterministic diagnostics, evidence thresholds, honest before/after preview, user-approved writes, stale-value rejection, conflict-safe undo, UI integration
+test:v316: PASS PASS V316: pure A/B snapshot, stale guard, deterministic shared beat, actual R3F rig/show engines, lazy 3D preview
+test:v317: PASS PASS V317: isolated real source catalog, deterministic A/B clip sampling, retargeting, continuous two-clip loop, live review wiring
+test:v318: PASS PASS V318: safe provider adapters, seconds/ms import, non-inferred sections, stable bars and beats, track isolation, live fallback, local cache and director wiring
+test:v319: PASS PASS V319: measured bars/beats, track isolation, BPM fallback, song clock, safe edit/trim/fade, musical grid, real 3D timeline preview, legacy compatibility
+test:v320: PASS PASS V320: genre-aware groove, follow through, planted feet, clip priority, seek/pause/reduced motion, presets, both avatars and settings
+test:v321: PASS PASS V321: isolated quaternion repair, 3D comparison wiring, timestamps, foot-safety diagnostics, opt-in and source immutability
+test:v322: PASS PASS V322: contact acquisition, release, bounded world anchors, jumps, floor estimate, storage, integration, diagnostics
+test:v323: PASS PASS V323: support stance, critical-damping, turns, landings, permissions, reset, clip priority, UI and GLB integration
+test:v324: PASS PASS V324: shared duet, movement cap, gap, lane protection, role/drop, pause/reduced, foot-lock slowdown, track reset, safety and UI
+test:v325: PASS PASS V325: 2-dancer cue timeline, safe role/formation blending, import beat grid, seeking, track isolation, storage, UI/3D integration
+test:v326: PASS PASS V326: 3/4 independent stage slots, bounded spacing, track isolation, interpolation, cue editing, persistence, UI/3D integration
+test:v327: PASS PASS V327: 3/4 dancer unison, stagger, call/response, alternating, drop/solo, imported markers, track-safe read, persistence, rendering
+test:v328: PASS PASS V328: deterministic 3/4 GLB phases, beat offsets, mode/cycle, input clamping, imported beats, pause, persistence and runtime wiring
+test:v329: PASS PASS V329: source-safe keyframe fingerprints, group selection, manual priority, confidence gate, storage and runtime/preview wiring
+test:v330: PASS V330 stage content plugin regression passed
+test:v331: PASS V331 live push regression passed
+test:v332: PASS PASS V332 provider publish, scoped subscriber token, local fallback, errors, cleanup
+test:v333: PASS PASS V333: layout bounds, uniqueness, routes, push policy, wiring, editor
+test:v334: PASS PASS V334: sanitizing, per-source priorities/durations, section gating, bounded weighted fairness, UI/wiring
+test:v335: PASS PASS V335: bio validation, strict artist matching, concert deduplication/recency, API keys, route wiring
+test:v336: PASS PASS V336: eventim strict matching, recency, safety, merge
+test:v337: PASS V337 concert display wiring regression passed
+test:v338: PASS V338 multi-image gallery regression passed
+test:v339: PASS V339 Wikimedia gallery regression passed
+test:v340: PASS V340 smart image selection passed
+test:v341: PASS V341 music-synced gallery tests passed
+test:v342: PASS V342 cinematic gallery regression passed
+test:v343: PASS V343 gallery preview regression passed
+test:v344: PASS V344 gallery layout regression passed
+test:v345: PASS PASS V345 multi-photo model/editor/stage wiring
+test:v346: PASS PASS V346 photo director state, UI and stage wiring
+test:v347: PASS PASS V347 settings validation, beat-gating, renderer and UI regression
+test:v348: PASS PASS V348 world-space geometry, sanitization, fallback, controls, stage wiring and regression
+test:v349: PASS PASS V349 image quality estimates, per-panel crop, 2D/3D integration, deduplication, offline controls
+test:v350: PASS PASS V350 lyrics presence, quiet verse, hook/drop photo emphasis, fallback, manual override, 2D/3D stage wiring and settings

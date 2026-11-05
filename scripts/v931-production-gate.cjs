@@ -11,6 +11,14 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V969 Smart Concert Presets','tests/v969-smart-concert-presets-regression.cjs'],
+  ['V969 signed Alexa intents','tests/v969-alexa-lambda-regression.cjs'],
+  ['V968 Alexa focused virtual scenes','tests/v968-alexa-concert-regression.cjs'],
+  ['V968 authenticated Lambda intents','tests/v968-alexa-lambda-regression.cjs'],
+  ['V967 private Alexa virtual show','tests/v967-alexa-integration-regression.cjs'],
+  ['V967 signed Alexa relay','tests/v967-alexa-relay-route-regression.cjs'],
+  ['V966 immersive concert', 'tests/v966-immersive-concert-regression.cjs'],
+  ['V966 cleaned project structure', 'tests/v966-project-structure-regression.cjs'],
   ['V965 verified room wave', 'tests/v965-room-wave-regression.cjs'],
   ['V965 public deployment smoke regression', 'tests/v965-vercel-deployment-smoke-regression.cjs'],
   ['V964 verified post-peak recovery', 'tests/v964-peak-recovery-regression.cjs'],
@@ -41,6 +49,10 @@ const regressions = [
   ['Source syntax + duplicate imports', 'tests/check-source-syntax.cjs'],
 ];
 const productionChecks = [
+  ['V969 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v969-core.json']],
+  ['V968 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v968-core.json']],
+  ['V967 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v967-core.json']],
+  ['V966 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v966-core.json']],
   ['V965 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v965-core.json']],
   ['V964 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v964-core.json']],
   ['V963 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v963-core.json']],

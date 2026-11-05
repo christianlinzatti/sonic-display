@@ -1,0 +1,3 @@
+# V64 Avatar-Bibliothek
+
+Copy .glb or .gltf files into `public/avatars/`. Start Next.js and open Settings > Avatar & Tanz > Avatar-Bibliothek. Click "Modelle neu laden". Click a model card to select it. The selected model is used in both the 3D preview and the main visualizer. Models are discovered by a server route (`/api/avatars`) which lists only regular files with .glb/.gltf extensions in that directory; it does not allow arbitrary filesystem browsing. No upload or file editing via the browser is implemented. GLTF files may reference external textures or binary buffers that must be copied with the model. No full build performed.

@@ -1,3 +1,56 @@
+# V968 – Alexa Concert Commands 2.0
+
+Die virtuelle Konzertregie lässt sich jetzt pro Bühnenbereich (Bühne / LED-Wand / Publikum),
+Lichtpalette (Warm / Kühl / Neon / Genreautomatik) und gezieltem virtuellem Effekt
+(Lichtkegel, Nebel, Konfetti, Luftschlangen) über den privaten Alexa-Skill oder die
+lokalen Studio-Auswahllisten steuern. Manuelle Shows, Eco-Budget und verifizierte
+Songphasen bleiben maßgeblich; keine Spotify- oder Govee-Sprachsteuerung.
+
+**Details:** `docs/versions/V968-ALEXA-CONCERT-COMMANDS-2.md`
+
+---
+
+## V967 – Alexa Skill Integration (private virtuelle Konzertsteuerung)
+
+V967 ergänzt den bereits vorhandenen V958/V966-Konzertregisseur um einen **privaten
+Alexa Custom Skill via AWS Lambda**. Unterstützt werden Arena, Festival, Club,
+ruhige Atmosphäre, virtuelle FX ein/aus und Konzertautomatik beenden.
+Das Konzertstudio besitzt einen eigenen **opt-in Alexa-Empfänger** und einen
+lokalen Festival-Testknopf. Alle Befehle sind auf virtuelle Shows begrenzt,
+HardwareSync wird bei Übernahme eines Alexa-Kommandos ausgeschaltet.
+
+Das Relay verwendet Upstash Redis, HMAC, Zeitfenster und einmalige Nonces;
+Alexa Skill ID und Amazon User ID werden in der Lambda strikt geprüft. **Noch
+nicht mit einem echten Alexa-Konto verbunden**: AWS-Lambda- und Vercel-Secrets,
+Upstash und der private Skill müssen vom Betreiber konfiguriert werden.
+Kein Spotify per Sprache, kein Govee-Hardwarebefehl, kein Multi-User-Pairing.
+
+[Ausführliche Anleitung](docs/versions/V967-ALEXA-ANBINDUNG.md) und
+`integrations/alexa/interaction-model.de-DE.json`. Tests:
+`npm run test:v967`, `npm run test:v967:types`, `npm run test:structure`.
+Die vollständige Freigabe verlangt einen erfolgreichen GitHub-Produktionsbuild.
+Der alte V965-Importer erfordert weiterhin den ZIP-Namen `SonicDisplay-V965.zip`
+sowie `sonicRoadmapRelease=v965`; `sonicFeatureRelease=v967` kennzeichnet den
+neuen funktionalen Stand, ohne die historischen V908/V965-Tests zu brechen.
+
+## V966 – Immersive Concert Engine 3.0 (Feature-Upgrade)
+
+Neue optionale 3D-Konzertatmosphäre **innerhalb der vorhandenen R3F-Bühne**:
+seitliche räumliche Lichtkegel, Bühnenbogen, Bodenglows, dezenter Hintergrunddunst
+und Publikumsrandbeleuchtung. Die Effekte reagieren auf verifizierte
+V318-Songphasen und die bestehenden V958-Genrepaletten. Keine neue Kamera-,
+Publikums-, Govee- oder Audio-Autorität; manuelle V354-Shows und der Pi-Eco-Modus
+haben Vorrang. Einstellungen unter **Govee LAN → Ultimate Concert Experience
+Studio → V966 Immersive Konzertatmosphäre**. Standard: AUS.
+
+Details: [V966-Implementierung](docs/versions/V966-IMMERSIVE-CONCERT-ENGINE.md),
+[geplante Alexa-Anbindung V967](docs/versions/V967-ALEXA-ANBINDUNG-PLAN.md).
+Tests: `npm run test:v966`, `npm run test:v966:types`, `npm run test:structure`.
+Der volle Next.js-Produktionsbuild muss in GitHub Actions grün werden.
+Die ZIP-Datei heißt wegen des bereits installierten Importers weiterhin
+`SonicDisplay-V965.zip`; das Label `sonicRoadmapRelease` bleibt ebenfalls
+auf `v965` bis zur unabhängigen Importer-Migration.
+
 ## V908 – Live Avatar & FX Benchmark Verification
 
 Das V905/V907 Benchmark-Studio prüft jetzt pro realem V826-Messfenster
@@ -9,6 +62,19 @@ Keine neuen Renderer, Listener oder automatischen Einstellungsänderungen.
 
 `npm run verify:v908:focused` prüft V908 und frühere Versionen. Der vollständige
 Produktionsbuild benötigt installierte npm-Abhängigkeiten.
+
+## V966 – Bereinigte Projektstruktur (kompatibel zum V965 ZIP-Import)
+
+Die alten duplizierten `v874/` bis `v878/`-Ordner wurden entfernt.
+Frühere Feature-Anleitungen sind nun nach Themen unter `docs/features/`
+sortiert, Verifikationsdateien unter `artifacts/historical/`, archivierte
+Installer unter `docs/history/retired-installers/`.
+Produktive Komponenten und ihre Regressionstests bleiben unter
+`components/visualizer/` und `tests/` unverändert. Die frühere
+`ARCHITECTURE.md` bleibt aus Rücksicht auf historische Testreferenzen
+im Root. Alle Details: [Struktur und GitHub-Import](docs/structure/README.md).
+Prüfung: `npm run test:structure`. Die `V965`-Importbenennung und
+die `v908`-Paketversion sind aus Kompatibilitätsgründen vorerst unverändert.
 
 ## V922 – Bass Shockwave Room FX
 
@@ -209,7 +275,7 @@ Drei rein digitale 3D-Bühneneffekte – **virtuelle Flammen, CO₂-Jets und
 Funkenfontänen** – als kurze, bestätigte Show-Momente. Einstellbar unter
 **LIVE FX DECK → V891 Virtual Pyrotechnics**. Standardmäßig ausgeschaltet.
 Keine Geräteansteuerung, kein Stroboskop, kein zusätzlicher Audio-Analysator.
-Anleitung: [`VIRTUAL_PYROTECHNICS_V891.md`](VIRTUAL_PYROTECHNICS_V891.md),
+Anleitung: [`VIRTUAL_PYROTECHNICS_V891.md`](docs/features/stage/VIRTUAL_PYROTECHNICS_V891.md),
 Prüfstatus: [`docs/versions/V891-VERIFICATION.md`](docs/versions/V891-VERIFICATION.md).
 
 ## Neu in V889: Advanced Particle FX
@@ -220,7 +286,7 @@ Konfetti. Die 3D-Emitter bleiben dieselben; vorhandene Budget-, manuelle FX-
 und Lyrics-Schutzregeln haben Vorrang. Details: `ADVANCED_PARTICLE_FX_V889.md`
 und `docs/versions/V889-VERIFICATION.md`. **Gesamt-Typecheck und Next.js-Produktionsbuild sind noch offen.**
 
-> **V888 · Laser Show Director**: Vier szenengesteuerte, virtuelle Laser-Looks auf dem vorhandenen V811-Shader – mit Schutz für Lyrics, manuelle Lichtregie und Blackouts. [Details](LASER_SHOW_DIRECTOR_V888.md).
+> **V888 · Laser Show Director**: Vier szenengesteuerte, virtuelle Laser-Looks auf dem vorhandenen V811-Shader – mit Schutz für Lyrics, manuelle Lichtregie und Blackouts. [Details](docs/features/stage/LASER_SHOW_DIRECTOR_V888.md).
 
 > **V887 · Cinematic Fog & Haze**: Cinematic Nebel-Looks auf den vorhandenen V814-Flächen. [Details](docs/versions/V887-CINEMATIC-FOG-HAZE-README.md).
 
@@ -1545,7 +1611,7 @@ Der zuletzt vom Nutzer unter Windows gemeldete vollständige **V473.7-Produktion
 ## 10. Weitere Referenzen
 
 - [README](README.md) – Installation und Einstieg.
-- [Spotify-Setup](SPOTIFY_LOCAL_SETUP.md) – OAuth/Entwicklungsumgebung.
+- [Spotify-Setup](docs/setup/SPOTIFY_LOCAL_SETUP.md) – OAuth/Entwicklungsumgebung.
 - [V488 – Natural Full-Body Dance 5.0](docs/versions/V488-NATURAL-FULL-BODY-DANCE-5.md)
 - [V492 – GLB Blending Preset Studio](docs/versions/V492-GLB-BLENDING-PRESET-STUDIO.md)
 - [V491 – GLB Motion Preview & Blending Studio](docs/versions/V491-GLB-MOTION-PREVIEW-BLENDING-STUDIO.md)
@@ -1890,7 +1956,7 @@ Für die lokale Freigabe: `npm ci`, `npm run doctor:v858`, `npm run typecheck`, 
 
 ## Govee LAN Lichtsteuerung (V909)
 
-Lokale Govee-Beleuchtung mit Geräteerkennung, Farbauswahl, Helligkeit und optionaler musikreaktiver Synchronisierung. Für einen Vercel-Deployment läuft eine lokale Node.js-Bridge (`npm run govee:bridge`) auf dem Display-Gerät. Vollständige Einrichtung und Sicherheitsinformationen: [GOVEE_LAN_V909.md](GOVEE_LAN_V909.md).
+Lokale Govee-Beleuchtung mit Geräteerkennung, Farbauswahl, Helligkeit und optionaler musikreaktiver Synchronisierung. Für einen Vercel-Deployment läuft eine lokale Node.js-Bridge (`npm run govee:bridge`) auf dem Display-Gerät. Vollständige Einrichtung und Sicherheitsinformationen: [GOVEE_LAN_V909.md](docs/features/integrations/GOVEE_LAN_V909.md).
 
 ## V910 – Raspberry Pi Vercel Kiosk & Govee LAN AutoStart
 
@@ -2072,3 +2138,7 @@ Optionaler sanfter Lichtwechsel für automatisch gesteuerte Govee-LAN-Leuchten. 
 ## V962 – Intelligent Concert Narrative
 
 Neue optionale dramaturgische Lichtkurve für bestätigte Verse/Hook/Build/Drop/Break/Outro-Songphasen. Keine zusätzlichen LAN-Ticks und kein Überschreiben gespeicherter oder manuell erstellter Shows. Details: [V962-Dokumentation](docs/versions/V962-INTELLIGENT-CONCERT-NARRATIVE.md).
+
+## V969 – Smart Concert Presets
+
+Im **Ultimate Concert Experience Studio** gibt es jetzt genreabhängige virtuelle Konzertwelten (Smart Automatik, Arena, Festival, Club, Cinematic Night, Hardtekk Reactor und Rock Arena). V969 verwendet bestätigte V318-Songphasen und lässt gespeicherte Shows, Kameraentscheidungen, die Spotify-Wiedergabe und Govee-Hardware unverändert. Alexa-Einrichtung und Tests: [`docs/versions/V969-SMART-CONCERT-PRESETS.md`](docs/versions/V969-SMART-CONCERT-PRESETS.md).

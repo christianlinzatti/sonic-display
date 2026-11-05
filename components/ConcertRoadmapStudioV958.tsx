@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
+import {AlexaConcertControlV967} from '@/components/AlexaConcertControlV967';
 import {useMusic} from '@/context/MusicContext';
 import {concertContinuityAuditV960} from '@/lib/concertContinuityV960';
 import type {GoveeConfigV909,GoveeDeviceV909} from '@/lib/goveeLanV909';
@@ -7,7 +8,7 @@ import {loadGoveeSpatialV926,saveGoveeSpatialV926} from '@/lib/goveeSpatialDirec
 import {loadGoveeCalibrationV927} from '@/lib/goveeRoomCalibrationV927';
 import {readTrackAnalysisV318,ANALYSIS_EVENT_V318,ANALYSIS_STORAGE_KEY_V318,type TrackAnalysisV318} from '@/services/musicAnalysis/trackAnalysisV318';
 import {composeConcertSceneV958,rehearseConcertV938,qualityImportedConcertV957,loadConcertRoadmapV958,saveConcertRoadmapV958,
- upsertRoomPresetV936,latencyAnalysisV932,CONCERT_SIGNAL_EVENT_V933,
+ upsertRoomPresetV936,latencyAnalysisV932,CONCERT_SIGNAL_EVENT_V933,CONCERT_ROADMAP_EVENT_V958,
  type ConcertSettingsV958,type ConcertPhaseV958,type ConcertRoleV935,type ConcertCameraV940,
  type ConcertDanceV941,type ConcertFxV955,type ConcertSignalV933} from '@/lib/ultimateConcertRoadmapV958';
 
@@ -32,6 +33,10 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
     setSignals(previous=>[...previous.filter(s=>s.fixture!==msg.fixture),msg].slice(-32));};
   window.addEventListener(CONCERT_SIGNAL_EVENT_V933,receive);
   return()=>window.removeEventListener(CONCERT_SIGNAL_EVENT_V933,receive);
+ },[]);
+ useEffect(()=>{const refresh=()=>setSettings(loadConcertRoadmapV958());
+  window.addEventListener(CONCERT_ROADMAP_EVENT_V958,refresh);
+  return()=>window.removeEventListener(CONCERT_ROADMAP_EVENT_V958,refresh);
  },[]);
  useEffect(()=>{
   const refresh=()=>setActualAnalysis(readTrackAnalysisV318(track?.id||''));
@@ -103,9 +108,15 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
     onChange={e=>save({peakRecoveryV964:e.target.checked})}/> V964: Kurze Erholungsphase nach bestätigten Hook-/Drop-Spitzen (nur automatische Govee-Cues)</label>
    <label><input type="checkbox" checked={settings.roomWaveV965} disabled={!settings.enabled||!settings.hardwareSync}
     onChange={e=>save({roomWaveV965:e.target.checked})}/> V965: Langsame, genreabhängige Lichtwelle durch den Raum bei bestätigten Hooks und Drops (mindestens zwei Lampen; keine Blitze)</label>
+   <label><input type="checkbox" checked={settings.immersiveV966} disabled={!settings.enabled||!settings.virtualFx}
+    onChange={e=>save({immersiveV966:e.target.checked})}/> V966: Immersive Konzertatmosphäre – räumliche Lichtkegel, Bühnenhintergrund und Publikumsrand (nur virtuell; keine Lichtblitze)</label>
+   <label>V966 Immersion: {settings.immersiveStrengthV966}% <input type="range" min={0} max={100} step={5}
+    value={settings.immersiveStrengthV966} disabled={!settings.enabled||!settings.virtualFx||!settings.immersiveV966}
+    onChange={e=>save({immersiveStrengthV966:Number(e.target.value)})}/></label>
    <label>Einfluss {settings.strength}% <input type="range" min={0} max={100} value={settings.strength} onChange={e=>save({strength:Number(e.target.value)})}/></label>
   </div>
   {settings.hardwareSync&&<p className="settings-note" role="status">Neue Govee-Cues werden nur bei aktivem Auto-Sync und echten bestätigten Songphasen berücksichtigt. Gespeicherte Shows und manuell gesetzte Kameracues bleiben unverändert. Keine Strobe-/Power-Kommandos.</p>}
+  <AlexaConcertControlV967/>
   <h4>V939 / V945 / V946 · Konzertregie und Anti-Repetition</h4>
   <div className="govee-v958-settings"><label>Vorschauphase <select value={phase} onChange={e=>setPhase(e.target.value as ConcertPhaseV958)}>
    {phaseOptions.map(p=><option key={p} value={p}>{p}</option>)}

@@ -1,0 +1,63 @@
+===== test:v451 exit=0 secs=0.86 =====
+PASS V451: deterministic lyrics priority, gaps, seek/stale index, paused, legacy, one metadata card, independent manual discovery
+
+===== test:v452 exit=0 secs=1.05 =====
+PASS V452: 2-4 avatars, shared hook groove, staggered verse responses, stable positions, easing, manual guards, no inferred artist or GLB rewrites
+
+===== test:v453 exit=0 secs=1.08 =====
+PASS V453: verified timed-word-only lip dynamics, bilabial closures, silence/seek guards, authorship, GLB/procedural sharing, reduced motion
+
+===== test:v454 exit=0 secs=1.15 =====
+PASS V454: portrait/ensemble coverage, lyric protection, 2–4 artist clearance, timing, pause/seek and manual camera priority
+
+===== test:v455 exit=0 secs=0.66 =====
+PASS V455: rapid-rap damping, long-line typography, valid timing, pause, reduced motion and render wiring
+
+===== test:v456 exit=0 secs=1.15 =====
+PASS V456: shared stage/info director, hook priority, solo/crew/interlude, lighting, camera, motion, pause, manual & reduced-motion safeguards
+
+===== test:v457 exit=0 secs=1.12 =====
+PASS V457: deterministic phrase-boundary continuity, 3-4 avatar energy, adaptive quality budgets, manual protections, track/pause guards and stage wiring
+
+===== test:v458 exit=0 secs=1.08 =====
+PASS V458: 2-4 avatar natural accents, hooks/verse, partner spacing, foot-IK, tiers, all manual/reduced-motion guards, 30-minute deterministic simulation
+
+===== test:v459 exit=0 secs=1.18 =====
+PASS V459: V453 continuity, verified next-word transitions, closure and edit priority, 3D/GLB, silence and reduced motion, bounded head motion
+
+===== test:v460 exit=0 secs=1.18 =====
+PASS V460: deterministic scene phrases; dual focus; camera, badges, automatic gestures; authored overrides; pause/reduced motion; seek-safe 30-minute simulation
+
+===== test:v461 exit=0 secs=1.10 =====
+PASS V461: lyric density, stage-safe typography, real word timing, reduced motion, 3D fallback, immutable performance controls, integration
+
+===== test:v462 exit=0 secs=0.71 =====
+PASS V462: rap face/verse/hook, kick-grounded hardstyle/hardtekk drops, bounded haze/sweeps, saved scenes/blackouts, low tier, no new GPU lights, 20k input matrix
+
+===== test:v463 exit=0 secs=0.73 =====
+PASS V463: song/recovery/visibility/pause guard, stale frames, manual priority, 30-minute 4-avatar policy simulation (330 accepted, 30 guarded), existing canvas/telemetry
+
+===== test:v464 exit=0 secs=1.32 =====
+PASS V464: musical arc (visual), repeated hooks, breathing, shared feature/camera/lighting, manual/lyrics priority, low tier, pauses/seeks, deterministic 30-minute playback
+
+===== test:v465 exit=0 secs=1.11 =====
+PASS V465: immersive 4-avatar label legibility, visual reply preservation, manual priority, reduced clutter, paused/split/unsynced behavior, 30-minute deterministic playback
+
+===== test:v466 exit=0 secs=0.76 =====
+PASS V466: real renderer wiring, opt-in projection, head-bone/estimated distinction, true DOM lyrics geometry, FPS/stale thresholds, no fabricated visibility or GPU data, 30-minute deterministic logic
+
+===== test:v467 exit=0 secs=0.76 =====
+PASS V467: three consecutive observations, rated actionable tips, provenance/fallback, no automatic intervention, no transient false positives, bounded history and 30-minute deterministic simulation
+
+===== test:v468 exit=0 secs=0.28 =====
+PASS V468: kick envelope, rate limiting, drop strength, reduced motion, low tier, 6000 frames, GLB material ownership and integration
+
+===== test:v469 exit=0 secs=0.55 =====
+V469 expanded genres passed: 34 genres, 22 Last.fm aliases, scene/dance/lighting/override/accessibility checks
+
+===== test:v470 exit=0 secs=0.48 =====
+PASS V470: 34 genres, 7 Rock/Pop variants, Last.fm fusion evidence, visual/dance blend, manual overrides, reduced motion, lyrics, integration
+
+===== test:v471 exit=0 secs=0.32 =====
+PASS V471: Deutschrap verse/hook, Pop/Rock motion style, fusion, authored protection, pause, reduced motion, scene integration
+

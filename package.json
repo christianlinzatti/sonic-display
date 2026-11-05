@@ -1960,7 +1960,23 @@
     "test:v964:types": "tsc -p tests/tsconfig.v964-core.json --noEmit",
     "verify:v964:production": "node scripts/v964-production-verify.cjs",
     "test:v965": "node tests/v965-room-wave-regression.cjs",
-    "test:v965:types": "tsc -p tests/tsconfig.v965-core.json --noEmit"
+    "test:v965:types": "tsc -p tests/tsconfig.v965-core.json --noEmit",
+    "test:structure": "node tests/v966-project-structure-regression.cjs",
+    "structure:organize": "node scripts/organize-version-docs.cjs",
+    "test:v966": "node tests/v966-immersive-concert-regression.cjs",
+    "test:v966:types": "tsc -p tests/tsconfig.v966-core.json --noEmit",
+    "verify:v966:focused": "node tests/v966-project-structure-regression.cjs && npm run test:v966 && npm run test:v966:types && npm run test:v965",
+    "test:v967": "node tests/v967-alexa-integration-regression.cjs",
+    "test:v967:types": "tsc -p tests/tsconfig.v967-core.json --noEmit",
+    "verify:v967:focused": "npm run test:v967 && npm run test:v967:relay && npm run test:v967:types && npm run test:v966 && npm run test:structure",
+    "test:v967:relay": "node tests/v967-alexa-relay-route-regression.cjs",
+    "test:v968": "node tests/v968-alexa-concert-regression.cjs",
+    "test:v968:types": "tsc -p tests/tsconfig.v968-core.json --noEmit",
+    "verify:v968": "npm run test:v968 && npm run test:v968:lambda && npm run test:v968:types && npm run test:v967 && npm run test:v967:types && npm run test:v966 && npm run test:v966:types && npm run check:syntax && npm run check:architecture && npm run test:structure",
+    "test:v968:lambda": "node tests/v968-alexa-lambda-regression.cjs",
+    "test:v969": "node tests/v969-smart-concert-presets-regression.cjs",
+    "test:v969:lambda": "node tests/v969-alexa-lambda-regression.cjs",
+    "test:v969:types": "tsc -p tests/tsconfig.v969-core.json --noEmit"
   },
   "engines": {
     "node": "24.x"
@@ -1988,5 +2004,6 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v965"
+  "sonicRoadmapRelease": "v969",
+  "sonicFeatureRelease": "v969"
 }

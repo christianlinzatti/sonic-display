@@ -1,0 +1,1 @@
+V67: avoid repeated no-op state updates while microphone disabled, reduce synthetic visual update frequency, and use saved microphone preference as sole enabled source. These fixes address avoidable update cascades; React DevTools can still show repeated renders while animation is active. Run npm run typecheck and npm run build locally.

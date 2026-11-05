@@ -81,5 +81,5 @@ check('all exported patterns have finite time ranges',()=>{const j=JSON.parse(v8
 check('package and lock align',()=>{const p=JSON.parse(read('package.json'));const lock=JSON.parse(read('package-lock.json'));assert(/^0\.1\.0-v\d+$/.test(p.version)&&Number(p.version.split('-v')[1])>=888);assert.equal(lock.version,p.version);assert.equal(lock.packages[''].version,p.version);});
 check('CI runs new gates',()=>assert(read('.github/workflows/v832-continuous-validation.yml').includes('npm run test:v888:ui-types')));
 check('Windows release script exists',()=>assert(read('scripts/verify-v888-windows.ps1').includes('verify:v888:focused')));
-check('docs describe safety',()=>assert(read('LASER_SHOW_DIRECTOR_V888.md').includes('V888')));
+check('docs describe safety',()=>assert(read('docs/features/stage/LASER_SHOW_DIRECTOR_V888.md').includes('V888')));
 console.log(`V888 Laser Show Director: PASS ${n} checks`);

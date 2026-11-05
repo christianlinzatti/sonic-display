@@ -69,5 +69,5 @@ test('no new 3D spotlights',()=>{const s=read('components/visualizer/ConcertAtmo
 test('never creates independent visual rig',()=>assert(!/new SpotLight|new WebGLRenderer|setInterval\(|strobe\s*[:=(]/i.test(read('components/visualizer/professionalSpotlightShowV890.ts'))));
 test('project and lock versions',()=>{const a=JSON.parse(read('package.json')),b=JSON.parse(read('package-lock.json'));assert.match(a.version,/^0\.1\.0-v(?:890|891|892|893|894|895|896|897|898|899|900|901|902|903|904|905|906|907|908)$/);assert.equal(b.version,a.version);assert.equal(b.packages[''].version,a.version);});
 test('CI and Windows',()=>{assert(read('.github/workflows/v832-continuous-validation.yml').includes('npm run test:v890:ui-types'));assert(read('scripts/verify-v890-windows.ps1').includes('verify:v890:focused'));});
-test('release note',()=>assert(read('PROFESSIONAL_SPOTLIGHT_SHOW_V890.md').includes('V890')));
+test('release note',()=>assert(read('docs/features/stage/PROFESSIONAL_SPOTLIGHT_SHOW_V890.md').includes('V890')));
 console.log(`V890 Professional Spotlight Show: PASS ${checks} checks`);

@@ -1,0 +1,6 @@
+Sonic Display V519 – isolierte TypeScript-Kernprüfungen
+24.10.2026
+npm run test:v492:types bis npm run test:v519:types
+28 PASS / 0 FAIL (tsc --noEmit, eigenständige TypeScript-Core-Projekte)
+Die Prüfung umfasst kein vollständiges Next.js-App-Typecheck mit allen externen
+npm-Abhängigkeiten; diese sind lokal nicht installiert.

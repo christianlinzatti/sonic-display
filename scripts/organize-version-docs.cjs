@@ -91,5 +91,11 @@ function main() {
   if (remaining.length) throw new Error(`${remaining.length} unexpected root version docs remain: ${remaining.slice(0,5)}`);
   console.log(`Version docs organized: ${count} moved/merged, ${updated} reference files updated, ${known.size} version docs indexed`);
 }
-if (require.main === module) main();
+if (require.main === module) {
+  // Move untouched old root docs first. Running the reference-rewriting pass
+  // before this step would mutate only the old copies and cause a false conflict
+  // against the already-organized files unpacked from the new ZIP.
+  require('./organize-project-structure.cjs').main();
+  main();
+}
 module.exports = { main };
