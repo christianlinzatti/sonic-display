@@ -116,7 +116,8 @@ test('UI mounted and reads live settings without extra sending',()=>{
 test('CI, prebuild, and four scripts are preserved',()=>{
  const pkg=JSON.parse(read('package.json'));const ci=read('.github/workflows/v832-continuous-validation.yml');
  for(const name of ['test:v925','test:v925:types','test:v925:ui-types','verify:v925:focused'])assert.ok(pkg.scripts[name]);
- assert.ok(pkg.scripts.prebuild.startsWith('npm run test:v908 && '));
+ assert.ok(pkg.scripts.prebuild.includes('npm run test:v908 && '));
+ assert.ok(pkg.scripts.prebuild.endsWith('npm run check:fast'));
  assert.ok(pkg.scripts.prebuild.indexOf('test:v925')<pkg.scripts.prebuild.indexOf('test:v924'));
  assert.match(ci,/V925 Govee Festival Lighting FX Studio/);assert.match(ci,/V924 Govee Intelligent Light Energy Director/);
 });

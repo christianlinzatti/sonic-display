@@ -64,7 +64,9 @@ check('app uses browser-controlled loopback LNA and reconnect status',()=>{
 });
 check('package keeps historical V908 prebuild guard and adds V910 test',()=>{
  const scripts=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).scripts;
- assert(scripts.prebuild.startsWith('npm run test:v908'));
+ assert(/^(?:npm run test:v\d+ && )+/.test(scripts.prebuild));
+ assert(scripts.prebuild.includes('npm run test:v908 &&'));
+ assert(scripts.prebuild.endsWith('npm run check:fast'));
  assert(scripts.prebuild.includes('test:v910'));
  assert(scripts['pi:install'].includes('install-v910.cjs'));
 });

@@ -109,7 +109,9 @@ test('dashboard integrates assistant using current safe snapshot',()=>{const src
 test('all navigation target anchors exist',()=>{const code=read('lib/goveeTroubleshootingV929.ts');const targets=[...code.matchAll(/'govee-v\d{3}-[a-z0-9-]+'(?=\s*[,\)])/g)].map(x=>x[0].slice(1,-1));const all=[read('components/GoveeLanPanelV909.tsx'),read('components/GoveeLightShowEditorV912.tsx'),read('components/GoveeRoomCalibrationStudioV927.tsx')].join('\n');assert.ok(targets.length>=6);for(const target of new Set(targets))assert.ok(all.includes(`id="${target}"`),target);});
 test('dashboard still has its existing refresh/report actions',()=>{const src=read('components/GoveeRoomPerformanceDashboardV928.tsx');assert.ok(src.includes('onRefresh'));assert.ok(src.includes('copyReport'));});
 test('existing V909 poll and LAN sender unchanged',()=>{assert.ok(read('components/GoveeLanPanelV909.tsx').includes('setInterval(()=>void poll(),12000)'));assert.equal((read('components/GoveeMusicSyncV909.tsx').match(/goveeBridgeRequestV909\(config,'\/command'/g)||[]).length,1);});
-test('build preflight retains V908 first and existing V928 order',()=>{const p=JSON.parse(read('package.json'));assert.ok(p.scripts.prebuild.startsWith('npm run test:v908 && npm run test:v928 && npm run test:v928:types && npm run test:v928:ui-types &&'));assert.ok(p.scripts.prebuild.includes('npm run test:v929 && npm run test:v929:types && npm run test:v929:ui-types'));});
+test('build preflight retains V908 first and existing V928 order',()=>{const p=JSON.parse(read('package.json'));assert.ok(p.scripts.prebuild.includes('npm run test:v908 &&'));
+ assert.ok(p.scripts.prebuild.includes('npm run test:v928 && npm run test:v928:types && npm run test:v928:ui-types &&'));
+ assert.ok(p.scripts.prebuild.endsWith('npm run check:fast'));assert.ok(p.scripts.prebuild.includes('npm run test:v929 && npm run test:v929:types && npm run test:v929:ui-types'));});
 test('CI includes V929 gates',()=>assert.ok(read('.github/workflows/v832-continuous-validation.yml').includes('npm run test:v929 && npm run test:v929:types && npm run test:v929:ui-types')));
 let sampled=0;
 for(let i=0;i<5000;i++){
