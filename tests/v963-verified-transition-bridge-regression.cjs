@@ -135,7 +135,7 @@ check('Govee integration retains exactly one existing request per changed lamp',
  const s=read('components/GoveeMusicSyncV909.tsx');
  assert.match(s,/const bridgeV963=planVerifiedConcertBridgeV963\(/);
  assert.match(s,/dimConcertBridgeLookV963\(narrativeLookV962,bridgeV963\)/);
- assert.ok(s.indexOf('dimConcertBridgeLookV963(narrativeLookV962,bridgeV963)')<s.indexOf('governConcertLookV961(previous,recoveryLookV961'));
+ assert.ok(s.indexOf('dimConcertBridgeLookV963(narrativeLookV962,bridgeV963)')<s.indexOf('const finalLook=governConcertLookV961(previous,voiceLookV970'));
  assert.match(s,/if\(!changedGoveeLookV911\(previous,finalLook\)\)continue/);
  assert.match(s,/value:finalLook/);
  assert.equal((s.match(/await goveeBridgeRequestV909\(config,'\/command','POST',\{ip,action:'look',value:finalLook\}\)/g)||[]).length,1);

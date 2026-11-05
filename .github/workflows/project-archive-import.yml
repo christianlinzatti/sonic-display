@@ -57,6 +57,12 @@ jobs:
         env:
           ARCHIVE: ${{ steps.selection.outputs.archive }}
         run: python3 scripts/project-archive-import.py --archive "$ARCHIVE" --output "$GITHUB_OUTPUT"
+      - name: Restore organized project structure after ZIP import
+        run: node scripts/organize-project-structure.cjs
+      - name: Verify clean repository layout and preserved integrations
+        run: |
+          node tests/v966-project-structure-regression.cjs
+          node tests/v974-repository-cleanup-regression.cjs
       - name: Commit the imported project; remove imported ZIP
         env:
           ARCHIVE: ${{ steps.selection.outputs.archive }}
