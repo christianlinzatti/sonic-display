@@ -21,25 +21,23 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: npm
       - name: Reproducible dependency installation
         run: npm ci --no-audit --no-fund
       - name: Parallel regression tests (bounded to 3)
-        run: node scripts/v959-ci-parallel-bridge.cjs
+        run: node scripts/v959-regressions-only.cjs
       - name: Full app TypeScript check
         run: npm run typecheck
       - name: Real Next.js production build
-        run: npm run build
+        run: node node_modules/next/dist/bin/next build
       - name: Upload per-platform evidence on failure or success
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: v959-ci-${{ matrix.os }}-reports
           path: |
-            reports/v959-ci-parallel-summary.json
-            reports/v959-ci-regression-logs/
-            reports/v959-build-proof.json
-            reports/v931-production-gate.json
+            reports/v959-regression-only.json
+            reports/v959-regression-logs/
           if-no-files-found: warn
 # This workflow checks the committed repository; it does not itself deploy V959.
