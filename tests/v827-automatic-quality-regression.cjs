@@ -67,9 +67,9 @@ check('benchmark subscribers notified and unsubscribe',()=>{let calls=0;const st
 check('benchmark never promises Raspberry Pi speed',()=>{clearBenchmarkV827();assert(benchmarkAdviceV827(getBenchmarkV827()).includes('gleicher Auflösung'))});
 const stage=f('components/visualizer/DynamicStage.tsx'),panel=f('components/visualizer/ConcertFxStudioPanelV810.tsx'),ui=f('components/visualizer/ConcertBenchmarkPanelV827.tsx');
 check('V827 only after completed V826 snapshot',()=>assert(stage.indexOf('advanceAutomaticQualityV827(')>stage.indexOf('completeConcertQualityV826(')));
-check('V827 increases only V825 input pressure',()=>assert(stage.includes('pressure:effectiveFxPressureV827(')));
+check('V827 still drives V825 input unless V980 is explicitly enabled',()=>{assert(stage.includes('effectiveFxPressureV827(fxPerfStateV825.current.pressure'));assert(stage.includes('pressure:fxPressureV980,'));assert(stage.includes('qualityEnabledV980?'));});
 check('manual V825 opt-out remains authoritative',()=>assert(stage.includes('optimizerEnabled:concertFxV810?.perfOptimizerV825!==false')));
-check('V827 disabled for previews',()=>assert(stage.includes('enabled:concertFxV810?.autoQualityV827!==false&&liveShowV827')));
+check('V827 disabled for previews and when V980 takes ownership',()=>assert(stage.includes('enabled:!qualityEnabledV980&&concertFxV810?.autoQualityV827!==false&&liveShowV827')));
 check('real stage explicitly enabled',()=>assert(f('components/visualizer/ThreeAvatar.tsx').includes('<DynamicStage liveShowV827 ')));
 check('preview stage defaults nonlive',()=>assert(stage.includes('liveShowV827=false')));
 check('benchmark only receives real stage gate',()=>assert(stage.includes('liveShow:liveShowV827')));

@@ -180,7 +180,8 @@ test('one-click UI and production gates are registered',()=>{
   'energyArcV975:true','intelligentTransitionsV976:true','storytellingV977:true',
   'atmosphereV978:true'])assert(ui.includes(name),name);
  const pkg=JSON.parse(read('package.json'));
- assert.equal(pkg.sonicRoadmapRelease,'v979');assert.equal(pkg.sonicFeatureRelease,'v979');
+ assert(Number(pkg.sonicRoadmapRelease?.slice(1))>=979);
+ assert(Number(pkg.sonicFeatureRelease?.slice(1))>=979);
  for(const script of ['test:v979','test:v979:types'])assert(pkg.scripts[script],script);
  for(const file of ['scripts/vercel-production-build.cjs','scripts/v931-production-gate.cjs']){
   assert(read(file).includes('V979 Intelligent Live Show Director 3.0'),file);

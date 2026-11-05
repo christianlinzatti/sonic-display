@@ -61,7 +61,7 @@ export interface ConcertFxSettingsV810 {
   cameraAwareV834:boolean;cameraStrengthV834:number;
   professionalLightingV841:boolean;lightingStrengthV841:number;lightingStyleV841:'cinematic'|'balanced'|'festival';
   perfOptimizerV825:boolean;perfModeV825:'balanced'|'fps'|'quality';perfSensitivityV825:number;
-  qualityDashboardV826:boolean;autoQualityV827:boolean;autoResponseV827:'gentle'|'balanced'|'responsive';
+  qualityDashboardV826:boolean;concertQualityDirectorV980:boolean;concertQualityModeV980:'visual'|'balanced'|'performance';concertQualityPiV980:boolean;concertQualityRecoveryV980:boolean;autoQualityV827:boolean;autoResponseV827:'gentle'|'balanced'|'responsive';
   concertExperienceV828:boolean;experienceIntensityV828:number;experienceStyleV828:'cinematic'|'dynamic'|'festival';concertCrownV828:boolean;
   palette:'genre'|'custom';primary:string;secondary:string;
 }
@@ -115,7 +115,7 @@ export const DEFAULT_CONCERT_FX_V810:Readonly<ConcertFxSettingsV810>={
   cameraAwareV834:true,cameraStrengthV834:65,
   professionalLightingV841:true,lightingStrengthV841:65,lightingStyleV841:'balanced',
   perfOptimizerV825:true,perfModeV825:'balanced',perfSensitivityV825:65,
-  qualityDashboardV826:true,autoQualityV827:true,autoResponseV827:'balanced',
+  qualityDashboardV826:true,concertQualityDirectorV980:false,concertQualityModeV980:'balanced',concertQualityPiV980:false,concertQualityRecoveryV980:true,autoQualityV827:true,autoResponseV827:'balanced',
   concertExperienceV828:true,experienceIntensityV828:66,experienceStyleV828:'dynamic',concertCrownV828:true,
   palette:'genre',primary:'#40e5ff',secondary:'#ef4ad8',
 };
@@ -289,6 +289,10 @@ export function normalizeConcertFxV810(raw?:Partial<ConcertFxSettingsV810>|null)
  perfModeV825:raw?.perfModeV825==='fps'||raw?.perfModeV825==='quality'?raw.perfModeV825:'balanced',
  perfSensitivityV825:finite(raw?.perfSensitivityV825)?Math.round(clamp(raw.perfSensitivityV825,0,100)):d.perfSensitivityV825,
  qualityDashboardV826:typeof raw?.qualityDashboardV826==='boolean'?raw.qualityDashboardV826:d.qualityDashboardV826,
+ concertQualityDirectorV980:typeof raw?.concertQualityDirectorV980==='boolean'?raw.concertQualityDirectorV980:d.concertQualityDirectorV980,
+ concertQualityModeV980:raw?.concertQualityModeV980==='visual'||raw?.concertQualityModeV980==='performance'?raw.concertQualityModeV980:'balanced',
+ concertQualityPiV980:typeof raw?.concertQualityPiV980==='boolean'?raw.concertQualityPiV980:d.concertQualityPiV980,
+ concertQualityRecoveryV980:typeof raw?.concertQualityRecoveryV980==='boolean'?raw.concertQualityRecoveryV980:d.concertQualityRecoveryV980,
  autoQualityV827:typeof raw?.autoQualityV827==='boolean'?raw.autoQualityV827:d.autoQualityV827,
  autoResponseV827:raw?.autoResponseV827==='gentle'||raw?.autoResponseV827==='responsive'?raw.autoResponseV827:'balanced',
  concertExperienceV828:typeof raw?.concertExperienceV828==='boolean'?raw.concertExperienceV828:d.concertExperienceV828,

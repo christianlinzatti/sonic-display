@@ -2005,7 +2005,10 @@
     "verify:v979:focused": "npm run test:v979 && npm run test:v979:types && npm run test:v978 && npm run test:v977 && npm run test:v976 && npm run test:v975 && npm run check:syntax && npm run check:architecture",
     "test:v978": "node tests/v978-smart-concert-atmosphere-regression.cjs",
     "test:v978:types": "tsc -p tests/tsconfig.v978-core.json --noEmit",
-    "verify:v978:focused": "npm run test:v978 && npm run test:v978:types && npm run test:v977 && npm run test:v976 && npm run test:v975 && npm run test:v973 && npm run test:v972 && npm run check:syntax && npm run check:architecture"
+    "verify:v978:focused": "npm run test:v978 && npm run test:v978:types && npm run test:v977 && npm run test:v976 && npm run test:v975 && npm run test:v973 && npm run test:v972 && npm run check:syntax && npm run check:architecture",
+    "test:v980": "node tests/v980-concert-quality-director-regression.cjs",
+    "test:v980:types": "tsc -p tests/tsconfig.v980-core.json --noEmit",
+    "verify:v980:focused": "npm run test:v980 && npm run test:v980:types && npm run test:v979 && npm run test:v978 && npm run test:v977 && npm run test:v976 && npm run test:v975 && npm run check:syntax && npm run check:architecture"
   },
   "engines": {
     "node": "24.x"
@@ -2033,6 +2036,6 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v979",
-  "sonicFeatureRelease": "v979"
+  "sonicRoadmapRelease": "v980",
+  "sonicFeatureRelease": "v980"
 }

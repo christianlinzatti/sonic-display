@@ -31,6 +31,7 @@ import {planSmartFxShowDirectorV824,mergeSmartFxWithTimelineV824} from "./smartF
 import {applyCameraAwarePerformanceV834} from "./cameraAwarePerformanceV834";
 import {createFxPerfStateV825,advanceFxPerfStateV825,planFxPerformanceV825} from "./concertFxPerformanceOptimizerV825";
 import {createAutoQualityV827,advanceAutomaticQualityV827,effectiveFxPressureV827} from "./automaticConcertQualityV827";
+import {createConcertQualityDirectorV980,advanceConcertQualityDirectorV980,clearAdaptiveQualityV980,qualityPressureV980} from "./concertQualityDirectorV980";
 import {recordBenchmarkWindowV827} from "./concertBenchmarkV827";
 import {recordRealGlbWindowV832} from "./realGlbConcertBenchmarkV832";
 import {inspectVisibleCastV830} from "./concertProductionEvidenceV830";
@@ -241,6 +242,8 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
   const lyricsDrawnV813=useRef('');
   const fxPerfStateV825=useRef(createFxPerfStateV825());
   const autoQualityStateV827=useRef(createAutoQualityV827());
+  const qualityDirectorStateV980=useRef(createConcertQualityDirectorV980());
+  const qualityTrackScopeV980=useRef({trackId:'',positionMs:NaN,epoch:0});
   const qualityMonitorV826=useRef(createConcertQualityMonitorV826());
   const qualityPublishedV826=useRef(false);
   const concertArcStateV880=useRef<ConcertArcStateV880|null>(null);
@@ -723,9 +726,15 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     advanceFxPerfStateV825(fxPerfStateV825.current,delta,
       fxCueV810.reason==='music'&&concertFxV810?.perfOptimizerV825!==false&&isPlaying,
       tier==='balanced'?30:60);
+    const qualityEnabledV980=concertFxV810?.concertQualityDirectorV980===true&&liveShowV827&&
+      concertFxV810?.qualityDashboardV826!==false&&concertFxV810?.perfOptimizerV825!==false&&
+      (tier!=='low'||concertFxV810?.concertQualityPiV980===true);
+    const fxPressureV980=qualityEnabledV980?
+      qualityPressureV980(fxPerfStateV825.current.pressure,qualityDirectorStateV980.current,true):
+      effectiveFxPressureV827(fxPerfStateV825.current.pressure,
+        autoQualityStateV827.current,liveShowV827&&concertFxV810?.qualityDashboardV826!==false&&concertFxV810?.autoQualityV827!==false&&concertFxV810?.perfOptimizerV825!==false);
     const fxPerfV825=planFxPerformanceV825({settings:concertFxV810,fx:fxCueV810,tier,
-      pressure:effectiveFxPressureV827(fxPerfStateV825.current.pressure,
-        autoQualityStateV827.current,liveShowV827&&concertFxV810?.qualityDashboardV826!==false&&concertFxV810?.autoQualityV827!==false&&concertFxV810?.perfOptimizerV825!==false),
+      pressure:fxPressureV980,
       lyricsProtected:lyricsProtectedV542,
       vocalFocus:vocalFocusV542,groupCount:groupCountV542,
       authoredLanes:(['laser','led','particles','foam','transition'] as const).filter(lane=>
@@ -1266,6 +1275,9 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
         gains:fxPerfV825.gains,performanceTier:tier,
         autoQualityPressureV827:autoQualityStateV827.current.pressure,
         autoQualityReasonV827:autoQualityStateV827.current.reason,
+        qualityDirectorPressureV980:qualityEnabledV980?qualityDirectorStateV980.current.pressure:undefined,
+        qualityDirectorReasonV980:qualityEnabledV980?qualityDirectorStateV980.current.reason:undefined,
+        qualityDirectorObservationsV980:qualityEnabledV980?qualityDirectorStateV980.current.observations:undefined,
         cameraAwareReasonV834:cameraBudgetV834.reason,
         cameraAwareSavingsV834:cameraBudgetV834.relativeCostSaved,
         cameraIntentV834:cameraBudgetV834.intent??undefined,
@@ -1280,9 +1292,32 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       // V827 uses only completed V826 sample windows: no per-frame tuner allocations.
       // The verified V810 authority, manual FX switches and V825 floors still win.
       advanceAutomaticQualityV827(autoQualityStateV827.current,{snapshot,
-        enabled:concertFxV810?.autoQualityV827!==false&&liveShowV827,
+        enabled:!qualityEnabledV980&&concertFxV810?.autoQualityV827!==false&&liveShowV827,
         optimizerEnabled:concertFxV810?.perfOptimizerV825!==false,
         response:concertFxV810?.autoResponseV827??'balanced'});
+      // V980 replaces V827 feedback only while explicitly opted in: no competing
+      // regulators, no extra telemetry loop or extra Three.js allocations.
+      // Only evaluate seek discontinuities at the completed V826 measurement window.
+      // A real seek to another part of the same track clears previous auto pressure.
+      const trackScopeV980=qualityTrackScopeV980.current;
+      const songIdV980=playback.trackId??'';
+      if(trackScopeV980.trackId!==songIdV980){
+        trackScopeV980.trackId=songIdV980;trackScopeV980.epoch=0;trackScopeV980.positionMs=NaN;
+      }else if(Number.isFinite(trackScopeV980.positionMs)&&Number.isFinite(playback.positionMs)&&
+        Math.abs(playback.positionMs-trackScopeV980.positionMs)>5000){
+        trackScopeV980.epoch++;
+      }
+      trackScopeV980.positionMs=playback.positionMs;
+      advanceConcertQualityDirectorV980(qualityDirectorStateV980.current,{
+        snapshot,enabled:qualityEnabledV980,optimizerEnabled:concertFxV810?.perfOptimizerV825!==false,
+        telemetryEnabled:concertFxV810?.qualityDashboardV826!==false,
+        tier,allowLowTier:concertFxV810?.concertQualityPiV980===true,
+        restore:concertFxV810?.concertQualityRecoveryV980!==false,
+        mode:concertFxV810?.concertQualityModeV980??'balanced',
+        scopeKey:songIdV980?`${songIdV980}:${trackScopeV980.epoch}`:''});
+      snapshot.qualityDirectorPressureV980=qualityEnabledV980?qualityDirectorStateV980.current.pressure:undefined;
+      snapshot.qualityDirectorReasonV980=qualityEnabledV980?qualityDirectorStateV980.current.reason:undefined;
+      snapshot.qualityDirectorObservationsV980=qualityEnabledV980?qualityDirectorStateV980.current.observations:undefined;
       recordBenchmarkWindowV827({snapshot,count:groupCountV542,trackId:playback.trackId??'',
         liveShow:liveShowV827,targetSeconds:12});
       // V832: real scene and renderer evidence, sampled at most twice per second.
@@ -1312,7 +1347,8 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       publishConcertQualityV826(snapshot);qualityPublishedV826.current=true;
       }
     }else{
-      // No telemetry means no evidence for V827 feedback; drop cached overrides.
+      // No telemetry means no evidence for either regulator; drop cached overrides.
+      clearAdaptiveQualityV980(qualityDirectorStateV980.current);
       autoQualityStateV827.current.pressure=0;
       autoQualityStateV827.current.badWindows=0;
       autoQualityStateV827.current.goodWindows=0;

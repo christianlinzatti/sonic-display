@@ -352,6 +352,24 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
    <ConcertQualityDashboardV826 enabled={s.qualityDashboardV826}/>
   </fieldset>
   <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+   <legend>V980 · Concert Quality & Performance Director</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.concertQualityDirectorV980}
+    onChange={e=>patch({concertQualityDirectorV980:e.target.checked})}/> Intelligente Konzertqualität mit echten FPS-Messfenstern regeln</label>
+   <label>Priorität <select value={s.concertQualityModeV980} disabled={!s.concertQualityDirectorV980}
+    onChange={e=>patch({concertQualityModeV980:e.target.value as ConcertFxSettingsV810['concertQualityModeV980']})}>
+    <option value="visual">Visuelle Qualität länger erhalten</option>
+    <option value="balanced">Ausgewogen</option>
+    <option value="performance">Flüssigkeit priorisieren</option>
+   </select></label>
+   <label className="setting-check"><input type="checkbox" checked={s.concertQualityRecoveryV980}
+    disabled={!s.concertQualityDirectorV980} onChange={e=>patch({concertQualityRecoveryV980:e.target.checked})}/>
+    Dekorative Effekte bei stabiler Bildrate langsam wiederherstellen</label>
+   <label className="setting-check"><input type="checkbox" checked={s.concertQualityPiV980}
+    disabled={!s.concertQualityDirectorV980} onChange={e=>patch({concertQualityPiV980:e.target.checked})}/>
+    Raspberry-Pi-/Sparprofil: FPS-Diagnose einschalten (30-FPS-Ziel; bereits gesperrte FX bleiben aus)</label>
+   <small>V980 ersetzt bei Aktivierung die V827-Zusatzregelung; V825 verwaltet weiterhin das eigentliche Effektbudget. Nur nach mehreren echten und gültigen V826-Messfenstern, nur bei bestätigter laufender Songshow. Ausschalten, pausieren, Songwechsel oder fehlende Messungen entfernen automatische Zusatzdrosselung. Im Pi-Sparprofil bleiben V810-FX auch bei aktivem V980 gesperrt; V980 kann dort Last erkennen, aber keine FPS-Verbesserung garantieren. Keine Änderung an Kamera, Avataren, Lyrics, Govee oder Alexa.</small>
+  </fieldset>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
    <legend>V827 · Automatic Concert Quality Tuning</legend>
    <label className="setting-check"><input type="checkbox" checked={s.autoQualityV827}
     onChange={e=>patch({autoQualityV827:e.target.checked})}/> Qualitätsautomatik auf Basis echter Frame-Messfenster</label>

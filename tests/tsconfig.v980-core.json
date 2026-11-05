@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [],
+    "typeRoots": [
+      "./empty-types"
+    ],
+    "incremental": false,
+    "noEmit": true
+  },
+  "include": [],
+  "files": [
+    "../components/visualizer/concertQualityDirectorV980.ts",
+    "../components/visualizer/concertQualityTelemetryV826.ts",
+    "../components/visualizer/automaticConcertQualityV827.ts",
+    "../components/visualizer/concertFxPerformanceOptimizerV825.ts",
+    "../components/visualizer/concertFxStudioV810.ts"
+  ]
+}

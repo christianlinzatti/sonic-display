@@ -69,7 +69,10 @@ export function planFxPerformanceV825(i:{
  const gains=neutral();
  const off=(reason:FxPerfPlanV825['reason']):FxPerfPlanV825=>({active:false,reason,pressure:0,capacity:0,cost:0,gains,throttled:[]});
  if(i.settings?.enabled===false||i.settings?.perfOptimizerV825===false)return off('off');
- if(!i.fx.active||i.fx.reason!=='music'||i.tier==='low'||!Number.isInteger(i.groupCount)||i.groupCount<1||i.groupCount>4)return off('unverified');
+ // Low-tier FX remain untouched unless the user explicitly enables BOTH V980 and Pi protection.
+ if(!i.fx.active||i.fx.reason!=='music'||
+   (i.tier==='low'&&!(i.settings?.concertQualityDirectorV980===true&&i.settings?.concertQualityPiV980===true))||
+   !Number.isInteger(i.groupCount)||i.groupCount<1||i.groupCount>4)return off('unverified');
  const mode:FxPerfModeV825=i.settings?.perfModeV825==='fps'||i.settings?.perfModeV825==='quality'?i.settings.perfModeV825:'balanced';
  const sensitivity=finite(i.settings?.perfSensitivityV825)?clamp(i.settings!.perfSensitivityV825!,0,100)/100:.65;
  const observed=finite(i.pressure)?clamp(i.pressure,0,1):0;

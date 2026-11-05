@@ -15,6 +15,7 @@ export interface ConcertQualitySampleV826{
   rendererGeometries:number;rendererTextures:number; // Three.js WebGLRenderer.info counters, not GPU memory
   performanceTier:'low'|'balanced'|'high';
   autoQualityPressureV827?:number;autoQualityReasonV827?:string;
+  qualityDirectorPressureV980?:number;qualityDirectorReasonV980?:string;qualityDirectorObservationsV980?:number;
   cameraAwareReasonV834?:string;cameraAwareSavingsV834?:number;cameraIntentV834?:string;
 }
 export interface ConcertQualitySnapshotV826 extends ConcertQualitySampleV826 {

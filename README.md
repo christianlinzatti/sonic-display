@@ -1,3 +1,14 @@
+## V980 – Concert Quality & Performance Director
+
+Optionale, messbasierte Konzertqualität mit den bestehenden V825–V827-Renderfenstern:
+mehrere langsame FPS-Fenster führen zu priorisierter Drosselung dekorativer FX,
+anhaltend stabile Frames erlauben eine langsame Qualitätswiederherstellung.
+Live-Dashboard und Regieprofile im *Concert FX Studio*. Raspberry-Pi-Diagnose
+(30 FPS) ist separat zuschaltbar; die vorhandene Eco-FX-Sperre bleibt erhalten.
+Ohne zusätzliche Renderer-Loop, externe Hardwarebefehle oder Kamera-/Avatar-Eingriff.
+Details: [V980-Dokumentation](docs/versions/V980-CONCERT-QUALITY-PERFORMANCE-DIRECTOR.md).
+Der vollständige Next.js-/TypeScript-Produktionsbuild bleibt CI-Freigabebedingung.
+
 ## V977 – Smart Concert Storytelling
 
 Opt-in für einen dramaturgischen Konzertbogen über den ganzen Song: ruhiger Einstieg, bestätigte Verse/Hooks/Builds/Drops, bewusste Breaks und ein nur bei bestätigtem Outro angezeigtes Finale. Die neue Regie wird **nach V975/V976** auf die virtuelle Bühne angewendet, bietet die Stile *Dezent / Filmisch / Festival* und bewahrt manuelle Timelines, Kamera, Alexa, Govee und Raspberry-Pi-Eco. Details: [V977 Smart Concert Storytelling](docs/versions/V977-SMART-CONCERT-STORYTELLING.md). Der vollständige TypeScript-/Next.js-Produktionsbuild muss noch in CI bestätigt werden.

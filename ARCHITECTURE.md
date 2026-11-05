@@ -1,3 +1,15 @@
+## V980 – Concert Quality & Performance Director
+
+`components/visualizer/concertQualityDirectorV980.ts` wertet nur neue, valide
+V826-Rendererfenster aus. Der Ref-State wird in `DynamicStage.tsx` zusammen mit
+V825, V826 und V827 verwaltet (keine zweite Render-Schleife): V980 ersetzt die
+V827-Zusatzregelung nur bei explizitem Opt-in, V825 wendet priorisierte FX-Gains
+unter V810-/V823-Sicherheitssperren an. `ConcertQualityDashboardV826.tsx` zeigt
+FPS, P95, Drosselung und Erholungszustand. Der Pi-Sparmodus bleibt bei V810
+zwingend `guarded`. Siehe `docs/versions/V980-CONCERT-QUALITY-PERFORMANCE-DIRECTOR.md`.
+
+---
+
 ## V977 – Smart Concert Storytelling (virtuelle Konzertregie)
 
 `lib/concertStorytellingV977.ts` berechnet deterministisch und ohne Nebenwirkungen einen dramaturgischen Energieverlauf aus der realen V318-Songposition und dem bestätigten aktuellen Abschnitt. `components/visualizer/ConcertFestivalFxV958.tsx` ruft V977 direkt **nach V976/V975** und vor V969/V968 auf. Es gibt keinen weiteren Render-Loop, keine neue Kamera-Regie, keine Gerätedaten und keine zusätzlichen Netzwerkaufrufe. Die vier persistenten V977-Einstellungen sind im bestehenden `lib/ultimateConcertRoadmapV958.ts` normalisiert und im `ConcertRoadmapStudioV958.tsx` bedienbar. Tests: `tests/v977-concert-storytelling-regression.cjs`, isolierte TypeScript-Prüfung: `tests/tsconfig.v977-core.json`. Das Version-Gate ist sowohl in V931 als auch im Vercel-Build registriert. Ältere Manuell-/Show-/Lyrics-/Pi-Prioritäten bleiben bestehen.
