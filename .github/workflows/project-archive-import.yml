@@ -52,11 +52,20 @@ jobs:
           python3 scripts/project-archive-import.py --select \
             --before "$PUSH_BEFORE" --head "$GITHUB_SHA" \
             --manual "$MANUAL_ARCHIVE" --output "$GITHUB_OUTPUT"
+      - name: Preview safe removal of obsolete tracked sources
+        env:
+          ARCHIVE: ${{ steps.selection.outputs.archive }}
+        run: |
+          python3 scripts/project-archive-import.py --archive "$ARCHIVE" \
+            --sync-tracked --dry-run --prune-report "$RUNNER_TEMP/sonic-import-sync-plan.json"
       - name: Validate and import project files (keep protected GitHub workflows)
         id: imported
         env:
           ARCHIVE: ${{ steps.selection.outputs.archive }}
-        run: python3 scripts/project-archive-import.py --archive "$ARCHIVE" --output "$GITHUB_OUTPUT"
+        run: |
+          python3 scripts/project-archive-import.py --archive "$ARCHIVE" \
+            --sync-tracked --prune-report "$RUNNER_TEMP/sonic-import-sync-plan.json" \
+            --output "$GITHUB_OUTPUT"
       - name: Restore organized project structure after ZIP import
         run: node scripts/organize-project-structure.cjs
       - name: Verify clean repository layout and preserved integrations
@@ -79,6 +88,13 @@ jobs:
             git commit -m "chore: import full Sonic Display V$VERSION project"
             git push origin HEAD:master
           fi
+      - name: Publish audited cleanup manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonic-zip-sync-plan-${{ github.run_id }}
+          path: ${{ runner.temp }}/sonic-import-sync-plan.json
+          if-no-files-found: warn
       - name: Trigger full Linux/Windows production validation
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

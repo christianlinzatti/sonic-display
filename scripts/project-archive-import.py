@@ -26,6 +26,81 @@ MAX_UNPACKED_BYTES = 80 * 1024 * 1024
 MAX_ENTRIES = 10000
 MIN_ENTRIES = 2500
 
+# Only managed application/code directories are reconciled against complete ZIPs.
+# Historical evidence, runtime user data, uploads, .github, and releases are NEVER
+# pruned. The importer's own file and GitHub-only tests are pinned as well.
+SYNC_DIRS = frozenset({
+    "app", "components", "config", "context", "hooks", "integrations",
+    "lib", "public", "scripts", "services", "tests", "types",
+})
+SYNC_PROTECTED = frozenset({
+    "scripts/project-archive-import.py", "tests/test_project_archive_import.py",
+    "scripts/organize-project-structure.cjs", "tests/v974-repository-cleanup-regression.cjs",
+})
+
+
+def is_managed_source(name):
+    parts = PurePosixPath(name).parts
+    return (len(parts) >= 2 and name not in SYNC_PROTECTED and
+            (parts[0] in SYNC_DIRS or re.fullmatch(r"v[0-9]+", parts[0]) is not None))
+
+
+def plan_tracked_prune(root, archive_files):
+    """Return Git-tracked stale files only; fail closed if Git isn't available.
+
+    This is not a recursive deletion: ignored/untracked files and protected
+    project documentation, runtime data, release ZIPs and workflows survive.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "--cached", "--full-name", "-z"],
+            cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise ValueError(f"Cannot inspect Git-tracked files for safe cleanup: {exc}") from exc
+    tracked = [entry.decode("utf-8", errors="surrogateescape")
+               for entry in result.stdout.split(b"\0") if entry]
+    managed = [path for path in tracked if is_managed_source(path)]
+    stale = sorted(path for path in managed if path not in archive_files)
+    # A major shrink usually indicates an incomplete or wrong archive. Stop
+    # rather than deleting an unexpectedly large fraction of the project.
+    if len(managed) >= 100 and len(stale) > max(50, len(managed) // 10):
+        raise ValueError(f"Unsafe source shrink: {len(stale)} of {len(managed)} managed Git files "
+                         "are absent from ZIP (over 10%); import cancelled")
+    for name in stale:
+        path = root.joinpath(*PurePosixPath(name).parts)
+        if not path.is_file() and not path.is_symlink():
+            raise ValueError(f"Tracked cleanup target is not a file: {name}")
+        if any(parent.is_symlink() for parent in path.parents if parent != root.parent):
+            raise ValueError(f"Refusing cleanup under symlink: {name}")
+    return stale
+
+
+def write_prune_report(path, version, removed, dry_run):
+    if not path:
+        return
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps({
+        "schema": "sonic-tracked-source-prune-v1", "version": version,
+        "dry_run": bool(dry_run), "count": len(removed), "paths": removed,
+    }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def prune_tracked_files(root, stale):
+    for name in stale:
+        target = root.joinpath(*PurePosixPath(name).parts)
+        target.unlink()
+        parent = target.parent
+        # Git does not track directories. Remove newly empty directories only.
+        while parent != root:
+            try:
+                parent.rmdir()
+            except OSError:
+                break
+            parent = parent.parent
+
+
 
 def checked_name(value):
     """Return (basename, version); never accept arbitrary checkout paths."""
@@ -84,7 +159,7 @@ def validate_member(info):
     return p
 
 
-def import_archive(root, requested, output=None, dry_run=False):
+def import_archive(root, requested, output=None, dry_run=False, sync_tracked=False, prune_report=None):
     name, version = checked_name(requested)
     archive = root / "releases" / name
     if not archive.is_file() or archive.is_symlink():
@@ -128,17 +203,25 @@ def import_archive(root, requested, output=None, dry_run=False):
             if dest.is_symlink() or any(parent.is_symlink() for parent in dest.parents if parent != root.parent):
                 raise ValueError(f"Target includes a symlink: {rel}")
             planned.append((entry, dest))
+        stale = plan_tracked_prune(root, set(names)) if sync_tracked else []
+        write_prune_report(prune_report, version, stale, dry_run)
         if not dry_run:
             for entry, dest in planned:
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 with zf.open(entry) as source, dest.open("wb") as target:
                     shutil.copyfileobj(source, target, length=256 * 1024)
+            prune_tracked_files(root, stale)
     if not dry_run:
         archive.unlink()
-    outputs(output, {"version": version, "archive": name, "files": len(planned)})
+    outputs(output, {"version": version, "archive": name, "files": len(planned), "removed": len(stale)})
     print(f"Validated V{version}: {len(entries)} entries; "+
           f"{'would import' if dry_run else 'imported'} {len(planned)} files, "
-          f"preserved {len(skipped)} protected paths")
+          f"preserved {len(skipped)} protected paths; "
+          f"{'would remove' if dry_run else 'removed'} {len(stale)} stale managed Git files")
+    for old in stale[:40]:
+        print(f"  {'would remove' if dry_run else 'removed'}: {old}")
+    if len(stale) > 40:
+        print(f"  ... {len(stale) - 40} additional paths (see prune report)")
 
 
 def main():
@@ -151,6 +234,10 @@ def main():
     parser.add_argument("--head", default="")
     parser.add_argument("--output", default="")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--sync-tracked", action="store_true",
+                        help="Remove missing Git-tracked code files from managed directories")
+    parser.add_argument("--prune-report", default="",
+                        help="Write audited JSON listing all planned/removed files")
     args = parser.parse_args()
     try:
         root = args.root.resolve()
@@ -160,7 +247,9 @@ def main():
         else:
             if not args.archive:
                 raise ValueError("--archive required")
-            import_archive(root, args.archive, output=args.output or None, dry_run=args.dry_run)
+            import_archive(root, args.archive, output=args.output or None,
+                           dry_run=args.dry_run, sync_tracked=args.sync_tracked,
+                           prune_report=args.prune_report or None)
     except (ValueError, BadZipFile, OSError, subprocess.CalledProcessError, json.JSONDecodeError) as exc:
         print(f"Sonic Display ZIP import rejected: {exc}", file=sys.stderr)
         return 1
