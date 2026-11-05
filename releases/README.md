@@ -1,15 +1,11 @@
-# Sonic Display V959 – ZIP-Import vom Handy
+# Sonic Display – versionsunabhängiger ZIP-Import
 
-Dieser Ordner ist für den einmaligen Import des vollständigen V959-Projekts eingerichtet.
+Lade eine vollständige ZIP-Datei unter **`releases/SonicDisplay-V<Nummer>.zip`** auf `master` hoch (z. B. `SonicDisplay-V969.zip` oder `SonicDisplay-V970.zip`) und bestätige **Commit changes**.
 
-1. Im GitHub-Webbrowser diesen Ordner auf `master` öffnen.
-2. **Add file → Upload files** auswählen.
-3. Die ChatGPT-Datei `sonic-display-v959-parallel-production-validation-full.zip` hier hochladen (nicht nur verlinken).
-4. Mit **Commit changes** direkt auf `master` bestätigen.
+Der Workflow **Sonic Display - Versioned Project ZIP Import** erkennt die Versionsnummer automatisch. Du musst dafür **keine Workflow-Dateien und keine Python-Skripte pro Version kopieren**. Wichtig: `package.json` muss im ZIP unter `sonicRoadmapRelease` dieselbe Version nennen, z. B. `"v969"`. Die ältere Angabe `v965` in einer neueren ZIP muss vorher aktualisiert werden. `package.json` → `version` ist eine separate App-Paketversion und wird nicht für den Import verwendet.
 
-Anschließend startet der Workflow **V959 Import Complete Project ZIP**.
-Er prüft ZIP-Integrität, Quell-Dateiliste, Release-Marker, Pfad-Sicherheit und Dateinamen-Kollisionen und übernimmt die Dateien in den Hauptbranch, ohne bestehende fremde Dateien zu löschen.
+Der Workflow kontrolliert ZIP-Integrität, vollständige Projektdateien, Pfadsicherheit, Dateinamen-Kollisionen, Größenlimit und Version. Er extrahiert die Quelldateien nach `master`, überspringt `.github/**` aus dem ZIP zum Schutz der Workflows, löscht die übernommene ZIP-Datei und startet den bestehenden Linux/Windows-Produktionscheck. Der letzte Schritt ist eine **separat laufende GitHub Action**; ein erfolgreicher Import bedeutet nicht automatisch, dass der Build grün ist.
 
-Der Import-Workflow startet danach explizit **V959 Parallel Regression and Production Build** für Linux und Windows. Ein fehlerhafter Import oder Build gilt niemals als erfolgreich.
+**Manuelle Wiederholung:** Unter **Actions → Sonic Display - Versioned Project ZIP Import → Run workflow** den Dateinamen explizit eingeben. Das funktioniert nur, solange diese ZIP noch im Repository liegt. Bei mehreren gleichzeitig geänderten ZIPs in einem Commit verweigert der automatische Import die mehrdeutige Auswahl; Dateien daher einzeln hochladen.
 
-Achtung: GitHub-Repository und dessen Commit-Historie sind öffentlich. Keine privaten Daten oder Zugangsdaten in die ZIP aufnehmen.
+**Hinweise:** Ein fehlgeschlagener Import commitet keine extrahierten Dateien. Bereits importierte Dateien, die in späteren ZIPs fehlen, werden nicht pauschal gelöscht. GitHub ist hier öffentlich: ZIPs niemals mit `.env`-Zugangsdaten, persönlichen Tokens oder Secrets erzeugen.
