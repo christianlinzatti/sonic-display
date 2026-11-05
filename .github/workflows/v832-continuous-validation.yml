@@ -22,6 +22,42 @@ jobs:
           cache: npm
       - name: Reproducible dependency installation
         run: npm ci --no-audit --no-fund
+      - name: V1003 Auto Improvement Director (regression and isolated type checks)
+        run: npm run test:v1003 && npm run test:v1003:types
+      - name: V1002 Concert Quality Assurance (regression and isolated type checks)
+        run: npm run test:v1002 && npm run test:v1002:api && npm run test:v1002:types
+      - name: V1001 Interactive Concert Control (regression and isolated type checks)
+        run: npm run test:v1001 && npm run test:v1001:types
+      - name: V1000 Immersive Concert Director (regression and isolated type checks)
+        run: npm run test:v1000 && npm run test:v1000:types
+      - name: V999 Intelligent Performance Governor (regression and isolated type checks)
+        run: npm run test:v999 && npm run test:v999:types
+      - name: V997 Continuous Concert Flow (regression and isolated type checks)
+        run: npm run test:v997 && npm run test:v997:types
+      - name: V996 Virtual Crowd Experience (regression and isolated type checks)
+        run: npm run test:v996 && npm run test:v996:types
+      - name: V995 Duet & Ensemble 3.0 (regression and isolated type checks)
+        run: npm run test:v995 && npm run test:v995:types
+      - name: V994 Vocal Performance Intelligence (regression and isolated type checks)
+        run: npm run test:v994 && npm run test:v994:types
+      - name: V993 AI Choreography Director (regression and isolated type checks)
+        run: npm run test:v993 && npm run test:v993:types
+      - name: V992 Cinematic Camera Director (regression and isolated type checks)
+        run: npm run test:v992 && npm run test:v992:types
+      - name: V991 Bass Impact Physics (regression and isolated type checks)
+        run: npm run test:v991 && npm run test:v991:types
+      - name: V987 Govee Immersive Sync 2.0 (regression and isolated type checks)
+        run: npm run test:v987 && npm run test:v987:types
+      - name: V986 AI Atmosphere Designer (regression and isolated type checks)
+        run: npm run test:v986 && npm run test:v986:types
+      - name: V985 Predictive Show Timeline (regression and isolated type checks)
+        run: npm run test:v985 && npm run test:v985:types
+      - name: V984 AI Concert Story Director (regression and isolated type checks)
+        run: npm run test:v984 && npm run test:v984:types
+      - name: V983 AI Song Intelligence (regression and isolated type checks)
+        run: npm run test:v983 && npm run test:v983:types
+      - name: V982 Immersive AI Show (regression and isolated type checks)
+        run: npm run test:v982 && npm run test:v982:types
       - name: V998 Live AI Concert Assistant (regression and isolated type checks)
         run: npm run test:v998 && npm run test:v998:types
       - name: V990 Living LED Wall 3.0 (regression and isolated type checks)

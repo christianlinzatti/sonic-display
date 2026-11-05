@@ -101,7 +101,7 @@ test('10,000 legal configurations stay within original bounds and never boost ef
  }
 });
 test('AI output cannot generate executable changes, share sensitive metadata or write hardware',()=>{
- const ui=read('components/visualizer/AutoImprovementDirectorV1003.tsx');
+ const ui=read('components/visualizer/AutoImprovementDirectorPanelV1003.tsx');
  assert(ui.includes("'/api/ai/concert-qa'"));assert(ui.includes('aiConcertQaPayloadV1002(report)'));
  assert(ui.includes('normalizeQaAiResponseV1002'));assert(ui.includes('canCommitAutoImprovementV1003'));
  assert(ui.includes('onChange(preview.after)'));
@@ -115,13 +115,13 @@ test('new component uses V1001 guarded state and the V1002 verified evidence sou
  assert(live.includes('AutoImprovementDirectorV1003'));
  assert(live.includes('context={touchContextV1001} current={touchValuesV1001}'));
  assert(live.includes('onChange={applyTouchValuesV1001}'));
- const ui=read('components/visualizer/AutoImprovementDirectorV1003.tsx');
+ const ui=read('components/visualizer/AutoImprovementDirectorPanelV1003.tsx');
  assert(ui.includes('reviewConcertQualityV1002'));assert(ui.includes('useConcertInspectorV801'));
  assert(ui.includes('useConcertQualityV466'));
 });
 test('new planner and UI transpile without syntax errors',()=>{
  for(const f of ['components/visualizer/autoImprovementDirectorV1003.ts',
-  'components/visualizer/AutoImprovementDirectorV1003.tsx','components/visualizer/LiveFxDeckV881.tsx']){
+  'components/visualizer/AutoImprovementDirectorPanelV1003.tsx','components/visualizer/LiveFxDeckV881.tsx']){
   const r=transpileModule(read(f),{fileName:f,reportDiagnostics:true,
    compilerOptions:{target:ScriptTarget.ES2022,module:ModuleKind.CommonJS,jsx:JsxEmit.ReactJSX}});
   assert.equal((r.diagnostics||[]).filter(d=>d.category===DiagnosticCategory.Error).length,0,f);

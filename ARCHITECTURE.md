@@ -5,7 +5,7 @@
   wenn V1002 eine schlechte Bildrate oder hohe P95-Framezeit meldet. Die Vorschläge
   reduzieren nur **bereits aktivierte** virtuelle V1000-Bühnen- und V885-Lichtintensitäten;
   Kameras, Tanz, Lyrics, Songzeit, Govee und manuelle Timelines werden nicht angepasst.
-- `components/visualizer/AutoImprovementDirectorV1003.tsx` nutzt die gemeinsame
+- `components/visualizer/AutoImprovementDirectorPanelV1003.tsx` nutzt die gemeinsame
   V1001-Änderungsleitung im `components/visualizer/LiveFxDeckV881.tsx`.
   Review → Freigabe mit 20-s-TTL, Track-/Seek-/Konfliktprüfung → Compare-and-swap Undo.
   Weder KI-Text noch planbasierte Hinweise erzeugen ausführbare Befehle.
@@ -3885,7 +3885,7 @@ Build benötigt installierte Projektpakete unter Node 24.
 
 ### V1001 – Interactive Concert Control
 
-Die optionale Touch-Konsole `components/visualizer/InteractiveConcertControlV1001.tsx`
+Die optionale Touch-Konsole `components/visualizer/InteractiveConcertControlPanelV1001.tsx`
 lebt im bestehenden `components/visualizer/LiveFxDeckV881.tsx` (kein weiterer
 Canvas oder Renderer). Der reine, deterministische Planer
 `components/visualizer/interactiveConcertControlV1001.ts` erzeugt nur

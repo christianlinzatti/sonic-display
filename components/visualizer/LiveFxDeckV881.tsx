@@ -57,8 +57,8 @@ import {SPOTLIGHT_STORAGE_KEY_V890,DEFAULT_SPOTLIGHT_V890,normalizeSpotlightV890
 import {ConcertQualityIntelligencePanelV901} from './ConcertQualityIntelligencePanelV901';
 import {ImmersiveAiDirectorV982} from './ImmersiveAiDirectorV982';
 import {LiveConcertAssistantV998} from './LiveConcertAssistantV998';
-import {InteractiveConcertControlV1001} from './InteractiveConcertControlV1001';
-import {AutoImprovementDirectorV1003} from './AutoImprovementDirectorV1003';
+import {InteractiveConcertControlV1001} from './InteractiveConcertControlPanelV1001';
+import {AutoImprovementDirectorV1003} from './AutoImprovementDirectorPanelV1003';
 import type {TouchValuesV1001,TouchContextV1001} from './interactiveConcertControlV1001';
 import {getImmersiveSettingsV1000,useImmersiveSettingsV1000,restoreImmersiveSettingsV1000,setImmersiveSettingsV1000} from './immersiveConcertStoreV1000';
 import {normalizeLivePlanV998,resolveLiveChangesV998,

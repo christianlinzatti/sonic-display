@@ -94,7 +94,7 @@ test('10,000 simulated user plans never change enabled flags or unselected lanes
  }
 });
 test('new touch interface uses existing controllers and requires confirmation',()=>{
- const ui=read('components/visualizer/InteractiveConcertControlV1001.tsx');
+ const ui=read('components/visualizer/InteractiveConcertControlPanelV1001.tsx');
  const deck=read('components/visualizer/LiveFxDeckV881.tsx');
  for(const phrase of ['Änderungen anzeigen','Vorschau übernehmen','Letzte Touch-Änderung rückgängig','aria-pressed','type="range"',
  'canCommitTouchV1001','canUndoTouchV1001'])assert(ui.includes(phrase),phrase);
@@ -102,14 +102,14 @@ test('new touch interface uses existing controllers and requires confirmation',(
   'updateAtmosphere({intensity:','setImmersiveSettingsV1000({...prior,intensity:','verified:directorPlanV895.source'])assert(deck.includes(phrase),phrase);
 });
 test('controller has no direct Spotify, network, hardware or rendering authority',()=>{
- const files=['components/visualizer/interactiveConcertControlV1001.ts','components/visualizer/InteractiveConcertControlV1001.tsx'];
+ const files=['components/visualizer/interactiveConcertControlV1001.ts','components/visualizer/InteractiveConcertControlPanelV1001.tsx'];
  for(const f of files){const s=read(f);
   for(const forbidden of ['fetch(', '/api/govee','/api/spotify','/api/alexa','new Audio(',
    'requestAnimationFrame(', 'useFrame(', 'setInterval(', 'setTimeout(', 'navigator.mediaDevices'])assert(!s.includes(forbidden),`${f} ${forbidden}`);
  }
 });
 test('source TS/TSX transpiles cleanly, with no test-only declaration shims',()=>{
- for(const f of ['components/visualizer/interactiveConcertControlV1001.ts','components/visualizer/InteractiveConcertControlV1001.tsx',
+ for(const f of ['components/visualizer/interactiveConcertControlV1001.ts','components/visualizer/InteractiveConcertControlPanelV1001.tsx',
   'components/visualizer/LiveFxDeckV881.tsx']){
   const r=transpileModule(read(f),{fileName:f,reportDiagnostics:true,compilerOptions:{target:ScriptTarget.ES2022,module:ModuleKind.CommonJS,jsx:JsxEmit.ReactJSX}});
   assert.equal((r.diagnostics||[]).filter(d=>d.category===DiagnosticCategory.Error).length,0,f);
