@@ -129,9 +129,12 @@ test('new planner and UI transpile without syntax errors',()=>{
 });
 test('V1003 release has build gates and docs',()=>{
  const p=JSON.parse(read('package.json'));
- assert.equal(p.version,'0.1.0-v1003');assert.equal(p.sonicFeatureRelease,'v1003');
- assert.equal(p.sonicRoadmapRelease,'v1003');
- assert(p.scripts.prebuild.startsWith('npm run test:v1003 && npm run test:v1003:types'));
+ assert.match(p.version,/^0\.1\.0-v\d+$/);
+ assert(Number(p.version.split('-v')[1])>=1003);
+ assert.equal(p.sonicFeatureRelease,'v'+p.version.split('-v')[1]);
+ assert.equal(p.sonicRoadmapRelease,p.sonicFeatureRelease);
+ assert(p.scripts.prebuild.includes('npm run test:v1003 && npm run test:v1003:types'));
+ assert(p.scripts.prebuild.endsWith('npm run check:fast'));
  assert(read('scripts/vercel-production-build.cjs').includes('V1003 AI Auto-Improvement Director'));
  assert(read('.github/workflows/v1003-auto-improvement-validation.yml').includes('npm run build:next'));
  assert(read('ARCHITECTURE.md').includes('V1003'));

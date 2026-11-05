@@ -1,3 +1,15 @@
+## V1004 – CI and build reliability
+
+Current GitHub action failures in V908/V910/V925/V929 were traced to
+hard-coded assumptions about old release metadata and the initial `prebuild`
+command. V1004 retains their substantive safety assertions while allowing the
+versioned prebuild sequence to prepend more recent regressions. The full
+`typecheck` (`tsc --noEmit`) and actual Next.js `build:next` remain mandatory
+in Node 24 Linux/Windows CI, independently of the fast syntax/preflight gates.
+Vercel keeps its own complete TypeScript + Next.js runner and adds the fixed
+historical regression checks. Workflow files inside the archive are protected
+by the importer and must be committed separately.
+
 ## V1003 – Auto-Improvement Director (2026-11-05)
 
 - `components/visualizer/autoImprovementDirectorV1003.ts` erstellt **ausschließlich** nach
@@ -1164,7 +1176,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1003
+**Dokumentationsstand:** V1004
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

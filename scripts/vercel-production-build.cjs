@@ -35,6 +35,11 @@ try {
   }
   run('Source and lockfile preflight','scripts/v959-source-preflight.cjs');
   run('React 19 production/development parity','tests/react-act-compat-regression.cjs');
+  run('V752 negative fixture build integrity','tests/v752-build-integrity-regression.cjs');
+  run('V1004 Production Reliability 2.0','tests/v1004-production-reliability-regression.cjs');
+  run('V908 historical camera and FX CI assertions','tests/v908-live-avatar-fx-verification-regression.cjs');
+  run('V925 historical Govee Festival FX CI assertions','tests/v925-govee-festival-fx-regression.cjs');
+  run('V929 historical Govee troubleshooting CI assertions','tests/v929-govee-troubleshooting-regression.cjs');
   run('V1003 AI Auto-Improvement Director','tests/v1003-auto-improvement-regression.cjs');
   run('V1002 Concert Quality Assurance','tests/v1002-concert-quality-assurance-regression.cjs');
   run('V1002 Concert QA authenticated API','tests/v1002-concert-qa-api-regression.cjs');

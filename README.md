@@ -1,3 +1,15 @@
+## V1004 – Production Reliability 2.0 (2026-11-05)
+
+V1004 fixes current failed GitHub Actions regression checks by replacing brittle
+V908/V910/V925/V929 assumptions about the **first** prebuild command and an exact
+historic architecture version with forward-compatible assertions that still
+require the original safety checks, the V752 quick gate, and the real Node 24
+TypeScript/Next.js production build. No Govee or avatar production logic was
+weakened. Run `npm run verify:v1004:focused` for the targeted checks. The new
+V1004 workflow runs complete TypeScript and Next.js on Linux and Windows.
+The protected `.github` workflow requires a separate GitHub commit after ZIP import.
+**Do not claim production success until both CI platforms are green.**
+
 ## V1003 – AI Auto-Improvement Director (2026-11-05)
 
 Im **Live FX Deck** analysiert V1003 die aktuelle **V1002-Qualitätsdiagnose** und
