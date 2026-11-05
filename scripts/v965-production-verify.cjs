@@ -32,11 +32,16 @@ const checks=Object.fromEntries(labels.map(label=>[label,
 const buildStartMs=Date.parse(inherited?.startedAt||'');
 const artifacts=(inherited?.passed===true&&Number.isFinite(buildStartMs)&&buildStartMs>0)
  ?inspectBuild(root,buildStartMs):{passed:false,issues:['No valid V964 proof'],appPageCount:0};
-const passed=atmosphereV972.status===0&&!atmosphereV972.error&&structure.status===0&&!structure.error&&run.status===0&&!run.error&&inherited?.passed===true&&gate?.passed===true&&
+const productionPassed=atmosphereV972.status===0&&!atmosphereV972.error&&structure.status===0&&!structure.error&&run.status===0&&!run.error&&inherited?.passed===true&&gate?.passed===true&&
  Object.values(checks).every(Boolean)&&artifacts.passed;
+// ZIP imports trigger this protected workflow; browser failures must fail its existing gate.
+const browser=productionPassed
+ ?require('./playwright-production.cjs').runProductionTests({existingBuildSince:buildStartMs})
+ :{passed:false,error:'Production build gate failed; browser tests not run'};
+const passed=productionPassed&&browser.passed===true;
 fs.writeFileSync(proof,JSON.stringify({schema:'sonic-v965-production-proof-v1',
  platform:process.platform,node:process.version,startedAt,finishedAt:new Date().toISOString(),
- passed:Boolean(passed),v972AtmospherePassed:atmosphereV972.status===0&&!atmosphereV972.error,structurePassed:structure.status===0&&!structure.error,checks,artifact:{passed:artifacts.passed,appPageCount:artifacts.appPageCount,
+ passed:Boolean(passed),playwright:browser,v972AtmospherePassed:atmosphereV972.status===0&&!atmosphereV972.error,structurePassed:structure.status===0&&!structure.error,checks,artifact:{passed:artifacts.passed,appPageCount:artifacts.appPageCount,
  issues:artifacts.issues},error:passed?null:run.error?.code||'PRODUCTION_GATE_NOT_CERTIFIED'},null,2)+'\n');
 console.log('V965 '+(passed?'PASS production certified':'FAIL no production approval'));
 if(!passed)process.exitCode=1;

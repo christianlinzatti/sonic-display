@@ -3914,3 +3914,20 @@ Touch-Ziele ab 44px, Screenreader-Beschriftungen und Reduced-Motion-CSS;
 keine zusätzlichen render loops. `tests/v1001-interactive-concert-control-regression.cjs`
 und `tests/tsconfig.v1001-core.json` prüfen Planungs- und Schutzlogik.
 Der vollständige Next.js-Build braucht Node 24 und installierte Abhängigkeiten.
+
+
+## V1005 – Real production Playwright gate (2026-11-06)
+
+The protected ZIP import dispatches the existing V965 Linux/Windows workflow. Its source-side
+`scripts/v965-production-verify.cjs` now requires `scripts/playwright-production.cjs` after
+all inherited gates and fresh emitted artifacts pass. The browser runner reuses exactly that
+build, installs pinned Playwright Chromium on GitHub runners, and serves it via `next start`
+on loopback without server reuse. `config/playwright.production.cjs` runs desktop and touch
+Chromium tests in `tests/e2e/production.spec.cjs` with no application/API mocks. Any browser
+failure fails the V965 aggregate proof. Full Playwright JSON evidence is mirrored to the
+existing uploaded `reports/v959-regression-logs/*.log` artifact path. HTML, traces and screenshots
+remain local runner outputs. No protected workflow modifications are required for ZIP imports.
+The existing Vercel parity workflow also runs the browser gate after its production build
+on source pushes/PRs. This hook in `scripts/vercel-production-build.cjs` is conditional on
+`GITHUB_ACTIONS=true`, so Vercel deployments do not install browsers. Parity artifacts include
+the Playwright summary inside `vercel-production-proof.json`.

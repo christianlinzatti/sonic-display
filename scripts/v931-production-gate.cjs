@@ -11,6 +11,7 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1005 Playwright production orchestration','tests/v1005-playwright-production-regression.cjs'],
   ['V990 Living LED Wall 3.0','tests/v990-living-led-wall-regression.cjs'],
   ['V989 Volumetric Atmosphere 2.0','tests/v989-volumetric-atmosphere-regression.cjs'],
   ['V988 Holographic Stage Portal','tests/v988-holographic-stage-portal-regression.cjs'],

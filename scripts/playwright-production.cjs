@@ -1,0 +1,71 @@
+#!/usr/bin/env node
+'use strict';
+const fs = require('node:fs');
+const path = require('node:path');
+const { spawnSync } = require('node:child_process');
+const { inspectBuild } = require('./check-next-build-v964.cjs');
+const root = path.resolve(__dirname, '..');
+const directory = path.join(root, 'reports/playwright-production');
+const proofFile = path.join(directory, 'proof.json');
+const evidenceFile = path.join(root, 'reports/v959-regression-logs/playwright-production.log');
+function runProductionTests({ existingBuildSince } = {}) {
+  fs.rmSync(directory, { recursive: true, force: true });
+  fs.mkdirSync(directory, { recursive: true });
+  fs.mkdirSync(path.dirname(evidenceFile), { recursive: true });
+  fs.rmSync(evidenceFile, { force: true });
+  const proof = { schema: 'sonic-playwright-production-v1', passed: false, startedAt: new Date().toISOString(),
+    platform: process.platform, node: process.version, buildId: null, steps: [] };
+  let results = null;
+  function run(label, file, args, timeout) {
+    const started = Date.now();
+    const result = spawnSync(process.execPath, [path.join(root, file), ...args], {
+      cwd: root, shell: false, windowsHide: true, stdio: 'inherit', timeout,
+      env: { ...process.env, NODE_ENV: 'production', NEXT_TELEMETRY_DISABLED: '1', SONIC_LOW_MEMORY_BUILD: '1' },
+    });
+    proof.steps.push({ label, passed: result.status === 0 && !result.error, elapsedMs: Date.now() - started });
+    if (result.status !== 0 || result.error) throw Error(`${label} failed (${result.error?.code || result.status})`);
+  }
+  try {
+    let notBefore = existingBuildSince;
+    if (notBefore === undefined) {
+      notBefore = Date.now();
+      // Prevent a failed compilation from leaving an old BUILD_ID usable.
+      fs.rmSync(path.join(root, '.next'), { recursive: true, force: true });
+      run('Real Next.js production build', 'node_modules/next/dist/bin/next', ['build'], 30 * 60 * 1000);
+    }
+    if (!Number.isFinite(notBefore) || notBefore <= 0 || notBefore > Date.now()) throw Error('Invalid production build start');
+    const artifacts = inspectBuild(root, notBefore);
+    if (!artifacts.passed) throw Error('Missing/stale production build: ' + artifacts.issues.join('; '));
+    proof.buildId = fs.readFileSync(path.join(root, '.next/BUILD_ID'), 'utf8').trim();
+    if (process.env.GITHUB_ACTIONS === 'true') {
+      run('Install Chromium and system dependencies', 'node_modules/@playwright/test/cli.js',
+        process.platform === 'linux' ? ['install', '--with-deps', 'chromium'] : ['install', 'chromium'], 10 * 60 * 1000);
+    }
+    run('Playwright against next start', 'node_modules/@playwright/test/cli.js', ['test', '--config=config/playwright.production.cjs'], 10 * 60 * 1000);
+    results = JSON.parse(fs.readFileSync(path.join(directory, 'results.json'), 'utf8'));
+    if (results.stats.expected < 1 || results.stats.unexpected !== 0 || results.stats.skipped !== 0 || results.stats.flaky !== 0)
+      throw Error('No complete passing Playwright suite');
+    proof.passed = true;
+  } catch (error) {
+    proof.error = error.message;
+  } finally {
+    if (!results) { try { results = JSON.parse(fs.readFileSync(path.join(directory, 'results.json'), 'utf8')); } catch {} }
+    proof.stats = results?.stats || null;
+    proof.finishedAt = new Date().toISOString();
+    fs.writeFileSync(proofFile, JSON.stringify(proof, null, 2) + '\n');
+    // Existing protected workflow already uploads *.log from this directory.
+    fs.writeFileSync(evidenceFile, JSON.stringify({ proof, playwright: results }, null, 2) + '\n');
+    if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+      `\n### Playwright production (${process.platform})\n\n${proof.passed ? 'PASS' : 'FAIL'} — ${proof.stats?.expected || 0} passed, ${proof.stats?.unexpected || 0} failed.\n\nReal production build → next start → Chromium desktop + touch.\n\nDetailed results: production artifact → v959-regression-logs/playwright-production.log.\n`);
+  }
+  console.log('PLAYWRIGHT_PRODUCTION ' + (proof.passed ? 'PASS' : 'FAIL: ' + proof.error));
+  return proof;
+}
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  if (args.length && !(args.length === 2 && args[0] === '--existing-build-since')) {
+    console.error('Usage: node scripts/playwright-production.cjs [--existing-build-since <epoch-ms>]');
+    process.exitCode = 1;
+  } else if (!runProductionTests(args.length ? { existingBuildSince: Number(args[1]) } : {}).passed) process.exitCode = 1;
+}
+module.exports = { runProductionTests };

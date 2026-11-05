@@ -1,3 +1,16 @@
+## V1005 – Automatische Playwright-Tests am Produktionsbuild (2026-11-06)
+
+`SonicDisplay-V1005.zip` unter `releases/` auf `master` hochladen und committen.
+Der bestehende ZIP-Importer startet den Linux-/Windows-Produktionscheck; dieser führt nun
+nach erfolgreichem `next build` automatisch zwölf Playwright-Tests gegen `next start` aus
+(Desktop und Touch). Keine zusätzliche Workflow-Datei und keine GitHub-Secrets nötig.
+Fehlgeschlagene Browsertests lassen den Check fehlschlagen. Ergebnisse stehen in der
+GitHub-Job-Zusammenfassung und im vorhandenen Produktionsartefakt. Der vorhandene
+Vercel-Parity-Workflow führt die Tests außerdem bei Quellcode-Pushes und Pull Requests aus.
+Lokal: `npm ci --include=dev`, `npx playwright install --with-deps chromium`,
+`npm run test:e2e:production`.
+Details und Testgrenzen: [V1005 Playwright Production](changelog/V1005-PLAYWRIGHT-PRODUCTION.md).
+
 ## V1004 – Production Reliability 2.0 (2026-11-05)
 
 V1004 fixes current failed GitHub Actions regression checks by replacing brittle

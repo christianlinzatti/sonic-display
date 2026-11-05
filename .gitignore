@@ -29,3 +29,7 @@ v867-artifacts/
 
 # V974: generated TS incremental caches
 *.tsbuildinfo
+
+# Generated Playwright production evidence
+/reports/playwright-production/
+/reports/v959-regression-logs/playwright-production.log

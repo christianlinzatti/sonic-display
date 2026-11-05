@@ -11,6 +11,7 @@ const root=path.resolve(__dirname,'..');
 const proof=path.join(root,'reports','vercel-production-proof.json');
 const startedAt=new Date().toISOString();
 const results=[];
+let browser=null;
 const env={...process.env,NODE_ENV:'production',CI:'true',NEXT_TELEMETRY_DISABLED:'1',
   // Applied to the real Next.js build (and never to local dev).
   SONIC_LOW_MEMORY_BUILD:'1'};
@@ -27,7 +28,7 @@ function report(passed,error){
   fs.mkdirSync(path.dirname(proof),{recursive:true});
   fs.writeFileSync(proof,JSON.stringify({schema:'sonic-vercel-production-v1',
     startedAt,finishedAt:new Date().toISOString(),node:process.version,
-    env:process.env.VERCEL_ENV||'local-production',passed,tests:results,error},null,2)+'\n');
+    env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
   if(Number(process.versions.node.split('.')[0])!==24) {
@@ -134,6 +135,12 @@ try {
   console.log('VERCEL_PRODUCTION_GATE Memory profile: 1 worker CPU, webpack memory optimizations, no persistent webpack cache');
   run('Real Next.js production build','node_modules/next/dist/bin/next',['build'],30*60*1000);
   run('Real Next.js emitted artifact verification','scripts/check-next-build-v964.cjs',[String(buildStartedAt)]);
+  // The existing parity workflow covers source pushes/PRs beyond ZIP imports.
+  // Real Vercel deployments keep the build-only path.
+  if(process.env.GITHUB_ACTIONS==='true') {
+    browser=require('./playwright-production.cjs').runProductionTests({existingBuildSince:buildStartedAt});
+    if(!browser.passed)throw new Error('Playwright production browser gate failed');
+  }
   report(true,null);
   console.log('VERCEL_PRODUCTION_GATE PASS: full TypeScript and Next.js output built');
 } catch(error) {
