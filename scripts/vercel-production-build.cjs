@@ -1,0 +1,49 @@
+#!/usr/bin/env node
+'use strict';
+/** Small fail-closed Vercel gate: true production React environment, full TS and
+ * Next.js. The exhaustive historical prebuild remains mandatory in GitHub CI.
+ * Do NOT call npm run build here (it recursively launches 100s of legacy tests).
+ */
+const path=require('node:path');
+const fs=require('node:fs');
+const {spawnSync}=require('node:child_process');
+const root=path.resolve(__dirname,'..');
+const proof=path.join(root,'reports','vercel-production-proof.json');
+const startedAt=new Date().toISOString();
+const results=[];
+const env={...process.env,NODE_ENV:'production',CI:'true',NEXT_TELEMETRY_DISABLED:'1'};
+function run(label,relative,args=[],timeout=15*60*1000){
+  console.log('VERCEL_PRODUCTION_GATE '+label);
+  const started=Date.now();
+  const r=spawnSync(process.execPath,[path.join(root,relative),...args],{
+    cwd:root,env,stdio:'inherit',shell:false,windowsHide:true,timeout});
+  const ok=r.status===0&&!r.error;
+  results.push({label,ok,elapsedMs:Date.now()-started});
+  if(!ok)throw new Error(label+' failed, exit='+r.status+', error='+(r.error?.message||'none'));
+}
+function report(passed,error){
+  fs.mkdirSync(path.dirname(proof),{recursive:true});
+  fs.writeFileSync(proof,JSON.stringify({schema:'sonic-vercel-production-v1',
+    startedAt,finishedAt:new Date().toISOString(),node:process.version,
+    env:process.env.VERCEL_ENV||'local-production',passed,tests:results,error},null,2)+'\n');
+}
+try {
+  if(Number(process.versions.node.split('.')[0])!==24) {
+    throw new Error('Vercel must use Node 24.x; got '+process.version);
+  }
+  run('Source and lockfile preflight','scripts/v959-source-preflight.cjs');
+  run('React 19 production/development parity','tests/react-act-compat-regression.cjs');
+  run('V963 verified transition bridge','tests/v963-verified-transition-bridge-regression.cjs');
+  run('V962 narrative regression','tests/v962-concert-narrative-regression.cjs');
+  run('V961 light governor regression','tests/v961-govee-concert-governor-regression.cjs');
+  run('Vercel deployment configuration regression','tests/vercel-production-parity-regression.cjs');
+  run('V963 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v963-core.json','--noEmit']);
+  run('Full TypeScript','node_modules/typescript/bin/tsc',['--noEmit']);
+  run('Real Next.js production build','node_modules/next/dist/bin/next',['build'],30*60*1000);
+  report(true,null);
+  console.log('VERCEL_PRODUCTION_GATE PASS: full TypeScript and Next.js output built');
+} catch(error) {
+  report(false,error.message);
+  console.error('VERCEL_PRODUCTION_GATE FAIL: '+error.message);
+  process.exitCode=1;
+}

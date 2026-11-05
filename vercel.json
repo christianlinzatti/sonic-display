@@ -4,5 +4,8 @@
       "path": "/api/cron/release-push",
       "schedule": "0 8 * * *"
     }
-  ]
+  ],
+  "buildCommand": "node scripts/vercel-production-build.cjs",
+  "ignoreCommand": "node scripts/vercel-ignore-upload.cjs",
+  "installCommand": "npm ci --include=dev --no-audit --no-fund"
 }

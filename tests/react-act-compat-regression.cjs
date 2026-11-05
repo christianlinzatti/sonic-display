@@ -21,14 +21,36 @@ for (const name of tests) {
   assert.match(source, /(?:\bact\s*=\s*React\.act|\{\s*act\s*\}\s*=\s*React)/,
     `${name}: use React.act`);
 }
-// In CI node_modules is installed: verify the exported runtime function too.
-// Source-only archives can still run this static guard before npm ci.
-let runtime = 'static source check';
+// React 19 intentionally does not expose React.act in its production runtime.
+// Validate real test-mode compatibility in a separate development process and
+// validate production imports without requiring test-only APIs. This check must
+// also run during Vercel's NODE_ENV=production build.
+const {spawnSync} = require('node:child_process');
+const projectRoot = path.resolve(__dirname, '..');
+let runtime = 'static source check (dependencies not installed)';
+let installed = false;
 try {
-  const React = require('react');
-  assert.equal(typeof React.act, 'function', 'Installed React must export act');
-  runtime = 'static + runtime React.act check';
+  require.resolve('react', {paths: [projectRoot]});
+  installed = true;
 } catch (error) {
   if (error.code !== 'MODULE_NOT_FOUND') throw error;
 }
-console.log(`PASS React.act compatibility: ${tests.length} renderer-based regression suites (${runtime})`);
+if (installed) {
+  const source = [
+    'const assert=require("node:assert/strict");',
+    'const React=require("react");',
+    'assert.equal(typeof React.createElement,"function");',
+    'if(process.env.NODE_ENV==="development")',
+    '  assert.equal(typeof React.act,"function","Test runtime must export React.act");'
+  ].join('\n');
+  for (const mode of ['development', 'production']) {
+    const result = spawnSync(process.execPath, ['-e', source], {
+      cwd: projectRoot, env: {...process.env, NODE_ENV: mode},
+      encoding: 'utf8', timeout: 20000, windowsHide: true
+    });
+    assert.equal(result.status, 0,
+      'React runtime failed in '+mode+': '+(result.error?.message || result.stderr || result.stdout));
+  }
+  runtime = 'development React.act and production React import validated';
+}
+console.log('PASS React.act compatibility: '+tests.length+' renderer-based regression suites ('+runtime+')');

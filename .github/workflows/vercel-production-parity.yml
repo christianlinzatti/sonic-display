@@ -1,0 +1,48 @@
+name: Vercel Production Parity (Node 24 / React 19)
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - 'releases/*.zip'
+      - 'docs/**'
+      - 'changelog/**'
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: vercel-parity-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  vercel-production-parity:
+    name: Vercel parity / ${{ matrix.os }} / Node 24
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install Vercel-compatible dependencies including development build tools
+        run: npm ci --include=dev --no-audit --no-fund
+      - name: Simulate actual Vercel production command on Node 24
+        env:
+          NODE_ENV: production
+          VERCEL_ENV: production
+        run: node scripts/vercel-production-build.cjs
+      - name: Upload fail-closed Vercel production proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vercel-parity-${{ matrix.os }}
+          path: reports/vercel-production-proof.json
+          if-no-files-found: warn
+          retention-days: 30

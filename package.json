@@ -3,6 +3,8 @@
   "version": "0.1.0-v908",
   "private": true,
   "scripts": {
+    "test:vercel:parity": "node tests/vercel-production-parity-regression.cjs",
+    "build:vercel": "node scripts/vercel-production-build.cjs",
     "test:v853": "node tests/v853-spotify-mini-player-regression.cjs",
     "test:v853:types": "tsc --noEmit --strict --target es2022 --moduleResolution node --skipLibCheck --lib es2022,dom lib/spotify-mini-player-v853.ts",
     "test:v554": "node tests/v554-lyrics-provider-selection-regression.cjs",
@@ -1956,7 +1958,7 @@
     "verify:production:v963": "node scripts/v963-production-verify.cjs"
   },
   "engines": {
-    "node": ">=20.9.0"
+    "node": "24.x"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.6",
