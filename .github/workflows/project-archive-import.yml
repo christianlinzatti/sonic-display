@@ -98,4 +98,8 @@ jobs:
       - name: Trigger full Linux/Windows production validation
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run v965-room-wave-production.yml --ref master
+          VERSION: ${{ steps.imported.outputs.version }}
+        run: |
+          IMPORTED_REVISION="$(git rev-parse HEAD)"
+          gh workflow run v965-room-wave-production.yml --ref master \
+            -f "release=V$VERSION" -f "revision=$IMPORTED_REVISION"

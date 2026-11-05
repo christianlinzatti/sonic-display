@@ -1,11 +1,8 @@
 name: V1000 Sonic Display Immersive 1.0 production validation
+# Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:
-  push:
-    branches: [master]
-    paths:
-      - 'components/visualizer/immersiveConcertDirectorV1000.ts'
-      - 'tests/v1000-immersive-coordination-regression.cjs'
+
 permissions:
   contents: read
 jobs:

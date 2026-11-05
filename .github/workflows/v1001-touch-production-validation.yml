@@ -1,11 +1,8 @@
 name: V1001 Interactive Concert Control production validation
+# Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:
-  push:
-    branches: [master]
-    paths:
-      - 'components/visualizer/interactiveConcertControlV1001.ts'
-      - 'tests/v1001-interactive-concert-control-regression.cjs'
+
 permissions:
   contents: read
 jobs:

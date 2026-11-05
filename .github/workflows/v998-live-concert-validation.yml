@@ -1,11 +1,8 @@
 name: V998 Live AI Concert Assistant production validation
+# Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:
-  push:
-    branches: [master]
-    paths:
-      - 'app/api/ai/live-concert/**'
-      - 'tests/v998-live-ai-concert-regression.cjs'
+
 permissions:
   contents: read
 jobs:

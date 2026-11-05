@@ -1,13 +1,8 @@
 name: Vercel Production Parity (Node 24 / React 19)
+# Historical checks remain available on demand; automatic production CI is centralized.
 on:
-  push:
-    branches: [master]
-    paths-ignore:
-      - 'releases/*.zip'
-      - 'docs/**'
-      - 'changelog/**'
-  pull_request:
   workflow_dispatch:
+
 permissions:
   contents: read
 concurrency:

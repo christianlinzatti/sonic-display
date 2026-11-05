@@ -1,21 +1,8 @@
 name: V964 Peak Recovery and Vercel Production Gate
+# Historical checks remain available on demand; automatic production CI is centralized.
 on:
-  push:
-    branches: [master]
-    paths:
-      - 'lib/concertPeakRecoveryV964.ts'
-      - 'tests/v964-peak-recovery-regression.cjs'
-      - 'tests/v964-next-build-artifact-regression.cjs'
-      - 'scripts/check-next-build-v964.cjs'
-      - 'scripts/v964-production-verify.cjs'
-      - 'scripts/vercel-production-build.cjs'
-      - 'lib/ultimateConcertRoadmapV958.ts'
-      - 'components/GoveeMusicSyncV909.tsx'
-      - 'components/ConcertRoadmapStudioV958.tsx'
-      - 'scripts/v931-production-gate.cjs'
-      - 'package.json'
-  pull_request:
   workflow_dispatch:
+
 permissions:
   contents: read
 concurrency:

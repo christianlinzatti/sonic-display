@@ -1,11 +1,8 @@
 name: V1003 AI Auto Improvement Director production validation
+# Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:
-  push:
-    branches: [master]
-    paths:
-      - 'components/visualizer/autoImprovementDirectorV1003.ts'
-      - 'tests/v1003-auto-improvement-regression.cjs'
+
 permissions:
   contents: read
 jobs:

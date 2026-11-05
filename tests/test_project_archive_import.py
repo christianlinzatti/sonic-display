@@ -120,6 +120,19 @@ class ArchiveImportTest(unittest.TestCase):
         self.assertEqual(json.loads(report.read_text())['paths'],
                          ['components/retired.tsx', 'v874/retired.ts'])
 
+    def test_old_zip_preserves_production_workflow_helpers(self):
+        helpers = ['scripts/production-workflow-metadata.cjs',
+                   'tests/production-workflow-regression.cjs']
+        for name in helpers:
+            target = self.root / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text('protected workflow helper')
+        self.init_git(*helpers)
+        self.build()
+        mod.import_archive(self.root, 'SonicDisplay-V969.zip', sync_tracked=True)
+        for name in helpers:
+            self.assertEqual((self.root / name).read_text(), 'protected workflow helper')
+
     def test_dry_run_reports_without_modifying_files(self):
         (self.root / 'components').mkdir()
         (self.root / 'components/stale.ts').write_text('unchanged')

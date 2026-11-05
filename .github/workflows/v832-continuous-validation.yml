@@ -1,8 +1,8 @@
 name: V832 Continuous Technical Validation
+# Historical checks remain available on demand; automatic production CI is centralized.
 on:
-  pull_request:
-  push:
   workflow_dispatch:
+
 permissions:
   contents: read
 jobs:

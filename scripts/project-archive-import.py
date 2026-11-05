@@ -34,6 +34,8 @@ SYNC_DIRS = frozenset({
     "lib", "public", "scripts", "services", "tests", "types",
 })
 SYNC_PROTECTED = frozenset({
+    # These support the protected, version-independent production workflow.
+    "scripts/production-workflow-metadata.cjs", "tests/production-workflow-regression.cjs",
     "scripts/project-archive-import.py", "tests/test_project_archive_import.py",
     "scripts/organize-project-structure.cjs", "tests/v974-repository-cleanup-regression.cjs",
 })
