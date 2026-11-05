@@ -1,0 +1,37 @@
+name: V965 Vercel Deployment Reachability Smoke
+on:
+  deployment_status:
+  workflow_dispatch:
+    inputs:
+      deployment_url:
+        description: 'Public Sonic Display deployment URL (*.vercel.app)'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  deployed-site-smoke:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+       contains(github.event.deployment_status.environment_url, 'sonic-display') &&
+       contains(github.event.deployment_status.environment_url, '.vercel.app'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      VERCEL_DEPLOYMENT_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.deployment_url || github.event.deployment_status.environment_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Test public deployed HTML without touching authentication or Govee
+        run: node scripts/check-vercel-deployment-v965.cjs
+      - name: Save measured result, even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v965-vercel-public-reachability
+          path: reports/v965-deployment-smoke.json
+          if-no-files-found: warn
+          retention-days: 14

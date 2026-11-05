@@ -1,0 +1,64 @@
+name: V965 Verified Room Wave and Deployment Production Gate
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'lib/concertRoomWaveV965.ts'
+      - 'tests/v965-room-wave-regression.cjs'
+      - 'tests/v965-vercel-deployment-smoke-regression.cjs'
+      - 'scripts/check-vercel-deployment-v965.cjs'
+      - 'scripts/check-next-build-v964.cjs'
+      - 'scripts/v965-production-verify.cjs'
+      - 'scripts/vercel-production-build.cjs'
+      - 'lib/ultimateConcertRoadmapV958.ts'
+      - 'components/GoveeMusicSyncV909.tsx'
+      - 'components/ConcertRoadmapStudioV958.tsx'
+      - 'scripts/v931-production-gate.cjs'
+      - 'package.json'
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: sonic-v965-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  v965-production:
+    name: V965 regressions, full TypeScript and Next.js / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 95
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      SONIC_TEST_CONCURRENCY: '3'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Verify lockfile and cross-platform source names
+        run: node scripts/v959-source-preflight.cjs
+      - name: Install reproducible dependencies
+        run: npm ci --include=dev --no-audit --no-fund
+      - name: Verify complete inherited gate and actual V965 production artifacts
+        run: node scripts/v965-production-verify.cjs
+      - name: Recheck successful V964 proof and emitted Next.js output without CLI timestamp
+        run: node scripts/check-next-build-v964.cjs
+      - name: Save production evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonic-v965-${{ matrix.os }}-production
+          path: |
+            reports/v965-production-proof.json
+            reports/v964-production-proof.json
+            reports/v963-production-proof.json
+            reports/v931-production-gate.json
+            reports/v959-regression-logs/*.log
+          if-no-files-found: warn
+          retention-days: 30
