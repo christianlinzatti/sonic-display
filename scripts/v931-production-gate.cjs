@@ -11,6 +11,7 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V981 Concert Performance Intelligence 2.0','tests/v981-concert-performance-intelligence-regression.cjs'],
   ['V980 Concert Quality & Performance Director','tests/v980-concert-quality-director-regression.cjs'],
   ['V979 Intelligent Live Show Director 3.0','tests/v979-intelligent-live-show-director-regression.cjs'],
   ['V978 Smart Concert Atmosphere 2.0','tests/v978-smart-concert-atmosphere-regression.cjs'],
@@ -60,6 +61,7 @@ const regressions = [
   ['Source syntax + duplicate imports', 'tests/check-source-syntax.cjs'],
 ];
 const productionChecks = [
+  ['V981 Performance Intelligence core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v981-core.json']],
   ['V980 Concert Quality Director core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v980-core.json']],
   ['V979 Intelligent Live Show Director 3.0 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v979-core.json']],
   ['V978 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v978-core.json']],

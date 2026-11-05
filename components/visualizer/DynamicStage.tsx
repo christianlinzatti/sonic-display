@@ -32,6 +32,7 @@ import {applyCameraAwarePerformanceV834} from "./cameraAwarePerformanceV834";
 import {createFxPerfStateV825,advanceFxPerfStateV825,planFxPerformanceV825} from "./concertFxPerformanceOptimizerV825";
 import {createAutoQualityV827,advanceAutomaticQualityV827,effectiveFxPressureV827} from "./automaticConcertQualityV827";
 import {createConcertQualityDirectorV980,advanceConcertQualityDirectorV980,clearAdaptiveQualityV980,qualityPressureV980} from "./concertQualityDirectorV980";
+import {createPerformanceIntelligenceV981,analyzeConcertPerformanceV981,clearPerformanceIntelligenceV981} from "./concertPerformanceIntelligenceV981";
 import {recordBenchmarkWindowV827} from "./concertBenchmarkV827";
 import {recordRealGlbWindowV832} from "./realGlbConcertBenchmarkV832";
 import {inspectVisibleCastV830} from "./concertProductionEvidenceV830";
@@ -243,6 +244,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
   const fxPerfStateV825=useRef(createFxPerfStateV825());
   const autoQualityStateV827=useRef(createAutoQualityV827());
   const qualityDirectorStateV980=useRef(createConcertQualityDirectorV980());
+  const performanceIntelligenceV981=useRef(createPerformanceIntelligenceV981());
   const qualityTrackScopeV980=useRef({trackId:'',positionMs:NaN,epoch:0});
   const qualityMonitorV826=useRef(createConcertQualityMonitorV826());
   const qualityPublishedV826=useRef(false);
@@ -1310,7 +1312,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       trackScopeV980.positionMs=playback.positionMs;
       advanceConcertQualityDirectorV980(qualityDirectorStateV980.current,{
         snapshot,enabled:qualityEnabledV980,optimizerEnabled:concertFxV810?.perfOptimizerV825!==false,
-        // V826 outer guard already confirms telemetry is enabled; avoid TS2367.
+        // The enclosing V826 guard already proves telemetry is enabled.
         telemetryEnabled:true,
         tier,allowLowTier:concertFxV810?.concertQualityPiV980===true,
         restore:concertFxV810?.concertQualityRecoveryV980!==false,
@@ -1319,6 +1321,9 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       snapshot.qualityDirectorPressureV980=qualityEnabledV980?qualityDirectorStateV980.current.pressure:undefined;
       snapshot.qualityDirectorReasonV980=qualityEnabledV980?qualityDirectorStateV980.current.reason:undefined;
       snapshot.qualityDirectorObservationsV980=qualityEnabledV980?qualityDirectorStateV980.current.observations:undefined;
+      // V981 read-only diagnostics: completed V826 windows, same seek-safe scope as V980.
+      snapshot.performanceInsightV981=analyzeConcertPerformanceV981(performanceIntelligenceV981.current,
+        snapshot,songIdV980?`${songIdV980}:${trackScopeV980.epoch}`:'')??undefined;
       recordBenchmarkWindowV827({snapshot,count:groupCountV542,trackId:playback.trackId??'',
         liveShow:liveShowV827,targetSeconds:12});
       // V832: real scene and renderer evidence, sampled at most twice per second.
@@ -1350,6 +1355,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     }else{
       // No telemetry means no evidence for either regulator; drop cached overrides.
       clearAdaptiveQualityV980(qualityDirectorStateV980.current);
+      clearPerformanceIntelligenceV981(performanceIntelligenceV981.current);
       autoQualityStateV827.current.pressure=0;
       autoQualityStateV827.current.badWindows=0;
       autoQualityStateV827.current.goodWindows=0;

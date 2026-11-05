@@ -2008,7 +2008,9 @@
     "verify:v978:focused": "npm run test:v978 && npm run test:v978:types && npm run test:v977 && npm run test:v976 && npm run test:v975 && npm run test:v973 && npm run test:v972 && npm run check:syntax && npm run check:architecture",
     "test:v980": "node tests/v980-concert-quality-director-regression.cjs",
     "test:v980:types": "tsc -p tests/tsconfig.v980-core.json --noEmit",
-    "verify:v980:focused": "npm run test:v980 && npm run test:v980:types && npm run test:v979 && npm run test:v978 && npm run test:v977 && npm run test:v976 && npm run test:v975 && npm run check:syntax && npm run check:architecture"
+    "verify:v980:focused": "npm run test:v980 && npm run test:v980:types && npm run test:v979 && npm run test:v978 && npm run test:v977 && npm run test:v976 && npm run test:v975 && npm run check:syntax && npm run check:architecture",
+    "test:v981": "node tests/v981-concert-performance-intelligence-regression.cjs",
+    "test:v981:types": "tsc -p tests/tsconfig.v981-core.json --noEmit"
   },
   "engines": {
     "node": "24.x"
@@ -2036,6 +2038,6 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v980",
-  "sonicFeatureRelease": "v980"
+  "sonicRoadmapRelease": "v981",
+  "sonicFeatureRelease": "v981"
 }

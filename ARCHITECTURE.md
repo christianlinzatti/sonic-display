@@ -1,3 +1,14 @@
+## V981 – Read-only performance intelligence
+
+`concertPerformanceIntelligenceV981.ts` consumes only completed V826 telemetry,
+using a preallocated 12-window FPS/strain ring. It is invoked from DynamicStage
+in the pre-existing <=2 Hz publish path and scoped by the same track/seek key as
+V980. The V826 snapshot carries an optional V981 insight to the existing
+`useSyncExternalStore` quality dashboard. There is no new RAF/timer, GPU query,
+network or extra hardware sender. Reset on stop, invalid data or scope change.
+Never claim renderer counters as measured CPU/GPU utilization. No changes to
+V980 auto-quality policy or V825 output budget.
+
 ## V980 – Concert Quality & Performance Director
 
 `components/visualizer/concertQualityDirectorV980.ts` wertet nur neue, valide

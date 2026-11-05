@@ -1,3 +1,17 @@
+## V981 – Concert Performance Intelligence 2.0
+
+Read-only performance trends from the existing V826 ~0.5-second renderer measurement
+windows. The live quality dashboard displays a 12-window FPS history, a trend
+and carefully labelled suspected bottlenecks (frame spikes, renderer complexity,
+FX-budget pressure). No CPU/GPU profiling claims; no Govee/Alexa, camera or
+automatic FX changes. History resets on song/seek, pause and invalid telemetry.
+
+**GitHub upload:** `releases/SonicDisplay-V981.zip`, marker
+`sonicRoadmapRelease=v981`. V980 memory-safe Vercel build remains intact.
+Production release requires GitHub Actions full Linux+Windows build and
+successful Vercel deployment; public deployment HTTP-302 smoke is separately
+under investigation. Details: [V981 release notes](docs/versions/V981-CONCERT-PERFORMANCE-INTELLIGENCE.md).
+
 ## V980 – Concert Quality & Performance Director
 
 Optionale, messbasierte Konzertqualität mit den bestehenden V825–V827-Renderfenstern:

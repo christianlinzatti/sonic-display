@@ -3,6 +3,7 @@
  * Three renderer info counters are the previous draw when automatic reset is on.
  */
 import type {FxPerfGainsV825,FxPerfLaneV825} from './concertFxPerformanceOptimizerV825';
+import type {PerformanceInsightV981} from './concertPerformanceIntelligenceV981';
 export type ConcertQualityStatusV826='unavailable'|'paused'|'healthy'|'warning'|'critical';
 export type ConcertQualityCountsV826={crowd:number;sparks:number;shards:number;confetti:number;energyRings:number;
   foamBubbles:number;foamMist:number;kineticColumns:number;spectralWaves:number;spectralRings:number;spectralPrisms:number};
@@ -16,6 +17,7 @@ export interface ConcertQualitySampleV826{
   performanceTier:'low'|'balanced'|'high';
   autoQualityPressureV827?:number;autoQualityReasonV827?:string;
   qualityDirectorPressureV980?:number;qualityDirectorReasonV980?:string;qualityDirectorObservationsV980?:number;
+  performanceInsightV981?:PerformanceInsightV981;
   cameraAwareReasonV834?:string;cameraAwareSavingsV834?:number;cameraIntentV834?:string;
 }
 export interface ConcertQualitySnapshotV826 extends ConcertQualitySampleV826 {

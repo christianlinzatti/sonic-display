@@ -27,6 +27,14 @@ export function ConcertQualityDashboardV826({enabled=true}:{enabled?:boolean}){
    <div><strong>{p(snapshot.slowFrameShare)}</strong><small style={{display:'block'}}>Langsame Frames</small></div>
   </div>
   {typeof snapshot.qualityDirectorPressureV980==='number'&&<div role="status"><b>V980 Live Quality Director:</b> {p(snapshot.qualityDirectorPressureV980)} zusätzliche FX-Drosselung · Zustand <strong>{({off:'Aus',waiting:'Wartet auf gültige Daten',stable:'Stabil',observing:'Prüft anhaltende Last',reducing:'Reduziert Dekoration',holding:'Hält Qualitätsstufe',restoring:'Stellt schrittweise wieder her'} as Record<string,string>)[snapshot.qualityDirectorReasonV980??'waiting']}</strong> · {snapshot.qualityDirectorObservationsV980??0} gültige Messfenster. Ziel {snapshot.targetFps} FPS, Profil {snapshot.performanceTier}. Priorität: Schaum/Partikel vor Vocals/LED; manuelle Show-Cues bleiben vorrangig.</div>}
+  {snapshot.performanceInsightV981&&<fieldset style={{border:'1px solid #666',borderRadius:8,padding:9}} aria-label="V981 Performance Intelligence">
+   <legend>V981 · Performance Intelligence 2.0</legend>
+   <div><b>Ø {snapshot.performanceInsightV981.meanFps.toFixed(1)} FPS</b> über {snapshot.performanceInsightV981.examinedWindows} gültige Fenster · {snapshot.performanceInsightV981.strainedWindows} belastete der letzten vier.</div>
+   <div>Trend: <b>{({insufficient:'Noch zu wenig Daten',improving:'Verbessert sich',steady:'Stabil',degrading:'Verschlechtert sich'} as const)[snapshot.performanceInsightV981.trend]}</b></div>
+   <div>Hinweis: <b>{({insufficient:'Noch zu wenig Daten',healthy:'Keine anhaltende Last', 'frame-spikes':'Unregelmäßige Framezeiten','scene-complexity':'Hohe Szenenkomplexität','fx-budget':'FX-Budget hoch','unclassified':'Ursache unklar'} as const)[snapshot.performanceInsightV981.clue]}</b></div>
+   <div>{snapshot.performanceInsightV981.advice}</div>
+   <small>{snapshot.performanceInsightV981.disclaimer} Keine automatische Änderung an Avataren, Kameras oder Govee.</small>
+  </fieldset>}
   {typeof snapshot.qualityDirectorPressureV980!=='number'&&typeof snapshot.autoQualityPressureV827==='number'&&<div><b>V827 Auto-Tuning:</b> {p(snapshot.autoQualityPressureV827)} zusätzlicher FX-Regeldruck · {snapshot.autoQualityReasonV827??'wartet'}. V825 und manuelle Sicherheitssperren bleiben vorrangig.</div>}
   {snapshot.cameraAwareReasonV834&&<div><b>V834 Kamera-bewusstes FX-Budget:</b> {snapshot.cameraAwareReasonV834==='optimized'?`Dekorative Effekte reduziert (${snapshot.cameraIntentV834??'Kameraabsicht'}, ${snapshot.cameraAwareSavingsV834?.toFixed(2)??'0'} relative Kosten gespart)`:`${snapshot.cameraAwareReasonV834} – keine zusätzliche Reduktion`}. Nur bestätigte Kameraabsichten, keine Sichtbarkeitsmessung.</div>}
   <small>Messfenster ca. 0,5 s ({snapshot.sampleCount} Frames), Ziel {snapshot.targetFps} FPS. Framezeit ist keine GPU-Zeit. Fensterwechsel und Browser-Aufwachspitzen werden ausgeschlossen.</small>
