@@ -26,3 +26,6 @@ v867-release-dashboard.html
 v867-release-matrix.json
 v867-release-matrix.html
 v867-artifacts/
+
+# V974: local TypeScript incremental cache must never enter git
+*.tsbuildinfo
