@@ -106,7 +106,8 @@ test('fixed low-risk color steps over 10,000 concert situations',()=>{
 });
 test('no additional polling or bridge call: integration is in pre-existing Govee send loop',()=>{
  const g=read('components/GoveeMusicSyncV909.tsx');
- assert(g.includes('applyAlexaGoveeLookV970(recoveryLookV961,previous'));
+ assert(g.includes('applyAlexaGoveeLookV970(roomLookV987,previous'));
+ assert(g.includes('applyRoomAtmosphereV987(recoveryLookV961,previous'));
  assert(g.indexOf('applyAlexaGoveeLookV970(')<g.indexOf('governConcertLookV961(previous,voiceLookV970'));
  assert(g.includes("goveeBridgeRequestV909(config,'/command','POST'"));
  assert(g.includes('!config?.enabled||!config.autoSync')); 

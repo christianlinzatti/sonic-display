@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "incremental": false,
+    "noEmit": true
+  },
+  "files": [
+    "../lib/aiAtmosphereDesignerV986.ts",
+    "../lib/atmosphereTimelineV986.ts",
+    "../app/api/ai/atmosphere/route.ts",
+    "../components/visualizer/AtmosphereDesignerV986.tsx",
+    "../components/visualizer/ConcertStoryDirectorV984.tsx",
+    "../components/visualizer/SongIntelligencePanelV983.tsx",
+    "../components/visualizer/LiveFxDeckV881.tsx"
+  ]
+}

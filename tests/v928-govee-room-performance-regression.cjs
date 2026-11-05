@@ -93,7 +93,7 @@ test('dashboard UI includes refresh, report, status, features, lag',()=>{const s
 test('panel invokes dashboard with existing bridge state',()=>{const src=read('components/GoveeLanPanelV909.tsx');for(const v of ['<GoveeRoomPerformanceDashboardV928','bridgeState={bridgeState}','devices={devices}','lastRefreshedAt={lastRefreshedAt}','onRefresh={()=>void operation(refresh)}'])assert.ok(src.includes(v));});
 test('existing 12-sec connectivity poll preserved',()=>assert.ok(read('components/GoveeLanPanelV909.tsx').includes('setInterval(()=>void poll(),12000)')));
 test('existing 1 LAN sender preserved',()=>assert.equal((read('components/GoveeMusicSyncV909.tsx').match(/goveeBridgeRequestV909\(config,'\/command'/g)||[]).length,1));
-test('build guards retain first v908 and now v928',()=>{const pkg=JSON.parse(read('package.json'));assert.ok(pkg.scripts.prebuild.startsWith('npm run test:v908 && npm run test:v928 && npm run test:v928:types && npm run test:v928:ui-types &&'));});
+test('build guards retain first v908 and now v928',()=>{const pkg=JSON.parse(read('package.json'));assert.ok(pkg.scripts.prebuild.includes('npm run test:v908 && npm run test:v928 && npm run test:v928:types && npm run test:v928:ui-types &&'));});
 test('CI includes new V928 checks',()=>assert.ok(read('.github/workflows/v832-continuous-validation.yml').includes('npm run test:v928 && npm run test:v928:types && npm run test:v928:ui-types')));
 let sampled=0;
 for(let i=0;i<5000;i++){

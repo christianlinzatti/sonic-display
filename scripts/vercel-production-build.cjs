@@ -35,6 +35,10 @@ try {
   }
   run('Source and lockfile preflight','scripts/v959-source-preflight.cjs');
   run('React 19 production/development parity','tests/react-act-compat-regression.cjs');
+  run('V987 Govee Immersive Sync 2.0','tests/v987-govee-immersive-sync-regression.cjs');
+  run('V986 AI Atmosphere Designer','tests/v986-ai-atmosphere-designer-regression.cjs');
+  run('V985 Predictive Show Timeline','tests/v985-predictive-show-timeline-regression.cjs');
+  run('V984 AI concert story director','tests/v984-ai-concert-story-regression.cjs');
   run('V983 AI song intelligence','tests/v983-ai-song-intelligence-regression.cjs');
   run('V982 immersive AI director','tests/v982-immersive-ai-show-regression.cjs');
   run('V981 Concert Performance Intelligence 2.0','tests/v981-concert-performance-intelligence-regression.cjs');
@@ -65,6 +69,10 @@ try {
   run('V962 narrative regression','tests/v962-concert-narrative-regression.cjs');
   run('V961 light governor regression','tests/v961-govee-concert-governor-regression.cjs');
   run('Vercel deployment configuration regression','tests/vercel-production-parity-regression.cjs');
+  run('V987 Govee Immersive Sync 2.0 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v987-core.json','--noEmit']);
+  run('V986 AI Atmosphere Designer isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v986-core.json','--noEmit']);
+  run('V985 Predictive Show Timeline isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v985-core.json','--noEmit']);
+  run('V984 Concert Story Director isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v984-core.json','--noEmit']);
   run('V983 AI Song Intelligence isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v983-core.json','--noEmit']);
   run('V982 Immersive AI Director isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v982-core.json','--noEmit']);
   run('V981 Performance Intelligence isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v981-core.json','--noEmit']);

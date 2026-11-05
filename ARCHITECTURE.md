@@ -1,3 +1,39 @@
+## V987 – Govee Immersive Sync 2.0
+
+- Nach ausdrücklicher Freigabe aus dem V986 Atmosphere Designer kann die
+  Palette der fünf kreativen Akte auf vorhandene V909-Govee-LAN-Looks wirken.
+- Die aktuelle V604/V763-Szenentimeline muss **bestätigt**, songgebunden,
+  aktuell und synchron zur Spotify-Wiedergabe sein. Die fünf visuellen Akte
+  bleiben kreative Motive, keine behaupteten akustisch gemessenen Abschnitte.
+- Reine RGB-Farbüberblendung (max. 24 % Gewicht), Helligkeit ausschließlich
+  reduzierend (max. 10 %), RGB-Ratenbegrenzung 24 Kanalschritte je vorhandenem
+  LAN-Sendedurchlauf. Bestehende Master-/Gerätegruppen-Limits werden nie erhöht.
+- Gespeicherte V912-Shows, manuelle V354-Cues, Alexa-Govee-Befehle,
+  Geräte-Recovery, reduzierte Bewegung, Pausen und versteckte Tabs haben Vorrang.
+- Die Erlaubnis ist nur im aktuellen Tab für den aktuellen Titel im Speicher,
+  wird bei einem Trackwechsel oder beim Verlassen des Studios widerrufen und
+  verfällt nach spätestens einer Stunde. Ein Stop-Button widerruft sofort.
+- Keine zusätzlichen Govee-Netzwerkaufrufe, keine neuen Timer, keine
+  Hardware-On/Off-Befehle, keine Lichtblitze und keine KI-API-Aufrufe.
+
+
+---
+
+## V985 – Verified Predictive Show Timeline
+
+`lib/predictiveShowTimelineV985.ts` ist eine rein deterministische Brücke:
+V984-Storyboard-Energie → ausschließlich bestätigte, songgebundene V604/V763-
+Szenengrenzen → überprüfbare, begrenzte V354-Cue-Kandidaten. Die 2-Sekunden-
+Vorschau verursacht **keine** zeitliche Verschiebung und **keinen** Trigger.
+`PredictiveShowTimelineV985.tsx` liest den vorhandenen Event-Bridge-Zustand und
+speichert nur nach ausdrücklichem Checkbox-Review; V354 bleibt alleinige
+Playback-Instanz. Bestehende V354-Lanes und V764-Sicherungswege bleiben intakt.
+Keine neuen Timer, Frame-Loops, Cloud-Routen oder Hardwarebefehle. Bei fehlenden
+validierten Szenen wird nichts importiert. Details:
+`docs/versions/V985-PREDICTIVE-SHOW-TIMELINE.md`.
+
+---
+
 ## V981 – Read-only performance intelligence
 
 `concertPerformanceIntelligenceV981.ts` consumes only completed V826 telemetry,
@@ -3643,3 +3679,35 @@ Einstellungsnormalisierung erfolgen über die unveränderte V958-Speicherkennung
 Regressionen und Release-Gates: `tests/v979-intelligent-live-show-director-regression.cjs`,
 `tests/tsconfig.v979-core.json`, V931 und Vercel; ausführlicher Status unter
 `docs/versions/V979-VERIFICATION.md`.
+
+## V984 – AI Concert Story Director (Storyboard, kein Scheduler)
+
+Nach der lokalen/optionalen KI-Interpretation V983 generiert
+`lib/aiConcertStoryV984.ts` eine endliche fünfteilige Erzählkurve mit
+visuellem Leitmotiv, relativer Energie und Übergangsbeschreibungen.
+`components/visualizer/ConcertStoryDirectorV984.tsx` ist ohne neue
+Audio- oder Renderer-Schleife in `components/visualizer/SongIntelligencePanelV983.tsx`
+eingebettet. Eine Anfrage an `app/api/ai/concert-story/route.ts` ist nur per
+Klick möglich und verwendet Spotify-Session, Origin-/Rate-Limits und serverseitige
+OpenAI-Konfiguration. Unbestätigte Zeitabschnitte lösen keinerlei Effekte aus;
+nach manueller Freigabe kann lediglich die bereits abgesicherte V982-Look-Übernahme
+(`components/visualizer/LiveFxDeckV881.tsx`) ausgeführt werden. Keine Gerätebefehle,
+kein Persistieren der Entwürfe. Neue Regression:
+`tests/v984-ai-concert-story-regression.cjs`; vollständige Buildfreigabe weiterhin
+über TypeScript und Next.js erforderlich.
+
+
+## V986 – AI Atmosphere Designer (virtuelle Fünf-Akt-Lichtwelt)
+
+`lib/aiAtmosphereDesignerV986.ts` berechnet streng normalisierte fünf
+Atmosphärenakte aus der V984-Story und dem V983-Stimmungswert, offline oder
+über die authentifizierte `app/api/ai/atmosphere/route.ts`.
+`components/visualizer/AtmosphereDesignerV986.tsx` übernimmt erst nach
+Benutzerfreigabe einen begrenzten V982-Look; 5-Akt-Lichtfarben/LED/Nebel
+bleiben reine Vorschau. `lib/atmosphereTimelineV986.ts` erstellt optional
+gebundene virtuelle `lighting`-Cues bei `verified-v604`-Szenengrenzen und
+importiert sie ausschließlich konfliktfrei in V354, ohne Show-Aktivierung.
+Keine physische Lichtsteuerung, neuen Renderer oder automatisches Timing.
+Regression: `tests/v986-ai-atmosphere-designer-regression.cjs`;
+Type-Gate: `tests/tsconfig.v986-core.json`. Nach Installation vollständiger
+TypeScript- und Next.js-Produktionsbuild erforderlich.

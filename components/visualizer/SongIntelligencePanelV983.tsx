@@ -3,6 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import {localSongInsightV983,normalizeSongInsightV983,immersivePlanFromInsightV983,
  type SongInsightV983,type SongContextV983} from '@/lib/aiSongIntelligenceV983';
 import type {ImmersivePlanV982} from '@/lib/immersiveAiDirectorV982';
+import {ConcertStoryDirectorV984} from './ConcertStoryDirectorV984';
 const phaseNames={intro:'Intro',verse:'Verse',hook:'Hook',drop:'Drop-Idee',finale:'Finale'};
 const moodNames={dark:'Dunkel / cineastisch',energetic:'Energetisch',anthemic:'Arena',dreamy:'Verträumt',warm:'Warm',neutral:'Neutral'};
 export function SongIntelligencePanelV983({trackId,title,artist,genre,durationMs,onApply,canApply}: {
@@ -80,6 +81,7 @@ export function SongIntelligencePanelV983({trackId,title,artist,genre,durationMs
     }}>{applied?'Show-Look übernommen':'Virtuellen Song-Look übernehmen'}</button>
    </div>
    {!canApply&&<small>Übernahme nur mit aktivierter automatischer Show und ohne reduzierte Bewegung.</small>}
+   <ConcertStoryDirectorV984 trackId={trackId} insight={insight} durationMs={durationMs} onApply={onApply} canApply={canApply}/>
   </section>}
  </fieldset>;
 }

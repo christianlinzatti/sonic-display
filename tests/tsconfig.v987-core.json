@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {"types": ["node"], "incremental": false, "noEmit": true},
+  "files": [
+    "../lib/goveeAtmosphereSyncV987.ts",
+    "../components/GoveeMusicSyncV909.tsx",
+    "../components/visualizer/AtmosphereDesignerV986.tsx"
+  ]
+}

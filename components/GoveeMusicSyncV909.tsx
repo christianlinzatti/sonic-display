@@ -30,11 +30,13 @@ import {loadConcertRoadmapV958,CONCERT_ROADMAP_EVENT_V958,CONCERT_ROADMAP_KEY_V9
  type ConcertSettingsV958,type ConcertPhaseV958} from '@/lib/ultimateConcertRoadmapV958';
 import {previousVerifiedConcertSceneV960,applyConcertContinuityV960} from '@/lib/concertContinuityV960';
 import {governConcertLookV961} from '@/lib/goveeConcertGovernorV961';
+import {GOVEE_ROOM_ATMOSPHERE_EVENT_V987,normalizeRoomAtmosphereSessionV987,planRoomAtmosphereV987,applyRoomAtmosphereV987,type RoomAtmosphereSessionV987} from '@/lib/goveeAtmosphereSyncV987';
+import {getConcertTimelineV763} from '@/components/visualizer/concertTimelineBridgeV763';
 import {planConcertNarrativeV962,dimConcertNarrativeLookV962} from '@/lib/concertNarrativeV962';
 import {planVerifiedConcertBridgeV963,dimConcertBridgeLookV963} from '@/lib/concertBridgeV963';
 import {planConcertPeakRecoveryV964,dimConcertPeakRecoveryLookV964} from '@/lib/concertPeakRecoveryV964';
 import {planConcertRoomWaveV965,dimConcertRoomWaveLookV965} from '@/lib/concertRoomWaveV965';
-import {ALEXA_GOVEE_CUE_EVENT_V970,ALEXA_GOVEE_CONSENT_EVENT_V970,ALEXA_GOVEE_RESET_EVENT_V970,
+import {ALEXA_GOVEE_CUE_EVENT_V970,ALEXA_GOVEE_CONSENT_EVENT_V970,ALEXA_GOVEE_RESET_EVENT_V970,ALEXA_GOVEE_CUE_TTL_MS_V970,
  loadAlexaGoveeConsentV970,mayAcceptAlexaGoveeV970,applyAlexaGoveeLookV970,
  isAlexaGoveeCommandV970,type AlexaGoveeCueV970} from '@/lib/alexaGoveeV970';
 import {ALEXA_LOCAL_ENABLED_KEY_V967} from '@/lib/alexaConcertV967';
@@ -62,6 +64,21 @@ export function GoveeMusicSyncV909(){
  const [calibrationSettings,setCalibrationSettings]=useState<GoveeRoomCalibrationV927>(loadGoveeCalibrationV927);
  const [roadmapSettings,setRoadmapSettings]=useState<ConcertSettingsV958>(loadConcertRoadmapV958);
  const stageCueV921=useRef<GoveeStageCueV921|null>(null);
+ const roomAtmosphereV987=useRef<RoomAtmosphereSessionV987|null>(null);
+ useEffect(()=>{
+  const receive=(event:Event)=>{
+   const detail=(event as CustomEvent<unknown>).detail;
+   roomAtmosphereV987.current=normalizeRoomAtmosphereSessionV987(detail);
+  };
+  const revoke=()=>{const cfg=loadGoveeConfigV909();
+   if(!cfg.enabled||!cfg.autoSync||!cfg.token||!cfg.selectedIps.length)
+    roomAtmosphereV987.current=null;};
+  window.addEventListener(GOVEE_ROOM_ATMOSPHERE_EVENT_V987,receive);
+  window.addEventListener(GOVEE_CONFIG_EVENT_V909,revoke);
+  return()=>{roomAtmosphereV987.current=null;
+   window.removeEventListener(GOVEE_ROOM_ATMOSPHERE_EVENT_V987,receive);
+   window.removeEventListener(GOVEE_CONFIG_EVENT_V909,revoke);};
+ },[]);
  const alexaGoveeCueV970=useRef<AlexaGoveeCueV970|null>(null);
  useEffect(()=>{
   const receive=(event:Event)=>{
@@ -267,6 +284,9 @@ export function GoveeMusicSyncV909(){
      lastDevicesAt=Date.now();bridgeFailures=0;
     }
     const progress=state.progressMs+Math.max(0,now-(state.fetchedAt||now));
+    // A previously approved atmosphere never survives a track switch.
+    if(roomAtmosphereV987.current?.trackId!==state.track.id)
+     roomAtmosphereV987.current=null;
     const phase=resolveGoveePhaseV911(analysis.current,state.track.id,progress);
     const sectionDecision=config.directorEnabledV911?planGoveeSectionV919(analysis.current,state.track.id,progress,sectionSettings):null;
     const genreDecision=sectionDecision?planGoveeGenreV920(analysis.current,state.track.id,progress,state.genre,sectionDecision,genreSettings):null;
@@ -475,7 +495,20 @@ export function GoveeMusicSyncV909(){
        ?easeGoveeLookV911(previous,safeFallbackV934(plannedLook)):plannedLook;
       // V970: ephemeral opted-in voice overlay inside the existing LAN dispatch.
       // Never enables Govee, bypasses selected devices or introduces extra UDP sends.
-      const voiceLookV970=applyAlexaGoveeLookV970(recoveryLookV961,previous,alexaGoveeCueV970.current,config,{
+      // V987: verified V763 scenes + explicit current-tab permission only.
+      // Reuses this same V909 per-fixture send; V915/group caps stay the ceiling.
+      const roomDecisionV987=planRoomAtmosphereV987(roomAtmosphereV987.current,
+       getConcertTimelineV763(),state.track.id,state.track.durationMs,progress,Date.now(),{
+        enabled:config.enabled&&config.autoSync,playing:state.isPlaying,visible:!document.hidden,
+        savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
+        recovering:recoveringDevices.has(ip),
+        reducedMotion:Boolean(stage?.reducedMotion||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches),
+        voiceActive:Boolean(alexaGoveeCueV970.current&&loadAlexaGoveeConsentV970().enabled&&
+         now>=alexaGoveeCueV970.current.receivedAt&&
+         now-alexaGoveeCueV970.current.receivedAt<=ALEXA_GOVEE_CUE_TTL_MS_V970)});
+      const roomLookV987=applyRoomAtmosphereV987(recoveryLookV961,previous,roomDecisionV987,
+       role,config.masterBrightness);
+      const voiceLookV970=applyAlexaGoveeLookV970(roomLookV987,previous,alexaGoveeCueV970.current,config,{
        consent:loadAlexaGoveeConsentV970(),playing:state.isPlaying,visible:!document.hidden,
        savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
        recovering:recoveringDevices.has(ip),now:Date.now()});

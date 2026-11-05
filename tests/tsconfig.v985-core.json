@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "incremental": false,
+    "noEmit": true
+  },
+  "files": [
+    "../lib/predictiveShowTimelineV985.ts",
+    "../components/visualizer/PredictiveShowTimelineV985.tsx",
+    "../components/visualizer/ConcertStoryDirectorV984.tsx",
+    "../components/visualizer/SongIntelligencePanelV983.tsx",
+    "../components/visualizer/LiveFxDeckV881.tsx"
+  ]
+}

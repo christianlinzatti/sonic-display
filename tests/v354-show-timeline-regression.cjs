@@ -63,7 +63,7 @@ assert.match(stage,/evaluateTimelineV354/);assert.match(stage,/timelineCue=\{tim
 assert.match(stage,/timelineGainV354=/);assert.match(stage,/StageContentScreensV333/);
 assert.match(stage,/VisualFxCueV353|visualFxCueV353/);assert.match(stage,/compositionV354/);
 assert.match(read('components/visualizer/StageCameraDirectorV289.tsx'),/automaticShot&&timelineCue/);
-assert.match(read('components/visualizer/StageCameraDirectorV289.tsx'),/guardAutomaticCameraV351\((?:framedV809|framedV806|framedV797|framedV747|composedV633),composition\)/); // V809 is the post-composition guard, after V797/V806 and the existing protected camera chain
+assert.match(read('components/visualizer/StageCameraDirectorV289.tsx'),/guardAutomaticCameraV351\((?:framedV809|framedV806|framedV797|framedV747|composedV633|composedV620|danceCameraV898\.pose),composition\)/); // V809 is the post-composition guard, after V797/V806 and the existing protected camera chain
 assert.match(read('components/visualizer/SmartStageCameraV236.tsx'),/directCameraV354/);
 assert.match(read('components/visualizer/DynamicStage.tsx'),/timelineGainV354/);
 const editor=read('components/visualizer/ShowTimelineEditorV354.tsx');

@@ -4847,3 +4847,22 @@
 .song-intelligence-v983 button:focus-visible{outline:3px solid #a2f3db;outline-offset:2px}
 .song-intelligence-preview-v983{border-top:1px solid rgba(150,234,220,.26);margin-top:14px;padding-top:10px}
 .song-intelligence-preview-v983 ol{padding-left:23px;line-height:1.6}
+
+/* V984 – readable five-act concert storyboard; reduced-motion safe. */
+.concert-story-v984{border:1px solid rgba(184,161,253,.43);border-radius:12px;margin:18px 0 4px;padding:13px;background:linear-gradient(135deg,rgba(39,24,70,.43),rgba(16,40,63,.40));min-width:0}
+.concert-story-v984 legend{font-weight:750;color:#d5c3ff;padding:0 8px}
+.concert-story-v984 p{line-height:1.5;margin:9px 0}
+.concert-story-v984>label{display:block;font-weight:650;margin:10px 0 7px}
+.concert-story-v984 select{background:#151c31;color:#fff;border:1px solid #8978ae;border-radius:8px;padding:10px;min-height:44px;width:100%;max-width:400px;font:inherit}
+.concert-story-actions-v984{display:flex;flex-wrap:wrap;gap:8px;margin:13px 0}
+.concert-story-v984 :is(button,select):focus-visible{outline:3px solid #d5b8ff;outline-offset:2px}
+.concert-story-preview-v984{border-top:1px solid rgba(198,180,243,.36);padding-top:12px;margin-top:12px}
+.concert-story-preview-v984 h4{font-size:1.02rem;margin:4px 0 8px}
+.concert-story-acts-v984{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px;list-style:none;margin:12px 0;padding:0}
+.concert-story-acts-v984 li{border:1px solid rgba(159,144,207,.38);border-radius:10px;padding:11px;background:rgba(11,18,35,.46);min-width:0}
+.concert-story-act-heading-v984{display:flex;flex-wrap:wrap;gap:4px;justify-content:space-between;align-items:center}
+.concert-story-acts-v984 small{font-size:.81rem}
+.concert-story-energy-v984{height:6px;border-radius:8px;background:rgba(201,181,244,.17);margin:9px 0;overflow:hidden}
+.concert-story-energy-v984 i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#77cae4,#cc9dfb)}
+.concert-story-acts-v984 p{margin:8px 0;overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){.concert-story-v984 *{animation:none!important;transition:none!important}}

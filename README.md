@@ -1,3 +1,59 @@
+## V987 – Govee Immersive Sync 2.0
+
+- Nach ausdrücklicher Freigabe aus dem V986 Atmosphere Designer kann die
+  Palette der fünf kreativen Akte auf vorhandene V909-Govee-LAN-Looks wirken.
+- Die aktuelle V604/V763-Szenentimeline muss **bestätigt**, songgebunden,
+  aktuell und synchron zur Spotify-Wiedergabe sein. Die fünf visuellen Akte
+  bleiben kreative Motive, keine behaupteten akustisch gemessenen Abschnitte.
+- Reine RGB-Farbüberblendung (max. 24 % Gewicht), Helligkeit ausschließlich
+  reduzierend (max. 10 %), RGB-Ratenbegrenzung 24 Kanalschritte je vorhandenem
+  LAN-Sendedurchlauf. Bestehende Master-/Gerätegruppen-Limits werden nie erhöht.
+- Gespeicherte V912-Shows, manuelle V354-Cues, Alexa-Govee-Befehle,
+  Geräte-Recovery, reduzierte Bewegung, Pausen und versteckte Tabs haben Vorrang.
+- Die Erlaubnis ist nur im aktuellen Tab für den aktuellen Titel im Speicher,
+  wird bei einem Trackwechsel oder beim Verlassen des Studios widerrufen und
+  verfällt nach spätestens einer Stunde. Ein Stop-Button widerruft sofort.
+- Keine zusätzlichen Govee-Netzwerkaufrufe, keine neuen Timer, keine
+  Hardware-On/Off-Befehle, keine Lichtblitze und keine KI-API-Aufrufe.
+
+
+---
+
+## V986 – AI Atmosphere Designer
+
+V986 erstellt aus der V983-Songidee und V984-Konzertgeschichte **fünf kohärente
+virtuelle Atmosphärenakte** (Farbwelt, Licht, Nebel-/LED-Ideen). Wahlweise
+**lokal ohne API** oder als bewusste KI-Abfrage. Erst nach Freigabe kann ein
+bestehender virtueller V982-Look übernommen werden; auf Wunsch können
+virtuelle Licht-Cues nur an **bestätigten V604/V763-Szenengrenzen** zur V354-
+Timeline hinzugefügt werden, ohne manuelle Cues zu überschreiben.
+Reale Govee-Leuchten werden nicht angesteuert. Per-Akt-LED-/Nebelideen werden
+noch nicht automatisch live gerendert.
+
+**ZIP-Upload:** `releases/SonicDisplay-V986.zip` (`sonicRoadmapRelease=v986`).
+Tests: `npm run test:v986`, `npm run test:v986:types`.
+Vollständige TypeScript-/Next.js-Produktionsfreigabe bleibt erforderlich.
+[Dokumentation](docs/versions/V986-AI-ATMOSPHERE-DESIGNER.md).
+
+---
+
+## V985 – Predictive Show Timeline
+
+Die V984-Konzertgeschichte kann jetzt **nur auf bestätigte V604/V763-Szenen** in
+prüfbare, songgebundene Kamera-/virtuelle Licht-/Tanz-/FX-Cues für die bestehende
+V354-Timeline übertragen werden. Ein Zwei-Sekunden-Vorlauf ist nur eine
+**Vorschau**, keine vorgezogene Effektauslösung. Die Clips werden ausschließlich
+nach Auswahl und Freigabe übernommen, überlappen keine manuellen Vorgaben und
+aktivieren die Show nicht automatisch. Ohne verifizierte Quelle keine Cues.
+Keine BPM-Schätzung als Messung und keine KI-/Govee-Gerätebefehle.
+
+**ZIP-Upload:** `releases/SonicDisplay-V985.zip` (`sonicRoadmapRelease=v985`).
+Tests: `npm run test:v985`, `npm run verify:v985:focused`. Vollständiger
+TypeScript-/Next.js-Produktionsbuild bleibt Voraussetzung für die Freigabe.
+[Dokumentation](docs/versions/V985-PREDICTIVE-SHOW-TIMELINE.md).
+
+---
+
 > **V982 – AI Immersive Show Studio:** Neuer Regie-Dialog im Live FX Deck (optionale serverseitige OpenAI Responses API oder lokaler Entwurf), überprüfbarer Show-Look, manuelle Übernahme und Undo; zusätzliche sparsame 3D-Tiefenringe. Siehe [V982-Anleitung](docs/versions/V982-AI-IMMERSIVE-SHOW-STUDIO.md) und [Teststatus](docs/versions/V982-VERIFICATION.md). Vollständige GitHub-/Vercel-Produktionsfreigabe bleibt erforderlich.
 
 ## V981 – Concert Performance Intelligence 2.0
@@ -2238,3 +2294,43 @@ und `docs/versions/V979-VERIFICATION.md`.
 Im Live-FX-Deck analysiert **V983 · AI Song Intelligence** auf Wunsch ausschließlich den aktuell angezeigten Songtitel, Künstler, die Songdauer und das angezeigte Genre. Es entstehen fünf **nicht zeitlich verifizierte** Konzertideen und ein übernehmbarer virtueller Look. Es werden ausdrücklich **keine BPM, Audioaufnahmen oder Songabschnittszeiten gemessen**. Erst mit manueller Freigabe gelten die bestehenden V982-Look-Grenzen und die verifizierte Konzert-Timeline; reale Leuchten werden nicht geändert.
 
 Für Online-KI-Abfragen serverseitig `OPENAI_API_KEY` (optional `OPENAI_MODEL`) setzen; ohne Schlüssel jederzeit **Lokale Song-Idee** verwenden. `npm run test:v983` und `npm run test:v983:types`.
+
+## V984 – AI Concert Story Director
+
+Aufbauend auf der V983-Songidee plant **V984 · AI Concert Story Director** eine
+zusammenhängende Geschichte aus fünf virtuellen Akten. Die Visualisierung enthält
+Leitmotiv, Energieverlauf, Kameraperspektiven und sanfte Übergänge. Zwischen den
+Inszenierungsstilen **Filmisch**, **Festival** und **Intim** wechseln. Zwei Optionen:
+**Lokale Konzertgeschichte** (ohne Internet) und **KI-Konzertgeschichte entwerfen**
+(auf Klick; benötigt serverseitig `OPENAI_API_KEY`, optional `OPENAI_MODEL`).
+
+Nach einer Vorschau darf ein begrenzter **virtueller Bühnen-Look** übernommen werden;
+V982 kann ihn rückgängig machen. Die fünf Akte sind **kreative, zeitlich ungebundene
+Szenen**, keine aus Musik erkannten Abschnitte. Realweltbeleuchtung, gespeicherte
+Timelines und automatische Übergangsauslösung werden nicht geändert.
+
+Tests: `npm run test:v984`, `npm run test:v984:types`,
+`npm run verify:v984:focused`. Production Gate: `npm ci`, vollständiger
+TypeScript-Check und Next.js-Build über die bestehende CI/Vercel-Prüfung.
+Details: [`docs/versions/V984-AI-CONCERT-STORY-DIRECTOR.md`](docs/versions/V984-AI-CONCERT-STORY-DIRECTOR.md).
+
+
+## V986 – AI Atmosphere Designer
+
+Nach V983-Songidee und V984-Konzertgeschichte ergänzt V986 im Live-FX-Deck
+**eine zusammenhängende virtuelle Lichtwelt** für fünf Story-Akte.
+**KI-Lichtwelt gestalten** ruft auf Wunsch die OpenAI-API mit der vorhandenen
+Story und der Songstimmung auf; **Lokale Lichtwelt erstellen** funktioniert
+ohne Internet oder API-Schlüssel. Feste Farbpaletten, begrenzte virtuelle
+Licht-/Nebel-/LED-Entwürfe und ein sichtbarer Spannungsbogen werden angezeigt.
+
+Erst die **manuelle Freigabe** übernimmt über V982 den globalen virtuellen Look;
+mit bestätigter V604/V763-Timeline können zudem **virtuelle** Lichtstärke-Cues
+in V354 importiert werden, ohne bestehende Cues zu überschreiben oder die
+Show automatisch zu aktivieren. Einzelne LED-/Nebel-/Farbwechsel pro Akt sind
+noch **Gestaltungsideen**, keine live ausgeführten Änderungen. Govee-Geräte
+und andere reale Hardware werden nicht angesteuert.
+
+Details: [`V986 – AI Atmosphere Designer`](docs/versions/V986-AI-ATMOSPHERE-DESIGNER.md).
+Tests: `npm run test:v986` und `npm run test:v986:types`;
+TypeScript- und Next.js-Produktionsbuild nach `npm ci` zusätzlich in der CI.
