@@ -30,6 +30,7 @@ import {loadConcertRoadmapV958,CONCERT_ROADMAP_EVENT_V958,CONCERT_ROADMAP_KEY_V9
  type ConcertSettingsV958,type ConcertPhaseV958} from '@/lib/ultimateConcertRoadmapV958';
 import {previousVerifiedConcertSceneV960,applyConcertContinuityV960} from '@/lib/concertContinuityV960';
 import {governConcertLookV961} from '@/lib/goveeConcertGovernorV961';
+import {planConcertNarrativeV962,dimConcertNarrativeLookV962} from '@/lib/concertNarrativeV962';
 import {readTrackAnalysisV318,ANALYSIS_EVENT_V318,ANALYSIS_STORAGE_KEY_V318,
  type TrackAnalysisV318} from '@/services/musicAnalysis/trackAnalysisV318';
 /** Client-mounted on the Vercel page. Commands go only to the Raspberry Pi's localhost Bridge.
@@ -248,7 +249,7 @@ export function GoveeMusicSyncV909(){
       lyricsVisible:stage?.lyricsVisible??false,reducedMotion:stage?.reducedMotion??false,
       stageCamera:stage?.cameraShot,stageFormation:stage?.danceFormation,
       authoredStage:stage?.source==='authored'},roadmapSettings):null;
-    const priorSceneV960=roadmapScene&&roadmapSettings.transitionsV960?previousVerifiedConcertSceneV960({
+    const priorSceneV960=roadmapScene&&(roadmapSettings.transitionsV960||roadmapSettings.narrativeV962)?previousVerifiedConcertSceneV960({
       analysis:analysis.current,trackId:state.track.id,sectionIndex,
       durationMs:state.track.durationMs,genre:String(state.genre??''),
       energy:state.metrics.energyEnvelope??0,bass:state.metrics.bass??0,
@@ -258,6 +259,14 @@ export function GoveeMusicSyncV909(){
       progress-(sourceSection?.startMs??progress),roadmapSettings,{
        manualStage:stage?.source==='authored',savedShowActive:Boolean(show),
        reducedMotion:stage?.reducedMotion??false}).scene:null;
+    // V962: plan once per existing send batch. No new LAN tick, audio polling or network request.
+    const narrativeV962=continuousSceneV960?planConcertNarrativeV962(continuousSceneV960,priorSceneV960,{
+     enabled:roadmapSettings.enabled&&roadmapSettings.hardwareSync&&roadmapSettings.narrativeV962,
+     playing:state.isPlaying,elapsedMs:progress-(sourceSection?.startMs??progress),
+     sectionDurationMs:sourceSection?.durationMs??0,
+     savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
+     reducedMotion:stage?.reducedMotion??false}):null;
+    const narrativeSceneV962=narrativeV962?.scene??continuousSceneV960;
     const shared={genre:String(state.genre??''),progressMs:progress,durationMs:state.track.durationMs,
      metrics:state.metrics,microphoneActive:state.microphoneActive,config};
     for(const ip of config.selectedIps){
@@ -395,10 +404,11 @@ export function GoveeMusicSyncV909(){
       // It may dim the existing group-capped brightness, never exceed group caps.
       // Saved V912 shows and authored V354 stages are protected by hard gates.
       const role958=resolveConcertRoleV935(ip,roadmapSettings,role);
-      const mixed=continuousSceneV960?mixConcertRoomLookV937(festivalDeliveredLook,continuousSceneV960,role958,roadmapSettings,
+      const mixed=narrativeSceneV962?mixConcertRoomLookV937(festivalDeliveredLook,narrativeSceneV962,role958,roadmapSettings,
        {savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored'}):festivalDeliveredLook;
+      const narrativeLookV962=narrativeV962?dimConcertNarrativeLookV962(mixed,narrativeV962):mixed;
       const plannedLook=roadmapScene&&roadmapSettings.hardwareSync
-       ?easeGoveeLookV911(previous,{...mixed,brightness:Math.min(festivalDeliveredLook.brightness,mixed.brightness)})
+       ?easeGoveeLookV911(previous,{...narrativeLookV962,brightness:Math.min(festivalDeliveredLook.brightness,narrativeLookV962.brightness)})
        :festivalDeliveredLook;
       // V934: a lamp that just reconnected gets ONE calm, dimmed recovery look.
       // This is opt-in and never interferes with existing V912 shows or manual input.

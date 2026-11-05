@@ -2067,3 +2067,8 @@ Details: `docs/versions/V959-AUTOMATIC-PARALLEL-PRODUCTION-VALIDATION.md`.
 ## V961 – Govee Concert Light Governor
 
 Optionaler sanfter Lichtwechsel für automatisch gesteuerte Govee-LAN-Leuchten. 21 neue Testgruppen und 5.000 deterministische Szenarien; 30/30 fokussierte parallele Regressionen bestanden. Gespeicherte V912-Lichtshows, manuelle V354-Bühnencues und Wiederverbindungs-Fallback bleiben unangetastet. Vollständiger TypeScript-/Next.js-Produktionsbuild auf GitHub erforderlich (lokal nicht ausgeführt).
+
+
+## V962 – Intelligent Concert Narrative
+
+Neue optionale dramaturgische Lichtkurve für bestätigte Verse/Hook/Build/Drop/Break/Outro-Songphasen. Keine zusätzlichen LAN-Ticks und kein Überschreiben gespeicherter oder manuell erstellter Shows. Details: [V962-Dokumentation](docs/versions/V962-INTELLIGENT-CONCERT-NARRATIVE.md).

@@ -95,6 +95,8 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
     onChange={e=>save({compactFxV960:e.target.checked})}/> V960: Kompaktes 3D-FX-Profil (maximal zwei Effekte)</label>
    <label><input type="checkbox" checked={settings.lightGovernorV961} disabled={!settings.enabled||!settings.hardwareSync}
     onChange={e=>save({lightGovernorV961:e.target.checked})}/> V961: Sanfte Govee-Lichtwechsel (max. +12% Helligkeit und 40 RGB-Stufen je vorhandenem Auto-Sync-Tick)</label>
+   <label><input type="checkbox" checked={settings.narrativeV962} disabled={!settings.enabled||!settings.hardwareSync}
+    onChange={e=>save({narrativeV962:e.target.checked})}/> V962: Songdramaturgie für Govee (Verse/Hook/Build/Drop/Break/Outro – nur bestätigte Abschnitte)</label>
    <label>Einfluss {settings.strength}% <input type="range" min={0} max={100} value={settings.strength} onChange={e=>save({strength:Number(e.target.value)})}/></label>
   </div>
   {settings.hardwareSync&&<p className="settings-note" role="status">Neue Govee-Cues werden nur bei aktivem Auto-Sync und echten bestätigten Songphasen berücksichtigt. Gespeicherte Shows und manuell gesetzte Kameracues bleiben unverändert. Keine Strobe-/Power-Kommandos.</p>}
@@ -123,6 +125,8 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
     :' Keine bestätigte Songanalyse – keine Hardware-Übergänge.'}</p>
   <h4>V961 · Govee Concert Light Governor</h4>
   <p className="settings-note">Optional, nur während laufender Wiedergabe mit bestätigter V318-Songphase und eingeschalteter Govee-Konzertsteuerung. Neue 100%-Lichtspitzen werden abgefedert; Verdunkelung erfolgt sofort. V912-Lichtshows, eigene V354-Regie und die Wiederverbindung einer Lampe behalten Vorrang. Kein neuer LAN-Timer, keine zusätzliche Bridge-Abfrage, keine Power- oder Stroboskopbefehle.</p>
+  <h4>V962 · Intelligent Concert Narrative</h4>
+  <p className="settings-note">Optional: Verse bleiben fokussiert, Hooks werden voller, Builds steigern sich bis zum Drop, Breaks und Outros werden ruhiger. Bestätigte V318-Songabschnitte sind Pflicht. Die Lichtkurve darf nur dimmen und überschreibt weder V912-Lichtshows noch manuelle V354-Cues. Keine neuen LAN-Timer oder zusätzlichen Lichtkommandos.</p>
   <h4>V948 · Professional Timeline Studio</h4>
   <p className="settings-note">Zusätzliche manuelle Cues für den aktuellen Song. Keine automatische Änderung von V354 oder gespeicherten V912-Shows.</p>
   <div className="govee-v958-settings"><label>Kamera <select value={camera} onChange={e=>setCamera(e.target.value as ConcertCameraV940)}>{cameraOptions.map(v=><option key={v}>{v}</option>)}</select></label>

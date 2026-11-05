@@ -1,105 +1,95 @@
 #!/usr/bin/env node
 'use strict';
-// Keep historical documentation organized after importing full-project ZIPs.
-// Safe to rerun; never overwrite a different destination file.
+/**
+ * Preserve the clean repository layout when importing complete Sonic Display ZIPs.
+ * Run after extraction, before staging. Idempotent and deliberately conservative.
+ */
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
-const versions = path.join(root, 'docs', 'versions');
-const changelog = path.join(root, 'changelog');
-const versionName = /^V\d+[.-].+\.md$/i;
-const textName = /\.(?:md|cjs|mjs|js|jsx|ts|tsx|py|yml|yaml)$/i;
-const ignored = new Set(['.git', '.next', 'node_modules', 'coverage', 'dist', 'build']);
-const slash = value => value.split(path.sep).join('/');
-function mergeMove(src, dest) {
-  fs.mkdirSync(path.dirname(dest), {recursive: true});
-  if (fs.existsSync(dest)) {
-    if (!fs.readFileSync(src).equals(fs.readFileSync(dest))) {
-      throw new Error('Different files exist at both locations: ' + src + ' and ' + dest);
-    }
-    fs.unlinkSync(src);
+const versionsDir = path.join(root, 'docs', 'versions');
+const changelogDir = path.join(root, 'changelog');
+const versionFile = /^V\d+[.-].+\.md$/i;
+const textFile = /\.(?:md|cjs|mjs|js|jsx|ts|tsx|py|yml|yaml)$/i;
+const excludedDirs = new Set(['.git', '.next', 'node_modules', 'coverage', 'dist', 'build']);
+const readUtf8 = file => fs.readFileSync(file, 'utf8');
+const same = (a, b) => fs.readFileSync(a).equals(fs.readFileSync(b));
+const normalize = s => s.replace(/\\/g, '/');
+
+function moveChecked(source, destination) {
+  fs.mkdirSync(path.dirname(destination), { recursive: true });
+  if (fs.existsSync(destination)) {
+    if (!same(source, destination)) throw new Error(`Different files at ${source} and ${destination}; migration stopped`);
+    fs.unlinkSync(source);
   } else {
-    fs.renameSync(src, dest);
+    fs.renameSync(source, destination);
   }
 }
-function visit(dir, output) {
-  for (const entry of fs.readdirSync(dir, {withFileTypes:true})) {
-    const absolute = path.join(dir, entry.name);
-    const relative = slash(path.relative(root, absolute));
-    if (entry.isDirectory() && !ignored.has(entry.name)
-      && relative !== 'docs/versions' && relative !== 'changelog') {
-      visit(absolute, output);
-    } else if (entry.isFile() && textName.test(entry.name)) {
-      output.push(absolute);
+function allRelevantFiles(base, found = []) {
+  for (const entry of fs.readdirSync(base, { withFileTypes: true })) {
+    if (entry.isDirectory()) {
+      if (!excludedDirs.has(entry.name) && !['docs/versions', 'changelog'].includes(normalize(path.relative(root,path.join(base, entry.name))))) {
+        allRelevantFiles(path.join(base, entry.name), found);
+      }
+    } else if (entry.isFile() && textFile.test(entry.name)) {
+      found.push(path.join(base, entry.name));
     }
   }
+  return found;
 }
 function main() {
-  const rootEntries = fs.readdirSync(root, {withFileTypes:true});
-  let moved = 0;
-  for (const item of rootEntries) {
-    if (!item.isFile() || !versionName.test(item.name)) continue;
-    const toChangelog = /CHANGELOG/i.test(item.name);
-    mergeMove(path.join(root, item.name),
-      path.join(toChangelog ? changelog : versions, item.name));
-    moved++;
+  const entries = fs.readdirSync(root, { withFileTypes: true });
+  const versions = entries.filter(x => x.isFile() && versionFile.test(x.name));
+  const moved = new Set();
+  let count = 0;
+  for (const entry of versions) {
+    const name = entry.name;
+    const isChangelog = /CHANGELOG/i.test(name);
+    moveChecked(path.join(root, name), path.join(isChangelog ? changelogDir : versionsDir, name));
+    if (!isChangelog) moved.add(name);
+    count++;
   }
-  const releaseNote = 'RELEASE_NOTES_V880_HOTFIX2.md';
-  if (fs.existsSync(path.join(root, releaseNote))) {
-    mergeMove(path.join(root, releaseNote), path.join(changelog, releaseNote));
-    moved++;
+  const legacyRelease = 'RELEASE_NOTES_V880_HOTFIX2.md';
+  if (fs.existsSync(path.join(root, legacyRelease))) {
+    moveChecked(path.join(root, legacyRelease), path.join(changelogDir, legacyRelease));
+    count++;
   }
-  const known = new Set(fs.existsSync(versions)
-    ? fs.readdirSync(versions).filter(name => versionName.test(name)) : []);
-  // Rewrite only references to files which actually exist in the new archive.
-  const reference = /(?<![A-Za-z0-9_\/])(?<dot>\.\/)?(?<file>V\d+[.-][A-Za-z0-9._-]+\.md)/gi;
-  const files = [];
-  visit(root, files);
-  let rewritten = 0;
-  for (const absolute of files) {
-    const relative = slash(path.relative(root, absolute));
-    if (relative.startsWith('docs/versions/') || relative.startsWith('changelog/')) continue;
-    const previous = fs.readFileSync(absolute, 'utf8');
-    let next = previous.replace(reference, (whole, unusedDot, unusedFile, position, text, groups) => {
-      if (!known.has(groups.file)) return whole;
-      const destination = relative.endsWith('.md')
-        ? slash(path.relative(path.dirname(absolute), path.join(versions, groups.file)))
-        : 'docs/versions/' + groups.file;
-      return (groups.dot || '') + destination;
+  // Rewrite references in the remaining textual sources, README and architecture.
+  // Version markdown documents stay untouched: their relative sibling links still work.
+  const known = new Set(fs.existsSync(versionsDir) ? fs.readdirSync(versionsDir).filter(x => versionFile.test(x)) : []);
+  const ref = /(?<![A-Za-z0-9_/])(?<dot>\.\/)?(?<file>V\d+[.-][A-Za-z0-9._-]+\.md)/gi;
+  let updated = 0;
+  for (const file of allRelevantFiles(root)) {
+    const rel = normalize(path.relative(root, file));
+    if (rel.startsWith('docs/versions/') || rel.startsWith('changelog/')) continue;
+    const old = readUtf8(file);
+    let next = old.replace(ref, (whole, _prefix, _name, offset, source, groups) => {
+      const name = groups.file;
+      if (!known.has(name)) return whole;
+      const newPath = rel.endsWith('.md')
+        ? normalize(path.relative(path.dirname(file), path.join(versionsDir, name)))
+        : `docs/versions/${name}`;
+      return `${groups.dot || ''}${newPath}`;
     });
-    // Keep markdown link labels readable, only change the actual target.
-    if (relative.endsWith('.md')) {
-      next = next.replace(/\[docs\/versions\/(V\d+[.-][A-Za-z0-9._-]+\.md)\]/gi,'[$1]');
+    if (rel.endsWith('.md')) {
+      next = next.replace(/\[docs\/versions\/(V\d+[.-][A-Za-z0-9._-]+\.md)\]/gi, '[$1]');
     }
-    if (previous !== next) {
-      fs.writeFileSync(absolute, next, 'utf8');
-      rewritten++;
+    if (old !== next) { fs.writeFileSync(file, next, 'utf8'); updated++; }
+  }
+  if (fs.existsSync(versionsDir)) {
+    const index = path.join(versionsDir, 'README.md');
+    if (!fs.existsSync(index)) {
+      const sorted = fs.readdirSync(versionsDir).filter(x => versionFile.test(x)).sort((a,b) => {
+        const n = x => Number(x.match(/^V(\d+)/i)?.[1] || 0);
+        return n(b) - n(a) || a.localeCompare(b);
+      });
+      const latest = sorted.filter(x => Number(x.match(/^V(\d+)/i)?.[1]) >= 958).slice(0,15);
+      fs.writeFileSync(index, '# Versionsdokumentation\n\nHistorische Sonic-Display-Releases, Funktionsbeschreibungen und technische Verifikationen. Alle `V###-*.md`-Dateien liegen in diesem Ordner.\n\n## Neuere Versionen\n\n' + latest.map(name => `- [${name}](./${name})`).join('\n') + '\n\nDie offiziellen Changelogs liegen separat in [`changelog/`](../../changelog/README.md).\n');
     }
   }
-  const index = path.join(versions,'README.md');
-  if (!fs.existsSync(index)) {
-    fs.mkdirSync(versions,{recursive:true});
-    const latest = Array.from(known).filter(name => {
-      const match = name.match(/^V(\d+)/i);
-      return match && Number(match[1]) >= 958;
-    }).sort().reverse();
-    const lines = [
-      '# Versionsdokumentation',
-      '',
-      'Historische Sonic-Display-Releases, Funktionsbeschreibungen und Verifikationen.',
-      'Alle Versionsdokumente liegen hier. Die eigentlichen Changelogs liegen in [changelog/](../../changelog/README.md).',
-      '',
-      '## Neuere Versionen',
-      '',
-      ...latest.map(name => '- ['+name+'](./'+name+')'),
-      ''
-    ];
-    fs.writeFileSync(index,lines.join('\n'),'utf8');
-  }
-  const leftover = fs.readdirSync(root).filter(name => versionName.test(name));
-  if (leftover.length) throw new Error('Root version docs remain: '+leftover.slice(0,5).join(', '));
-  console.log('VERSION_DOCS_MIGRATION_SUCCESS: '+moved+' moved/merged, '+rewritten+
-    ' references rewritten, '+known.size+' archived version docs');
+  const remaining = fs.readdirSync(root).filter(x => versionFile.test(x));
+  if (remaining.length) throw new Error(`${remaining.length} unexpected root version docs remain: ${remaining.slice(0,5)}`);
+  console.log(`Version docs organized: ${count} moved/merged, ${updated} reference files updated, ${known.size} version docs indexed`);
 }
 if (require.main === module) main();
-module.exports = {main};
+module.exports = { main };
