@@ -11,7 +11,9 @@ const root=path.resolve(__dirname,'..');
 const proof=path.join(root,'reports','vercel-production-proof.json');
 const startedAt=new Date().toISOString();
 const results=[];
-const env={...process.env,NODE_ENV:'production',CI:'true',NEXT_TELEMETRY_DISABLED:'1'};
+const env={...process.env,NODE_ENV:'production',CI:'true',NEXT_TELEMETRY_DISABLED:'1',
+  // Applied to the real Next.js build (and never to local dev).
+  SONIC_LOW_MEMORY_BUILD:'1'};
 function run(label,relative,args=[],timeout=15*60*1000){
   console.log('VERCEL_PRODUCTION_GATE '+label);
   const started=Date.now();
@@ -78,6 +80,7 @@ try {
   run('V963 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v963-core.json','--noEmit']);
   run('Full TypeScript','node_modules/typescript/bin/tsc',['--noEmit']);
   const buildStartedAt=Date.now();
+  console.log('VERCEL_PRODUCTION_GATE Memory profile: 1 worker CPU, webpack memory optimizations, no persistent webpack cache');
   run('Real Next.js production build','node_modules/next/dist/bin/next',['build'],30*60*1000);
   run('Real Next.js emitted artifact verification','scripts/check-next-build-v964.cjs',[String(buildStartedAt)]);
   report(true,null);
