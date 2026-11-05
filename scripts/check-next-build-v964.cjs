@@ -38,8 +38,22 @@ function inspectBuild(root,notBeforeMs){
  }
  return {passed:issues.length===0,issues,appPageCount:appPages};
 }
+/** A missing explicit timestamp must be recovered from a VERIFIED V964 build proof.
+ * Fail closed on absent, failed, invalid or future proof instead of accepting old output. */
+function resolveBuildStartV964(root,explicit){
+ if(explicit!==undefined){
+  const value=Number(explicit);
+  return Number.isFinite(value)&&value>0?value:NaN;
+ }
+ try{
+  const proof=JSON.parse(fs.readFileSync(path.join(root,'reports/v964-production-proof.json'),'utf8'));
+  if(proof.schema!=='sonic-v964-production-proof-v1'||proof.passed!==true)return NaN;
+  const started=Date.parse(proof.startedAt);
+  return Number.isFinite(started)&&started>0&&started<=Date.now()+2000?started:NaN;
+ }catch{return NaN;}
+}
 if(require.main===module){
- const notBeforeMs=Number(process.argv[2]);
+ const notBeforeMs=resolveBuildStartV964(path.resolve(__dirname,'..'),process.argv[2]);
  if(!Number.isFinite(notBeforeMs)||notBeforeMs<0){
   console.error('NEXT_BUILD_ARTIFACT_V964 FAIL: invalid start timestamp');process.exitCode=1;
  }else{
@@ -49,4 +63,4 @@ if(require.main===module){
   if(!result.passed)process.exitCode=1;
  }
 }
-module.exports={inspectBuild};
+module.exports={inspectBuild,resolveBuildStartV964};
