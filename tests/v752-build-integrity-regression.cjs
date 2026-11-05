@@ -35,7 +35,9 @@ try {
   }
   const baseline = inspect();
   ok(baseline.ok, JSON.stringify(baseline.issues));
-  ok(baseline.dependencyCount === 18, '18 direct application dependencies must be covered');
+  const manifest = JSON.parse(fs.readFileSync(path.join(project, 'package.json'), 'utf8'));
+  const directPackages = Object.keys(manifest.dependencies || {}).length + Object.keys(manifest.devDependencies || {}).length;
+  ok(directPackages > 0 && baseline.dependencyCount === directPackages, 'Every declared direct application and development dependency must be covered');
   ok(inspectRelease(project, { ci: true }).ok, 'Real checkout also passes');
   mutateJson('package-lock.json', p => { p.lockfileVersion = 2; }, 'lock:format');
   mutateJson('package-lock.json', p => { p.version = '0.1.0-v751'; }, 'lock:top:version');

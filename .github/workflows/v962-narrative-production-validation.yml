@@ -1,18 +1,8 @@
 name: V962 Intelligent Concert Narrative Production Gate
+# Historical checks remain available on demand; automatic production CI is centralized.
 on:
-  push:
-    branches: [master]
-    paths:
-      - 'lib/concertNarrativeV962.ts'
-      - 'scripts/v962-production-verify.cjs'
-      - 'tests/v962-concert-narrative-regression.cjs'
-      - 'lib/ultimateConcertRoadmapV958.ts'
-      - 'components/GoveeMusicSyncV909.tsx'
-      - 'components/ConcertRoadmapStudioV958.tsx'
-      - 'scripts/v931-production-gate.cjs'
-      - 'package.json'
-  pull_request:
   workflow_dispatch:
+
 permissions:
   contents: read
 concurrency:

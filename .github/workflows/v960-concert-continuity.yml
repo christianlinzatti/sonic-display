@@ -1,8 +1,8 @@
 name: V960 Concert Continuity Production Gate
+# Historical checks remain available on demand; automatic production CI is centralized.
 on:
-  push:
-  pull_request:
   workflow_dispatch:
+
 permissions:
   contents: read
 concurrency:

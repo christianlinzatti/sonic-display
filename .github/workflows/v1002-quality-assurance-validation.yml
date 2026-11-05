@@ -1,11 +1,8 @@
 name: V1002 Concert Quality Assurance production validation
+# Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:
-  push:
-    branches: [master]
-    paths:
-      - 'app/api/ai/concert-qa/route.ts'
-      - 'tests/v1002-concert-quality-assurance-regression.cjs'
+
 permissions:
   contents: read
 jobs:

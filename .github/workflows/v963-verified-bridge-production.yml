@@ -1,18 +1,8 @@
 name: V963 Verified Concert Transition Bridge Production Gate
+# Historical checks remain available on demand; automatic production CI is centralized.
 on:
-  push:
-    branches: [master]
-    paths:
-      - 'lib/concertBridgeV963.ts'
-      - 'tests/v963-verified-transition-bridge-regression.cjs'
-      - 'scripts/v963-production-verify.cjs'
-      - 'lib/ultimateConcertRoadmapV958.ts'
-      - 'components/GoveeMusicSyncV909.tsx'
-      - 'components/ConcertRoadmapStudioV958.tsx'
-      - 'scripts/v931-production-gate.cjs'
-      - 'package.json'
-  pull_request:
   workflow_dispatch:
+
 permissions:
   contents: read
 concurrency:

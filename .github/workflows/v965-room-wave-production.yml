@@ -1,30 +1,60 @@
-name: V965 Verified Room Wave and Deployment Production Gate
+# Keep the filename stable: older ZIP importers already dispatch this entry point.
+name: Sonic Display · Production & Playwright
+run-name: Sonic Display · ${{ inputs.release || github.event_name }} · Production & Playwright
 on:
   push:
     branches: [master]
-    paths:
-      - 'lib/concertRoomWaveV965.ts'
-      - 'tests/v965-room-wave-regression.cjs'
-      - 'tests/v965-vercel-deployment-smoke-regression.cjs'
-      - 'scripts/check-vercel-deployment-v965.cjs'
-      - 'scripts/check-next-build-v964.cjs'
-      - 'scripts/v965-production-verify.cjs'
-      - 'scripts/vercel-production-build.cjs'
-      - 'lib/ultimateConcertRoadmapV958.ts'
-      - 'components/GoveeMusicSyncV909.tsx'
-      - 'components/ConcertRoadmapStudioV958.tsx'
-      - 'scripts/v931-production-gate.cjs'
-      - 'package.json'
+    paths-ignore:
+      - 'releases/**'
+      - 'docs/**'
+      - 'changelog/**'
+      - '**/*.md'
   pull_request:
+    paths-ignore:
+      - 'releases/**'
+      - 'docs/**'
+      - 'changelog/**'
+      - '**/*.md'
   workflow_dispatch:
+    inputs:
+      release:
+        description: 'Optional expected release, e.g. V1005 (checked against package.json)'
+        required: false
+        type: string
+      revision:
+        description: 'Optional exact imported commit SHA (40 characters)'
+        required: false
+        type: string
 permissions:
   contents: read
 concurrency:
-  group: sonic-v965-${{ github.ref }}
+  group: sonic-production-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
+  release:
+    name: Resolve release and exact source revision
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      release: ${{ steps.metadata.outputs.release }}
+      revision: ${{ steps.metadata.outputs.revision }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.revision || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Read version from checked-out package and verify import metadata
+        id: metadata
+        env:
+          EXPECTED_RELEASE: ${{ inputs.release }}
+          EXPECTED_REVISION: ${{ inputs.revision }}
+        run: node scripts/production-workflow-metadata.cjs
   v965-production:
-    name: V965 regressions, full TypeScript and Next.js / ${{ matrix.os }}
+    needs: release
+    name: ${{ needs.release.outputs.release }} · Production & Playwright · ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 95
     strategy:
@@ -37,6 +67,9 @@ jobs:
       SONIC_TEST_CONCURRENCY: '3'
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release.outputs.revision }}
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -45,20 +78,67 @@ jobs:
         run: node scripts/v959-source-preflight.cjs
       - name: Install reproducible dependencies
         run: npm ci --include=dev --no-audit --no-fund
-      - name: Verify complete inherited gate and actual V965 production artifacts
+      - name: Verify workflow routing and release metadata
+        run: node tests/production-workflow-regression.cjs
+      - name: Release reliability regressions
+        run: npm run verify:v1004:focused
+      - name: V1003 Auto Improvement Director (regression and isolated type checks)
+        run: npm run test:v1003 && npm run test:v1003:types
+      - name: V1002 Concert Quality Assurance (regression and isolated type checks)
+        run: npm run test:v1002 && npm run test:v1002:api && npm run test:v1002:types
+      - name: V1001 Interactive Concert Control (regression and isolated type checks)
+        run: npm run test:v1001 && npm run test:v1001:types
+      - name: V1000 Immersive Concert Director (regression and isolated type checks)
+        run: npm run test:v1000 && npm run test:v1000:types
+      - name: V999 Intelligent Performance Governor (regression and isolated type checks)
+        run: npm run test:v999 && npm run test:v999:types
+      - name: V997 Continuous Concert Flow (regression and isolated type checks)
+        run: npm run test:v997 && npm run test:v997:types
+      - name: V996 Virtual Crowd Experience (regression and isolated type checks)
+        run: npm run test:v996 && npm run test:v996:types
+      - name: V995 Duet & Ensemble 3.0 (regression and isolated type checks)
+        run: npm run test:v995 && npm run test:v995:types
+      - name: V994 Vocal Performance Intelligence (regression and isolated type checks)
+        run: npm run test:v994 && npm run test:v994:types
+      - name: V993 AI Choreography Director (regression and isolated type checks)
+        run: npm run test:v993 && npm run test:v993:types
+      - name: V992 Cinematic Camera Director (regression and isolated type checks)
+        run: npm run test:v992 && npm run test:v992:types
+      - name: V991 Bass Impact Physics (regression and isolated type checks)
+        run: npm run test:v991 && npm run test:v991:types
+      - name: V987 Govee Immersive Sync 2.0 (regression and isolated type checks)
+        run: npm run test:v987 && npm run test:v987:types
+      - name: V986 AI Atmosphere Designer (regression and isolated type checks)
+        run: npm run test:v986 && npm run test:v986:types
+      - name: V985 Predictive Show Timeline (regression and isolated type checks)
+        run: npm run test:v985 && npm run test:v985:types
+      - name: V984 AI Concert Story Director (regression and isolated type checks)
+        run: npm run test:v984 && npm run test:v984:types
+      - name: V983 AI Song Intelligence (regression and isolated type checks)
+        run: npm run test:v983 && npm run test:v983:types
+      - name: V982 Immersive AI Show (regression and isolated type checks)
+        run: npm run test:v982 && npm run test:v982:types
+      - name: V998 Live AI Concert Assistant (regression and isolated type checks)
+        run: npm run test:v998 && npm run test:v998:types
+      - name: V990 Living LED Wall 3.0 (regression and isolated type checks)
+        run: npm run test:v990 && npm run test:v990:types
+      - name: V989 Volumetric Atmosphere 2.0 (regression and isolated type checks)
+        run: npm run test:v989 && npm run test:v989:types
+      - name: V988 Holographic Stage Portal (regression and isolated type checks)
+        run: npm run test:v988 && npm run test:v988:types
+      - name: Regressions, full TypeScript, production build and Playwright
         run: node scripts/v965-production-verify.cjs
-      - name: Recheck successful V964 proof and emitted Next.js output without CLI timestamp
+      - name: Verify emitted production artifacts
         run: node scripts/check-next-build-v964.cjs
-      - name: Save production evidence, including failures
+      - name: Save production and browser evidence, including failures
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sonic-v965-${{ matrix.os }}-production
+          name: sonic-${{ needs.release.outputs.release }}-${{ matrix.os }}-production
           path: |
-            reports/v965-production-proof.json
-            reports/v964-production-proof.json
-            reports/v963-production-proof.json
+            reports/*production-proof.json
             reports/v931-production-gate.json
             reports/v959-regression-logs/*.log
+            reports/playwright-production/
           if-no-files-found: warn
           retention-days: 30

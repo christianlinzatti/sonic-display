@@ -1,11 +1,8 @@
 name: V999 Intelligent Performance Governor production validation
+# Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:
-  push:
-    branches: [master]
-    paths:
-      - 'components/visualizer/intelligentPerformanceGovernorV999.ts'
-      - 'tests/v999-performance-governor-regression.cjs'
+
 permissions:
   contents: read
 jobs:

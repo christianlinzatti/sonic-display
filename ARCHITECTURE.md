@@ -1176,7 +1176,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1004
+**Dokumentationsstand:** V1005
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -3931,3 +3931,16 @@ The existing Vercel parity workflow also runs the browser gate after its product
 on source pushes/PRs. This hook in `scripts/vercel-production-build.cjs` is conditional on
 `GITHUB_ACTIONS=true`, so Vercel deployments do not install browsers. Parity artifacts include
 the Playwright summary inside `vercel-production-proof.json`.
+
+
+### Unified production workflow and release naming
+
+The protected `v965-room-wave-production.yml` entry point has the stable display name
+Sonic Display · Production & Playwright. Its import dispatch carries the release and exact
+commit; `scripts/production-workflow-metadata.cjs` validates both against checked-out sources.
+Platform jobs and artifacts resolve the package version automatically. Legacy production
+workflows run only on manual request; scheduled history and deployment smoke remain separate.
+The central matrix retains recent feature regressions, full TypeScript/Next.js and actual
+Playwright execution, and uploads browser HTML/JSON plus failure traces/screenshots.
+`tests/production-workflow-regression.cjs` checks workflow routing, metadata and artifact paths.
+See `docs/setup/PRODUCTION_WORKFLOW.md` for operation and naming details.

@@ -1,3 +1,12 @@
+## Automatische Produktionsprüfung
+
+Nach dem Import startet **Sonic Display · Production & Playwright** genau eine
+Linux-/Windows-Matrix. Der Lauf erhält automatisch die importierte Version, z. B.
+**Sonic Display · V1005 · Production & Playwright**, und prüft den zugehörigen Commit.
+Alte versionsspezifische Produktions-Workflows sind weiterhin manuell verfügbar.
+HTML-Berichte und Fehler-Screenshots/Traces gehören jetzt zu den Produktionsartefakten.
+Details: [Produktionsworkflow](../docs/setup/PRODUCTION_WORKFLOW.md).
+
 # Sonic Display – versionsunabhängiger ZIP-Import
 
 Lade eine vollständige ZIP-Datei unter **`releases/SonicDisplay-V<Nummer>.zip`** auf `master` hoch (z. B. `SonicDisplay-V969.zip` oder `SonicDisplay-V970.zip`) und bestätige **Commit changes**.

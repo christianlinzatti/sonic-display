@@ -1,10 +1,8 @@
 name: V964 Import Complete Project ZIP
+# Historical checks remain available on demand; automatic production CI is centralized.
 on:
-  push:
-    branches: [master]
-    paths:
-      - 'releases/SonicDisplay-V964.zip'
   workflow_dispatch:
+
 permissions:
   contents: write
   actions: write
