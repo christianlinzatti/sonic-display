@@ -1,0 +1,64 @@
+name: V963 Verified Concert Transition Bridge Production Gate
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'lib/concertBridgeV963.ts'
+      - 'tests/v963-verified-transition-bridge-regression.cjs'
+      - 'scripts/v963-production-verify.cjs'
+      - 'lib/ultimateConcertRoadmapV958.ts'
+      - 'components/GoveeMusicSyncV909.tsx'
+      - 'components/ConcertRoadmapStudioV958.tsx'
+      - 'scripts/v931-production-gate.cjs'
+      - 'package.json'
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: sonic-v963-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  v963-production-gate:
+    name: V963 TypeScript + Next.js and regressions / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 95
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      SONIC_TEST_CONCURRENCY: '3'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Verify project sources and lockfile
+        run: node scripts/v959-source-preflight.cjs
+      - name: Install reproducible dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Run V963 verified bridge, inherited regressions, full TypeScript and Next.js build
+        run: node scripts/v963-production-verify.cjs
+      - name: Finalize existing V959 evidence even on failure
+        if: always()
+        run: node scripts/v959-ci-finalize.cjs
+      - name: Archive full production evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonic-v963-${{ matrix.os }}-production-evidence
+          path: |
+            reports/v963-production-proof.json
+            reports/v962-production-proof.json
+            reports/v961-production-proof.json
+            reports/v960-production-proof.json
+            reports/v959-build-proof.json
+            reports/v959-build-summary.md
+            reports/v931-production-gate.json
+            reports/v959-regression-logs/*.log
+          if-no-files-found: warn
+          retention-days: 30
