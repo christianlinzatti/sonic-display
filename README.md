@@ -1,3 +1,25 @@
+## V975 – Adaptive Concert Energy Director
+
+Opt-in für eine genre- und abschnittssensible virtuelle Konzert-Energiekurve im Ultimate Concert Experience Studio. Details: [V975 Dokumentation](docs/versions/V975-ADAPTIVE-CONCERT-ENERGY-DIRECTOR.md). Govee, Alexa und die bestehenden Windows-/Raspberry-Pi-Bridges bleiben erhalten.
+
+# Sonic Display V973 – Living Audience 3.0
+
+V973 erweitert die **bereits bestehende, instanzierte V815/V874–V893-Publikumsdarstellung** um unterschiedliche Kopf-, Körper- und Armbewegungen je Person, eine räumlich fortlaufende Sektor-Welle sowie separate Stimmungen für Verse, Hooks, Builds, Drops und Finales. Die Konzertregie bestimmt weiterhin ausschließlich anhand verifizierter Musikabschnitte, welche Reaktionen stattfinden.
+
+**Performance:** Eco bis 24 Personen (Raspberry Pi), Balanced bis 48, Cinematic bis 72; die zulässige V815/V825-Personenzahl wird nie erhöht. Es gibt keine zusätzlichen Meshes, Renderloops oder Govee-/Alexa-Kommandos. Die visuellen Effekte unterliegen weiterhin Pause, manueller Licht-/Kameraregie, Blackout, Lyrics-Schutz und reduzierter Bewegung. Alle Einstellungen unter *Concert FX Studio → V973 Living Audience 3.0*.
+
+**GitHub-Upload:** `releases/SonicDisplay-V973.zip` mit `sonicRoadmapRelease=v973`. Die Windows-/Raspberry-Pi-Govee-Bridge und der V971-Alexa-Skill bleiben enthalten. Der vollständige TypeScript-Check und der Next.js-Produktionsbuild müssen im Node-24-CI-Workflow bestätigt werden. Dokumentation: `docs/versions/V973-LIVING-AUDIENCE-3.md`.
+
+---
+
+# Sonic Display V972 – Volumetric Stage Atmosphere
+
+V972 ergänzt in der bestehenden 3D-Bühne **weiche gestaffelte Lichtvolumen**, **ruhigen Hintergrunddunst** und **dezenten Bodennebel**. Als Performance-Profile stehen Eco (Raspberry Pi), Balanced und Cinematic zur Verfügung. Die Funktion ist **opt-in**, wird nur bei bereits freigegebener V966-Immersion und bestätigten V318-Songabschnitten dargestellt und benötigt keine neue Render-Schleife, kein Hardware-Interface und keine zusätzlichen Lichter.
+
+**GitHub-Upload:** `releases/SonicDisplay-V972.zip` mit `sonicRoadmapRelease=v972`. Die bestehende V971-Alexa- und Govee-LAN-Bridge bleiben enthalten. Der Produktionsbuild ist erst nach erfolgreichem TypeScript-Check, Next.js-Build und späterem Hardwaretest freigegeben. Details: `docs/versions/V972-VOLUMETRIC-STAGE-ATMOSPHERE.md`.
+
+---
+
 ## V971 – Windows- und Raspberry-Pi-Govee-LAN-Bridge & Alexa Setup Center
 
 Das V971-Einrichtungscenter unterstützt **Windows und Raspberry Pi OS (64-bit)**. Eigenständige Bridge-Pakete mit lokalen Start-, Diagnose- und Token-Skripten liegen unter `integrations/govee-bridge-windows/` und `integrations/govee-bridge-raspberry-pi/`. Für bereits eingerichtete V910-Kiosks keine zweite Bridge am selben Port starten. Alle Integrationen bleiben opt-in; siehe `docs/versions/V971-INTEGRATION-SETUP-CENTER.md`.

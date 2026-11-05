@@ -1,3 +1,13 @@
+## V973 – Living Audience 3.0
+
+- `components/visualizer/livingAudienceDirectorV973.ts`: rein deterministischer Musik-/Sektor-Planer; nur aktive, verifizierte V810- und bestehende V815/V825/V893-Cues, kein weiterer Sound- oder Datenanbieter.
+- `DynamicStage.tsx`: letzter Publikumsdurchlauf **nach** V880 und V893, mit manuellen Regie-/Lyrics-/Blackout-/Qualitätsgrenzen.
+- `VirtualConcertCrowdV815.tsx` und `IntelligentAudienceArmsV874.tsx`: aktualisieren dieselben instanzierten Körper/Köpfe/Arme mit bereits vorhandener 20-Hz-Obergrenze. Scratch-Daten sind pro Komponente wiederverwendet.
+- `ConcertFxStudioPanelV810.tsx`: Regler für individuelle Bewegung, Reihenwellen, Intensität und Obergrenze 24/48/72. `concertFxStudioV810.ts`: persistierte, normalisierte Konfiguration.
+- Keine zusätzlichen Draw Calls, keine neue Render-Schleife, keine Hardwaresteuerung; `tests/v973-living-audience-regression.cjs`, `tests/tsconfig.v973-core.json` und die produktiven GitHub-/Vercel-Gates prüfen die Funktion.
+
+---
+
 # V968 – Alexa Concert Commands 2.0
 
 Die virtuelle Konzertregie lässt sich jetzt pro Bühnenbereich (Bühne / LED-Wand / Publikum),

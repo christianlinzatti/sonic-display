@@ -113,6 +113,29 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
    <label>V966 Immersion: {settings.immersiveStrengthV966}% <input type="range" min={0} max={100} step={5}
     value={settings.immersiveStrengthV966} disabled={!settings.enabled||!settings.virtualFx||!settings.immersiveV966}
     onChange={e=>save({immersiveStrengthV966:Number(e.target.value)})}/></label>
+   <label><input type="checkbox" checked={settings.energyArcV975} disabled={!settings.enabled||!settings.virtualFx}
+    onChange={e=>save({energyArcV975:e.target.checked})}/> V975: Adaptive Konzert-Energiekurve (nur virtuelle Bühne und bestätigte Songabschnitte)</label>
+   <label>V975 · Dynamik <select value={settings.energyArcModeV975} disabled={!settings.energyArcV975||!settings.enabled||!settings.virtualFx}
+    onChange={e=>save({energyArcModeV975:e.target.value as ConcertSettingsV958['energyArcModeV975']})}>
+    <option value="subtle">Dezent</option><option value="balanced">Ausgewogen</option><option value="cinematic">Filmisch</option>
+   </select></label>
+   <label>V975 · Intensität {settings.energyArcStrengthV975}% <input type="range" min={0} max={100} step={5}
+    disabled={!settings.energyArcV975||!settings.enabled||!settings.virtualFx}
+    value={settings.energyArcStrengthV975} onChange={e=>save({energyArcStrengthV975:Number(e.target.value)})}/></label>
+   <label><input type="checkbox" checked={settings.volumetricV972}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.immersiveV966}
+    onChange={e=>save({volumetricV972:e.target.checked})}/>
+    V972: Weiche Lichtvolumen, Tiefendunst und Bodennebel (nur virtuell, keine Lichtblitze)</label>
+   <label>V972 Atmosphärenstärke: {settings.volumetricStrengthV972}% <input type="range" min={0} max={100} step={5}
+    value={settings.volumetricStrengthV972} disabled={!settings.enabled||!settings.virtualFx||!settings.immersiveV966||!settings.volumetricV972}
+    onChange={e=>save({volumetricStrengthV972:Number(e.target.value)})}/></label>
+   <label>V972 Performance-Profil <select aria-label="Volumetrische Atmosphäre Profil" value={settings.volumetricQualityV972}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.immersiveV966||!settings.volumetricV972}
+    onChange={e=>save({volumetricQualityV972:e.target.value as ConcertSettingsV958['volumetricQualityV972']})}>
+    <option value="eco">Eco – Raspberry Pi / 4 Ebenen</option>
+    <option value="balanced">Balanced – 7 Ebenen</option>
+    <option value="cinematic">Cinematic – 10 Ebenen</option>
+   </select></label>
    <label>Einfluss {settings.strength}% <input type="range" min={0} max={100} value={settings.strength} onChange={e=>save({strength:Number(e.target.value)})}/></label>
   </div>
   {settings.hardwareSync&&<p className="settings-note" role="status">Neue Govee-Cues werden nur bei aktivem Auto-Sync und echten bestätigten Songphasen berücksichtigt. Gespeicherte Shows und manuell gesetzte Kameracues bleiben unverändert. Keine Strobe-/Power-Kommandos.</p>}
@@ -140,6 +163,8 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
    {continuity?.repeated??0} aufeinanderfolgende Kamera-/Formation-Wiederholungen.
    {realQuality?.available?` Importierte Songabschnitte: ${concertContinuityAuditV960(realQuality.scenes).phaseChanges} bestätigte Phasenwechsel.`
     :' Keine bestätigte Songanalyse – keine Hardware-Übergänge.'}</p>
+  <h4>V975 · Adaptive Concert Energy Director</h4>
+  <p className="settings-note">Opt-in: Gestaffelte Energie für Verse, Hooks, Build, Drop und Ruhephasen. Die Einstellungen beeinflussen nur die virtuelle Bühne, wenn echte V318-Songabschnitte bestätigt wurden. Kein zusätzlicher Timer, keine Govee-Lichtkommandos oder neuen Effekte. Im Raspberry-Pi-/Bewegungsreduktionsmodus deaktiviert.</p>
   <h4>V961 · Govee Concert Light Governor</h4>
   <p className="settings-note">Optional, nur während laufender Wiedergabe mit bestätigter V318-Songphase und eingeschalteter Govee-Konzertsteuerung. Neue 100%-Lichtspitzen werden abgefedert; Verdunkelung erfolgt sofort. V912-Lichtshows, eigene V354-Regie und die Wiederverbindung einer Lampe behalten Vorrang. Kein neuer LAN-Timer, keine zusätzliche Bridge-Abfrage, keine Power- oder Stroboskopbefehle.</p>
   <h4>V962 · Intelligent Concert Narrative</h4>

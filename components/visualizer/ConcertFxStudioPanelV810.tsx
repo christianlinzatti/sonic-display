@@ -19,6 +19,7 @@ import {planDynamicFestivalCrowdChoreographyV876} from './dynamicFestivalCrowdCh
 import {planIntelligentCrowdInteractionV877} from './intelligentCrowdInteractionV877';
 import {planSmartAudienceEmotionV878} from './smartAudienceEmotionDirectorV878';
 import {planCrowdCameraStageHarmonyV879} from './crowdCameraStageHarmonyV879';
+import {planLivingAudienceV973} from './livingAudienceDirectorV973';
 import {planSmartConcertExperienceV880} from './smartConcertExperienceV880';
 import {planReactiveParticlesV816} from './reactiveParticlePlannerV816';
 import {planFoamCannonV817} from './foamCannonPlannerV817';
@@ -87,6 +88,10 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
    lyricsVisible:true,lyricsProtected:false,vocalFocus:true,performerVerified:true,
    groupCount:2,transitionActive:true,transitionProximity:.7,playing:true,
    blackout:false,manualLighting:false,reducedMotion:false,tier:'high'});
+ const livingPreviewV973=planLivingAudienceV973({base:harmonyPreviewV879,fx:preview,settings:s,
+   positionMs:5000,playing:true,manualLighting:false,manualCamera:false,blackout:false,
+   reducedMotion:false,lyricsProtected:false,vocalFocus:false,groupCount:2,
+   energy:.86,kick:.92,tier:'high'});
  const concertPreviewV880=planSmartConcertExperienceV880({
    settings:s,fx:preview,previous:null,trackId:'preview',positionMs:5000,durationMs:10000,
    energy:.86,kick:.92,cameraVerified:true,cameraIntent:'wide',manualCamera:false,
@@ -545,6 +550,36 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
   <label>V815 · Publikumsreaktion ({s.crowdIntensity} %)<input type="range" min="0" max="100" step="5" disabled={!s.virtualCrowd} value={s.crowdIntensity} onChange={e=>patch({crowdIntensity:+e.target.value})}/></label>
   <label>V815 · Publikumsdichte<select value={s.crowdDensity} disabled={!s.virtualCrowd} onChange={e=>patch({crowdDensity:e.target.value as ConcertFxSettingsV810['crowdDensity']})}>
    <option value="sparse">Klein – 40 %</option><option value="balanced">Mittel – 70 %</option><option value="arena">Arena – 100 %</option></select></label>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+    <legend>V973 · Living Audience 3.0</legend>
+    <label className="setting-check"><input type="checkbox" checked={s.livingAudienceV973}
+      disabled={!s.virtualCrowd} onChange={e=>patch({livingAudienceV973:e.target.checked})}/>
+      Lebendiges Publikum – individuelle Bewegungen je Songabschnitt</label>
+    <label className="setting-check"><input type="checkbox" checked={s.livingWavesV973}
+      disabled={!s.virtualCrowd||!s.livingAudienceV973}
+      onChange={e=>patch({livingWavesV973:e.target.checked})}/>
+      Räumliche Publikumswellen über die sechs bestehenden Sektoren</label>
+    <label className="setting-check"><input type="checkbox" checked={s.livingIndividualV973}
+      disabled={!s.virtualCrowd||!s.livingAudienceV973}
+      onChange={e=>patch({livingIndividualV973:e.target.checked})}/>
+      Leichte individuelle Kopf-, Arm- und Körperbewegungen</label>
+    <label>Bewegungsintensität ({s.livingStrengthV973} %)
+      <input type="range" min="0" max="100" step="5" value={s.livingStrengthV973}
+        disabled={!s.virtualCrowd||!s.livingAudienceV973}
+        onChange={e=>patch({livingStrengthV973:+e.target.value})}/></label>
+    <label>Publikumsbudget <select value={s.livingQualityV973}
+      disabled={!s.virtualCrowd||!s.livingAudienceV973}
+      onChange={e=>patch({livingQualityV973:e.target.value as ConcertFxSettingsV810['livingQualityV973']})}>
+      <option value="eco">Eco · maximal 24 Personen (Raspberry Pi)</option>
+      <option value="balanced">Balanced · maximal 48 Personen</option>
+      <option value="cinematic">Cinematic · maximal 72 Personen</option>
+    </select></label>
+    <small>Simulierte Vorschau: {livingPreviewV973.livingActiveV973?
+      `${livingPreviewV973.livingModeV973} · ${Math.round(livingPreviewV973.livingStrengthV973*100)} % · ${livingPreviewV973.count} Personen`:'deaktiviert'}.
+      Wirkt nur auf bereits freigegebenes V815-Publikum. Manuelle Kameras/Lichtspuren, Blackout,
+      reduzierte Bewegung und der bestehende Performance-Governor behalten Vorrang.
+      Kein zweiter Renderloop, kein Mikrofon oder zusätzliches Govee-Kommando.</small>
+  </fieldset>
   <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}><legend>V874 · Intelligent Audience Experience 2.0</legend>
     <label className="setting-check"><input type="checkbox" checked={s.crowdExperienceV874} disabled={!s.virtualCrowd} onChange={e=>patch({crowdExperienceV874:e.target.checked})}/> Automatische Reaktionen auf Hooks, Drops und Genre</label>
     <label className="setting-check"><input type="checkbox" checked={s.crowdArmWaveV874} disabled={!s.virtualCrowd||!s.crowdExperienceV874} onChange={e=>patch({crowdArmWaveV874:e.target.checked})}/> Synchrone Armbewegungen und Publikumswellen</label>

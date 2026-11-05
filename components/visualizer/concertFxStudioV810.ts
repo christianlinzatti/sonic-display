@@ -24,6 +24,8 @@ export interface ConcertFxSettingsV810 {
   crowdInteractionV877:boolean;crowdCallResponseV877:boolean;crowdFollowPerformerV877:boolean;crowdDanceEchoV877:boolean;crowdInteractionStrengthV877:number;crowdInteractionStyleV877:'subtle'|'balanced'|'lively';
   crowdEmotionDirectorV878:boolean;crowdEmotionWavesV878:boolean;crowdEmotionContrastV878:boolean;crowdEmotionStrengthV878:number;crowdEmotionStyleV878:'cinematic'|'balanced'|'responsive';
   crowdCameraHarmonyV879:boolean;crowdCameraStrengthV879:number;crowdLyricsGuardV879:boolean;
+  livingAudienceV973:boolean;livingWavesV973:boolean;livingIndividualV973:boolean;
+  livingStrengthV973:number;livingQualityV973:'eco'|'balanced'|'cinematic';
   crowdPerformerPriorityV879:boolean;crowdTransitionSofteningV879:boolean;
   crowdCameraStyleV879:'cinematic'|'balanced'|'festival';
   smartConcertExperienceV880:boolean;smartConcertStrengthV880:number;smartConcertContrastV880:boolean;
@@ -82,6 +84,8 @@ export const DEFAULT_CONCERT_FX_V810:Readonly<ConcertFxSettingsV810>={
   crowdInteractionV877:true,crowdCallResponseV877:true,crowdFollowPerformerV877:true,crowdDanceEchoV877:true,crowdInteractionStrengthV877:65,crowdInteractionStyleV877:'balanced',
   crowdEmotionDirectorV878:true,crowdEmotionWavesV878:true,crowdEmotionContrastV878:true,crowdEmotionStrengthV878:65,crowdEmotionStyleV878:'balanced',
   crowdCameraHarmonyV879:true,crowdCameraStrengthV879:70,crowdLyricsGuardV879:true,
+  livingAudienceV973:true,livingWavesV973:true,livingIndividualV973:true,
+  livingStrengthV973:65,livingQualityV973:'balanced',
   crowdPerformerPriorityV879:true,crowdTransitionSofteningV879:true,crowdCameraStyleV879:'balanced',
   smartConcertExperienceV880:true,smartConcertStrengthV880:65,smartConcertContrastV880:true,
   smartConcertHeroRotationV880:true,smartConcertPerformerGuardV880:true,smartConcertStyleV880:'balanced',
@@ -187,6 +191,11 @@ export function normalizeConcertFxV810(raw?:Partial<ConcertFxSettingsV810>|null)
  crowdCameraHarmonyV879:typeof raw?.crowdCameraHarmonyV879==='boolean'?raw.crowdCameraHarmonyV879:d.crowdCameraHarmonyV879,
  crowdCameraStrengthV879:finite(raw?.crowdCameraStrengthV879)?Math.round(clamp(raw.crowdCameraStrengthV879,0,100)):d.crowdCameraStrengthV879,
  crowdLyricsGuardV879:typeof raw?.crowdLyricsGuardV879==='boolean'?raw.crowdLyricsGuardV879:d.crowdLyricsGuardV879,
+ livingAudienceV973:typeof raw?.livingAudienceV973==='boolean'?raw.livingAudienceV973:d.livingAudienceV973,
+ livingWavesV973:typeof raw?.livingWavesV973==='boolean'?raw.livingWavesV973:d.livingWavesV973,
+ livingIndividualV973:typeof raw?.livingIndividualV973==='boolean'?raw.livingIndividualV973:d.livingIndividualV973,
+ livingStrengthV973:finite(raw?.livingStrengthV973)?Math.round(clamp(raw.livingStrengthV973,0,100)):d.livingStrengthV973,
+ livingQualityV973:raw?.livingQualityV973==='eco'||raw?.livingQualityV973==='cinematic'?raw.livingQualityV973:'balanced',
  crowdPerformerPriorityV879:typeof raw?.crowdPerformerPriorityV879==='boolean'?raw.crowdPerformerPriorityV879:d.crowdPerformerPriorityV879,
  crowdTransitionSofteningV879:typeof raw?.crowdTransitionSofteningV879==='boolean'?raw.crowdTransitionSofteningV879:d.crowdTransitionSofteningV879,
  crowdCameraStyleV879:raw?.crowdCameraStyleV879==='cinematic'||raw?.crowdCameraStyleV879==='festival'?raw.crowdCameraStyleV879:'balanced',

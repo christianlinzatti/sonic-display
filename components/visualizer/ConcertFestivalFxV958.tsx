@@ -2,11 +2,14 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {useFrame} from '@react-three/fiber';
 import {previousVerifiedConcertSceneV960,applyConcertContinuityV960} from '@/lib/concertContinuityV960';
+import {applyConcertEnergyArcV975} from '@/lib/concertEnergyArcV975';
 import type {Group} from 'three';
 import {planImmersiveConcertV966} from '@/lib/immersiveConcertEngineV966';
 import {applyAlexaVirtualSceneV968,maskAlexaImmersiveCueV968} from '@/lib/alexaConcertV968';
 import {applySmartConcertPresetV969} from '@/lib/smartConcertPresetsV969';
 import {ImmersiveConcertEnvironmentV966} from './ImmersiveConcertEnvironmentV966';
+import {planVolumetricStageV972} from '@/lib/volumetricStageAtmosphereV972';
+import {VolumetricStageAtmosphereV972} from './VolumetricStageAtmosphereV972';
 import {readTrackAnalysisV318,ANALYSIS_EVENT_V318} from '@/services/musicAnalysis/trackAnalysisV318';
 import {loadConcertRoadmapV958,composeConcertSceneV958,CONCERT_ROADMAP_EVENT_V958,
  type ConcertSettingsV958,type ConcertPhaseV958} from '@/lib/ultimateConcertRoadmapV958';
@@ -41,7 +44,11 @@ export function ConcertFestivalFxV958({trackId,progressMs,durationMs,genre,energ
   const previous=settings.transitionsV960?previousVerifiedConcertSceneV960({analysis,trackId,
     sectionIndex:active??0,durationMs,genre,energy,bass,lyricsVisible,reducedMotion,settings}):null;
   const continuity=applyConcertContinuityV960(original,previous,progressMs-section.startMs,settings,{reducedMotion}).scene;
-  const presetScene=applySmartConcertPresetV969(continuity,settings,{authoredStage,reducedMotion,lowPerformance});
+  // V975 changes only this virtual renderer, never the separate Govee cue path.
+  const energyArcV975=applyConcertEnergyArcV975({scene:continuity,settings,
+   positionMs:progressMs,durationMs,sectionStartMs:section.startMs,sectionDurationMs:section.durationMs,
+   sectionIndex:active??0,playing,authoredStage,lowPerformance,reducedMotion,lyricsVisible});
+  const presetScene=applySmartConcertPresetV969(energyArcV975.scene??continuity,settings,{authoredStage,reducedMotion,lowPerformance});
   return applyAlexaVirtualSceneV968(
    presetScene,settings,{authoredStage,reducedMotion,lowPerformance});
  },[analysis,settings,playing,trackId,progressMs,durationMs,genre,verified,section,active,energy,bass,lyricsVisible,reducedMotion,authoredStage,lowPerformance]);
@@ -58,6 +65,8 @@ export function ConcertFestivalFxV958({trackId,progressMs,durationMs,genre,energ
   trackId,analysisTrackId:analysis?.trackId??'',positionMs:progressMs,durationMs,
   energy,bass,playing,reducedMotion,authoredStage,lyricsVisible,lowPerformance});
  const immersiveV966=maskAlexaImmersiveCueV968(immersiveBaseV966,settings);
+ const volumetricV972=planVolumetricStageV972({immersive:immersiveV966,scene,settings,
+  positionMs:progressMs,playing,authoredStage,lowPerformance,reducedMotion,lyricsVisible});
  if(!scene)return null;
  // Voice zoning never modifies an authored stage or the user's timeline cues.
  const voiceZonesEnabledV968=!authoredStage&&!scene.timelineOverride&&!lowPerformance&&scene.verified;
@@ -69,6 +78,7 @@ export function ConcertFestivalFxV958({trackId,progressMs,durationMs,genre,energ
  const impact=scene.effects.includes('bass-impact');
  return <group name="UltimateConcertStageFxV958">
   <ImmersiveConcertEnvironmentV966 cue={immersiveV966}/>
+  <VolumetricStageAtmosphereV972 cue={volumetricV972}/>
   {/* V951: dynamic low-cost LED geometry behind performers; an actual 3D object. */}
   {showBackdropV968&&<group ref={wallMotion} position={[0,1.8,-3.0]}>
    {Array.from({length:14},(_,i)=><mesh key={i} position={[(i-6.5)*.47,0,0]}>

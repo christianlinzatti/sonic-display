@@ -120,7 +120,7 @@ test('Alexa bundled but not auto configured',()=>{
 });
 test('V971 package marker, scripts and Pi documentation are present',()=>{
  const p=JSON.parse(read('package.json'));
- assert.equal(p.sonicRoadmapRelease,'v971');
+ assert(/^v\d+$/.test(p.sonicRoadmapRelease)&&Number(p.sonicRoadmapRelease.slice(1))>=971);
  assert(p.scripts['test:v971'].includes('v971-integration-setup-regression.cjs'));
  assert(p.scripts['test:v971:types'].includes('v971-core'));
  assert(read('README.md').includes('Raspberry Pi'));

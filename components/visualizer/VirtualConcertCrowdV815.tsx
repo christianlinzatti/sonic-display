@@ -8,6 +8,8 @@ import {sampleCrowdChoreographyV876,createCrowdMotionScratchV876} from './dynami
 import {applyCrowdInteractionMotionV877} from './intelligentCrowdInteractionV877';
 import {applyAudienceEmotionMotionV878} from './smartAudienceEmotionDirectorV878';
 import {applyCrowdCameraHarmonyMotionV879} from './crowdCameraStageHarmonyV879';
+import {sampleLivingAudienceV973,createLivingMotionScratchV973} from './livingAudienceDirectorV973';
+import type {LivingAudienceCueV973} from './livingAudienceDirectorV973';
 import type {VirtualCrowdCueV815} from './virtualConcertCrowdPlannerV815';
 import type {ArenaCrowdCueV893} from './arenaCrowdAtmosphereV893';
 
@@ -19,6 +21,7 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
  const people=useMemo(createVirtualCrowdLayoutV815,[]);
  const dummy=useMemo(()=>new Object3D(),[]);
  const choreographyMotion=useMemo(createCrowdMotionScratchV876,[]);
+ const livingMotionV973=useMemo(createLivingMotionScratchV973,[]);
  const heads=useRef<InstancedMesh>(null),bodies=useRef<InstancedMesh>(null);
  const phones=useRef<InstancedMesh>(null);
  const silhouetteMat=useRef<MeshBasicMaterial>(null),headMat=useRef<MeshBasicMaterial>(null);
@@ -75,6 +78,7 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
    applyCrowdInteractionMotionV877(index,p,cue,choreographyMotion);
    applyAudienceEmotionMotionV878(index,p,cue,choreographyMotion);
    applyCrowdCameraHarmonyMotionV879(index,p,cue,choreographyMotion);
+   sampleLivingAudienceV973(index,p,cue as LivingAudienceCueV973,choreographyMotion,livingMotionV973);
     // Bounded V893 arena ripple uses existing instanced silhouettes.
     const arenaRipple=arenaWave*Math.sin((arenaCue.arenaPhaseV893??0)*1.8+Math.floor(index/12)*.72+p.phase*.13);
     const visualLift=lift+choreographyMotion.bob+Math.max(-.012,Math.min(.012,arenaRipple*.05));
@@ -84,6 +88,7 @@ export function VirtualConcertCrowdV815({cueRef}:{cueRef:{current:VirtualCrowdCu
     dummy.updateMatrix();body.setMatrixAt(index,dummy.matrix);
     dummy.position.set(p.x+choreographyMotion.horizontal,p.y+.8*p.scale+visualLift,p.z);
     dummy.scale.set(.155*p.scale,.17*p.scale,.14*p.scale);
+    dummy.rotation.z+=livingMotionV973.headNod;
     dummy.updateMatrix();head.setMatrixAt(index,dummy.matrix);
     const phoneWave=(cue as {phoneWave?:number}).phoneWave??0;
     const phoneSway=phoneWave*Math.sin(cue.phase*5+p.phase)*.13*p.scale+

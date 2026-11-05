@@ -19,16 +19,20 @@ export type ConcertFxV955='beams'|'lasers'|'sweep'|'bass-impact'|'fog'|'confetti
 export type ConcertTimelineCueV948={atMs:number;phase:ConcertPhaseV958;camera?:ConcertCameraV940;formation?:ConcertDanceV941;effect?:ConcertFxV955};
 export type ConcertRoomPresetV936={id:string;name:string;roles:Record<string,ConcertRoleV935>;positions:Record<string,{x:number;y:number}>};
 export type ConcertPresetIdV969='off'|'auto'|'arena'|'festival'|'club'|'cinematic'|'hardtekk'|'rock';
+export type AtmosphereQualityV972='eco'|'balanced'|'cinematic';
+export type EnergyArcModeV975='subtle'|'balanced'|'cinematic';
 export type VoiceZoneV968='all'|'stage'|'backdrop'|'audience';
 export type VoiceMoodV968='auto'|'warm'|'cool'|'neon';
 export type VoiceFxV968='auto'|'off'|'beams'|'fog'|'confetti'|'streamers';
 export type ConcertSettingsV958={schema:'ultimate-concert-v958';enabled:boolean;hardwareSync:boolean;virtualFx:boolean;strength:number;
   roleOverrides:Record<string,ConcertRoleV935>;presets:ConcertRoomPresetV936[];timeline:Record<string,ConcertTimelineCueV948[]>;
-  transitionsV960:boolean;compactFxV960:boolean;lightGovernorV961:boolean;narrativeV962:boolean;bridgeV963:boolean;peakRecoveryV964:boolean;roomWaveV965:boolean;immersiveV966:boolean;immersiveStrengthV966:number;
-  voiceZoneV968:VoiceZoneV968;voiceMoodV968:VoiceMoodV968;voiceFxV968:VoiceFxV968;concertPresetV969:ConcertPresetIdV969};
+  transitionsV960:boolean;compactFxV960:boolean;lightGovernorV961:boolean;narrativeV962:boolean;bridgeV963:boolean;peakRecoveryV964:boolean;roomWaveV965:boolean;immersiveV966:boolean;immersiveStrengthV966:number;volumetricV972:boolean;volumetricStrengthV972:number;volumetricQualityV972:AtmosphereQualityV972;
+  voiceZoneV968:VoiceZoneV968;voiceMoodV968:VoiceMoodV968;voiceFxV968:VoiceFxV968;concertPresetV969:ConcertPresetIdV969;
+  energyArcV975:boolean;energyArcModeV975:EnergyArcModeV975;energyArcStrengthV975:number};
 export const DEFAULT_CONCERT_V958:ConcertSettingsV958={schema:'ultimate-concert-v958',enabled:false,hardwareSync:false,virtualFx:false,
- strength:55,roleOverrides:{},presets:[],timeline:{},transitionsV960:false,compactFxV960:false,lightGovernorV961:false,narrativeV962:false,bridgeV963:false,peakRecoveryV964:false,roomWaveV965:false,immersiveV966:false,immersiveStrengthV966:60,
- voiceZoneV968:'all',voiceMoodV968:'auto',voiceFxV968:'auto',concertPresetV969:'off'};
+ strength:55,roleOverrides:{},presets:[],timeline:{},transitionsV960:false,compactFxV960:false,lightGovernorV961:false,narrativeV962:false,bridgeV963:false,peakRecoveryV964:false,roomWaveV965:false,immersiveV966:false,immersiveStrengthV966:60,volumetricV972:false,volumetricStrengthV972:55,volumetricQualityV972:'balanced',
+ voiceZoneV968:'all',voiceMoodV968:'auto',voiceFxV968:'auto',concertPresetV969:'off',
+ energyArcV975:false,energyArcModeV975:'balanced',energyArcStrengthV975:55};
 export type ConcertInputV958={trackId:string;progressMs:number;durationMs:number;phase:ConcertPhaseV958;
  sectionIndex:number;sectionStartMs:number;verified:boolean;genre:string;energy:number;bass:number;lyricsVisible:boolean;
  reducedMotion:boolean;stageCamera?:ConcertCameraV940;stageFormation?:ConcertDanceV941;authoredStage?:boolean};
@@ -77,10 +81,16 @@ export function normalizeConcertRoadmapV958(raw:unknown):ConcertSettingsV958{
   transitionsV960:o.transitionsV960===true,compactFxV960:o.compactFxV960===true,lightGovernorV961:o.lightGovernorV961===true,
   narrativeV962:o.narrativeV962===true,bridgeV963:o.bridgeV963===true,peakRecoveryV964:o.peakRecoveryV964===true,roomWaveV965:o.roomWaveV965===true,
   immersiveV966:o.immersiveV966===true,immersiveStrengthV966:Math.round(clamp(Number(o.immersiveStrengthV966??60),0,100)),
+  volumetricV972:o.volumetricV972===true,
+  volumetricStrengthV972:Math.round(clamp(Number(o.volumetricStrengthV972??55),0,100)),
+  volumetricQualityV972:(['eco','balanced','cinematic'] as unknown[]).includes(o.volumetricQualityV972)?o.volumetricQualityV972!:'balanced',
   voiceZoneV968:(['all','stage','backdrop','audience'] as unknown[]).includes(o.voiceZoneV968)?o.voiceZoneV968!:'all',
   voiceMoodV968:(['auto','warm','cool','neon'] as unknown[]).includes(o.voiceMoodV968)?o.voiceMoodV968!:'auto',
   voiceFxV968:(['auto','off','beams','fog','confetti','streamers'] as unknown[]).includes(o.voiceFxV968)?o.voiceFxV968!:'auto',
-  concertPresetV969:(['off','auto','arena','festival','club','cinematic','hardtekk','rock'] as unknown[]).includes(o.concertPresetV969)?o.concertPresetV969!:'off'};
+  concertPresetV969:(['off','auto','arena','festival','club','cinematic','hardtekk','rock'] as unknown[]).includes(o.concertPresetV969)?o.concertPresetV969!:'off',
+  energyArcV975:o.energyArcV975===true,
+  energyArcModeV975:(['subtle','balanced','cinematic'] as unknown[]).includes(o.energyArcModeV975)?o.energyArcModeV975!:'balanced',
+  energyArcStrengthV975:Math.round(clamp(Number(o.energyArcStrengthV975??55),0,100))};
 }
 export function loadConcertRoadmapV958():ConcertSettingsV958{
  if(typeof window==='undefined')return normalizeConcertRoadmapV958(null);

@@ -1,0 +1,6 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {"types": [], "typeRoots": ["./empty-types"], "incremental": false, "noEmit": true},
+  "include": [],
+  "files": ["../components/visualizer/livingAudienceDirectorV973.ts", "../components/visualizer/concertFxStudioV810.ts"]
+}

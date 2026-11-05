@@ -76,13 +76,11 @@ check('existing test scripts still run canonical regressions', () => {
     assert(pkg.scripts[`test:v${v}:types`].includes(`tests/tsconfig.v${v}-core.json`));
   }
 });
-check('version-neutral importer protects workflows and maintains clean sources', () => {
+check('version-neutral importer protects workflows and the organized project', () => {
   const importer=read('scripts/project-archive-import.py');
-  const workflow=read('.github/workflows/project-archive-import.yml');
   assert(importer.includes('ARCHIVE_NAME'));
   assert(importer.includes('scripts/project-archive-import.py'));
   assert(importer.includes('rel.parts[0].casefold() == ".github"'));
-  assert(workflow.includes('node scripts/organize-project-structure.cjs'));
-  assert(workflow.includes('node tests/v974-repository-cleanup-regression.cjs'));
+  assert(read('scripts/organize-version-docs.cjs').includes("require('./organize-project-structure.cjs').main()"));
 });
 console.log(`V966 Project Structure: PASS ${checks} checks`);

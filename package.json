@@ -1985,7 +1985,15 @@
     "test:v971:types": "tsc -p tests/tsconfig.v971-core.json --noEmit",
     "govee:bridge:check": "node scripts/govee-bridge-check-v971.cjs",
     "govee:bridge:token": "node scripts/print-govee-token-v971.cjs",
-    "verify:v971": "npm run test:v971 && npm run test:v971:types && npm run verify:v970"
+    "verify:v971": "npm run test:v971 && npm run test:v971:types && npm run verify:v970",
+    "test:v972": "node tests/v972-volumetric-stage-regression.cjs",
+    "test:v972:types": "tsc -p tests/tsconfig.v972-core.json --noEmit",
+    "test:v973": "node tests/v973-living-audience-regression.cjs",
+    "test:v973:types": "tsc -p tests/tsconfig.v973-core.json --noEmit",
+    "verify:v973:focused": "npm run test:v973 && npm run test:v973:types && npm run test:v972 && npm run test:structure && npm run check:syntax && npm run check:architecture",
+    "test:v975": "node tests/v975-adaptive-concert-energy-regression.cjs",
+    "test:v975:types": "tsc -p tests/tsconfig.v975-core.json --noEmit",
+    "verify:v975:focused": "npm run test:v975 && npm run test:v975:types && npm run test:v973 && npm run test:v972 && npm run test:v971 && npm run check:syntax && npm run check:architecture"
   },
   "engines": {
     "node": "24.x"
@@ -2013,6 +2021,6 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v971",
-  "sonicFeatureRelease": "v970"
+  "sonicRoadmapRelease": "v975",
+  "sonicFeatureRelease": "v975"
 }

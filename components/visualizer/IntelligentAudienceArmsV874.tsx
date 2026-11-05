@@ -8,6 +8,8 @@ import {sampleCrowdChoreographyV876,createCrowdMotionScratchV876} from './dynami
 import {applyCrowdInteractionMotionV877} from './intelligentCrowdInteractionV877';
 import {applyAudienceEmotionMotionV878} from './smartAudienceEmotionDirectorV878';
 import {applyCrowdCameraHarmonyMotionV879} from './crowdCameraStageHarmonyV879';
+import {sampleLivingAudienceV973,createLivingMotionScratchV973} from './livingAudienceDirectorV973';
+import type {LivingAudienceCueV973} from './livingAudienceDirectorV973';
 import type {AudienceCueV874} from './intelligentAudienceExperienceV874';
 import type {VirtualCrowdCueV815} from './virtualConcertCrowdPlannerV815';
 
@@ -18,6 +20,7 @@ export function IntelligentAudienceArmsV874({cueRef}:{cueRef:{current:VirtualCro
  const people=useMemo(createVirtualCrowdLayoutV815,[]);
  const object=useMemo(()=>new Object3D(),[]);
  const choreographyMotion=useMemo(createCrowdMotionScratchV876,[]);
+ const livingMotionV973=useMemo(createLivingMotionScratchV973,[]);
  const left=useRef<InstancedMesh>(null),right=useRef<InstancedMesh>(null);
  const accumulator=useRef(0);
  useFrame((_,dt)=>{
@@ -39,6 +42,7 @@ export function IntelligentAudienceArmsV874({cueRef}:{cueRef:{current:VirtualCro
    applyCrowdInteractionMotionV877(index,p,cue,choreographyMotion);
    applyAudienceEmotionMotionV878(index,p,cue,choreographyMotion);
    applyCrowdCameraHarmonyMotionV879(index,p,cue,choreographyMotion);
+   sampleLivingAudienceV973(index,p,cue as LivingAudienceCueV973,choreographyMotion,livingMotionV973);
    const festivalWave=(cue as typeof cue & {festivalWave?:number}).festivalWave;
    const waveStrength=Number.isFinite(festivalWave)?Math.max(0,Math.min(.65,festivalWave??0)):0;
    const position=p.phase+cue.phase*(cue.style==='rave'?7:cue.style==='clap'?5:3)+
@@ -49,7 +53,8 @@ export function IntelligentAudienceArmsV874({cueRef}:{cueRef:{current:VirtualCro
     const mesh=side<0?l:r;
     const alternate=side===-1?wave:Math.max(0,Math.min(1,.51+Math.sin(position+1.2)*.49));
     object.position.set(p.x+choreographyMotion.horizontal+side*.36*p.scale,p.y+.65*p.scale+choreographyMotion.bob,p.z-.018);
-    object.rotation.set(0,0,-side*(.12+lift*(.27+alternate*1.07+choreographyMotion.armAccent)));
+    const livingRaise=side<0?livingMotionV973.leftRaise:livingMotionV973.rightRaise;
+    object.rotation.set(0,0,-side*(.12+lift*(.27+alternate*1.07+choreographyMotion.armAccent+livingRaise*.55)));
     object.scale.set(p.scale,p.scale,p.scale);
     object.updateMatrix();mesh.setMatrixAt(index,object.matrix);
    }

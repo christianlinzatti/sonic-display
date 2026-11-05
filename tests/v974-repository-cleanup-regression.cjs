@@ -16,11 +16,8 @@ const allowed = new Set([
 ]);
 let checks = 0;
 function check(description, fn) {
-  fn();
-  checks++;
-  console.log('PASS V974 ' + description);
+  fn(); checks++; console.log('PASS V974 ' + description);
 }
-
 check('root contains only runtime and configuration entry points', () => {
   const entries = fs.readdirSync(root, { withFileTypes: true });
   for (const entry of entries) {

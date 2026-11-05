@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [],
+    "typeRoots": [
+      "./empty-types"
+    ],
+    "incremental": false,
+    "noEmit": true
+  },
+  "include": [],
+  "files": [
+    "../lib/volumetricStageAtmosphereV972.ts",
+    "../lib/immersiveConcertEngineV966.ts",
+    "../lib/ultimateConcertRoadmapV958.ts"
+  ]
+}

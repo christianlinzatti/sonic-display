@@ -62,6 +62,7 @@ import type {AudienceEmotionStateV878} from "./smartAudienceEmotionDirectorV878"
 import type {CrowdInteractionCueV877} from "./intelligentCrowdInteractionV877";
 import type {CrowdChoreographyCueV876} from "./dynamicFestivalCrowdChoreographyV876";
 import type {FestivalAtmosphereCueV875} from "./smartFestivalAtmosphereV875";
+import {planLivingAudienceV973} from './livingAudienceDirectorV973';
 import {planVirtualConcertCrowdV815,CROWD_OFF_V815} from "./virtualConcertCrowdPlannerV815";
 import type {VirtualCrowdCueV815} from "./virtualConcertCrowdPlannerV815";
 import {planFestivalSpecialFxV844,mergeFestivalParticlesV844,coordinateFestivalFoamV844,FESTIVAL_OFF_V844} from './festivalSpecialFxPlannerV844';
@@ -1192,6 +1193,19 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       lyricsProtected:lyricsProtectedV542,lyricsVisible:lyricsVisibleV813,
       vocalFocus:vocalFocusV542,manualCamera:cameraNarrativeV605?.manualCamera===true,
       genre:genre??'',energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+    });
+    // V973: last audience pass, AFTER the existing V815/V825/V874–V880/V893
+    // authority. Never re-enable a disabled crowd or bypass manual camera/show.
+    crowdCueV815.current=planLivingAudienceV973({
+      base:crowdCueV815.current,fx:fxCueV810,settings:normalizeConcertFxV810(concertFxV810),
+      positionMs:playback.positionMs,energy:audio.energyEnvelope??0,
+      kick:audio.kickAccentIntensity??0,tier,
+      playing:isPlaying&&playback.playing&&reactive,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false||!!liveSignalV882.manual,
+      manualCamera:cameraNarrativeV605?.manualCamera===true,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      reducedMotion,lyricsProtected:lyricsProtectedV542||lyricsVisibleV813,
+      vocalFocus:vocalFocusV542,groupCount:groupCountV542,
     });
     // V889: final reduction-only artistic mix after V871 and V880, applied to the
     // existing 3D particle/foam emitters. Authored timelines and stage safety win.
