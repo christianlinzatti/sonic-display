@@ -41,6 +41,16 @@ for(const src of ["NODE_ENV:'production'",'React 19 production/development parit
  'Full TypeScript','Real Next.js production build','VERCEL_PRODUCTION_GATE FAIL'])
  assert(build.includes(src),'Vercel gate missing: '+src);
 assert(!build.includes("run('Legacy prebuild'"),'Vercel should not run the full historical prebuild');
+assert(build.includes("SONIC_LOW_MEMORY_BUILD:'1'"),
+  'Actual Vercel build must activate the low-memory Next.js profile');
+const nextConfig=read('next.config.ts');
+assert.match(nextConfig,/lowMemoryBuild\s*=\s*process\.env\.SONIC_LOW_MEMORY_BUILD\s*===\s*'1'/,
+  'Low-memory mode must be opt in outside the Vercel command');
+for(const directive of ['cpus: 1','webpackMemoryOptimizations: true',
+  'webpackBuildWorker: true','webpack: lowMemoryWebpack','if (!dev)','config.cache = false'])
+  assert(nextConfig.includes(directive),'Vercel OOM protection missing: '+directive);
+assert(build.includes("run('Full TypeScript'") && build.includes("run('Real Next.js production build'"),
+  'Memory profile may not skip real TypeScript or Next.js build');
 assert(read('tests/react-act-compat-regression.cjs').includes("['development', 'production']"),
  'React smoke test must verify both runtime conditions');
 console.log('PASS Vercel parity: Node 24, real Next.js, React 19, legacy CI guard and ZIP-only skips');
