@@ -1,6 +1,7 @@
 "use client";
 import type {ImmersiveCueV966} from '@/lib/immersiveConcertEngineV966';
 import {AdditiveBlending,DoubleSide} from 'three';
+import {planImmersiveDepthV982} from '@/lib/immersiveDepthPortalV982';
 
 /** A few bounded, unlit meshes in the existing stage Canvas.
  * No lights, post-process passes, timers, additional render loops or hardware.
@@ -8,6 +9,7 @@ import {AdditiveBlending,DoubleSide} from 'three';
  */
 export function ImmersiveConcertEnvironmentV966({cue}:{cue:ImmersiveCueV966}){
  if(!cue.active)return null;
+ const depthRingsV982=planImmersiveDepthV982(cue);
  return <group name="ImmersiveConcertEnvironmentV966">
   {/* Perimeter light shafts create perceived depth without actual volumetric raymarching. */}
   {[-1,1].map(side=><group key={`side-${side}`}>
@@ -32,6 +34,14 @@ export function ImmersiveConcertEnvironmentV966({cue}:{cue:ImmersiveCueV966}){
    <meshBasicMaterial color={cue.colorA} opacity={cue.sideGlowOpacity} transparent
     depthWrite={false} blending={AdditiveBlending}/>
   </mesh>
+  {/* V982: bounded concentric depth accents. Only high-confidence V966 scenes
+      get the extra three far-stage draw calls; no new lights or render loop. */}
+  {depthRingsV982.map((ring,i)=><mesh key={`depth-ring-${i}`}
+   position={[0,1.55,ring.z]} scale={[cue.archScale,cue.archScale,1]}>
+   <torusGeometry args={[ring.radius,ring.width,4,48]}/>
+   <meshBasicMaterial color={i===1?cue.colorB:cue.colorA} opacity={ring.opacity}
+    transparent depthWrite={false} blending={AdditiveBlending}/>
+  </mesh>)}
   <mesh position={[0,1.5,-4.5]}>
    <planeGeometry args={[7.8,4.6]}/>
    <meshBasicMaterial color={cue.colorB} opacity={cue.backHazeOpacity} transparent depthWrite={false}/>

@@ -47,12 +47,15 @@ import {EPIC_DROP_KEY_V892,DEFAULT_EPIC_DROP_V892,normalizeEpicDropV892,
 import {SPOTLIGHT_STORAGE_KEY_V890,DEFAULT_SPOTLIGHT_V890,normalizeSpotlightV890,
  suggestedSpotlightV890,exportSpotlightPlanV890,type SpotlightSettingsV890} from './professionalSpotlightShowV890';
 import {ConcertQualityIntelligencePanelV901} from './ConcertQualityIntelligencePanelV901';
+import {ImmersiveAiDirectorV982} from './ImmersiveAiDirectorV982';
+import {SongIntelligencePanelV983} from './SongIntelligencePanelV983';
+import type {ImmersivePlanV982} from '@/lib/immersiveAiDirectorV982';
 import type {AdvisorPatchV902} from './concertQualityAdvisorV902';
 import {validReviewPatchV903} from './concertQualityReviewV903';
 import {CONCERT_SYNC_KEY_V882,DEFAULT_CONCERT_SYNC_V882,normalizeConcertSyncV882,
  publishConcertStageSyncV882,type ConcertSyncSettingsV882} from './concertStageSyncV882';
 
-type Props={trackId:string;durationMs:number;progressMs:number;genre:string;
+type Props={trackId:string;title:string;artist:string;durationMs:number;progressMs:number;genre:string;
  playing:boolean;reducedMotion:boolean;controlsVisible?:boolean};
 const fmt=(ms:number)=>`${Math.floor(ms/60000)}:${String(Math.floor(ms/1000)%60).padStart(2,'0')}`;
 const sparks=Array.from({length:12},(_,i)=>i);
@@ -60,7 +63,7 @@ const effectLabels:Record<LiveFxManualV881,string>={shockwave:'Bass-Welle',sweep
 const sceneLabels:Record<string,string>={verse:'Verse',hook:'Hook',build:'Build-up',drop:'Drop',break:'Break'};
 const momentIcons:Record<string,string>={rise:'↗',hook:'✦',drop:'◎',finale:'★'};
 
-export function LiveFxDeckV881({trackId,durationMs,progressMs,genre,playing,reducedMotion,controlsVisible=true}:Props){
+export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre,playing,reducedMotion,controlsVisible=true}:Props){
  const [settings,setSettings]=useState<LiveFxSettingsV881>({...DEFAULT_LIVE_FX_V881});
  const [storageReady,setStorageReady]=useState(false);
  const [syncSettings,setSyncSettings]=useState<ConcertSyncSettingsV882>({...DEFAULT_CONCERT_SYNC_V882});
@@ -104,6 +107,11 @@ export function LiveFxDeckV881({trackId,durationMs,progressMs,genre,playing,redu
  const [storageError,setStorageError]=useState(false);
  const [open,setOpen]=useState(false);
  const [timeline,setTimeline]=useState<ConcertTimelineSnapshotV763|null>(null);
+ const [aiUndoV982,setAiUndoV982]=useState<null|{
+  trackId:string;
+  before:{atmosphere:AtmosphereSettingsV885;genreStage:GenreStageSettingsV894;fx:LiveFxSettingsV881};
+  after:{atmosphere:AtmosphereSettingsV885;genreStage:GenreStageSettingsV894;fx:LiveFxSettingsV881};
+ }>(null);
  const [trigger,setTrigger]=useState<LiveFxTriggerV881|null>(null);
  const nextTrigger=useRef(0);
  const priorPlayback=useRef<{trackId:string;progressMs:number}|null>(null);
@@ -320,7 +328,7 @@ export function LiveFxDeckV881({trackId,durationMs,progressMs,genre,playing,redu
   sync();window.addEventListener(CONCERT_TIMELINE_EVENT_V763,sync);
   return()=>window.removeEventListener(CONCERT_TIMELINE_EVENT_V763,sync);
  },[trackId]);
- useEffect(()=>{setTrigger(null);setOpen(false);},[trackId]);
+ useEffect(()=>{setTrigger(null);setOpen(false);setAiUndoV982(null);},[trackId]);
  useEffect(()=>{
   const current={trackId,progressMs};
   if(resetManualLiveFxOnSeekV881(priorPlayback.current,current)){
@@ -465,6 +473,30 @@ export function LiveFxDeckV881({trackId,durationMs,progressMs,genre,playing,redu
    normalizeSpotlightV890({...s,intensity:value as number}):s);
  },[]);
 
+ /** V982 approval applies only already-enabled virtual effects; no hardware or automatic re-enabling. */
+ const applyImmersiveV982=(plan:ImmersivePlanV982)=>{
+  if(!settings.auto||!settings.enabled||motionOff||!trackId)return;
+  const atmosphere=atmosphereSettings.enabled?normalizeAtmosphereV885({...atmosphereSettings,
+   palette:plan.palette,pace:plan.pace,intensity:plan.atmosphereIntensity}):atmosphereSettings;
+  const genreStage=genreStageSettingsV894.enabled?normalizeGenreStageV894({...genreStageSettingsV894,
+   look:plan.look,pace:plan.pace==='gentle'?'smooth':plan.pace==='festival'?'festival':'concert',
+   intensity:plan.stageIntensity,protectLyrics:true}):genreStageSettingsV894;
+  // FX budget can only be reduced, never escalated by an AI response.
+  const fx=normalizeLiveFxSettingsV881({...settings,intensity:Math.min(settings.intensity,plan.fxIntensity)});
+  setAiUndoV982({trackId,before:{atmosphere:atmosphereSettings,genreStage:genreStageSettingsV894,fx:settings},
+   after:{atmosphere,genreStage,fx}});
+  setAtmosphereSettings(atmosphere);setGenreStageSettingsV894(genreStage);setSettings(fx);
+ };
+ const undoImmersiveV982=():boolean=>{
+  if(!aiUndoV982||aiUndoV982.trackId!==trackId||
+   JSON.stringify(atmosphereSettings)!==JSON.stringify(aiUndoV982.after.atmosphere)||
+   JSON.stringify(genreStageSettingsV894)!==JSON.stringify(aiUndoV982.after.genreStage)||
+   JSON.stringify(settings)!==JSON.stringify(aiUndoV982.after.fx))return false;
+  setAtmosphereSettings(aiUndoV982.before.atmosphere);
+  setGenreStageSettingsV894(aiUndoV982.before.genreStage);
+  setSettings(aiUndoV982.before.fx);
+  setAiUndoV982(null);return true;
+ };
  const update=useCallback((patch:Partial<LiveFxSettingsV881>)=>setSettings(s=>normalizeLiveFxSettingsV881({...s,...patch})),[]);
  const updateSync=useCallback((patch:Partial<ConcertSyncSettingsV882>)=>setSyncSettings(s=>normalizeConcertSyncV882({...s,...patch})),[]);
  const updateMoments=useCallback((patch:Partial<ConcertMomentsSettingsV883>)=>setMomentSettings(s=>normalizeConcertMomentsV883({...s,...patch})),[]);
@@ -688,6 +720,12 @@ export function LiveFxDeckV881({trackId,durationMs,progressMs,genre,playing,redu
      {cue.manual&&<div className="live-fx-manual-progress-v881" role="status">{effectLabels[cue.manual]} aktiv
       <span><i style={{width:`${100*(1-cue.manualProgress)}%`}}/></span></div>}
     </div>
+    <SongIntelligencePanelV983 key={trackId} trackId={trackId} title={title} artist={artist}
+     durationMs={durationMs} genre={genre} onApply={applyImmersiveV982}
+     canApply={settings.enabled&&settings.auto&&!motionOff}/>
+    <ImmersiveAiDirectorV982 trackId={trackId} genre={genre} onApply={applyImmersiveV982}
+     onUndo={undoImmersiveV982} undoAvailable={Boolean(aiUndoV982)}
+     canApply={settings.enabled&&settings.auto&&!motionOff}/>
     <div className="live-fx-options-v881">
      <label className="live-fx-check-v881"><input type="checkbox" checked={settings.enabled} onChange={(e:{target:{checked:boolean}})=>update({enabled:e.target.checked})}/>Live FX aktiv</label>
      <label className="live-fx-check-v881"><input type="checkbox" checked={settings.auto} onChange={(e:{target:{checked:boolean}})=>update({auto:e.target.checked})}/>Automatik aus Regie-Timeline</label>

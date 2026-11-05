@@ -2,9 +2,7 @@
 'use strict';
 /** Public, read-only Vercel deployment smoke check for the Sonic Display project.
  * Never contacts arbitrary addresses: domain allowlist blocks SSRF and redirects
- * are not followed. Optional CI-only bypass header tests protected deployments
- * without weakening public URL rules or exposing tokens in diagnostics.
- * This verifies HTML readiness, not Spotify/Govee auth.
+ * are not followed. This verifies public reachability, not Spotify/Govee auth.
  */
 const fs=require('node:fs');
 const path=require('node:path');
@@ -18,21 +16,12 @@ function normalizeDeploymentUrlV965(raw){
   return u.origin+'/';
  }catch{return null;}
 }
-async function smokeV965(url,fetcher=fetch,options={}){
- // Resolve the target before touching any credentials. A bypass token must never
- // be sent to unknown hosts or forwarded through an HTTP redirect.
+async function smokeV965(url,fetcher=fetch){
  const target=normalizeDeploymentUrlV965(url);
  if(!target)return{passed:false,reason:'TARGET_NOT_ALLOWED'};
- const secret=options.automationBypassSecret??'';
- if(typeof secret!=='string'||secret.length>2048||/[\r\n]/.test(secret))
-  return{passed:false,reason:'INVALID_AUTOMATION_BYPASS_SECRET'};
- const headers={accept:'text/html'};
- if(secret)headers['x-vercel-protection-bypass']=secret;
  try{
-  const response=await fetcher(target,{redirect:'manual',headers,
+  const response=await fetcher(target,{redirect:'manual',headers:{accept:'text/html'},
    signal:AbortSignal.timeout(15000)});
-  // Even with a bypass token, redirects and sign-in pages do not count as healthy.
-  // Never include Location, request headers, or token values in the report.
   if(response.status!==200)return{passed:false,reason:'HTTP_'+response.status};
   if(!/^text\/html(?:;|$)/i.test(response.headers.get('content-type')||''))
    return{passed:false,reason:'NOT_HTML'};
@@ -45,9 +34,7 @@ async function smokeV965(url,fetcher=fetch,options={}){
 async function main(){
  const raw=process.env.VERCEL_DEPLOYMENT_URL||process.argv[2]||'';
  const start=new Date().toISOString();
- const result=await smokeV965(raw,fetch,{
-  automationBypassSecret:process.env.VERCEL_AUTOMATION_BYPASS_SECRET||''
- });
+ const result=await smokeV965(raw);
  const file=path.resolve(__dirname,'../reports/v965-deployment-smoke.json');
  fs.mkdirSync(path.dirname(file),{recursive:true});
  fs.writeFileSync(file,JSON.stringify({schema:'sonic-v965-deployment-smoke-v1',

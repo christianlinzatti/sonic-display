@@ -4809,3 +4809,41 @@
 .govee-v958-cue label{display:flex;flex-direction:column;gap:.25rem;font-size:.9rem}
 .govee-v958-cue input[type=number]{width:110px}
 .govee-v958-signals{display:grid;gap:.25rem;font-variant-numeric:tabular-nums}
+
+/* V982: compact, touch-friendly AI concert director; no decorative animation or flashing. */
+.immersive-ai-v982{border:1px solid rgba(95,190,255,.38);border-radius:14px;padding:14px;margin:14px 0;background:linear-gradient(140deg,rgba(14,42,64,.55),rgba(40,15,67,.4));color:inherit}
+.immersive-ai-v982 legend{font-weight:750;letter-spacing:.04em;padding:0 8px;color:#b9ecff}
+.immersive-ai-v982 p{line-height:1.45;margin:8px 0 12px}
+.immersive-ai-v982 label{display:block;font-weight:650;margin:10px 0 6px}
+.immersive-ai-v982 textarea{box-sizing:border-box;display:block;width:100%;min-height:84px;resize:vertical;background:#0e1825;color:#fff;border:1px solid #55758b;border-radius:9px;padding:10px;font:inherit}
+.immersive-ai-actions-v982,.immersive-ai-presets-v982{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.immersive-ai-v982 button{cursor:pointer;min-height:44px;padding:9px 11px;background:#15364d;border:1px solid #5385a4;border-radius:9px;color:#fff;font:inherit;font-size:.91em}
+.immersive-ai-v982 button:hover:not(:disabled){background:#205071}
+.immersive-ai-v982 button:focus-visible,.immersive-ai-v982 textarea:focus-visible{outline:3px solid #9df1ff;outline-offset:2px}
+.immersive-ai-v982 button:disabled{opacity:.55;cursor:not-allowed}
+.immersive-ai-v982 small{display:block;opacity:.85;line-height:1.4}
+.immersive-ai-message-v982{border-left:3px solid #72d3ef;padding-left:10px}
+.immersive-ai-preview-v982{border:1px solid #5d7990;padding:12px;border-radius:10px;margin-top:12px;background:rgba(6,12,24,.65)}
+.immersive-ai-preview-title-v982{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between}
+.immersive-ai-preview-v982 ol{padding-left:23px;line-height:1.48}
+.immersive-ai-preview-v982 li{margin:7px 0}
+.immersive-ai-swatches-v982{display:flex;align-items:center;gap:8px;margin:10px 0}
+.immersive-ai-color-v982{width:30px;height:30px;border-radius:7px;flex-shrink:0;background:linear-gradient(135deg,#334d88,#bb568b)}
+.immersive-ai-color-v982.palette-electric{background:linear-gradient(135deg,#16d9ee,#8c2fba)}
+.immersive-ai-color-v982.palette-arena{background:linear-gradient(135deg,#efbc65,#e84b48)}
+.immersive-ai-color-v982.palette-dream{background:linear-gradient(135deg,#7dc5f7,#e3b0eb)}
+.immersive-ai-undo-v982{margin-top:10px}
+@media (prefers-reduced-motion:reduce){.immersive-ai-v982 *{animation:none!important;transition:none!important}}
+
+/* V983 – metadata-only, opt-in AI Song Intelligence. */
+.song-intelligence-v983{border:1px solid rgba(126,209,186,.42);border-radius:14px;padding:14px;margin:16px 0;background:linear-gradient(130deg,rgba(15,56,61,.48),rgba(14,35,59,.48));color:inherit}
+.song-intelligence-v983 legend{font-weight:750;color:#a9f3dc;padding:0 9px}
+.song-intelligence-v983 p{margin:10px 0;line-height:1.48}
+.song-intelligence-v983 small{display:block;opacity:.87;line-height:1.42}
+.song-intelligence-track-v983{overflow-wrap:anywhere}
+.song-intelligence-actions-v983{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.song-intelligence-v983 button{cursor:pointer;min-height:44px;padding:9px 12px;border-radius:9px;background:#144c53;color:#fff;border:1px solid #5cacbb;font:inherit}
+.song-intelligence-v983 button:disabled{opacity:.5;cursor:not-allowed}
+.song-intelligence-v983 button:focus-visible{outline:3px solid #a2f3db;outline-offset:2px}
+.song-intelligence-preview-v983{border-top:1px solid rgba(150,234,220,.26);margin-top:14px;padding-top:10px}
+.song-intelligence-preview-v983 ol{padding-left:23px;line-height:1.6}

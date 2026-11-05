@@ -35,6 +35,8 @@ try {
   }
   run('Source and lockfile preflight','scripts/v959-source-preflight.cjs');
   run('React 19 production/development parity','tests/react-act-compat-regression.cjs');
+  run('V983 AI song intelligence','tests/v983-ai-song-intelligence-regression.cjs');
+  run('V982 immersive AI director','tests/v982-immersive-ai-show-regression.cjs');
   run('V981 Concert Performance Intelligence 2.0','tests/v981-concert-performance-intelligence-regression.cjs');
   run('V980 Concert Quality & Performance Director','tests/v980-concert-quality-director-regression.cjs');
   run('V979 Intelligent Live Show Director 3.0','tests/v979-intelligent-live-show-director-regression.cjs');
@@ -63,6 +65,8 @@ try {
   run('V962 narrative regression','tests/v962-concert-narrative-regression.cjs');
   run('V961 light governor regression','tests/v961-govee-concert-governor-regression.cjs');
   run('Vercel deployment configuration regression','tests/vercel-production-parity-regression.cjs');
+  run('V983 AI Song Intelligence isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v983-core.json','--noEmit']);
+  run('V982 Immersive AI Director isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v982-core.json','--noEmit']);
   run('V981 Performance Intelligence isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v981-core.json','--noEmit']);
   run('V980 Concert Quality Director isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v980-core.json','--noEmit']);
   run('V979 Intelligent Live Show Director 3.0 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v979-core.json','--noEmit']);

@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {"types":["node"],"incremental":false,"noEmit":true},
+  "files": [
+    "../lib/aiSongIntelligenceV983.ts",
+    "../app/api/ai/song-intelligence/route.ts",
+    "../components/visualizer/SongIntelligencePanelV983.tsx",
+    "../components/visualizer/LiveFxDeckV881.tsx",
+    "../components/SonicDisplay.tsx"
+  ]
+}

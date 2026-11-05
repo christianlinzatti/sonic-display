@@ -1,3 +1,5 @@
+> **V982 – AI Immersive Show Studio:** Neuer Regie-Dialog im Live FX Deck (optionale serverseitige OpenAI Responses API oder lokaler Entwurf), überprüfbarer Show-Look, manuelle Übernahme und Undo; zusätzliche sparsame 3D-Tiefenringe. Siehe [V982-Anleitung](docs/versions/V982-AI-IMMERSIVE-SHOW-STUDIO.md) und [Teststatus](docs/versions/V982-VERIFICATION.md). Vollständige GitHub-/Vercel-Produktionsfreigabe bleibt erforderlich.
+
 ## V981 – Concert Performance Intelligence 2.0
 
 Read-only performance trends from the existing V826 ~0.5-second renderer measurement
@@ -2229,3 +2231,10 @@ Ein-Klick-Schalter zur Aktivierung der zusammengehörenden virtuellen Regiestufe
 manuelle Timelines und Gerätebefehle behalten Vorrang. Details und
 Verifizierungsgrenzen: `docs/versions/V979-INTELLIGENT-LIVE-SHOW-DIRECTOR-3.md`
 und `docs/versions/V979-VERIFICATION.md`.
+
+
+## V983 – AI Song Intelligence
+
+Im Live-FX-Deck analysiert **V983 · AI Song Intelligence** auf Wunsch ausschließlich den aktuell angezeigten Songtitel, Künstler, die Songdauer und das angezeigte Genre. Es entstehen fünf **nicht zeitlich verifizierte** Konzertideen und ein übernehmbarer virtueller Look. Es werden ausdrücklich **keine BPM, Audioaufnahmen oder Songabschnittszeiten gemessen**. Erst mit manueller Freigabe gelten die bestehenden V982-Look-Grenzen und die verifizierte Konzert-Timeline; reale Leuchten werden nicht geändert.
+
+Für Online-KI-Abfragen serverseitig `OPENAI_API_KEY` (optional `OPENAI_MODEL`) setzen; ohne Schlüssel jederzeit **Lokale Song-Idee** verwenden. `npm run test:v983` und `npm run test:v983:types`.

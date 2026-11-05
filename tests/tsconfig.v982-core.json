@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "incremental": false,
+    "noEmit": true
+  },
+  "files": [
+    "../lib/immersiveAiDirectorV982.ts",
+    "../lib/immersiveDepthPortalV982.ts",
+    "../components/visualizer/ImmersiveConcertEnvironmentV966.tsx",
+    "../app/api/ai/immersive-show/route.ts",
+    "../components/visualizer/ImmersiveAiDirectorV982.tsx",
+    "../components/visualizer/LiveFxDeckV881.tsx"
+  ]
+}
