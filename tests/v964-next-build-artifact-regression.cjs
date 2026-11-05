@@ -19,7 +19,7 @@ try{
  assert(Number.isNaN(resolveBuildStartV964(root)),'failed build must never authorize artifacts');
  fs.writeFileSync(proofFile,JSON.stringify({...goodProof,startedAt:'not-a-date'}));
  assert(Number.isNaN(resolveBuildStartV964(root)),'malformed proof timestamp rejected');
- fs.writeFileSync(proofFile,JSON.stringify(goodProof);
+ fs.writeFileSync(proofFile,JSON.stringify(goodProof));
  write('BUILD_ID','SonicDisplay_Production_Test_964');
  write('build-manifest.json',JSON.stringify({pages:{'/_app':['app.js']}}));
  write('prerender-manifest.json',JSON.stringify({routes:{'/':{}},dynamicRoutes:{}}));
