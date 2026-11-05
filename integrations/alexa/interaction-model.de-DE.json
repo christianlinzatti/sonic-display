@@ -249,6 +249,54 @@
             "wähle passende Konzertwelt",
             "starte Smart Preset"
           ]
+        },
+        {
+          "name": "GoveeArenaIntent",
+          "samples": [
+            "aktiviere Govee Arena Raumlicht",
+            "starte Govee Arena Licht",
+            "Govee Arena Stimmung"
+          ]
+        },
+        {
+          "name": "GoveeFestivalIntent",
+          "samples": [
+            "aktiviere Govee Festival Raumlicht",
+            "starte Govee Festivallicht",
+            "Govee Festival Stimmung"
+          ]
+        },
+        {
+          "name": "GoveeClubIntent",
+          "samples": [
+            "aktiviere Govee Club Raumlicht",
+            "starte Govee Clublicht",
+            "Govee Club Stimmung"
+          ]
+        },
+        {
+          "name": "GoveeCalmIntent",
+          "samples": [
+            "aktiviere ruhiges Govee Licht",
+            "Govee Licht beruhigen",
+            "starte ruhiges Govee Raumlicht"
+          ]
+        },
+        {
+          "name": "GoveeDimIntent",
+          "samples": [
+            "dimme Govee Raumlicht",
+            "mach das Govee Raumlicht dunkler",
+            "reduziere Govee Lichtstimmung"
+          ]
+        },
+        {
+          "name": "GoveeAutoIntent",
+          "samples": [
+            "schalte Govee auf Automatik",
+            "Govee Musikautomatik wiederherstellen",
+            "beende Govee Sprachlicht"
+          ]
         }
       ],
       "types": []

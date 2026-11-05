@@ -12,7 +12,10 @@ const ACTIONS={
  BeamsEffectIntent:'effect-beams',FogEffectIntent:'effect-fog',ConfettiEffectIntent:'effect-confetti',
  StreamersEffectIntent:'effect-streamers',AutoEffectIntent:'effect-auto',EffectsOffIntent:'effect-off',
  RapPresetIntent:'preset-rap',HardtekkPresetIntent:'preset-hardtekk',RockPresetIntent:'preset-rock',
- CinemaPresetIntent:'preset-cinema',AutoPresetIntent:'preset-auto'
+ CinemaPresetIntent:'preset-cinema',AutoPresetIntent:'preset-auto',
+ GoveeArenaIntent:'govee-arena',GoveeFestivalIntent:'govee-festival',
+ GoveeClubIntent:'govee-club',GoveeCalmIntent:'govee-calm',
+ GoveeDimIntent:'govee-dim',GoveeAutoIntent:'govee-auto'
 };
 const labels={arena:'Arena',festival:'Festival',club:'Club',calm:'ruhige Konzertatmosphäre',
  stop:'gestoppte Konzertautomatik','fx-on':'virtuelle Effekte','fx-off':'virtuelle Effekte aus',
@@ -21,7 +24,10 @@ const labels={arena:'Arena',festival:'Festival',club:'Club',calm:'ruhige Konzert
  'effect-beams':'virtuelle Lichtkegel','effect-fog':'virtueller Nebel','effect-confetti':'virtuelles Konfetti',
  'effect-streamers':'virtuelle Luftschlangen','effect-auto':'automatische Bühneneffekte','effect-off':'abgeschaltete Zusatzeffekte',
  'preset-rap':'filmische Deutschrap Konzertkulisse','preset-hardtekk':'Hardtekk-Reaktor',
- 'preset-rock':'Rock-Arena','preset-cinema':'Cinematic-Night-Atmosphäre','preset-auto':'Smart-Konzertautomatik'};
+ 'preset-rock':'Rock-Arena','preset-cinema':'Cinematic-Night-Atmosphäre','preset-auto':'Smart-Konzertautomatik',
+ 'govee-arena':'Govee-Arena-Lichtstimmung','govee-festival':'Govee-Festival-Lichtstimmung',
+ 'govee-club':'Govee-Club-Lichtstimmung','govee-calm':'ruhiges Govee-Raumlicht',
+ 'govee-dim':'gedämpftes Govee-Raumlicht','govee-auto':'Govee-Musikautomatik'};
 function reply(text,shouldEndSession=true){
  return {version:'1.0',response:{outputSpeech:{type:'PlainText',text},shouldEndSession}};
 }
@@ -48,7 +54,7 @@ async function handler(event){
  if(event?.request?.type==='LaunchRequest')return reply('Sonic Display ist bereit. Sage zum Beispiel: starte den Festivalmodus.',false);
  const intent=event?.request?.intent?.name;
  if(event?.request?.type!=='IntentRequest')return reply('Sonic Display unterstützt Konzertmodi und virtuelle Effekte.');
- if(intent==='AMAZON.HelpIntent')return reply('Sage zum Beispiel: starte Festival, beleuchte das Publikum, aktiviere Neon, zeige virtuellen Nebel starte den Hardtekk-Reaktor, aktiviere die Rock-Arena oder beende die Konzertautomatik.',false);
+ if(intent==='AMAZON.HelpIntent')return reply('Sage zum Beispiel: starte Festival, beleuchte das Publikum, aktiviere Neon, zeige virtuellen Nebel starte den Hardtekk-Reaktor, aktiviere die Rock-Arena, nutze Govee Festival Raumlicht oder beende die Konzertautomatik.',false);
  if(intent==='AMAZON.CancelIntent'||intent==='AMAZON.StopIntent')return reply('Bis bald.');
  if(intent==='StatusIntent')return reply('Der Alexa Skill ist eingerichtet. Ob das Display den nächsten Befehl übernimmt, siehst du im Konzertstudio.');
  if(!Object.hasOwn(ACTIONS,intent))return reply('Diesen Bühnenbefehl kenne ich noch nicht.');
@@ -62,7 +68,7 @@ async function handler(event){
   if(!result.ok)return reply('Sonic Display konnte den Befehl nicht annehmen. Bitte prüfe die Verbindung.');
   const response=await result.json();
   if(response?.queued!==true)return reply('Sonic Display hat den Befehl nicht bestätigt.');
-  return reply(`${labels[ACTIONS[intent]]} wurde an Sonic Display gesendet. Das Display übernimmt den Befehl, wenn die Sprachsteuerung dort aktiviert ist.`);
+  return reply(`${labels[ACTIONS[intent]]} wurde an Sonic Display gesendet. Das Display übernimmt den Befehl nur bei entsprechender Freigabe und aktiver Verbindung.`);
  }catch{return reply('Sonic Display ist gerade nicht erreichbar.');}
 }
 exports.handler=handler;

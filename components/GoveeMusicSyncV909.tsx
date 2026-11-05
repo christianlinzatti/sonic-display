@@ -34,6 +34,10 @@ import {planConcertNarrativeV962,dimConcertNarrativeLookV962} from '@/lib/concer
 import {planVerifiedConcertBridgeV963,dimConcertBridgeLookV963} from '@/lib/concertBridgeV963';
 import {planConcertPeakRecoveryV964,dimConcertPeakRecoveryLookV964} from '@/lib/concertPeakRecoveryV964';
 import {planConcertRoomWaveV965,dimConcertRoomWaveLookV965} from '@/lib/concertRoomWaveV965';
+import {ALEXA_GOVEE_CUE_EVENT_V970,ALEXA_GOVEE_CONSENT_EVENT_V970,ALEXA_GOVEE_RESET_EVENT_V970,
+ loadAlexaGoveeConsentV970,mayAcceptAlexaGoveeV970,applyAlexaGoveeLookV970,
+ isAlexaGoveeCommandV970,type AlexaGoveeCueV970} from '@/lib/alexaGoveeV970';
+import {ALEXA_LOCAL_ENABLED_KEY_V967} from '@/lib/alexaConcertV967';
 import {readTrackAnalysisV318,ANALYSIS_EVENT_V318,ANALYSIS_STORAGE_KEY_V318,
  type TrackAnalysisV318} from '@/services/musicAnalysis/trackAnalysisV318';
 /** Client-mounted on the Vercel page. Commands go only to the Raspberry Pi's localhost Bridge.
@@ -58,6 +62,37 @@ export function GoveeMusicSyncV909(){
  const [calibrationSettings,setCalibrationSettings]=useState<GoveeRoomCalibrationV927>(loadGoveeCalibrationV927);
  const [roadmapSettings,setRoadmapSettings]=useState<ConcertSettingsV958>(loadConcertRoadmapV958);
  const stageCueV921=useRef<GoveeStageCueV921|null>(null);
+ const alexaGoveeCueV970=useRef<AlexaGoveeCueV970|null>(null);
+ useEffect(()=>{
+  const receive=(event:Event)=>{
+   const data=(event as CustomEvent<{command?:unknown;createdAt?:unknown}>).detail;
+   const command=data?.command;const createdAt=data?.createdAt;
+   const consent=loadAlexaGoveeConsentV970();const settings=loadGoveeConfigV909();
+   let receiver:{enabled?:boolean;since?:number}|null=null;
+   try{receiver=JSON.parse(localStorage.getItem(ALEXA_LOCAL_ENABLED_KEY_V967)||'null');}catch{/* fail closed */}
+   // Runtime recheck: a stale browser message cannot grant consent or enable Govee.
+   if(isAlexaGoveeCommandV970(command)&&typeof createdAt==='number'&&
+    mayAcceptAlexaGoveeV970(command,consent,settings,receiver?.enabled===true,receiver?.since??0,createdAt))
+    alexaGoveeCueV970.current=command==='govee-auto'?null:{command,receivedAt:Date.now()};
+  };
+  const revoke=()=>{const cfg=loadGoveeConfigV909();
+   let receiver:{enabled?:boolean}|null=null;
+   try{receiver=JSON.parse(localStorage.getItem(ALEXA_LOCAL_ENABLED_KEY_V967)||'null');}catch{/* fail closed */}
+   if(!loadAlexaGoveeConsentV970().enabled||!cfg.enabled||!cfg.autoSync||receiver?.enabled!==true)
+    alexaGoveeCueV970.current=null;};
+  const reset=()=>{alexaGoveeCueV970.current=null;};
+  window.addEventListener(ALEXA_GOVEE_CUE_EVENT_V970,receive);
+  window.addEventListener(ALEXA_GOVEE_CONSENT_EVENT_V970,revoke);
+  window.addEventListener(ALEXA_GOVEE_RESET_EVENT_V970,reset);
+  window.addEventListener('storage',revoke);
+  window.addEventListener(GOVEE_CONFIG_EVENT_V909,revoke);
+  return()=>{alexaGoveeCueV970.current=null;
+   window.removeEventListener(ALEXA_GOVEE_CUE_EVENT_V970,receive);
+   window.removeEventListener(ALEXA_GOVEE_CONSENT_EVENT_V970,revoke);
+   window.removeEventListener(ALEXA_GOVEE_RESET_EVENT_V970,reset);
+   window.removeEventListener('storage',revoke);
+   window.removeEventListener(GOVEE_CONFIG_EVENT_V909,revoke);};
+ },[]);
  // An unchanged audio snapshot is NOT a fresh beat measurement.
  const metricSeen=useRef({current:metrics,observedAt:Date.now()});
  if(metricSeen.current.current!==metrics)metricSeen.current={current:metrics,observedAt:Date.now()};
@@ -438,7 +473,13 @@ export function GoveeMusicSyncV909(){
       // This is opt-in and never interferes with existing V912 shows or manual input.
       const recoveryLookV961=recoveringDevices.has(ip)&&roadmapSettings.enabled&&roadmapSettings.hardwareSync&&!show&&stage?.source!=='authored'
        ?easeGoveeLookV911(previous,safeFallbackV934(plannedLook)):plannedLook;
-      const finalLook=governConcertLookV961(previous,recoveryLookV961,{
+      // V970: ephemeral opted-in voice overlay inside the existing LAN dispatch.
+      // Never enables Govee, bypasses selected devices or introduces extra UDP sends.
+      const voiceLookV970=applyAlexaGoveeLookV970(recoveryLookV961,previous,alexaGoveeCueV970.current,config,{
+       consent:loadAlexaGoveeConsentV970(),playing:state.isPlaying,visible:!document.hidden,
+       savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
+       recovering:recoveringDevices.has(ip),now:Date.now()});
+      const finalLook=governConcertLookV961(previous,voiceLookV970,{
        enabled:roadmapSettings.enabled&&roadmapSettings.hardwareSync&&roadmapSettings.lightGovernorV961,
        playing:state.isPlaying,verified:Boolean(roadmapScene?.verified),
        savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',

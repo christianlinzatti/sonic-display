@@ -139,7 +139,7 @@ test('V968 model and Lambda action names stay in sync',()=>{
  for(const [name,command] of Object.entries(ACTIONS)){
   assert(names.includes(name),name);
   // V969 adds new intents; this legacy suite verifies the original V968 subset.
-  if(!command.startsWith('preset-'))assert(v968.isAlexaConcertCommandV968(command),command);
+  if(!command.startsWith('preset-')&&!command.startsWith('govee-'))assert(v968.isAlexaConcertCommandV968(command),command);
  }
  assert.equal(new Set(names).size,names.length);
  for(const i of model.interactionModel.languageModel.intents.filter(i=>!i.name.startsWith('AMAZON.')))

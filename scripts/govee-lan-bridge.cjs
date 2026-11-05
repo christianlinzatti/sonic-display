@@ -141,9 +141,9 @@ const server=http.createServer(async(req,res)=>{
 server.listen(PORT,'127.0.0.1',()=>{
   console.log('\nSONIC DISPLAY · GOVEE LAN BRIDGE');
   console.log('Nur lokal erreichbar: http://127.0.0.1:'+PORT);
-  if(process.stdout.isTTY||process.env.GOVEE_BRIDGE_PRINT_TOKEN==='1')
+  if(process.env.GOVEE_BRIDGE_PRINT_TOKEN==='1')
    console.log('Token (im Sonic-Display-Govee-Tab eintragen):',TOKEN);
-  else console.log('Token bewusst nicht ins Systemjournal geschrieben; mit node scripts/pi/print-govee-token-v910.cjs anzeigen.');
+  else console.log('Token bewusst nicht ins Systemjournal geschrieben; mit node scripts/print-govee-token-v971.cjs (oder show-token.sh/.cmd) anzeigen.');
   console.log('Freigegebene Browser-Origins:',Array.from(origins).join(', '));
   console.log('Govee: UDP 4001 (Scan), 4002 (Antwort), 4003 (Steuerung).\n');
 });

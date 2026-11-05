@@ -137,10 +137,10 @@ test('UI, renderer, signed bridge and CI gates wire V969 end to end',()=>{
   assert(ui.includes(s),s);
  assert(stage.includes('applySmartConcertPresetV969(continuity,settings,'));
  assert(stage.indexOf('applySmartConcertPresetV969(')<stage.indexOf('applyAlexaVirtualSceneV968('));
- const route=read('app/api/alexa/command/route.ts');assert(route.includes('isAlexaConcertCommandV969'));
+ const route=read('app/api/alexa/command/route.ts');assert(route.includes('isAlexaConcertCommandV969')||route.includes('isAlexaCommandV970')); 
  assert(read('scripts/vercel-production-build.cjs').includes('v969-smart-concert-presets-regression.cjs'));
  assert(read('scripts/v931-production-gate.cjs').includes('v969-smart-concert-presets-regression.cjs'));
- const p=JSON.parse(read('package.json'));assert.equal(p.sonicRoadmapRelease,'v969');
+ const p=JSON.parse(read('package.json'));assert(/^v\d+$/.test(p.sonicRoadmapRelease)&&Number(p.sonicRoadmapRelease.slice(1))>=969);
 });
 test('pure policy has no networking, browser, microphone or physical lights',()=>{
  const src=read('lib/smartConcertPresetsV969.ts').toLowerCase();

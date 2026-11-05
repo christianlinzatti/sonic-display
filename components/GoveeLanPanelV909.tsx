@@ -19,6 +19,7 @@ import {GoveeFestivalFxStudioV925} from '@/components/GoveeFestivalFxStudioV925'
 import {GoveeSpatialStudioV926} from '@/components/GoveeSpatialStudioV926';
 import {GoveeRoomCalibrationStudioV927} from '@/components/GoveeRoomCalibrationStudioV927';
 import {GoveeRoomPerformanceDashboardV928} from '@/components/GoveeRoomPerformanceDashboardV928';
+import {IntegrationSetupWizardV971} from '@/components/IntegrationSetupWizardV971';
 import {ConcertRoadmapStudioV958} from '@/components/ConcertRoadmapStudioV958';
 import {recoveryDelayV930} from '@/lib/ultimateConcertRoadmapV958';
 type DeviceList={devices:GoveeDeviceV909[]};
@@ -109,18 +110,20 @@ export function GoveeLanPanelV909(){
   setNotice(`Befehl an ${config.selectedIps.length} Leuchte(n) gesendet (UDP quittiert Schaltbefehle nicht).`);
  };
  return <fieldset className="govee-v909"><legend>Govee LAN · lokale Konzertbeleuchtung</legend>
-  <p>Govee-Leuchten ohne Cloud/API-Schlüssel steuern. Bei deiner Vercel-Anzeige läuft die <strong>lokale Bridge auf dem Raspberry Pi</strong>, auf dem auch Chromium geöffnet ist. Nicht unterstützte Govee-Modelle können nicht über das offizielle LAN-Protokoll gesteuert werden.</p>
+  <p>Govee-Leuchten ohne Cloud/API-Schlüssel steuern. Die lokale Bridge läuft auf demselben Gerät wie der Browser: <strong>Windows-PC oder Raspberry Pi mit Chromium</strong>. Nicht unterstützte Govee-Modelle können nicht über das offizielle LAN-Protokoll gesteuert werden.</p>
   <div className="govee-v909-grid">
    <label>Bridge-Adresse<input id="govee-v909-endpoint" type="text" spellCheck={false} value={config.endpoint} onChange={e=>setConfig(v=>({...v,endpoint:e.target.value}))} onBlur={()=>{try{update({endpoint:validBridgeUrlV909(config.endpoint)});}catch(error){setNotice(error instanceof Error?error.message:'Ungültige Adresse');}}} placeholder="http://127.0.0.1:8765"/></label>
    <label>Bridge-Token<input id="govee-v909-auth" type="password" autoComplete="off" spellCheck={false} value={config.token} onChange={e=>update({token:e.target.value})} placeholder="Token aus Terminal einfügen"/></label>
   </div>
-  <p className="settings-note">Raspberry Pi V910: <code>node scripts/pi/install-v910.cjs --url https://deine-app.vercel.app</code>. Der systemd-Dienst startet die Bridge und Chromium öffnet die Vercel-Seite beim Desktop-Login. Bridge-Adresse auf <code>http://127.0.0.1:8765</code> lassen. Beim ersten Verbindungstest in Chromium die Freigabe für den lokalen/Loopback-Netzwerkzugriff erteilen. Token einmalig auf dem Pi mit <code>npm run pi:token</code> anzeigen.</p>
+  <p className="settings-note">Raspberry Pi V910 (bestehender Kiosk): <code>node scripts/pi/install-v910.cjs --url https://deine-app.vercel.app</code>. Der systemd-Dienst startet die Bridge und Chromium öffnet die Vercel-Seite beim Desktop-Login. Bridge-Adresse auf <code>http://127.0.0.1:8765</code> lassen. Beim ersten Verbindungstest in Chromium die Freigabe für den lokalen/Loopback-Netzwerkzugriff erteilen. Token einmalig auf dem Pi mit <code>npm run pi:token</code> anzeigen. Alternativ V971-Pi-Bridge aus <code>integrations/govee-bridge-raspberry-pi/</code> manuell starten; keine zweite Bridge bei laufendem V910-Dienst.</p>
   <div className="govee-v909-actions">
    <button id="govee-v909-connect" type="button" disabled={busy} onClick={()=>void operation(refresh)}>Verbindung prüfen</button>
    <button id="govee-v909-scan" type="button" disabled={busy} onClick={()=>void operation(scan)}>Leuchten im LAN suchen</button>
   </div>
   <p className="govee-v909-notice" role="status">{bridgeState==='connected'?'● Bridge verbunden · ':bridgeState==='offline'?'○ Bridge getrennt – automatischer Wiederverbindungsversuch · ':'○ Noch nicht verbunden · '}{notice}</p>
   {health&&bridgeState==='connected'&&<p className="settings-note">Bridge {health.version} · {health.onlineDevices??'?'} von {health.devices} Leuchten zuletzt erreichbar · Aktualisierung etwa alle 12 Sekunden nach dem ersten Verbindungstest.</p>}
+  <IntegrationSetupWizardV971 config={config} bridgeState={bridgeState} bridgeHealthy={Boolean(health?.ok)}
+   onlineDevices={health?.onlineDevices??0} busy={busy} onCheck={()=>void operation(refresh)} onScan={()=>void operation(scan)}/>
   <div className="govee-v909-actions"><label>IP manuell hinzufügen
    <input type="text" spellCheck={false} value={ip} onChange={e=>setIp(e.target.value)} placeholder="192.168.1.50" aria-label="Govee-Geräte-IP" /></label>
    <button type="button" disabled={busy} onClick={()=>void operation(addIp)}>Hinzufügen</button>

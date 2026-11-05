@@ -33,6 +33,9 @@ try {
   }
   run('Source and lockfile preflight','scripts/v959-source-preflight.cjs');
   run('React 19 production/development parity','tests/react-act-compat-regression.cjs');
+  run('V971 Alexa and Govee onboarding + standalone bridge','tests/v971-integration-setup-regression.cjs');
+  run('V970 Alexa & Govee opt-in room looks','tests/v970-alexa-govee-regression.cjs');
+  run('V970 signed Govee Alexa intents','tests/v970-alexa-lambda-regression.cjs');
   run('V969 Smart Concert Presets','tests/v969-smart-concert-presets-regression.cjs');
   run('V969 signed Alexa intents','tests/v969-alexa-lambda-regression.cjs');
   run('V968 Alexa focused concert visuals','tests/v968-alexa-concert-regression.cjs');
@@ -49,6 +52,8 @@ try {
   run('V962 narrative regression','tests/v962-concert-narrative-regression.cjs');
   run('V961 light governor regression','tests/v961-govee-concert-governor-regression.cjs');
   run('Vercel deployment configuration regression','tests/vercel-production-parity-regression.cjs');
+  run('V971 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v971-core.json','--noEmit']);
+  run('V970 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v970-core.json','--noEmit']);
   run('V969 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v969-core.json','--noEmit']);
   run('V968 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v968-core.json','--noEmit']);
   run('V967 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v967-core.json','--noEmit']);

@@ -11,6 +11,9 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V971 Alexa and Govee onboarding + standalone bridge','tests/v971-integration-setup-regression.cjs'],
+  ['V970 Alexa & Govee opt-in room looks','tests/v970-alexa-govee-regression.cjs'],
+  ['V970 signed Govee Alexa intents','tests/v970-alexa-lambda-regression.cjs'],
   ['V969 Smart Concert Presets','tests/v969-smart-concert-presets-regression.cjs'],
   ['V969 signed Alexa intents','tests/v969-alexa-lambda-regression.cjs'],
   ['V968 Alexa focused virtual scenes','tests/v968-alexa-concert-regression.cjs'],
@@ -49,6 +52,8 @@ const regressions = [
   ['Source syntax + duplicate imports', 'tests/check-source-syntax.cjs'],
 ];
 const productionChecks = [
+  ['V971 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v971-core.json']],
+  ['V970 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v970-core.json']],
   ['V969 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v969-core.json']],
   ['V968 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v968-core.json']],
   ['V967 core TypeScript', 'node_modules/typescript/bin/tsc', ['-p','tests/tsconfig.v967-core.json']],

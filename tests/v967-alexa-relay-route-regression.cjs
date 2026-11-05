@@ -22,6 +22,8 @@ function load(file){
    'zone-stage','zone-backdrop','zone-audience','zone-all','mood-warm','mood-cool','mood-neon','mood-auto',
    'effect-beams','effect-fog','effect-confetti','effect-streamers','effect-auto','effect-off'].includes(c)},
   '@/lib/alexaConcertV969':{isAlexaConcertCommandV969:c=>['preset-rap','preset-hardtekk','preset-rock','preset-cinema','preset-auto'].includes(c)},
+  '@/lib/alexaGoveeV970':{isAlexaCommandV970:c=>['govee-arena','govee-festival','govee-club','govee-calm','govee-dim','govee-auto',
+   'preset-rap','preset-hardtekk','preset-rock','preset-cinema','preset-auto'].includes(c)},
   '@/lib/alexaRedisV967':redis,
   '@/lib/spotify':{getValidSession:async()=>loggedIn?{session:{}}:null}
  };
@@ -60,9 +62,13 @@ const signing=(command='festival',override={})=>{
   configured=false;response=await cmd.POST(signing());assert.equal(response.status,503);configured=true;
   failRedis=true;response=await cmd.POST(signing());assert.equal(response.status,503);failRedis=false;
   response=await pending.GET();assert.equal(response.status,200);assert.equal((await response.json()).command.command,'preset-hardtekk');
+  request=signing('govee-festival');response=await cmd.POST(request);assert.equal(response.status,200);
+  assert.equal(published.at(-1).command,'govee-festival');
+  request=signing('govee-on');response=await cmd.POST(request);assert.equal(response.status,400);
+  request=signing('govee-strobe');response=await cmd.POST(request);assert.equal(response.status,400);
   loggedIn=false;response=await pending.GET();assert.equal(response.status,401);
   loggedIn=true;configured=false;response=await pending.GET();assert.equal(response.status,503);
-  console.log('V967–V969 PASS 16 signed-relay and authenticated-poll conditions');
+  console.log('V967–V970 PASS signed relay including private Govee opt-in command transport');
  }finally{
   if(original===undefined)delete process.env.ALEXA_BRIDGE_SECRET;
   else process.env.ALEXA_BRIDGE_SECRET=original;

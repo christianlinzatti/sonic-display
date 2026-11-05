@@ -1976,7 +1976,16 @@
     "test:v968:lambda": "node tests/v968-alexa-lambda-regression.cjs",
     "test:v969": "node tests/v969-smart-concert-presets-regression.cjs",
     "test:v969:lambda": "node tests/v969-alexa-lambda-regression.cjs",
-    "test:v969:types": "tsc -p tests/tsconfig.v969-core.json --noEmit"
+    "test:v969:types": "tsc -p tests/tsconfig.v969-core.json --noEmit",
+    "test:v970": "node tests/v970-alexa-govee-regression.cjs",
+    "test:v970:lambda": "node tests/v970-alexa-lambda-regression.cjs",
+    "test:v970:types": "tsc -p tests/tsconfig.v970-core.json --noEmit",
+    "verify:v970": "npm run test:v970 && npm run test:v970:lambda && npm run test:v970:types && npm run test:v969 && npm run test:v969:lambda && npm run test:v967:relay && npm run check:syntax && npm run check:architecture && npm run test:structure && npm run typecheck && npm run build",
+    "test:v971": "node tests/v971-integration-setup-regression.cjs",
+    "test:v971:types": "tsc -p tests/tsconfig.v971-core.json --noEmit",
+    "govee:bridge:check": "node scripts/govee-bridge-check-v971.cjs",
+    "govee:bridge:token": "node scripts/print-govee-token-v971.cjs",
+    "verify:v971": "npm run test:v971 && npm run test:v971:types && npm run verify:v970"
   },
   "engines": {
     "node": "24.x"
@@ -2004,6 +2013,6 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v969",
-  "sonicFeatureRelease": "v969"
+  "sonicRoadmapRelease": "v971",
+  "sonicFeatureRelease": "v970"
 }

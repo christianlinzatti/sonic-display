@@ -1,3 +1,23 @@
+## V971 – Windows- und Raspberry-Pi-Govee-LAN-Bridge & Alexa Setup Center
+
+Das V971-Einrichtungscenter unterstützt **Windows und Raspberry Pi OS (64-bit)**. Eigenständige Bridge-Pakete mit lokalen Start-, Diagnose- und Token-Skripten liegen unter `integrations/govee-bridge-windows/` und `integrations/govee-bridge-raspberry-pi/`. Für bereits eingerichtete V910-Kiosks keine zweite Bridge am selben Port starten. Alle Integrationen bleiben opt-in; siehe `docs/versions/V971-INTEGRATION-SETUP-CENTER.md`.
+
+## V971 – Alexa-/Govee-Einrichtungscenter und Windows-LAN-Bridge
+
+Im Govee-LAN-Tab gibt es jetzt einen geführten Assistenten mit lokalen Prüfschritten, Bridge-Test und Geräteerkennung. Eine vollständig separat startbare Windows-Bridge liegt unter `integrations/govee-bridge-windows/`; sie ist auch als `SonicDisplay-Govee-LAN-Bridge-V971.zip` verfügbar. Der private Alexa-Skill-Code und das deutsche Sprachmodell bleiben unter `integrations/alexa/` enthalten, benötigen aber weiterhin eine persönliche AWS-/Vercel-/Upstash-Konfiguration. Alle Freigaben bleiben opt-in, und die Cloud wird ohne echten Test niemals als verbunden angezeigt. Details: `docs/versions/V971-INTEGRATION-SETUP-CENTER.md`.
+
+**GitHub-Upload:** `releases/SonicDisplay-V971.zip` mit `sonicRoadmapRelease=v971`. Produktionsfreigabe erfordert grünen vollständigen TypeScript-/Next.js-Build und einen Hardwaretest.
+
+---
+
+## V970 – Alexa & Govee Room Immersion (separate Freigabe)
+
+Im Ultimate Concert Experience Studio kannst du nun nach ausdrücklicher zweiter Freigabe und bestehender Govee-Musik-Synchronisation Alexa-Farbwelten für bereits ausgewählte, aktive LAN-Lampen wählen (Arena, Festival, Club, Calm, Dim, Auto). Die bereits konfigurierte Bridge und ihre Geschwindigkeitsbegrenzungen werden wiederverwendet. Keine Lampen-Ein-/Aus-Befehle und keine Spotify-Sprachsteuerung. Dokumentation: [`docs/versions/V970-ALEXA-GOVEE-ROOM-IMMERSION.md`](docs/versions/V970-ALEXA-GOVEE-ROOM-IMMERSION.md).
+
+**Import:** `releases/SonicDisplay-V970.zip` mit `sonicRoadmapRelease=v970`. Checks: `npm run test:v970`, `npm run test:v970:lambda`, `npm run test:v970:types`. Vollständigen Node-24-/Next.js-Build und echtes Echo/Govee-Gerät separat in GitHub/auf Hardware prüfen.
+
+---
+
 # V968 – Alexa Concert Commands 2.0
 
 Die virtuelle Konzertregie lässt sich jetzt pro Bühnenbereich (Bühne / LED-Wand / Publikum),

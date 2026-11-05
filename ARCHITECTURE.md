@@ -3572,3 +3572,10 @@ führt die Strukturmigration automatisiert nach dem ZIP-Import aus.
 ## V969 – Smart Concert Presets (virtual-only)
 
 `lib/smartConcertPresetsV969.ts` projects verified existing V958 scenes onto deterministic preset palettes, LED-wall styles, bounded FX and a verse/hook/build/drop intensity arc. `lib/alexaConcertV969.ts` supplies a strictly enumerated Alexa command extension and delegates to V968; the signed AWS Lambda and Redis transport are reused. The renderer in `components/visualizer/ConcertFestivalFxV958.tsx` composes V960 continuity → V969 smart preset → V968 manual voice mood/effects → V966 immersive cue. Authored shows, low-performance and reduced-motion gates keep priority. No additional network access or hardware dispatcher is introduced.
+
+
+## V970 – Privater Alexa-Govee-Look (opt-in)
+
+`lib/alexaGoveeV970.ts` begrenzt die sechs neuen Govee-Lichtstimmungsbefehle auf schon freigeschaltete Govee-Auto-Sync-Lampen. Es gibt eine eigene lokale Zustimmung, die nicht aus bestehender Alexa- oder Govee-Konfiguration abgeleitet wird. Der bereits signierte V967-Redis-Relay nimmt nur Befehle aus der V970-Allowlist an. `components/AlexaConcertControlV967.tsx` prüft die Freigabe vor dem lokalen Event; `components/GoveeMusicSyncV909.tsx` wiederholt die Prüfung und blendet die gewählte Farbe direkt vor dem bestehenden V961-Governor in den **vorhandenen** LAN-Sendepfad ein. Keine zusätzlichen Timer und kein Bypass der manuellen V912-Lichtshow.
+
+Siehe `docs/versions/V970-ALEXA-GOVEE-ROOM-IMMERSION.md`; Produktionsprüfungen müssen auf Node 24 mit installierten npm-Abhängigkeiten ausgeführt werden.

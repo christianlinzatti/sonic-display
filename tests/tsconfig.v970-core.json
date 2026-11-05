@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [],
+    "typeRoots": [
+      "./empty-types"
+    ],
+    "incremental": false,
+    "noEmit": true
+  },
+  "include": [],
+  "files": [
+    "../lib/alexaGoveeV970.ts",
+    "../lib/alexaConcertV969.ts",
+    "../lib/alexaConcertV968.ts",
+    "../lib/alexaConcertV967.ts",
+    "../lib/goveeLanV909.ts"
+  ]
+}
