@@ -1310,7 +1310,8 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       trackScopeV980.positionMs=playback.positionMs;
       advanceConcertQualityDirectorV980(qualityDirectorStateV980.current,{
         snapshot,enabled:qualityEnabledV980,optimizerEnabled:concertFxV810?.perfOptimizerV825!==false,
-        telemetryEnabled:concertFxV810?.qualityDashboardV826!==false,
+        // V826 outer guard already confirms telemetry is enabled; avoid TS2367.
+        telemetryEnabled:true,
         tier,allowLowTier:concertFxV810?.concertQualityPiV980===true,
         restore:concertFxV810?.concertQualityRecoveryV980!==false,
         mode:concertFxV810?.concertQualityModeV980??'balanced',
