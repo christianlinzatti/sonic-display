@@ -21,6 +21,9 @@ export type ConcertRoomPresetV936={id:string;name:string;roles:Record<string,Con
 export type ConcertPresetIdV969='off'|'auto'|'arena'|'festival'|'club'|'cinematic'|'hardtekk'|'rock';
 export type AtmosphereQualityV972='eco'|'balanced'|'cinematic';
 export type EnergyArcModeV975='subtle'|'balanced'|'cinematic';
+export type TransitionStyleV976='gentle'|'balanced'|'dramatic';
+export type StorytellingModeV977='subtle'|'cinematic'|'festival';
+export type AtmosphereModeV978='subtle'|'balanced'|'immersive';
 export type VoiceZoneV968='all'|'stage'|'backdrop'|'audience';
 export type VoiceMoodV968='auto'|'warm'|'cool'|'neon';
 export type VoiceFxV968='auto'|'off'|'beams'|'fog'|'confetti'|'streamers';
@@ -28,11 +31,19 @@ export type ConcertSettingsV958={schema:'ultimate-concert-v958';enabled:boolean;
   roleOverrides:Record<string,ConcertRoleV935>;presets:ConcertRoomPresetV936[];timeline:Record<string,ConcertTimelineCueV948[]>;
   transitionsV960:boolean;compactFxV960:boolean;lightGovernorV961:boolean;narrativeV962:boolean;bridgeV963:boolean;peakRecoveryV964:boolean;roomWaveV965:boolean;immersiveV966:boolean;immersiveStrengthV966:number;volumetricV972:boolean;volumetricStrengthV972:number;volumetricQualityV972:AtmosphereQualityV972;
   voiceZoneV968:VoiceZoneV968;voiceMoodV968:VoiceMoodV968;voiceFxV968:VoiceFxV968;concertPresetV969:ConcertPresetIdV969;
-  energyArcV975:boolean;energyArcModeV975:EnergyArcModeV975;energyArcStrengthV975:number};
+  energyArcV975:boolean;energyArcModeV975:EnergyArcModeV975;energyArcStrengthV975:number;
+  intelligentTransitionsV976:boolean;transitionStyleV976:TransitionStyleV976;transitionStrengthV976:number;cameraHandoffsV976:boolean;
+  storytellingV977:boolean;storytellingModeV977:StorytellingModeV977;storytellingStrengthV977:number;storytellingAccentsV977:boolean;
+  atmosphereV978:boolean;atmosphereModeV978:AtmosphereModeV978;atmosphereStrengthV978:number;
+  atmosphereFogV978:boolean;atmosphereBeamsV978:boolean;atmosphereCrowdV978:boolean};
 export const DEFAULT_CONCERT_V958:ConcertSettingsV958={schema:'ultimate-concert-v958',enabled:false,hardwareSync:false,virtualFx:false,
  strength:55,roleOverrides:{},presets:[],timeline:{},transitionsV960:false,compactFxV960:false,lightGovernorV961:false,narrativeV962:false,bridgeV963:false,peakRecoveryV964:false,roomWaveV965:false,immersiveV966:false,immersiveStrengthV966:60,volumetricV972:false,volumetricStrengthV972:55,volumetricQualityV972:'balanced',
  voiceZoneV968:'all',voiceMoodV968:'auto',voiceFxV968:'auto',concertPresetV969:'off',
- energyArcV975:false,energyArcModeV975:'balanced',energyArcStrengthV975:55};
+ energyArcV975:false,energyArcModeV975:'balanced',energyArcStrengthV975:55,
+ intelligentTransitionsV976:false,transitionStyleV976:'balanced',transitionStrengthV976:65,cameraHandoffsV976:true,
+ storytellingV977:false,storytellingModeV977:'cinematic',storytellingStrengthV977:60,storytellingAccentsV977:true,
+ atmosphereV978:false,atmosphereModeV978:'balanced',atmosphereStrengthV978:60,
+ atmosphereFogV978:true,atmosphereBeamsV978:true,atmosphereCrowdV978:true};
 export type ConcertInputV958={trackId:string;progressMs:number;durationMs:number;phase:ConcertPhaseV958;
  sectionIndex:number;sectionStartMs:number;verified:boolean;genre:string;energy:number;bass:number;lyricsVisible:boolean;
  reducedMotion:boolean;stageCamera?:ConcertCameraV940;stageFormation?:ConcertDanceV941;authoredStage?:boolean};
@@ -90,7 +101,21 @@ export function normalizeConcertRoadmapV958(raw:unknown):ConcertSettingsV958{
   concertPresetV969:(['off','auto','arena','festival','club','cinematic','hardtekk','rock'] as unknown[]).includes(o.concertPresetV969)?o.concertPresetV969!:'off',
   energyArcV975:o.energyArcV975===true,
   energyArcModeV975:(['subtle','balanced','cinematic'] as unknown[]).includes(o.energyArcModeV975)?o.energyArcModeV975!:'balanced',
-  energyArcStrengthV975:Math.round(clamp(Number(o.energyArcStrengthV975??55),0,100))};
+  energyArcStrengthV975:Math.round(clamp(Number(o.energyArcStrengthV975??55),0,100)),
+  intelligentTransitionsV976:o.intelligentTransitionsV976===true,
+  transitionStyleV976:(['gentle','balanced','dramatic'] as unknown[]).includes(o.transitionStyleV976)?o.transitionStyleV976!:'balanced',
+  transitionStrengthV976:Math.round(clamp(Number(o.transitionStrengthV976??65),0,100)),
+  cameraHandoffsV976:o.cameraHandoffsV976!==false,
+  storytellingV977:o.storytellingV977===true,
+  storytellingModeV977:(['subtle','cinematic','festival'] as unknown[]).includes(o.storytellingModeV977)?o.storytellingModeV977!:'cinematic',
+  storytellingStrengthV977:Math.round(clamp(Number(o.storytellingStrengthV977??60),0,100)),
+  storytellingAccentsV977:o.storytellingAccentsV977!==false,
+  atmosphereV978:o.atmosphereV978===true,
+  atmosphereModeV978:(['subtle','balanced','immersive'] as unknown[]).includes(o.atmosphereModeV978)?o.atmosphereModeV978!:'balanced',
+  atmosphereStrengthV978:Math.round(clamp(Number(o.atmosphereStrengthV978??60),0,100)),
+  atmosphereFogV978:o.atmosphereFogV978!==false,
+  atmosphereBeamsV978:o.atmosphereBeamsV978!==false,
+  atmosphereCrowdV978:o.atmosphereCrowdV978!==false};
 }
 export function loadConcertRoadmapV958():ConcertSettingsV958{
  if(typeof window==='undefined')return normalizeConcertRoadmapV958(null);

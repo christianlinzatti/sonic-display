@@ -11,6 +11,9 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V978 Smart Concert Atmosphere 2.0','tests/v978-smart-concert-atmosphere-regression.cjs'],
+  ['V977 Smart Concert Storytelling','tests/v977-concert-storytelling-regression.cjs'],
+  ['V976 Intelligent Concert Transitions','tests/v976-intelligent-concert-transitions-regression.cjs'],
   ['V975 Adaptive Concert Energy Director','tests/v975-adaptive-concert-energy-regression.cjs'],
   ['V973 Living Audience 3.0','tests/v973-living-audience-regression.cjs'],
   ['V972 volumetric stage atmosphere','tests/v972-volumetric-stage-regression.cjs'],
@@ -55,6 +58,9 @@ const regressions = [
   ['Source syntax + duplicate imports', 'tests/check-source-syntax.cjs'],
 ];
 const productionChecks = [
+  ['V978 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v978-core.json']],
+  ['V977 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v977-core.json']],
+  ['V976 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v976-core.json']],
   ['V973 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v973-core.json']],
   ['V972 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v972-core.json']],
   ['V971 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v971-core.json']],

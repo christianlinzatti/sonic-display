@@ -122,6 +122,53 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
    <label>V975 · Intensität {settings.energyArcStrengthV975}% <input type="range" min={0} max={100} step={5}
     disabled={!settings.energyArcV975||!settings.enabled||!settings.virtualFx}
     value={settings.energyArcStrengthV975} onChange={e=>save({energyArcStrengthV975:Number(e.target.value)})}/></label>
+   <label><input type="checkbox" checked={settings.intelligentTransitionsV976} disabled={!settings.enabled||!settings.virtualFx}
+    onChange={e=>save({intelligentTransitionsV976:e.target.checked})}/> V976: Intelligent Concert Transitions – weiche virtuelle Licht- und Kameraübergänge</label>
+   <label>V976 · Übergangsstil <select value={settings.transitionStyleV976}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.intelligentTransitionsV976}
+    onChange={e=>save({transitionStyleV976:e.target.value as ConcertSettingsV958['transitionStyleV976']})}>
+    <option value="gentle">Sanft</option><option value="balanced">Ausgewogen</option><option value="dramatic">Dynamisch</option>
+   </select></label>
+   <label>V976 · Stärke {settings.transitionStrengthV976}% <input type="range" min={0} max={100} step={5}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.intelligentTransitionsV976}
+    value={settings.transitionStrengthV976} onChange={e=>save({transitionStrengthV976:Number(e.target.value)})}/></label>
+   <label><input type="checkbox" checked={settings.cameraHandoffsV976}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.intelligentTransitionsV976}
+    onChange={e=>save({cameraHandoffsV976:e.target.checked})}/> V976: Weiche automatische Kameraübergaben (keine manuellen Kameracues)</label>
+   <label><input type="checkbox" checked={settings.storytellingV977} disabled={!settings.enabled||!settings.virtualFx}
+    onChange={e=>save({storytellingV977:e.target.checked})}/> V977: Smart Concert Storytelling – dramaturgischer Spannungsbogen für bestätigte Songabschnitte</label>
+   <label>V977 · Inszenierung <select aria-label="V977 Erzählstil" value={settings.storytellingModeV977}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.storytellingV977}
+    onChange={e=>save({storytellingModeV977:e.target.value as ConcertSettingsV958['storytellingModeV977']})}>
+    <option value="subtle">Dezent</option><option value="cinematic">Filmisch</option><option value="festival">Festival</option>
+   </select></label>
+   <label>V977 · Stärke {settings.storytellingStrengthV977}% <input type="range" min={0} max={100} step={5}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.storytellingV977}
+    value={settings.storytellingStrengthV977} onChange={e=>save({storytellingStrengthV977:Number(e.target.value)})}/></label>
+   <label><input type="checkbox" checked={settings.storytellingAccentsV977}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.storytellingV977}
+    onChange={e=>save({storytellingAccentsV977:e.target.checked})}/> V977: Ruhige, optionale Sweep-Akzente in bestätigten Hooks/Drops und beim Outro-Finale</label>
+   <label><input type="checkbox" checked={settings.atmosphereV978}
+    disabled={!settings.enabled||!settings.virtualFx}
+    onChange={e=>save({atmosphereV978:e.target.checked})}/> V978: Smart Concert Atmosphere 2.0 – virtueller Genre-Nebel, Lichtstrahlen und Publikumsimpulse</label>
+   <label>V978 · Atmosphäre <select aria-label="V978 Atmosphärenstil" value={settings.atmosphereModeV978}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.atmosphereV978}
+    onChange={e=>save({atmosphereModeV978:e.target.value as ConcertSettingsV958['atmosphereModeV978']})}>
+    <option value="subtle">Dezent</option><option value="balanced">Ausgewogen</option><option value="immersive">Immersiv</option>
+   </select></label>
+   <label>V978 · Stärke {settings.atmosphereStrengthV978}% <input type="range" min={0} max={100} step={5}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.atmosphereV978}
+    value={settings.atmosphereStrengthV978} onChange={e=>save({atmosphereStrengthV978:Number(e.target.value)})}/></label>
+   <label><input type="checkbox" checked={settings.atmosphereFogV978}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.atmosphereV978}
+    onChange={e=>save({atmosphereFogV978:e.target.checked})}/> V978: Dynamischer virtueller Bodennebel</label>
+   <label><input type="checkbox" checked={settings.atmosphereBeamsV978}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.atmosphereV978}
+    onChange={e=>save({atmosphereBeamsV978:e.target.checked})}/> V978: Sanft schwenkende virtuelle Lichtkegel</label>
+   <label><input type="checkbox" checked={settings.atmosphereCrowdV978}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.atmosphereV978}
+    onChange={e=>save({atmosphereCrowdV978:e.target.checked})}/> V978: Ruhige Publikumsrand-Impulse (keine neuen Avatare)</label>
+   <p className="settings-note">V978 verändert nur bestätigte virtuelle Songabschnitte. Bei manuellen Shows, reduzierter Bewegung, kompaktem FX-Modus oder dem Raspberry-Pi-Sparprofil bleibt die Erweiterung aus. Govee/Alexa erhalten keine zusätzlichen Befehle.</p>
    <label><input type="checkbox" checked={settings.volumetricV972}
     disabled={!settings.enabled||!settings.virtualFx||!settings.immersiveV966}
     onChange={e=>save({volumetricV972:e.target.checked})}/>
@@ -163,6 +210,10 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
    {continuity?.repeated??0} aufeinanderfolgende Kamera-/Formation-Wiederholungen.
    {realQuality?.available?` Importierte Songabschnitte: ${concertContinuityAuditV960(realQuality.scenes).phaseChanges} bestätigte Phasenwechsel.`
     :' Keine bestätigte Songanalyse – keine Hardware-Übergänge.'}</p>
+  <h4>V977 · Smart Concert Storytelling</h4>
+  <p className="settings-note">Opt-in: V975-Energiekurve und V976-Lichtüberblendungen werden durch eine langsame Dramaturgie über die tatsächliche Songposition ergänzt. Wiederkehrende bestätigte Hooks variieren dezent, Breaks lassen Luft und ein Outro-Finale setzt nur am echten Songende einen Akzent. Manuelle Bühnen-Cues und reduzierte Bewegung bleiben unangetastet. Ausschließlich virtuelle Effekte, keine Govee-/Alexa-Befehle.</p>
+  <h4>V976 · Intelligent Concert Transitions</h4>
+  <p className="settings-note">Opt-in: Farb-, Licht- und Effektübergänge zwischen wirklich erkannten, benachbarten Songabschnitten. Nur virtuelle Bühne; bestehende Kamera-Interpolation wird für automatische Übergaben verwendet. Manuelle V354-Cues und gespeicherte Lichtshows gewinnen. Für Raspberry-Pi-Eco und reduzierte Bewegung deaktiviert. Keine neuen Govee-Befehle, Timer oder WebGL-Objekte.</p>
   <h4>V975 · Adaptive Concert Energy Director</h4>
   <p className="settings-note">Opt-in: Gestaffelte Energie für Verse, Hooks, Build, Drop und Ruhephasen. Die Einstellungen beeinflussen nur die virtuelle Bühne, wenn echte V318-Songabschnitte bestätigt wurden. Kein zusätzlicher Timer, keine Govee-Lichtkommandos oder neuen Effekte. Im Raspberry-Pi-/Bewegungsreduktionsmodus deaktiviert.</p>
   <h4>V961 · Govee Concert Light Governor</h4>

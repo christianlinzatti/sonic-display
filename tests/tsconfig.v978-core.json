@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": [],
+    "typeRoots": [
+      "./empty-types"
+    ],
+    "incremental": false,
+    "noEmit": true
+  },
+  "include": [],
+  "files": [
+    "../lib/concertAtmosphereV978.ts",
+    "../lib/concertStorytellingV977.ts",
+    "../lib/intelligentConcertTransitionsV976.ts",
+    "../lib/concertEnergyArcV975.ts",
+    "../lib/ultimateConcertRoadmapV958.ts"
+  ]
+}

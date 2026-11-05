@@ -37,6 +37,7 @@ import {ConcertDetailStageV555} from './ConcertDetailStageV555';
 import { StageVisualEffectsV353 } from "./StageVisualEffectsV353";
 import {ConcertFestivalFxV958} from "./ConcertFestivalFxV958";
 import {previousVerifiedConcertSceneV960,applyConcertContinuityV960} from "@/lib/concertContinuityV960";
+import {applyIntelligentConcertTransitionV976} from "@/lib/intelligentConcertTransitionsV976";
 import { LongRunStabilityControllerV355 } from "./LongRunStabilityV355";
 import { useStabilityCapV355, stabilityEffectFactorV355 } from "@/services/monitoring/performanceStabilityV355";
 import {autoLoadConcertSongV764} from "@/services/stageContent/concertTimelineAutomationV764";
@@ -242,15 +243,26 @@ export function ThreeAvatar(props: VisualizerProps) {
     verified:true,genre:String(props.genre??''),energy:props.audio?.energyEnvelope??0,
     bass:props.audio?.bass??0,lyricsVisible:lyricsActiveV356,reducedMotion:props.reducedMotion},concertSettingsV958)
    :null;
-  const previousSceneV960=scene958&&concertSettingsV958.transitionsV960?previousVerifiedConcertSceneV960({
+  const previousSceneV960=scene958&&(concertSettingsV958.transitionsV960||concertSettingsV958.intelligentTransitionsV976)?previousVerifiedConcertSceneV960({
     analysis:concertAnalysisV958,trackId:track958,sectionIndex:marker958,
     durationMs:props.track?.durationMs??concertAnalysisV958?.durationMs??0,
     genre:String(props.genre??''),energy:props.audio?.energyEnvelope??0,bass:props.audio?.bass??0,
     lyricsVisible:lyricsActiveV356,reducedMotion:props.reducedMotion,settings:concertSettingsV958}):null;
-  const continuousSceneV960=scene958?applyConcertContinuityV960(scene958,previousSceneV960,
+  const legacyContinuityV960=scene958?applyConcertContinuityV960(scene958,previousSceneV960,
     progress958-(source958?.startMs??progress958),concertSettingsV958,{
     manualStage:authoredCueV354.active||authoredEnabled,
     reducedMotion:props.reducedMotion}).scene:null;
+  // V976 hands off only automatic V354 camera cues; the existing camera director
+  // handles movement interpolation. Authored camera, group and lyric cues win.
+  const continuousSceneV960=applyIntelligentConcertTransitionV976({
+    scene:concertSettingsV958.intelligentTransitionsV976?scene958:legacyContinuityV960,
+    previous:previousSceneV960,settings:concertSettingsV958,
+    elapsedMs:progress958-(source958?.startMs??progress958),
+    sectionDurationMs:source958?.durationMs??0,playing:props.isPlaying,
+    authoredStage:authoredCueV354.active||authoredEnabled,
+    savedShowActive:false,lowPerformance:getActivePerformanceTier()==='low'||
+      (piConcertBudgetV479.enabled&&piConcertBudgetV479.level==='eco'),
+    reducedMotion:props.reducedMotion,lyricsVisible:lyricsActiveV356}).scene;
   // V354 authored clips always win. Explicit avatar groups and manual duo setups are excluded.
   const timelineCueV354=overlayConcertStageV958(automaticCueV354,continuousSceneV960,{
     enabled:concertSettingsV958.enabled,authored:authoredCueV354.active,

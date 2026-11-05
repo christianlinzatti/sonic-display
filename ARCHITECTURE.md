@@ -1,3 +1,9 @@
+## V977 – Smart Concert Storytelling (virtuelle Konzertregie)
+
+`lib/concertStorytellingV977.ts` berechnet deterministisch und ohne Nebenwirkungen einen dramaturgischen Energieverlauf aus der realen V318-Songposition und dem bestätigten aktuellen Abschnitt. `components/visualizer/ConcertFestivalFxV958.tsx` ruft V977 direkt **nach V976/V975** und vor V969/V968 auf. Es gibt keinen weiteren Render-Loop, keine neue Kamera-Regie, keine Gerätedaten und keine zusätzlichen Netzwerkaufrufe. Die vier persistenten V977-Einstellungen sind im bestehenden `lib/ultimateConcertRoadmapV958.ts` normalisiert und im `ConcertRoadmapStudioV958.tsx` bedienbar. Tests: `tests/v977-concert-storytelling-regression.cjs`, isolierte TypeScript-Prüfung: `tests/tsconfig.v977-core.json`. Das Version-Gate ist sowohl in V931 als auch im Vercel-Build registriert. Ältere Manuell-/Show-/Lyrics-/Pi-Prioritäten bleiben bestehen.
+
+---
+
 ## V973 – Living Audience 3.0
 
 - `components/visualizer/livingAudienceDirectorV973.ts`: rein deterministischer Musik-/Sektor-Planer; nur aktive, verifizierte V810- und bestehende V815/V825/V893-Cues, kein weiterer Sound- oder Datenanbieter.
@@ -3589,3 +3595,12 @@ führt die Strukturmigration automatisiert nach dem ZIP-Import aus.
 `lib/alexaGoveeV970.ts` begrenzt die sechs neuen Govee-Lichtstimmungsbefehle auf schon freigeschaltete Govee-Auto-Sync-Lampen. Es gibt eine eigene lokale Zustimmung, die nicht aus bestehender Alexa- oder Govee-Konfiguration abgeleitet wird. Der bereits signierte V967-Redis-Relay nimmt nur Befehle aus der V970-Allowlist an. `components/AlexaConcertControlV967.tsx` prüft die Freigabe vor dem lokalen Event; `components/GoveeMusicSyncV909.tsx` wiederholt die Prüfung und blendet die gewählte Farbe direkt vor dem bestehenden V961-Governor in den **vorhandenen** LAN-Sendepfad ein. Keine zusätzlichen Timer und kein Bypass der manuellen V912-Lichtshow.
 
 Siehe `docs/versions/V970-ALEXA-GOVEE-ROOM-IMMERSION.md`; Produktionsprüfungen müssen auf Node 24 mit installierten npm-Abhängigkeiten ausgeführt werden.
+
+
+## V978 – Smart Concert Atmosphere 2.0
+
+`lib/concertAtmosphereV978.ts` berechnet aus tatsächlich bestätigten V318-Songabschnitten eine reine, begrenzte Atmosphären-Cue. `components/visualizer/ConcertGenreAtmosphereV978.tsx` nutzt dafür die bestehende R3F-Bühne (acht transparente, kostengünstige Meshes), keine zweite Render-Schleife. Die Settings sind im V958-Studio opt-in und normalisiert. Manuelle Shows, Govee, Alexa, Kamera und Raspberry-Pi-Sparprofile bleiben unangetastet.
+
+## V976 – Verified virtual concert transitions
+
+`lib/intelligentConcertTransitionsV976.ts` implements a pure deterministic V318 section-boundary crossfade consumed by `ConcertFestivalFxV958` and the **existing** V354 automatic camera cue in `ThreeAvatar`. V960 previous-scene validation and manual precedence are preserved; no hardware, timers or extra R3F loops.

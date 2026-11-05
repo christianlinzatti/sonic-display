@@ -128,7 +128,8 @@ test('no added R3F loop, network access, LED commands or audio capture',()=>{
 });
 test('new scripts, version markers and CI gates remain installed',()=>{
  const packageJson=JSON.parse(read('package.json'));
- assert.equal(packageJson.sonicRoadmapRelease,'v975');assert.equal(packageJson.sonicFeatureRelease,'v975');
+ assert(Number.parseInt(String(packageJson.sonicRoadmapRelease).replace(/^v/,''),10)>=975);
+ assert.equal(packageJson.sonicRoadmapRelease,packageJson.sonicFeatureRelease);
  assert(packageJson.scripts['test:v975'].includes('v975-adaptive-concert-energy-regression'));
  assert(packageJson.scripts['test:v975:types'].includes('tsconfig.v975-core.json'));
  assert(read('scripts/v931-production-gate.cjs').includes('v975-adaptive-concert-energy-regression'));

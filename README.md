@@ -1,3 +1,7 @@
+## V977 – Smart Concert Storytelling
+
+Opt-in für einen dramaturgischen Konzertbogen über den ganzen Song: ruhiger Einstieg, bestätigte Verse/Hooks/Builds/Drops, bewusste Breaks und ein nur bei bestätigtem Outro angezeigtes Finale. Die neue Regie wird **nach V975/V976** auf die virtuelle Bühne angewendet, bietet die Stile *Dezent / Filmisch / Festival* und bewahrt manuelle Timelines, Kamera, Alexa, Govee und Raspberry-Pi-Eco. Details: [V977 Smart Concert Storytelling](docs/versions/V977-SMART-CONCERT-STORYTELLING.md). Der vollständige TypeScript-/Next.js-Produktionsbuild muss noch in CI bestätigt werden.
+
 ## V975 – Adaptive Concert Energy Director
 
 Opt-in für eine genre- und abschnittssensible virtuelle Konzert-Energiekurve im Ultimate Concert Experience Studio. Details: [V975 Dokumentation](docs/versions/V975-ADAPTIVE-CONCERT-ENERGY-DIRECTOR.md). Govee, Alexa und die bestehenden Windows-/Raspberry-Pi-Bridges bleiben erhalten.
@@ -2184,3 +2188,8 @@ Neue optionale dramaturgische Lichtkurve für bestätigte Verse/Hook/Build/Drop/
 ## V969 – Smart Concert Presets
 
 Im **Ultimate Concert Experience Studio** gibt es jetzt genreabhängige virtuelle Konzertwelten (Smart Automatik, Arena, Festival, Club, Cinematic Night, Hardtekk Reactor und Rock Arena). V969 verwendet bestätigte V318-Songphasen und lässt gespeicherte Shows, Kameraentscheidungen, die Spotify-Wiedergabe und Govee-Hardware unverändert. Alexa-Einrichtung und Tests: [`docs/versions/V969-SMART-CONCERT-PRESETS.md`](docs/versions/V969-SMART-CONCERT-PRESETS.md).
+
+
+## V976 – Intelligent Concert Transitions
+
+Optionale, sanfte Übergänge für die virtuelle Bühne zwischen bestätigten V318-Songabschnitten: Lichtfarbe, Intensität, Effektfreigaben und automatische Kamerahandovers. Keine zweite Kamera- oder Govee-Steuerung; manuelle Timelines haben Vorrang. Im Ultimate Concert Experience Studio einstellen. Anleitung: [`docs/versions/V976-INTELLIGENT-CONCERT-TRANSITIONS.md`](docs/versions/V976-INTELLIGENT-CONCERT-TRANSITIONS.md). Prüfungen: `npm run test:v976`, `npm run test:v976:types`. Vollständiger Next.js-Build bleibt ein separates Production Gate.

@@ -136,7 +136,8 @@ test('UI, renderer, signed bridge and CI gates wire V969 end to end',()=>{
  for(const s of ['Smart Konzert-Preset V969','selectSmartConcertPresetV969','applyAlexaConcertCommandV969'])
   assert(ui.includes(s),s);
  assert(stage.includes('applySmartConcertPresetV969(continuity,settings,')||
-  stage.includes('applySmartConcertPresetV969(energyArcV975.scene??continuity,settings,'));
+  stage.includes('applySmartConcertPresetV969(energyArcV975.scene??continuity,settings,')||
+  stage.includes('applySmartConcertPresetV969(storyV977.scene??energyArcV975.scene??continuity,settings,'));
  assert(stage.indexOf('applySmartConcertPresetV969(')<stage.indexOf('applyAlexaVirtualSceneV968('));
  const route=read('app/api/alexa/command/route.ts');assert(route.includes('isAlexaConcertCommandV969')||route.includes('isAlexaCommandV970')); 
  assert(read('scripts/vercel-production-build.cjs').includes('v969-smart-concert-presets-regression.cjs'));

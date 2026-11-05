@@ -1993,7 +1993,16 @@
     "verify:v973:focused": "npm run test:v973 && npm run test:v973:types && npm run test:v972 && npm run test:structure && npm run check:syntax && npm run check:architecture",
     "test:v975": "node tests/v975-adaptive-concert-energy-regression.cjs",
     "test:v975:types": "tsc -p tests/tsconfig.v975-core.json --noEmit",
-    "verify:v975:focused": "npm run test:v975 && npm run test:v975:types && npm run test:v973 && npm run test:v972 && npm run test:v971 && npm run check:syntax && npm run check:architecture"
+    "verify:v975:focused": "npm run test:v975 && npm run test:v975:types && npm run test:v973 && npm run test:v972 && npm run test:v971 && npm run check:syntax && npm run check:architecture",
+    "test:v977": "node tests/v977-concert-storytelling-regression.cjs",
+    "test:v977:types": "tsc -p tests/tsconfig.v977-core.json --noEmit",
+    "verify:v977:focused": "npm run test:v977 && npm run test:v977:types && npm run test:v976 && npm run test:v975 && npm run test:v973 && npm run check:syntax && npm run check:architecture",
+    "test:v976": "node tests/v976-intelligent-concert-transitions-regression.cjs",
+    "test:v976:types": "tsc -p tests/tsconfig.v976-core.json --noEmit",
+    "verify:v976:focused": "npm run test:v976 && npm run test:v976:types && npm run test:v975 && npm run test:v973 && npm run test:v972 && npm run check:syntax && npm run check:architecture",
+    "test:v978": "node tests/v978-smart-concert-atmosphere-regression.cjs",
+    "test:v978:types": "tsc -p tests/tsconfig.v978-core.json --noEmit",
+    "verify:v978:focused": "npm run test:v978 && npm run test:v978:types && npm run test:v977 && npm run test:v976 && npm run test:v975 && npm run test:v973 && npm run test:v972 && npm run check:syntax && npm run check:architecture"
   },
   "engines": {
     "node": "24.x"
@@ -2021,6 +2030,6 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v975",
-  "sonicFeatureRelease": "v975"
+  "sonicRoadmapRelease": "v978",
+  "sonicFeatureRelease": "v978"
 }

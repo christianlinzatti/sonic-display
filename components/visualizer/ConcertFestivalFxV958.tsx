@@ -3,6 +3,10 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {useFrame} from '@react-three/fiber';
 import {previousVerifiedConcertSceneV960,applyConcertContinuityV960} from '@/lib/concertContinuityV960';
 import {applyConcertEnergyArcV975} from '@/lib/concertEnergyArcV975';
+import {applyIntelligentConcertTransitionV976} from '@/lib/intelligentConcertTransitionsV976';
+import {applyConcertStorytellingV977} from '@/lib/concertStorytellingV977';
+import {planConcertAtmosphereV978} from '@/lib/concertAtmosphereV978';
+import {ConcertGenreAtmosphereV978} from './ConcertGenreAtmosphereV978';
 import type {Group} from 'three';
 import {planImmersiveConcertV966} from '@/lib/immersiveConcertEngineV966';
 import {applyAlexaVirtualSceneV968,maskAlexaImmersiveCueV968} from '@/lib/alexaConcertV968';
@@ -41,14 +45,26 @@ export function ConcertFestivalFxV958({trackId,progressMs,durationMs,genre,energ
   const original=composeConcertSceneV958({trackId,progressMs,durationMs,genre,
    phase:section.label as ConcertPhaseV958,sectionIndex:active??0,sectionStartMs:section.startMs,
    verified:true,energy,bass,lyricsVisible,reducedMotion},settings);
-  const previous=settings.transitionsV960?previousVerifiedConcertSceneV960({analysis,trackId,
+  const previous=(settings.transitionsV960||settings.intelligentTransitionsV976)?previousVerifiedConcertSceneV960({analysis,trackId,
     sectionIndex:active??0,durationMs,genre,energy,bass,lyricsVisible,reducedMotion,settings}):null;
-  const continuity=applyConcertContinuityV960(original,previous,progressMs-section.startMs,settings,{reducedMotion}).scene;
+  const existingContinuity=applyConcertContinuityV960(original,previous,progressMs-section.startMs,settings,{reducedMotion}).scene;
+  // V976 takes over virtual blending if enabled; V960 remains the fallback.
+  const continuity=applyIntelligentConcertTransitionV976({
+   scene:settings.intelligentTransitionsV976?original:existingContinuity,previous,settings,
+   elapsedMs:progressMs-section.startMs,sectionDurationMs:section.durationMs,playing,
+   authoredStage,lowPerformance,reducedMotion,lyricsVisible}).scene;
   // V975 changes only this virtual renderer, never the separate Govee cue path.
   const energyArcV975=applyConcertEnergyArcV975({scene:continuity,settings,
    positionMs:progressMs,durationMs,sectionStartMs:section.startMs,sectionDurationMs:section.durationMs,
    sectionIndex:active??0,playing,authoredStage,lowPerformance,reducedMotion,lyricsVisible});
-  const presetScene=applySmartConcertPresetV969(energyArcV975.scene??continuity,settings,{authoredStage,reducedMotion,lowPerformance});
+  // V977 composes after V975/V976, before the existing virtual preset/voice policy.
+  const hookOrdinal=analysis?.sections.slice(0,(active??0)+1).filter(item=>
+   item.label==='hook'&&item.confidence>=.5).length??0;
+  const storyV977=applyConcertStorytellingV977({scene:energyArcV975.scene??continuity,settings,
+   positionMs:progressMs,durationMs,sectionStartMs:section.startMs,sectionDurationMs:section.durationMs,
+   sectionIndex:active??0,sectionConfidence:section.confidence,hookOrdinal,playing,
+   authoredStage,lowPerformance,reducedMotion,lyricsVisible});
+  const presetScene=applySmartConcertPresetV969(storyV977.scene??energyArcV975.scene??continuity,settings,{authoredStage,reducedMotion,lowPerformance});
   return applyAlexaVirtualSceneV968(
    presetScene,settings,{authoredStage,reducedMotion,lowPerformance});
  },[analysis,settings,playing,trackId,progressMs,durationMs,genre,verified,section,active,energy,bass,lyricsVisible,reducedMotion,authoredStage,lowPerformance]);
@@ -67,6 +83,12 @@ export function ConcertFestivalFxV958({trackId,progressMs,durationMs,genre,energ
  const immersiveV966=maskAlexaImmersiveCueV968(immersiveBaseV966,settings);
  const volumetricV972=planVolumetricStageV972({immersive:immersiveV966,scene,settings,
   positionMs:progressMs,playing,authoredStage,lowPerformance,reducedMotion,lyricsVisible});
+ const atmosphereV978=planConcertAtmosphereV978({scene,settings,trackId,analysisTrackId:analysis?.trackId??'',
+  sectionLabel:section?.label??'',sectionConfidence:section?.confidence??0,
+  positionMs:progressMs,durationMs,sectionStartMs:section?.startMs??-1,
+  sectionDurationMs:section?.durationMs??0,playing,authoredStage,lowPerformance,
+  reducedMotion,lyricsVisible,energy,bass,immersiveActive:immersiveV966.active,
+  volumetricActive:volumetricV972.active});
  if(!scene)return null;
  // Voice zoning never modifies an authored stage or the user's timeline cues.
  const voiceZonesEnabledV968=!authoredStage&&!scene.timelineOverride&&!lowPerformance&&scene.verified;
@@ -79,6 +101,9 @@ export function ConcertFestivalFxV958({trackId,progressMs,durationMs,genre,energ
  return <group name="UltimateConcertStageFxV958">
   <ImmersiveConcertEnvironmentV966 cue={immersiveV966}/>
   <VolumetricStageAtmosphereV972 cue={volumetricV972}/>
+  <ConcertGenreAtmosphereV978 cue={atmosphereV978}
+   showStage={showStageV968} showAudience={voiceZonesEnabledV968&&
+    (settings.voiceZoneV968==='all'||settings.voiceZoneV968==='audience')}/>
   {/* V951: dynamic low-cost LED geometry behind performers; an actual 3D object. */}
   {showBackdropV968&&<group ref={wallMotion} position={[0,1.8,-3.0]}>
    {Array.from({length:14},(_,i)=><mesh key={i} position={[(i-6.5)*.47,0,0]}>
