@@ -158,7 +158,8 @@ check('Integration is virtual-only: no physical hardware, no extra render loop',
  const fx=read('components/visualizer/ConcertFestivalFxV958.tsx');
  const renderer=read('components/visualizer/ConcertGenreAtmosphereV978.tsx');
  assert(fx.includes('planConcertAtmosphereV978({scene,settings'));
- assert(fx.includes('<ConcertGenreAtmosphereV978 cue={atmosphereV978}'));
+ assert(fx.includes('coordinateAtmosphereV979(atmosphereV978,concert.direction)'));
+ assert(fx.includes('<ConcertGenreAtmosphereV978 cue={atmosphereDirectedV979}'));
  assert(!renderer.includes('useFrame('));assert(!renderer.includes('directionalLight'));
  for(const token of ['circleGeometry','coneGeometry','planeGeometry','fogOpacity','beamOpacity','crowdOpacity'])assert(renderer.includes(token));
  assert(read('components/ConcertRoadmapStudioV958.tsx').includes('atmosphereStrengthV978'));

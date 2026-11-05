@@ -24,6 +24,7 @@ export type EnergyArcModeV975='subtle'|'balanced'|'cinematic';
 export type TransitionStyleV976='gentle'|'balanced'|'dramatic';
 export type StorytellingModeV977='subtle'|'cinematic'|'festival';
 export type AtmosphereModeV978='subtle'|'balanced'|'immersive';
+export type LiveShowStyleV979='adaptive'|'cinematic'|'festival'|'club';
 export type VoiceZoneV968='all'|'stage'|'backdrop'|'audience';
 export type VoiceMoodV968='auto'|'warm'|'cool'|'neon';
 export type VoiceFxV968='auto'|'off'|'beams'|'fog'|'confetti'|'streamers';
@@ -35,7 +36,8 @@ export type ConcertSettingsV958={schema:'ultimate-concert-v958';enabled:boolean;
   intelligentTransitionsV976:boolean;transitionStyleV976:TransitionStyleV976;transitionStrengthV976:number;cameraHandoffsV976:boolean;
   storytellingV977:boolean;storytellingModeV977:StorytellingModeV977;storytellingStrengthV977:number;storytellingAccentsV977:boolean;
   atmosphereV978:boolean;atmosphereModeV978:AtmosphereModeV978;atmosphereStrengthV978:number;
-  atmosphereFogV978:boolean;atmosphereBeamsV978:boolean;atmosphereCrowdV978:boolean};
+  atmosphereFogV978:boolean;atmosphereBeamsV978:boolean;atmosphereCrowdV978:boolean;
+  liveShowDirectorV979:boolean;liveShowStyleV979:LiveShowStyleV979;liveShowStrengthV979:number};
 export const DEFAULT_CONCERT_V958:ConcertSettingsV958={schema:'ultimate-concert-v958',enabled:false,hardwareSync:false,virtualFx:false,
  strength:55,roleOverrides:{},presets:[],timeline:{},transitionsV960:false,compactFxV960:false,lightGovernorV961:false,narrativeV962:false,bridgeV963:false,peakRecoveryV964:false,roomWaveV965:false,immersiveV966:false,immersiveStrengthV966:60,volumetricV972:false,volumetricStrengthV972:55,volumetricQualityV972:'balanced',
  voiceZoneV968:'all',voiceMoodV968:'auto',voiceFxV968:'auto',concertPresetV969:'off',
@@ -43,7 +45,8 @@ export const DEFAULT_CONCERT_V958:ConcertSettingsV958={schema:'ultimate-concert-
  intelligentTransitionsV976:false,transitionStyleV976:'balanced',transitionStrengthV976:65,cameraHandoffsV976:true,
  storytellingV977:false,storytellingModeV977:'cinematic',storytellingStrengthV977:60,storytellingAccentsV977:true,
  atmosphereV978:false,atmosphereModeV978:'balanced',atmosphereStrengthV978:60,
- atmosphereFogV978:true,atmosphereBeamsV978:true,atmosphereCrowdV978:true};
+ atmosphereFogV978:true,atmosphereBeamsV978:true,atmosphereCrowdV978:true,
+ liveShowDirectorV979:false,liveShowStyleV979:'adaptive',liveShowStrengthV979:65};
 export type ConcertInputV958={trackId:string;progressMs:number;durationMs:number;phase:ConcertPhaseV958;
  sectionIndex:number;sectionStartMs:number;verified:boolean;genre:string;energy:number;bass:number;lyricsVisible:boolean;
  reducedMotion:boolean;stageCamera?:ConcertCameraV940;stageFormation?:ConcertDanceV941;authoredStage?:boolean};
@@ -115,7 +118,10 @@ export function normalizeConcertRoadmapV958(raw:unknown):ConcertSettingsV958{
   atmosphereStrengthV978:Math.round(clamp(Number(o.atmosphereStrengthV978??60),0,100)),
   atmosphereFogV978:o.atmosphereFogV978!==false,
   atmosphereBeamsV978:o.atmosphereBeamsV978!==false,
-  atmosphereCrowdV978:o.atmosphereCrowdV978!==false};
+  atmosphereCrowdV978:o.atmosphereCrowdV978!==false,
+  liveShowDirectorV979:o.liveShowDirectorV979===true,
+  liveShowStyleV979:(['adaptive','cinematic','festival','club'] as unknown[]).includes(o.liveShowStyleV979)?o.liveShowStyleV979!:'adaptive',
+  liveShowStrengthV979:Math.round(clamp(Number(o.liveShowStrengthV979??65),0,100))};
 }
 export function loadConcertRoadmapV958():ConcertSettingsV958{
  if(typeof window==='undefined')return normalizeConcertRoadmapV958(null);

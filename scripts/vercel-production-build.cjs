@@ -33,6 +33,7 @@ try {
   }
   run('Source and lockfile preflight','scripts/v959-source-preflight.cjs');
   run('React 19 production/development parity','tests/react-act-compat-regression.cjs');
+  run('V979 Intelligent Live Show Director 3.0','tests/v979-intelligent-live-show-director-regression.cjs');
   run('V978 Smart Concert Atmosphere 2.0','tests/v978-smart-concert-atmosphere-regression.cjs');
   run('V977 Smart Concert Storytelling','tests/v977-concert-storytelling-regression.cjs');
   run('V976 Intelligent Concert Transitions','tests/v976-intelligent-concert-transitions-regression.cjs');
@@ -58,6 +59,7 @@ try {
   run('V962 narrative regression','tests/v962-concert-narrative-regression.cjs');
   run('V961 light governor regression','tests/v961-govee-concert-governor-regression.cjs');
   run('Vercel deployment configuration regression','tests/vercel-production-parity-regression.cjs');
+  run('V979 Intelligent Live Show Director 3.0 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v979-core.json','--noEmit']);
   run('V978 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v978-core.json','--noEmit']);
   run('V977 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v977-core.json','--noEmit']);
   run('V976 isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v976-core.json','--noEmit']);

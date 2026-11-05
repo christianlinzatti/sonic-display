@@ -6,6 +6,7 @@ import {applyConcertEnergyArcV975} from '@/lib/concertEnergyArcV975';
 import {applyIntelligentConcertTransitionV976} from '@/lib/intelligentConcertTransitionsV976';
 import {applyConcertStorytellingV977} from '@/lib/concertStorytellingV977';
 import {planConcertAtmosphereV978} from '@/lib/concertAtmosphereV978';
+import {coordinateLiveShowV979,coordinateAtmosphereV979} from '@/lib/intelligentLiveShowDirectorV979';
 import {ConcertGenreAtmosphereV978} from './ConcertGenreAtmosphereV978';
 import type {Group} from 'three';
 import {planImmersiveConcertV966} from '@/lib/immersiveConcertEngineV966';
@@ -40,7 +41,7 @@ export function ConcertFestivalFxV958({trackId,progressMs,durationMs,genre,energ
  const active=analysis?.trackId===trackId?analysis.sections.findIndex(s=>s.startMs<=progressMs&&progressMs<s.startMs+s.durationMs):-1;
  const section=active!==undefined&&active>=0?analysis?.sections[active]:undefined;
  const verified=Boolean(section&&section.label&&section.confidence>=.5);
- const scene=useMemo(()=>{
+ const concert=useMemo(()=>{
   if(!settings.enabled||!settings.virtualFx||!playing||!trackId||!verified||!section?.label)return null;
   const original=composeConcertSceneV958({trackId,progressMs,durationMs,genre,
    phase:section.label as ConcertPhaseV958,sectionIndex:active??0,sectionStartMs:section.startMs,
@@ -64,10 +65,21 @@ export function ConcertFestivalFxV958({trackId,progressMs,durationMs,genre,energ
    positionMs:progressMs,durationMs,sectionStartMs:section.startMs,sectionDurationMs:section.durationMs,
    sectionIndex:active??0,sectionConfidence:section.confidence,hookOrdinal,playing,
    authoredStage,lowPerformance,reducedMotion,lyricsVisible});
+  // Keep legacy V969 genre presets and V968 virtual Alexa scene authoritative.
+  // V979 applies the shared safety/overdraw budget after ALL virtual styles;
+  // camera, formations and any real Govee/Alexa device path remain separate.
   const presetScene=applySmartConcertPresetV969(storyV977.scene??energyArcV975.scene??continuity,settings,{authoredStage,reducedMotion,lowPerformance});
-  return applyAlexaVirtualSceneV968(
-   presetScene,settings,{authoredStage,reducedMotion,lowPerformance});
+  const virtualScene=applyAlexaVirtualSceneV968(presetScene,settings,{authoredStage,reducedMotion,lowPerformance});
+  const directedV979=coordinateLiveShowV979({
+   original,scene:virtualScene,settings,
+   trackId,analysisTrackId:analysis?.trackId??'',sectionLabel:section.label,
+   sectionConfidence:section.confidence,sectionIndex:active??0,
+   positionMs:progressMs,durationMs,sectionStartMs:section.startMs,
+   sectionDurationMs:section.durationMs,playing,authoredStage,lowPerformance,
+   reducedMotion,lyricsVisible});
+  return {scene:directedV979.scene,direction:directedV979};
  },[analysis,settings,playing,trackId,progressMs,durationMs,genre,verified,section,active,energy,bass,lyricsVisible,reducedMotion,authoredStage,lowPerformance]);
+ const scene=concert?.scene??null;
  useFrame((_state,delta)=>{if(rotation.current&&playing&&!reducedMotion&&scene){
   rotation.current.rotation.y+=Math.min(.02,Math.max(0,delta))*.20;
  }
@@ -89,6 +101,7 @@ export function ConcertFestivalFxV958({trackId,progressMs,durationMs,genre,energ
   sectionDurationMs:section?.durationMs??0,playing,authoredStage,lowPerformance,
   reducedMotion,lyricsVisible,energy,bass,immersiveActive:immersiveV966.active,
   volumetricActive:volumetricV972.active});
+ const atmosphereDirectedV979=concert?.direction?coordinateAtmosphereV979(atmosphereV978,concert.direction):atmosphereV978;
  if(!scene)return null;
  // Voice zoning never modifies an authored stage or the user's timeline cues.
  const voiceZonesEnabledV968=!authoredStage&&!scene.timelineOverride&&!lowPerformance&&scene.verified;
@@ -101,7 +114,7 @@ export function ConcertFestivalFxV958({trackId,progressMs,durationMs,genre,energ
  return <group name="UltimateConcertStageFxV958">
   <ImmersiveConcertEnvironmentV966 cue={immersiveV966}/>
   <VolumetricStageAtmosphereV972 cue={volumetricV972}/>
-  <ConcertGenreAtmosphereV978 cue={atmosphereV978}
+  <ConcertGenreAtmosphereV978 cue={atmosphereDirectedV979}
    showStage={showStageV968} showAudience={voiceZonesEnabledV968&&
     (settings.voiceZoneV968==='all'||settings.voiceZoneV968==='audience')}/>
   {/* V951: dynamic low-cost LED geometry behind performers; an actual 3D object. */}

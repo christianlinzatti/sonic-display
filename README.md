@@ -2193,3 +2193,14 @@ Im **Ultimate Concert Experience Studio** gibt es jetzt genreabhängige virtuell
 ## V976 – Intelligent Concert Transitions
 
 Optionale, sanfte Übergänge für die virtuelle Bühne zwischen bestätigten V318-Songabschnitten: Lichtfarbe, Intensität, Effektfreigaben und automatische Kamerahandovers. Keine zweite Kamera- oder Govee-Steuerung; manuelle Timelines haben Vorrang. Im Ultimate Concert Experience Studio einstellen. Anleitung: [`docs/versions/V976-INTELLIGENT-CONCERT-TRANSITIONS.md`](docs/versions/V976-INTELLIGENT-CONCERT-TRANSITIONS.md). Prüfungen: `npm run test:v976`, `npm run test:v976:types`. Vollständiger Next.js-Build bleibt ein separates Production Gate.
+
+### V979 – Intelligent Live Show Director 3.0
+
+Die gemeinsame, optionale V979-Konzertregie koordiniert V975 Energie, V976
+Übergänge, V977 Songdramaturgie und V978 virtuelle Atmosphäre mit einem
+konservativen Licht-/Effektbudget über bestätigte V318-Songabschnitte.
+Regiestile: Genre-automatisch, Filmisch, Festival und Club. Es gibt einen
+Ein-Klick-Schalter zur Aktivierung der zusammengehörenden virtuellen Regiestufen;
+manuelle Timelines und Gerätebefehle behalten Vorrang. Details und
+Verifizierungsgrenzen: `docs/versions/V979-INTELLIGENT-LIVE-SHOW-DIRECTOR-3.md`
+und `docs/versions/V979-VERIFICATION.md`.

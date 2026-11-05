@@ -2000,6 +2000,9 @@
     "test:v976": "node tests/v976-intelligent-concert-transitions-regression.cjs",
     "test:v976:types": "tsc -p tests/tsconfig.v976-core.json --noEmit",
     "verify:v976:focused": "npm run test:v976 && npm run test:v976:types && npm run test:v975 && npm run test:v973 && npm run test:v972 && npm run check:syntax && npm run check:architecture",
+    "test:v979": "node tests/v979-intelligent-live-show-director-regression.cjs",
+    "test:v979:types": "tsc -p tests/tsconfig.v979-core.json --noEmit",
+    "verify:v979:focused": "npm run test:v979 && npm run test:v979:types && npm run test:v978 && npm run test:v977 && npm run test:v976 && npm run test:v975 && npm run check:syntax && npm run check:architecture",
     "test:v978": "node tests/v978-smart-concert-atmosphere-regression.cjs",
     "test:v978:types": "tsc -p tests/tsconfig.v978-core.json --noEmit",
     "verify:v978:focused": "npm run test:v978 && npm run test:v978:types && npm run test:v977 && npm run test:v976 && npm run test:v975 && npm run test:v973 && npm run test:v972 && npm run check:syntax && npm run check:architecture"
@@ -2030,6 +2033,6 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v978",
-  "sonicFeatureRelease": "v978"
+  "sonicRoadmapRelease": "v979",
+  "sonicFeatureRelease": "v979"
 }

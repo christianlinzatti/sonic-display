@@ -3604,3 +3604,19 @@ Siehe `docs/versions/V970-ALEXA-GOVEE-ROOM-IMMERSION.md`; Produktionsprüfungen 
 ## V976 – Verified virtual concert transitions
 
 `lib/intelligentConcertTransitionsV976.ts` implements a pure deterministic V318 section-boundary crossfade consumed by `ConcertFestivalFxV958` and the **existing** V354 automatic camera cue in `ThreeAvatar`. V960 previous-scene validation and manual precedence are preserved; no hardware, timers or extra R3F loops.
+
+## V979 Intelligent Live Show Director 3.0
+
+`lib/intelligentLiveShowDirectorV979.ts` ist ein reiner, zustandsloser
+Bühnenbudget-Adapter hinter V975–V978 und den bestehenden V969-/V968-
+Stiladaptern. `coordinateLiveShowV979` überprüft Track-ID, verifizierte
+V318-Sektion, Playbackzeit, Confidence, manuelle Autorität, Performance- und
+Sicherheitsparameter. Der Adapter deckelt die bereits komponierte virtuelle
+Intensität, drosselt bestehende Effektspitzen und liefert einen zum Songmoment
+passenden Atmosphärenfaktor an `coordinateAtmosphereV979`. Die bestehende
+`ConcertGenreAtmosphereV978` stellt weiterhin sämtliche Geometrien dar.
+Dies ist kein neuer Kamera-Direktor und kein Hardware-Sync-Pfad. Opt-in und
+Einstellungsnormalisierung erfolgen über die unveränderte V958-Speicherkennung.
+Regressionen und Release-Gates: `tests/v979-intelligent-live-show-director-regression.cjs`,
+`tests/tsconfig.v979-core.json`, V931 und Vercel; ausführlicher Status unter
+`docs/versions/V979-VERIFICATION.md`.

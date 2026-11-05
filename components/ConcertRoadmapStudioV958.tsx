@@ -148,6 +148,27 @@ export function ConcertRoadmapStudioV958({config,devices,onConfig}:{config:Govee
    <label><input type="checkbox" checked={settings.storytellingAccentsV977}
     disabled={!settings.enabled||!settings.virtualFx||!settings.storytellingV977}
     onChange={e=>save({storytellingAccentsV977:e.target.checked})}/> V977: Ruhige, optionale Sweep-Akzente in bestätigten Hooks/Drops und beim Outro-Finale</label>
+   <h4>V979 · Intelligent Live Show Director 3.0</h4>
+   <label><input type="checkbox" checked={settings.liveShowDirectorV979}
+    disabled={!settings.enabled||!settings.virtualFx}
+    onChange={e=>save({liveShowDirectorV979:e.target.checked})}/> V979: Gemeinsame Konzertregie mit Bühnen- und Effektbudget</label>
+   <label>V979 · Regiestil <select aria-label="V979 Regiestil" value={settings.liveShowStyleV979}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.liveShowDirectorV979}
+    onChange={e=>save({liveShowStyleV979:e.target.value as ConcertSettingsV958['liveShowStyleV979']})}>
+    <option value="adaptive">Genre-automatisch</option><option value="cinematic">Filmisch</option>
+    <option value="festival">Festival</option><option value="club">Club</option>
+   </select></label>
+   <label>V979 · Regiestärke {settings.liveShowStrengthV979}% <input type="range" min={0} max={100} step={5}
+    disabled={!settings.enabled||!settings.virtualFx||!settings.liveShowDirectorV979}
+    value={settings.liveShowStrengthV979} onChange={e=>save({liveShowStrengthV979:Number(e.target.value)})}/></label>
+   <button type="button" disabled={!settings.enabled||!settings.virtualFx}
+    onClick={()=>save({liveShowDirectorV979:true,energyArcV975:true,
+     intelligentTransitionsV976:true,storytellingV977:true,atmosphereV978:true})}>
+    V975–V979 als gemeinsame Show aktivieren
+   </button>
+   <p className="settings-note">V979 synchronisiert die vorhandenen V975–V978-Stufen und begrenzt gemeinsame Licht- und Effektspitzen.
+    Bestehende Einzel-Schalter bleiben wirksam. Keine Hardware-Kommandos, keine zusätzliche Render-Schleife,
+    keine automatischen Übergänge bei manuellen Shows oder im Raspberry-Pi-Sparprofil.</p>
    <label><input type="checkbox" checked={settings.atmosphereV978}
     disabled={!settings.enabled||!settings.virtualFx}
     onChange={e=>save({atmosphereV978:e.target.checked})}/> V978: Smart Concert Atmosphere 2.0 – virtueller Genre-Nebel, Lichtstrahlen und Publikumsimpulse</label>
