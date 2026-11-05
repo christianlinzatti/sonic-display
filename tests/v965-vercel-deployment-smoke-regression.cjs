@@ -47,7 +47,7 @@ const response=(status=200,type='text/html; charset=utf-8',html='<!doctype html>
   {automationBypassSecret:token});
  assert.equal(unsafe.reason,'TARGET_NOT_ALLOWED');
  assert.equal(unsafeCalls,0,'Never send token to untrusted hosts');
- for(const invalid of ['bad\\r\\nInjected: true','a'.repeat(2049),42]){
+ for(const invalid of ['bad\r\nInjected: true','a'.repeat(2049),42]){
   const actual=await smokeV965(valid,async()=>{throw Error('must not request')},
    {automationBypassSecret:invalid});
   assert.equal(actual.reason,'INVALID_AUTOMATION_BYPASS_SECRET');
