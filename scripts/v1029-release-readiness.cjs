@@ -48,6 +48,9 @@ function inspectReleaseV1029(root){
     'v1028-immersive-concert-fx-validation.yml','v1029-ai-visual-director-validation.yml',
   ].every(f=>exists('.github/workflows/'+f)));
   const titles=require('./version-action-titles-v1016.cjs').formatActionTitlesV1016(root,false);
+  // The importer cannot install protected workflows without workflow-write permission.
+  // Require the optional V1029 validator to exist in the live checkout.
+  check('v1029-workflow-installed',exists('.github/workflows/v1029-ai-visual-director-validation.yml'));
   check('versioned-actions',titles.total>=38&&titles.changed===0);
   check('real-production-gate',read('.github/workflows/v965-room-wave-production.yml').includes('node scripts/v965-production-verify.cjs'));
  }catch(error){console.error('V1029 release guard:',error.message);check('read-source',false);}
