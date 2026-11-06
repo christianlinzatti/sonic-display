@@ -1,0 +1,26 @@
+name: V1026 Intelligent Stage Lighting 4.0 validation
+run-name: Sonic Display · V1028 · V1026 Intelligent Stage Lighting 4.0 validation
+# Manual diagnostic only; full Linux/Windows production gate remains the authority.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: node scripts/v959-source-preflight.cjs
+      - run: npm ci --include=dev --no-audit --no-fund
+      - run: npm run test:v1026 && npm run test:v1026:types
+      - run: npm run test:v1025 && npm run test:v1024 && npm run test:v1023
+      - run: npm run check:syntax && npm run check:architecture
+      - run: npm run typecheck && npm run build:next

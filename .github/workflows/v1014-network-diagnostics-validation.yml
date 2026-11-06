@@ -1,0 +1,26 @@
+name: V1014 Network Diagnostics 2.0
+run-name: Sonic Display · V1028 · V1014 Network Diagnostics 2.0
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: node scripts/v1014-release-readiness.cjs
+      - run: npm ci --include=dev --no-audit --no-fund
+      - run: npm run test:v1014
+      - run: npm run test:v1014:types
+      - run: npm run test:v1013
+      - run: npm run test:v1012
+      - run: npm run test:v1011
+      - run: npm run test:v1010
+      - run: npm run typecheck
+      - run: npm run build:next

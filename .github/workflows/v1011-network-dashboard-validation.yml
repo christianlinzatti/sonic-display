@@ -1,0 +1,22 @@
+name: V1011 Network Dashboard & Release Safety
+run-name: Sonic Display · V1028 · V1011 Network Dashboard & Release Safety
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --include=dev --no-audit --no-fund
+      - run: npm run test:v1011
+      - run: npm run test:v1011:types
+      - run: npm run test:v1003
+      - run: npm run typecheck
+      - run: npm run build:next
