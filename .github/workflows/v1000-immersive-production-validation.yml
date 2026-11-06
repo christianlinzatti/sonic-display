@@ -1,5 +1,5 @@
 name: V1000 Sonic Display Immersive 1.0 production validation
-run-name: Sonic Display · V1021 · V1000 Sonic Display Immersive 1.0 production validation
+run-name: Sonic Display · V1022 · V1000 Sonic Display Immersive 1.0 production validation
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:

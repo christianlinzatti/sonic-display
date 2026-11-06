@@ -1,5 +1,5 @@
 name: Sonic Display - Versioned Project ZIP Import
-run-name: Sonic Display · ${{ inputs.archive || 'V1021' }} · Projekt-ZIP-Import
+run-name: Sonic Display · ${{ inputs.archive || 'V1022' }} · Projekt-ZIP-Import
 on:
   push:
     branches: [master]
