@@ -1,5 +1,5 @@
 name: V1001 Interactive Concert Control production validation
-run-name: Sonic Display · V1029 · V1001 Interactive Concert Control production validation
+run-name: Sonic Display · V1038 · V1001 Interactive Concert Control production validation
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:

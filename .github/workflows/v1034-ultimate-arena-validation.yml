@@ -1,0 +1,33 @@
+name: V1034 Ultimate Concert Arena manual validation
+run-name: Sonic Display · V1038 · V1034 Ultimate Concert Arena manual validation
+# Manual version-specific diagnostics; v965 is the authoritative production matrix.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --include=dev --no-audit --no-fund
+      - run: node scripts/v959-source-preflight.cjs
+      - run: npm run test:v1034 && npm run test:v1034:types
+      - run: npm run test:v1033 && npm run test:v1033:types
+      - run: npm run test:v1032 && npm run test:v1032:types
+      - run: npm run test:v1031 && npm run test:v1031:types
+      - run: npm run test:v1030
+      - run: npm run check:syntax && npm run check:architecture
+      - run: npm run typecheck && npm run build:next
