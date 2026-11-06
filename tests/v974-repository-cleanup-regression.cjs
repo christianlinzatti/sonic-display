@@ -68,8 +68,8 @@ check('new full ZIP safely updates an already-organized version document', () =>
   try {
     const old = 'V1031 archived 360 arena documentation';
     const revised = 'V1041 updated 360 arena documentation';
-    const src = path.join(temp, 'V1031-360-ARENA.md');
-    const dest = path.join(temp, 'docs', 'versions', 'V1031-360-ARENA.md');
+    const src = path.join(temp, 'docs/versions/V1031-360-ARENA.md');
+    const dest = path.join(temp, 'docs', 'versions', 'docs/versions/V1031-360-ARENA.md');
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     fs.writeFileSync(src, revised);
     fs.writeFileSync(dest, old);
@@ -78,7 +78,7 @@ check('new full ZIP safely updates an already-organized version document', () =>
     assert(!fs.existsSync(src));
     const digest = crypto.createHash('sha256').update(old).digest('hex');
     const archive = path.join(temp, 'artifacts', 'historical', 'document-revisions',
-      'V1031-360-ARENA.md.' + digest + '.bak');
+      'docs/versions/V1031-360-ARENA.md.' + digest + '.bak');
     assert.equal(fs.readFileSync(archive, 'utf8'), old);
     fs.writeFileSync(src, revised);
     moveChecked(src, dest, { allowVersionUpdate: true, archiveRoot: temp });
