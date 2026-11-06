@@ -1,3 +1,9 @@
+# V1020 — AI Concert Storytelling (Stand 2026-11-06)
+
+V1020 ergänzt den V1019-Planer um eine verifizierte Dramaturgie-Vorschau: zusammenhängende Akte, Spannungsaufbau, Atempause und bedingtes Finale. Die Darstellung erzeugt weder neue Songmarker noch Befehle für Kamera, Lichter oder Hardware. Manuelle Eingriffe, Seek und Blackout haben Vorrang. Details: `changelog/V1020-AI-CONCERT-STORYTELLING.md`.
+
+---
+
 > **V1016:** `lib/smartOfflineV1016.ts` hält zeitlich begrenzte, account-spezifische letzte bekannte Titel und Lyrics ausschließlich im Browser-RAM. `hooks/usePlaybackPolling.ts` stoppt falsche Live-Anzeige bei Fehlern und beim Offline-Event. `scripts/version-action-titles-v1016.cjs` aktualisiert ausschließlich `run-name` in geschützten GitHub-Workflows nach einem validierten ZIP-Import.
 
 ## V1015 – Adaptive Request Intelligence (2026-11-06)
@@ -1243,7 +1249,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1016
+**Dokumentationsstand:** V1020
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -4090,3 +4096,17 @@ Der browserlokale `NetworkCoordinatorV1010` misst ausschließlich sichere Zeit- 
 
 ## V1017 – Intelligent Cache Manager
 Browserlokaler, kontogebundener LRU-Antwortcache mit 120 Einträgen und 2-MiB-Speicherbudget (geschätzte Größe, pro Eintrag 256 KiB). HTTP-GET-Antworten werden nur mit expliziter TTL und innerhalb der Provider-Obergrenzen zwischengespeichert. Aktuelle Spotify-Wiedergabedaten sind ausgeschlossen. Hot-Entry-Warmups erfolgen nur für optionale Anfragen bei freier Kapazität und ohne Online-/Visibility-/Rate-Limit-Konflikt. Das Dashboard zeigt ausschließlich aggregierte Daten; Kontowechsel löscht Cache und Statistik. Details: `changelog/V1017-INTELLIGENT-CACHE-MANAGER.md`.
+
+
+## V1018 – AI Song Understanding 2.0 (06.11.2026)
+
+- Ergänzte Echtzeit-Songübersicht mit getrenntem Evidenzstatus für V896 Live-Audio und verifizierte V604/V763 Timeline.
+- Songabschnitte, Hook und Drop werden ausschließlich aus bestätigten, songgenauen Timelines angezeigt; Genre ist nur ein kreativer Stilhinweis.
+- Normierte Energie- und Bassmessung mit Trend ohne zusätzliche Netzwerkzugriffe oder Hardwaresteuerung.
+- Abbruchsichere Regeln für Trackwechsel, Pausen, Seeks, veraltete Messungen und fehlerhafte Daten.
+- UI in V881 Live-FX-Deck. V983-KI-Interpretationen bleiben separate Opt-in-Ideen und gelten nicht als Audiomessung.
+- Pflicht-Regressionscheck in Node-24-CI/Vercel-Gate, versionierte Action-Titel für V1018.
+
+## V1020 – AI Concert Storytelling
+
+Die Live-FX-Ansicht enthält eine **lesende, songgebundene Dramaturgie** aus verifizierten V604/V763-Akten: Auftakt, Fokus, Build, Peak, Atempause und ggf. Finale. Der Plan zeigt Soll-Intensität und genrebezogene Bühnen-/Kamera-/Avatar-/Licht-Vorschläge, ohne echte Messwerte zu erfinden oder Geräte zu steuern. V1019 und die vorhandene Konzertregie behalten die alleinige Autorität über aktive Cues. Pause, Seek, Blackout, manuelle Regie, fehlende oder unvollständige Timeline unterdrücken die Vorschau. Tests: `npm run test:v1020`.

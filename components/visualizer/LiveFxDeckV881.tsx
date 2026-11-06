@@ -64,6 +64,9 @@ import {getImmersiveSettingsV1000,useImmersiveSettingsV1000,restoreImmersiveSett
 import {normalizeLivePlanV998,resolveLiveChangesV998,
  type LivePlanV998,type LiveSnapshotV998} from '@/lib/liveConcertAssistantV998';
 import {SongIntelligencePanelV983} from './SongIntelligencePanelV983';
+import {SongUnderstandingPanelV1018} from './SongUnderstandingPanelV1018';
+import {PredictiveConcertPanelV1019} from './PredictiveConcertPanelV1019';
+import {ConcertStorytellingPanelV1020} from './ConcertStorytellingPanelV1020';
 import type {ImmersivePlanV982} from '@/lib/immersiveAiDirectorV982';
 import type {AdvisorPatchV902} from './concertQualityAdvisorV902';
 import {validReviewPatchV903} from './concertQualityReviewV903';
@@ -914,6 +917,16 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
      undoAvailable={Boolean(liveUndoV998&&liveUndoV998.trackId===trackId)}
      canApply={Boolean(trackId)&&playing&&!motionOff&&settings.enabled&&settings.auto&&
       storageReady&&atmosphereReady&&genreStageReadyV894&&cameraReadyV992&&controlsVisible}/>
+    <SongUnderstandingPanelV1018 trackId={trackId} durationMs={durationMs}
+     positionMs={progressMs} playing={playing} genre={genre}/>
+    <PredictiveConcertPanelV1019 trackId={trackId} durationMs={durationMs}
+     positionMs={progressMs} playing={playing} genre={genre}
+     enabled={settings.enabled&&settings.auto} manualOverride={Boolean(cue.manual)}
+     reducedMotion={motionOff} seekBlocked={transitionSeekBlock.trackId===trackId&&progressMs<transitionSeekBlock.untilMs}/>
+    <ConcertStorytellingPanelV1020 trackId={trackId} durationMs={durationMs}
+     positionMs={progressMs} playing={playing} genre={genre}
+     enabled={settings.enabled&&settings.auto} manualOverride={Boolean(cue.manual)}
+     reducedMotion={motionOff} seekBlocked={transitionSeekBlock.trackId===trackId&&progressMs<transitionSeekBlock.untilMs}/>
     <SongIntelligencePanelV983 key={trackId} trackId={trackId} title={title} artist={artist}
      durationMs={durationMs} genre={genre} onApply={applyImmersiveV982}
      canApply={settings.enabled&&settings.auto&&!motionOff}/>

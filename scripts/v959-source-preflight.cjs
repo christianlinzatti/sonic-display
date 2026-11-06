@@ -30,3 +30,18 @@ const {inspectReleaseV1017}=require('./v1017-release-readiness.cjs');
 const v1017=inspectReleaseV1017(root);
 for(const c of v1017.checks)console.log(`${c.ok?'PASS':'FAIL'} V1017 ${c.name}`);
 if(!v1017.passed)process.exitCode=1;
+
+const {inspectReleaseV1018}=require('./v1018-release-readiness.cjs');
+const v1018=inspectReleaseV1018(root);
+for(const c of v1018.checks)console.log(`${c.ok?'PASS':'FAIL'} V1018 ${c.name}`);
+if(!v1018.passed)process.exitCode=1;
+
+const {inspectReleaseV1019}=require('./v1019-release-readiness.cjs');
+const v1019=inspectReleaseV1019(root);
+for(const c of v1019.checks)console.log(`${c.ok?'PASS':'FAIL'} V1019 ${c.name}`);
+if(!v1019.passed)process.exitCode=1;
+
+const {inspectReleaseV1020}=require('./v1020-release-readiness.cjs');
+const v1020=inspectReleaseV1020(root);
+for(const check of v1020.checks)console.log(`${check.ok?'PASS':'FAIL'} V1020 ${check.name}`);
+if(!v1020.passed)process.exitCode=1;

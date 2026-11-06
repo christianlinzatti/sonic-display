@@ -56,6 +56,9 @@ try {
     throw new Error('Vercel must use Node 24.x; got '+process.version);
   }
   run('Source and lockfile preflight','scripts/v959-source-preflight.cjs');
+  run('V1020 AI Concert Storytelling','tests/v1020-concert-storytelling-regression.cjs');
+  run('V1019 Predictive Concert Director','tests/v1019-predictive-concert-regression.cjs');
+  run('V1018 AI Song Understanding 2.0','tests/v1018-song-understanding-regression.cjs');
   run('React 19 production/development parity','tests/react-act-compat-regression.cjs');
   run('V752 negative fixture build integrity','tests/v752-build-integrity-regression.cjs');
   run('V1004 Production Reliability 2.0','tests/v1004-production-reliability-regression.cjs');

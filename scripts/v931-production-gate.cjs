@@ -11,6 +11,9 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1020 AI Concert Storytelling','tests/v1020-concert-storytelling-regression.cjs'],
+  ['V1019 Predictive Concert Director','tests/v1019-predictive-concert-regression.cjs'],
+  ['V1018 AI Song Understanding 2.0','tests/v1018-song-understanding-regression.cjs'],
   ['V1017 intelligent cache manager','tests/v1017-intelligent-cache-regression.cjs'],
   ['V1016 smart offline and Action titles','tests/v1016-smart-offline-regression.cjs'],
   ['V1015 adaptive request intelligence','tests/v1015-adaptive-network-regression.cjs'],
@@ -84,6 +87,7 @@ const regressions = [
   ['Source syntax + duplicate imports', 'tests/check-source-syntax.cjs'],
 ];
 const productionChecks = [
+  ['V1020 AI Concert Storytelling strict TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','lib/aiConcertStorytellingV1020.ts']],
   ['V1014 network diagnostics isolated TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','lib/networkCoordinatorV1010.ts','lib/networkDiagnosticsV1014.ts','lib/networkHealthV1012.ts']],
   ['V1014 network diagnostics isolated TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','lib/networkCoordinatorV1010.ts','lib/networkDiagnosticsV1014.ts','lib/networkHealthV1012.ts']],
   ['V990 Living LED Wall 3.0 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v990-core.json']],
