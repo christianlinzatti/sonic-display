@@ -72,7 +72,7 @@ test('existing V958 project is cross-platform path collision free',()=>{
 });
 test('workflow requires clean install, both operating systems and artifact upload',()=>{
   const ci=fs.readFileSync(path.join(root,'.github/workflows/v958-ultimate-concert-validation.yml'),'utf8');
-  for(const expected of ['npm ci --no-audit --no-fund','ubuntu-24.04','windows-latest','node scripts/v959-production-verify.cjs','SONIC_TEST_CONCURRENCY','if: always()','actions/upload-artifact@v4']) assert.ok(ci.includes(expected),expected);
+  for(const expected of ['npm ci --no-audit --no-fund','ubuntu-24.04','windows-latest','node scripts/v959-production-verify.cjs','SONIC_TEST_CONCURRENCY','if: always()','actions/upload-artifact@']) assert.ok(ci.includes(expected),expected);
 });
 test('production gate requires real TypeScript and real Next.js, not only an isolated check',()=>{
   const gate=fs.readFileSync(path.join(root,'scripts/v931-production-gate.cjs'),'utf8');

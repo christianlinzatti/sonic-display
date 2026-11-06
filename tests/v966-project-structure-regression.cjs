@@ -39,6 +39,7 @@ check('root contains only intentional project entry files', () => {
     'global.d.ts', 'next-env.d.ts', 'next.config.ts',
     'package.json', 'package-lock.json', 'tsconfig.json',
     'tsconfig.v319-core.json', 'vercel.json',
+    'tsconfig.tsbuildinfo', // Known ignored TypeScript cache from a prior local build.
   ]);
   for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
     if (entry.isFile()) assert(allowed.has(entry.name), `unexpected root file ${entry.name}`);

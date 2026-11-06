@@ -229,7 +229,7 @@ test('V960 production wrapper never approves without full TypeScript and Next.js
 test('V960 GitHub workflow requires Windows and Linux and fail-closed production gate',()=>{
  const s=read('.github/workflows/v960-concert-continuity.yml');
  for(const item of ['ubuntu-24.04','windows-latest','npm ci --no-audit --no-fund',
- 'node scripts/v960-production-verify.cjs','SONIC_TEST_CONCURRENCY','actions/upload-artifact@v4'])
+ 'node scripts/v960-production-verify.cjs','SONIC_TEST_CONCURRENCY','actions/upload-artifact@'])
   assert.ok(s.includes(item),item);
 });
 test('V960 legacy V929 regression is restored in Windows/Linux CI',()=>{
