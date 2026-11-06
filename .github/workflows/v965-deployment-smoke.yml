@@ -1,4 +1,5 @@
 name: Sonic Display · Deployment reachability
+run-name: Sonic Display · V1017 · Deployment reachability · ${{ github.event.deployment_status.state || github.event_name }}
 on:
   deployment_status:
   workflow_dispatch:
