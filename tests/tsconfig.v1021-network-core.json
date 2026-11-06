@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "composite": false,
+    "types": [],
+    "plugins": []
+  },
+  "files": [
+    "../lib/networkCoordinatorV1010.ts",
+    "../lib/networkJsonV1010.ts",
+    "../lib/networkHealthV1012.ts",
+    "../lib/networkDiagnosticsV1014.ts"
+  ],
+  "include": [],
+  "exclude": []
+}

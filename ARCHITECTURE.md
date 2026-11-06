@@ -1,3 +1,7 @@
+# V1021 — Genre Intelligence 3.0 (Stand 2026-11-06)
+
+V1021 trennt Meta-Genre-Hinweise strikt von verifizierten V604/V763-Songabschnitten. Eine reine, lesende Regievorschau differenziert Deutschrap, Hardtekk, Hardstyle, Deutschrock/NDH und unbekannte Genres, ohne Beats, Tempo oder Vocals zu erfinden. Manuelle Regie, Pause, Seek, Blackout, Bewegungsreduktion und Lyrics-Schutz haben Vorrang. Details: `changelog/V1021-GENRE-INTELLIGENCE-3.md`.
+
 # V1020 — AI Concert Storytelling (Stand 2026-11-06)
 
 V1020 ergänzt den V1019-Planer um eine verifizierte Dramaturgie-Vorschau: zusammenhängende Akte, Spannungsaufbau, Atempause und bedingtes Finale. Die Darstellung erzeugt weder neue Songmarker noch Befehle für Kamera, Lichter oder Hardware. Manuelle Eingriffe, Seek und Blackout haben Vorrang. Details: `changelog/V1020-AI-CONCERT-STORYTELLING.md`.
@@ -1249,7 +1253,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1020
+**Dokumentationsstand:** V1021
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -4110,3 +4114,11 @@ Browserlokaler, kontogebundener LRU-Antwortcache mit 120 Einträgen und 2-MiB-Sp
 ## V1020 – AI Concert Storytelling
 
 Die Live-FX-Ansicht enthält eine **lesende, songgebundene Dramaturgie** aus verifizierten V604/V763-Akten: Auftakt, Fokus, Build, Peak, Atempause und ggf. Finale. Der Plan zeigt Soll-Intensität und genrebezogene Bühnen-/Kamera-/Avatar-/Licht-Vorschläge, ohne echte Messwerte zu erfinden oder Geräte zu steuern. V1019 und die vorhandene Konzertregie behalten die alleinige Autorität über aktive Cues. Pause, Seek, Blackout, manuelle Regie, fehlende oder unvollständige Timeline unterdrücken die Vorschau. Tests: `npm run test:v1020`.
+
+## V1021 – Genre Intelligence 3.0
+
+`lib/genreIntelligenceV1021.ts` verwendet nur bestätigte V1020-Akte. Für fünf Profile wird eine dramaturgische **Vorschau** erstellt, nicht eine neue Audiomessung. Für Deutschrap priorisiert sie Lyrics und filmische Nahaufnahmen, für Hardtekk geometrische Looks und Footwork, für Hardstyle Festival-Steigerungen, für Deutschrock/NDH Band-/Arena-Momente. Unknown-Genres bleiben neutral. `components/visualizer/GenreIntelligencePanelV1021.tsx` zeigt die aktive Empfehlung im Live-FX-Deck. Keine I/O-, Timer-, Govee-, Kamera- oder Avatar-Befehle. V1020 und die manuelle Regie bleiben autoritativ.
+
+### V1021 – CI-Typgrenze
+
+Die Kanonischen `Track`- und `Lyrics`-DTOs liegen in `types/playbackCore.ts`; `types/music.ts` bleibt der rückwärtskompatible Reexport. Das Netzwerk-Subsystem importiert nicht mehr die UI-Preferences-Typreferenzen. Das behebt V1020 TS2307-Fehler der isolierten V1014-Netzwerkprüfung auf Windows und Ubuntu; keine produktiven Typen werden durch Test-Deklarationen ersetzt.

@@ -67,6 +67,7 @@ import {SongIntelligencePanelV983} from './SongIntelligencePanelV983';
 import {SongUnderstandingPanelV1018} from './SongUnderstandingPanelV1018';
 import {PredictiveConcertPanelV1019} from './PredictiveConcertPanelV1019';
 import {ConcertStorytellingPanelV1020} from './ConcertStorytellingPanelV1020';
+import {GenreIntelligencePanelV1021} from './GenreIntelligencePanelV1021';
 import type {ImmersivePlanV982} from '@/lib/immersiveAiDirectorV982';
 import type {AdvisorPatchV902} from './concertQualityAdvisorV902';
 import {validReviewPatchV903} from './concertQualityReviewV903';
@@ -927,6 +928,11 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
      positionMs={progressMs} playing={playing} genre={genre}
      enabled={settings.enabled&&settings.auto} manualOverride={Boolean(cue.manual)}
      reducedMotion={motionOff} seekBlocked={transitionSeekBlock.trackId===trackId&&progressMs<transitionSeekBlock.untilMs}/>
+    <GenreIntelligencePanelV1021 trackId={trackId} durationMs={durationMs}
+     positionMs={progressMs} playing={playing} genre={genre}
+     enabled={settings.enabled&&settings.auto} manualOverride={Boolean(cue.manual)}
+     reducedMotion={motionOff} lyricsProtected={lyricsProtected}
+     seekBlocked={transitionSeekBlock.trackId===trackId&&progressMs<transitionSeekBlock.untilMs}/>
     <SongIntelligencePanelV983 key={trackId} trackId={trackId} title={title} artist={artist}
      durationMs={durationMs} genre={genre} onApply={applyImmersiveV982}
      canApply={settings.enabled&&settings.auto&&!motionOff}/>

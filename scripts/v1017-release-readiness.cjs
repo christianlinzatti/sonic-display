@@ -21,7 +21,7 @@ function inspectReleaseV1017(root){
   check('preflight-hook',read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1017(root)'));
   check('user-visible-dashboard',read('components/NetworkPerformanceDashboardV1011.tsx').includes('data-v1017-cache-manager'));
   const titles=require('./version-action-titles-v1016.cjs').formatActionTitlesV1016(root,false);
-  check('versioned-actions',titles.total>=25&&titles.changed===0);
+  check('versioned-actions',titles.total>=30&&titles.changed===0);
   check('real-build',read('.github/workflows/v965-room-wave-production.yml').includes('node scripts/v965-production-verify.cjs'));
  }catch(error){check('read-source',false);}
  return {passed:checks.length>=14&&checks.every(c=>c.ok),checks};

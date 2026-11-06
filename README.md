@@ -1,3 +1,7 @@
+# V1021 — Genre Intelligence 3.0
+
+Genrebezogene Show-Vorschau für Deutschrap, Hardtekk, Hardstyle, Deutschrock/NDH und unbekannte Genres. Ausschließlich verifizierte Songstruktur; keine erfundenen Drops, Beats oder BPM. Safety: Pause, Seek, Blackout, manuelle Übersteuerung, Lyrics-Schutz, reduzierte Bewegung. UI im Live-FX-Deck. Tests: `npm run test:v1021` und `npm run test:v1021:types`. Außerdem wurde der V1020-CI-Fehler `TS2307` in isolierten Netzwerk-TypeScript-Prüfungen durch die kompatible Extraktion von `types/playbackCore.ts` behoben. Details: `changelog/V1021-GENRE-INTELLIGENCE-3.md`.
+
 # V1020 — AI Concert Storytelling (Stand 2026-11-06)
 
 V1020 ergänzt den V1019-Planer um eine verifizierte Dramaturgie-Vorschau: zusammenhängende Akte, Spannungsaufbau, Atempause und bedingtes Finale. Die Darstellung erzeugt weder neue Songmarker noch Befehle für Kamera, Lichter oder Hardware. Manuelle Eingriffe, Seek und Blackout haben Vorrang. Details: `changelog/V1020-AI-CONCERT-STORYTELLING.md`.

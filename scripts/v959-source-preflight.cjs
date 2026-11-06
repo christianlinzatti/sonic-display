@@ -41,6 +41,11 @@ const v1019=inspectReleaseV1019(root);
 for(const c of v1019.checks)console.log(`${c.ok?'PASS':'FAIL'} V1019 ${c.name}`);
 if(!v1019.passed)process.exitCode=1;
 
+const {inspectReleaseV1021}=require('./v1021-release-readiness.cjs');
+const v1021=inspectReleaseV1021(root);
+for(const check of v1021.checks)console.log(`${check.ok?'PASS':'FAIL'} V1021 ${check.name}`);
+if(!v1021.passed)process.exitCode=1;
+
 const {inspectReleaseV1020}=require('./v1020-release-readiness.cjs');
 const v1020=inspectReleaseV1020(root);
 for(const check of v1020.checks)console.log(`${check.ok?'PASS':'FAIL'} V1020 ${check.name}`);
