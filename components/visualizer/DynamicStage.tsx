@@ -195,7 +195,8 @@ const palettes = {
   galaxy: {base:"#030513",primary:"#869fff",secondary:"#c766ff",floor:"#111027"},
   white: {base:"#e9edf4",primary:"#fff9e6",secondary:"#a2b5d0",floor:"#dfe4ea"},
   rock: {base:"#141314",primary:"#ff9d3e",secondary:"#e53c37",floor:"#2a292c"},
-} as const;
+  arena360: {base:"#080f24",primary:"#00e4ff",secondary:"#d756ff",floor:"#17213c"},
+} as const satisfies Record<StageTheme,{base:string;primary:string;secondary:string;floor:string}>;
 
 
 /** Reuse the stage's two point lights and one world-space vector (no frame allocations). */
