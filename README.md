@@ -2715,3 +2715,8 @@ Visuelle Showchoreografie für die vorhandenen Lichtwellen, Nebel, Konfetti und 
 ### V1029 – AI Visual Director 5.0
 
 In **Concert FX Studio** activate/deactivate `AI Visual Director 5.0` and adjust the visual hierarchy contrast. The feature coordinates the existing LED wall, haze, stage lighting and bounded particle lanes with verified V604/V761 section and camera intent. Rap portraits and lyrics become calmer, confirmed high-energy peaks retain large FX, and scene changes fade. This is rule-based evidence-gated show direction, not generative music detection. No extra camera, GPU emitter, Govee commands or automatic authoring is introduced. Run `npm run verify:v1029:focused` for the focused tests; full production certification requires Node 24 Windows/Linux CI.
+
+
+## V1030 – Intelligent Concert Atmosphere 5.0
+
+Atmosphere composer in the existing DynamicStage render loop: evidence-gated cinematic mood, reduction-only crowd lights/movement/phone glow, ambient background/floor tint, haze and beam balance. Enabled and strength-controlled in the Concert FX Studio. No extra scene objects, no hardware calls, no invented music segments. See changelog/V1030-INTELLIGENT-CONCERT-ATMOSPHERE-5.md.

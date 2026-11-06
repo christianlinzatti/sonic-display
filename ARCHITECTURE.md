@@ -1265,7 +1265,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1029
+**Dokumentationsstand:** V1030
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -4156,3 +4156,8 @@ Der `immersiveConcertFxV1028.ts`-Planer wird im **bestehenden** `DynamicStage.ts
 ## V1029 – AI Visual Director 5.0
 
 `components/visualizer/aiVisualDirectorV1029.ts` is a stateless, dependency-free visual hierarchy planner. It requires the identical track/act, verified V600→V604 and V761 storyboarding, live V810 section, sample position, and bounded audio evidence. `DynamicStage` samples it once inside the existing R3F frame, then reduces existing stage, particle, foam, haze and all LED power uniform lanes **after** performance budgeting. It never creates an additional emitter, camera, shader pass or network request. At verified actor or camera changes, gains fade across scene edges. A portrait/lyrics frame dims distracting background lanes but never touches manual camera, lipsync or avatar control. At confirmed peak sections, existing stage impact is allowed at its previous cap only with measured kick and energy. All manual controls, authored FX, blackout, pause, seek, low tier and pressure limits are authoritative. Settings live in V810 concert FX studio and default to 70% contrast.
+
+
+## V1030 · Intelligent Concert Atmosphere 5.0
+
+`intelligentConcertAtmosphereV1030.ts` is pure, deterministic and evidence-gated (V604/V761/V810), uses same current track/act/time and capped performance budget. The only R3F integration is the existing `DynamicStage` `useFrame`: V814 haze opacity, post-V999 virtual crowd movement/phone glow, V882 beams, V885 scene/background tint and existing V1026 fill palette. All gains are <=1; no new draw calls, hardware commands, React state or extra scene loop. Protected if manually authored, seek/pause/blackout, low tier, reduced motion or invalid act evidence.

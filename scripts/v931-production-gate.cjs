@@ -11,6 +11,7 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1030 Intelligent Concert Atmosphere 5.0','tests/v1030-intelligent-concert-atmosphere-regression.cjs'],
   ['V1029 AI Visual Director 5.0','tests/v1029-ai-visual-director-regression.cjs'],
   ['V1028 Immersive Concert FX 5.0','tests/v1028-immersive-concert-fx-regression.cjs'],
   ['V1027 Govee Concert Sync 3.0','tests/v1027-govee-concert-sync-regression.cjs'],

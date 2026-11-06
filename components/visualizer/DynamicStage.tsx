@@ -6,6 +6,7 @@ import {planConcertStageV882,readConcertStageSyncV882,OFF_CONCERT_STAGE_V882,
 import {ConcertStageFxV882} from './ConcertStageFxV882';
 import {planImmersiveConcertFxV1028,mixImmersiveConcertFxV1028} from './immersiveConcertFxV1028';
 import {planAiVisualDirectorV1029,mixAiVisualDirectorV1029,VISUAL_LED_UNIFORMS_V1029} from './aiVisualDirectorV1029';
+import {planIntelligentConcertAtmosphereV1030,applyConcertAtmosphereCrowdV1030,applyConcertAtmosphereStageV1030} from './intelligentConcertAtmosphereV1030';
 import {VirtualPyroStageV891} from './VirtualPyroStageV891';
 import {sampleEpicDropV892,DEFAULT_EPIC_DROP_V892} from './epicDropExperienceV892';
 import {planPyroV891,PYRO_OFF_V891,DEFAULT_PYRO_V891,type PyroCueV891} from './virtualPyrotechnicsV891';
@@ -910,6 +911,35 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
       budget:fxPerfV825.gains.led,pressure:fxPerfStateV825.current.pressure,
     });
+    // V1030 – a single evidence-checked atmosphere director, using only the
+    // authorized stage, lights, haze and already budgeted audience. Never sends
+    // hardware commands or creates any additional meshes or lights.
+    const concertAtmosphereV1030=planIntelligentConcertAtmosphereV1030({
+      enabled:concertFxV810?.intelligentAtmosphereV1030??false,
+      masterEnabled:concertFxV810?.enabled??false,
+      strength:concertFxV810?.atmosphereStrengthV1030??0,
+      trackId:playback.trackId,durationMs:playback.durationMs,positionMs:playback.positionMs,
+      playing:isPlaying&&playback.playing,reactive,reducedMotion,tier,
+      narrative:cameraNarrativeV605?.plan&&currentActV810?{
+        source:cameraNarrativeV605.plan.source,trackId:cameraNarrativeV605.plan.trackId,
+        durationMs:cameraNarrativeV605.plan.durationMs,actIndex:currentActV810.index,
+        section:currentActV810.section,startMs:currentActV810.startMs,
+        endMs:currentActV810.endMs}:null,
+      cinematic:cinematicCueV761?{
+        active:cinematicCueV761.active,reason:cinematicCueV761.reason,
+        actIndex:cinematicCueV761.actIndex,intent:cinematicCueV761.intent,
+        blend:cinematicCueV761.blend}:null,
+      fx:fxCueV810,groupCount:groupCountV542,vocalFocus:!!vocalFocusV542,
+      lyricsProtected:!!lyricsProtectedV542,lyricsVisible:!!lyricsVisibleV813,
+      manualCamera:cameraNarrativeV605?.manualCamera===true,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false,
+      manualFx:!!liveSignalV882.manual,authoredLanes:authoredLanesV850,
+      seekBlocked:playback.positionMs<(liveSignalV882.atmosphereSeekBlockedUntilMs??0),
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+      budget:Math.min(fxPerfV825.gains.crowd,fxPerfV825.gains.haze),
+      pressure:fxPerfStateV825.current.pressure,
+    });
     // V814 augments the existing V308 fog and V762 gobo. No scene.fog replacement.
     const hazeV814=planAtmosphericConcertFxV814({fx:fxCueV810,
       settings:normalizeConcertFxV810(concertFxV810),lyricsProtected:lyricsProtectedV542,
@@ -933,7 +963,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     });
     if(hazeFloorMatV814.current){
       const u=hazeFloorMatV814.current.uniforms;
-      u.uOpacity.value=cinematicFogV887.floorOpacity*immersiveFxV1028.fogGain*visualDirectorV1029.fogGain;
+      u.uOpacity.value=cinematicFogV887.floorOpacity*immersiveFxV1028.fogGain*visualDirectorV1029.fogGain*concertAtmosphereV1030.hazeGain;
       u.uPhase.value=cinematicFogV887.phase;
       u.uFogDriftV887.value=cinematicFogV887.drift;
       u.uFogSoftV887.value=cinematicFogV887.softness;
@@ -942,15 +972,15 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     }
     if(hazeShaftsMatV814.current){
       const u=hazeShaftsMatV814.current.uniforms;
-      u.uOpacity.value=cinematicFogV887.shaftsOpacity*immersiveFxV1028.fogGain*visualDirectorV1029.fogGain;
+      u.uOpacity.value=cinematicFogV887.shaftsOpacity*immersiveFxV1028.fogGain*visualDirectorV1029.fogGain*concertAtmosphereV1030.hazeGain;
       u.uPhase.value=cinematicFogV887.phase;
       u.uFogDriftV887.value=cinematicFogV887.drift;
       u.uFogSoftV887.value=cinematicFogV887.softness;
       u.uFogWarpV887.value=cinematicFogV887.warp;
       (u.uColor.value as Color).set(cinematicFogV887.color);
     }
-    if(hazeFloorV814.current)hazeFloorV814.current.visible=cinematicFogV887.floorOpacity*immersiveFxV1028.fogGain*visualDirectorV1029.fogGain>.002;
-    if(hazeShaftsV814.current)hazeShaftsV814.current.visible=cinematicFogV887.shaftsOpacity*immersiveFxV1028.fogGain*visualDirectorV1029.fogGain>.002;
+    if(hazeFloorV814.current)hazeFloorV814.current.visible=cinematicFogV887.floorOpacity*immersiveFxV1028.fogGain*visualDirectorV1029.fogGain*concertAtmosphereV1030.hazeGain>.002;
+    if(hazeShaftsV814.current)hazeShaftsV814.current.visible=cinematicFogV887.shaftsOpacity*immersiveFxV1028.fogGain*visualDirectorV1029.fogGain*concertAtmosphereV1030.hazeGain>.002;
     // V815 uses the SAME verified FX cue; disables on pauses, blackout, manual
     // light tracks and low tier, and stays outside the central performer lane.
     crowdCueV815.current=planVirtualConcertCrowdV815({fx:fxCueV810,
@@ -1330,6 +1360,8 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       lyricsProtected:lyricsProtectedV542||lyricsVisibleV813,vocalFocus:vocalFocusV542,
       energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
     }),getConcertFactorsV999().crowd*immersiveCueV1000.gains.crowd);
+    // V1030 reduces ONLY the existing V815/V999 crowd after all audience governors.
+    crowdCueV815.current=applyConcertAtmosphereCrowdV1030(crowdCueV815.current,concertAtmosphereV1030);
     // V889: final reduction-only artistic mix after V871 and V880, applied to the
     // existing 3D particle/foam emitters. Authored timelines and stage safety win.
     const particleMixV889=directParticlesV889({
@@ -1367,6 +1399,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     const visualMixV1029=mixAiVisualDirectorV1029(visualDirectorV1029,
       liveStageV882.current,particlesCueV816.current,foamCueV817.current);
     liveStageV882.current=visualMixV1029.stage;
+    liveStageV882.current=applyConcertAtmosphereStageV1030(liveStageV882.current,concertAtmosphereV1030);
     particlesCueV816.current=visualMixV1029.particles;
     foamCueV817.current=visualMixV1029.foam;
     // V891: confirmed sections only; opt-in virtual-only 3D pyrotechnics.
@@ -1580,7 +1613,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       backgroundTargetV622.current.lerp(secondaryTintV828.current.set(fxCueV810.secondary),experienceV828.backgroundAccent);
     }
     if(liveAtmosphereV885.environmentMix>0&&!timelineCue.color){
-      backgroundTargetV622.current.lerp(atmosphereAmbientV885.current.set(liveAtmosphereV885.ambient),liveAtmosphereV885.environmentMix);
+      backgroundTargetV622.current.lerp(atmosphereAmbientV885.current.set(liveAtmosphereV885.ambient),liveAtmosphereV885.environmentMix*concertAtmosphereV1030.ambientGain);
     }
     if(state.scene.background instanceof Color){state.scene.background.lerp(backgroundTargetV622.current,environmentRateV622);}
     floorTargetV622.current.set(palette.floor).lerp(moodTintV622.current,Math.min(.26,transformationV622.floor+stageVisualV635.floorTint*ledBudgetV640+stageScaleV690.floorMix+evolutionRefV795.current.floorMix));
@@ -1588,7 +1621,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       floorTargetV622.current.lerp(secondaryTintV828.current,experienceV828.backgroundAccent*.58);
     }
     if(liveAtmosphereV885.environmentMix>0&&!timelineCue.color){
-      floorTargetV622.current.lerp(atmosphereAmbientV885.current,liveAtmosphereV885.environmentMix*.8);
+      floorTargetV622.current.lerp(atmosphereAmbientV885.current,liveAtmosphereV885.environmentMix*.8*concertAtmosphereV1030.ambientGain);
     }
     if(floorMaterialV622.current)floorMaterialV622.current.color.lerp(floorTargetV622.current,environmentRateV622);
     // Portrait key/fill are altered only very slightly and never override authored colors.
@@ -1944,6 +1977,10 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       targetPrimary.current.lerp(stageLightTintV1026.current,stageLightV1026.colorMix);
       targetSecondary.current.lerp(stageLightTintV1026.current,stageLightV1026.colorMix*.65);
     }
+    // V1030 slightly unifies the already selected live key/fill palettes.
+    // Authored color/manual cues and the V1026 portrait light are authoritative.
+    if(concertAtmosphereV1030.active&&!timelineCue.color)
+      targetSecondary.current.lerp(targetPrimary.current,concertAtmosphereV1030.fillColorBlend);
     if (key.current) key.current.color.lerp(targetPrimary.current, colorFade);
     if (fill.current) fill.current.color.lerp(targetSecondary.current, colorFade);
     if (floorLight.current) floorLight.current.color.lerp(

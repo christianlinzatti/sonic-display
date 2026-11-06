@@ -96,10 +96,11 @@ assert(settings.includes('aiVisualDirectorV1029:true,aiVisualDirectorStrengthV10
 assert(settings.includes("typeof raw?.aiVisualDirectorV1029==='boolean'"));
 assert(read('components/visualizer/ConcertFxStudioPanelV810.tsx').includes('AI Visual Director 5.0'));
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1029');assert.equal(lock.version,pkg.version);
+assert(/^0\.1\.0-v(?:1029|10[3-9]\d|1[1-9]\d\d)$/.test(pkg.version));assert.equal(lock.version,pkg.version);
 assert.equal(lock.packages[''].version,pkg.version);
-assert.equal(pkg.sonicFeatureRelease,'v1029');assert.equal(pkg.sonicRoadmapRelease,'v1029');
-assert(pkg.scripts.prebuild.startsWith('npm run test:v1029 &&'));
+const latest=pkg.version.split('-')[1];
+assert.equal(pkg.sonicFeatureRelease,latest);assert.equal(pkg.sonicRoadmapRelease,latest);
+assert(pkg.scripts.prebuild.startsWith(`npm run test:${latest} &&`));
 for(const f of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(f).includes('tests/v1029-ai-visual-director-regression.cjs'));
 assert(read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1029(root)'));

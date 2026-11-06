@@ -168,7 +168,20 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
    playing:true,reducedMotion:false,blackout:false,manualLighting:false,
    lyricsProtected:false,vocalFocus:false,cameraCloseup:false,groupCount:1,tier:'high',
    authoredLanes:[]});
- return <fieldset><legend>V810–V1029 · Concert FX Studio 5.0</legend>
+ return <fieldset><legend>V810–V1030 · Concert FX Studio 5.0</legend>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+   <legend>V1030 · Intelligent Concert Atmosphere 5.0</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.intelligentAtmosphereV1030}
+     onChange={e=>patch({intelligentAtmosphereV1030:e.target.checked})}/>
+     Virtuelles Publikum, Bühnenatmosphäre und bestehende Lichtstimmung abstimmen</label>
+   <label>Atmosphären-Kontrast ({s.atmosphereStrengthV1030} %)
+    <input type="range" min="0" max="100" step="5" value={s.atmosphereStrengthV1030}
+     disabled={!s.intelligentAtmosphereV1030} onChange={e=>patch({atmosphereStrengthV1030:+e.target.value})}/></label>
+   <small>Nur bestätigte Songabschnitte und Kameraszenen: Intime Rap-Momente,
+     gemeinsame Auftritte, musikalische Builds und ruhigere Atempausen.
+     Keine neuen Publikumsobjekte, Lichtquellen, Nebel-Emitter oder Gerätebefehle.
+     Manuelle Regie, Blackout, Lyrics und der Performance-Governor haben Vorrang.</small>
+  </fieldset>
   <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
    <legend>V1029 · AI Visual Director 5.0</legend>
    <label className="setting-check"><input type="checkbox" checked={s.aiVisualDirectorV1029}

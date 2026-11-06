@@ -41,6 +41,7 @@ export interface ConcertFxSettingsV810 {
   kineticStage:boolean;kineticIntensity:number;foamCannon:boolean;foamIntensity:number;foamSide:'both'|'left'|'right';
   immersiveFxV1028:boolean;immersiveFxStrengthV1028:number;
   aiVisualDirectorV1029:boolean;aiVisualDirectorStrengthV1029:number;
+  intelligentAtmosphereV1030:boolean;atmosphereStrengthV1030:number;
   festivalFxV844:boolean;festivalIntensityV844:number;festivalStyleV844:'balanced'|'festival';
   festivalCoordinationV871:boolean;festivalClarityV871:number;
   festivalCo2V844:boolean;festivalSparksV844:boolean;festivalConfettiV844:boolean;
@@ -104,6 +105,7 @@ export const DEFAULT_CONCERT_FX_V810:Readonly<ConcertFxSettingsV810>={
   kineticStage:true,kineticIntensity:65,foamCannon:true,foamIntensity:65,foamSide:'both',
   immersiveFxV1028:true,immersiveFxStrengthV1028:65,
   aiVisualDirectorV1029:true,aiVisualDirectorStrengthV1029:70,
+  intelligentAtmosphereV1030:true,atmosphereStrengthV1030:65,
   festivalFxV844:true,festivalIntensityV844:65,festivalStyleV844:'balanced',
   festivalCoordinationV871:true,festivalClarityV871:70,
   festivalCo2V844:true,festivalSparksV844:true,festivalConfettiV844:true,
@@ -242,6 +244,8 @@ export function normalizeConcertFxV810(raw?:Partial<ConcertFxSettingsV810>|null)
  immersiveFxStrengthV1028:finite(raw?.immersiveFxStrengthV1028)?Math.round(clamp(raw.immersiveFxStrengthV1028,0,100)):d.immersiveFxStrengthV1028,
  aiVisualDirectorV1029:typeof raw?.aiVisualDirectorV1029==='boolean'?raw.aiVisualDirectorV1029:d.aiVisualDirectorV1029,
  aiVisualDirectorStrengthV1029:finite(raw?.aiVisualDirectorStrengthV1029)?Math.round(clamp(raw.aiVisualDirectorStrengthV1029,0,100)):d.aiVisualDirectorStrengthV1029,
+ intelligentAtmosphereV1030:typeof raw?.intelligentAtmosphereV1030==='boolean'?raw.intelligentAtmosphereV1030:d.intelligentAtmosphereV1030,
+ atmosphereStrengthV1030:finite(raw?.atmosphereStrengthV1030)?Math.round(clamp(raw.atmosphereStrengthV1030,0,100)):d.atmosphereStrengthV1030,
  festivalFxV844:typeof raw?.festivalFxV844==='boolean'?raw.festivalFxV844:d.festivalFxV844,
  festivalCoordinationV871:typeof raw?.festivalCoordinationV871==='boolean'?raw.festivalCoordinationV871:d.festivalCoordinationV871,
  festivalClarityV871:finite(raw?.festivalClarityV871)?Math.round(clamp(raw.festivalClarityV871,0,100)):d.festivalClarityV871,
