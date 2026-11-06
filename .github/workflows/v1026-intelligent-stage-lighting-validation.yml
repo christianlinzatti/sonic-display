@@ -1,5 +1,5 @@
 name: V1026 Intelligent Stage Lighting 4.0 validation
-run-name: Sonic Display · V1039 · V1026 Intelligent Stage Lighting 4.0 validation
+run-name: Sonic Display · V1041 · V1026 Intelligent Stage Lighting 4.0 validation
 # Manual diagnostic only; full Linux/Windows production gate remains the authority.
 on:
   workflow_dispatch:

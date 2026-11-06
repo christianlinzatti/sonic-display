@@ -1,0 +1,29 @@
+name: V1041 Intelligent Avatar Choreography manual validation
+run-name: Sonic Display · V1041 · V1041 Intelligent Avatar Choreography manual validation
+# Manual diagnostic workflow; the v965 production matrix is the only automatic CI workflow.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --include=dev --no-audit --no-fund
+      - run: npm run test:v1041 && npm run test:v1041:types
+      - run: node scripts/v959-source-preflight.cjs
+      - run: npm run typecheck
+      - run: npm run build:next

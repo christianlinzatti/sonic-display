@@ -1,5 +1,5 @@
 name: V1030 Intelligent Concert Atmosphere 5.0 validation
-run-name: Sonic Display · V1039 · V1030 Intelligent Concert Atmosphere 5.0 validation
+run-name: Sonic Display · V1041 · V1030 Intelligent Concert Atmosphere 5.0 validation
 # Manual version-specific diagnostics; v965 is the authoritative production matrix.
 on:
   workflow_dispatch:
