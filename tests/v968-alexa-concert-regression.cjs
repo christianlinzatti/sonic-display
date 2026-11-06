@@ -138,7 +138,8 @@ test('V968 model and Lambda action names stay in sync',()=>{
  const {ACTIONS}=require('../integrations/alexa/handler.cjs')._internals;
  for(const [name,command] of Object.entries(ACTIONS)){
   assert(names.includes(name),name);
-  // V969 adds new intents; this legacy suite verifies the original V968 subset.
+  // V1007 artist actions have their own exact policy; visual actions retain V968 guards.
+  if(require('./helpers/ts-loader-v404.cjs').load('lib/alexaArtistV1007').isAlexaArtistCommandV1007(command))continue;
   if(!command.startsWith('preset-')&&!command.startsWith('govee-'))assert(v968.isAlexaConcertCommandV968(command),command);
  }
  assert.equal(new Set(names).size,names.length);

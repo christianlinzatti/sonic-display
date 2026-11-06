@@ -10,6 +10,8 @@ function fixture({ artifactPassed = true, spawnStatus = 0, stats = { expected: 1
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sonic-playwright-'));
   fs.mkdirSync(path.join(root, '.next'), { recursive: true });
   fs.writeFileSync(path.join(root, '.next/BUILD_ID'), 'fixture-build-123');
+  fs.mkdirSync(path.join(root, 'public/benchmark'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'public/benchmark/v777-reference-performer.glb'), 'fixture avatar');
   const calls = [];
   const module = { exports: {} };
   const fakeProcess = { execPath: process.execPath, platform: process.platform, version: process.version, env: {} };
@@ -44,6 +46,7 @@ for (const stats of [{ expected: 0, unexpected: 0, skipped: 0, flaky: 0 }, { exp
   check('empty, skipped or failed suite cannot pass: ' + JSON.stringify(stats), { stats }, proof => assert.equal(proof.passed, false));
 }
 check('passing suite records build and artifact evidence without rebuilding', {}, (proof, f) => {
+  assert.equal(fs.existsSync(path.join(f.root, 'public/avatars/sonic-playwright-reference.glb')), false);
   assert.equal(proof.passed, true); assert.equal(proof.buildId, 'fixture-build-123'); assert.equal(f.calls.length, 1);
   const evidence = JSON.parse(fs.readFileSync(path.join(f.root, 'reports/v959-regression-logs/playwright-production.log')));
   assert.equal(evidence.proof.passed, true); assert.equal(evidence.playwright.stats.expected, 12);

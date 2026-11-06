@@ -8,6 +8,19 @@ const root = path.resolve(__dirname, '..');
 const directory = path.join(root, 'reports/playwright-production');
 const proofFile = path.join(directory, 'proof.json');
 const evidenceFile = path.join(root, 'reports/v959-regression-logs/playwright-production.log');
+const REFERENCE_AVATAR_NAME = 'sonic-playwright-reference.glb';
+function stageReferenceAvatar(root) {
+  const source = path.join(root, 'public/benchmark/v777-reference-performer.glb');
+  const target = path.join(root, 'public/avatars', REFERENCE_AVATAR_NAME);
+  const original = fs.readFileSync(source);
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  // Exclusive creation protects user-owned local avatars, even during local runs.
+  fs.copyFileSync(source, target, fs.constants.COPYFILE_EXCL);
+  return () => {
+    if (!fs.readFileSync(target).equals(original)) throw Error('Test avatar changed during run; preserving file');
+    fs.unlinkSync(target);
+  };
+}
 function runProductionTests({ existingBuildSince } = {}) {
   fs.rmSync(directory, { recursive: true, force: true });
   fs.mkdirSync(directory, { recursive: true });
@@ -16,6 +29,7 @@ function runProductionTests({ existingBuildSince } = {}) {
   const proof = { schema: 'sonic-playwright-production-v1', passed: false, startedAt: new Date().toISOString(),
     platform: process.platform, node: process.version, buildId: null, steps: [] };
   let results = null;
+  let cleanupAvatar = () => {};
   function run(label, file, args, timeout) {
     const started = Date.now();
     const result = spawnSync(process.execPath, [path.join(root, file), ...args], {
@@ -37,6 +51,7 @@ function runProductionTests({ existingBuildSince } = {}) {
     const artifacts = inspectBuild(root, notBefore);
     if (!artifacts.passed) throw Error('Missing/stale production build: ' + artifacts.issues.join('; '));
     proof.buildId = fs.readFileSync(path.join(root, '.next/BUILD_ID'), 'utf8').trim();
+    cleanupAvatar = stageReferenceAvatar(root);
     if (process.env.GITHUB_ACTIONS === 'true') {
       run('Install Chromium and system dependencies', 'node_modules/@playwright/test/cli.js',
         process.platform === 'linux' ? ['install', '--with-deps', 'chromium'] : ['install', 'chromium'], 10 * 60 * 1000);
@@ -49,6 +64,7 @@ function runProductionTests({ existingBuildSince } = {}) {
   } catch (error) {
     proof.error = error.message;
   } finally {
+    try { cleanupAvatar(); } catch (error) { proof.passed = false; proof.error = error.message; }
     if (!results) { try { results = JSON.parse(fs.readFileSync(path.join(directory, 'results.json'), 'utf8')); } catch {} }
     proof.stats = results?.stats || null;
     proof.finishedAt = new Date().toISOString();
@@ -68,4 +84,4 @@ if (require.main === module) {
     process.exitCode = 1;
   } else if (!runProductionTests(args.length ? { existingBuildSince: Number(args[1]) } : {}).passed) process.exitCode = 1;
 }
-module.exports = { runProductionTests };
+module.exports = { runProductionTests, stageReferenceAvatar, REFERENCE_AVATAR_NAME };

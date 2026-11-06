@@ -24,6 +24,7 @@ function load(file){
   '@/lib/alexaConcertV969':{isAlexaConcertCommandV969:c=>['preset-rap','preset-hardtekk','preset-rock','preset-cinema','preset-auto'].includes(c)},
   '@/lib/alexaGoveeV970':{isAlexaCommandV970:c=>['govee-arena','govee-festival','govee-club','govee-calm','govee-dim','govee-auto',
    'preset-rap','preset-hardtekk','preset-rock','preset-cinema','preset-auto'].includes(c)},
+  '@/lib/alexaArtistV1007':{isAlexaArtistCommandV1007:c=>['artist-follow','artist-unfollow'].includes(c)},
   '@/lib/alexaRedisV967':redis,
   '@/lib/spotify':{getValidSession:async()=>loggedIn?{session:{}}:null}
  };
@@ -62,6 +63,7 @@ const signing=(command='festival',override={})=>{
   configured=false;response=await cmd.POST(signing());assert.equal(response.status,503);configured=true;
   failRedis=true;response=await cmd.POST(signing());assert.equal(response.status,503);failRedis=false;
   response=await pending.GET();assert.equal(response.status,200);assert.equal((await response.json()).command.command,'preset-hardtekk');
+  for(const action of ['artist-follow','artist-unfollow']){response=await cmd.POST(signing(action));assert.equal(response.status,200);assert.equal(published.at(-1).command,action);}
   request=signing('govee-festival');response=await cmd.POST(request);assert.equal(response.status,200);
   assert.equal(published.at(-1).command,'govee-festival');
   request=signing('govee-on');response=await cmd.POST(request);assert.equal(response.status,400);

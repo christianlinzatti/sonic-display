@@ -297,6 +297,33 @@
             "Govee Musikautomatik wiederherstellen",
             "beende Govee Sprachlicht"
           ]
+        },
+        {
+          "name": "LikeArtistIntent",
+          "slots": [],
+          "samples": [
+            "like den künstler",
+            "bitte like den künstler",
+            "like diesen künstler",
+            "folge dem künstler",
+            "folge diesem künstler",
+            "abonniere den künstler",
+            "künstler liken"
+          ]
+        },
+        {
+          "name": "UnlikeArtistIntent",
+          "slots": [],
+          "samples": [
+            "entlike den künstler",
+            "bitte entlike den künstler",
+            "entlike diesen künstler",
+            "wieder entliken",
+            "künstler entliken",
+            "entfolge dem künstler",
+            "folge diesem künstler nicht mehr",
+            "entferne den künstler aus meinen favoriten"
+          ]
         }
       ],
       "types": []

@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
+import {AlexaArtistPermissionV1007} from '@/components/AlexaArtistControlV1007';
 import {ALEXA_LOCAL_ENABLED_KEY_V967,canApplyAlexaCommandV967}
  from '@/lib/alexaConcertV967';
 import {loadConcertRoadmapV958,saveConcertRoadmapV958,CONCERT_ROADMAP_EVENT_V958,
@@ -119,11 +120,12 @@ export function AlexaConcertControlV967(){
  },[enabled,enabledSince]);
  return <section className="govee-v958" aria-label="V967 Alexa Sprachsteuerung">
   <h4>V967–V970 · Alexa Konzert- und Raumlichtsteuerung</h4>
-  <p className="settings-note">Alexa kann Arena, Festival, Club, ruhige Atmosphäre und virtuelle Effekte wählen oder die Konzertautomatik stoppen. Govee-Lichtstimmungen benötigen eine getrennte Freigabe und bereits aktive Musik-Synchronisation. Kein Ein- oder Ausschalten von Lampen und keine Spotify-Sprachsteuerung. Eine gültige Spotify-Sitzung und die geöffnete Seite sind für den Empfang erforderlich.</p>
+  <p className="settings-note">Alexa kann Arena, Festival, Club, ruhige Atmosphäre und virtuelle Effekte wählen oder die Konzertautomatik stoppen. Govee-Lichtstimmungen benötigen eine getrennte Freigabe und bereits aktive Musik-Synchronisation. Kein Ein- oder Ausschalten von Lampen oder Spotify-Wiedergabebefehle. Künstler-Abonnements lassen sich separat freigeben. Eine gültige Spotify-Sitzung und die geöffnete Seite sind für den Empfang erforderlich.</p>
   <div className="govee-v958-settings">
    <label><input type="checkbox" checked={enabled} onChange={e=>toggle(e.target.checked)}/> Alexa-Befehle auf diesem Display empfangen (opt-in)</label>
    <button type="button" onClick={()=>apply('festival')}>Festivalmodus lokal testen (ohne Alexa)</button>
   </div>
+  <AlexaArtistPermissionV1007/>
   <h4>V970 · Alexa &amp; Govee – Raumlicht (separate Freigabe)</h4>
   <p className="settings-note">Alexa kann nur bei laufender Musik die bereits synchronisierten, ausgewählten Govee-Lampen mit ruhigen Arena-, Festival- und Club-Farben überblenden. Die Funktion schaltet keine Lampen ein oder aus, aktiviert keine Bridge und verändert keine gespeicherte Govee-Show. Presets laufen höchstens 3 Minuten. Vorhandene manuelle Shows bleiben vorrangig.</p>
   <div className="govee-v958-settings">

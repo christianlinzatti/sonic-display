@@ -1,24 +1,5 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./fixtures.cjs');
 const fs = require('node:fs');
-
-// Browser errors and broken production chunks fail every UI test. No app/API mocks.
-test.beforeEach(async ({ page }) => {
-  page.productionErrors = [];
-  page.on('pageerror', error => page.productionErrors.push(error.message));
-  page.on('response', response => {
-    if (response.url().includes('/_next/static/') && response.status() >= 400)
-      page.productionErrors.push(`Chunk HTTP ${response.status()}: ${response.url()}`);
-  });
-  await page.route('**/*', route => {
-    const url = new URL(route.request().url());
-    if (url.hostname === '127.0.0.1' || ['data:', 'blob:'].includes(url.protocol)) return route.continue();
-    page.productionErrors.push(`Unexpected external browser request: ${url.origin}`);
-    return route.abort();
-  });
-});
-test.afterEach(async ({ page }) => {
-  expect(page.productionErrors, 'No runtime errors, missing chunks or external requests').toEqual([]);
-});
 
 async function home(page) {
   const response = await page.goto('/');

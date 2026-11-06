@@ -98,7 +98,7 @@ können Phrasen für Deutsch (DE) angepasst werden.
   ungültige oder nicht signierte Befehle werden abgewiesen.
 - Unterbrochene/geschlossene Displays verlieren Befehle nach 75 Sekunden.
   Das Relay ist aktuell **last-message-wins**, keine persistente Aufgaben-Queue.
-- Die Spotify-API **darf über diesen Alexa-Skill nicht sprachgesteuert** werden.
+- Historischer Umfang von V967: keine Spotify-Sprachsteuerung. Seit V1007 sind explizit freigegebene Künstler-Follow-/Unfollow-Befehle möglich; siehe `changelog/V1007-ALEXA-ARTIST-AND-DEPLOYMENT.md`. Playback und Lautstärke bleiben unverändert.
 - **Nicht** kompatibel mit einem Alexa-HTTPS-Custom-Skill-Endpoint auf Vercel:
   hierfür wären die zusätzlichen Amazon-Zertifikats- und Timestamp-Prüfungen
   erforderlich. V967 nutzt bewusst Lambda.

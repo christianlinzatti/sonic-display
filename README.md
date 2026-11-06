@@ -1,3 +1,31 @@
+## V1007 – Alexa: Künstler liken/entliken und Vercel-302-Fix (2026-11-06)
+
+„Alexa, sage Sonic Display, bitte like den Künstler“ folgt dem Hauptkünstler des aktuellen
+Spotify-Titels. „Bitte entlike den Künstler“ entfolgt ihm. Die vorhandene signierte Alexa-
+Verbindung und Spotify-Künstler-API werden weiterverwendet; das Display zeigt nur bestätigte
+Änderungen. In Settings → Govee LAN → Alexa den Künstler-Zugriff zusätzlich freigeben.
+
+**Einmalig auch das Alexa-Interaktionsmodell neu bauen und die Lambda aktualisieren.**
+Beide Dateien und ein fertiges kleines Lambda-ZIP liegen unter `integrations/alexa/`.
+Der Vercel-Erreichbarkeitstest nutzt jetzt den bereits konfigurierten Protection-Bypass;
+Redirects und Login-Seiten werden weiterhin nicht als Erfolg gezählt.
+Alle V1006-Avatar-Tests bleiben erhalten, insgesamt 36 Playwright-Tests.
+Anleitung: [V1007 Alexa & Build-Fix](changelog/V1007-ALEXA-ARTIST-AND-DEPLOYMENT.md).
+
+## V1006 – Avatar- und Bedienungstests am Produktionsbuild (2026-11-06)
+
+Die Playwright-Suite wächst auf **32 Tests** (Desktop und Touch). Sie lädt den eingebauten
+Procedural-Avatar und einen echten kleinen, animierten GLB-Avatar über die vorhandene
+Avatar-Bibliothek. Geprüft werden sichtbares WebGL-Rendering, Animation/Timeline,
+Abspielen/Pausieren, Tempo, Avatar-Wechsel und die Auswahl nach Neuladen.
+Weitere Tests decken Settings-Suche und Tastatur, fehlerhafte JSON-Importe, beschädigte
+Browserdaten, bestätigtes Löschen und API-Schutzgrenzen ab.
+
+`SonicDisplay-V1006.zip` unter `releases/` auf `master` hochladen. Der bereits eingerichtete
+Produktionsworkflow prüft die neue Version automatisch. Lokal führt
+`npm run test:e2e:production` den Produktionsbuild und alle Tests aus.
+Details: [V1006 Avatar Production Tests](changelog/V1006-AVATAR-PRODUCTION-TESTS.md).
+
 ## V1005 – Automatische Playwright-Tests am Produktionsbuild (2026-11-06)
 
 `SonicDisplay-V1005.zip` unter `releases/` auf `master` hochladen und committen.

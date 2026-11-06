@@ -4,6 +4,7 @@
  */
 import {createHmac,randomUUID,timingSafeEqual} from 'node:crypto';
 import {isAlexaConcertCommandV968} from '@/lib/alexaConcertV968';
+import {isAlexaArtistCommandV1007} from '@/lib/alexaArtistV1007';
 import {isAlexaCommandV970} from '@/lib/alexaGoveeV970';
 import {alexaRelayConfiguredV967,claimAlexaNonceV967,saveAlexaCommandV967} from '@/lib/alexaRedisV967';
 export const runtime='nodejs';
@@ -30,7 +31,7 @@ export async function POST(request:Request):Promise<Response>{
  let input:unknown;
  try{input=JSON.parse(body);}catch{return Response.json({error:'Invalid JSON'},{status:400,headers:common});}
  const cmd=(input&&typeof input==='object'&&!Array.isArray(input))?(input as {command?:unknown}).command:null;
- if(!isAlexaConcertCommandV968(cmd)&&!isAlexaCommandV970(cmd))return Response.json({error:'Unsupported command'},{status:400,headers:common});
+ if(!isAlexaConcertCommandV968(cmd)&&!isAlexaCommandV970(cmd)&&!isAlexaArtistCommandV1007(cmd))return Response.json({error:'Unsupported command'},{status:400,headers:common});
  try{
   if(!await claimAlexaNonceV967(nonce))return Response.json({error:'Duplicate request'},{status:409,headers:common});
   const message={id:randomUUID(),command:cmd,createdAt:Date.now()};

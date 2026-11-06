@@ -31,6 +31,9 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1007 Alexa artist receiver lifecycle','tests/v1007-alexa-artist-receiver-regression.cjs');
+  run('V1007 Alexa artist follow and unfollow','tests/v1007-alexa-artist-regression.cjs');
+  run('V1006 real avatar browser fixtures','tests/v1006-avatar-production-regression.cjs');
   if(Number(process.versions.node.split('.')[0])!==24) {
     throw new Error('Vercel must use Node 24.x; got '+process.version);
   }

@@ -7,7 +7,7 @@ module.exports = defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: 0,
-  timeout: 45000,
+  timeout: 90000,
   expect: { timeout: 15000 },
   outputDir: path.join(root, 'reports/playwright-production/test-results'),
   reporter: [
@@ -18,9 +18,10 @@ module.exports = defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:3215',
     serviceWorkers: 'block',
+    reducedMotion: 'no-preference',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    launchOptions: executablePath ? { executablePath } : {},
+    launchOptions: { ...(executablePath ? { executablePath } : {}), args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] },
   },
   projects: [
     { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },

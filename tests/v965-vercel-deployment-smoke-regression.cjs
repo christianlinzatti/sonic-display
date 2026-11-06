@@ -14,7 +14,7 @@ for(const untrusted of ['','http://sonic-display.vercel.app/','https://example.c
  'https://127.0.0.1/','https://sonic-display.vercel.app/#secret',
  'https://sonic-display.vercel.app@127.0.0.1/'])
  assert.equal(normalizeDeploymentUrlV965(untrusted),null,'Unsafe URL must be rejected: '+untrusted);
-const response=(status=200,type='text/html; charset=utf-8',html='<!doctype html><html><body>ok</body></html>')=>({
+const response=(status=200,type='text/html; charset=utf-8',html='<!doctype html><html><head><title>Sonic Display</title></head><body>ok</body></html>')=>({
  status,headers:{get:()=>type},text:async()=>html});
 (async()=>{
  let attempts=0;
@@ -28,6 +28,24 @@ const response=(status=200,type='text/html; charset=utf-8',html='<!doctype html>
   const x=await smokeV965(valid,async()=>r);assert.equal(x.reason,reason);
  }
  assert.equal((await smokeV965(valid,async()=>{throw Error('connection refused')})).passed,false);
+ const secret='test-bypass-value-not-a-real-token';
+ const protectedResult=await smokeV965(valid,async (url,options)=>{
+  assert.equal(url,valid);assert.equal(options.redirect,'manual');
+  assert.equal(options.headers['x-vercel-protection-bypass'],secret);return response();
+ },{automationBypassSecret:secret});
+ assert.equal(protectedResult.reason,'PROTECTED_HTML_READY');
+ assert(!JSON.stringify(protectedResult).includes(secret));
+ let unsafeCalls=0;const unsafe=async()=>{unsafeCalls++;return response();};
+ assert.equal((await smokeV965('https://example.org/',unsafe,{automationBypassSecret:secret})).passed,false);
+ assert.equal((await smokeV965(valid,unsafe,{automationBypassSecret:'bad\r\nheader'})).reason,'INVALID_AUTOMATION_BYPASS_SECRET');
+ assert.equal(unsafeCalls,0);
+ let redirects=0;
+ const redirected=await smokeV965(valid,async(_url,options)=>{
+  redirects++;assert.equal(options.redirect,'manual');return response(302);
+ },{automationBypassSecret:secret});
+ assert.equal(redirected.reason,'HTTP_302');assert.equal(redirects,1);
+ const login=await smokeV965(valid,async()=>response(200,'text/html','<html><head><title>Login – Vercel</title></head><body>Sign in</body></html>'),{automationBypassSecret:secret});
+ assert.equal(login.reason,'NOT_SONIC_DISPLAY_HTML');
  const config=fs.readFileSync(path.join(root,'.github/workflows/v965-deployment-smoke.yml'),'utf8');
  assert(config.includes('deployment_status:'));assert(config.includes('workflow_dispatch:'));
  assert(config.includes('VERCEL_DEPLOYMENT_URL:'));

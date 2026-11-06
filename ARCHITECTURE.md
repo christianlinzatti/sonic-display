@@ -1176,7 +1176,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1005
+**Dokumentationsstand:** V1007
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -3944,3 +3944,38 @@ The central matrix retains recent feature regressions, full TypeScript/Next.js a
 Playwright execution, and uploads browser HTML/JSON plus failure traces/screenshots.
 `tests/production-workflow-regression.cjs` checks workflow routing, metadata and artifact paths.
 See `docs/setup/PRODUCTION_WORKFLOW.md` for operation and naming details.
+
+
+## V1006 – Real avatar production browser tests
+
+`tests/e2e/fixtures.cjs` applies the same browser runtime/chunk/network guard to every spec.
+`tests/e2e/avatar.spec.cjs` uses the real avatar API and settings components to load the
+bundled animated reference GLB, validate its SHA-256, inspect embedded animation controls,
+render it in WebGL, exercise playback/scrubbing and persist selection across reload.
+Canvas screenshots are decoded and checked for nonblank rendered color content; screenshots
+are attached as evidence. The procedural avatar and model switching/filtering are also covered.
+`tests/e2e/interactions.spec.cjs` covers keyboard/search, corrupt/imported review data, deletion,
+and session/Origin rejection. Desktop and touch profiles yield 32 production browser tests.
+The runner stages the bundled GLB with exclusive file creation before starting Next.js and
+removes its unchanged fixture afterwards. Existing or modified user models are preserved.
+GitHub Chromium uses software WebGL for reproducibility; these are functional render tests,
+not physical GPU or Raspberry Pi performance certification.
+
+
+## V1007 – Explicit Alexa artist-follow commands and protected deployment smoke
+
+`lib/alexaArtistV1007.ts` defines exact follow/unfollow actions, separate opt-in parsing,
+15-second command freshness and an executor which reads the current primary artist before
+calling the existing authenticated artist API. Success requires a matching artist ID and
+confirmed following state. `components/AlexaArtistControlV1007.tsx` is mounted under the music
+provider on the display, requires both Alexa and artist permissions, pauses in hidden tabs,
+checks revocation before mutation, deduplicates claimed commands and emits the existing
+artist-follow update event only after confirmation. The original visual receiver remains
+separate and does not execute artist mutations. The signed relay accepts the new explicit
+commands; Lambda and the German interaction model include both intents without Spotify tokens.
+`tests/v1007-alexa-artist-regression.cjs` and
+`tests/v1007-alexa-artist-receiver-regression.cjs` cover policies, signed intents, API flow and
+actual React receiver effects. `tests/e2e/alexa-artist.spec.cjs` verifies the production UI
+permission and anonymous rejection alongside the V1006 avatar cases (36 browser tests).
+The Vercel deployment smoke sends the configured automation bypass only to its allowlisted
+host, never follows redirects, and requires Sonic Display page identity rather than login HTML.

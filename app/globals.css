@@ -4886,3 +4886,5 @@
 .concert-touch-v1001 :focus-visible{outline:3px solid #5eead4;outline-offset:2px}
 @media(max-width:560px){.concert-touch-lanes-v1001{grid-template-columns:1fr}.concert-touch-actions-v1001 button{flex:1 1 100%}}
 @media(prefers-reduced-motion:reduce){.concert-touch-v1001 *{scroll-behavior:auto;animation:none!important;transition:none!important}}
+
+.alexa-artist-status-v1007{position:fixed;right:1rem;bottom:1rem;z-index:10000;max-width:min(30rem,calc(100vw - 2rem));padding:1rem 1.25rem;border:1px solid #79f7ff66;border-radius:1rem;background:#101624f5;color:#eff8ff;box-shadow:0 8px 32px #0007;font-size:1rem;line-height:1.5}

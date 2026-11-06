@@ -11,6 +11,10 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1007 Alexa artist receiver lifecycle','tests/v1007-alexa-artist-receiver-regression.cjs'],
+  ['V1007 Alexa artist follow and unfollow','tests/v1007-alexa-artist-regression.cjs'],
+  ['Spotify artist follow API readback','tests/v359-spotify-artist-follow-regression.cjs'],
+  ['V1006 real avatar browser fixtures','tests/v1006-avatar-production-regression.cjs'],
   ['V1005 Playwright production orchestration','tests/v1005-playwright-production-regression.cjs'],
   ['V990 Living LED Wall 3.0','tests/v990-living-led-wall-regression.cjs'],
   ['V989 Volumetric Atmosphere 2.0','tests/v989-volumetric-atmosphere-regression.cjs'],

@@ -1,10 +1,11 @@
 'use strict';
 /** V967 AWS Lambda Alexa Custom Skill. Only install on Lambda with an Alexa Skills Kit
  * trigger with Skill ID verification ENABLED. Never expose this handler via Vercel HTTP.
- * The Lambda REST call is HMAC authenticated; commands never touch Spotify or hardware.
+ * The Lambda REST call is HMAC authenticated; the Lambda never holds Spotify tokens or accesses Spotify or hardware directly.
  */
 const {createHmac,randomUUID}=require('node:crypto');
 const ACTIONS={
+ LikeArtistIntent:'artist-follow',UnlikeArtistIntent:'artist-unfollow',
  ArenaIntent:'arena',FestivalIntent:'festival',ClubIntent:'club',CalmIntent:'calm',
  StopShowIntent:'stop',VirtualFxOnIntent:'fx-on',VirtualFxOffIntent:'fx-off',
  StageZoneIntent:'zone-stage',BackdropZoneIntent:'zone-backdrop',AudienceZoneIntent:'zone-audience',AllZonesIntent:'zone-all',
@@ -17,7 +18,7 @@ const ACTIONS={
  GoveeClubIntent:'govee-club',GoveeCalmIntent:'govee-calm',
  GoveeDimIntent:'govee-dim',GoveeAutoIntent:'govee-auto'
 };
-const labels={arena:'Arena',festival:'Festival',club:'Club',calm:'ruhige Konzertatmosphäre',
+const labels={'artist-follow':'Künstler folgen','artist-unfollow':'Künstler entfolgen',arena:'Arena',festival:'Festival',club:'Club',calm:'ruhige Konzertatmosphäre',
  stop:'gestoppte Konzertautomatik','fx-on':'virtuelle Effekte','fx-off':'virtuelle Effekte aus',
  'zone-stage':'Bühnenbeleuchtung','zone-backdrop':'LED-Hintergrund','zone-audience':'Publikumsbeleuchtung','zone-all':'gesamte Bühne',
  'mood-warm':'warme Lichtstimmung','mood-cool':'kühle Lichtstimmung','mood-neon':'Neon-Lichtstimmung','mood-auto':'automatische Lichtfarben',
@@ -54,7 +55,7 @@ async function handler(event){
  if(event?.request?.type==='LaunchRequest')return reply('Sonic Display ist bereit. Sage zum Beispiel: starte den Festivalmodus.',false);
  const intent=event?.request?.intent?.name;
  if(event?.request?.type!=='IntentRequest')return reply('Sonic Display unterstützt Konzertmodi und virtuelle Effekte.');
- if(intent==='AMAZON.HelpIntent')return reply('Sage zum Beispiel: starte Festival, beleuchte das Publikum, aktiviere Neon, zeige virtuellen Nebel starte den Hardtekk-Reaktor, aktiviere die Rock-Arena, nutze Govee Festival Raumlicht oder beende die Konzertautomatik.',false);
+ if(intent==='AMAZON.HelpIntent')return reply('Du kannst auch sagen: bitte like den Künstler oder bitte entlike den Künstler. Sage zum Beispiel: starte Festival, beleuchte das Publikum, aktiviere Neon, zeige virtuellen Nebel starte den Hardtekk-Reaktor, aktiviere die Rock-Arena, nutze Govee Festival Raumlicht oder beende die Konzertautomatik.',false);
  if(intent==='AMAZON.CancelIntent'||intent==='AMAZON.StopIntent')return reply('Bis bald.');
  if(intent==='StatusIntent')return reply('Der Alexa Skill ist eingerichtet. Ob das Display den nächsten Befehl übernimmt, siehst du im Konzertstudio.');
  if(!Object.hasOwn(ACTIONS,intent))return reply('Diesen Bühnenbefehl kenne ich noch nicht.');
@@ -68,6 +69,7 @@ async function handler(event){
   if(!result.ok)return reply('Sonic Display konnte den Befehl nicht annehmen. Bitte prüfe die Verbindung.');
   const response=await result.json();
   if(response?.queued!==true)return reply('Sonic Display hat den Befehl nicht bestätigt.');
+  if(ACTIONS[intent]==='artist-follow'||ACTIONS[intent]==='artist-unfollow')return reply('Die Künstleranfrage wurde an dein Sonic Display gesendet. Das geöffnete Display führt sie bei freigegebener Künstlersteuerung aus und zeigt den bestätigten Spotify-Status.');
   return reply(`${labels[ACTIONS[intent]]} wurde an Sonic Display gesendet. Das Display übernimmt den Befehl nur bei entsprechender Freigabe und aktiver Verbindung.`);
  }catch{return reply('Sonic Display ist gerade nicht erreichbar.');}
 }
