@@ -1,5 +1,5 @@
 name: Sonic Display production build gate (V680)
-run-name: Sonic Display · V1023 · production build gate (V680)
+run-name: Sonic Display · V1028 · production build gate (V680)
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:
