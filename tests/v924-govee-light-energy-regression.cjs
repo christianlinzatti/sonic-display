@@ -101,7 +101,13 @@ test('integration uses single existing LAN dispatch; group dimmer runs last',()=
 });
 test('settings are opt-in, integrated with the legacy sync dependency key',()=>{
  const sync=read('components/GoveeMusicSyncV909.tsx');
- assert.match(sync,/\[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings(?:,festivalSettings(?:,spatialSettings)?)?(?:,calibrationSettings)?(?:,roadmapSettings)?\]/);
+ const dependencies=sync.match(/},\[([^\]\n]+)\]\);\s*return null;\s*}/)?.[1]?.split(',');
+ assert(dependencies,'single Govee send effect must declare dependencies');
+ for(const name of ['config','showLibrary','groups','bassSettings','beatSettings',
+  'sectionSettings','genreSettings','cinematicSettings','shockSettings',
+  'neonSettings','energySettings','festivalSettings','spatialSettings',
+  'calibrationSettings','roadmapSettings','syncSettingsV1027'])
+   assert(dependencies.includes(name),'missing send effect dependency: '+name);
  assert.match(sync,/GOVEE_ENERGY_EVENT_V924/);
  assert.match(read('components/GoveeLightEnergyStudioV924.tsx'),/previewGoveeEnergyV924/);
 });

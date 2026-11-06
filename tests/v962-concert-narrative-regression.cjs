@@ -114,7 +114,7 @@ check('Govee request count unchanged, V961 remains final sender governor',()=>{
  const source=read('components/GoveeMusicSyncV909.tsx');
  assert.match(source,/const narrativeV962=continuousSceneV960\?planConcertNarrativeV962\(/);
  assert.match(source,/const narrativeLookV962=narrativeV962\?dimConcertNarrativeLookV962\(mixed,narrativeV962\):mixed/);
- assert.ok(source.indexOf('dimConcertNarrativeLookV962(mixed,narrativeV962)')<source.indexOf('governConcertLookV961(previous,voiceLookV970'));
+ assert.ok(source.indexOf('dimConcertNarrativeLookV962(mixed,narrativeV962)')<source.indexOf('governConcertLookV961(previous,syncedLookV1027'));
  assert.match(source,/if\(!changedGoveeLookV911\(previous,finalLook\)\)continue/);
  assert.match(source,/value:finalLook/);assert.match(source,/sent\.set\(ip,finalLook\)/);
 });
