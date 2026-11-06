@@ -1,3 +1,31 @@
+## V1011 – Netzwerkdiagnose und Release-Sicherheit (2026-11-06)
+
+`components/NetworkPerformanceDashboardV1011.tsx` visualisiert die tatsächlich gemessene
+Arbeit des browserlokalen `lib/networkCoordinatorV1010.ts` im vorhandenen
+`components/ServiceStatusDashboardV667.tsx`. Erfasst werden gleichzeitige Requests je
+Priorität, Warteschlangenspitzen, Cache-Treffer, zusammengelegte Anfragen, Abbrüche,
+Retry-Versuche, HTTP-429-Pausen und Circuit-Breaker. Die Ansicht selbst fragt **keinen**
+externen Dienst ab. Sie pausiert ihre Sekundenaktualisierung bei verstecktem Tab.
+
+Telemetrie ist ausschließlich flüchtig, wird beim Konto-/Sitzungswechsel verworfen
+und enthält keine Spotify-IDs, Konten, Tokens, URLs, Songs oder Rohfehlermeldungen.
+Provider-Namen und Fehler werden in feste, ungefährliche Kategorien überführt.
+Benutzeraktionen können nun bei voller Warteschlange niedrig priorisierte Aufträge
+verdrängen. Weder der vorhandene Wiedergabe-Poller noch die Konfiguration werden
+von der passiven Anzeige verändert.
+
+Der CI-Fix zu Run 42202961731 setzt `sonicFeatureRelease` auf die tatsächliche
+Release-Version (V1010, danach V1011). `scripts/production-workflow-metadata.cjs`
+prüft Feature-, Roadmap- und Paket-Version jetzt gemeinsam vor jedem Build.
+Im V359-Spotify-Follow-API-Regressionstest simuliert der Mock jetzt die echten
+`Response.headers` (inklusive 429-`Retry-After`) und löst nicht mehr unberechtigt
+`spotify_unavailable` aus.
+`tests/v1011-network-dashboard-regression.cjs` prüft aktive Kapazität,
+Warteschlangen, Cache, Kontowechsel, 429, Geheimnisschutz und UI-Integration.
+Node-24-TypeScript-/Next.js-Build und Playwright müssen weiterhin in GitHub CI
+bestätigt werden; isolierte Tests ersetzen keinen vollständigen Produktionsbuild.
+Siehe `changelog/V1011-NETWORK-PERFORMANCE-DASHBOARD.md`.
+
 ## V1010 – Zentrale Browser-Anfragesteuerung (2026-11-06)
 
 `lib/networkCoordinatorV1010.ts` koordiniert browserseitig Konto-gebundene GET-Anfragen
@@ -1201,7 +1229,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1010
+**Dokumentationsstand:** V1011
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

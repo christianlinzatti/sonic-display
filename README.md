@@ -1,3 +1,23 @@
+## V1011 – Network Performance Dashboard & CI-Fix (2026-11-06)
+
+Unter **Einstellungen → Dashboard** gibt es jetzt den Bereich „Internetabfragen in
+Echtzeit“ mit tatsächlicher Browser-Koordinator-Telemetrie: parallele Slots,
+begrenzte Queue, geteilte Requests, Cache-Treffer, Spotify-429-Sperren, Dienstpausen
+und Fehler. Keine Netzwerkabfragen nur für das Dashboard und keine sensitiven
+Konten-/Requestdaten in der Telemetrie. Schreibaktionen bleiben höher priorisiert;
+beim Kontowechsel werden alle Zähler verworfen. Zusätzlich repariert V1011 die
+Versionsinkonsistenz, die am 6. November 2026 den GitHub-Run 42202961731
+auf Windows und Ubuntu im V1003-Historientest blockierte. Zusätzlich wird der V359-Spotify-Follow-Test
+mit realistischem `Response.headers` und einem 429-`Retry-After`-Fall repariert.
+
+**Einspielen:** `SonicDisplay-V1011.zip` in `releases/` auf `master` hochladen.
+Der Projektimport übernimmt die Quellcodeänderungen; bestehende GitHub-Workflows
+werden durch den Importer absichtlich nicht überschrieben. Der bereits eingerichtete
+Produktionsworkflow validiert die neuen V1011-Tests. Für eine neue dedizierte
+`.github/workflows/v1011-network-dashboard-validation.yml` wäre ein gesonderter
+Repository-Commit nötig. Weitere Hinweise:
+[changelog/V1011-NETWORK-PERFORMANCE-DASHBOARD.md](changelog/V1011-NETWORK-PERFORMANCE-DASHBOARD.md).
+
 ## V1010 – Zentrale Anfragesteuerung (2026-11-06)
 
 Neu: gemeinsame, kontogebundene Browser-Warteschlange für Spotify, Lyrics, Genre und

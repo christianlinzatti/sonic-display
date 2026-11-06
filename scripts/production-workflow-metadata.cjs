@@ -7,6 +7,7 @@ function resolveMetadata(pkg, { revision, expectedRelease = '', expectedRevision
   if (!match) throw Error('Invalid sonicRoadmapRelease in package.json');
   const release = 'V' + match[1];
   if (pkg.version !== '0.1.0-v' + match[1]) throw Error('Package version and roadmap release differ');
+  if (pkg.sonicFeatureRelease !== 'v' + match[1]) throw Error('Feature release and package version differ');
   if (!/^[0-9a-f]{40}$/.test(revision || '')) throw Error('Expected a full checked-out commit SHA');
   if (expectedRelease && expectedRelease !== release) throw Error('Dispatched release differs from checked-out package');
   if (expectedRevision && expectedRevision !== revision) throw Error('Dispatched revision differs from checked-out commit');

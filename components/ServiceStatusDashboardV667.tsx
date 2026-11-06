@@ -9,6 +9,7 @@ import {GENRE_DANCE_SETTINGS_EVENT_V666,refreshGenreDanceSettingsV666} from "@/c
 import {getLiveVocalEnvelopeV661} from "@/components/visualizer/vocalAnalysisStudioV661";
 import {DiagnosticAssistantV668} from "@/components/DiagnosticAssistantV668";
 import {ConnectedServicesMonitorV725} from "@/components/ConnectedServicesMonitorV725";
+import {NetworkPerformanceDashboardV1011} from "@/components/NetworkPerformanceDashboardV1011";
 import {ConcertQualityDashboardV751} from "@/components/visualizer/ConcertQualityDashboardV751";
 import {PerformanceMemoryDashboardV770} from "@/components/visualizer/PerformanceMemoryDashboardV770";
 import type {ConfigurationSnapshotV667,ServiceConfigurationV667} from "@/services/system/configurationStatusV667";
@@ -107,6 +108,7 @@ export function ServiceStatusDashboardV667({onNavigate}:{onNavigate:(tab:"audio"
   return <div className="v667-dashboard" data-v667-dashboard>
     <ConcertQualityDashboardV751/>
     <PerformanceMemoryDashboardV770/>
+    <NetworkPerformanceDashboardV1011/>
     <ConnectedServicesMonitorV725 snapshot={server} serverError={serverError} refreshing={loading} onRefresh={()=>{refreshLocal();void refreshServer();}} spotify={{connected:music.connected,error:music.error,fetchedAt:music.fetchedAt}} lyrics={{hasTrack:Boolean(music.track),provider:activeLyricsProvider,enabled:preferences.lyricsVisible}}/>
     <div className="v667-summary"><div><h3>System- & Service-Dashboard</h3>
       <p>Konfiguration, Aktivierung und bestätigte Funktion werden getrennt angezeigt. Kein Anbieter wird automatisch angepingt.</p>

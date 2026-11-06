@@ -13,6 +13,35 @@ type Job = {key:string;provider:string;priority:NetworkPriorityV1010;lane:Networ
   ttl:number;stale:number;retry:number;tries:number;readyAt:number;retain:boolean;started:boolean;order:number;cacheWhen?:(value:unknown)=>boolean;retainers:Map<AbortSignal,()=>void>};
 type CacheEntry = {value:unknown;freshUntil:number;staleUntil:number};
 type Circuit = {failures:number;openUntil:number;probe:boolean};
+/** V1011 telemetry contains counts only: NEVER request URLs, keys, tokens or account identifiers. */
+export type NetworkProviderIdV1011 = 'Spotify'|'Lyrics'|'Genius'|'LRCLIB'|'Buehneninhalte'|'Weitere';
+export type NetworkFailureKindV1011 = 'Rate-Limit'|'Anmeldung'|'Timeout'|'Serverfehler'|'Netzwerk'|'Sonstiger Fehler';
+export type NetworkTelemetryV1011 = {
+  since:number; queue:number; queueLimit:number; peakQueue:number;
+  inFlight:Record<NetworkLaneV1010,number>;limits:Record<NetworkLaneV1010,number>;
+  cacheEntries:number;cacheLimit:number;offline:boolean;hidden:boolean;
+  counters:{started:number;completed:number;failed:number;joined:number;cacheHits:number;staleHits:number;
+    cancelled:number;retries:number;rateLimits:number;queueDropped:number};
+  averageLatencyMs:number;lastFailure:NetworkFailureKindV1011|null;
+  providers:Array<{name:NetworkProviderIdV1011;queued:number;active:number;failures:number;
+    blockedForMs:number;circuitForMs:number;lastFailure:NetworkFailureKindV1011|null}>;
+};
+const safeProviderV1011=(provider:string):NetworkProviderIdV1011=>{
+  switch(provider.toLowerCase()){
+    case 'spotify':return 'Spotify';case 'lyrics':case 'lyrics-ovh':return 'Lyrics';
+    case 'genius':return 'Genius';case 'lrclib':return 'LRCLIB';
+    case 'stage-content':return 'Buehneninhalte';default:return 'Weitere';
+  }
+};
+function failureKindV1011(error:unknown):NetworkFailureKindV1011{
+  const candidate=error as {status?:number;name?:string};const status=candidate?.status??0;
+  if(status===429)return 'Rate-Limit';
+  if(status===401||status===403)return 'Anmeldung';
+  if(status===408||candidate?.name==='AbortError')return 'Timeout';
+  if(status>=500)return 'Serverfehler';
+  if(!status)return 'Netzwerk';
+  return 'Sonstiger Fehler';
+}
 export class NetworkErrorV1010 extends Error {
   constructor(message:string, public readonly status:number=0, public readonly retryAfter:number=0){super(message);this.name='NetworkErrorV1010';}
 }
@@ -42,6 +71,66 @@ export class NetworkCoordinatorV1010 {
   private serial=0;
   private generation=0;
   private account='anonymous';
+  private telemetrySince=Date.now();
+  private telemetryCounters={started:0,completed:0,failed:0,joined:0,cacheHits:0,staleHits:0,
+    cancelled:0,retries:0,rateLimits:0,queueDropped:0};
+  private totalLatency=0;
+  private lastFailure:NetworkFailureKindV1011|null=null;
+  private readonly providerFailures=new Map<NetworkProviderIdV1011,{count:number;last:NetworkFailureKindV1011|null}>();
+  private readonly telemetryListeners=new Set<()=>void>();
+  private telemetryPending=false;
+  private changedV1011(){
+    if(this.telemetryPending)return;
+    this.telemetryPending=true;
+    void Promise.resolve().then(()=>{
+      this.telemetryPending=false;
+      for(const notify of this.telemetryListeners)try{notify();}catch{/* monitor must not break networking */}
+    });
+  }
+  subscribeTelemetryV1011(notify:()=>void):()=>void{
+    this.telemetryListeners.add(notify);
+    return ()=>{this.telemetryListeners.delete(notify);};
+  }
+  /** Read-only, tab-local and account-resettable. Never stores request identities. */
+  snapshotV1011(now=Date.now()):NetworkTelemetryV1011{
+    const grouped=new Map<NetworkProviderIdV1011,{queued:number;active:number;blockedForMs:number;circuitForMs:number}>();
+    const ensure=(name:NetworkProviderIdV1011)=>{
+      let entry=grouped.get(name);
+      if(!entry){entry={queued:0,active:0,blockedForMs:0,circuitForMs:0};grouped.set(name,entry);}
+      return entry;
+    };
+    for(const job of this.jobs.values()){
+      const name=safeProviderV1011(job.provider);
+      if(job.started && !this.queue.includes(job))ensure(name).active++;
+      else ensure(name).queued++;
+    }
+    for(const [provider,until] of this.blocked){
+      if(until>now){const entry=ensure(safeProviderV1011(provider));entry.blockedForMs=Math.max(entry.blockedForMs,until-now);}
+    }
+    for(const [provider,circuit] of this.circuits){
+      if(circuit.openUntil>now){const entry=ensure(safeProviderV1011(provider));entry.circuitForMs=Math.max(entry.circuitForMs,circuit.openUntil-now);}
+    }
+    for(const provider of this.providerFailures.keys())ensure(provider);
+    const providers=[...grouped.entries()].map(([name,entry])=>({name,...entry,
+      failures:this.providerFailures.get(name)?.count??0,
+      lastFailure:this.providerFailures.get(name)?.last??null})).sort((a,b)=>a.name.localeCompare(b.name));
+    return {since:this.telemetrySince,queue:this.queue.length,queueLimit:this.maxQueue,
+      peakQueue:this.peakQueue,inFlight:{...this.running},limits:{...this.limits},
+      cacheEntries:this.cache.size,cacheLimit:this.maxCache,
+      offline:typeof navigator!=='undefined'&&navigator.onLine===false,
+      hidden:typeof document!=='undefined'&&document.visibilityState==='hidden',
+      counters:{...this.telemetryCounters},
+      averageLatencyMs:this.telemetryCounters.completed?Math.round(this.totalLatency/this.telemetryCounters.completed):0,
+      lastFailure:this.lastFailure,providers};
+  }
+  private peakQueue=0;
+  private noteFailureV1011(provider:string,error:unknown){
+    const name=safeProviderV1011(provider),kind=failureKindV1011(error);
+    this.lastFailure=kind;
+    const state=this.providerFailures.get(name)??{count:0,last:null};
+    state.count++;state.last=kind;this.providerFailures.set(name,state);
+    this.changedV1011();
+  }
   constructor(private readonly limits:Record<NetworkLaneV1010,number>=DEFAULT_LIMITS,
     private readonly maxQueue=48,private readonly maxCache=120,private readonly backoffMs=750){}
   /** Switching accounts invalidates ALL in-flight results and in-memory personal data. */
@@ -77,8 +166,9 @@ export class NetworkCoordinatorV1010 {
     const existing=this.cache.get(key);
     if(existing){
       if(existing.staleUntil<=now)this.cache.delete(key);
-      else if(existing.freshUntil>now)return Promise.resolve(existing.value as T);
+      else if(existing.freshUntil>now){this.telemetryCounters.cacheHits++;this.changedV1011();return Promise.resolve(existing.value as T);}
       else if(stale>0){
+        this.telemetryCounters.staleHits++;this.changedV1011();
         // Stale-while-revalidate: keep showing existing data. A refresh can outlive callers.
         const refresh=this.enqueue(options,key,ttl,stale,false);
         if(refresh)this.retainStale(refresh,options.signal);
@@ -96,18 +186,22 @@ export class NetworkCoordinatorV1010 {
   }
   private enqueue<T>(options:NetworkRequestV1010<T>,key:string,ttl:number,stale:number,retain:boolean):Job|null{
     let job=this.jobs.get(key);
-    if(job)return job;
+    if(job){this.telemetryCounters.joined++;this.changedV1011();return job;}
     const priority=options.priority??'optional';const lane=requestLaneV1010(priority);
     if(this.queue.length>=this.maxQueue){
       // Discard outdated prefetches first; never let them starve deliberate actions.
-      const victim=[...this.queue].reverse().find(j=>j.priority==='optional');
-      if(victim)this.cancel(victim);
-      else if(priority==='optional')return null;
-      else if(this.queue.length>=this.maxQueue)return null;
+      // Prefer removing an outdated optional job; if only lower-priority regular
+      // work remains, playback or an explicit user action may preempt it.
+      const victim=[...this.queue].reverse().find(j=>j.priority==='optional')
+        ??[...this.queue].reverse().find(j=>weight[j.priority]>weight[priority]);
+      if(victim){this.telemetryCounters.queueDropped++;this.cancel(victim);}
+      else if(priority==='optional'){this.telemetryCounters.queueDropped++;this.changedV1011();return null;}
+      else if(this.queue.length>=this.maxQueue){this.telemetryCounters.queueDropped++;this.changedV1011();return null;}
     }
     const provider=options.provider??'generic';
     job={key,provider,priority,lane,run:options.execute as (signal:AbortSignal)=>Promise<unknown>,controller:new AbortController(),waiters:new Set(),ttl,stale,retry:finite(options.retry??2,2,4),tries:0,readyAt:Date.now(),retain,started:false,order:this.serial++,cacheWhen:options.cacheWhen as ((value:unknown)=>boolean)|undefined,retainers:new Map()};
     this.jobs.set(key,job);this.queue.push(job);
+    this.peakQueue=Math.max(this.peakQueue,this.queue.length);this.changedV1011();
     // Queue first, install subscriber synchronously, then dispatch on microtask.
     void Promise.resolve().then(()=>this.pump());
     return job;
@@ -128,7 +222,7 @@ export class NetworkCoordinatorV1010 {
     this.jobs.delete(job.key);
     const index=this.queue.indexOf(job);if(index>=0)this.queue.splice(index,1);
     job.controller.abort();this.releaseRetainers(job);for(const w of job.waiters){w.remove?.();w.reject(abortError());}job.waiters.clear();
-    this.pump();
+    this.telemetryCounters.cancelled++;this.changedV1011();this.pump();
   }
   private offlineOrHidden(job:Job){
     if(typeof navigator!=='undefined'&&navigator.onLine===false)return true;
@@ -151,6 +245,7 @@ export class NetworkCoordinatorV1010 {
       this.running[job.lane]++;
       if(circuit&&circuit.failures>=3)circuit.probe=true;
       job.started=true;
+      this.telemetryCounters.started++;this.changedV1011();
       void this.execute(job);
     }
     if(Number.isFinite(next))this.timer=setTimeout(()=>{this.timer=null;this.pump();},Math.max(1,next));
@@ -173,6 +268,7 @@ export class NetworkCoordinatorV1010 {
   }
   private async execute(job:Job){
     let failure:unknown;
+    const startedAt=Date.now();
     try{
       job.tries++;
       const result=await this.boundedRun(job);
@@ -186,11 +282,12 @@ export class NetworkCoordinatorV1010 {
         for(const listener of this.listeners.get(job.key)??[])try{listener(result);}catch{/* user subscriber */}
       }
       this.jobs.delete(job.key);this.releaseRetainers(job);
+      this.telemetryCounters.completed++;this.totalLatency+=Date.now()-startedAt;this.changedV1011();
       for(const w of job.waiters){w.remove?.();w.resolve(result);}job.waiters.clear();
       return;
     }catch(error){failure=error;}
     finally{
-      this.running[job.lane]--;
+      this.running[job.lane]--;this.changedV1011();
       const circuit=this.circuits.get(job.provider);
       if(circuit)circuit.probe=false;
       void Promise.resolve().then(()=>this.pump());
@@ -199,7 +296,8 @@ export class NetworkCoordinatorV1010 {
     const error=failure as {status?:number;retryAfter?:number;name?:string};
     const status=error?.status??0;
     const retryAfter=finite(error?.retryAfter??0,0,300000);
-    if(status===429)this.observeRateLimit(job.provider,retryAfter);
+    if(status===429){this.telemetryCounters.rateLimits++;this.observeRateLimit(job.provider,retryAfter);}
+    this.noteFailureV1011(job.provider,failure);
     const retryable=(!status||status===408||status===425||status===429||status>=500)&&error?.name!=='AbortError';
     if(retryable&&job.priority==='optional'&&status!==429){
       const circuit=this.circuits.get(job.provider)??{failures:0,openUntil:0,probe:false};
@@ -209,21 +307,26 @@ export class NetworkCoordinatorV1010 {
     }
     if(retryable&&job.tries<=job.retry&&!job.controller.signal.aborted){
       job.readyAt=Date.now()+Math.max(retryAfter,Math.min(30000,this.backoffMs*2**(job.tries-1)));
-      this.queue.push(job);this.pump();return;
+      this.telemetryCounters.retries++;this.queue.push(job);
+      this.peakQueue=Math.max(this.peakQueue,this.queue.length);this.changedV1011();this.pump();return;
     }
     this.jobs.delete(job.key);this.releaseRetainers(job);
+    this.telemetryCounters.failed++;this.changedV1011();
     for(const w of job.waiters){w.remove?.();w.reject(failure);}job.waiters.clear();
   }
   /** Hooks can wake work paused by an offline connection or a hidden document. */
   observeRateLimit(provider:string,waitMs:number){
     this.blocked.set(provider,Math.max(this.blocked.get(provider)??0,Date.now()+Math.max(1000,finite(waitMs,1000,300000))));
-    this.pump();
+    this.changedV1011();this.pump();
   }
   wake(){this.pump();}
   reset(){
     this.generation++;
     for(const job of [...this.jobs.values()])this.cancel(job);
     this.cache.clear();this.listeners.clear();this.blocked.clear();this.circuits.clear();
+    this.providerFailures.clear();this.telemetrySince=Date.now();
+    for(const key of Object.keys(this.telemetryCounters) as Array<keyof typeof this.telemetryCounters>)this.telemetryCounters[key]=0;
+    this.totalLatency=0;this.peakQueue=0;this.lastFailure=null;this.changedV1011();
     if(this.timer)clearTimeout(this.timer);this.timer=null;
   }
   stats(){return {queued:this.queue.length,inFlight:{...this.running},cache:this.cache.size,blockedProviders:this.blocked.size};}
