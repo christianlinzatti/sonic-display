@@ -1,5 +1,5 @@
 name: V1025 Cinematic Camera Intelligence 4.0 validation
-run-name: Sonic Display · V1029 · V1025 Cinematic Camera Intelligence 4.0 validation
+run-name: Sonic Display · V1038 · V1025 Cinematic Camera Intelligence 4.0 validation
 # Historical / manual validation only; the automatic production matrix remains centralized.
 on:
   workflow_dispatch:
