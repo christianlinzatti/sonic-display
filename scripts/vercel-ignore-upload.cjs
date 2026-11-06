@@ -7,10 +7,13 @@
 const path=require('node:path');
 const {spawnSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..');
-const ZIP_ONLY=/^releases\/SonicDisplay-V\d+\.zip$/;
+// Same safe, versioned filename grammar as scripts/project-archive-import.py.
+// A descriptive suffix must not trigger an unnecessary pre-import Vercel build.
+const ZIP_ONLY=/^releases\/SonicDisplay-V[1-9]\d*(?:-[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)?\.zip$/;
 function shouldSkipForPaths(paths) {
   return Array.isArray(paths) && paths.length>0 && paths.every(p=>
-    typeof p==='string' && ZIP_ONLY.test(p));
+    typeof p==='string' && ZIP_ONLY.test(p) &&
+    Buffer.byteLength(p.slice('releases/'.length),'utf8')<=255);
 }
 function main(){
   const result=spawnSync('git',['diff','--name-only','HEAD^','HEAD'],{

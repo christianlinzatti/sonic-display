@@ -28,6 +28,23 @@ assert(pkg.scripts.prebuild.endsWith(' && npm run check:fast'),'Keep complete lo
 for(const single of ['releases/SonicDisplay-V963.zip','releases/SonicDisplay-V964.zip'])
   assert(shouldSkipForPaths([single]),'Skip ZIP-only commit: '+single);
 assert(shouldSkipForPaths(['releases/SonicDisplay-V963.zip','releases/SonicDisplay-V964.zip']));
+for(const name of [
+ 'releases/SonicDisplay-V1037-Arena-Transformation-2.zip',
+ 'releases/SonicDisplay-V1038-Floating-Stage-360-Arena-Experience.zip',
+ 'releases/SonicDisplay-V1039-Lasers-Holograms-And-Atmospheric-Effects.zip'
+])assert(shouldSkipForPaths([name]),'Skip full descriptive ZIP filename: '+name);
+assert(shouldSkipForPaths(['releases/SonicDisplay-V1038-Arena.zip','releases/SonicDisplay-V1037.zip']));
+const maxName='SonicDisplay-V1038-'+('A'.repeat(255-'SonicDisplay-V1038-'.length-'.zip'.length))+'.zip';
+assert(Buffer.byteLength(maxName,'utf8')===255);
+assert(shouldSkipForPaths(['releases/'+maxName]));
+assert(!shouldSkipForPaths(['releases/'+maxName.replace('.zip','A.zip')]));
+for(const bad of [
+ 'releases/SonicDisplay-V1038-.zip','releases/SonicDisplay-V1038-description-.zip',
+ 'releases/SonicDisplay-V1038-name with spaces.zip',
+ 'releases/../SonicDisplay-V1038.zip','releases/nested/SonicDisplay-V1038.zip',
+ 'releases/SonicDisplay-V1038-ä.zip','releases/SonicDisplay-V0.zip'
+])assert(!shouldSkipForPaths([bad]),'Refuse unsafe archive path: '+bad);
+
 for(const changes of [[],['package.json'],['releases/README.md'],
  ['releases/SonicDisplay-V963.zip','lib/concertBridgeV963.ts'],
  ['releases/SonicDisplay-V963.zip','vercel.json'],
