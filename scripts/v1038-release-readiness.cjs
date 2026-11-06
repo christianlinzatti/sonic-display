@@ -7,10 +7,10 @@ function inspectReleaseV1038(root){
  const exists=f=>fs.existsSync(path.join(root,f));
  try {
   const p=JSON.parse(read('package.json')),l=JSON.parse(read('package-lock.json'));
-  add('version',p.version==='0.1.0-v1038'&&p.sonicFeatureRelease==='v1038'&&p.sonicRoadmapRelease==='v1038');
+  add('version',Number(/^0\.1\.0-v(\d+)$/.exec(p.version)?.[1])>=1038&&p.sonicFeatureRelease===p.version.split('-')[1]&&p.sonicRoadmapRelease===p.version.split('-')[1]);
   add('lock',p.version===l.version&&p.version===l.packages?.['']?.version);
   add('node',p.engines?.node==='24.x');
-  add('prebuild',p.scripts.prebuild.startsWith('npm run test:v1038 && npm run test:v1038:types && npm run test:v1037 &&'));
+  add('prebuild',p.scripts.prebuild.includes('npm run test:v1038 && npm run test:v1038:types && npm run test:v1037 &&')&&p.scripts.prebuild.startsWith(`npm run test:${p.sonicFeatureRelease} &&`));
   add('scripts',p.scripts['test:v1038']==='node tests/v1038-floating-stage-regression.cjs'&&p.scripts['test:v1038:types']==='tsc -p tests/tsconfig.v1038-core.json');
   for(const f of ['lib/arena360FloatingStageV1038.ts','components/visualizer/stages/ArenaFloatingPlatformsV1038.tsx',
     'components/visualizer/stages/Arena360StageV1031.tsx','components/visualizer/stages/index.tsx',

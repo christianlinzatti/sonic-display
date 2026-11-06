@@ -2829,3 +2829,11 @@ Atmosphere composer in the existing DynamicStage render loop: evidence-gated cin
 The 360° Arena now supports 2–6 floating, independently animated decorative platforms on the perimeter. Modes: `auto`, `wave`, `orbit`, `rise`; intensity slider 0–100%. Only rendered in `arena360`. They are not avatar-bearing; performers keep their existing stable 360° deck and Foot-IK. The satellites freeze on pause, park on reduced-motion, and adapt to performance tiers. Use `npm run test:v1038`, `npm run test:v1038:types`, and `npm run check:architecture` to validate. See `changelog/V1038-FLOATING-STAGE.md` for the integration details.
 
 Release ZIP filenames may retain descriptive suffixes, e.g. `SonicDisplay-V1038-Floating-Stage-360-Arena.zip`. The GitHub importer accepts safe descriptive names up to 255 bytes.
+
+
+### V1039 · Holographic Laser Architecture
+Wählbare Hologramm-Portale, 360°-Laser-Tunnel, Spirale und Halo mit Genre-Looks
+(Deutschrap, Hardtekk, Deutschrock, Pop). Die Effekte sind rein virtuell,
+leistungsbegrenzt und berühren weder Avatare noch Hardware-Lichter. Der zentrale
+GitHub-Produktionsworkflow bleibt für Ubuntu/Windows maßgeblich; die neuen
+Workflows im ZIP werden von der geschützten GitHub-Importlogik nicht übertragen.

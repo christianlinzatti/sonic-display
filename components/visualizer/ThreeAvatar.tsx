@@ -575,6 +575,11 @@ export function ThreeAvatar(props: VisualizerProps) {
         floatingStageEnabled={props.arenaFloatingStageEnabledV1038 ?? true}
         floatingStageMode={props.arenaFloatingStageModeV1038 ?? 'auto'}
         floatingStageIntensity={props.arenaFloatingStageIntensityV1038 ?? 70}
+        hologramsEnabled={props.arenaHologramsEnabledV1039 ?? true}
+        laserArchitectureEnabled={props.arenaLaserArchitectureEnabledV1039 ?? true}
+        hologramPattern={props.arenaHologramPatternV1039 ?? 'auto'}
+        hologramStrength={props.arenaHologramStrengthV1039 ?? 65}
+        genre={props.genre}
         progressMs={props.cameraDirectorProgressMs ?? 0} durationMs={props.track?.durationMs ?? 0}
         section={props.cameraDirectorSection ?? "verse"}>
       <group name={TRACKING_ROOT_NAME}>{groupOnV326 ? <GroupDancersV326 props={autoGroupOnV442?dancerPropsV356:{...dancerPropsV356,multiArtistMotionsV442:undefined}} settings={effectiveGroupSettingsV442} vocalDuetV838={vocalDuetV838}/> : (dual || auto || multiEnabled || showFormation) ? <FormationDancers props={dancerPropsV356} mode={mode} choreography={authoredEnabled ? null : multiEnabled ? choreography : intelligentEnabled ? intelligentCue : null} /> : <group><Dancer props={dancerPropsV356}/><ArtistNameBubbleV441 plan={props.artistBubblePlanV441} slot={0} reducedMotion={props.reducedMotion}/></group>}</group>

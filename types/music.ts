@@ -34,6 +34,10 @@ export interface UiPreferences {
   arenaFloatingStageEnabledV1038?: boolean;
   arenaFloatingStageModeV1038?: 'auto'|'wave'|'orbit'|'rise';
   arenaFloatingStageIntensityV1038?: number;
+  arenaHologramsEnabledV1039?: boolean;
+  arenaLaserArchitectureEnabledV1039?: boolean;
+  arenaHologramPatternV1039?: 'auto'|'tunnel'|'spiral'|'halo';
+  arenaHologramStrengthV1039?: number;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;

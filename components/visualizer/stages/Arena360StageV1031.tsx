@@ -22,6 +22,9 @@ import {ArenaTransformingDeckV1037} from './ArenaTransformingDeckV1037';
 import type {ArenaTransformationModeV1037} from '@/lib/arena360TransformationV1037';
 import {ArenaFloatingPlatformsV1038} from './ArenaFloatingPlatformsV1038';
 import type {FloatingStageModeV1038} from '@/lib/arena360FloatingStageV1038';
+import {ArenaHologramPortalsV1039} from './ArenaHologramPortalsV1039';
+import {ArenaLaserTunnelsV1039} from './ArenaLaserTunnelsV1039';
+import type {HologramPatternV1039} from '@/lib/arena360HolographyV1039';
 import {INITIAL_ARENA_LIFT_V1034,stepArenaLiftV1034} from "@/lib/arena360ShowV1034";
 import type {ArenaPhoneModeV1033} from "@/lib/arena360ImmersionV1033";
 
@@ -40,7 +43,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   showIntensity=65,progressMs=0,durationMs=0,
   lasersEnabled=true,movingSkyEnabled=true,groundFogEnabled=true,arenaPeaksEnabled=true,
   transformingDeckEnabled=true,transformingDeckMode='auto',transformingDeckStrength=70,
-  floatingStageEnabled=true,floatingStageMode='auto',floatingStageIntensity=70}: {
+  floatingStageEnabled=true,floatingStageMode='auto',floatingStageIntensity=70,
+  hologramsEnabled=true,laserArchitectureEnabled=true,hologramPattern='auto',hologramStrength=65,genre}: {
   children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
   reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
   audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
@@ -51,6 +55,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   lasersEnabled?:boolean;movingSkyEnabled?:boolean;groundFogEnabled?:boolean;arenaPeaksEnabled?:boolean;
   transformingDeckEnabled?:boolean;transformingDeckMode?:ArenaTransformationModeV1037;transformingDeckStrength?:number;
   floatingStageEnabled?:boolean;floatingStageMode?:FloatingStageModeV1038;floatingStageIntensity?:number;
+  hologramsEnabled?:boolean;laserArchitectureEnabled?:boolean;hologramPattern?:HologramPatternV1039;
+  hologramStrength?:number;genre?:string|null;
 }){
   const turntable=useRef<Group>(null);
   const scenicTier=useRef<Group>(null);
@@ -174,6 +180,12 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaLowFogV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={groundFogEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={showIntensity} peakRef={sharedPeak}/>
+    <ArenaHologramPortalsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
+      reactive={reactive} enabled={hologramsEnabled&&showDirectorEnabled}
+      genre={genre} section={section} pattern={hologramPattern} strength={hologramStrength}/>
+    <ArenaLaserTunnelsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
+      reactive={reactive} enabled={laserArchitectureEnabled&&showDirectorEnabled&&lasersEnabled}
+      genre={genre} section={section} pattern={hologramPattern} strength={hologramStrength}/>
     <ArenaFloatingPlatformsV1038 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={floatingStageEnabled} mode={floatingStageMode}
       intensity={floatingStageIntensity} section={section}/>

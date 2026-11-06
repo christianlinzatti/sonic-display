@@ -437,6 +437,33 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
         <label className="setting-check"><input type="checkbox" checked={preferences.stageReactive ?? true} onChange={e => updatePreferences({stageReactive: e.target.checked})}/> Musikreaktive Beleuchtung</label>
         <label>Lichtreaktion ({preferences.stageLightStrength ?? 60} %)<input type="range" min="0" max="100" step="5" value={preferences.stageLightStrength ?? 60} onChange={e => updatePreferences({stageLightStrength:Number(e.target.value)})}/></label>
         {(preferences.stageTheme === "arena360") && <div className="arena360-settings-v1031">
+          <strong>V1039 · Holographic Laser Architecture</strong>
+          <div className="arena360-experience-options-v1032">
+            <strong>Hologramm-Portale und 360°-Laserformationen</strong>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaHologramsEnabledV1039 ?? true}
+              onChange={e=>updatePreferences({arenaHologramsEnabledV1039:e.target.checked})}/>
+              Schwebende, animierte Hologramm-Ringe und 3D-Kristalle</label>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaLaserArchitectureEnabledV1039 ?? true}
+              onChange={e=>updatePreferences({arenaLaserArchitectureEnabledV1039:e.target.checked})}/>
+              Geometrische Laser-Tunnel und Lichtspiralen</label>
+            <label>Lasermuster
+              <select value={preferences.arenaHologramPatternV1039 ?? 'auto'}
+                disabled={!(preferences.arenaLaserArchitectureEnabledV1039 ?? true)}
+                onChange={e=>updatePreferences({arenaHologramPatternV1039:e.target.value as 'auto'|'tunnel'|'spiral'|'halo'})}>
+                <option value="auto">Automatisch nach Songabschnitt</option>
+                <option value="tunnel">Tunnel</option><option value="spiral">Spirale</option><option value="halo">Halo</option>
+              </select>
+            </label>
+            <label>Hologramm-Intensität: {preferences.arenaHologramStrengthV1039 ?? 65} %
+              <input type="range" min={0} max={100} step={5}
+                value={preferences.arenaHologramStrengthV1039 ?? 65}
+                disabled={!((preferences.arenaHologramsEnabledV1039 ?? true)||(preferences.arenaLaserArchitectureEnabledV1039 ?? true))}
+                onChange={e=>updatePreferences({arenaHologramStrengthV1039:Number(e.target.value)})}/>
+            </label>
+            <small>Genre-Looks für Deutschrap, Hardtekk/Hardstyle, Deutschrock/NDH und Pop. Rein virtuelle, gedämpfte Strahlen ohne reale Laser- oder Pyrosteuerung. Bei Pause steht die Animation still; reduzierte Bewegung schaltet die dynamischen Akzente ab.</small>
+          </div>
           <strong>V1038 · Floating Stage</strong>
           <div className="arena360-experience-options-v1032">
             <strong>Schwebende LED-Plattformen</strong>

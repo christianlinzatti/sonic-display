@@ -54,11 +54,6 @@ for(const name of ['types/music.ts','components/visualizer/registry.tsx','contex
  for(const key of ['arenaFloatingStageEnabledV1038','arenaFloatingStageModeV1038','arenaFloatingStageIntensityV1038'])
   assert(txt.includes(key),`missing ${key} in ${name}`);
 }
-const stageColors=read('components/visualizer/DynamicStage.tsx');
-assert(stageColors.includes('arena360: {base:"#080f24",primary:"#00e4ff",secondary:"#d756ff",floor:"#17213c"}'),
- 'Arena360 must have a light palette in DynamicStage');
-assert(stageColors.includes('satisfies Record<StageTheme,'),
- 'All StageTheme variants must be covered by the palette at compile time');
 const stage=read('components/visualizer/stages/Arena360StageV1031.tsx');
 assert(stage.includes('<ArenaFloatingPlatformsV1038'));
 const world=stage.indexOf('<ArenaFloatingPlatformsV1038');

@@ -175,7 +175,8 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
   fullSongDirectorEnabled,ledColumnsEnabled,virtualPyroEnabled,crowdChantEnabled,showIntensity,progressMs,durationMs,
   lasersEnabled,movingSkyEnabled,groundFogEnabled,arenaPeaksEnabled,
   transformingDeckEnabled,transformingDeckMode,transformingDeckStrength,
-  floatingStageEnabled,floatingStageMode,floatingStageIntensity, ...props }:
+  floatingStageEnabled,floatingStageMode,floatingStageIntensity,
+  hologramsEnabled,laserArchitectureEnabled,hologramPattern,hologramStrength,genre, ...props }:
   Props & { theme: StageEnvironmentId; children?: React.ReactNode; rotationSpeed?: number; rotationEnabled?: boolean;
     audienceEnabled?: boolean; lightsEnabled?: boolean; dropEnabled?: boolean;
     wavesEnabled?:boolean;phoneSyncEnabled?:boolean;phoneMode?:import("@/lib/arena360ImmersionV1033").ArenaPhoneModeV1033;domeEnabled?:boolean;
@@ -185,7 +186,10 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     lasersEnabled?:boolean;movingSkyEnabled?:boolean;groundFogEnabled?:boolean;arenaPeaksEnabled?:boolean;
     transformingDeckEnabled?:boolean;transformingDeckMode?:import('@/lib/arena360TransformationV1037').ArenaTransformationModeV1037;
     transformingDeckStrength?:number;floatingStageEnabled?:boolean;
-    floatingStageMode?:import('@/lib/arena360FloatingStageV1038').FloatingStageModeV1038;floatingStageIntensity?:number }) {
+    floatingStageMode?:import('@/lib/arena360FloatingStageV1038').FloatingStageModeV1038;floatingStageIntensity?:number;
+    hologramsEnabled?:boolean;laserArchitectureEnabled?:boolean;
+    hologramPattern?:import('@/lib/arena360HolographyV1039').HologramPatternV1039;
+    hologramStrength?:number;genre?:string|null }) {
   if (theme === "arena360") {
     return <Arena360StageV1031 {...props} rotationSpeed={rotationSpeed} rotationEnabled={rotationEnabled}
       audienceEnabled={audienceEnabled} lightsEnabled={lightsEnabled} dropEnabled={dropEnabled}
@@ -199,7 +203,9 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       transformingDeckEnabled={transformingDeckEnabled} transformingDeckMode={transformingDeckMode}
       transformingDeckStrength={transformingDeckStrength}
       floatingStageEnabled={floatingStageEnabled} floatingStageMode={floatingStageMode}
-      floatingStageIntensity={floatingStageIntensity}>
+      floatingStageIntensity={floatingStageIntensity}
+      hologramsEnabled={hologramsEnabled} laserArchitectureEnabled={laserArchitectureEnabled}
+      hologramPattern={hologramPattern} hologramStrength={hologramStrength} genre={genre}>
       {children}
     </Arena360StageV1031>;
   }

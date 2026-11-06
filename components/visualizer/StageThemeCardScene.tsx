@@ -584,6 +584,19 @@ function Arena360CardSetV1031({palette,animate}:{palette:StagePalette;animate:bo
       <ringGeometry args={[1.68,2.05,48]}/>
       <meshBasicMaterial color="#668ea9" transparent opacity={.16} depthWrite={false}/>
     </mesh>
+    {/* V1039 preview: transparent hologram portals and laser architecture. */}
+    {Array.from({length:6},(_,i)=>{
+      const a=Math.PI*2*(i+.5)/6;
+      return <group key={`v1039-preview-portal-${i}`} position={[Math.cos(a)*2.23,.16,Math.sin(a)*2.23]}
+        name={`v1039-preview-portal-${i}`} rotation={[0,-a,0]}>
+        <mesh><torusGeometry args={[.18,.013,4,24]}/>
+          <meshBasicMaterial color={i%2===0?'#4deafa':'#f17fff'} transparent opacity={.55} depthWrite={false}/>
+        </mesh>
+        <mesh><octahedronGeometry args={[.07,0]}/>
+          <meshBasicMaterial color="#b9efff" wireframe transparent opacity={.55}/>
+        </mesh>
+      </group>;
+    })}
     {/* V1038 preview: floating satellite platforms above the outer stage ring. */}
     {Array.from({length:4},(_,i)=>{
       const angle=i*Math.PI/2;
