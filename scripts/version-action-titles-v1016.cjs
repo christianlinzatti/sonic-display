@@ -14,6 +14,7 @@ function formatActionTitlesV1016(root,apply=false){
   throw Error('Cannot retitle workflows: inconsistent release metadata');
  const release=`V${v[1]}`,directory=path.join(root,'.github/workflows');
  let changed=0;
+ const mismatched=[];
  const files=fs.readdirSync(directory).filter(x=>/\.ya?ml$/.test(x));
  for(const filename of files){
   const file=path.join(directory,filename),original=fs.readFileSync(file,'utf8');
@@ -31,14 +32,18 @@ function formatActionTitlesV1016(root,apply=false){
   // One top-level run-name only; leave all other YAML bytes exactly as-is.
   const without=original.replace(/^run-name:[^\n]*(?:\n|$)/gm,'');
   const desired=without.replace(/^name:[^\n]*\n/m,(line)=>line+`run-name: ${runName}\n`);
-  if(desired!==original){changed++;if(apply)fs.writeFileSync(file,desired,'utf8');}
+  if(desired!==original){changed++;mismatched.push(filename);if(apply)fs.writeFileSync(file,desired,'utf8');}
  }
- return {release,total:files.length,changed};
+ return {release,total:files.length,changed,mismatched};
 }
 if(require.main===module){try{
  const apply=process.argv.includes('--apply'),check=process.argv.includes('--check');
  const result=formatActionTitlesV1016(path.resolve(__dirname,'..'),apply);
  console.log(`${result.release} Actions: ${result.total} Workflow-Titel, ${result.changed} ${apply?'aktualisiert':'abweichend'}`);
- if(check&&result.changed)process.exitCode=1;
+ if(check&&result.changed){
+  console.error('Protected workflow titles differ from the installed release: '+result.mismatched.join(', '));
+  console.error('The ZIP importer deliberately does not replace .github/workflows; synchronize these trusted files with a workflow-authorized GitHub connection.');
+  process.exitCode=1;
+ }
 }catch(error){console.error(error);process.exitCode=1;}}
 module.exports={formatActionTitlesV1016};
