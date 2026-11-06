@@ -1,5 +1,5 @@
 name: V1036 Atmospheric Arena manual validation
-run-name: Sonic Display · V1038 · V1036 Atmospheric Arena manual validation
+run-name: Sonic Display · V1039 · V1036 Atmospheric Arena manual validation
 # Manual version-specific diagnostics; v965 is the authoritative production matrix.
 on:
   workflow_dispatch:

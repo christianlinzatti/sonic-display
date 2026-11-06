@@ -1,5 +1,5 @@
 name: V961 Govee Concert Light Governor Production Gate
-run-name: Sonic Display · V1038 · V961 Govee Concert Light Governor Production Gate
+run-name: Sonic Display · V1039 · V961 Govee Concert Light Governor Production Gate
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:

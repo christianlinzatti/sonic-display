@@ -1,5 +1,5 @@
 name: V1034 Ultimate Concert Arena manual validation
-run-name: Sonic Display · V1038 · V1034 Ultimate Concert Arena manual validation
+run-name: Sonic Display · V1039 · V1034 Ultimate Concert Arena manual validation
 # Manual version-specific diagnostics; v965 is the authoritative production matrix.
 on:
   workflow_dispatch:

@@ -1,5 +1,5 @@
 name: V1028 Immersive Concert FX 5.0 validation
-run-name: Sonic Display · V1038 · V1028 Immersive Concert FX 5.0 validation
+run-name: Sonic Display · V1039 · V1028 Immersive Concert FX 5.0 validation
 # Optional focused workflow; full two-platform production validation is mandatory.
 on:
   workflow_dispatch:

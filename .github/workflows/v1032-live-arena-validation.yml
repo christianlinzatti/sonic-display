@@ -1,5 +1,5 @@
 name: V1032 Live Arena Experience validation
-run-name: Sonic Display · V1038 · V1032 Live Arena Experience validation
+run-name: Sonic Display · V1039 · V1032 Live Arena Experience validation
 # Manual version-specific diagnostics; v965 is the authoritative production matrix.
 # Compatibility inventory: these source paths are exercised by the shared
 # production matrix; this optional manual workflow must not add a push trigger.
@@ -38,6 +38,7 @@ jobs:
       - run: npm run test:v1035 && npm run test:v1035:types
       - run: npm run test:v1036 && npm run test:v1036:types
       - run: npm run test:v1037 && npm run test:v1037:types
+      - run: npm run test:v1039 && npm run test:v1039:types
       - run: npm run test:v1038 && npm run test:v1038:types
       - run: npm run check:syntax && npm run check:architecture
       - run: npm run typecheck && npm run build:next

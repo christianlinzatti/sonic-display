@@ -1,5 +1,5 @@
 name: V1004 Production Reliability - Node 24 Linux & Windows
-run-name: Sonic Display · V1038 · V1004 Production Reliability - Node 24 Linux & Windows
+run-name: Sonic Display · V1039 · V1004 Production Reliability - Node 24 Linux & Windows
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:

@@ -1,5 +1,5 @@
 name: V832 Continuous Technical Validation
-run-name: Sonic Display · V1038 · V832 Continuous Technical Validation
+run-name: Sonic Display · V1039 · V832 Continuous Technical Validation
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:

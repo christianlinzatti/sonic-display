@@ -1,5 +1,5 @@
 name: V831 Full Production Gate (manual)
-run-name: Sonic Display · V1038 · V831 Full Production Gate (manual)
+run-name: Sonic Display · V1039 · V831 Full Production Gate (manual)
 on:
   workflow_dispatch:
 permissions:
