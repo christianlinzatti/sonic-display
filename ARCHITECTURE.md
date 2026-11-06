@@ -1265,7 +1265,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1028
+**Dokumentationsstand:** V1029
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -4152,3 +4152,7 @@ Die produktive GLB-Avatar-Pipeline verfeinert die bereits verifizierten V472/V56
 ## V1028 – Immersive Concert FX 5.0
 
 Der `immersiveConcertFxV1028.ts`-Planer wird im **bestehenden** `DynamicStage.tsx`-`useFrame` einmal aus der V810-verifizierten Song-Autorität berechnet. Seine ausschließlich begrenzenden Multiplikatoren verändern die Uniforms des existierenden V814/V887-Fogs und nach V889 die bereits zugeteilten V882-Ringe, V816-Instanzen und V817-Foam-Cues. Gespeicherte Timelines, Blackout, Lyrics, Vocal-Porträts, Seek und V825-Performance-Grenzen gelten unverändert. Kein neues Netzwerk, kein Licht-/Stroboskopkommando, keine neue Canvas-/Renderer-Schleife.
+
+## V1029 – AI Visual Director 5.0
+
+`components/visualizer/aiVisualDirectorV1029.ts` is a stateless, dependency-free visual hierarchy planner. It requires the identical track/act, verified V600→V604 and V761 storyboarding, live V810 section, sample position, and bounded audio evidence. `DynamicStage` samples it once inside the existing R3F frame, then reduces existing stage, particle, foam, haze and all LED power uniform lanes **after** performance budgeting. It never creates an additional emitter, camera, shader pass or network request. At verified actor or camera changes, gains fade across scene edges. A portrait/lyrics frame dims distracting background lanes but never touches manual camera, lipsync or avatar control. At confirmed peak sections, existing stage impact is allowed at its previous cap only with measured kick and energy. All manual controls, authored FX, blackout, pause, seek, low tier and pressure limits are authoritative. Settings live in V810 concert FX studio and default to 70% contrast.

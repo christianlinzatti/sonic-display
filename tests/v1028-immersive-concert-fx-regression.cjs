@@ -77,7 +77,9 @@ const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.js
 assert(Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1])>=1028);
 assert.equal(pkg.version,lock.version);assert.equal(pkg.sonicFeatureRelease,pkg.version.split('-')[1]);
 assert.equal(pkg.sonicRoadmapRelease,pkg.version.split('-')[1]);
-assert(pkg.scripts.prebuild.startsWith('npm run test:v1028 &&'));
+assert(pkg.scripts.prebuild.includes('npm run test:v1028 &&'));
+assert(pkg.scripts.prebuild.startsWith(`npm run test:${pkg.sonicFeatureRelease} &&`),
+ 'the latest release must be the first prebuild gate');
 for(const path of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(path).includes('tests/v1028-immersive-concert-fx-regression.cjs'),path);
 assert(read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1028(root)'));

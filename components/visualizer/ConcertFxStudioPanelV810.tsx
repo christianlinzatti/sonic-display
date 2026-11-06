@@ -168,7 +168,20 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
    playing:true,reducedMotion:false,blackout:false,manualLighting:false,
    lyricsProtected:false,vocalFocus:false,cameraCloseup:false,groupCount:1,tier:'high',
    authoredLanes:[]});
- return <fieldset><legend>V810–V1028 · Concert FX Studio 5.0</legend>
+ return <fieldset><legend>V810–V1029 · Concert FX Studio 5.0</legend>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+   <legend>V1029 · AI Visual Director 5.0</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.aiVisualDirectorV1029}
+     onChange={e=>patch({aiVisualDirectorV1029:e.target.checked})}/>
+     Bildregie über den Song koordinieren (Kamera, LED-Wand, Licht, Nebel und Avatare)</label>
+   <label>Regie-Kontrast ({s.aiVisualDirectorStrengthV1029} %)
+    <input type="range" min="0" max="100" step="5" value={s.aiVisualDirectorStrengthV1029}
+     disabled={!s.aiVisualDirectorV1029} onChange={e=>patch({aiVisualDirectorStrengthV1029:+e.target.value})}/></label>
+   <small>Ein gemeinsamer, bestätigter Songabschnitt bestimmt, welche bestehenden Effekte
+    gegenüber Sänger und Kamera zurücktreten. Die Steuerung erzeugt keine Songabschnitte,
+    keine neue Kamera, keine GPU-Partikel und keine Govee-Befehle. Manuelle Regie und
+    sichtbare Lyrics haben Vorrang.</small>
+  </fieldset>
   <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
    <legend>V1028 · Immersive Concert FX 5.0</legend>
    <label className="setting-check"><input type="checkbox" checked={s.immersiveFxV1028}

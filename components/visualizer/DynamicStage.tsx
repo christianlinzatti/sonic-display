@@ -5,6 +5,7 @@ import {planConcertStageV882,readConcertStageSyncV882,OFF_CONCERT_STAGE_V882,
  type ConcertStageCueV882} from './concertStageSyncV882';
 import {ConcertStageFxV882} from './ConcertStageFxV882';
 import {planImmersiveConcertFxV1028,mixImmersiveConcertFxV1028} from './immersiveConcertFxV1028';
+import {planAiVisualDirectorV1029,mixAiVisualDirectorV1029,VISUAL_LED_UNIFORMS_V1029} from './aiVisualDirectorV1029';
 import {VirtualPyroStageV891} from './VirtualPyroStageV891';
 import {sampleEpicDropV892,DEFAULT_EPIC_DROP_V892} from './epicDropExperienceV892';
 import {planPyroV891,PYRO_OFF_V891,DEFAULT_PYRO_V891,type PyroCueV891} from './virtualPyrotechnicsV891';
@@ -881,6 +882,34 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       groupCount:groupCountV542,tier,energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
       budget:fxPerfV825.gains.particles,pressure:fxPerfStateV825.current.pressure,
     });
+    // V1029: a single verified V604/V761 storyboard coordinates the EXISTING
+    // LED, haze, beam and particle lanes. This is not another camera or emitter.
+    const visualDirectorV1029=planAiVisualDirectorV1029({
+      enabled:concertFxV810?.aiVisualDirectorV1029??false,
+      masterEnabled:concertFxV810?.enabled??false,
+      strength:concertFxV810?.aiVisualDirectorStrengthV1029??0,
+      trackId:playback.trackId,durationMs:playback.durationMs,positionMs:playback.positionMs,
+      playing:isPlaying&&playback.playing,reactive,reducedMotion,tier,
+      narrative:cameraNarrativeV605?.plan&&currentActV810?{
+        source:cameraNarrativeV605.plan.source,trackId:cameraNarrativeV605.plan.trackId,
+        durationMs:cameraNarrativeV605.plan.durationMs,actIndex:currentActV810.index,
+        section:currentActV810.section,startMs:currentActV810.startMs,
+        endMs:currentActV810.endMs}:null,
+      cinematic:cinematicCueV761?{
+        active:cinematicCueV761.active,reason:cinematicCueV761.reason,
+        actIndex:cinematicCueV761.actIndex,intent:cinematicCueV761.intent,
+        blend:cinematicCueV761.blend}:null,
+      fx:fxCueV810,groupCount:groupCountV542,vocalFocus:!!vocalFocusV542,
+      focusSlot:lightingV749.focusSlot,partnerSlot:lightingV749.partnerSlot,
+      lyricsProtected:!!lyricsProtectedV542,lyricsVisible:!!lyricsVisibleV813,
+      manualCamera:cameraNarrativeV605?.manualCamera===true,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false,
+      manualFx:!!liveSignalV882.manual,authoredLanes:authoredLanesV850,
+      seekBlocked:playback.positionMs<(liveSignalV882.atmosphereSeekBlockedUntilMs??0),
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+      budget:fxPerfV825.gains.led,pressure:fxPerfStateV825.current.pressure,
+    });
     // V814 augments the existing V308 fog and V762 gobo. No scene.fog replacement.
     const hazeV814=planAtmosphericConcertFxV814({fx:fxCueV810,
       settings:normalizeConcertFxV810(concertFxV810),lyricsProtected:lyricsProtectedV542,
@@ -904,7 +933,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     });
     if(hazeFloorMatV814.current){
       const u=hazeFloorMatV814.current.uniforms;
-      u.uOpacity.value=cinematicFogV887.floorOpacity*immersiveFxV1028.fogGain;
+      u.uOpacity.value=cinematicFogV887.floorOpacity*immersiveFxV1028.fogGain*visualDirectorV1029.fogGain;
       u.uPhase.value=cinematicFogV887.phase;
       u.uFogDriftV887.value=cinematicFogV887.drift;
       u.uFogSoftV887.value=cinematicFogV887.softness;
@@ -913,15 +942,15 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     }
     if(hazeShaftsMatV814.current){
       const u=hazeShaftsMatV814.current.uniforms;
-      u.uOpacity.value=cinematicFogV887.shaftsOpacity*immersiveFxV1028.fogGain;
+      u.uOpacity.value=cinematicFogV887.shaftsOpacity*immersiveFxV1028.fogGain*visualDirectorV1029.fogGain;
       u.uPhase.value=cinematicFogV887.phase;
       u.uFogDriftV887.value=cinematicFogV887.drift;
       u.uFogSoftV887.value=cinematicFogV887.softness;
       u.uFogWarpV887.value=cinematicFogV887.warp;
       (u.uColor.value as Color).set(cinematicFogV887.color);
     }
-    if(hazeFloorV814.current)hazeFloorV814.current.visible=cinematicFogV887.floorOpacity*immersiveFxV1028.fogGain>.002;
-    if(hazeShaftsV814.current)hazeShaftsV814.current.visible=cinematicFogV887.shaftsOpacity*immersiveFxV1028.fogGain>.002;
+    if(hazeFloorV814.current)hazeFloorV814.current.visible=cinematicFogV887.floorOpacity*immersiveFxV1028.fogGain*visualDirectorV1029.fogGain>.002;
+    if(hazeShaftsV814.current)hazeShaftsV814.current.visible=cinematicFogV887.shaftsOpacity*immersiveFxV1028.fogGain*visualDirectorV1029.fogGain>.002;
     // V815 uses the SAME verified FX cue; disables on pauses, blackout, manual
     // light tracks and low tier, and stays outside the central performer lane.
     crowdCueV815.current=planVirtualConcertCrowdV815({fx:fxCueV810,
@@ -1334,6 +1363,12 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     liveStageV882.current=immersiveMixV1028.stage;
     particlesCueV816.current=immersiveMixV1028.particles;
     foamCueV817.current=immersiveMixV1028.foam;
+    // V1029: reduction-only artistic finish after V889/V1028 resource budgets.
+    const visualMixV1029=mixAiVisualDirectorV1029(visualDirectorV1029,
+      liveStageV882.current,particlesCueV816.current,foamCueV817.current);
+    liveStageV882.current=visualMixV1029.stage;
+    particlesCueV816.current=visualMixV1029.particles;
+    foamCueV817.current=visualMixV1029.foam;
     // V891: confirmed sections only; opt-in virtual-only 3D pyrotechnics.
     // Existing V844 CO2, authored V823 particles and blackouts always win.
     livePyroV891.current=planPyroV891({
@@ -1739,6 +1774,15 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       (led.uniforms.uSecondary.value as Color).lerp(
         genreStageSecondaryV894.current.set(genreStageCueV894.current.secondary),mixV894);
     }
+    // V1029 post-budget LED hierarchy, shared across every existing wall shader.
+    // Zero stays zero. No new mesh, materials, shader or GPU upload is allocated.
+    if(led&&visualDirectorV1029.active){
+      for(const uniform of VISUAL_LED_UNIFORMS_V1029){
+        const layer=led.uniforms[uniform];
+        if(layer&&Number.isFinite(layer.value)&&layer.value>0)
+          layer.value*=visualDirectorV1029.ledGain;
+      }
+    }
     // Explicit scenic settings have priority over the automatic V841 floor Gobo.
     if(goboMaterialV762.current){
       const u=goboMaterialV762.current.uniforms;
@@ -1928,7 +1972,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     if(floorLight.current&&floorLight.current.visible&&festivalCueV844.current.strobeGain>0)
       floorLight.current.intensity=Math.min(2.5,floorLight.current.intensity+festivalCueV844.current.strobeGain);
     if (beam.current) {
-      beam.current.intensity += ((sceneFlags.extraLights ? (theme === "minimal" ? .2 : Math.min(3.0,directed(cue.beam) * (1 + smartCue.sweep * .12) * showBeam * lightingV462.beamGain * lightingV542.beamGain * lightingV551.beamGain * lightingV608.beam * lightingMixV749Now.beam * concertGenreV610.beam * lightingV621.beam * concertContinuityV611.beam * cinematicBeamV497*scenicCueV762.current.beamGain * peakBeamGainV794 * (lightAccentV386.focusSlot===null&&!(cinematicBeamV497>1&&cinematicCueV497?.focusSlot!=null)?choreographyV793.beamGain:1))) * lightScale * liveCueV882.beamGain * stageLightV1026.beamGain : 0) - beam.current.intensity) * lerp;
+      beam.current.intensity += ((sceneFlags.extraLights ? (theme === "minimal" ? .2 : Math.min(3.0,directed(cue.beam) * (1 + smartCue.sweep * .12) * showBeam * lightingV462.beamGain * lightingV542.beamGain * lightingV551.beamGain * lightingV608.beam * lightingMixV749Now.beam * concertGenreV610.beam * lightingV621.beam * concertContinuityV611.beam * cinematicBeamV497*scenicCueV762.current.beamGain * peakBeamGainV794 * (lightAccentV386.focusSlot===null&&!(cinematicBeamV497>1&&cinematicCueV497?.focusSlot!=null)?choreographyV793.beamGain:1))) * lightScale * liveCueV882.beamGain * stageLightV1026.beamGain * visualDirectorV1029.beamGain : 0) - beam.current.intensity) * lerp;
       beam.current.position.x = sceneFlags.beamSweep && cue.sweep && !reducedMotion && tier === "high"
         ? Math.sin(state.clock.elapsedTime * .65) * (1.2 + cue.sweep + director.sweep + predictive.anticipation * .15 + smartCue.sweep * .24) * lightingV462.sweepGain * lightingV542.sweepGain * lightingV551.sweepGain * lightingV608.sweep * lightingMixV749Now.sweep * concertGenreV610.sweep * lightingV621.sweep * concertContinuityV611.sweep : 0;
       if(scenicCueV762.current.active&&sceneFlags.beamSweep&&!lyricsProtectedV542&&

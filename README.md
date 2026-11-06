@@ -2711,3 +2711,7 @@ Four-zone, explicitly enabled Govee LAN room-light sync with selected fixture ma
 ## V1028 – Immersive Concert FX 5.0
 
 Visuelle Showchoreografie für die vorhandenen Lichtwellen, Nebel, Konfetti und Schaum-Effekte. V604/V761/V810 bestätigte Abschnitte und gemessene V822-Audioakzente sind die einzige musikalische Evidenz. Reduktion nur nach den vorhandenen Effekt-/Performance-Gates; keine zusätzlichen Draw Calls oder Hardwareaktionen. Einstellbar im Concert FX Studio. Siehe `changelog/V1028-IMMERSIVE-CONCERT-FX-5.md`.
+
+### V1029 – AI Visual Director 5.0
+
+In **Concert FX Studio** activate/deactivate `AI Visual Director 5.0` and adjust the visual hierarchy contrast. The feature coordinates the existing LED wall, haze, stage lighting and bounded particle lanes with verified V604/V761 section and camera intent. Rap portraits and lyrics become calmer, confirmed high-energy peaks retain large FX, and scene changes fade. This is rule-based evidence-gated show direction, not generative music detection. No extra camera, GPU emitter, Govee commands or automatic authoring is introduced. Run `npm run verify:v1029:focused` for the focused tests; full production certification requires Node 24 Windows/Linux CI.
