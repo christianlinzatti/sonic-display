@@ -95,10 +95,11 @@ function deferred(){let resolve;const promise=new Promise(r=>{resolve=r;});retur
     assert.equal((result.diagnostics||[]).filter(x=>x.category===ts.DiagnosticCategory.Error).length,0,file);
   }
   const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-  assert.equal(pkg.version,'0.1.0-v1014');assert.equal(lock.version,pkg.version);
+  assert(/^0\.1\.0-v(?:101[4-9]|10[2-9]\d|1[1-9]\d{2}|[2-9]\d{3,})$/.test(pkg.version));assert.equal(lock.version,pkg.version);
   assert.equal(lock.packages[''].version,pkg.version);
-  assert.equal(pkg.sonicRoadmapRelease,'v1014');assert.equal(pkg.sonicFeatureRelease,'v1014');
-  assert(pkg.scripts.prebuild.startsWith('npm run test:v1014 &&'));
+  const release=pkg.version.split('-')[1];assert.equal(pkg.sonicRoadmapRelease,release);assert.equal(pkg.sonicFeatureRelease,release);
+  assert(pkg.scripts.prebuild.startsWith('npm run test:'+release+' &&'));
+  assert(pkg.scripts.prebuild.includes('npm run test:v1014 &&'));
   for(const file of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
     assert(read(file).includes('tests/v1014-network-diagnostics-regression.cjs'),file);
   assert(read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1014(root)'));

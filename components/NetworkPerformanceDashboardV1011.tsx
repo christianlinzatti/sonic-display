@@ -90,6 +90,23 @@ export function NetworkPerformanceDashboardV1011(){
       </table></div>
       <p className="network-v1011-note">P50/P95 beruhen auf abgeschlossenen Versuchen in diesem Browser-Tab. Bei wenigen Messungen sind sie noch kein stabiler Trend. Es werden keine zusätzlichen Anfragen, URLs, Songtitel, Kontonamen oder Fehlertexte gespeichert.</p>
     </section>
+    <section className="network-v1015-adaptive" data-v1015-adaptive-network aria-label="Adaptive Request Intelligence">
+      <div className="network-v1014-heading"><div>
+        <span className="network-v1011-kicker">ADAPTIVE REQUEST INTELLIGENCE / V1015</span>
+        <h4>Intelligente Parallelität</h4>
+      </div><span className="network-v1014-window">Automatische Anpassung · Keine zusätzlichen Anfragen</span></div>
+      <div className="network-v1015-grid">
+        {state.adaptive.lanes.map(lane=><div className="network-v1015-card" key={lane.name}>
+          <div className="network-v1015-card-title"><strong>{laneLabels[lane.name]}</strong>
+            <span>{lane.effective} / {lane.configured} parallel</span></div>
+          <progress max={Math.max(1,lane.configured)} value={lane.effective}
+            aria-label={`${laneLabels[lane.name]} adaptive Kapazität`}/>
+          <p>{lane.lastReason}</p>
+          <small>{lane.observations} ausgewertete Antworten · {lane.reductions} Reduktionen · {lane.increases} Erholungen</small>
+        </div>)}
+      </div>
+      <p className="network-v1011-note">Benutzeraktionen und Wiedergabe behalten ihre feste, reservierte Kapazität. Anmeldefehler und abgebrochene Anfragen führen zu keiner Drosselung. Ein Spotify-429-Limit gilt weiterhin für den betroffenen Dienst und seine angegebene Wartezeit. Beim Kontowechsel beginnen die Werte neu.</p>
+    </section>
     <div className="network-v1011-stats" aria-label="Netzwerk-Kennzahlen">
       <div><strong>{inflight}</strong><span>Aktive Anfragen</span></div>
       <div><strong>{state.queue}<small> / {state.queueLimit}</small></strong><span>Warteschlange (Spitze {state.peakQueue})</span></div>

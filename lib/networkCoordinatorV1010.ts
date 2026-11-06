@@ -1,3 +1,4 @@
+import {AdaptiveCapacityV1015,type AdaptiveSnapshotV1015} from './networkAdaptiveV1015';
 /** V1010: browser-local, account-isolated request governor. No global server singleton. */
 export type NetworkPriorityV1010 = 'action'|'playback'|'lyrics'|'optional';
 export type NetworkLaneV1010 = 'action'|'playback'|'regular'|'optional';
@@ -34,6 +35,8 @@ export type NetworkTelemetryV1011 = {
   averageLatencyMs:number;lastFailure:NetworkFailureKindV1011|null;diagnostics:NetworkDiagnosticsV1014;
   /** V1012: aggregated, account-resettable recovery evidence; no endpoint or identity. */
   recovery:{staged:number;probes:number;restored:number;circuitsOpened:number};
+  /** V1015: measured, bounded capacity for background lanes only. */
+  adaptive:AdaptiveSnapshotV1015;
   providers:Array<{name:NetworkProviderIdV1011;queued:number;active:number;failures:number;
     blockedForMs:number;circuitForMs:number;lastFailure:NetworkFailureKindV1011|null;
     failureStreak:number;lastSuccessAgoMs:number|null;probing:boolean}>;
@@ -82,6 +85,7 @@ const abortError=()=>Object.assign(new Error('Network request cancelled'),{name:
 const finite=(n:number,defaultValue:number,max:number)=>Number.isFinite(n)?Math.max(0,Math.min(max,n)):defaultValue;
 export class NetworkCoordinatorV1010 {
   private readonly running:Record<NetworkLaneV1010,number>={action:0,playback:0,regular:0,optional:0};
+  private readonly adaptiveV1015:AdaptiveCapacityV1015;
   private readonly jobs=new Map<string,Job>();
   private readonly queue:Job[]=[];
   private readonly cache=new Map<string,CacheEntry>();
@@ -153,13 +157,15 @@ export class NetworkCoordinatorV1010 {
       failures:this.providerFailures.get(name)?.count??0,
       lastFailure:this.providerFailures.get(name)?.last??null})).sort((a,b)=>a.name.localeCompare(b.name));
     return {since:this.telemetrySince,queue:this.queue.length,queueLimit:this.maxQueue,
-      peakQueue:this.peakQueue,inFlight:{...this.running},limits:{...this.limits},
+      peakQueue:this.peakQueue,inFlight:{...this.running},
+      limits:{...this.limits,regular:this.adaptiveV1015.limit('regular'),optional:this.adaptiveV1015.limit('optional')},
       cacheEntries:this.cache.size,cacheLimit:this.maxCache,
       offline:typeof navigator!=='undefined'&&navigator.onLine===false,
       hidden:typeof document!=='undefined'&&document.visibilityState==='hidden',
       counters:{...this.telemetryCounters},
       averageLatencyMs:this.telemetryCounters.completed?Math.round(this.totalLatency/this.telemetryCounters.completed):0,
-      lastFailure:this.lastFailure,diagnostics:this.snapshotDiagnosticsV1014(now),recovery:{...this.recoveryCounters},providers};
+      lastFailure:this.lastFailure,diagnostics:this.snapshotDiagnosticsV1014(now),
+      recovery:{...this.recoveryCounters},adaptive:this.adaptiveV1015.snapshot(),providers};
   }
   /** Aggregate only, never a trace: bounded to 120 latest completed attempts. */
   private noteAttemptV1014(job:Job,success:boolean,error:unknown){
@@ -220,7 +226,9 @@ export class NetworkCoordinatorV1010 {
     health.failureStreak=0;health.lastSuccessAt=Date.now();this.providerHealth.set(provider,health);
   }
   constructor(private readonly limits:Record<NetworkLaneV1010,number>=DEFAULT_LIMITS,
-    private readonly maxQueue=48,private readonly maxCache=120,private readonly backoffMs=750){}
+    private readonly maxQueue=48,private readonly maxCache=120,private readonly backoffMs=750){
+    this.adaptiveV1015=new AdaptiveCapacityV1015(limits);
+  }
   /** Switching accounts invalidates ALL in-flight results and in-memory personal data. */
   setAccount(account:string){
     if(!account||this.account===account)return;
@@ -334,7 +342,9 @@ export class NetworkCoordinatorV1010 {
       if(block>now){next=Math.min(next,block-now);continue;}
       if(this.offlineOrHidden(job))continue;
       if(circuit?.probe)continue;
-      if(this.running[job.lane]>=this.limits[job.lane])continue;
+      const effective=(job.lane==='regular'||job.lane==='optional')
+        ?this.adaptiveV1015.limit(job.lane):this.limits[job.lane];
+      if(this.running[job.lane]>=effective)continue;
       this.queue.splice(this.queue.indexOf(job),1);
       this.running[job.lane]++;
       if(circuit&&circuit.failures>=3){circuit.probe=true;
@@ -374,6 +384,8 @@ export class NetworkCoordinatorV1010 {
       const circuit=this.circuits.get(job.provider);
       if(circuit){circuit.failures=0;circuit.openUntil=0;circuit.probe=false;}
       this.noteSuccessV1012(job.provider);
+      if(job.lane==='regular'||job.lane==='optional')
+        this.adaptiveV1015.observe(job.lane,{status:200,latencyMs:Date.now()-startedAt,succeeded:true});
       if(job.ttl>0&&(!job.cacheWhen||job.cacheWhen(result))){
         const now=Date.now();this.cache.delete(job.key);
         this.cache.set(job.key,{value:result,freshUntil:now+job.ttl,staleUntil:now+job.ttl+job.stale});
@@ -397,6 +409,8 @@ export class NetworkCoordinatorV1010 {
     if(this.jobs.get(job.key)!==job)return;
     const error=failure as {status?:number;retryAfter?:number;name?:string};
     const status=error?.status??0;
+    if((job.lane==='regular'||job.lane==='optional')&&!job.controller.signal.aborted)
+      this.adaptiveV1015.observe(job.lane,{status,latencyMs:Date.now()-startedAt,succeeded:false});
     const retryAfter=finite(error?.retryAfter??0,0,300000);
     if(status===429){this.telemetryCounters.rateLimits++;this.observeRateLimit(job.provider,retryAfter);}
     this.noteFailureV1011(job.provider,failure);
@@ -444,6 +458,7 @@ export class NetworkCoordinatorV1010 {
     for(const job of [...this.jobs.values()])this.cancel(job);
     this.cache.clear();this.listeners.clear();this.blocked.clear();this.circuits.clear();
     this.providerFailures.clear();this.providerHealth.clear();this.diagnosticSamplesV1014.length=0;
+    this.adaptiveV1015.reset();
     this.recoveryCounters={staged:0,probes:0,restored:0,circuitsOpened:0};
     this.recoveryPending=false;this.telemetrySince=Date.now();
     for(const key of Object.keys(this.telemetryCounters) as Array<keyof typeof this.telemetryCounters>)this.telemetryCounters[key]=0;

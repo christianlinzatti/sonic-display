@@ -1,3 +1,9 @@
+## V1015 – Adaptive Request Intelligence (2026-11-06)
+
+Die vorhandene Netzwerkanfragesteuerung passt die Parallelität ausschließlich bei Lyrics/Genre und optionalen Inhalten anhand abgeschlossener Antwortzeiten und Fehler automatisch an. Bei Spotify-429-Limits wird Hintergrundlast sofort abgesenkt, ohne die separate Retry-After-Sperre zu umgehen. Nach mehreren schnellen erfolgreichen Antworten wird die Parallelität stufenweise wiederhergestellt. Benutzeraktionen und Wiedergabe behalten eigene feste Kapazitäten. Neue Live-Daten stehen im Service-Status-Dashboard; die anonymen Zähler werden beim Spotify-Kontowechsel zurückgesetzt. Vollständiger Produktionsbuild: über GitHub Actions zu bestätigen.
+
+Details: `changelog/V1015-ADAPTIVE-REQUEST-INTELLIGENCE.md`.
+
 > **V1014 – Network Diagnostics 2.0:** Laufzeit- und Wartezeit-P50/P95, altersbasierte Engpasserkennung, sichere Dienstgruppen, begrenzte Fünf-Minuten-Historie und Diagnosekarten im Netzwerk-Dashboard. Details in `changelog/V1014-NETWORK-DIAGNOSTICS-2.md`.
 
 > **V1013 – Production Build Stabilization:** Release-/Lockfile-Prüfungen vor npm ci, Pflichtregressionen V1010–V1013 in der gesamten Produktionspipeline und Fail-Closed-Negativtests. Siehe `changelog/V1013-PRODUCTION-BUILD-STABILIZATION.md`.

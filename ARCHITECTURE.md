@@ -1,3 +1,11 @@
+## V1015 – Adaptive Request Intelligence (2026-11-06)
+
+Die vorhandene Netzwerkanfragesteuerung passt die Parallelität ausschließlich bei Lyrics/Genre und optionalen Inhalten anhand abgeschlossener Antwortzeiten und Fehler automatisch an. Bei Spotify-429-Limits wird Hintergrundlast sofort abgesenkt, ohne die separate Retry-After-Sperre zu umgehen. Nach mehreren schnellen erfolgreichen Antworten wird die Parallelität stufenweise wiederhergestellt. Benutzeraktionen und Wiedergabe behalten eigene feste Kapazitäten. Neue Live-Daten stehen im Service-Status-Dashboard; die anonymen Zähler werden beim Spotify-Kontowechsel zurückgesetzt. Vollständiger Produktionsbuild: über GitHub Actions zu bestätigen.
+
+Die adaptive Steuerung liegt in `lib/networkAdaptiveV1015.ts`, wird in `lib/networkCoordinatorV1010.ts` beim Start und Abschluss jedes Netzwerkversuchs berücksichtigt und im vorhandenen `components/NetworkPerformanceDashboardV1011.tsx` passiv visualisiert. Die Prüfungen liegen in `tests/v1015-adaptive-network-regression.cjs`.
+
+Details: `changelog/V1015-ADAPTIVE-REQUEST-INTELLIGENCE.md`.
+
 ## V1012 – Intelligent Network Health & Auto Recovery (2026-11-06)
 
 Der lokale Netzwerk-Koordinator führt den Circuit Breaker, Recovery-Zähler und gestaffelte Warteschlangen fort. `lib/networkHealthV1012.ts` leitet daraus sichere Diagnose- und Handlungstexte ab. Die Darstellung erfolgt im bestehenden `components/NetworkPerformanceDashboardV1011.tsx`, ohne eigene Internetabfragen. Nach Wiederverbindung starten optionale Aufträge in kleinen zeitlich versetzten Wellen; Benutzeraktionen bleiben bevorzugt.
@@ -1233,7 +1241,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1014
+**Dokumentationsstand:** V1015
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
