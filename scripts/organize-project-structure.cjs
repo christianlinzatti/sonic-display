@@ -20,11 +20,34 @@ const staleButPreserved = new Set([
 const results = { moved: [], retired: [], preserved: [] };
 const slash = value => value.split(path.sep).join('/');
 const fileHash = file => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
-function moveChecked(src, target) {
+/**
+ * Versioned root Markdown files may be updated by a newer complete ZIP.
+ * Archive the previous canonical revision before replacing it. Do not allow
+ * overwrites for setup guides, manifests, source files or unrelated documents.
+ */
+function moveChecked(src, target, options = {}) {
+  const archiveRoot = options.archiveRoot || root;
   fs.mkdirSync(path.dirname(target), { recursive: true });
   if (fs.existsSync(target)) {
-    if (fileHash(src) !== fileHash(target)) {
-      throw new Error(`Conflicting documents: ${slash(path.relative(root, src))} => ${slash(path.relative(root, target))}`);
+    const previousHash = fileHash(target);
+    if (fileHash(src) !== previousHash) {
+      const sourceName = path.basename(src);
+      const canonical = path.join(archiveRoot, 'docs', 'versions', sourceName);
+      const allowed = options.allowVersionUpdate === true &&
+        /^V[1-9][0-9]*[._-].+\.md$/i.test(sourceName) &&
+        path.resolve(target) === path.resolve(canonical) &&
+        path.resolve(src) === path.resolve(path.join(archiveRoot, sourceName));
+      if (!allowed) {
+        throw new Error(`Conflicting documents: ${slash(path.relative(root, src))} => ${slash(path.relative(root, target))}`);
+      }
+      const revisionDir = path.join(archiveRoot, 'artifacts', 'historical', 'document-revisions');
+      const backup = path.join(revisionDir, sourceName + '.' + previousHash + '.bak');
+      fs.mkdirSync(revisionDir, { recursive: true });
+      if (fs.existsSync(backup)) {
+        if (fileHash(backup) !== previousHash) throw new Error('Conflicting document history: ' + backup);
+      } else fs.copyFileSync(target, backup, fs.constants.COPYFILE_EXCL);
+      // Backup succeeded: the incoming versioned document is now canonical.
+      fs.copyFileSync(src, target);
     }
     fs.unlinkSync(src);
   } else fs.renameSync(src, target);
@@ -81,7 +104,7 @@ function moveRootDocuments() {
     if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
     if (entry.name === 'README.md' || entry.name === 'ARCHITECTURE.md') continue;
     const dest = `docs/${topicFor(entry.name)}/${entry.name}`;
-    moveChecked(here(entry.name), here(dest));
+    moveChecked(here(entry.name), here(dest), { allowVersionUpdate: true });
     moved.set(entry.name, dest);
   }
   return moved;
@@ -151,4 +174,4 @@ function main() {
   return results;
 }
 if (require.main === module) main();
-module.exports = { main, topicFor };
+module.exports = { main, topicFor, moveChecked };
