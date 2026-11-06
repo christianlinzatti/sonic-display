@@ -6,6 +6,9 @@ const fs=require('node:fs'),path=require('node:path');
  * Only writes the top-level `run-name` line. Never executes workflow content,
  * changes triggers, credentials, permissions, actions, or job steps.
  * The protected importer calls --apply after validation, before staging Git.
+ * GitHub rejects updating workflow files when the importer app lacks workflow-write
+ * permission. In that case the importer warns and these protected titles must
+ * be updated with an authorized GitHub connection before production validation.
  */
 function formatActionTitlesV1016(root,apply=false){
  const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));
