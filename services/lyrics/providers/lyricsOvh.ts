@@ -5,11 +5,11 @@ interface LyricsOvhResponse {
 }
 
 /** lyrics.ovh provides plain, unsynchronized lyrics. */
-export async function lookupLyricsOvh(title: string, artist: string): Promise<Lyrics | null> {
+export async function lookupLyricsOvh(title: string, artist: string, parent?:AbortSignal): Promise<Lyrics | null> {
   const url = `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`;
   const response = await fetch(url, {
     cache: "no-store",
-    signal: AbortSignal.timeout(8_000),
+    signal: parent?AbortSignal.any([parent,AbortSignal.timeout(8_000)]):AbortSignal.timeout(8_000),
   });
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(`lyrics.ovh returned HTTP ${response.status}`);

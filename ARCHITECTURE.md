@@ -1,3 +1,28 @@
+## V1010 – Zentrale Browser-Anfragesteuerung (2026-11-06)
+
+`lib/networkCoordinatorV1010.ts` koordiniert browserseitig Konto-gebundene GET-Anfragen
+mit deduplizierten Flügen, vier getrennten Kapazitäten (Aktionen: 2, Wiedergabe: 2,
+Lyrics/Genre: 3, optionale Quellen: 2), einer begrenzten Queue (48) und einem
+begrenzten In-Memory-Cache (120). Alte Informationen werden bei Aktualisierung zunächst
+weiter angezeigt; der erneute GET läuft unabhängig, kann aber bei Titelwechsel oder
+Sitzungsende abgebrochen werden. Nicht reagierende Dienste belegen keine Kapazität
+über das interne Zeitlimit hinaus. Schreibtätigkeiten werden nie blind wiederholt.
+
+`lib/networkJsonV1010.ts` bündelt HTTP, Timeout, Auth- und Retry-After-Behandlung.
+`services/spotify/client.ts`, `services/lyrics/client.ts`, `hooks/usePlaybackPolling.ts`,
+`services/stageContent/providersV330.ts` und die Spotify-Künstler- und Connect-Oberflächen
+nutzen die gemeinsamen Prioritäten. Der Server signiert einen vom Spotify-Refresh-Token
+abgeleiteten, nicht rückrechenbaren Kontoschlüssel. Die Browser-Koordination ist nicht
+server-global, sodass sich Spotify-Konten von verschiedenen HTTP-Nutzern nicht vermischen.
+Ein HTTP 429 blockiert zukünftige Spotify-Anfragen bis `Retry-After`; vorübergehende
+Fehler bekommen begrenzten Backoff, optionale Dienste einen Circuit Breaker.
+
+Die Abdeckung betrifft die zentralen genannten Browserpfade; sie ersetzt **nicht** einen
+verteilten Spotify-Limiter über mehrere Vercel-Instanzen. Tests:
+`tests/v1010-network-coordination-regression.cjs` und die isolierten TypeScript-Checks,
+zusätzlich der unverändert verpflichtende Node-24-Produktionsbuild in CI.
+Siehe `changelog/V1010-CENTRAL-NETWORK-COORDINATION.md`.
+
 ## V1004 – CI and build reliability
 
 Current GitHub action failures in V908/V910/V925/V929 were traced to
@@ -1176,7 +1201,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1007
+**Dokumentationsstand:** V1010
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -3979,3 +4004,31 @@ actual React receiver effects. `tests/e2e/alexa-artist.spec.cjs` verifies the pr
 permission and anonymous rejection alongside the V1006 avatar cases (36 browser tests).
 The Vercel deployment smoke sends the configured automation bypass only to its allowlisted
 host, never follows redirects, and requires Sonic Display page identity rather than login HTML.
+
+### V1008 Alexa-Sprachaufträge und Wiederherstellung
+
+`alexaVoiceV1008` kapselt Künstlerauswahl, Status, Sammel-Follow aller aktuellen Künstler,
+kontogebundenes Rückgängig und Anzeigeoptionen. Die signierten Voice-Routen und
+`alexaVoiceStoreV1008` nutzen eine begrenzte Redis-Warteschlange, exklusive Übernahme und
+bestätigte Ergebnisse für die private Lambda. `AlexaVoiceControlV1008` läuft innerhalb des
+MusicProviders und erfordert sichtbare Seite sowie getrennte Freigaben. Der Batch-Endpunkt
+prüft bei Sammel-Follow Titel und vollständige Künstlerliste, bei Rückgängig den erwarteten
+Ausgangszustand; Spotify-Erfolg wird zurückgelesen. `release-recovery.py` bietet Git-basierte
+Vorschau und ausdrücklich ausgelöste lokale Wiederherstellung mit geschützten Laufzeitdaten.
+Details und Betriebsgrenzen: `changelog/V1008-ALEXA-EXTRAS-AND-RECOVERY.md`.
+
+
+### V1009 Hintergrundabfragen und Netzwerklebensdauer
+
+`backgroundJsonV1009` begrenzt asynchrone Anfragen einschließlich JSON-Dekodierung und reicht
+Abbrüche an Fetch weiter. Der Genius-Lyrics-Adapter verwendet native Fetch-Aufrufe,
+`htmlparser2`, eine feste Hostgrenze und ein gemeinsames Zeit-/Größenbudget. Die alte
+Scraper-Abhängigkeitskette entfällt. Die Produktionsprüfung ergänzt einen kurzen Chromium-
+Speichertest mit Messpunkten nach GC; `playwright-soak.cjs` erlaubt längere lokale Läufe.
+Betriebsgrenzen: `changelog/V1009-BACKGROUND-NETWORK-AND-SECURITY.md`.
+
+`useOwnedAvatarResourcesV1009` kapselt die Lebensdauer privater Render-Ressourcen eines
+SkeletonUtils-Klons. Eigene Geometrien, Materialien und Texturobjekte verhindern, dass
+Dispose-Listener früherer WebGL-Renderer über den GLTF-Cache alte Canvas-/DOM-Bäume halten.
+Die Originale und Bilddaten bleiben im Cache; ein gemeinsamer Ressourcentest und der
+Produktions-Speichertest prüfen Wiederverwendung, Freigabe und begrenztes Wachstum.

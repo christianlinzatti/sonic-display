@@ -1,4 +1,5 @@
 'use client';
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 /** V787 diagnostic: all three *rig-validated* GLBs are kept loaded. Cross-tier
  * dance uses one monotonically advancing mixer time, never remount-on-tier.
  * Not used by live stage; do not interpret three preloaded assets as a GPU benchmark. */
@@ -29,6 +30,7 @@ function sameOriginGlb(url:string):boolean{
 function Performer({url,visible}:{url:string;visible:boolean}){
  const {scene,animations}=useGLTF(url);
  const clone=useMemo(()=>cloneSkinnedScene(scene),[scene]);
+  useOwnedAvatarResourcesV1009(clone);
  const mixer=useMemo(()=>new AnimationMixer(clone),[clone]);
  const mouth=useMemo(()=>{const targets:Array<{mesh:Mesh;idx:number}>=[];clone.traverse(o=>{const m=o as Mesh;
   if(!m.isMesh||!m.morphTargetDictionary||!m.morphTargetInfluences)return;

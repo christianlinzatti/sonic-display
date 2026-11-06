@@ -1,4 +1,5 @@
 'use client';
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {usePreviewGltfCacheV654} from './usePreviewGltfCacheV654';
 import {Suspense,useEffect,useMemo,useState} from 'react';
 import {Canvas,useFrame} from '@react-three/fiber';
@@ -16,6 +17,7 @@ function ImportedFigure({url,seconds,index,sync,bpm,beatTimes,playing,phrase,pla
  const {scene,animations}=useGLTF(url);
   usePreviewGltfCacheV654(url);
  const model=useMemo(()=>cloneScene(scene),[scene]);
+  useOwnedAvatarResourcesV1009(model);
  useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(model);},[model]);
  const mixer=useMemo(()=>new AnimationMixer(model),[model]);
  const signatures=useMemo(()=>phrase.enabled?describeAnimationClipsV329(animations,phrase.maxCandidates):[],[animations,phrase.enabled,phrase.maxCandidates]);

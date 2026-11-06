@@ -1,0 +1,95 @@
+'use client';
+import {backgroundJsonV1009} from '@/lib/backgroundJsonV1009';
+import {useEffect,useRef,useState} from 'react';
+import {useMusic} from '@/context/MusicContext';
+import {useUiPreferences} from '@/context/UiPreferencesContext';
+import {ALEXA_LOCAL_ENABLED_KEY_V967} from '@/lib/alexaConcertV967';
+import {ALEXA_ARTIST_KEY_V1007,ALEXA_ARTIST_EVENT_V1007,parseArtistVoiceConsentV1007} from '@/lib/alexaArtistV1007';
+import {VOICE_DISPLAY_KEY_V1008,VOICE_SETTINGS_EVENT_V1008,freshVoiceV1008,isArtistVoiceV1008,
+ executeArtistVoiceV1008,executeDisplayVoiceV1008,type VoiceUndoV1008,type VoiceResultV1008,type VoiceMessageV1008} from '@/lib/alexaVoiceV1008';
+const UNDO='sonic:alexa-undo-v1008';
+function permissions(){try{return {
+ general:parseArtistVoiceConsentV1007(localStorage.getItem(ALEXA_LOCAL_ENABLED_KEY_V967)),
+ artist:parseArtistVoiceConsentV1007(localStorage.getItem(ALEXA_ARTIST_KEY_V1007)),
+ display:parseArtistVoiceConsentV1007(localStorage.getItem(VOICE_DISPLAY_KEY_V1008)),
+};}catch{return {general:{enabled:false,since:0},artist:{enabled:false,since:0},display:{enabled:false,since:0}};}}
+export function AlexaVoiceControlV1008(){
+ const {connected}=useMusic();const {preferences,updatePreferences}=useUiPreferences();
+ const current=useRef(preferences);current.current=preferences;
+ const [settings,setSettings]=useState(permissions),[status,setStatus]=useState('');
+ const seen=useRef(new Set<string>()),undo=useRef<VoiceUndoV1008|null>(null);
+ useEffect(()=>{try{undo.current=JSON.parse(sessionStorage.getItem(UNDO)||'null');}catch{/* no history */}
+  const refresh=()=>setSettings(permissions());refresh();
+  const events=['storage',VOICE_SETTINGS_EVENT_V1008,ALEXA_ARTIST_EVENT_V1007,'sonic-display:alexa-local-status-v971'];
+  events.forEach(e=>window.addEventListener(e,refresh));return()=>events.forEach(e=>window.removeEventListener(e,refresh));
+ },[]);
+ useEffect(()=>{if(!status)return;const timer=window.setTimeout(()=>setStatus(''),18000);return()=>window.clearTimeout(timer);},[status]);
+ useEffect(()=>{
+  if(!connected||!settings.general.enabled)return;
+  let disposed=false,flight=false;const abort=new AbortController();
+  const visible=()=>!disposed&&!abort.signal.aborted&&document.visibilityState==='visible';
+  const notify=(value:{artistId:string;following:boolean})=>window.dispatchEvent(new CustomEvent('sonic:artist-follow-changed-v359',{detail:value}));
+  const saveUndo=(value:VoiceUndoV1008|null)=>{undo.current=value;try{if(value)sessionStorage.setItem(UNDO,JSON.stringify(value));else sessionStorage.removeItem(UNDO);}catch{/* keep in-memory undo */}};
+  const post=async(value:object)=>backgroundJsonV1009('/api/alexa/voice-result',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(value),signal:abort.signal});
+  const poll=async()=>{
+   if(flight||!visible())return;flight=true;
+   try{
+    const response=await backgroundJsonV1009('/api/alexa/voice-pending',{cache:'no-store',signal:abort.signal});
+    if(!response.ok){if(response.status===401)setStatus('Spotify-Anmeldung fehlt. Bitte Spotify neu verbinden.');else if(response.status===503)setStatus('Alexa-Weiterleitung nicht erreichbar. Unter Einstellungen die Verbindung prüfen.');return;}
+    const data=await response.json();if(!Array.isArray(data.commands)||!visible())return;
+    for(const raw of data.commands.slice(0,20)){
+     const p=permissions();if(!p.general.enabled||!freshVoiceV1008(raw,p.general.since,Date.now())||seen.current.has(raw.id)||!visible())continue;
+     const message:VoiceMessageV1008=raw;seen.current.add(message.id);if(seen.current.size>100)seen.current.delete(seen.current.values().next().value!);
+     const claim=await post({id:message.id,phase:'claim'});if(!claim.ok)continue;
+     const {token}=await claim.json();let result:VoiceResultV1008;
+     try{
+      const category=isArtistVoiceV1008(message.command)?'artist':'display';
+      const consent=p[category];const since=Math.max(p.general.since,consent.since);
+      const allowed=()=>{const latest=permissions();return visible()&&latest.general.enabled&&latest.general.since===p.general.since&&latest[category].enabled&&latest[category].since===consent.since;};
+      if(message.command==='connection-status'){
+       const response=await backgroundJsonV1009('/api/alexa/status',{cache:'no-store',signal:abort.signal});const health=await response.json();
+       if(!response.ok||health.spotify!==true||health.relay!=='ready')throw Error(health.spotify===false?'Spotify-Verbindung fehlt oder ist nicht erreichbar. Bitte auf dem Display prüfen.':'Die Alexa-Weiterleitung ist noch nicht bereit. Bitte auf dem Display prüfen.');
+       result={kind:'complete',text:`Das Display ist erreichbar. Spotify und die Alexa-Weiterleitung sind verbunden.${health.artistScopes?'':' Für Künstleraktionen Spotify bitte neu verbinden.'}`};
+      }
+      else if(!consent.enabled||!freshVoiceV1008(message,since,Date.now()))throw Error(category==='artist'?'Bitte zuerst die Künstlersteuerung auf diesem Display freigeben.':'Bitte zuerst die Anzeigesteuerung auf diesem Display freigeben.');
+      else if(category==='artist')result=await executeArtistVoiceV1008(message,{since,now:Date.now,allowed,fetcher:fetch,signal:abort.signal,undo:undo.current,saveUndo,notify});
+      else result=await executeDisplayVoiceV1008(message.command,{current:current.current.avatarModelId,fetcher:fetch,update:updatePreferences,allowed,signal:abort.signal});
+     }catch(error){result={kind:'error',text:error instanceof Error?error.message.slice(0,1000):'Sprachbefehl konnte nicht ausgeführt werden.'};}
+     if(disposed||abort.signal.aborted)return;
+     setStatus(result.text);await post({id:message.id,phase:'complete',token,result});
+    }
+   }catch{if(visible())setStatus('Alexa-Verbindung unterbrochen. Bitte die Verbindung in den Einstellungen prüfen.');}
+   finally{flight=false;}
+  };
+  void poll();const timer=window.setInterval(()=>{void poll();},1000);
+  const onVisible=()=>{if(document.visibilityState==='visible')void poll();};document.addEventListener('visibilitychange',onVisible);
+  return()=>{disposed=true;abort.abort();window.clearInterval(timer);document.removeEventListener('visibilitychange',onVisible);};
+ },[connected,settings,updatePreferences]);
+ return status?<div className="alexa-artist-status-v1007" role="status" aria-live="polite">{status}</div>:null;
+}
+export function AlexaToolsV1008(){
+ const {preferences,updatePreferences}=useUiPreferences();
+ const [enabled,setEnabled]=useState(false),[notice,setNotice]=useState(''),[health,setHealth]=useState('Noch nicht geprüft.'),[busy,setBusy]=useState(false);
+ useEffect(()=>{const refresh=()=>{try{setEnabled(parseArtistVoiceConsentV1007(localStorage.getItem(VOICE_DISPLAY_KEY_V1008)).enabled);}catch{setEnabled(false);}};refresh();window.addEventListener(VOICE_SETTINGS_EVENT_V1008,refresh);window.addEventListener('storage',refresh);return()=>{window.removeEventListener(VOICE_SETTINGS_EVENT_V1008,refresh);window.removeEventListener('storage',refresh);};},[]);
+ const toggle=(next:boolean)=>{try{localStorage.setItem(VOICE_DISPLAY_KEY_V1008,JSON.stringify({enabled:next,since:next?Date.now():0}));setEnabled(next);window.dispatchEvent(new Event(VOICE_SETTINGS_EVENT_V1008));}catch{setNotice('Die Freigabe konnte nicht gespeichert werden.');}};
+ const diagnose=async()=>{setBusy(true);try{
+  const r=await backgroundJsonV1009('/api/alexa/status',{cache:'no-store'});const d=await r.json();
+  setHealth(r.status===401?'Spotify: Anmeldung fehlt. Bitte neu verbinden.':d.spotify===false?'Spotify: momentan nicht erreichbar. Bitte Spotify-Berechtigungen und Verbindung prüfen.':d.relay==='ready'?`Spotify: verbunden. Künstler-Berechtigungen: ${d.artistScopes?'vorhanden':'Spotify neu verbinden'}. Alexa-Weiterleitung: erreichbar. Skill und Echo bitte mit einem Sprachbefehl testen.`:d.relay==='not-configured'?'Spotify: verbunden. Alexa-Weiterleitung: noch nicht konfiguriert.':'Alexa-Weiterleitung: momentan nicht erreichbar.');
+ }catch{setHealth('Server nicht erreichbar. Bitte Netzwerk und Deployment prüfen.');}finally{setBusy(false);}};
+ const local=async(command:Parameters<typeof executeDisplayVoiceV1008>[0])=>{try{const r=await executeDisplayVoiceV1008(command,{current:preferences.avatarModelId,fetcher:fetch,update:updatePreferences,allowed:()=>true});setNotice(r.text);}catch(e){setNotice(e instanceof Error?e.message:'Anzeige konnte nicht geändert werden.');}};
+ return <fieldset aria-label="Alexa Zusatzfunktionen"><legend>Alexa: Status, Rückgängig und Anzeige</legend>
+  <p className="settings-note">Frage „Folge ich diesem Künstler schon?“ oder sage „Letzte Künstleraktion rückgängig“. Bei mehreren Künstlern fragt Alexa nach einer Nummer. Mit „Like den Hauptkünstler“ wählst du direkt den ersten Künstler. „Bitte allen Künstlern folgen“ abonniert alle Künstler des aktuellen Titels; auch diese Sammeländerung kann rückgängig gemacht werden. Rückgängig gilt zehn Minuten für die letzte bestätigte Änderung auf diesem Display und demselben Spotify-Konto.</p>
+  <label><input type="checkbox" checked={enabled} onChange={e=>toggle(e.target.checked)}/> Anzeige per Alexa steuern erlauben</label>
+  <p className="settings-note">Zusätzlich Alexa-Empfang aktivieren. Befehle: „Lyrics einblenden“, „Lyrics ausblenden“, „Avatar wechseln“, „ruhige Darstellung“ und „normale Darstellung“. Musik und Lampen werden dadurch nicht verändert.</p>
+  <div className="govee-v958-settings"><button type="button" disabled={busy} onClick={()=>void diagnose()}>{busy?'Verbindung wird geprüft…':'Alexa- und Spotify-Verbindung prüfen'}</button></div>
+  <p role="status">{health}</p>
+  <details><summary>Anzeige lokal ausprobieren</summary><div className="govee-v958-settings">
+   <button type="button" onClick={()=>void local('lyrics-on')}>Lyrics einblenden</button>
+   <button type="button" onClick={()=>void local('lyrics-off')}>Lyrics ausblenden</button>
+   <button type="button" onClick={()=>void local('avatar-next')}>Avatar wechseln</button>
+   <button type="button" onClick={()=>void local('display-calm')}>Ruhige Darstellung</button>
+   <button type="button" onClick={()=>void local('display-normal')}>Normale Darstellung</button>
+  </div></details>
+  {notice&&<p role="status">{notice}</p>}
+ </fieldset>;
+}

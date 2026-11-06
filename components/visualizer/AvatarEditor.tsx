@@ -1,4 +1,6 @@
 "use client";
+import {disposeClonedAvatarSkeletonsV654} from './disposeClonedAvatarSkeletonsV654';
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
 
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -72,6 +74,8 @@ function GltfPreview({ url, clip, playing, pulse, intensity, onClips, hipMode, h
   usePreviewGltfCacheV654(url);
   const { actions, names } = useAnimations(animations, root);
   const model = useMemo(() => cloneSkinnedScene(scene), [scene]);
+  useOwnedAvatarResourcesV1009(model);
+  useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(model);},[model]);
   const targets = useMemo(() => collectAvatarRigNodes(model).targets,[model]);
   const gluteRigV741=useMemo(()=>collectGluteRigV741(model),[model]);
   const gluteOverlayV741=useMemo(()=>createGluteOverlayV741(),[model]);

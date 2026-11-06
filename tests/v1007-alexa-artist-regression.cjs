@@ -68,7 +68,7 @@ async function execute(command='artist-follow',config={}){
   const model=require('../integrations/alexa/interaction-model.de-DE.json').interactionModel.languageModel;
   let traffic=0;
   global.fetch=async(url,options)=>{
-   traffic++;assert.equal(String(url),'https://sonic-display.test/api/alexa/command');
+   traffic++;assert.equal(String(url),'https://sonic-display.test/api/alexa/voice');
    const headers=options.headers;
    assert.equal(headers['x-sonic-signature'],createHmac('sha256',secret).update(`${headers['x-sonic-timestamp']}.${headers['x-sonic-nonce']}.${options.body}`).digest('hex'));
    assert.deepEqual(Object.keys(JSON.parse(options.body)),['command']);

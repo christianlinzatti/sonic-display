@@ -1,4 +1,5 @@
 "use client";
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 /** V321 synchronized A/B motion preview. Both canvases sample the same clock;
  * both GLB skeletons and animation mixers are independent. */
 import {Suspense,useEffect,useMemo,type ReactNode,Component} from 'react';
@@ -17,6 +18,7 @@ function MotionStage({modelUrl,motionUrl,sourceClips,index,settings,seconds,corr
  const sourceScene=useGLTF(motionUrl).scene;
  const gltf=useGLTF(modelUrl);
  const clone=useMemo(()=>cloneSkinnedScene(gltf.scene),[gltf.scene]);
+  useOwnedAvatarResourcesV1009(clone);
  const clips=useMemo(()=>retargetHumanoidClips(sourceClips,sourceScene,clone,readRetargetCalibration(modelUrl)).clips,[sourceClips,sourceScene,clone,modelUrl]);
  const source=clips[index]??clips[0];
  const clip=useMemo(()=>source?(corrected?polishMotionClipV321(source,{...settings,enabled:true}):source):null,[source,corrected,settings]);

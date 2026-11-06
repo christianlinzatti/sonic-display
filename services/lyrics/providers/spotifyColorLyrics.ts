@@ -45,14 +45,14 @@ export function parseSpotifyColorLyrics(value: unknown): Lyrics | null {
   return { provider: "spotify", synced, lines, plainText: synced ? null : lines.map(line => line.text).join("\n") };
 }
 
-export async function lookupSpotifyColorLyrics(trackId: string, albumId: string | null | undefined, accessToken: string): Promise<Lyrics | null> {
+export async function lookupSpotifyColorLyrics(trackId: string, albumId: string | null | undefined, accessToken: string, parent?:AbortSignal): Promise<Lyrics | null> {
   const url = colorLyricsUrl(trackId, albumId);
   if (!url || !accessToken || accessToken.length > 8192) return null;
   try {
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${accessToken}`, "app-platform": "WebPlayer", Accept: "application/json" },
       cache: "no-store",
-      signal: AbortSignal.timeout(5000),
+      signal: parent?AbortSignal.any([parent,AbortSignal.timeout(5000)]):AbortSignal.timeout(5000),
     });
     // 401/403 are common because Web API OAuth tokens may not authorize this private endpoint.
     // Always fall back without retrying with extracted tokens or player cookies.

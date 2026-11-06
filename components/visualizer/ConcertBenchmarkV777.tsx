@@ -1,4 +1,5 @@
 'use client';
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 /** Real WebGL concert-like fixture: actual GLB/SkeletonUtils.clone, AnimationMixer,
  * facial morphs, three.js lighting, existing DanceFX, stage and Drei 3D text.
  * Synthetic deterministic audio/lyrics inputs only; NOT a full Spotify player or the
@@ -116,6 +117,7 @@ function PerformerV777({url,slot,count,cycle,clock,animationStride,interpolation
   clock:MutableRefObject<CollectV777>;animationStride:number;interpolationV782:boolean;lipGuardV783:boolean;onReady:(cycle:number,slot:number,url:string,rig:RigV777)=>void}){
   const {scene,animations}=useGLTF(url);
   const clone=useMemo(()=>cloneSkinnedScene(scene),[scene]);
+  useOwnedAvatarResourcesV1009(clone);
   const mixer=useMemo(()=>new AnimationMixer(clone),[clone]);
   const {mouthMeshes,rig}=useMemo(()=>{
     const mouthMeshes:{mesh:Mesh;index:number}[]=[];let skinnedMeshes=0;

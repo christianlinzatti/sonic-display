@@ -1,4 +1,5 @@
 "use client";
+import {networkJsonV1010,requestActionV1010} from "@/lib/networkJsonV1010";
 import {useCallback,useEffect,useRef,useState} from "react";
 import {useMusic} from "@/context/MusicContext";
 import {formatPlayerTimeV853,playerProgressV853,type SpotifyMiniPlayerActionV853} from "@/lib/spotify-mini-player-v853";
@@ -34,7 +35,8 @@ export function SpotifyMiniPlayerV853(){
  useEffect(()=>{
   if(!connected){setDevice(null);setDevices([]);setPanelOpen(false);setSettings(null);return;}
   const ctrl=new AbortController();
-  void fetch("/api/spotify/devices",{cache:"no-store",signal:ctrl.signal})
+  void networkJsonV1010("/api/spotify/devices",{cache:"no-store",signal:ctrl.signal},
+     {provider:"spotify",priority:"optional",ttlMs:20000,staleMs:40000})
    .then(async r=>{
     const data=await r.json() as {devices?:SpotifyDeviceV851[]}&ErrorResponseV853;
     if(!r.ok)throw new Error(data.message??"Spotify Connect nicht erreichbar");
@@ -57,7 +59,8 @@ export function SpotifyMiniPlayerV853(){
  useEffect(()=>{
   if(!connected||!panelOpen)return;
   const controller=new AbortController();setSettingsLoading(true);
-  void fetch("/api/spotify/player/settings",{cache:"no-store",signal:controller.signal})
+  void networkJsonV1010("/api/spotify/player/settings",{cache:"no-store",signal:controller.signal},
+     {provider:"spotify",priority:"lyrics",ttlMs:10000,staleMs:20000})
    .then(async response=>{
     const data=await response.json() as {state?:SpotifyConnectStateV854}&ErrorResponseV853;
     if(!response.ok){if(data.code==="consent_required"||data.code==="reauth_required")setNeedsConsent(true);throw new Error(data.message??"Spotify-Einstellungen nicht abrufbar.");}
@@ -88,7 +91,10 @@ export function SpotifyMiniPlayerV853(){
   if(!connected||!track||lock.current)return;
   lock.current=true;setBusy(true);setError(null);
   try{
-   const response=await fetch("/api/spotify/player/control",{method:"POST",cache:"no-store",headers:{"Content-Type":"application/json"},body:JSON.stringify({action})});
+   const response=await requestActionV1010(`player-control:${action}`,async signal=>{
+    const reply=await fetch("/api/spotify/player/control",{method:"POST",cache:"no-store",signal,headers:{"Content-Type":"application/json"},body:JSON.stringify({action})});
+    const body=await reply.json();return {ok:reply.ok,status:reply.status,headers:reply.headers,json:async()=>body};
+   });
    const data=await response.json() as {ok?:boolean}&ErrorResponseV853;
    if(!response.ok||!data.ok){if(data.code==="consent_required"||data.code==="reauth_required")setNeedsConsent(true);throw new Error(data.message??"Spotify konnte den Befehl nicht ausführen.");}
    await refresh();
@@ -100,7 +106,10 @@ export function SpotifyMiniPlayerV853(){
   if(!connected||lock.current)return;
   lock.current=true;setBusy(true);setError(null);setNotice(null);
   try{
-   const response=await fetch("/api/spotify/player/settings",{method:"POST",cache:"no-store",headers:{"Content-Type":"application/json"},body:JSON.stringify(command)});
+   const response=await requestActionV1010(`player-settings:${command.action}`,async signal=>{
+    const reply=await fetch("/api/spotify/player/settings",{method:"POST",cache:"no-store",signal,headers:{"Content-Type":"application/json"},body:JSON.stringify(command)});
+    const body=await reply.json();return {ok:reply.ok,status:reply.status,headers:reply.headers,json:async()=>body};
+   });
    const data=await response.json() as {ok?:boolean}&ErrorResponseV853;
    if(!response.ok||!data.ok){if(data.code==="consent_required"||data.code==="reauth_required")setNeedsConsent(true);throw new Error(data.message??"Spotify Connect konnte den Befehl nicht ausführen.");}
    if(command.action==="transfer"){

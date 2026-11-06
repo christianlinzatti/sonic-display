@@ -1,3 +1,4 @@
+import {enqueueVoiceV1008} from './alexaVoiceStoreV1008';
 /** V967: Serverless-safe, expiring Alexa command relay via configured Upstash REST. */
 import {redis} from './push-storage-v365';
 import type {ArtistVoiceMessageV1007} from './alexaArtistV1007';
@@ -11,6 +12,7 @@ export async function claimAlexaNonceV967(nonce:string):Promise<boolean>{
  return (await redis('SET',NONCE_PREFIX+nonce,'1','EX',180,'NX'))==='OK';
 }
 export async function saveAlexaCommandV967(message:{id:string;command:AlexaQueuedCommandV970['command']|ArtistVoiceMessageV1007['command'];createdAt:number}):Promise<void>{
+ if(message.command==='artist-follow'||message.command==='artist-unfollow')await enqueueVoiceV1008({...message,command:message.command});
  const result=await redis('SET',LATEST,JSON.stringify(message),'EX',75);
  if(result!=='OK')throw new Error('Alexa command not stored');
 }

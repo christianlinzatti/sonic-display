@@ -1,3 +1,4 @@
+import {networkJsonV1010} from '@/lib/networkJsonV1010';
 import {
   buildStageEndpointV330,normalizeStageResponseV330,safeStageMediaV330,
   type StageContentV330,type StageContentSourceV330,type StageContentSettingsV330,
@@ -9,7 +10,8 @@ export interface StageContentProviderV330 {
   load(ctx:StageContentContextV330,settings:StageContentSettingsV330,signal:AbortSignal):Promise<StageContentV330|null>;
 }
 async function readJson(url:string,signal:AbortSignal):Promise<unknown>{
-  const res=await fetch(url,{signal,cache:"no-store",credentials:"same-origin",headers:{Accept:"application/json"}});
+  const spotify=url.startsWith("/api/canvas");
+  const res=await networkJsonV1010(url,{signal,cache:"no-store",credentials:"same-origin",headers:{Accept:"application/json"}},{provider:spotify?"spotify":"stage-content",priority:"optional",ttlMs:spotify?360000:1800000,staleMs:3600000,timeoutMs:7500,retry:1});
   if(!res.ok)throw Error(`API ${res.status}`);
   return res.json() as Promise<unknown>;
 }

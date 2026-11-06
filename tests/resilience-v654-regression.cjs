@@ -75,7 +75,8 @@ const flush=async()=>{for(let i=0;i<12;i++)await Promise.resolve();};
  assert(!/await\s+fetchLyrics\(/.test(playback));
  assert(playback.includes('controller.signal')&&playback.includes('lyricsAbort.current?.abort()'));
  const genius=read('services/lyrics/providers/genius.ts');
- assert(genius.includes('withProviderDeadlineV654('));
+ assert(genius.includes('withDeadlineV734('));
+ assert(!genius.includes('import("genius-lyrics-api")')); // V1009: abort the actual transport too.
  const whole=read('services/lyrics/server.ts');
  assert(whole.includes('requests.map(request=>withProviderDeadlineV654(request,9_000))'));
  const stalled=new Promise(()=>{});

@@ -1,4 +1,5 @@
 "use client";
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { Canvas, ThreeEvent } from "@react-three/fiber";
@@ -18,6 +19,7 @@ function RigScene({url, selected, onSelect, overrides, constraints, onDiagnostic
   const gltf = useGLTF(url);
   usePreviewGltfCacheV654(url);
   const model = useMemo(() => cloneSkinnedScene(gltf.scene), [gltf.scene]);
+  useOwnedAvatarResourcesV1009(model);
   useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(model);},[model]);
   // Preview is applied to a cloned GLB, never to the source asset. Rest poses
   // are cached to prevent accumulating rotations on every slider change.

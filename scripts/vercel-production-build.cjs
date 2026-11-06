@@ -31,6 +31,13 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1010 central network governor','tests/v1010-network-coordination-regression.cjs');
+  run('V1009 private avatar resources','tests/v1009-avatar-resources-regression.cjs');
+  run('V1009 native providers and background deadlines','tests/v1009-network-regression.cjs');
+  run('V1008 receiver lifecycle','tests/v1008-receiver-regression.cjs');
+  run('V1008 voice features and dialogs','tests/v1008-voice-regression.cjs');
+  run('V1008 all artists and batch undo','tests/v1008-batch-regression.cjs');
+  run('V1008 signed result relay','tests/v1008-relay-regression.cjs');
   run('V1007 Alexa artist receiver lifecycle','tests/v1007-alexa-artist-receiver-regression.cjs');
   run('V1007 Alexa artist follow and unfollow','tests/v1007-alexa-artist-regression.cjs');
   run('V1006 real avatar browser fixtures','tests/v1006-avatar-production-regression.cjs');
@@ -95,6 +102,7 @@ try {
   run('V962 narrative regression','tests/v962-concert-narrative-regression.cjs');
   run('V961 light governor regression','tests/v961-govee-concert-governor-regression.cjs');
   run('Vercel deployment configuration regression','tests/vercel-production-parity-regression.cjs');
+  run('V1010 network governor isolated TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','lib/networkCoordinatorV1010.ts','lib/networkJsonV1010.ts']);
   run('V1002 QA Core isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v1002-core.json','--noEmit']);
   run('V1003 Auto Improvement isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v1003-core.json','--noEmit']);
   run('V1001 Touch Controller isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v1001-core.json','--noEmit']);

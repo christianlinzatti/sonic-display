@@ -1,5 +1,7 @@
 'use client';
+import {backgroundJsonV1009 as fetch} from '@/lib/backgroundJsonV1009';
 import {useEffect,useRef,useState} from 'react';
+import {AlexaToolsV1008} from '@/components/AlexaVoiceControlV1008';
 import {AlexaArtistPermissionV1007} from '@/components/AlexaArtistControlV1007';
 import {ALEXA_LOCAL_ENABLED_KEY_V967,canApplyAlexaCommandV967}
  from '@/lib/alexaConcertV967';
@@ -126,6 +128,7 @@ export function AlexaConcertControlV967(){
    <button type="button" onClick={()=>apply('festival')}>Festivalmodus lokal testen (ohne Alexa)</button>
   </div>
   <AlexaArtistPermissionV1007/>
+  <AlexaToolsV1008/>
   <h4>V970 · Alexa &amp; Govee – Raumlicht (separate Freigabe)</h4>
   <p className="settings-note">Alexa kann nur bei laufender Musik die bereits synchronisierten, ausgewählten Govee-Lampen mit ruhigen Arena-, Festival- und Club-Farben überblenden. Die Funktion schaltet keine Lampen ein oder aus, aktiviert keine Bridge und verändert keine gespeicherte Govee-Show. Presets laufen höchstens 3 Minuten. Vorhandene manuelle Shows bleiben vorrangig.</p>
   <div className="govee-v958-settings">

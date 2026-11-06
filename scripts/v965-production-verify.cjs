@@ -38,10 +38,18 @@ const productionPassed=atmosphereV972.status===0&&!atmosphereV972.error&&structu
 const browser=productionPassed
  ?require('./playwright-production.cjs').runProductionTests({existingBuildSince:buildStartMs})
  :{passed:false,error:'Production build gate failed; browser tests not run'};
-const passed=productionPassed&&browser.passed===true;
+// Short resource soak runs in the existing matrix, without adding another automatic workflow.
+let soak={passed:false,error:'Browser checks failed; soak not run'};
+if(productionPassed&&browser.passed===true){
+ const result=spawnSync(process.execPath,[path.join(root,'scripts/playwright-soak.cjs'),'1'],{cwd:root,env:process.env,stdio:'inherit',shell:false,windowsHide:true,timeout:6*60*1000});
+ const data=read('playwright-soak/proof.json');const results=read('playwright-soak/results.json');
+ soak={...data,passed:result.status===0&&!result.error&&data?.passed===true&&results?.stats?.expected===1&&results.stats.unexpected===0&&results.stats.skipped===0&&results.stats.flaky===0};
+ fs.writeFileSync(path.join(dir,'v959-regression-logs/playwright-soak.log'),JSON.stringify({proof:soak,results},null,2)+'\n');
+}
+const passed=productionPassed&&browser.passed===true&&soak.passed===true;
 fs.writeFileSync(proof,JSON.stringify({schema:'sonic-v965-production-proof-v1',
  platform:process.platform,node:process.version,startedAt,finishedAt:new Date().toISOString(),
- passed:Boolean(passed),playwright:browser,v972AtmospherePassed:atmosphereV972.status===0&&!atmosphereV972.error,structurePassed:structure.status===0&&!structure.error,checks,artifact:{passed:artifacts.passed,appPageCount:artifacts.appPageCount,
+ passed:Boolean(passed),playwright:browser,soak,v972AtmospherePassed:atmosphereV972.status===0&&!atmosphereV972.error,structurePassed:structure.status===0&&!structure.error,checks,artifact:{passed:artifacts.passed,appPageCount:artifacts.appPageCount,
  issues:artifacts.issues},error:passed?null:run.error?.code||'PRODUCTION_GATE_NOT_CERTIFIED'},null,2)+'\n');
 console.log('V965 '+(passed?'PASS production certified':'FAIL no production approval'));
 if(!passed)process.exitCode=1;

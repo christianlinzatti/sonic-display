@@ -1,4 +1,5 @@
 "use client";
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 /** V316: independent WebGL A/B stages. Both use one clock and the same sampled
  * beat, then run the real V306/307/310/311 quality algorithms with independent
  * state. Never reads or writes live-stage preferences inside Canvas. */
@@ -98,6 +99,7 @@ function DemoHumanoid(){
 function ModelHumanoid({url,onReady}:{url:string;onReady:(targets:AvatarRigTargets)=>void}){
   const {scene}=useGLTF(url);
   const clone=useMemo(()=>cloneSkinnedScene(scene),[scene]);
+  useOwnedAvatarResourcesV1009(clone);
   useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(clone);},[clone]);
   const transform=useMemo(()=>{
     const box=new Box3().setFromObject(clone);const size=new Vector3(),center=new Vector3();
@@ -122,6 +124,7 @@ function RealGLBMotionV317({url,motionUrl,clipId,secondClipId,onReady,onCatalog}
   clipId:string;secondClipId:string;onReady:(controller:ClipControllerV317|null)=>void;onCatalog:(clips:MotionClipInfoV317[])=>void}){
   const {scene,animations}=useGLTF(url);
   const cloned=useMemo(()=>cloneSkinnedScene(scene),[scene]);
+  useOwnedAvatarResourcesV1009(cloned);
   const mixer=useMemo(()=>new AnimationMixer(cloned),[cloned]);
   const [imported,setImported]=useState<AnimationClip[]>([]);
   useEffect(()=>{

@@ -10,8 +10,10 @@ const SPOTIFY_API = "https://api.spotify.com/v1";
 const json = (body: object, status = 200) => NextResponse.json(body, { status, headers: { "Cache-Control": "no-store" } });
 const unauth = () => { const r = json({ code: "reauth_required", message: "Bitte mit Spotify neu verbinden." }, 401); clearSessionCookie(r); return r; };
 const noScope = () => json({ code: "consent_required", message: "Bitte Spotify neu verbinden und Künstler-Abonnements freigeben." }, 403);
-const failed = (status: number) => {
-  if (status === 429) return json({ code: "rate_limited", message: "Spotify begrenzt derzeit die Anfragen. Bitte später erneut versuchen." }, 429);
+const failed = (status: number, retryAfter: string|null=null) => {
+  if (status === 429) {const result=json({ code: "rate_limited", message: "Spotify begrenzt derzeit die Anfragen. Bitte später erneut versuchen." }, 429);
+    if(retryAfter&&/^\d{1,5}$/.test(retryAfter))result.headers.set('Retry-After',retryAfter);
+    return result;}
   // The February 2026 migration guide names artist URIs, but the PUT/DELETE endpoint
   // reference currently omits them. An unsupported artist URI must never report success.
   if ([400, 404, 405, 410, 422].includes(status)) return json({ code: "unsupported", message: "Spotify akzeptiert diese Künstler-Aktion derzeit nicht. Du kannst den Künstler direkt in Spotify öffnen." }, 503);
@@ -38,7 +40,7 @@ async function readFollowing(valid: Valid, ids: string[]): Promise<{ response: N
   const call = await callSpotify(valid, `/me/library/contains?${query}`, "GET");
   valid = call.valid;
   if (call.result.status === 401) return { response: unauth(), valid };
-  if (!call.result.ok) return { response: failed(call.result.status), valid };
+  if (!call.result.ok) return { response: failed(call.result.status,call.result.headers.get("Retry-After")), valid };
   const statuses = normalizeContainsResponse(await call.result.json(), ids);
   if (!statuses) return { response: json({ code: "spotify_format_error", message: "Spotify hat keinen gültigen Follow-Status geliefert." }, 502), valid };
   return { response: json({ statuses }), valid, statuses };
@@ -74,7 +76,7 @@ export async function POST(req: NextRequest) {
     const mutation = await callSpotify(valid, `/me/library?${query}`, method);
     valid = mutation.valid;
     if (mutation.result.status === 401) return unauth();
-    if (!mutation.result.ok) return attachCookie(failed(mutation.result.status), valid);
+    if (!mutation.result.ok) return attachCookie(failed(mutation.result.status,mutation.result.headers.get("Retry-After")), valid);
     // A 2xx without a body is not proof of artist follow: read back the actual status.
     const verify = await readFollowing(valid, [item.artistId]);
     valid = verify.valid;

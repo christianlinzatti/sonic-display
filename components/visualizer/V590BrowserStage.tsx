@@ -1,4 +1,5 @@
 'use client';
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {usePreviewGltfCacheV654} from './usePreviewGltfCacheV654';
 /** Local V590 screenshot target. Loads genuine GLB(s), never a procedural substitute. */
 import {Suspense,useCallback,useEffect,useMemo,useRef,useState, type MutableRefObject} from 'react';
@@ -21,6 +22,7 @@ function RenderRig({modelUrl,motionUrl,selection,onReady,shotRef}:{modelUrl:stri
  const source=useGLTF(modelUrl);const motion=useGLTF(motionUrl||modelUrl);
  usePreviewGltfCacheV654(modelUrl);
  const gltf=useMemo(()=>cloneSkinnedScene(source.scene),[source.scene]);
+  useOwnedAvatarResourcesV1009(gltf);
  const clips=useMemo<AnimationClip[]>(()=>motionUrl
   ?retargetHumanoidClips(motion.animations,motion.scene,gltf,readRetargetCalibration(modelUrl)).clips
   :source.animations,[motionUrl,motion.animations,motion.scene,source.animations,gltf,modelUrl]);

@@ -1,4 +1,5 @@
 'use client';
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 /** V767 optional, loopback-only diagnostic; tests the real StageEnvironment and GLB cache/skeleton lifetime.
  * NOT a measurement of the whole Spotify concert scene. No WebGL resources are allocated until opt-in.
  */
@@ -45,8 +46,9 @@ function GlbActor({url,id,onReady}:{url:string;id:string;onReady:(value:string)=
   const {scene}=useGLTF(url);
   usePreviewGltfCacheV654(url);
   const model=useMemo(()=>cloneSkinnedScene(scene),[scene]);
+  useOwnedAvatarResourcesV1009(model);
   useEffect(()=>{onReady(id);return ()=>{disposeClonedAvatarSkeletonsV654(model);};},[model,id,onReady]);
-  // Shared loader geometry/material/texture ownership stays with useGLTF cache.
+  // Cached originals remain owned by useGLTF; this clone owns its render resources.
   return <primitive object={model} dispose={null} scale={1.3} position={[0,-.95,0]}/>;
 }
 const nextFrames=(count=4)=>new Promise<void>(resolve=>{

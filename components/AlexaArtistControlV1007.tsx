@@ -66,8 +66,8 @@ export function AlexaArtistPermissionV1007(){
  };
  return <fieldset aria-label="Alexa Spotify-Künstler"><legend>Künstler mit Alexa liken oder entliken</legend>
   <label><input type="checkbox" checked={enabled} onChange={event=>toggle(event.target.checked)}/> Künstler auf Spotify per Alexa folgen und entfolgen erlauben</label>
-  <p className="settings-note">Zusätzlich den Alexa-Empfang oben einschalten. Sage „Alexa, sage Sonic Display, bitte like den Künstler“ oder „bitte entlike den Künstler“. Gemeint ist der Hauptkünstler des gerade auf Spotify gespielten Titels. Das Display muss sichtbar geöffnet und mit Spotify verbunden sein; die Einstellungen dürfen geschlossen werden.</p>
-  <p className="settings-note">Bei fehlender Berechtigung Spotify neu verbinden und Künstler-Abonnements freigeben. Der bestätigte Spotify-Status erscheint auf dem Display. Alexa bestätigt zunächst nur die Weiterleitung.</p>
+  <p className="settings-note">Zusätzlich den Alexa-Empfang oben einschalten. Sage „Alexa, sage Sonic Display, bitte like den Künstler“ oder „bitte entlike den Künstler“. Bei mehreren Künstlern fragt Alexa nach einer Nummer. Mit „Bitte allen Künstlern folgen“ wird die gesamte aktuelle Künstlerliste gewählt. Das Display muss sichtbar geöffnet und mit Spotify verbunden sein; die Einstellungen dürfen geschlossen werden.</p>
+  <p className="settings-note">Bei fehlender Berechtigung Spotify neu verbinden und Künstler-Abonnements freigeben. Der bestätigte Spotify-Status erscheint auf dem Display. Alexa wartet kurz auf die Bestätigung; bei Verzögerung lässt sich das letzte Ergebnis erneut abfragen.</p>
   {error&&<p role="status">{error}</p>}
  </fieldset>;
 }

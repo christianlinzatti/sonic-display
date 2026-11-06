@@ -4,6 +4,7 @@
  * The Lambda REST call is HMAC authenticated; the Lambda never holds Spotify tokens or accesses Spotify or hardware directly.
  */
 const {createHmac,randomUUID}=require('node:crypto');
+const voiceV1008=require('./voice-v1008.cjs');
 const ACTIONS={
  LikeArtistIntent:'artist-follow',UnlikeArtistIntent:'artist-unfollow',
  ArenaIntent:'arena',FestivalIntent:'festival',ClubIntent:'club',CalmIntent:'calm',
@@ -55,8 +56,9 @@ async function handler(event){
  if(event?.request?.type==='LaunchRequest')return reply('Sonic Display ist bereit. Sage zum Beispiel: starte den Festivalmodus.',false);
  const intent=event?.request?.intent?.name;
  if(event?.request?.type!=='IntentRequest')return reply('Sonic Display unterstützt Konzertmodi und virtuelle Effekte.');
- if(intent==='AMAZON.HelpIntent')return reply('Du kannst auch sagen: bitte like den Künstler oder bitte entlike den Künstler. Sage zum Beispiel: starte Festival, beleuchte das Publikum, aktiviere Neon, zeige virtuellen Nebel starte den Hardtekk-Reaktor, aktiviere die Rock-Arena, nutze Govee Festival Raumlicht oder beende die Konzertautomatik.',false);
+ if(intent==='AMAZON.HelpIntent')return reply('Du kannst auch sagen: bitte like den Künstler, bitte allen Künstlern folgen, folge ich diesem Künstler schon oder letzte Künstleraktion rückgängig. Für die Anzeige: Lyrics ausblenden, Avatar wechseln oder ruhige Darstellung. Sage zum Beispiel: starte Festival, beleuchte das Publikum, aktiviere Neon, zeige virtuellen Nebel starte den Hardtekk-Reaktor, aktiviere die Rock-Arena, nutze Govee Festival Raumlicht oder beende die Konzertautomatik.',false);
  if(intent==='AMAZON.CancelIntent'||intent==='AMAZON.StopIntent')return reply('Bis bald.');
+ if(voiceV1008.COMMANDS[intent]||voiceV1008.CHOICES[intent]||intent==='SelectArtistIntent'||intent==='LastVoiceResultIntent')return voiceV1008.runVoiceV1008(event,{origin,secret});
  if(intent==='StatusIntent')return reply('Der Alexa Skill ist eingerichtet. Ob das Display den nächsten Befehl übernimmt, siehst du im Konzertstudio.');
  if(!Object.hasOwn(ACTIONS,intent))return reply('Diesen Bühnenbefehl kenne ich noch nicht.');
  const raw=JSON.stringify({command:ACTIONS[intent]});

@@ -308,7 +308,10 @@
             "folge dem künstler",
             "folge diesem künstler",
             "abonniere den künstler",
-            "künstler liken"
+            "künstler liken",
+            "ich mag diesen künstler",
+            "künstler abonnieren",
+            "abonniere diesen künstler"
           ]
         },
         {
@@ -322,7 +325,154 @@
             "künstler entliken",
             "entfolge dem künstler",
             "folge diesem künstler nicht mehr",
-            "entferne den künstler aus meinen favoriten"
+            "entferne den künstler aus meinen favoriten",
+            "nicht mehr folgen",
+            "künstler nicht mehr abonnieren",
+            "ich mag diesen künstler nicht mehr"
+          ]
+        },
+        {
+          "name": "FollowAllArtistsIntent",
+          "slots": [],
+          "samples": [
+            "bitte allen künstlern folgen",
+            "allen künstlern folgen",
+            "folge allen künstlern dieses titels",
+            "like alle künstler",
+            "bitte alle künstler liken"
+          ]
+        },
+        {
+          "name": "ArtistStatusIntent",
+          "slots": [],
+          "samples": [
+            "folge ich diesem künstler schon",
+            "mag ich schon diesen künstler",
+            "habe ich diesen künstler abonniert",
+            "künstlerstatus abfragen"
+          ]
+        },
+        {
+          "name": "UndoArtistIntent",
+          "slots": [],
+          "samples": [
+            "mache die letzte künstleraktion rückgängig",
+            "letzte künstleraktion rückgängig",
+            "mache die letzte änderung rückgängig",
+            "letzten künstlerbefehl rückgängig"
+          ]
+        },
+        {
+          "name": "FollowPrimaryArtistIntent",
+          "slots": [],
+          "samples": [
+            "like den hauptkünstler",
+            "folge dem hauptkünstler",
+            "bitte den hauptkünstler abonnieren"
+          ]
+        },
+        {
+          "name": "UnfollowPrimaryArtistIntent",
+          "slots": [],
+          "samples": [
+            "entlike den hauptkünstler",
+            "entfolge dem hauptkünstler",
+            "hauptkünstler nicht mehr folgen"
+          ]
+        },
+        {
+          "name": "LyricsOnIntent",
+          "slots": [],
+          "samples": [
+            "lyrics einblenden",
+            "zeige den songtext",
+            "blende den songtext ein"
+          ]
+        },
+        {
+          "name": "LyricsOffIntent",
+          "slots": [],
+          "samples": [
+            "lyrics ausblenden",
+            "verstecke den songtext",
+            "blende den songtext aus"
+          ]
+        },
+        {
+          "name": "NextAvatarIntent",
+          "slots": [],
+          "samples": [
+            "avatar wechseln",
+            "nächster avatar",
+            "wähle den nächsten avatar"
+          ]
+        },
+        {
+          "name": "CalmDisplayIntent",
+          "slots": [],
+          "samples": [
+            "ruhige darstellung",
+            "aktiviere die ruhige darstellung",
+            "zeige eine ruhige ansicht"
+          ]
+        },
+        {
+          "name": "NormalDisplayIntent",
+          "slots": [],
+          "samples": [
+            "normale darstellung",
+            "deaktiviere die ruhige darstellung",
+            "zeige die normale ansicht"
+          ]
+        },
+        {
+          "name": "LastVoiceResultIntent",
+          "slots": [],
+          "samples": [
+            "letztes ergebnis",
+            "was war das letzte ergebnis",
+            "hat die letzte anfrage funktioniert"
+          ]
+        },
+        {
+          "name": "SelectFirstArtistIntent",
+          "slots": [],
+          "samples": [
+            "den ersten künstler",
+            "den ersten",
+            "hauptkünstler auswählen"
+          ]
+        },
+        {
+          "name": "SelectSecondArtistIntent",
+          "slots": [],
+          "samples": [
+            "den zweiten künstler",
+            "den zweiten",
+            "gastkünstler auswählen"
+          ]
+        },
+        {
+          "name": "SelectThirdArtistIntent",
+          "slots": [],
+          "samples": [
+            "den dritten künstler",
+            "den dritten",
+            "dritten künstler auswählen"
+          ]
+        },
+        {
+          "name": "SelectArtistIntent",
+          "slots": [
+            {
+              "name": "ArtistNumber",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "nummer {ArtistNumber}",
+            "künstler nummer {ArtistNumber}",
+            "ich wähle nummer {ArtistNumber}"
           ]
         }
       ],

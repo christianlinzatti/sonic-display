@@ -1,4 +1,5 @@
 'use client';
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {Suspense,useEffect,useMemo} from 'react';
 import {Canvas,useFrame} from '@react-three/fiber';
 import {OrbitControls,useGLTF} from '@react-three/drei';
@@ -8,6 +9,7 @@ import type {EnsemblePoseV325} from './ensembleChoreographyV325';
 function RigModel({url,seconds}:{url:string;seconds:number}) {
  const {scene,animations}=useGLTF(url);
  const model=useMemo(()=>cloneSkinnedScene(scene),[scene]);
+  useOwnedAvatarResourcesV1009(model);
  const mixer=useMemo(()=>new AnimationMixer(model),[model]);
  useEffect(()=>{
   const clip=animations[0];if(clip)mixer.clipAction(clip).play();

@@ -1,4 +1,5 @@
 "use client";
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {usePreviewGltfCacheV654} from './usePreviewGltfCacheV654';
 import {Canvas,useFrame,useThree} from "@react-three/fiber";
 import {OrbitControls,useGLTF} from "@react-three/drei";
@@ -38,6 +39,7 @@ function AvatarClone({url}:{url:string}){
   }
   return cloned;
  },[scene]);
+  useOwnedAvatarResourcesV1009(copy);
  useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(copy);},[copy]);
  return <primitive object={copy} dispose={null}/>;
 }

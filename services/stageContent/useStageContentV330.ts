@@ -1,4 +1,5 @@
 "use client";
+import {backgroundJsonV1009 as fetch} from '@/lib/backgroundJsonV1009';
 import {useEffect,useMemo,useState} from "react";
 import {STAGE_CONTENT_EVENT_V330,STAGE_CONTENT_KEY_V330,readStageContentV330,selectStageSlidesV330,type StageContentV330} from "./stageContentV330";
 import {loadStageSlidesV330} from "./providersV330";

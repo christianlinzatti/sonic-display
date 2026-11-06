@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const artist = params.get("artist")?.trim();
   const duration = Number(params.get("duration"));
 
-  if (!title || !artist || !Number.isFinite(duration) || duration <= 0) {
+  if (!title || !artist || !Number.isFinite(duration) || duration <= 0 || duration > 7200 || title.length > 300 || artist.length > 300 || (params.get("album")?.length ?? 0) > 300) {
     return NextResponse.json(
       { error: "title, artist and positive duration required" },
       { status: 400 },
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
       duration,
       trackId: isSpotifyId(trackId) ? trackId : undefined,
       albumId: isSpotifyId(albumId) ? albumId : undefined,
-    }, token);
+    }, token, request.signal);
     const response = NextResponse.json(lyrics, {headers:{"Cache-Control":"private, no-store"}});
     if (refreshed?.refreshed) setSessionCookie(response, refreshed.session);
     return response;

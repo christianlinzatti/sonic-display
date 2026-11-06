@@ -1,4 +1,5 @@
 'use client';
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {usePreviewGltfCacheV654} from './usePreviewGltfCacheV654';
 /** An opt-in OFFLINE WebGL scene. It never mounts in the live visualizer Canvas. */
 import {Component,Suspense,useCallback,useEffect,useMemo,useRef,useState,type ReactNode,type RefObject} from 'react';
@@ -54,6 +55,7 @@ function RigV513({index,url,motionUrl,clock,tier,pi,count,onSample,qualityEnable
   }
   return copy;
  },[scene]);
+  useOwnedAvatarResourcesV1009(clone);
  useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(clone);},[clone]);
  const mixer=useMemo(()=>new AnimationMixer(clone),[clone]);
  const bones=useMemo(()=>findAnimatedBonesV508(clone),[clone]);

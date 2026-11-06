@@ -1,4 +1,5 @@
 "use client";
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
 import {Suspense,useEffect,useMemo,useRef,type ReactNode,Component} from 'react';
 import {useFrame} from '@react-three/fiber';
@@ -56,6 +57,7 @@ function GlbPreviewModelV560({url,correct,lowTier,lipModeV561='off',playingV561=
     });
     return clone;
   },[scene]);
+  useOwnedAvatarResourcesV1009(model);
   // V565: only an opt-in comparison of *embedded* GLB animations. Every preview
   // gets its own mixer and skinned clone; the shared cached model stays untouched.
   // Filter face/jaw/morph tracks so existing live facial rig remains independent.

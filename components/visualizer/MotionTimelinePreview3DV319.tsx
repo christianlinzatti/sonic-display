@@ -1,4 +1,5 @@
 "use client";
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {ModelPreviewBoundaryV733} from "./ModelPreviewBoundaryV733";
 import {Suspense,useEffect,useMemo,useState} from 'react';
 import {Canvas,useFrame} from '@react-three/fiber';
@@ -13,6 +14,7 @@ import {timelinePosition,timelineWeights,type MotionTimeline} from './motionTime
 function Preview({modelUrl,animationUrl,timeline,seconds}:{modelUrl:string;animationUrl?:string;timeline:MotionTimeline;seconds:number}){
  const {scene,animations}=useGLTF(modelUrl);
  const cloned=useMemo(()=>cloneSkinnedScene(scene),[scene]);
+  useOwnedAvatarResourcesV1009(cloned);
  const mixer=useMemo(()=>new AnimationMixer(cloned),[cloned]);
  const [external,setExternal]=useState<AnimationClip[]>([]);
  useEffect(()=>{

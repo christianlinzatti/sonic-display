@@ -1,4 +1,5 @@
 'use client';
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {Suspense,useEffect,useMemo,useRef,useState,type ReactNode,Component} from 'react';
 import {Canvas,useFrame,useThree} from '@react-three/fiber';
 import {useGLTF} from '@react-three/drei';
@@ -128,6 +129,7 @@ function FrozenGlb({url,progressMs,actorName="v804-glb-performer",offsetX=0}:
     }
     return copy;
   },[gltf.scene]);
+  useOwnedAvatarResourcesV1009(model);
   useEffect(()=>{
     // Identical frozen pose for both cameras. First embedded clip is a review
     // sample, NEVER described as a verified song-aligned dance performance.

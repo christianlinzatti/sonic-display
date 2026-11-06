@@ -1,4 +1,5 @@
 "use client";
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 
 import { Component, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Canvas } from "@react-three/fiber";
@@ -38,6 +39,7 @@ function PreviewGltfV370({url,pose,profile,demo,onScan,previewTargetV383}:{url:s
   const {scene}=useGLTF(url);
   // Runtime and editor get their own model clones; previews never modify the cached GLTF asset.
   const model=useMemo(()=>cloneSkinnedScene(scene),[scene]);
+  useOwnedAvatarResourcesV1009(model);
   const scan=useMemo(()=>scanFacialRigV370(model),[model]);
   const bounds=useMemo(()=>{
     const box=new Box3().setFromObject(model);

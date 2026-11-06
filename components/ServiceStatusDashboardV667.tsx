@@ -1,4 +1,5 @@
 "use client";
+import {backgroundJsonV1009 as fetch} from '@/lib/backgroundJsonV1009';
 import {useCallback,useEffect,useMemo,useState} from "react";
 import {useMusic} from "@/context/MusicContext";
 import {useAudioAnalysis} from "@/context/AudioAnalysisContext";

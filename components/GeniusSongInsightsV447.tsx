@@ -1,4 +1,5 @@
 "use client";
+import {backgroundJsonV1009 as fetch} from '@/lib/backgroundJsonV1009';
 import {useEffect,useMemo,useState} from "react";
 import type {Lyrics,Track} from "@/types/music";
 import {selectGeniusInsightV447,type GeniusSongInsightsV447} from "@/services/genius/songInsightsV447";

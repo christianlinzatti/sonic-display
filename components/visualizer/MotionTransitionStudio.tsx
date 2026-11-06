@@ -1,4 +1,5 @@
 "use client";
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import { Suspense,useCallback,useEffect,useMemo,useRef,useState } from "react";
 import { Canvas,useFrame } from "@react-three/fiber";
 import { OrbitControls,useGLTF } from "@react-three/drei";
@@ -16,6 +17,7 @@ type Prepared = {id:string;clip:AnimationClip};
 function PreviewActor({modelUrl,from,to,duration,request,onStatus}:{modelUrl:string;from:InstalledCharacterMotion;to:InstalledCharacterMotion;duration:number;request:number;onStatus:(message:string)=>void}){
  const {scene}=useGLTF(modelUrl);
  const rig=useMemo(()=>cloneSkinnedScene(scene),[scene]);
+  useOwnedAvatarResourcesV1009(rig);
  const mixer=useMemo(()=>new AnimationMixer(rig),[rig]);
  const [clips,setClips]=useState<Prepared[]>([]);
  const active=useRef<AnimationAction|null>(null);

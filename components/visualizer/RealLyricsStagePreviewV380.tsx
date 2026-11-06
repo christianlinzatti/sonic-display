@@ -1,4 +1,5 @@
 "use client";
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
 
 import { Component, Suspense, useEffect, useMemo, useRef, useState } from "react";
@@ -36,6 +37,7 @@ function InstalledAvatarV380({url,animationUrl,positionMs,speed}:{url:string;ani
   const gltf=useGLTF(url);
   usePreviewGltfCacheV654(url);
   const scene=useMemo(()=>cloneSkeleton(gltf.scene),[gltf.scene]);
+  useOwnedAvatarResourcesV1009(scene);
   const mixer=useMemo(()=>new AnimationMixer(scene),[scene]);
   const fit=useMemo(()=>{
     const b=new Box3().setFromObject(scene);

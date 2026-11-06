@@ -1,4 +1,5 @@
 "use client";
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { Line, OrbitControls, useGLTF } from "@react-three/drei";
@@ -30,6 +31,7 @@ function LoadedAvatar({ url, motionUrl, playing = false, speed = 1, seek, onMoti
     rig.position.set(-center.x * scale, -1.1 - box.min.y * scale, -center.z * scale);
     return rig;
   }, [scene]);
+  useOwnedAvatarResourcesV1009(cloned);
   const mixer = useMemo(() => new AnimationMixer(cloned), [cloned]);
   const [externalClips, setExternalClips] = useState<AnimationClip[]>([]);
   useEffect(() => {

@@ -1,4 +1,6 @@
 "use client";
+import {networkJsonV1010,requestActionV1010} from '@/lib/networkJsonV1010';
+import {clientNetworkV1010} from '@/lib/networkCoordinatorV1010';
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Track } from "@/types/music";
 import { DISCOVERY_GENRES, type DiscoveryGenre, type DiscoveryArtist, type DiscoverySong, validDiscoveryId } from "@/lib/artist-discovery-v360";
@@ -72,7 +74,7 @@ export function ArtistDiscoveryV360({ currentArtists }: { currentArtists?: Track
     setLoading(true); setError(null);
     const load = async () => {
       try {
-        const response = await fetch(`/api/spotify/discovery?${params}`, {cache:"no-store",signal:controller.signal});
+        const response = await networkJsonV1010(`/api/spotify/discovery?${params}`, {cache:"no-store",signal:controller.signal},{provider:"spotify",priority:"optional",ttlMs:60000,staleMs:240000,fresh:refresh>0});
         const data = await response.json() as ResponseArtists;
         if (!response.ok) { if (data.code === "consent_required") setNeedConsent(true); throw new Error(data.message ?? "Spotify-Suche fehlgeschlagen."); }
         if (!Array.isArray(data.artists)) throw new Error("Spotify hat keine gültige Künstlerliste geliefert.");
@@ -94,7 +96,7 @@ export function ArtistDiscoveryV360({ currentArtists }: { currentArtists?: Track
       try {
         const batches = ids.split(",").reduce<string[][]>((all, id) => { if (!all.length || all[all.length - 1].length === 10) all.push([]); all[all.length - 1].push(id); return all; }, []);
         const results = await Promise.all(batches.map(async batch => {
-          const response = await fetch(`/api/spotify/artists/follow?ids=${encodeURIComponent(batch.join(","))}`, {cache:"no-store",signal:controller.signal});
+          const response = await networkJsonV1010(`/api/spotify/artists/follow?ids=${encodeURIComponent(batch.join(","))}`, {cache:"no-store",signal:controller.signal},{provider:"spotify",priority:"lyrics",ttlMs:20000,staleMs:40000});
           const data = await response.json() as {statuses?:Record<string,FollowState>} & ApiError;
           if (!response.ok) { if (data.code === "consent_required" || data.code === "reauth_required") setNeedConsent(true); throw new Error(data.message ?? "Künstlerstatus derzeit nicht verfügbar."); }
           if (!data.statuses) throw new Error("Spotify hat keinen Follow-Status geliefert.");
@@ -114,7 +116,7 @@ export function ArtistDiscoveryV360({ currentArtists }: { currentArtists?: Track
     const params = new URLSearchParams({mode:"songs",artistId:selected.id,name:selected.name});
     const load = async () => {
       try {
-        const response = await fetch(`/api/spotify/discovery?${params}`,{cache:"no-store",signal:controller.signal});
+        const response = await networkJsonV1010(`/api/spotify/discovery?${params}`,{cache:"no-store",signal:controller.signal},{provider:"spotify",priority:"optional",ttlMs:60000,staleMs:240000});
         const data = await response.json() as ResponseSongs;
         if (!response.ok) throw new Error(data.message ?? "Songauswahl nicht verfügbar.");
         if (!controller.signal.aborted) setSongs(data.songs ?? []);
@@ -127,12 +129,31 @@ export function ArtistDiscoveryV360({ currentArtists }: { currentArtists?: Track
     if (actionLock.current || needConsent || typeof statuses[artist.id] !== "boolean") return;
     actionLock.current = true; setBusy(artist.id); setFollowError(null);
     try {
-      const response = await fetch("/api/spotify/artists/follow",{method:"POST",cache:"no-store",headers:{"Content-Type":"application/json"},body:JSON.stringify({artistId:artist.id,follow:following})});
+      const response = await requestActionV1010(`artist-follow:${artist.id}`,async signal=>{
+        const response=await fetch("/api/spotify/artists/follow",{method:"POST",cache:"no-store",signal,headers:{"Content-Type":"application/json"},body:JSON.stringify({artistId:artist.id,follow:following})});
+        const body=await response.json();return {ok:response.ok,status:response.status,headers:response.headers,json:async()=>body};
+      });
       const data = await response.json() as {following?:boolean}&ApiError;
-      if (!response.ok) { if (data.code === "consent_required" || data.code === "reauth_required") setNeedConsent(true); throw new Error(data.message ?? "Spotify hat diese Änderung abgelehnt."); }
+      if (!response.ok) { if (data.code === "consent_required" || data.code === "reauth_required") setNeedConsent(true); throw Object.assign(new Error(data.message ?? "Spotify hat diese Änderung abgelehnt."),{status:response.status}); }
       if (data.following !== following) throw new Error("Spotify hat den neuen Follow-Status nicht bestätigt.");
+      clientNetworkV1010.invalidatePrefix("spotify:/api/spotify/artists/follow?");
       if (active.current) { setStatuses(previous=>({...previous,[artist.id]:following})); window.dispatchEvent(new CustomEvent("sonic:artist-follow-changed-v359", {detail:{artistId:artist.id,following}})); }
-    } catch(err) { if(active.current) setFollowError(apiMessage(err)); }
+    } catch(err) {
+      const knownStatus=(err as {status?:number}).status;
+      if(knownStatus&&knownStatus<500){if(active.current)setFollowError(apiMessage(err));return;}
+      clientNetworkV1010.invalidatePrefix('spotify:/api/spotify/artists/follow?');
+      try{
+        const check=await networkJsonV1010(`/api/spotify/artists/follow?ids=${encodeURIComponent(artist.id)}`,{cache:'no-store'},
+          {provider:'spotify',priority:'action',retry:0,fresh:true});
+        const data=await check.json() as {statuses?:Record<string,boolean>};
+        if(check.ok&&typeof data.statuses?.[artist.id]==='boolean'){
+          const actual=data.statuses[artist.id];
+          if(active.current)setStatuses(previous=>({...previous,[artist.id]:actual}));
+          if(actual===following){if(active.current)window.dispatchEvent(new CustomEvent('sonic:artist-follow-changed-v359',{detail:{artistId:artist.id,following:actual}}));return;}
+        }
+      }catch{/* do not replay an ambiguous write */}
+      if(active.current)setFollowError(apiMessage(err));
+    }
     finally { actionLock.current = false; if(active.current)setBusy(null); }
   };
   return <>

@@ -1,4 +1,5 @@
 "use client";
+import {setupNetworkWakeV1010,resetClientSpotifyV1010} from '@/lib/networkCoordinatorV1010';
 import { useCallback, useEffect, useRef, useState } from "react";
 import { spotifyMusicSource } from "@/services/musicSource";
 import { fetchLyrics } from "@/services/lyrics/client";
@@ -72,11 +73,11 @@ export function usePlaybackPolling() {
         if(!current())return;
         const err=cause as Error & {status?:number;retryAfter?:number};
         if(err.status===401){
-          setState(s=>({...s,connected:false,connectionStatus:"disconnected",loading:false,error:"Spotify-Anmeldung erforderlich."}));
+          setState(s=>({...s,connected:false,connectionStatus:"disconnected",loading:false,error:"Spotify-Anmeldung erforderlich.",track:null,lyrics:null}));
           retryDelay.current=NORMAL_INTERVAL;
         }else{
           setState(s=>({...s,loading:false,connectionStatus:s.connected?"reconnecting":"disconnected",error:err.message||"Verbindungsfehler"}));
-          retryDelay.current=Number.isFinite(err.retryAfter)&&err.retryAfter!>0?err.retryAfter!*1000:Math.min(retryDelay.current*2,MAX_BACKOFF);
+          retryDelay.current=Number.isFinite(err.retryAfter)&&err.retryAfter!>0?Math.min(300000,err.retryAfter!):Math.min(retryDelay.current*2,MAX_BACKOFF);
           retryAt.current=Date.now()+retryDelay.current;
         }
       }
@@ -88,9 +89,13 @@ export function usePlaybackPolling() {
   },[]);
 
   useEffect(()=>{
+    const stopNetworkWake=setupNetworkWakeV1010();
     mounted.current=true;disconnected.current=false;generation.current++;
     const poll=createSingleFlightPollingV654({
-      run:refresh,delayMs:()=>Math.min(2147483647,Math.max(retryDelay.current,retryAt.current-Date.now())),
+      run:refresh,delayMs:()=>Math.min(2147483647,Math.max(
+        document.visibilityState==='hidden'?30000:NORMAL_INTERVAL,
+        typeof navigator!=='undefined'&&navigator.onLine===false?60000:0,
+        retryDelay.current,retryAt.current-Date.now())),
       clock:{setTimeout:(fn,ms)=>window.setTimeout(fn,ms),clearTimeout:id=>window.clearTimeout(id)},
     });
     pollStop.current=()=>poll.stop();
@@ -100,13 +105,13 @@ export function usePlaybackPolling() {
     return()=>{
       mounted.current=false;generation.current++;playbackAbort.current?.abort();
       poll.stop();pollStop.current=null;lyricsAbort.current?.abort();lyricsAbort.current=null;
-      pending.current=null;document.removeEventListener("visibilitychange",onVisibility);
+      pending.current=null;document.removeEventListener("visibilitychange",onVisibility);stopNetworkWake();
     };
   },[refresh]);
   const invalidateSession=useCallback(()=>{
     // Invalidate BEFORE the disconnect HTTP request. Even an already-resolved
     // Spotify response cannot resurrect a disconnected UI.
-    disconnected.current=true;generation.current++;playbackAbort.current?.abort();
+    disconnected.current=true;generation.current++;resetClientSpotifyV1010();playbackAbort.current?.abort();
     pollStop.current?.();lyricsAbort.current?.abort();lyricsAbort.current=null;
     pending.current=null;trackId.current=null;
     setState({connected:false,connectionStatus:"disconnected",loading:false,error:null,track:null,progressMs:0,isPlaying:false,fetchedAt:0,lyrics:null});

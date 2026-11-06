@@ -69,7 +69,7 @@ export async function lookupLrclibLyrics(query: {
   artist: string;
   album: string;
   duration: number;
-}): Promise<Lyrics | null> {
+}, parent?:AbortSignal): Promise<Lyrics | null> {
   const params = new URLSearchParams({
     track_name: query.title,
     artist_name: query.artist,
@@ -79,7 +79,7 @@ export async function lookupLrclibLyrics(query: {
   const response = await fetch(`https://lrclib.net/api/get?${params}`, {
     headers: { "User-Agent": process.env.LRCLIB_USER_AGENT ?? "SonicDisplay/0.1.0" },
     cache: "no-store",
-    signal: AbortSignal.timeout(8_000),
+    signal: parent?AbortSignal.any([parent,AbortSignal.timeout(8_000)]):AbortSignal.timeout(8_000),
   });
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(`LRCLIB returned HTTP ${response.status}`);

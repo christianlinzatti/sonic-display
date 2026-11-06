@@ -1,4 +1,5 @@
 "use client";
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
 
 import {useEffect,useMemo,useRef,useState} from "react";
@@ -30,6 +31,7 @@ export function RapRealAvatarPreviewV409({url,mouthPreviewV418=null,settings,sec
   usePreviewGltfCacheV654(url);
   useEffect(()=>onEmbeddedClips(animations.map(clip=>clip.name)),[animations,onEmbeddedClips]);
   const clone=useMemo(()=>cloneSkinnedScene(scene),[scene]);
+  useOwnedAvatarResourcesV1009(clone);
   useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(clone);},[clone]);
   const clock=useRef(0);
   const mixer=useMemo(()=>new AnimationMixer(clone),[clone]);

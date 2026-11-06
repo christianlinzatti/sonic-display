@@ -1,4 +1,5 @@
 "use client";
+import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
 import {planMotionPlaybackV659,keepCurrentMotionWhileLoadingV659} from "./motionPlaybackWindowV659";
 import {applyGltfVocalPerformanceV492} from "./gltfVocalPerformanceV492";
@@ -283,7 +284,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   },[bodyRegistryV507,bodyProfileV507,url,assetUrl,avatarScale,workloadSlot]);
   // Clone only when the model changes. SkeletonUtils preserves skinned-mesh
   // bone bindings; cloning inside JSX on every React render breaks caching.
-  // Geometry and materials remain shared with the GLTF cache (never dispose here).
+  // Cached originals stay untouched; the owned-resource hook isolates renderer resources.
   const model = useMemo(() => {
     const instance = cloneSkinnedScene(scene);
     instance.traverse(node => {
@@ -293,6 +294,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     return instance;
   }, [scene]);
   useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(model);},[model]);
+  useOwnedAvatarResourcesV1009(model);
   const gluteRigV741=useMemo(()=>collectGluteRigV741(model),[model]);
   const gluteOverlayV741=useMemo(()=>createGluteOverlayV741(),[model]);
   // V560: one private set of PBR material copies per GLB instance. Never edit

@@ -1,3 +1,38 @@
+## V1010 – Zentrale Anfragesteuerung (2026-11-06)
+
+Neu: gemeinsame, kontogebundene Browser-Warteschlange für Spotify, Lyrics, Genre und
+Bühneninhalte. Benutzeraktionen und Wiedergabestatus haben eigene Kapazität; hängende
+Dienste blockieren die Anzeige nicht dauerhaft. HTTP 429 pausiert Spotify-Abfragen nach
+`Retry-After`, und Follow-Aktionen werden bei unklaren Fehlern geprüft statt blind
+wiederholt. Das vollständige Projekt-ZIP kann unter `releases/` eingespielt werden;
+die automatischen GitHub-Checks müssen danach einen **echten Node-24-TypeScript-/Next.js-
+Produktionsbuild** bestätigen. Lokale Isoliertests ersetzen diesen Build nicht.
+[Details](changelog/V1010-CENTRAL-NETWORK-COORDINATION.md).
+
+## V1009 – Hintergrundabfragen und Sicherheitsfixes (2026-11-06)
+
+Zuerst [PR #10](https://github.com/christianlinzatti/sonic-display/pull/10) zusammenführen, dann das ZIP unter `releases/` hochladen.
+
+Veralteter Genius-Unterbau entfernt, betroffene Abhängigkeiten aktualisiert und echte
+Netzwerkabbrüche ergänzt. Anzeige und Bedienung bleiben bei langsamen Abfragen nutzbar.
+48 Produktions-Browsertests plus ein kurzer Speichertest laufen im bestehenden Workflow.
+Ein längerer Speichertest ist lokal mit `npm run test:soak:production -- 60` möglich.
+Ein nachgewiesenes GLB-/Canvas-Speicherleck ist ebenfalls behoben. Alle V1008-Alexa-Funktionen sind enthalten.
+[Details und Einspielen](changelog/V1009-BACKGROUND-NETWORK-AND-SECURITY.md).
+
+## V1008 – Alexa: alle Künstler, Rückgängig und Anzeige (2026-11-06)
+
+„Alexa, sage Sonic Display, bitte allen Künstlern folgen“ folgt allen Künstlern des aktuellen
+Titels. Hinzu kommen Künstlerauswahl bei Kollaborationen, Statusabfrage, Rückgängig,
+Lyrics-/Avatarsteuerung, ruhige Darstellung, Verbindungsdiagnose und eine geprüfte lokale
+Git-Wiederherstellung. Bestehende Künstler-Abonnements bleiben beim Rückgängig erhalten.
+
+**Alexa-Modell neu bauen, `integrations/alexa/lambda-v1008.zip` hochladen und Lambda-Timeout
+auf mindestens 8 Sekunden setzen.** Künstler- und Anzeigesteuerung separat im Display freigeben.
+46 Playwright-Fälle prüfen den echten Produktionsbuild auf Desktop und Touch.
+Einspiel-, Alexa- und Wiederherstellungsanleitung:
+[V1008 Alexa & Wiederherstellung](changelog/V1008-ALEXA-EXTRAS-AND-RECOVERY.md).
+
 ## V1007 – Alexa: Künstler liken/entliken und Vercel-302-Fix (2026-11-06)
 
 „Alexa, sage Sonic Display, bitte like den Künstler“ folgt dem Hauptkünstler des aktuellen

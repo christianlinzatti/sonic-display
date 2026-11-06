@@ -20,19 +20,19 @@ export interface LyricsQuery {
  * Promise.allSettled ensures one failing/unavailable provider cannot hide a more
  * accurately synchronized result returned by another provider.
  */
-export async function findLyrics(query: LyricsQuery, spotifyAccessToken?: string): Promise<Lyrics | null> {
+export async function findLyrics(query: LyricsQuery, spotifyAccessToken?: string, signal?:AbortSignal): Promise<Lyrics | null> {
   // Keep provider order deterministic for equally good versions. Private Spotify
   // Color Lyrics stays strictly opt-in, requiring an authorized session token.
   const requests: Array<Promise<Lyrics | null>> = [];
   if (process.env.SPOTIFY_INTERNAL_LYRICS_ENABLED === "true" && spotifyAccessToken && query.trackId) {
-    requests.push(lookupSpotifyColorLyrics(query.trackId, query.albumId, spotifyAccessToken));
+    requests.push(lookupSpotifyColorLyrics(query.trackId, query.albumId, spotifyAccessToken, signal));
   }
   requests.push(
-    lookupLrclibLyrics(query),
-    lookupLyricsOvh(query.title, query.artist),
+    lookupLrclibLyrics(query, signal),
+    lookupLyricsOvh(query.title, query.artist, signal),
   );
 
-  if(process.env.GENIUS_ACCESS_TOKEN)requests.push(lookupGeniusLyrics(query));
+  if(process.env.GENIUS_ACCESS_TOKEN)requests.push(lookupGeniusLyrics(query, signal));
   const results = await Promise.allSettled(
     requests.map(request=>withProviderDeadlineV654(request,9_000)));
   const best=chooseBestLyricsV554(results.map(result => result.status === "fulfilled" ? result.value : null));

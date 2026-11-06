@@ -1,4 +1,5 @@
 "use client";
+import {networkJsonV1010} from '@/lib/networkJsonV1010';
 import {useCallback,useEffect,useMemo,useRef,useState} from "react";
 import {useMusic} from "@/context/MusicContext";
 import {SpotifyMiniPlayerV853} from "@/components/SpotifyMiniPlayerV853";
@@ -12,7 +13,7 @@ const time=(ms:number)=>`${Math.floor(ms/60000)}:${String(Math.floor(ms/1000)%60
 const describeError=(error:unknown)=>error instanceof Error?error.message:"Spotify ist derzeit nicht erreichbar.";
 type ApiError={code?:string;message?:string};
 async function loadJson<T>(url:string,signal?:AbortSignal):Promise<T>{
- const response=await fetch(url,{cache:"no-store",signal});
+ const response=await networkJsonV1010(url,{cache:"no-store",signal},{provider:"spotify",priority:"optional",ttlMs:30000,staleMs:120000});
  const data=await response.json() as T&ApiError;
  if(!response.ok)throw Object.assign(new Error(data.message??"Spotify-Anfrage fehlgeschlagen."),{code:data.code??""});
  return data;
