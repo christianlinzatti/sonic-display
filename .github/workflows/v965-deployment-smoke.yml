@@ -1,4 +1,4 @@
-name: V965 Vercel Deployment Reachability Smoke
+name: Sonic Display · Deployment reachability
 on:
   deployment_status:
   workflow_dispatch:
@@ -24,15 +24,19 @@ jobs:
       # Never echo this value or add it to the target URL.
       VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Explain deployment check scope
+        run: |
+          echo '### Deployment reachability only' >> "$GITHUB_STEP_SUMMARY"
+          echo 'This job checks deployed HTML. Full regression, TypeScript, build and browser tests run in [Production & Playwright](https://github.com/christianlinzatti/sonic-display/actions/workflows/v965-room-wave-production.yml).' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
       - name: Test public deployed HTML without touching authentication or Govee
         run: node scripts/check-vercel-deployment-v965.cjs
       - name: Save measured result, even on failure
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: v965-vercel-public-reachability
           path: reports/v965-deployment-smoke.json

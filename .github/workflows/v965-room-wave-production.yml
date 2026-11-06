@@ -39,11 +39,11 @@ jobs:
       release: ${{ steps.metadata.outputs.release }}
       revision: ${{ steps.metadata.outputs.revision }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.revision || github.sha }}
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
       - name: Read version from checked-out package and verify import metadata
@@ -66,11 +66,11 @@ jobs:
       NEXT_TELEMETRY_DISABLED: '1'
       SONIC_TEST_CONCURRENCY: '3'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.release.outputs.revision }}
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: npm
@@ -130,9 +130,14 @@ jobs:
         run: node scripts/v965-production-verify.cjs
       - name: Verify emitted production artifacts
         run: node scripts/check-next-build-v964.cjs
+      - name: Publish every recorded test result in the job summary
+        if: always()
+        env:
+          SONIC_TEST_REVISION: ${{ needs.release.outputs.revision }}
+        run: node .github/scripts/production-test-summary.cjs
       - name: Save production and browser evidence, including failures
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: sonic-${{ needs.release.outputs.release }}-${{ matrix.os }}-production
           path: |
@@ -140,5 +145,6 @@ jobs:
             reports/v931-production-gate.json
             reports/v959-regression-logs/*.log
             reports/playwright-production/
+            reports/playwright-soak/
           if-no-files-found: warn
           retention-days: 30

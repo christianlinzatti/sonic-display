@@ -28,7 +28,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Validate versioned importer safety regressions
         run: python3 -m unittest discover -v -s tests -p test_project_archive_import.py
   import-project:
@@ -37,7 +37,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Check out exact uploaded revision
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: true
@@ -90,7 +90,7 @@ jobs:
           fi
       - name: Publish audited cleanup manifest
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: sonic-zip-sync-plan-${{ github.run_id }}
           path: ${{ runner.temp }}/sonic-import-sync-plan.json

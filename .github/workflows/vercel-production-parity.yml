@@ -21,8 +21,8 @@ jobs:
       CI: 'true'
       NEXT_TELEMETRY_DISABLED: '1'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: npm
@@ -35,7 +35,7 @@ jobs:
         run: node scripts/vercel-production-build.cjs
       - name: Upload fail-closed Vercel production proof
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: vercel-parity-${{ matrix.os }}
           path: reports/vercel-production-proof.json
