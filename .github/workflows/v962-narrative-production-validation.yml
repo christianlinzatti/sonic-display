@@ -1,5 +1,5 @@
 name: V962 Intelligent Concert Narrative Production Gate
-run-name: Sonic Display · V1023 · V962 Intelligent Concert Narrative Production Gate
+run-name: Sonic Display · V1028 · V962 Intelligent Concert Narrative Production Gate
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:
