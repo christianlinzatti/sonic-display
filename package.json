@@ -2117,7 +2117,7 @@
   },
   "sonicHotfix": "v679-intelligent-song-arc",
   "sonicRoadmapRelease": "v1010",
-  "sonicFeatureRelease": "v1009",
+  "sonicFeatureRelease": "v1010",
   "overrides": {
     "postcss": "^8.5.32",
     "@vercel/cli-config": {
