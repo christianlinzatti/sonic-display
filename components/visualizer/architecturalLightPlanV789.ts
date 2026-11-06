@@ -4,7 +4,7 @@
  */
 // Keep the pure geometry/score helper dependency-free for isolated typechecks.
 // These are the canonical stage, section and V761 intent literals.
-export type StageIdV789='classic'|'neon'|'festival'|'minimal'|'cyberpunk'|'vaporwave'|'galaxy'|'white'|'rock';
+export type StageIdV789='classic'|'neon'|'festival'|'minimal'|'cyberpunk'|'vaporwave'|'galaxy'|'white'|'rock'|'arena360';
 export type SectionV789='verse'|'hook'|'drop'|'build'|'break';
 export type IntentV789='portrait'|'dialogue'|'ensemble'|'wide'|'rise'|'pulse'|'breath';
 
@@ -14,7 +14,7 @@ export interface ArchitectureBarV789 {
 export type ArchitectureDesignV789 = 'halo'|'arena'|'proscenium'|'quiet';
 export const ARCHITECTURE_MAX_BARS_V789=64;
 export const architectureDesignV789=(stage:StageIdV789):ArchitectureDesignV789=>
-  stage==='galaxy'?'halo':stage==='rock'?'arena':
+  stage==='galaxy'?'halo':stage==='rock'||stage==='arena360'?'arena':
   stage==='minimal'||stage==='white'?'quiet':'proscenium';
 
 /** Static scene construction. Max 60 small bars, 1 instanced draw call. */

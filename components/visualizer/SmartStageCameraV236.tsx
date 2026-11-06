@@ -1,4 +1,7 @@
 "use client";
+import {composeArenaCameraV1032,type ArenaCameraModeV1032} from "@/lib/arena360ExperienceV1032";
+import {INITIAL_ARENA_FLYOVER_V1033,stepArenaFlyoverV1033,composeArenaFlyoverV1033} from "@/lib/arena360ImmersionV1033";
+import {composeArenaSectionCameraV1034} from "@/lib/arena360ShowV1034";
 import {guardAutomaticCameraV351,type SmartStageCueV351} from "@/services/stageContent/smartStageCompositionV351";
 import {directCameraV354,type ShowTimelineCueV354} from "@/services/stageContent/showTimelineV354";
 import type {GenreVisualCueV352} from "@/services/stageContent/genreVisualDirectorV352";
@@ -12,8 +15,10 @@ import type { PerspectiveCamera } from "three";
 import type { AudioFeatures } from "@/types/audio";
 import {advanceStageDirector,createStageDirectorState} from "./smartStageDirectorV236";
 /** Moves only the active scene camera; no new render passes or per-frame React state. */
-export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,composition,genreCue,timelineCue,lipSync}:{audio:AudioFeatures;genre?:string|null;playing:boolean;reducedMotion:boolean;duo:boolean;composition?:SmartStageCueV351;genreCue?:GenreVisualCueV352;timelineCue?:ShowTimelineCueV354;lipSync?:VisualizerProps["lipSync"]}){
+export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,composition,genreCue,timelineCue,lipSync,arena360=false,arenaCameraEnabled=true,arenaCameraMode="arc",arenaFlyoverEnabled=true,arenaSectionCameraEnabled=true,section="verse"}:{
+ arena360?:boolean;arenaCameraEnabled?:boolean;arenaCameraMode?:ArenaCameraModeV1032;arenaFlyoverEnabled?:boolean;arenaSectionCameraEnabled?:boolean;section?:string;audio:AudioFeatures;genre?:string|null;playing:boolean;reducedMotion:boolean;duo:boolean;composition?:SmartStageCueV351;genreCue?:GenreVisualCueV352;timelineCue?:ShowTimelineCueV354;lipSync?:VisualizerProps["lipSync"]}){
  const director=useRef(createStageDirectorState());
+ const arenaFlyoverV1033=useRef({...INITIAL_ARENA_FLYOVER_V1033});
  const focusV369=useRef(0);
  const holdV369=useRef(newVocalShotHoldV369());
  const faceV369=useRef<{value:number|null;remaining:number}>({value:null,remaining:0});
@@ -38,15 +43,30 @@ export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,comp
     faceV369.current.value=sampleVocalFaceYV369(scene.getObjectByName(TRACKING_ROOT_NAME)??null);
   }
   const vocalCamera=composeVocalCameraV369({...timelineCamera,y:targetY,targetY:0},focusV369.current,{duo,intensity:lipSync?.cameraStrengthV369??55,headY:faceV369.current.value,lyricsProtected:composition?.protectLyrics??false});
-  const safe=guardAutomaticCameraV351(vocalCamera,composition);
+  const safe=composeArenaCameraV1032(guardAutomaticCameraV351(vocalCamera,composition),{
+    enabled:arena360&&arenaCameraEnabled,playing,reducedMotion,automatic:true,
+    protectedShot:!!timelineCue?.active||focusV369.current>.01||!!composition?.protectLyrics,
+    seconds:clock.elapsedTime,mode:arenaCameraMode,
+  });
+  const protectedShotV1033=!!timelineCue?.active||focusV369.current>.01||!!composition?.protectLyrics;
+  const flyoverAllowedV1033=arena360&&arenaCameraEnabled&&arenaFlyoverEnabled&&playing&&!reducedMotion&&!protectedShotV1033;
+  arenaFlyoverV1033.current=stepArenaFlyoverV1033(arenaFlyoverV1033.current,delta,{
+    enabled:flyoverAllowedV1033,playing,reducedMotion,protectedShot:protectedShotV1033,
+    beat:audio.beat,beatStrength:audio.beatStrength,bass:audio.bass,
+  });
+  const safeV1033=composeArenaFlyoverV1033(safe,arenaFlyoverV1033.current,flyoverAllowedV1033);
+  const safeV1034=composeArenaSectionCameraV1034(safeV1033,{
+    enabled:arena360&&arenaCameraEnabled&&arenaSectionCameraEnabled,
+    playing,reducedMotion,protectedShot:protectedShotV1033,section,
+  });
   const t=1-Math.exp(-Math.min(Math.max(delta,0),.1)*3);
-  camera.position.x+=(safe.x-camera.position.x)*t;
-  camera.position.y+=(safe.y-camera.position.y)*t;
-  camera.position.z+=(safe.z-camera.position.z)*t;
+  camera.position.x+=(safeV1034.x-camera.position.x)*t;
+  camera.position.y+=(safeV1034.y-camera.position.y)*t;
+  camera.position.z+=(safeV1034.z-camera.position.z)*t;
   // Restore original FOV when V351 is disabled, rather than leaving the wider lens latched.
   const pc=camera as PerspectiveCamera;
-  if(Math.abs(pc.fov-safe.fov)>.015){pc.fov+=(safe.fov-pc.fov)*t;pc.updateProjectionMatrix();}
-  lookV369.current+=(safe.targetY-lookV369.current)*t;
+  if(Math.abs(pc.fov-safeV1034.fov)>.015){pc.fov+=(safeV1034.fov-pc.fov)*t;pc.updateProjectionMatrix();}
+  lookV369.current+=(safeV1034.targetY-lookV369.current)*t;
   camera.lookAt(0,lookV369.current,0);
  });
  return null;

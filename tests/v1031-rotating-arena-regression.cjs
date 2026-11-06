@@ -1,0 +1,54 @@
+#!/usr/bin/env node
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const {load}=require('./helpers/ts-loader-v404.cjs');
+const {ARENA360_DEFAULT_SPEED_V1031,ARENA360_MAX_SPEED_V1031,
+ normalizedArenaSpeedV1031:speed,stepArenaRotationV1031:step}=load('lib/arena360RotationV1031');
+const options={playing:true,reducedMotion:false,enabled:true,speedDegPerMinute:90,bass:0,reactive:false};
+assert.equal(ARENA360_DEFAULT_SPEED_V1031,90);
+assert.equal(ARENA360_MAX_SPEED_V1031,180);
+assert.equal(speed(-1),0);
+assert.equal(speed(10000),180);
+assert.equal(speed(NaN),90);
+assert.equal(speed(undefined),90);
+assert.equal(step(0,1/60,options)>0,true,'rotating while playing');
+assert.equal(step(1.3,1/60,{...options,playing:false}),1.3,'paused stage freezes');
+assert.equal(step(1.3,1/60,{...options,reducedMotion:true}),1.3,'accessibility stops turntable');
+assert.equal(step(1.3,1/60,{...options,enabled:false}),1.3,'manual switch stops turntable');
+assert.equal(step(1.3,1/60,{...options,speedDegPerMinute:0}),1.3,'zero speed is static');
+assert.equal(step(0,1000,options),step(0,.1,options),'long frame cannot jump the stage');
+assert.equal(step(0,-10,options),0,'invalid delta is ignored');
+assert.equal(step(Infinity,.04,options)>0,true,'invalid stored angle is recovered');
+const base=step(.2,.016,options);
+assert(step(.2,.016,{...options,reactive:true,bass:1})>base,'music response increases speed gently');
+assert(step(.2,.016,{...options,reactive:true,bass:1})<base*.999+0.01,'no sudden jumps');
+assert(step(2*Math.PI-.0001,.04,options)<1,'angle wraps after complete revolution');
+const stage=read('components/visualizer/stages/Arena360StageV1031.tsx');
+assert(stage.includes('name="v1031-rotating-platform-and-cast"'));
+assert(/<group ref=\{turntable\}[\s\S]*\{children\}[\s\S]*<\/group>/.test(stage),'platform and cast share one rotating root');
+assert(stage.includes('instancedMesh'),'LED segments are batched');
+assert(!stage.includes('setInterval')&&!stage.includes('requestAnimationFrame'),'R3F owns frame timing');
+const environment=read('components/visualizer/stages/index.tsx');
+assert(environment.includes('id:"arena360"'));
+assert(environment.includes('theme === "arena360"'));
+assert(environment.includes('<Arena360StageV1031'));
+const actualScene=read('components/visualizer/ThreeAvatar.tsx');
+assert.equal((actualScene.match(/<StageEnvironment theme=\{directedThemeV352\}/g)||[]).length,1);
+assert(/<StageEnvironment theme=\{directedThemeV352\}[\s\S]*?<group name=\{TRACKING_ROOT_NAME\}>[\s\S]*?<\/StageEnvironment>/.test(actualScene),'cast and stage nested together');
+assert(actualScene.includes('rotationSpeed={props.stageRotationSpeedV1031 ?? 90}'));
+const settings=read('components/SettingsPanel.tsx');
+assert(settings.includes('Drehplattform mit Künstlern drehen'));
+assert(settings.includes('Drehgeschwindigkeit'));
+assert(settings.includes('stageRotationEnabledV1031'));
+assert(settings.includes('stageRotationSpeedV1031'));
+const preferences=read('context/UiPreferencesContext.tsx');
+assert(preferences.includes('stageRotationSpeedV1031: 90'));
+assert(preferences.includes('stageRotationEnabledV1031: true'));
+for(const file of ['components/visualizer/StageThemeCardScene.tsx','components/visualizer/StagePreviewModal.tsx','components/visualizer/CinematicStageTransitionV288.tsx']){
+ assert(read(file).includes('arena360'),`${file}: missing stage palette`);
+}
+console.log('V1031 Rotating 360° Arena: logic, pause, reduced motion, cast parenting, controls and previews PASS');

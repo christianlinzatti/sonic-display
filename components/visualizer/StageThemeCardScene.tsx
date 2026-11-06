@@ -34,6 +34,7 @@ const PALETTES: Record<StageEnvironmentId, StagePalette> = {
   galaxy: { base: "#060914", accentA: "#8da4ff", accentB: "#77d6ff", glow: "#e2ecff", fog: "#97b6ff", floor: "#091124" },
   white: { base: "#f6f7fb", accentA: "#ffffff", accentB: "#d9dfeb", glow: "#ffffff", fog: "#ffffff", floor: "#eef1f7" },
   rock: { base: "#151111", accentA: "#ff9d56", accentB: "#d74d2f", glow: "#ffd0a8", fog: "#ffb77d", floor: "#161111" },
+  arena360: { base: "#070d21", accentA: "#29e9ff", accentB: "#fa48d9", glow: "#83eeff", fog: "#6388ff", floor: "#182641" },
 };
 
 function clampStrength(lightStrength: number | undefined) {
@@ -144,6 +145,8 @@ function renderStageSet(stageId: StageEnvironmentId, palette: StagePalette, anim
       return <WhiteSet palette={palette} animate={animate} />;
     case "rock":
       return <RockSet palette={palette} animate={animate} />;
+    case "arena360":
+      return <Arena360CardSetV1031 palette={palette} animate={animate} />;
   }
 }
 
@@ -535,4 +538,99 @@ function Flare({ position, color, animate, phase = 0 }: { position: [number, num
       <meshBasicMaterial color={color} transparent opacity={0.72} />
     </mesh>
   );
+}
+
+/** Lightweight card-only silhouette. The full shared-cast turntable is in Arena360StageV1031. */
+function Arena360CardSetV1031({palette,animate}:{palette:StagePalette;animate:boolean}){
+  const root=useRef<Group>(null);
+  useFrame((_,delta)=>{
+    if(root.current&&animate)root.current.rotation.y+=Math.min(.05,Math.max(0,delta))*.25;
+  });
+  return <group>
+    {/* V1032: an unmistakable spectator bowl and diagonal moving-head beams
+        in the lightweight preview, without loading the real crowd scene. */}
+    <mesh position={[0,-1.32,0]} rotation={[-Math.PI/2,0,0]}>
+      <ringGeometry args={[1.95,2.39,52]}/>
+      <meshStandardMaterial color="#142142" metalness={.45} roughness={.7}/>
+    </mesh>
+    {Array.from({length:20},(_,i)=>{
+      const a=i*Math.PI*2/20;
+      return <mesh key={i} position={[Math.cos(a)*2.22,-1.03,Math.sin(a)*2.22]}>
+        <sphereGeometry args={[.065,6,5]}/>
+        <meshBasicMaterial color={i%3===0?palette.accentB:"#5c7399"}/>
+      </mesh>;
+    })}
+    {/* V1036: a slim suspended LED halo, laser silhouettes and soft ground haze. */}
+    {Array.from({length:24},(_,i)=>{
+      const a=i*Math.PI*2/24;
+      return <mesh key={`v1036-sky-${i}`} position={[Math.cos(a)*2.22,1.21+Math.sin(a*3)*.05,Math.sin(a)*2.22]} rotation={[0,-a,0]}>
+        <boxGeometry args={[.10,.032,.12]}/>
+        <meshBasicMaterial color={i%2?palette.accentB:palette.accentA} toneMapped={false}/>
+      </mesh>;
+    })}
+    {[-1,1].map((side,i)=><group key={`v1036-laser-${i}`} position={[side*2.0,.94,.0]} rotation={[0,0,side*.60]}>
+      <mesh position={[0,-.68,0]}>
+        <coneGeometry args={[.11,1.36,6,1,true]}/>
+        <meshBasicMaterial color={side>0?palette.accentB:palette.accentA} transparent opacity={.16} depthWrite={false}/>
+      </mesh>
+    </group>)}
+    {Array.from({length:6},(_,i)=>
+      <mesh key={`v1037-petal-${i}`} name={`v1037-preview-petal-${i}`}
+        position={[Math.cos(i*Math.PI/3)*.11,-1.15,-Math.sin(i*Math.PI/3)*.11]} rotation={[-Math.PI/2,0,0]}>
+        <ringGeometry args={[1.63,1.94,10,1,i*Math.PI/3+.035,Math.PI/3-.07]}/>
+        <meshBasicMaterial color={i%2===0?'#2bdfff':'#ef68ff'} transparent opacity={.63} side={2}/>
+      </mesh>)}
+    <mesh name="v1036-preview-fog" position={[0,-1.15,0]} rotation={[-Math.PI/2,0,0]}>
+      <ringGeometry args={[1.68,2.05,48]}/>
+      <meshBasicMaterial color="#668ea9" transparent opacity={.16} depthWrite={false}/>
+    </mesh>
+    {/* V1035 preview: illuminated columns suggest the new independent kinetic perimeter. */}
+    {Array.from({length:10},(_,i)=>{
+      const angle=Math.PI*2*(i+.5)/10;
+      const height=.50+(i%3)*.12;
+      return <mesh key={`v1035-column-${i}`} position={[Math.cos(angle)*1.88,-1.28+height/2,Math.sin(angle)*1.88]}>
+        <boxGeometry args={[.08,height,.09]}/>
+        <meshBasicMaterial color={i%2?palette.accentA:palette.accentB} toneMapped={false}/>
+      </mesh>;
+    })}
+    {/* V1034 preview: suspended sky light ring and a visible second stage tier. */}
+    <mesh position={[0,.44,0]} rotation={[Math.PI/2,0,0]}>
+      <torusGeometry args={[2.44,.018,4,48]}/>
+      <meshBasicMaterial color={palette.accentB} toneMapped={false}/>
+    </mesh>
+    {/* V1033 preview: floating LED cupola over the central turntable. */}
+    {[[1.88,.69],[1.48,.94],[.94,1.16]].map(([r,h],i)=><mesh key={`dome-${i}`} position={[0,h,0]} rotation={[Math.PI/2,0,0]}>
+      <torusGeometry args={[r,.016,4,40]}/>
+      <meshBasicMaterial color={i===1?palette.accentB:palette.accentA} toneMapped={false}/>
+    </mesh>)}
+    {Array.from({length:20},(_,i)=>{
+      const a=i*Math.PI*2/20;
+      return <mesh key={`dome-pixel-${i}`} position={[Math.cos(a)*1.49,.96,Math.sin(a)*1.49]}>
+        <boxGeometry args={[.095,.04,.06]}/>
+        <meshBasicMaterial color={i%3===0?palette.accentB:palette.glow} toneMapped={false}/>
+      </mesh>;
+    })}
+    <mesh position={[0,.45,0]} rotation={[Math.PI/2,0,0]}>
+      <torusGeometry args={[1.9,.045,6,48]}/>
+      <meshBasicMaterial color={palette.accentA}/>
+    </mesh>
+    {[0,Math.PI].map((a,i)=><group key={i} position={[Math.cos(a)*1.9,.40,Math.sin(a)*1.9]} rotation={[i===0?.20:-.20,0,i===0?.16:-.16]}>
+      <mesh position={[0,-.85,0]}><coneGeometry args={[.35,1.65,8,1,true]}/>
+        <meshBasicMaterial color={i===0?palette.accentA:palette.accentB} transparent opacity={.12} depthWrite={false} side={2}/>
+      </mesh>
+    </group>)}
+    <group ref={root} position={[0,-1.14,0]}>
+      <mesh position={[0,-.12,0]}><cylinderGeometry args={[1.65,1.7,.18,48]}/>
+        <meshStandardMaterial color={palette.floor} metalness={.75} roughness={.3}/></mesh>
+      <mesh rotation={[-Math.PI/2,0,0]} position={[0,-.012,0]}>
+        <ringGeometry args={[1.47,1.63,48]}/>
+        <meshBasicMaterial color={palette.accentB} toneMapped={false}/></mesh>
+      <mesh position={[0,.02,0]} rotation={[-Math.PI/2,0,0]}>
+        <ringGeometry args={[.64,1.16,40]}/>
+        <meshBasicMaterial color={palette.accentA} transparent opacity={.46} toneMapped={false}/>
+      </mesh>
+      <mesh position={[0,.35,0]}><cylinderGeometry args={[.17,.27,.7,12]}/>
+        <meshStandardMaterial color={palette.glow}/></mesh>
+    </group>
+  </group>;
 }

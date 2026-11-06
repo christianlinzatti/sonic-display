@@ -4962,3 +4962,28 @@
 .network-v1017-metrics>div{display:flex;flex-direction:column;gap:.25rem;padding:.65rem;border:1px solid rgba(130,169,220,.18);border-radius:10px;background:rgba(25,36,58,.4)}
 .network-v1017-metrics strong{font-variant-numeric:tabular-nums;font-size:1.1em}
 .network-v1017-metrics span{opacity:.8;font-size:.82em}
+
+/* V1031 · a distinctive 360° stage card and touch-friendly speed controls. */
+.stage-theme-preview-arena360{background:radial-gradient(ellipse at 50% 22%,#164078 0%,#12193e 44%,#050a18 90%)}
+.stage-theme-preview-arena360 .stage-theme-glow-a{background:#23dfff;opacity:.85}
+.stage-theme-preview-arena360 .stage-theme-glow-b{background:#f344d7;opacity:.7}
+.stage-theme-preview-arena360 .stage-theme-ring{border-color:rgba(41,233,255,.75)}
+.stage-theme-preview-arena360 .stage-theme-floor{background:radial-gradient(ellipse at center,#253963 0%,#111731 50%,transparent 70%);border:2px solid #40dfff;border-radius:50%;box-shadow:0 0 20px #1be8ff66}
+.arena360-settings-v1031{margin-block:12px;padding:14px;border:1px solid #3bc9f055;border-radius:14px;background:linear-gradient(125deg,#0d234c33,#8b2cff16)}
+.arena360-settings-v1031 strong{display:block;margin-bottom:10px}
+.arena360-settings-v1031 label{display:block;margin-block:10px}
+.arena360-settings-v1031 input[type=range]{width:100%;min-height:32px;accent-color:#3bdfff}
+.arena360-settings-v1031 small{display:block;line-height:1.5}
+@media(prefers-reduced-motion:reduce){.stage-theme-preview-arena360 *{animation:none!important}}
+
+/* V1032 · accessible controls for the circular concert experience. */
+.arena360-experience-options-v1032{margin-top:12px;padding-top:10px;border-top:1px solid #4bd5e044}
+.arena360-experience-options-v1032 .setting-check{display:flex;align-items:center;gap:10px;min-height:40px}
+.arena360-experience-options-v1032 input[type=checkbox]{accent-color:#4bdcf5;min-width:18px;min-height:18px}
+.arena360-experience-options-v1032 select{width:100%;margin-top:6px;min-height:38px}
+.arena360-experience-options-v1032 :disabled{opacity:.55}
+@media (prefers-reduced-motion: reduce){.stage-live-preview.theme-arena360 *{animation:none!important}}
+
+/* V1033 touch-friendly Immersive Arena toggles. */
+.arena360-experience-options-v1032 strong{display:block;margin:12px 0 5px;color:#8ce6fa}
+.arena360-experience-options-v1032 select{min-height:44px}

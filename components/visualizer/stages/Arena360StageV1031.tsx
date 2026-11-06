@@ -1,0 +1,225 @@
+"use client";
+
+import {useFrame} from "@react-three/fiber";
+import {useLayoutEffect, useMemo, useRef, type ReactNode} from "react";
+import {Color, Object3D} from "three";
+import type {Group, InstancedMesh} from "three";
+import type {AudioFeatures} from "@/types/audio";
+import {getActivePerformanceTier} from "../adaptivePerformance";
+import {normalizedArenaSpeedV1031, stepArenaRotationV1031} from "@/lib/arena360RotationV1031";
+import {ArenaAudienceV1032} from "./ArenaAudienceV1032";
+import {ArenaLightsV1032} from "./ArenaLightsV1032";
+import {ArenaLedDomeV1033} from "./ArenaLedDomeV1033";
+import {ArenaSkyFormationV1034} from "./ArenaSkyFormationV1034";
+import {ArenaLedColumnsV1035} from "./ArenaLedColumnsV1035";
+import {ArenaVirtualPyroV1035} from "./ArenaVirtualPyroV1035";
+import {planArenaTimelineV1035} from "@/lib/arena360DirectorV1035";
+import {INITIAL_ARENA_PEAK_V1036,stepArenaPeakV1036} from "@/lib/arena360AtmosphereV1036";
+import {ArenaLaserFansV1036} from "./ArenaLaserFansV1036";
+import {ArenaMovingLedSkyV1036} from "./ArenaMovingLedSkyV1036";
+import {ArenaLowFogV1036} from "./ArenaLowFogV1036";
+import {ArenaTransformingDeckV1037} from './ArenaTransformingDeckV1037';
+import type {ArenaTransformationModeV1037} from '@/lib/arena360TransformationV1037';
+import {INITIAL_ARENA_LIFT_V1034,stepArenaLiftV1034} from "@/lib/arena360ShowV1034";
+import type {ArenaPhoneModeV1033} from "@/lib/arena360ImmersionV1033";
+
+const TAU = Math.PI * 2;
+const LED_COUNT = 32;
+
+/** One shared turntable parent rotates BOTH the physical deck and its performers.
+ * Outer audience / overhead truss stay fixed in the world, just as in an arena.
+ * No real-time shadows, network requests, camera ownership or new postprocessing.
+ */
+export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,reactive=true,
+  rotationSpeed=90,rotationEnabled=true,audienceEnabled=true,lightsEnabled=true,dropEnabled=true,
+  wavesEnabled=true,phoneSyncEnabled=true,phoneMode="wave",domeEnabled=true,
+  showDirectorEnabled=true,secondLevelEnabled=true,skyFormationEnabled=true,section="verse",
+  fullSongDirectorEnabled=true,ledColumnsEnabled=true,virtualPyroEnabled=true,crowdChantEnabled=true,
+  showIntensity=65,progressMs=0,durationMs=0,
+  lasersEnabled=true,movingSkyEnabled=true,groundFogEnabled=true,arenaPeaksEnabled=true,
+  transformingDeckEnabled=true,transformingDeckMode='auto',transformingDeckStrength=70}: {
+  children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
+  reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
+  audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
+  wavesEnabled?:boolean;phoneSyncEnabled?:boolean;phoneMode?:ArenaPhoneModeV1033;domeEnabled?:boolean;
+  showDirectorEnabled?:boolean;secondLevelEnabled?:boolean;skyFormationEnabled?:boolean;section?:string;
+  fullSongDirectorEnabled?:boolean;ledColumnsEnabled?:boolean;virtualPyroEnabled?:boolean;
+  crowdChantEnabled?:boolean;showIntensity?:number;progressMs?:number;durationMs?:number;
+  lasersEnabled?:boolean;movingSkyEnabled?:boolean;groundFogEnabled?:boolean;arenaPeaksEnabled?:boolean;
+  transformingDeckEnabled?:boolean;transformingDeckMode?:ArenaTransformationModeV1037;transformingDeckStrength?:number;
+}){
+  const turntable=useRef<Group>(null);
+  const scenicTier=useRef<Group>(null);
+  const scenicState=useRef({...INITIAL_ARENA_LIFT_V1034});
+  const sharedPeak=useRef({...INITIAL_ARENA_PEAK_V1036});
+  const glow=useRef<Group>(null);
+  const leds=useRef<InstancedMesh>(null);
+  const dummy=useMemo(()=>new Object3D(),[]);
+  const blue=useMemo(()=>new Color('#29e9ff'),[]);
+  const pink=useMemo(()=>new Color('#ef4ce9'),[]);
+  const speed=normalizedArenaSpeedV1031(rotationSpeed);
+  const cueV1035=planArenaTimelineV1035({enabled:fullSongDirectorEnabled&&showDirectorEnabled,
+    playing:isPlaying,reducedMotion,reactive,progressMs,durationMs,section,
+    energy:audio.energyEnvelope,intensity:showIntensity});
+
+  // One instance batch instead of 32 separate geometries/draw calls.
+  useLayoutEffect(()=>{
+    if(!leds.current)return;
+    for(let i=0;i<LED_COUNT;i++){
+      const a=TAU*i/LED_COUNT;
+      dummy.position.set(Math.cos(a)*2.35,-1.788,Math.sin(a)*2.35);
+      dummy.rotation.set(0,-a,0);
+      dummy.scale.set(1,1,1);
+      dummy.updateMatrix();
+      leds.current.setMatrixAt(i,dummy.matrix);
+      leds.current.setColorAt(i,i%4<2?blue:pink);
+    }
+    leds.current.instanceMatrix.needsUpdate=true;
+    if(leds.current.instanceColor)leds.current.instanceColor.needsUpdate=true;
+    leds.current.computeBoundingSphere();
+  },[dummy,blue,pink]);
+
+  useFrame((_,delta)=>{
+    sharedPeak.current=stepArenaPeakV1036(sharedPeak.current,delta,{
+      enabled:arenaPeaksEnabled&&showDirectorEnabled&&fullSongDirectorEnabled,
+      playing:isPlaying,reducedMotion,reactive,section,beat:audio.beat,
+      beatStrength:audio.beatStrength,energy:audio.energyEnvelope,progressMs,durationMs,
+    });
+    if(!turntable.current)return;
+    turntable.current.rotation.y=stepArenaRotationV1031(turntable.current.rotation.y,delta,{
+      playing:isPlaying,reducedMotion,enabled:rotationEnabled,speedDegPerMinute:speed,
+      bass:audio.bass??audio.energyEnvelope,reactive,
+    });
+    scenicState.current=stepArenaLiftV1034(scenicState.current,delta,{
+      enabled:showDirectorEnabled&&secondLevelEnabled,playing:isPlaying,reducedMotion,
+      reactive,section,energy:audio.energyEnvelope??audio.bass,
+    });
+    if(scenicTier.current){
+      scenicTier.current.position.y=scenicState.current.height;
+      scenicTier.current.rotation.y=scenicState.current.rotation;
+    }
+    if(glow.current){
+      const bass=reactive&&isPlaying&&!reducedMotion?Math.max(0,Math.min(1,audio.bass??0)):0;
+      const tier=getActivePerformanceTier();
+      const scale=tier==='low'||reducedMotion?1:1+bass*.035;
+      glow.current.scale.set(scale,1,scale);
+    }
+  });
+
+  return <group name="v1031-360-arena">
+    {/* A fixed dark arena surrounding the moving platform. */}
+    <mesh position={[0,-2.085,0]} rotation={[-Math.PI/2,0,0]}>
+      <circleGeometry args={[8.4,64]}/>
+      <meshStandardMaterial color="#080c1a" metalness={.42} roughness={.7}/>
+    </mesh>
+    <mesh position={[0,-2.058,0]} rotation={[-Math.PI/2,0,0]}>
+      <ringGeometry args={[2.8,4.25,80]}/>
+      <meshStandardMaterial color="#10182b" metalness={.7} roughness={.35}/>
+    </mesh>
+    <mesh position={[0,-2.047,0]} rotation={[-Math.PI/2,0,0]}>
+      <ringGeometry args={[3.13,3.17,80]}/>
+      <meshBasicMaterial color="#3371db" transparent opacity={.75} toneMapped={false}/>
+    </mesh>
+    <mesh position={[0,-2.045,0]} rotation={[-Math.PI/2,0,0]}>
+      <ringGeometry args={[3.8,3.83,80]}/>
+      <meshBasicMaterial color="#9c56de" transparent opacity={.46} toneMapped={false}/>
+    </mesh>
+    {/* Stage roof: a stationary circular lighting truss, not a rear wall. */}
+    <mesh position={[0,2.95,0]} rotation={[Math.PI/2,0,0]}>
+      <torusGeometry args={[3.1,.055,6,64]}/>
+      <meshStandardMaterial color="#41516a" metalness={.86} roughness={.32}/>
+    </mesh>
+    <mesh position={[0,2.91,0]} rotation={[Math.PI/2,0,0]}>
+      <torusGeometry args={[2.97,.018,4,64]}/>
+      <meshBasicMaterial color="#5b7df0" transparent opacity={.55} toneMapped={false}/>
+    </mesh>
+    {[0,1,2,3,4,5,6,7].map(i=>{
+      const a=TAU*i/8;
+      return <group key={i} position={[Math.cos(a)*3.1,2.9,Math.sin(a)*3.1]}>
+        <mesh position={[0,-.14,0]}>
+          <cylinderGeometry args={[.07,.10,.25,8]}/>
+          <meshStandardMaterial color="#1b2439" metalness={.7} roughness={.4}/>
+        </mesh>
+        <mesh position={[0,-.29,0]} rotation={[-Math.PI/2,0,0]}>
+          <circleGeometry args={[.09,10]}/>
+          <meshBasicMaterial color={i%2===0?'#3dd9ff':'#ff62d5'} toneMapped={false}/>
+        </mesh>
+      </group>;
+    })}
+    {/* Spectators and moving lights stay WORLD-FIXED as the round platform rotates. */}
+    <ArenaAudienceV1032 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={audienceEnabled} reactive={reactive}
+      wavesEnabled={wavesEnabled} phoneSyncEnabled={phoneSyncEnabled} phoneMode={phoneMode}
+      hookCueEnabled={crowdChantEnabled} progressMs={progressMs} durationMs={durationMs}
+      fullSongDirectorEnabled={fullSongDirectorEnabled&&showDirectorEnabled} showIntensity={showIntensity} section={section}/>
+    <ArenaLedDomeV1033 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={domeEnabled} reactive={reactive}/>
+    <ArenaSkyFormationV1034 audio={audio} section={section} playing={isPlaying} reducedMotion={reducedMotion}
+      enabled={skyFormationEnabled} directorEnabled={showDirectorEnabled} reactive={reactive}
+      showAmbience={fullSongDirectorEnabled?cueV1035.ambience:undefined}/>
+    <ArenaLedColumnsV1035 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
+      enabled={ledColumnsEnabled} directorEnabled={fullSongDirectorEnabled&&showDirectorEnabled}
+      progressMs={progressMs} durationMs={durationMs} section={section} intensity={showIntensity}/>
+    <ArenaVirtualPyroV1035 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
+      enabled={virtualPyroEnabled} directorEnabled={fullSongDirectorEnabled&&showDirectorEnabled}
+      progressMs={progressMs} durationMs={durationMs} section={section} intensity={showIntensity}/>
+    <ArenaLaserFansV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
+      enabled={lasersEnabled} directorEnabled={showDirectorEnabled} section={section}
+      progressMs={progressMs} durationMs={durationMs} intensity={showIntensity} peakRef={sharedPeak}/>
+    <ArenaMovingLedSkyV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
+      enabled={movingSkyEnabled} directorEnabled={showDirectorEnabled} section={section}
+      progressMs={progressMs} durationMs={durationMs} intensity={showIntensity} peakRef={sharedPeak}/>
+    <ArenaLowFogV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
+      enabled={groundFogEnabled} directorEnabled={showDirectorEnabled} section={section}
+      progressMs={progressMs} durationMs={durationMs} intensity={showIntensity} peakRef={sharedPeak}/>
+    <ArenaLightsV1032 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={lightsEnabled} dropEnabled={dropEnabled} reactive={reactive}/>
+    {/* The turntable and the performer root share precisely the same transform. */}
+    <group ref={turntable} name="v1031-rotating-platform-and-cast">
+      <mesh position={[0,-1.99,0]}>
+        <cylinderGeometry args={[2.76,2.83,.29,64]}/>
+        <meshStandardMaterial color="#151b2b" metalness={.82} roughness={.32}/>
+      </mesh>
+      <mesh position={[0,-1.833,0]} rotation={[-Math.PI/2,0,0]}>
+        <circleGeometry args={[2.74,64]}/>
+        <meshStandardMaterial color="#202b41" metalness={.62} roughness={.3}/>
+      </mesh>
+      <mesh position={[0,-1.825,0]} rotation={[-Math.PI/2,0,0]}>
+        <ringGeometry args={[.63,.66,64]}/>
+        <meshBasicMaterial color="#d9fcff" transparent opacity={.48} toneMapped={false}/>
+      </mesh>
+      <group ref={glow}>
+        <mesh position={[0,-1.816,0]} rotation={[-Math.PI/2,0,0]}>
+          <ringGeometry args={[2.58,2.70,64]}/>
+          <meshBasicMaterial color="#20cfff" transparent opacity={.92} toneMapped={false}/>
+        </mesh>
+        <mesh position={[0,-1.811,0]} rotation={[-Math.PI/2,0,0]}>
+          <ringGeometry args={[2.40,2.44,64]}/>
+          <meshBasicMaterial color="#f15cf0" transparent opacity={.75} toneMapped={false}/>
+        </mesh>
+      </group>
+      <instancedMesh ref={leds} args={[undefined,undefined,LED_COUNT]} name="v1031-turntable-led-segments" frustumCulled={false}>
+        <boxGeometry args={[.10,.012,.30]}/>
+        <meshBasicMaterial color="#ffffff" toneMapped={false}/>
+      </instancedMesh>
+      {secondLevelEnabled && <group ref={scenicTier} name="v1034-independent-scenic-lift-ring">
+        {/* A separate annular lift: no performer rigs move, and the center remains clear. */}
+        <mesh position={[0,-1.805,0]} rotation={[-Math.PI/2,0,0]}>
+          <ringGeometry args={[2.03,2.38,64]}/>
+          <meshStandardMaterial color="#19243d" metalness={.74} roughness={.28}/>
+        </mesh>
+        <mesh position={[0,-1.793,0]} rotation={[-Math.PI/2,0,0]}>
+          <ringGeometry args={[2.28,2.35,64]}/>
+          <meshBasicMaterial color="#7e9fff" toneMapped={false} transparent opacity={.65}/>
+        </mesh>
+        {[0,1,2,3,4,5,6,7].map(i=>{
+          const a=TAU*i/8;
+          return <mesh key={i} position={[Math.cos(a)*2.18,-1.783,Math.sin(a)*2.18]} rotation={[0,-a,0]}>
+            <boxGeometry args={[.11,.016,.33]}/>
+            <meshBasicMaterial color={i%2===0?"#6bdfff":"#ed72e9"} toneMapped={false}/>
+          </mesh>;
+        })}
+      </group>}
+      <ArenaTransformingDeckV1037 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
+        enabled={transformingDeckEnabled} mode={transformingDeckMode} strength={transformingDeckStrength} section={section}/>
+      {children}
+    </group>
+  </group>;
+}

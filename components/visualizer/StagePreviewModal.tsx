@@ -46,6 +46,7 @@ const colors: Record<StageEnvironmentId, {fog:string; first:string; second:strin
   galaxy: {fog:"#292553", first:"#8da4ff", second:"#c766ff"},
   white: {fog:"#e3eaf4", first:"#ffffff", second:"#bed0e1"},
   rock: {fog:"#4c302b", first:"#ff9d3e", second:"#e53c37"},
+  arena360: {fog:"#111a3f", first:"#21e1ff", second:"#ff4bde"},
 };
 
 const initialAudio: AudioFeatures = {
@@ -213,10 +214,11 @@ function PreviewScene({ stageId, reactive, lightStrength, reducedMotion, playing
       :<DynamicStage theme={stageId} audio={audio.current} isPlaying={motion} reducedMotion={reducedMotion}
       reactive={reactive&&playing} strength={lightStrength} groupCountV542={previewGroupCountV542}
       performerLightingV557={{settings:concertDetails,cue:demonstration.cue,progressMs:900,scene:null}}/>}
-    <StageEnvironment theme={stageId} audio={audio.current} isPlaying={motion} reducedMotion={reducedMotion} reactive={reactive && playing} />
+
     <Suspense fallback={null}><ConcertDetailStageV555 cue={demonstration.cue} settings={concertDetails} playing={playing} reducedMotion={reducedMotion} /></Suspense>
     {/* V560: optionally render the actual chosen GLB; legacy silhouettes remain
         the fallback for duet demos and when loading is not requested. */}
+    <StageEnvironment theme={stageId} audio={audio.current} isPlaying={motion} reducedMotion={reducedMotion} reactive={reactive && playing}>
     {showGlbV560&&<PreviewGlbPortraitV560 url={avatarModelUrl!} correct={previewMaterialV560} lowTier={tier==='low'}
       lipModeV561={lipModeV561} playingV561={playing} reducedMotionV561={reducedMotion}
       songV561={songV561} profileV561={profileV561} onDiagnosticsV561={onGlbDiagnosticsV561}
@@ -230,6 +232,7 @@ function PreviewScene({ stageId, reactive, lightStrength, reducedMotion, playing
       <mesh position={[-.16,.31,0]}><capsuleGeometry args={[.09,.52,4,8]}/><meshStandardMaterial color="#293347"/></mesh>
       <mesh position={[.16,.31,0]}><capsuleGeometry args={[.09,.52,4,8]}/><meshStandardMaterial color="#293347"/></mesh>
     </group>)}
+    </StageEnvironment>
     {showFx && <>
       <MovingSpotlight position={[-2.55,3.05,-1.1]} color={palette.first} phase={0} moving={motion} strength={strength}/>
       <MovingSpotlight position={[2.55,3.05,-1.1]} color={palette.second} phase={1.8} moving={motion} strength={strength}/>

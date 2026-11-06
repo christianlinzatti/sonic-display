@@ -9,6 +9,7 @@ import {resolveLightingBudgetV772} from "../adaptiveLightingBudgetV772";
 import type {SpotLight} from "three";
 import { createGalaxyStarfieldV766 } from "./galaxyStarfieldV766";
 import {StageStaticBatchV775} from "./StageStaticBatchV775";
+import {Arena360StageV1031} from "./Arena360StageV1031";
 import {VAPORWAVE_BARS_V775, VAPORWAVE_PALM_TRUNKS_V775, VAPORWAVE_PALM_LEAVES_V775,
   ROCK_AMP_PANELS_V775, ROCK_TRUSS_POSTS_V775, ROCK_TRUSS_HOUSINGS_V775,
   CYBERPUNK_TOWER_LEDS_V775, CYBERPUNK_SIDE_NEONS_V775} from "./stageInstancePlansV775";
@@ -31,6 +32,7 @@ export const STAGE_ENVIRONMENTS = [
   {id:"galaxy", label:"Cosmic Galaxy", genres:["ambient","trance","deep house"], description:"Offener Deep-Space-Raum mit Sternenfeld und schwebender kosmischer Atmosphäre.", mood:"Ambient / Trance"},
   {id:"white", label:"White Showroom", genres:["pop","hip-hop","rap","deutschrap"], description:"Helles High-End-Studio mit weichen Softboxen und Premium-Showroom-Gefühl.", mood:"Pop / Hip-Hop"},
   {id:"rock", label:"Rock Arena", genres:["rock","metal","punk"], description:"Dunkle Arena mit Traversen, Backstage-Stahl und warmen, aggressiven Flutern.", mood:"Rock / Metal"},
+  {id:"arena360", label:"360° Ultimate Concert Arena", genres:[], description:"360°-Rundbühne mit transformierenden LED-Petalen, Laserfächern, Nebel und intelligenter Konzertregie.", mood:"360° / Immersive Live"},
 ] as const satisfies readonly StageEnvironmentDefinition[];
 
 export type StageEnvironmentId = typeof STAGE_ENVIRONMENTS[number]["id"];
@@ -169,19 +171,41 @@ function RockStage(p: Props) {
   </ResponsiveGroup>;
 }
 
-export function StageEnvironment({ theme, ...props }: Props & { theme: StageEnvironmentId }) {
-  switch (theme) {
-    case "cyberpunk":
-      return <CyberpunkStage {...props} />;
-    case "vaporwave":
-      return <VaporwaveStage {...props} />;
-    case "galaxy":
-      return <GalaxyStage {...props} />;
-    case "white":
-      return <WhiteStudioStage {...props} />;
-    case "rock":
-      return <RockStage {...props} />;
-    default:
-      return null;
+export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabled, audienceEnabled, lightsEnabled, dropEnabled, wavesEnabled, phoneSyncEnabled, phoneMode, domeEnabled, showDirectorEnabled,secondLevelEnabled,skyFormationEnabled,section,
+  fullSongDirectorEnabled,ledColumnsEnabled,virtualPyroEnabled,crowdChantEnabled,showIntensity,progressMs,durationMs,
+  lasersEnabled,movingSkyEnabled,groundFogEnabled,arenaPeaksEnabled,
+  transformingDeckEnabled,transformingDeckMode,transformingDeckStrength, ...props }:
+  Props & { theme: StageEnvironmentId; children?: React.ReactNode; rotationSpeed?: number; rotationEnabled?: boolean;
+    audienceEnabled?: boolean; lightsEnabled?: boolean; dropEnabled?: boolean;
+    wavesEnabled?:boolean;phoneSyncEnabled?:boolean;phoneMode?:import("@/lib/arena360ImmersionV1033").ArenaPhoneModeV1033;domeEnabled?:boolean;
+    showDirectorEnabled?:boolean;secondLevelEnabled?:boolean;skyFormationEnabled?:boolean;section?:string;
+    fullSongDirectorEnabled?:boolean;ledColumnsEnabled?:boolean;virtualPyroEnabled?:boolean;
+    crowdChantEnabled?:boolean;showIntensity?:number;progressMs?:number;durationMs?:number;
+    lasersEnabled?:boolean;movingSkyEnabled?:boolean;groundFogEnabled?:boolean;arenaPeaksEnabled?:boolean;
+    transformingDeckEnabled?:boolean;transformingDeckMode?:import('@/lib/arena360TransformationV1037').ArenaTransformationModeV1037;
+    transformingDeckStrength?:number }) {
+  if (theme === "arena360") {
+    return <Arena360StageV1031 {...props} rotationSpeed={rotationSpeed} rotationEnabled={rotationEnabled}
+      audienceEnabled={audienceEnabled} lightsEnabled={lightsEnabled} dropEnabled={dropEnabled}
+      wavesEnabled={wavesEnabled} phoneSyncEnabled={phoneSyncEnabled} phoneMode={phoneMode} domeEnabled={domeEnabled} showDirectorEnabled={showDirectorEnabled}
+      secondLevelEnabled={secondLevelEnabled} skyFormationEnabled={skyFormationEnabled} section={section}
+      fullSongDirectorEnabled={fullSongDirectorEnabled} ledColumnsEnabled={ledColumnsEnabled}
+      virtualPyroEnabled={virtualPyroEnabled} crowdChantEnabled={crowdChantEnabled}
+      showIntensity={showIntensity} progressMs={progressMs} durationMs={durationMs}
+      lasersEnabled={lasersEnabled} movingSkyEnabled={movingSkyEnabled}
+      groundFogEnabled={groundFogEnabled} arenaPeaksEnabled={arenaPeaksEnabled}
+      transformingDeckEnabled={transformingDeckEnabled} transformingDeckMode={transformingDeckMode}
+      transformingDeckStrength={transformingDeckStrength}>
+      {children}
+    </Arena360StageV1031>;
   }
+  let environment: React.ReactNode = null;
+  switch (theme) {
+    case "cyberpunk": environment = <CyberpunkStage {...props}/>; break;
+    case "vaporwave": environment = <VaporwaveStage {...props}/>; break;
+    case "galaxy": environment = <GalaxyStage {...props}/>; break;
+    case "white": environment = <WhiteStudioStage {...props}/>; break;
+    case "rock": environment = <RockStage {...props}/>; break;
+  }
+  return <>{environment}{children}</>;
 }

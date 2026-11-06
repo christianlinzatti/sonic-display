@@ -9,6 +9,7 @@ const STORAGE_KEY = "sonic-display-stage-presets-v286";
 const MAX_PRESETS = 40;
 const BUILT_INS: readonly Preset[] = [
   { id: "builtin-festival", name: "Hardtekk Mainstage", stageTheme: "festival", stageReactive: true, stageLightStrength: 100 },
+  { id: "builtin-arena360", name: "360° Immersive Arena Show", stageTheme: "arena360", stageReactive: true, stageLightStrength: 88 },
   { id: "builtin-cyber", name: "Industrial Rave", stageTheme: "cyberpunk", stageReactive: true, stageLightStrength: 85 },
   { id: "builtin-rap", name: "Deutschrap Studio", stageTheme: "white", stageReactive: true, stageLightStrength: 65 },
   { id: "builtin-night", name: "Midnight Galaxy", stageTheme: "galaxy", stageReactive: true, stageLightStrength: 45 },

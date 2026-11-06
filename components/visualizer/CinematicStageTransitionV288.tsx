@@ -6,7 +6,7 @@ import type { StageSection } from "./stageDirectorV287";
 const stageColors: Record<StageEnvironmentId, string> = {
   classic: "#638cd8", neon: "#43edff", festival: "#fc6dc9",
   minimal: "#aebacf", cyberpunk: "#e65bfe", vaporwave: "#ff94b7",
-  galaxy: "#7b80ff", white: "#eef6ff", rock: "#f1a05b",
+  galaxy: "#7b80ff", white: "#eef6ff", rock: "#f1a05b", arena360:"#1bcfff",
 };
 
 /** One lightweight screen-space effect; the existing Three.js scene remains mounted. */

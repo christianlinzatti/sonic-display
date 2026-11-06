@@ -1,3 +1,89 @@
+# V1037 · Arena Transformation 2.0
+
+## Implementiert
+
+* 4/6/8 animierte Bühnen-Petalen am äußeren Rand der 360°-Rundbühne (low/balanced/high).
+* Sanfte radiale Translation (max. 46 cm) und Anhebung (max. 16 cm) mit begrenztem Drehen.
+* Auto-Modus: Verse = Halo, Build = Spirale, Hook/Drop = Fächer, Break = geschlossen.
+  Alternativ manuell Fächer, Spirale oder Halo; Stärkeregelung 0–100 %.
+* Szene dreht sich unverändert zusammen mit den Avataren; die zentralen Bühnenbretter,
+  Fuß-Kontakte und Avatarrigs werden **nicht** verschoben oder skaliert.
+* Erhalt aller V1031–V1036-Elemente, keine neuen Netzwerkaufrufe oder zusätzlichen
+  WebGL-Lichtquellen. Bei Musikpause wird die letzte Bühnenposition eingefroren,
+  bei reduzierter Bewegung wird die Mechanik zurückgesetzt.
+* Einstellungen → Dynamic Stage → Arena; aktualisierte Bühnenvorschau.
+
+## Tests und reale Einschränkungen
+
+`npm run test:v1037`, `npm run test:v1037:types`, `npm run check:syntax`,
+`npm run check:architecture`, `npm run verify:v959:source`.
+Nach `npm ci` sind zusätzlich `npm run typecheck` und `npm run build:next`
+über GitHub Actions (Ubuntu + Windows) vorgesehen. Eine echte Browser- und
+WebGL-Prüfung ist zusätzlich erforderlich.
+
+## Priorisierung V1038–V1042
+
+1. V1038: Floating Stage – separat steuerbare, schwebende, rein dekorative
+   Plattformen mit klaren Avatar-Kollisions-/Sichtbarkeitsgrenzen.
+2. V1039: Laser/Hologramme 2.0 – erweiterte Formationen mit GPU-Budget.
+3. V1040: KI-Showplanner – optionale API, Datenminimierung, lokaler Fallback,
+   Vorschau und nachvollziehbare Cues.
+4. V1041: Avatar-Formations-/Choreografie-Director – nur vorhandene passende
+   Animationen, Foot-IK und Übergangsprüfungen.
+5. V1042: Govee Sync – lokale/API-Limits, Gerätezuordnung, Ausfall-/Offline-
+   Fallback und sichere Begrenzung der Lichtwechsel.
+
+Bewusst noch nicht in V1037 implementiert: schwebende Avatarplattformen, neue
+Hologrammsysteme, generative KI-Abfragen oder reale Govee-Gerätesteuerung.
+
+# V1036 · Laser & Atmospheric Arena
+
+Erweitert die V1035-Rundbühne um drei separat einstellbare, ressourcenschonende Effekte:
+- 6/12/18 transparente Laserfächer je nach Grafikstufe (keine echten Lichtstrahlen, kein Stroboskop).
+- 24/60/120 Segmente eines beweglichen LED-Himmels, ohne eine blickdichte Decke.
+- 5/9/14 shaderbasierte Bodennebelflächen mit 2/4/6 transparenten Rauchschwaden (keine echte volumetrische Rauchsimulation).
+- Gemeinsame Showhöhepunkt-Regie: ein klassifizierter Hook oder Drop **und** eine kräftige gemessene Beatflanke,
+  danach 18 Sekunden Sperrzeit. Zeitleiste allein triggert keine Höhepunkte und keine Pyro.
+- Pause, reduzierte Bewegung, deaktivierte Musikreaktion und deaktivierte Einstellungen unterdrücken Bewegung;
+  keine zusätzlichen Spotlights, externe APIs, Intervalle oder Postprocessing-Instanzen.
+
+V1031–V1035 bleiben erhalten. Optionen unter Einstellungen → Dynamic Stage → 360° Arena.
+Die bisherigen Stages, Lyrics und Kamerapositionen bleiben unberührt.
+
+Prüfung: `npm run test:v1036`, `npm run test:v1036:types`, `npm run check:syntax`,
+`npm run verify:v959:source`; vollständiger Next.js-Build wird in GitHub Actions unter Windows und Ubuntu geprüft.
+
+# V1035 · AI Arena Show Director (regelbasiert)
+
+Auf Basis V1034: Acht bis sechzehn unabhängige, weltfeste LED-Säulen (Instancing, 2 Draw Calls),
+virtuelle Pyro-Spark-Jets (12–48 Partikelinstanzen) und ein stärker reagierendes 360°-Publikum.
+Eine lokale Showdramaturgie berücksichtigt tatsächlichen Songfortschritt, vorhandene Verse-/Hook-/Drop-Markierungen und gemessene Audioenergie.
+Bei fehlender Songdauer bleibt der Showbogen konservativ; ein Drop wird niemals allein aus Songfortschritt angenommen.
+Virtuelle Funken benötigen einen erkannten Drop, einen Beat mit >= 0,72 Stärke und >= 0,45 Energie, plus 5,5 s Cooldown.
+Eine Pause oder „Bewegung reduzieren“ setzt das Feuerwerk sofort zurück. Keine HTTP-/KI-Anfrage, keine echte Pyrotechnik.
+Die vier neuen Schalter und eine Intensitätsregelung sind unter Dynamic Stage / 360° Arena erreichbar.
+Die vorhandenen Bühnen, Avatare, Kameras, Lyrics und V1031–V1034-Funktionen bleiben unverändert.
+
+Validierung: `npm run test:v1035`, `npm run test:v1035:types`, `npm run check:syntax`,
+`npm run check:architecture`, `npm run verify:v959:source`; vollständiger Next.js-Build in GitHub Actions
+über Windows und Ubuntu vorgesehen.
+
+## V1034 – Ultimate 360° Concert Experience
+
+V1034 verbindet die 360°-Live-Arena mit einer zweiten, unabhängig anhebbaren Bühnenring-Ebene (Künstler bleiben sicher im Hauptdeck), einem zusätzlichen Ring aus adaptiven Overhead-LED-Formationspunkten sowie automatisch verschiedenen Verse-/Hook-/Build-/Break-/Drop-Looks. Die reinen Phasenpläne liegen in `lib/arena360ShowV1034.ts`; die beiden vorhandenen Kamera-Owner komponieren ausschließlich auf autorisierte automatische Shots. Alle Optionen können unter Dynamic Stage / 360° einzeln abgeschaltet werden. Regressionstests und Build-Workflow: `changelog/V1034-ULTIMATE-ARENA.md`. Die Showregie verwendet vorhandene Songabschnitts-Cues und führt keine neuen externen KI- oder Netzwerkanfragen durch.
+
+## V1033 – Immersive Arena Show
+
+Die Rundbühne ergänzt `lib/arena360ImmersionV1033.ts` mit drei deterministischen Lichtmustern für virtuelle Handys und einem durch Beat-Onsets ausgelösten Publikumswellen-Plan. In `components/visualizer/stages/ArenaAudienceV1032.tsx` bewegen sich die bestehenden GPU-Instanzen in begrenzter Frequenz. `components/visualizer/stages/ArenaLedDomeV1033.tsx` erzeugt eine feststehende schwebende LED-Kuppel mit adaptiven Segmentmengen. Beide Kamera-Owner integrieren einen bis 3,4 Sekunden dauernden Flyover über die bestehende Kamera, geschützt gegen manuelle Aufnahmen, Lyrics und reduzierte Bewegung. Settings, Tests und CI-Integration sind in `changelog/V1033-IMMERSIVE-ARENA-SHOW.md` dokumentiert. Ohne starke verifizierte Musik-Onsets bleiben Wellen und Drop-Kameraflüge ruhig; die LED-Kuppel kann weiter sanft leuchten.
+
+## V1032 – 360° Live Arena Experience
+
+Die rotierende V1031 Rundbühne erhält ein 360°-Publikum mit qualitätsabhängigem Instancing, bewegliche Scheinwerfer, einen begrenzten Drop-Lichtring und eine optionale Arena-Kamerafahrt (`arc`/`orbit`). Alle Funktionen sind in Settings → Dynamic Stage separat schaltbar. Künstler und Plattform rotieren weiter gemeinsam. Die bestehende Konzertregie behält die Autorität über manuelle, gesprochene, Gesangs- und Lyrics-Kameraansichten. Siehe `changelog/V1032-LIVE-ARENA-EXPERIENCE.md`.
+
+# V1031 – Rotating 360° Arena
+
+Die neue `components/visualizer/stages/Arena360StageV1031.tsx` zeichnet eine frei stehende Rundbühne mit bewegter LED-Drehplattform, Instancing für Segmentleuchten und stationärem Traversenring. In `components/visualizer/stages/index.tsx` ist `arena360` als auswählbarer `StageEnvironmentId` integriert. `components/visualizer/ThreeAvatar.tsx` legt den bestehenden `TRACKING_ROOT_NAME` der Solisten, Duette und Gruppen als Kind der Plattform an: Alle Avatare bleiben auf dem sich drehenden Boden und die vorhandene Kameraverfolgung kann ihren Weltort weiter lesen. Die bestehende Konzertregie behält ihre Kamera-/Licht-/Effektkontrolle. `lib/arena360RotationV1031.ts` berechnet den gedrosselten Winkel ohne separate Timer; Pause, reduzierte Bewegung und manuelle Abschaltung stoppen die Rotation. Die Einstellungen sind in `components/SettingsPanel.tsx` verfügbar. Releaseprüfung: `tests/v1031-rotating-arena-regression.cjs` und `scripts/v1031-release-readiness.cjs`. Vollständige GPU-Prüfung ist erst nach Installation in der Zielumgebung möglich.
+
 # V1026 – Intelligent Stage Lighting 4.0
 
 `DynamicStage.tsx` komponiert unverändert die existierenden V462/V542/V551/V749/V762-Key-, Fill-, Spot- und Bodenlichter. `intelligentStageLightingV1026.ts` wertet danach read-only die V604-verifizierte Song-Timeline und den V761-Camera-Cue aus, validiert Track/Dauer/Akt sowie V749-Sänger-Slots und ergänzt **ausschließlich kleine Multiplikatoren** und einen 4.5%-Farbmix ohne weitere Lights, Shadows oder Renderer-Loops. Gespeicherte Timelines, manueller FX-Modus, Blackout, Seek, Pause, Low Tier und reduzierte Bewegung blockieren den Layer; sichtbare Lyrics begrenzen den Beam und schützen Gesicht/Fill. Der V1026-Layer sendet keine Govee-, Matter-, Alexa- oder Netzwerk-Kommandos.
@@ -1265,7 +1351,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1030
+**Dokumentationsstand:** V1037
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

@@ -31,6 +31,13 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1037 Transforming Arena','tests/v1037-transforming-arena-regression.cjs');
+  run('V1036 Atmospheric Arena','tests/v1036-atmospheric-arena-regression.cjs');
+  run('V1035 AI Arena Show Director','tests/v1035-ai-arena-regression.cjs');
+  run('V1034 Ultimate Concert Arena','tests/v1034-ultimate-arena-regression.cjs');
+  run('V1033 Immersive Arena Show','tests/v1033-immersive-arena-regression.cjs');
+  run('V1032 360° Live Arena Experience','tests/v1032-live-arena-regression.cjs');
+  run('V1031 Rotating 360° Arena','tests/v1031-rotating-arena-regression.cjs');
   run('V1030 Intelligent Concert Atmosphere 5.0','tests/v1030-intelligent-concert-atmosphere-regression.cjs');
   run('V1029 AI Visual Director 5.0','tests/v1029-ai-visual-director-regression.cjs');
   run('V1028 Immersive Concert FX 5.0','tests/v1028-immersive-concert-fx-regression.cjs');

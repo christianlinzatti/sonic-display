@@ -103,10 +103,11 @@ assert(settings.includes('intelligentAtmosphereV1030:true,atmosphereStrengthV103
 assert(settings.includes("typeof raw?.intelligentAtmosphereV1030==='boolean'"));
 assert(read('components/visualizer/ConcertFxStudioPanelV810.tsx').includes('Intelligent Concert Atmosphere 5.0'));
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1030');assert.equal(lock.version,pkg.version);
+assert(Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1])>=1030);assert.equal(lock.version,pkg.version);
 assert.equal(lock.packages[''].version,pkg.version);
-assert.equal(pkg.sonicFeatureRelease,'v1030');assert.equal(pkg.sonicRoadmapRelease,'v1030');
-assert(pkg.scripts.prebuild.startsWith('npm run test:v1030 &&'));
+assert.equal(pkg.sonicFeatureRelease,pkg.version.split('-')[1]);assert.equal(pkg.sonicRoadmapRelease,pkg.version.split('-')[1]);
+assert(pkg.scripts.prebuild.includes('npm run test:v1030 &&'));
+assert(pkg.scripts.prebuild.startsWith(`npm run test:${pkg.sonicFeatureRelease} &&`));
 for(const f of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(f).includes('tests/v1030-intelligent-concert-atmosphere-regression.cjs'));
 assert(read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1030(root)'));

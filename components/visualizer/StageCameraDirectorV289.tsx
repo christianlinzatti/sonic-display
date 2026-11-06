@@ -1,6 +1,10 @@
 "use client";
 
 import {composeConcertSceneCameraV528} from "./cinematicConcertCoordinationV528";
+import {composeArenaCameraV1032,type ArenaCameraModeV1032} from "@/lib/arena360ExperienceV1032";
+import {INITIAL_ARENA_FLYOVER_V1033,stepArenaFlyoverV1033,composeArenaFlyoverV1033} from "@/lib/arena360ImmersionV1033";
+import {composeArenaSectionCameraV1034} from "@/lib/arena360ShowV1034";
+import type {AudioFeatures} from "@/types/audio";
 import {readConcertStageSyncV882} from './concertStageSyncV882';
 import {sampleDirectorV895,DEFAULT_DIRECTOR_V895} from './aiConcertDirectorV895';
 import {sampleUltimateV900,DEFAULT_ULTIMATE_V900} from './ultimateConcertExperienceV900';
@@ -78,7 +82,8 @@ import { showCameraPose } from "./showCameraV306";
 import type { ShowCue } from "./ultimateShowDirectorV306";
 import { CAMERA_PATH_EVENT, readCameraPathSettings, type CameraPathSettings } from "./cinematicCameraPathsV305";
 /** Drives the existing R3F camera only; avoids a second Canvas or React updates per frame. */
-export function StageCameraDirectorV289({ section, progressMs, intensity, playing, reducedMotion, duo, showCue, concertShowCueV387, concertShowCameraV387=true, festivalShowCueV394,festivalShowCameraV394=true, composition, genreCue, timelineCue, lipSync, genre, cinematicCueV497, cameraNarrativeV605, concertFlowV654, transitionV791, choreographyV792, vocalSpotlightV797, vocalDuetV838 }: {
+export function StageCameraDirectorV289({ section, progressMs, intensity, playing, reducedMotion, duo, showCue, concertShowCueV387, concertShowCameraV387=true, festivalShowCueV394,festivalShowCameraV394=true, composition, genreCue, timelineCue, lipSync, genre, cinematicCueV497, cameraNarrativeV605, concertFlowV654, transitionV791, choreographyV792, vocalSpotlightV797, vocalDuetV838, arena360=false, arenaCameraEnabled=true, arenaCameraMode="arc", arenaFlyoverEnabled=true, arenaSectionCameraEnabled=true, audio }: {
+  arena360?:boolean;arenaCameraEnabled?:boolean;arenaCameraMode?:ArenaCameraModeV1032;arenaFlyoverEnabled?:boolean;arenaSectionCameraEnabled?:boolean;audio?:AudioFeatures;
   section: StageSection; progressMs: number; intensity: number; playing: boolean; reducedMotion: boolean; duo: boolean; showCue?: ShowCue; concertShowCueV387?:ConcertShowCueV387; concertShowCameraV387?:boolean;festivalShowCueV394?:FestivalShowCueV394;festivalShowCameraV394?:boolean; composition?:SmartStageCueV351; genreCue?:GenreVisualCueV352; timelineCue?:ShowTimelineCueV354; lipSync?:VisualizerProps["lipSync"];genre?:string|null;cinematicCueV497?:CinematicConcertCueV497;cameraNarrativeV605?:{plan:NarrativePlanV604;cue:NarrativeCueV604;manualCamera:boolean};concertFlowV654?:ConcertFlowCueV654;transitionV791?:SceneTransitionCueV791;choreographyV792?:CameraChoreographyCueV792;vocalSpotlightV797?:MultiVocalSpotlightCueV797;vocalDuetV838?:VocalDuetPlanV838;
 }) {
   const camera = useThree(state => state.camera as PerspectiveCamera);
@@ -97,6 +102,7 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
   const trackingEnabled = useRef(false);
   const manualMode = useRef<ManualCameraMode>("auto");
   const statusInterval = useRef(0);
+  const arenaFlyoverV1033=useRef({...INITIAL_ARENA_FLYOVER_V1033});
   useEffect(()=>{const sync=()=>{manualMode.current=readManualCameraMode();};sync();window.addEventListener(CAMERA_STUDIO_MODE_EVENT,sync);return ()=>window.removeEventListener(CAMERA_STUDIO_MODE_EVENT,sync);},[]);
   const composerSettings = useRef(readSmartCameraComposer());
   const sampleDelay = useRef(0);
@@ -1002,14 +1008,39 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
         (naturalV655.cue.active?naturalV655.cue.cameraRate:1)*
         (cameraVarietyV682.cue.active?cameraVarietyV682.cue.cameraRate:1)*
         (performanceCameraV747.cue.active?performanceCameraV747.cue.cameraRate:1)*v884Camera.cameraRate*v892Camera.cameraRate*directorCameraV895.cameraRate*energyCameraV896.cameraRate*cinematicCameraV897.cameraRate*cinemaV992.cameraRate*danceCameraV898.cameraRate*danceShowCameraV899.cameraRate*cinematicV1025.cameraRate*ultimateCameraV900.cameraRate);
-    camera.position.x += (stageFramed.x-camera.position.x)*alpha;
-    camera.position.y += (stageFramed.y-camera.position.y)*alpha;
-    camera.position.z += (stageFramed.z-camera.position.z)*alpha;
-    camera.fov += (stageFramed.fov-camera.fov)*alpha;
+    // V1032: Compose into the SINGLE authorized camera. Never override manual,
+    // timeline, authored, lyrics, vocal/duet or concert-specific shots.
+    const arenaFramedV1032=composeArenaCameraV1032(stageFramed,{
+      enabled:arena360&&arenaCameraEnabled,playing,reducedMotion,automatic:automaticShot,
+      protectedShot:!!(editingPose||userHasPreset||manual!=="auto"||timelineCue?.active||authoredCueV400||
+        cameraNarrativeV605?.manualCamera||lipSync?.cameraManualStagePriorityV377||
+        shotV377.active||visualPlanV397.active||vocalPlanV401.active||lyricsPlanV378.active||
+        liveCueV400||cutToCameraCueV400),
+      seconds:progressMs/1000,mode:arenaCameraMode,
+    });
+    // V1033 is a temporary, non-owning composition into the existing director.
+    const flyoverProtectedV1033=!!(editingPose||userHasPreset||manual!=="auto"||timelineCue?.active||authoredCueV400||
+      cameraNarrativeV605?.manualCamera||lipSync?.cameraManualStagePriorityV377||shotV377.active||
+      visualPlanV397.active||vocalPlanV401.active||lyricsPlanV378.active||liveCueV400||cutToCameraCueV400);
+    const flyoverAllowedV1033=arena360&&arenaCameraEnabled&&arenaFlyoverEnabled&&automaticShot&&
+      playing&&!reducedMotion&&!flyoverProtectedV1033;
+    arenaFlyoverV1033.current=stepArenaFlyoverV1033(arenaFlyoverV1033.current,dt,{
+      enabled:flyoverAllowedV1033,playing,reducedMotion,protectedShot:flyoverProtectedV1033,
+      beat:audio?.beat,beatStrength:audio?.beatStrength,bass:audio?.bass,dropSection:section==="drop",
+    });
+    const arenaFramedV1033=composeArenaFlyoverV1033(arenaFramedV1032,arenaFlyoverV1033.current,flyoverAllowedV1033);
+    const arenaFramedV1034=composeArenaSectionCameraV1034(arenaFramedV1033,{
+      enabled:arena360&&arenaCameraEnabled&&arenaSectionCameraEnabled&&automaticShot,
+      playing,reducedMotion,protectedShot:flyoverProtectedV1033,section,
+    });
+    camera.position.x += (arenaFramedV1034.x-camera.position.x)*alpha;
+    camera.position.y += (arenaFramedV1034.y-camera.position.y)*alpha;
+    camera.position.z += (arenaFramedV1034.z-camera.position.z)*alpha;
+    camera.fov += (arenaFramedV1034.fov-camera.fov)*alpha;
     camera.updateProjectionMatrix();
-    target.current.x += ((stageFramed.targetX??0)-target.current.x)*alpha;
-    target.current.y += (stageFramed.targetY-target.current.y)*alpha;
-    target.current.z += ((stageFramed.targetZ??0)-target.current.z)*alpha;
+    target.current.x += ((arenaFramedV1034.targetX??0)-target.current.x)*alpha;
+    target.current.y += (arenaFramedV1034.targetY-target.current.y)*alpha;
+    target.current.z += ((arenaFramedV1034.targetZ??0)-target.current.z)*alpha;
     camera.lookAt(target.current);
     statusInterval.current -= Math.max(0,dt);
     if(statusInterval.current<=0 && typeof window!=="undefined") {

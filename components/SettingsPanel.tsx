@@ -436,6 +436,141 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
         <small className="settings-note">Die Vorschaukarten zeigen die visuelle Richtung der Bühne direkt in den Settings. Hover oder Fokus öffnet eine kleine 3D-Vorschau; Klick oder Tippen wählt die Bühne aus. Mit „Große 3D-Vorschau öffnen“ kannst du die Bühne frei drehen, zoomen und die Lichteffekte ausprobieren.</small>
         <label className="setting-check"><input type="checkbox" checked={preferences.stageReactive ?? true} onChange={e => updatePreferences({stageReactive: e.target.checked})}/> Musikreaktive Beleuchtung</label>
         <label>Lichtreaktion ({preferences.stageLightStrength ?? 60} %)<input type="range" min="0" max="100" step="5" value={preferences.stageLightStrength ?? 60} onChange={e => updatePreferences({stageLightStrength:Number(e.target.value)})}/></label>
+        {(preferences.stageTheme === "arena360") && <div className="arena360-settings-v1031">
+          <strong>V1037 · Arena Transformation 2.0</strong>
+          <div className="arena360-experience-options-v1032">
+            <strong>Transformierende 360°-Bühne</strong>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaTransformingDeckEnabledV1037 ?? true}
+              onChange={e=>updatePreferences({arenaTransformingDeckEnabledV1037:e.target.checked})}/>
+              Bewegliche LED-Bühnensegmente rund um das Hauptdeck</label>
+            <label>Bewegungsmuster
+              <select value={preferences.arenaTransformingDeckModeV1037 ?? 'auto'}
+                disabled={!(preferences.arenaTransformingDeckEnabledV1037 ?? true)}
+                onChange={e=>updatePreferences({arenaTransformingDeckModeV1037:e.target.value as 'auto'|'fan'|'spiral'|'halo'})}>
+                <option value="auto">Automatisch nach Songabschnitt</option>
+                <option value="fan">Fächer</option><option value="spiral">Spirale</option><option value="halo">Leuchtring</option>
+              </select>
+            </label>
+            <label>Verwandlungsstärke: {preferences.arenaTransformingDeckStrengthV1037 ?? 70} %
+              <input type="range" min={0} max={100} step={5}
+                disabled={!(preferences.arenaTransformingDeckEnabledV1037 ?? true)}
+                value={preferences.arenaTransformingDeckStrengthV1037 ?? 70}
+                onChange={e=>updatePreferences({arenaTransformingDeckStrengthV1037:Number(e.target.value)})}/>
+            </label>
+            <small>Bis zu acht äußere Segment-Petalen fahren sanft aus und heben sich leicht an. Der zentrale Avatar-Boden bleibt starr, die Bühne rotiert weiterhin; Bewegung stoppt bei Pause oder reduzierter Animation. Keine echten Mechanikantriebe.</small>
+          </div>
+          <strong>V1036 · Laser & Atmospheric Arena</strong>
+          <div className="arena360-experience-options-v1032">
+            <strong>Rundum-Licht, LED-Himmel und Bühnennebel</strong>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaLasersEnabledV1036 ?? true}
+              onChange={e=>updatePreferences({arenaLasersEnabledV1036:e.target.checked})}/> Sanft animierte Laserfächer rund um die Bühne</label>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaMovingSkyEnabledV1036 ?? true}
+              onChange={e=>updatePreferences({arenaMovingSkyEnabledV1036:e.target.checked})}/> Beweglicher LED-Himmel über dem Publikum</label>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaGroundFogEnabledV1036 ?? true}
+              onChange={e=>updatePreferences({arenaGroundFogEnabledV1036:e.target.checked})}/> Dezenter, shaderbasierter Bodennebel</label>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaPeakDirectorEnabledV1036 ?? true}
+              disabled={!(preferences.arenaFullSongDirectorEnabledV1035 ?? true)}
+              onChange={e=>updatePreferences({arenaPeakDirectorEnabledV1036:e.target.checked})}/> Gezielt dosierte Showhöhepunkte bei echten Beats</label>
+            <small>Ressourcenschonende, rein virtuelle Effekte. Höhepunkte benötigen einen erkannten Hook/Drop und starke Audioimpulse; 18 Sekunden Abstand verhindern Dauerfeuer. Keine Strobo-Blitze. Bei Pause oder reduzierter Bewegung bleiben die Effekte ruhig.</small>
+          </div>
+          <strong>V1035 · AI Arena Show Director</strong>
+          <div className="arena360-experience-options-v1032">
+            <strong>Intelligente Show über den ganzen Song</strong>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaFullSongDirectorEnabledV1035 ?? true}
+              onChange={e=>updatePreferences({arenaFullSongDirectorEnabledV1035:e.target.checked})}/> Dynamischer Showbogen aus Songabschnitt, Fortschritt und Musikenergie</label>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaLedColumnsEnabledV1035 ?? true}
+              onChange={e=>updatePreferences({arenaLedColumnsEnabledV1035:e.target.checked})}/> Bewegliche LED-Säulen um die Bühne</label>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaVirtualPyroEnabledV1035 ?? true}
+              disabled={!(preferences.arenaFullSongDirectorEnabledV1035 ?? true)}
+              onChange={e=>updatePreferences({arenaVirtualPyroEnabledV1035:e.target.checked})}/> Virtuelle Pyro-Partikel bei erkannten Drops</label>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaCrowdChantEnabledV1035 ?? true}
+              disabled={!(preferences.arenaAudienceEnabledV1032 ?? true)}
+              onChange={e=>updatePreferences({arenaCrowdChantEnabledV1035:e.target.checked})}/> Publikum bei Hooks stärker mitbewegen</label>
+            <label>Showintensität ({preferences.arenaShowIntensityV1035 ?? 65} %)
+              <input type="range" min="0" max="100" step="5" value={preferences.arenaShowIntensityV1035 ?? 65}
+                onChange={e=>updatePreferences({arenaShowIntensityV1035:Number(e.target.value)})}/>
+            </label>
+            <small>Lokale, regelbasierte Dramaturgie: keine externen KI-Anfragen. Intro, Hauptteil und Finale werden anhand der tatsächlichen Wiedergabeposition variiert; Pyro gibt es nur bei erkanntem Drop und kräftigem gemessenem Beat. Alle Effekte sind rein virtuell und leistungsbegrenzt.</small>
+          </div>
+          <strong>V1034 · Ultimate 360° Concert Experience</strong>
+          <div className="arena360-experience-options-v1032">
+            <strong>Automatische Show-Regie nach Songabschnitt</strong>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaShowDirectorEnabledV1034 ?? true}
+              onChange={e=>updatePreferences({arenaShowDirectorEnabledV1034:e.target.checked})}/> Verse-/Hook-/Drop-Inszenierung aktivieren</label>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaSecondLevelEnabledV1034 ?? true}
+              onChange={e=>updatePreferences({arenaSecondLevelEnabledV1034:e.target.checked})}/> Zweite bewegliche Bühnenebene</label>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaSkyFormationEnabledV1034 ?? true}
+              onChange={e=>updatePreferences({arenaSkyFormationEnabledV1034:e.target.checked})}/> Lichtformationen über dem Publikum</label>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaSectionCameraEnabledV1034 ?? true}
+              disabled={!(preferences.arenaCameraEnabledV1032 ?? true)}
+              onChange={e=>updatePreferences({arenaSectionCameraEnabledV1034:e.target.checked})}/> Eigene Kamerakompositionen für Verse, Hook und Drop</label>
+            <small>Die zweite Ebene ist ein unabhängig hebender LED-Ring um den Künstlerbereich; die Avatare bleiben auf dem Hauptdeck. Der aktive Songabschnitt bestimmt Formationsmuster, sanfte Ringhöhe und die automatische Kamerawirkung. Manuelle, Lyrics- und Gesangsaufnahmen behalten Vorrang.</small>
+          </div>
+          <label className="setting-check"><input type="checkbox"
+            checked={preferences.stageRotationEnabledV1031 ?? true}
+            onChange={e=>updatePreferences({stageRotationEnabledV1031:e.target.checked})}/>
+            Drehplattform mit Künstlern drehen
+          </label>
+          <label>Drehgeschwindigkeit ({preferences.stageRotationSpeedV1031 ?? 90}° pro Minute)
+            <input type="range" min="0" max="180" step="5" value={preferences.stageRotationSpeedV1031 ?? 90}
+              onChange={e=>updatePreferences({stageRotationSpeedV1031:Number(e.target.value)})}/>
+          </label>
+          <div className="arena360-experience-options-v1032">
+            <strong>Publikum &amp; LED-Kuppel</strong>
+            <label className="setting-check"><input type="checkbox" checked={preferences.arenaWavesEnabledV1033 ?? true}
+              disabled={!(preferences.arenaAudienceEnabledV1032 ?? true)}
+              onChange={e=>updatePreferences({arenaWavesEnabledV1033:e.target.checked})}/> Animierte Publikumswellen</label>
+            <label className="setting-check"><input type="checkbox" checked={preferences.arenaPhoneSyncEnabledV1033 ?? true}
+              disabled={!(preferences.arenaAudienceEnabledV1032 ?? true)}
+              onChange={e=>updatePreferences({arenaPhoneSyncEnabledV1033:e.target.checked})}/> Handylichter zur Musik synchronisieren</label>
+            <label>Handylicht-Muster
+              <select value={preferences.arenaPhoneModeV1033 ?? "wave"}
+                disabled={!(preferences.arenaAudienceEnabledV1032 ?? true) || !(preferences.arenaPhoneSyncEnabledV1033 ?? true)}
+                onChange={e=>updatePreferences({arenaPhoneModeV1033:e.target.value === "pulse" ? "pulse" : e.target.value === "chase" ? "chase" : "wave"})}>
+                <option value="wave">Wandernde Lichtwelle</option>
+                <option value="pulse">Beat-Puls</option>
+                <option value="chase">Lauflicht rundherum</option>
+              </select>
+            </label>
+            <label className="setting-check"><input type="checkbox" checked={preferences.arenaDomeEnabledV1033 ?? true}
+              onChange={e=>updatePreferences({arenaDomeEnabledV1033:e.target.checked})}/> Schwebende LED-Kuppel</label>
+            <strong>Konzertkamera</strong>
+            <label className="setting-check"><input type="checkbox" checked={preferences.arenaFlyoverEnabledV1033 ?? true}
+              disabled={!(preferences.arenaCameraEnabledV1032 ?? true)}
+              onChange={e=>updatePreferences({arenaFlyoverEnabledV1033:e.target.checked})}/> Kameraflug über das Publikum bei starken Drops</label>
+            <label className="setting-check"><input type="checkbox" checked={preferences.arenaAudienceEnabledV1032 ?? true}
+              onChange={e=>updatePreferences({arenaAudienceEnabledV1032:e.target.checked})}/> Publikum rund um die Bühne</label>
+            <label className="setting-check"><input type="checkbox" checked={preferences.arenaLightsEnabledV1032 ?? true}
+              onChange={e=>updatePreferences({arenaLightsEnabledV1032:e.target.checked})}/> Bewegliche Rundum-Scheinwerfer</label>
+            <label className="setting-check"><input type="checkbox" checked={preferences.arenaDropEnabledV1032 ?? true}
+              onChange={e=>updatePreferences({arenaDropEnabledV1032:e.target.checked})}
+              disabled={!(preferences.arenaLightsEnabledV1032 ?? true)}/> Sanfter Lichtimpuls bei starken Drops</label>
+            <label className="setting-check"><input type="checkbox" checked={preferences.arenaCameraEnabledV1032 ?? true}
+              onChange={e=>updatePreferences({arenaCameraEnabledV1032:e.target.checked})}/> Automatische Arena-Kamerafahrten</label>
+            <label>Kamerafahrt
+              <select value={preferences.arenaCameraModeV1032 ?? "arc"}
+                disabled={!(preferences.arenaCameraEnabledV1032 ?? true)}
+                onChange={e=>updatePreferences({arenaCameraModeV1032:e.target.value === "orbit" ? "orbit" : "arc"})}>
+                <option value="arc">Sanfte Rundum-Schwenks</option>
+                <option value="orbit">Volle 360°-Umrundung (100 s)</option>
+              </select>
+            </label>
+          </div>
+          <small>Die Künstler rotieren gemeinsam mit der Plattform. Publikum und Scheinwerfer bleiben an festen Plätzen. Die Arena-Kamera und der Drop-Flyover respektieren manuelle Aufnahmen sowie Gesangs- und Lyrics-Nahaufnahmen. Publikumswellen und Pixel-Kuppel werden je nach Grafikleistung begrenzt. Pause und „Bewegung reduzieren“ schalten dynamische Bewegungen und Drop-Lichtimpulse aus. Die Grafikqualität begrenzt die Anzahl echter Scheinwerfer und LED-Formationspunkte automatisch. Die V1035-Regie übernimmt erkannte Songabschnitte; ohne erkennbare Drops gibt es keine virtuellen Pyro-Auslösungen. Pause und reduzierte Bewegung unterdrücken die neuen Effekte.</small>
+        </div>}
         <ConcertQualityDashboardV751 avatarModelUrl={currentAvatar?.url??null} avatarChoicesV805={[...avatarModels.map(m=>defaultOverrides.find(o=>o.id===m.id)??m),...localModels].filter(m=>!!m.url).map(m=>({id:m.id,label:m.label,url:m.url!}))} stageTheme={preferences.stageTheme??"classic"}/>
         <InteractiveConcertTimelineStudioV763/>
         <SmartConcertTimelineAutomationV764/>
