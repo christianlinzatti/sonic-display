@@ -1,6 +1,6 @@
 # Keep the filename stable: older ZIP importers already dispatch this entry point.
 name: Sonic Display · Production & Playwright
-run-name: Sonic Display · ${{ inputs.release || 'V1023' }} · Production & Playwright · ${{ github.event_name }}
+run-name: Sonic Display · ${{ inputs.release || 'V1028' }} · Production & Playwright · ${{ github.event_name }}
 on:
   push:
     branches: [master]
