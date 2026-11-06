@@ -31,6 +31,9 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1017 intelligent cache manager','tests/v1017-intelligent-cache-regression.cjs');
+  run('V1017 release readiness','scripts/v1017-release-readiness.cjs');
+  run('V1016 offline experience and Actions release titles','tests/v1016-smart-offline-regression.cjs');
   run('V1015 adaptive request intelligence','tests/v1015-adaptive-network-regression.cjs');
   run('V1015 release readiness','scripts/v1015-release-readiness.cjs');
   run('V1014 network diagnostics 2.0','tests/v1014-network-diagnostics-regression.cjs');

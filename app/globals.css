@@ -4955,3 +4955,10 @@
 .network-v1015-card progress{width:100%;margin:.5rem 0;accent-color:#4fc6ce}
 .network-v1015-card p{margin:.1rem 0 .3rem}
 .network-v1015-card small{opacity:.75}
+
+/* V1017: safe, passive cache telemetry for the network dashboard */
+.network-v1017-cache{margin-top:1rem;padding:1rem;border:1px solid rgba(130,169,220,.23);border-radius:14px;background:rgba(15,27,47,.35)}
+.network-v1017-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:.7rem;margin:.8rem 0}
+.network-v1017-metrics>div{display:flex;flex-direction:column;gap:.25rem;padding:.65rem;border:1px solid rgba(130,169,220,.18);border-radius:10px;background:rgba(25,36,58,.4)}
+.network-v1017-metrics strong{font-variant-numeric:tabular-nums;font-size:1.1em}
+.network-v1017-metrics span{opacity:.8;font-size:.82em}

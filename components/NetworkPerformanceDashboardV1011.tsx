@@ -107,6 +107,22 @@ export function NetworkPerformanceDashboardV1011(){
       </div>
       <p className="network-v1011-note">Benutzeraktionen und Wiedergabe behalten ihre feste, reservierte Kapazität. Anmeldefehler und abgebrochene Anfragen führen zu keiner Drosselung. Ein Spotify-429-Limit gilt weiterhin für den betroffenen Dienst und seine angegebene Wartezeit. Beim Kontowechsel beginnen die Werte neu.</p>
     </section>
+    <section className="network-v1017-cache" data-v1017-cache-manager aria-label="Intelligent Cache Manager">
+      <div className="network-v1014-heading"><div>
+        <span className="network-v1011-kicker">INTELLIGENT CACHE MANAGER / V1017</span>
+        <h4>Cache &amp; vorsichtiges Vorladen</h4>
+      </div><span className="network-v1014-window">Nur in diesem Browser-Tab · Keine Speicherung auf Festplatte</span></div>
+      <div className="network-v1017-metrics">
+        <div><strong>{state.cacheV1017.entries} / {state.cacheV1017.entryLimit}</strong><span>Einträge</span></div>
+        <div><strong>{state.cacheV1017.usedKiB} / {state.cacheV1017.budgetKiB} KiB</strong><span>Geschätzter Speicher</span></div>
+        <div><strong>{state.cacheV1017.hits}</strong><span>Cache-Treffer</span></div>
+        <div><strong>{state.cacheV1017.evicted}</strong><span>LRU-Verdrängungen</span></div>
+        <div><strong>{state.cacheV1017.expired}</strong><span>Abgelaufene Einträge</span></div>
+        <div><strong>{state.cacheV1017.oversized}</strong><span>Zu große Antworten</span></div>
+        <div><strong>{state.cacheV1017.warmups}</strong><span>Gezielte Warmups</span></div>
+      </div>
+      <p className="network-v1011-note">Häufig benötigte optionale Daten werden nur bei freier Netzkapazität erneuert. Live-Wiedergabe und bewusste Spotify-Aktionen bleiben davon ausgenommen. Keine URLs, Titel, Kontokennungen oder Zugriffsschlüssel im Monitoring; alle Werte werden beim Kontowechsel zurückgesetzt.</p>
+    </section>
     <div className="network-v1011-stats" aria-label="Netzwerk-Kennzahlen">
       <div><strong>{inflight}</strong><span>Aktive Anfragen</span></div>
       <div><strong>{state.queue}<small> / {state.queueLimit}</small></strong><span>Warteschlange (Spitze {state.peakQueue})</span></div>

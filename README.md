@@ -1,3 +1,5 @@
+> **V1016 – Smart Offline Experience + Action-Lauftitel:** Kurzzeitige Offline-Fallbacks für bestätigte Titel/Lyrics (nur RAM und kontogebunden), sichere Reconnect-Anzeige und versionierte GitHub-Workflows. Details: `changelog/V1016-SMART-OFFLINE-AND-ACTION-TITLES.md`.
+
 ## V1015 – Adaptive Request Intelligence (2026-11-06)
 
 Die vorhandene Netzwerkanfragesteuerung passt die Parallelität ausschließlich bei Lyrics/Genre und optionalen Inhalten anhand abgeschlossener Antwortzeiten und Fehler automatisch an. Bei Spotify-429-Limits wird Hintergrundlast sofort abgesenkt, ohne die separate Retry-After-Sperre zu umgehen. Nach mehreren schnellen erfolgreichen Antworten wird die Parallelität stufenweise wiederhergestellt. Benutzeraktionen und Wiedergabe behalten eigene feste Kapazitäten. Neue Live-Daten stehen im Service-Status-Dashboard; die anonymen Zähler werden beim Spotify-Kontowechsel zurückgesetzt. Vollständiger Produktionsbuild: über GitHub Actions zu bestätigen.
@@ -2653,3 +2655,7 @@ Tests: `npm run test:v996`, `npm run test:v996:types` und
 `npm run verify:v996:focused`. Der vollständige Produktionsbuild benötigt
 Node 24, `npm ci` und `npm run build:vercel`; ein lokal fehlender Build ist
 **keine** CI-Freigabe. Der GitHub-Importer schützt `.github/workflows`.
+
+
+## V1017 – Intelligent Cache Manager
+Browserlokaler, kontogebundener LRU-Antwortcache mit 120 Einträgen und 2-MiB-Speicherbudget (geschätzte Größe, pro Eintrag 256 KiB). HTTP-GET-Antworten werden nur mit expliziter TTL und innerhalb der Provider-Obergrenzen zwischengespeichert. Aktuelle Spotify-Wiedergabedaten sind ausgeschlossen. Hot-Entry-Warmups erfolgen nur für optionale Anfragen bei freier Kapazität und ohne Online-/Visibility-/Rate-Limit-Konflikt. Das Dashboard zeigt ausschließlich aggregierte Daten; Kontowechsel löscht Cache und Statistik. Details: `changelog/V1017-INTELLIGENT-CACHE-MANAGER.md`.

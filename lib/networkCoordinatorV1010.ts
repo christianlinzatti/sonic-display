@@ -1,4 +1,6 @@
 import {AdaptiveCapacityV1015,type AdaptiveSnapshotV1015} from './networkAdaptiveV1015';
+import {smartOfflineV1016} from './smartOfflineV1016';
+import {IntelligentCacheV1017,boundedCacheLifetimeV1017,type CacheStatsV1017} from './intelligentCacheV1017';
 /** V1010: browser-local, account-isolated request governor. No global server singleton. */
 export type NetworkPriorityV1010 = 'action'|'playback'|'lyrics'|'optional';
 export type NetworkLaneV1010 = 'action'|'playback'|'regular'|'optional';
@@ -29,7 +31,7 @@ export type NetworkDiagnosticsV1014 = NetworkDiagnosticRowV1014 & {
 export type NetworkTelemetryV1011 = {
   since:number; queue:number; queueLimit:number; peakQueue:number;
   inFlight:Record<NetworkLaneV1010,number>;limits:Record<NetworkLaneV1010,number>;
-  cacheEntries:number;cacheLimit:number;offline:boolean;hidden:boolean;
+  cacheEntries:number;cacheLimit:number;cacheV1017:CacheStatsV1017;offline:boolean;hidden:boolean;
   counters:{started:number;completed:number;failed:number;joined:number;cacheHits:number;staleHits:number;
     cancelled:number;retries:number;rateLimits:number;queueDropped:number};
   averageLatencyMs:number;lastFailure:NetworkFailureKindV1011|null;diagnostics:NetworkDiagnosticsV1014;
@@ -88,7 +90,7 @@ export class NetworkCoordinatorV1010 {
   private readonly adaptiveV1015:AdaptiveCapacityV1015;
   private readonly jobs=new Map<string,Job>();
   private readonly queue:Job[]=[];
-  private readonly cache=new Map<string,CacheEntry>();
+  private readonly cache:IntelligentCacheV1017<CacheEntry>;
   private readonly listeners=new Map<string,Set<Listener<unknown>>>();
   private readonly circuits=new Map<string,Circuit>();
   private readonly blocked=new Map<string,number>();
@@ -125,6 +127,7 @@ export class NetworkCoordinatorV1010 {
   }
   /** Read-only, tab-local and account-resettable. Never stores request identities. */
   snapshotV1011(now=Date.now()):NetworkTelemetryV1011{
+    this.cache.prune(now); // V1017: idle dashboards reclaim expired data without polling any provider.
     const grouped=new Map<NetworkProviderIdV1011,{queued:number;active:number;blockedForMs:number;circuitForMs:number;
       failureStreak:number;lastSuccessAgoMs:number|null;probing:boolean}>();
     const ensure=(name:NetworkProviderIdV1011)=>{
@@ -159,7 +162,7 @@ export class NetworkCoordinatorV1010 {
     return {since:this.telemetrySince,queue:this.queue.length,queueLimit:this.maxQueue,
       peakQueue:this.peakQueue,inFlight:{...this.running},
       limits:{...this.limits,regular:this.adaptiveV1015.limit('regular'),optional:this.adaptiveV1015.limit('optional')},
-      cacheEntries:this.cache.size,cacheLimit:this.maxCache,
+      cacheEntries:this.cache.size,cacheLimit:this.maxCache,cacheV1017:this.cache.snapshot(),
       offline:typeof navigator!=='undefined'&&navigator.onLine===false,
       hidden:typeof document!=='undefined'&&document.visibilityState==='hidden',
       counters:{...this.telemetryCounters},
@@ -228,11 +231,12 @@ export class NetworkCoordinatorV1010 {
   constructor(private readonly limits:Record<NetworkLaneV1010,number>=DEFAULT_LIMITS,
     private readonly maxQueue=48,private readonly maxCache=120,private readonly backoffMs=750){
     this.adaptiveV1015=new AdaptiveCapacityV1015(limits);
+    this.cache=new IntelligentCacheV1017<CacheEntry>(maxCache);
   }
   /** Switching accounts invalidates ALL in-flight results and in-memory personal data. */
   setAccount(account:string){
     if(!account||this.account===account)return;
-    this.reset();this.account=account;
+    this.reset();this.account=account;smartOfflineV1016.setScope(account);
   }
   getAccount(){return this.account;}
   private fullKey(key:string,account:string){return `${this.generation}:${account}:${key}`;}
@@ -258,11 +262,30 @@ export class NetworkCoordinatorV1010 {
   request<T>(options:NetworkRequestV1010<T>):Promise<T>{
     if(options.signal?.aborted)return Promise.reject(abortError());
     const key=this.fullKey(options.key,options.account??this.account);
-    const now=Date.now(),ttl=finite(options.ttlMs??0,0,86400000),stale=finite(options.staleMs??0,0,604800000);
+    const now=Date.now();
+    const lifetime=boundedCacheLifetimeV1017(options.provider??'generic',options.key,
+      finite(options.ttlMs??0,0,86400000),finite(options.staleMs??0,0,604800000));
+    const ttl=lifetime.ttl,stale=lifetime.stale;
     const existing=this.cache.get(key);
     if(existing){
       if(existing.staleUntil<=now)this.cache.delete(key);
-      else if(existing.freshUntil>now){this.telemetryCounters.cacheHits++;this.changedV1011();return Promise.resolve(existing.value as T);}
+      else if(existing.freshUntil>now){
+        this.telemetryCounters.cacheHits++;this.changedV1011();
+        // V1017: best-effort hot-record warming, only for optional reads.
+        // No playback / user actions, hidden/offline tabs, blocked providers or full queues.
+        if(options.priority==='optional'&&ttl>=30000&&this.cache.shouldWarm(key,now)
+          &&this.queue.length<Math.min(12,this.maxQueue)
+          &&this.running.optional<this.adaptiveV1015.limit('optional')
+          &&(typeof navigator==='undefined'||navigator.onLine!==false)
+          &&(typeof document==='undefined'||document.visibilityState!=='hidden')
+          &&(this.blocked.get(options.provider??'generic')??0)<=now
+          &&(this.circuits.get(options.provider??'generic')?.openUntil??0)<=now
+          &&!this.recoveryPending &&!this.jobs.has(key)){
+          const warm=this.enqueue({...options,priority:'optional',signal:undefined,retry:0},key,ttl,stale,true);
+          if(warm)this.cache.markWarmed(key);
+        }
+        return Promise.resolve(existing.value as T);
+      }
       else if(stale>0){
         this.telemetryCounters.staleHits++;this.changedV1011();
         // Stale-while-revalidate: keep showing existing data. A refresh can outlive callers.
@@ -389,7 +412,7 @@ export class NetworkCoordinatorV1010 {
       if(job.ttl>0&&(!job.cacheWhen||job.cacheWhen(result))){
         const now=Date.now();this.cache.delete(job.key);
         this.cache.set(job.key,{value:result,freshUntil:now+job.ttl,staleUntil:now+job.ttl+job.stale});
-        while(this.cache.size>this.maxCache)this.cache.delete(this.cache.keys().next().value!);
+        // V1017 cache evicts expired and least-recently used records by entry & byte budgets.
         for(const listener of this.listeners.get(job.key)??[])try{listener(result);}catch{/* user subscriber */}
       }
       this.jobs.delete(job.key);this.releaseRetainers(job);

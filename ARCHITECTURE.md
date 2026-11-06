@@ -1,3 +1,5 @@
+> **V1016:** `lib/smartOfflineV1016.ts` hält zeitlich begrenzte, account-spezifische letzte bekannte Titel und Lyrics ausschließlich im Browser-RAM. `hooks/usePlaybackPolling.ts` stoppt falsche Live-Anzeige bei Fehlern und beim Offline-Event. `scripts/version-action-titles-v1016.cjs` aktualisiert ausschließlich `run-name` in geschützten GitHub-Workflows nach einem validierten ZIP-Import.
+
 ## V1015 – Adaptive Request Intelligence (2026-11-06)
 
 Die vorhandene Netzwerkanfragesteuerung passt die Parallelität ausschließlich bei Lyrics/Genre und optionalen Inhalten anhand abgeschlossener Antwortzeiten und Fehler automatisch an. Bei Spotify-429-Limits wird Hintergrundlast sofort abgesenkt, ohne die separate Retry-After-Sperre zu umgehen. Nach mehreren schnellen erfolgreichen Antworten wird die Parallelität stufenweise wiederhergestellt. Benutzeraktionen und Wiedergabe behalten eigene feste Kapazitäten. Neue Live-Daten stehen im Service-Status-Dashboard; die anonymen Zähler werden beim Spotify-Kontowechsel zurückgesetzt. Vollständiger Produktionsbuild: über GitHub Actions zu bestätigen.
@@ -1241,7 +1243,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1015
+**Dokumentationsstand:** V1016
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -4084,3 +4086,7 @@ Das Browser-Tab behält getrennte Priority-Lanes und Account-Caches. Optionale A
 ## V1014 – Network Diagnostics 2.0
 
 Der browserlokale `NetworkCoordinatorV1010` misst ausschließlich sichere Zeit- und Statuskategorien je abgeschlossenem Versuch in einem auf 120 Einträge begrenzten Ringpuffer. `snapshotV1011().diagnostics` berechnet P50/P95 der letzten fünf Minuten und das Alter wartender/aktiver Aufträge; es verlassen keine Schlüssel oder Inhalte den Koordinator. `evaluateNetworkDiagnosticsV1014` leitet daraus deterministische und lesende Hinweise ab. Der bisherige `NetworkPerformanceDashboardV1011` zeigt die neuen Werte passiv an. Datenverarbeitung und Kontolöschung bleiben unverändert auf den aktuellen Browser/Account beschränkt. Die Haupt-CI und Vercel-Gates testen V1014 zusammen mit allen bisherigen Netzwerk-Regressionen.
+
+
+## V1017 – Intelligent Cache Manager
+Browserlokaler, kontogebundener LRU-Antwortcache mit 120 Einträgen und 2-MiB-Speicherbudget (geschätzte Größe, pro Eintrag 256 KiB). HTTP-GET-Antworten werden nur mit expliziter TTL und innerhalb der Provider-Obergrenzen zwischengespeichert. Aktuelle Spotify-Wiedergabedaten sind ausgeschlossen. Hot-Entry-Warmups erfolgen nur für optionale Anfragen bei freier Kapazität und ohne Online-/Visibility-/Rate-Limit-Konflikt. Das Dashboard zeigt ausschließlich aggregierte Daten; Kontowechsel löscht Cache und Statistik. Details: `changelog/V1017-INTELLIGENT-CACHE-MANAGER.md`.

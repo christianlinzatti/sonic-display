@@ -277,7 +277,7 @@ export interface UiPreferences {
   beatSyncMode: "off" | "auto" | "manual";
   beatSyncOffsetMs: number;
 }
-export interface MusicState { connected:boolean; connectionStatus:ConnectionStatus; loading:boolean; error:string|null; track:Track|null; progressMs:number; isPlaying:boolean; fetchedAt:number; lyrics:Lyrics|null; }
+export interface MusicState { connected:boolean; connectionStatus:ConnectionStatus; loading:boolean; error:string|null; track:Track|null; progressMs:number; isPlaying:boolean; fetchedAt:number; lyrics:Lyrics|null; offlineSnapshot?:boolean; }
 import type { MusicGenre } from "./animation";
 export type GenreDetectionStatus = "idle" | "loading" | "detected" | "unknown" | "error";
 export interface GenreState {

@@ -11,6 +11,8 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1017 intelligent cache manager','tests/v1017-intelligent-cache-regression.cjs'],
+  ['V1016 smart offline and Action titles','tests/v1016-smart-offline-regression.cjs'],
   ['V1015 adaptive request intelligence','tests/v1015-adaptive-network-regression.cjs'],
   ['V1014 network diagnostics 2.0','tests/v1014-network-diagnostics-regression.cjs'],
   ['V1013 production stability and release metadata','tests/v1013-production-stability-regression.cjs'],
