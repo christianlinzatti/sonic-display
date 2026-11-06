@@ -1,5 +1,5 @@
 name: V960 Concert Continuity Production Gate
-run-name: Sonic Display · V1020 · V960 Concert Continuity Production Gate
+run-name: Sonic Display · V1021 · V960 Concert Continuity Production Gate
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:
