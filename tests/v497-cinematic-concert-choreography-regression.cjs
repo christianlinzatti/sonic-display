@@ -82,7 +82,7 @@ assert(active>100000&&maxFov<40&&large===0,'30-minute continuous live display re
 const src=file=>fs.readFileSync('components/visualizer/'+file,'utf8').replace(/\r\n?/g,'\n');
 for(const [file,tokens] of Object.entries({
  'ThreeAvatar.tsx':['planCinematicConcertV497(','cinematicCueV497={cinematicCueV497}','compositionV497','<Lyrics3DScene','cameraEnabled:props.lipSync?.rapDuetCameraV416!==false','vocalTimeEnabledV496===true && props.lipSync.vocalTimeSegmentsV496?.length'],
- 'StageCameraDirectorV289.tsx':['composeCinematicConcertCameraV497(','authored:!automaticShot','guardAutomaticCameraV351(danceCameraV898.pose,composition)'],
+ 'StageCameraDirectorV289.tsx':['composeCinematicConcertCameraV497(','authored:!automaticShot','guardAutomaticCameraV351(cinematicV1025.pose,composition)'],
  'DynamicStage.tsx':['concertLightMultiplierV497(','authored:authoredLightsV386','cinematicKeyV497','cinematicBeamV497','lightFocusV497','timelineCue.blackout>0'],
 }))for(const token of tokens)assert(src(file).includes(token),`${file}: missing ${token}`);
 assert(src('ThreeAvatar.tsx').includes('manualVocalPriority:props.lipSync?.manualVocalEnabledV385'));
@@ -90,7 +90,7 @@ assert(src('ThreeAvatar.tsx').includes('manualVocalPriority:props.lipSync?.manua
 const cameraStages=src('StageCameraDirectorV289.tsx');
 const cinematicV497=cameraStages.indexOf('const concertFramedV497=composeCinematicConcertCameraV497(');
 const cinematicV848=cameraStages.indexOf('const framedV848=composeCinematicCameraDirectorV848(');
-const lyricsGuardV351=cameraStages.indexOf('const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(danceCameraV898.pose,composition):to;');
+const lyricsGuardV351=cameraStages.indexOf('const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(cinematicV1025.pose,composition):to;');
 assert(cinematicV497>=0&&cinematicV848>cinematicV497&&lyricsGuardV351>cinematicV848,
   'V497 must precede V848 and the final V351 lyrics safety');
 assert(src('StageCameraDirectorV289.tsx').includes('!!authoredCueV400'));

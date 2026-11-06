@@ -128,6 +128,7 @@ import {createEnsembleHipStateV745,directEnsembleHipV745} from "./multiAvatarHip
 import {createNaturalContinuityStateV872,refineNaturalContinuityV872} from "./naturalDanceContinuityV872";
 import {createNaturalDanceStateV758,directNaturalDanceV758} from "./naturalDanceMotionV758";
 import {createDanceVarietyStateV759,stepDanceVarietyV759} from "./intelligentDanceVarietyV759";
+import {createDanceStateV1024,stepDanceChoreographyV1024} from "./aiDanceChoreographyV1024";
 import {sampleNaturalBodyV740,blendNaturalBodyV740} from "./naturalBodyDynamicsV740";
 import {collectGluteRigV741,createGluteOverlayV741,sampleGluteV741,applyGluteRigV741} from "./advancedGluteRigV741";
 import { getAvatarRigProfile, type AvatarRigProfileId } from "./avatarRigProfiles";
@@ -253,6 +254,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   const groundingV665=useRef(newGroundingStateV665());
   const genreDanceV666=useRef(newGenreDanceStateV666());
   const varietyStateV759=useRef(createDanceVarietyStateV759());
+  const danceStateV1024=useRef(createDanceStateV1024());
   const hipStudioV738=useRef(createHipStudioStateV738());
   const beatBassV743=useRef(createBeatBassStateV743());
   const smartHipV744=useRef(createSmartHipStateV744());
@@ -1129,7 +1131,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       plantedRight:footIK.current.right?.contact.phase==='planted',
       qualityGain:propsLipSyncV367?.qualityDanceGainV750??1,
     });
-    const debugMotion = blendNaturalBodyV740(
+    const baseDebugMotionV1024 = blendNaturalBodyV740(
       blendHipDanceV735(filterMotionDebugLayers(advancedRapV685, debugSettingsV735), naturalDanceV758.hip),
       {...naturalDanceV758.body,
         headTilt:debugSettingsV735.layers.head?naturalDanceV758.body.headTilt:0,
@@ -1144,6 +1146,29 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
         leftAnkle:naturalDanceV758.body.leftAnkle*hipLegGainV735,
         rightAnkle:naturalDanceV758.body.rightAnkle*hipLegGainV735,
       });
+    // V1024: phrase variety from the existing music clock, applied to already
+    // calculated upper-body overlays. V839 remains the final additive footwork
+    // guardian; mixer clips, root motion, IK anchors and lips are never changed.
+    const danceV1024=stepDanceChoreographyV1024(danceStateV1024.current,baseDebugMotionV1024,{
+      trackId:track?.id,modelId:avatarModelId??url,
+      seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,
+        progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
+      delta,bpm:audio.bpm,section:showCue?.enabled?showCue.section:performance.section,genre,
+      playing:isPlaying,reducedMotion,
+      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+        !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride||
+        !!clipChoiceV328||!!phraseChoiceV329||!!rapLiveEnabledV412||
+        (!!lowClipV481&&selectedClip===lowClipV481),
+      quality:getActivePerformanceTier(),footIKEnabled:avatarFootIKEnabled,
+      contactKnown:!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+      slot:Math.max(0,Math.min(3,workloadSlot??0)),
+      count:Math.max(1,Math.min(4,ensembleCountV745??Math.max(workloadSlot+1,propsLipSyncV367?.ensembleCountV374??1))),
+      qualityGain:propsLipSyncV367?.qualityDanceGainV750??1,
+    });
+    danceStateV1024.current=danceV1024.state;
+    const debugMotion = danceV1024.motion;
     // V839 is an additive-only, contact-evidenced FINAL dance guard. It never
     // edits source GLB clips, IK anchors, root motion, lips or manual cues.
     const footworkV839=refineNaturalFootworkRigV839(naturalFootworkV839.current,debugMotion,{

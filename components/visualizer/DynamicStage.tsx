@@ -4,6 +4,7 @@ import { useFrame } from "@react-three/fiber";
 import {planConcertStageV882,readConcertStageSyncV882,OFF_CONCERT_STAGE_V882,
  type ConcertStageCueV882} from './concertStageSyncV882';
 import {ConcertStageFxV882} from './ConcertStageFxV882';
+import {planImmersiveConcertFxV1028,mixImmersiveConcertFxV1028} from './immersiveConcertFxV1028';
 import {VirtualPyroStageV891} from './VirtualPyroStageV891';
 import {sampleEpicDropV892,DEFAULT_EPIC_DROP_V892} from './epicDropExperienceV892';
 import {planPyroV891,PYRO_OFF_V891,DEFAULT_PYRO_V891,type PyroCueV891} from './virtualPyrotechnicsV891';
@@ -109,6 +110,7 @@ import type {Lyrics} from "@/types/music";
 import { useEffect, useRef } from "react";
 import { AdditiveBlending as importedAdditiveBlendingV811,Color, Vector3,CanvasTexture,LinearFilter,SRGBColorSpace } from "three";
 import {planAdvancedLightChoreographyV793,LIGHT_CHOREOGRAPHY_OFF_V793} from "./advancedLightChoreographerV793";
+import {planIntelligentStageLightingV1026} from "./intelligentStageLightingV1026";
 import {planProfessionalLightingV841} from "./professionalLightingExperienceV841";
 import type {LightChoreographyCueV793} from "./advancedLightChoreographerV793";
 import type {EpicPeakCueV794} from "./epicPeakMomentsV794";
@@ -226,6 +228,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
   const genreStageCueV894=useRef<GenreStageCueV894>({...GENRE_STAGE_OFF_V894});
   const genreStagePrimaryV894=useRef(new Color());
   const genreStageSecondaryV894=useRef(new Color());
+  const stageLightTintV1026=useRef(new Color());
   const sceneFlags = sceneDetailFlags(useSceneDetail());
   const key = useRef<PointLight>(null);
   const targetPrimary = useRef(new Color());
@@ -860,6 +863,24 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       lyricsWallMatV813.current.color.set(lyricsCueV813.accent==='rhyme'?fxCueV810.secondary:fxCueV810.primary);}
     if(lyricsFloorMatV813.current){lyricsFloorMatV813.current.opacity=showFloorV813?lyricsCueV813.opacity:0;
       lyricsFloorMatV813.current.color.set(lyricsCueV813.accent==='rhyme'?fxCueV810.secondary:fxCueV810.primary);}
+    // V1028: one verified V810 clock, no independent FX activation. The final
+    // post-budget mix happens after V889; V814 fog merely receives a <=1 gain.
+    const immersiveFxV1028=planImmersiveConcertFxV1028({
+      enabled:concertFxV810?.immersiveFxV1028??false,masterEnabled:concertFxV810?.enabled??false,
+      strength:concertFxV810?.immersiveFxStrengthV1028??0,fx:fxCueV810,
+      positionMs:playback.positionMs,startMs:currentActV810?.startMs??-1,
+      endMs:currentActV810?.endMs??-1,durationMs:playback.durationMs,
+      playing:isPlaying&&playback.playing&&reactive,reducedMotion,
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false,
+      manualFx:!!liveSignalV882.manual,seekBlocked:playback.positionMs<(liveSignalV882.atmosphereSeekBlockedUntilMs??0),
+      authoredLanes:authoredLanesV850,lyricsProtected:lyricsProtectedV542,
+      lyricsVisible:!!lyricsVisibleV813,vocalFocus:vocalFocusV542,
+      cameraCloseup:cameraNarrativeV605?.manualCamera===true||
+        concertLipSyncV386?.cinematicSceneV528?.active===true&&vocalFocusV542,
+      groupCount:groupCountV542,tier,energy:audio.energyEnvelope??0,kick:audio.kickAccentIntensity??0,
+      budget:fxPerfV825.gains.particles,pressure:fxPerfStateV825.current.pressure,
+    });
     // V814 augments the existing V308 fog and V762 gobo. No scene.fog replacement.
     const hazeV814=planAtmosphericConcertFxV814({fx:fxCueV810,
       settings:normalizeConcertFxV810(concertFxV810),lyricsProtected:lyricsProtectedV542,
@@ -883,7 +904,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     });
     if(hazeFloorMatV814.current){
       const u=hazeFloorMatV814.current.uniforms;
-      u.uOpacity.value=cinematicFogV887.floorOpacity;
+      u.uOpacity.value=cinematicFogV887.floorOpacity*immersiveFxV1028.fogGain;
       u.uPhase.value=cinematicFogV887.phase;
       u.uFogDriftV887.value=cinematicFogV887.drift;
       u.uFogSoftV887.value=cinematicFogV887.softness;
@@ -892,15 +913,15 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     }
     if(hazeShaftsMatV814.current){
       const u=hazeShaftsMatV814.current.uniforms;
-      u.uOpacity.value=cinematicFogV887.shaftsOpacity;
+      u.uOpacity.value=cinematicFogV887.shaftsOpacity*immersiveFxV1028.fogGain;
       u.uPhase.value=cinematicFogV887.phase;
       u.uFogDriftV887.value=cinematicFogV887.drift;
       u.uFogSoftV887.value=cinematicFogV887.softness;
       u.uFogWarpV887.value=cinematicFogV887.warp;
       (u.uColor.value as Color).set(cinematicFogV887.color);
     }
-    if(hazeFloorV814.current)hazeFloorV814.current.visible=cinematicFogV887.floorOpacity>.002;
-    if(hazeShaftsV814.current)hazeShaftsV814.current.visible=cinematicFogV887.shaftsOpacity>.002;
+    if(hazeFloorV814.current)hazeFloorV814.current.visible=cinematicFogV887.floorOpacity*immersiveFxV1028.fogGain>.002;
+    if(hazeShaftsV814.current)hazeShaftsV814.current.visible=cinematicFogV887.shaftsOpacity*immersiveFxV1028.fogGain>.002;
     // V815 uses the SAME verified FX cue; disables on pauses, blackout, manual
     // light tracks and low tier, and stays outside the central performer lane.
     crowdCueV815.current=planVirtualConcertCrowdV815({fx:fxCueV810,
@@ -1306,6 +1327,13 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     paperStreamersCueV846.current=particleMixV889.streamers;
     festivalCueV844.current=particleMixV889.festival;
     festivalFinaleCueV847.current=particleMixV889.finale;
+    // V1028: last, reduction-only coordinated mix. Keep V871/V889 sources and
+    // V823/V825/authoring caps authoritative; V882 remains the only stage emitter.
+    const immersiveMixV1028=mixImmersiveConcertFxV1028(immersiveFxV1028,
+      liveStageV882.current,particlesCueV816.current,foamCueV817.current);
+    liveStageV882.current=immersiveMixV1028.stage;
+    particlesCueV816.current=immersiveMixV1028.particles;
+    foamCueV817.current=immersiveMixV1028.foam;
     // V891: confirmed sections only; opt-in virtual-only 3D pyrotechnics.
     // Existing V844 CO2, authored V823 particles and blackouts always win.
     livePyroV891.current=planPyroV891({
@@ -1853,6 +1881,25 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       targetPrimary.current.lerp(genreStagePrimaryV894.current.set(genreLookV894.primary),genreLookV894.lightMix);
       targetSecondary.current.lerp(genreStageSecondaryV894.current.set(genreLookV894.secondary),genreLookV894.lightMix);
     }
+    // V1026: concert-camera/verified-act lighting finish for the EXISTING four lights.
+    // V604 + V761 must both confirm the same track/act. V749 alone validates singer slots.
+    // Saved timelines, manual lighting, actual blackout and seek locks override this layer.
+    const stageLightV1026=planIntelligentStageLightingV1026({
+      narrative:cameraNarrativeV605,cinematic:cinematicCueV761,
+      trackId:playback.trackId,durationMs:playback.durationMs,positionMs:playback.positionMs,
+      playing:isPlaying&&playback.playing,reactive,reducedMotion,tier,genre,
+      manualLighting:manualLightingV763||authoredLightsV386||showCue?.lightingEnabled===false||!concertShowLightingV387,
+      manualFx:!!liveSignalV882.manual,seekBlocked:playback.positionMs<(liveSignalV882.atmosphereSeekBlockedUntilMs??0),
+      blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
+      lyricsProtected:!!lyricsProtectedV542,lyricsVisible:!!lyricsVisibleV813,vocalFocus:!!vocalFocusV542,
+      groupCount:groupCountV542,focusSlot:lightingV749.focusSlot,partnerSlot:lightingV749.partnerSlot,
+      energy:audio.energyEnvelope??audio.bass??0,kick:audio.kickAccentIntensity??0,
+    });
+    if(stageLightV1026.active&&stageLightV1026.colorMix>0&&!timelineCue.color){
+      stageLightTintV1026.current.set(stageLightV1026.color);
+      targetPrimary.current.lerp(stageLightTintV1026.current,stageLightV1026.colorMix);
+      targetSecondary.current.lerp(stageLightTintV1026.current,stageLightV1026.colorMix*.65);
+    }
     if (key.current) key.current.color.lerp(targetPrimary.current, colorFade);
     if (fill.current) fill.current.color.lerp(targetSecondary.current, colorFade);
     if (floorLight.current) floorLight.current.color.lerp(
@@ -1873,15 +1920,15 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
     // These factors never overpower a manual cue, low tier, pause, or blackout.
     const beatKeyTargetV559=Math.min(3,keyTargetV462*(1+beatPortraitPlanV559.keyLift*beatScaleV559+cinematicPlanV566.keyLift*cinematicScaleV566));
     const beatFillTargetV559=Math.min(2.4,fillTargetV462*(1+beatPortraitPlanV559.fillLift*beatScaleV559+cinematicPlanV566.fillLift*cinematicScaleV566));
-    if (key.current) key.current.intensity += (beatKeyTargetV559-key.current.intensity)*lerp;
-    if (fill.current) fill.current.intensity += (beatFillTargetV559-fill.current.intensity)*lerp;
-    if (floorLight.current) floorLight.current.intensity += ((sceneFlags.extraLights ? Math.min(2.5,directed(cue.floor) * lightScale * showGain) : 0) - floorLight.current.intensity) * lerp;
+    if (key.current) key.current.intensity += (Math.min(3,beatKeyTargetV559*stageLightV1026.keyGain)-key.current.intensity)*lerp;
+    if (fill.current) fill.current.intensity += (Math.min(2.4,beatFillTargetV559*stageLightV1026.fillGain)-fill.current.intensity)*lerp;
+    if (floorLight.current) floorLight.current.intensity += ((sceneFlags.extraLights ? Math.min(2.5,directed(cue.floor) * lightScale * showGain * stageLightV1026.floorGain) : 0) - floorLight.current.intensity) * lerp;
     // V844: optional narrow stage-floor strobe, never a fullscreen or portrait flash.
     // Apply after normal lighting interpolation, under the original budget visibility mask.
     if(floorLight.current&&floorLight.current.visible&&festivalCueV844.current.strobeGain>0)
       floorLight.current.intensity=Math.min(2.5,floorLight.current.intensity+festivalCueV844.current.strobeGain);
     if (beam.current) {
-      beam.current.intensity += ((sceneFlags.extraLights ? (theme === "minimal" ? .2 : Math.min(3.0,directed(cue.beam) * (1 + smartCue.sweep * .12) * showBeam * lightingV462.beamGain * lightingV542.beamGain * lightingV551.beamGain * lightingV608.beam * lightingMixV749Now.beam * concertGenreV610.beam * lightingV621.beam * concertContinuityV611.beam * cinematicBeamV497*scenicCueV762.current.beamGain * peakBeamGainV794 * (lightAccentV386.focusSlot===null&&!(cinematicBeamV497>1&&cinematicCueV497?.focusSlot!=null)?choreographyV793.beamGain:1))) * lightScale * liveCueV882.beamGain : 0) - beam.current.intensity) * lerp;
+      beam.current.intensity += ((sceneFlags.extraLights ? (theme === "minimal" ? .2 : Math.min(3.0,directed(cue.beam) * (1 + smartCue.sweep * .12) * showBeam * lightingV462.beamGain * lightingV542.beamGain * lightingV551.beamGain * lightingV608.beam * lightingMixV749Now.beam * concertGenreV610.beam * lightingV621.beam * concertContinuityV611.beam * cinematicBeamV497*scenicCueV762.current.beamGain * peakBeamGainV794 * (lightAccentV386.focusSlot===null&&!(cinematicBeamV497>1&&cinematicCueV497?.focusSlot!=null)?choreographyV793.beamGain:1))) * lightScale * liveCueV882.beamGain * stageLightV1026.beamGain : 0) - beam.current.intensity) * lerp;
       beam.current.position.x = sceneFlags.beamSweep && cue.sweep && !reducedMotion && tier === "high"
         ? Math.sin(state.clock.elapsedTime * .65) * (1.2 + cue.sweep + director.sweep + predictive.anticipation * .15 + smartCue.sweep * .24) * lightingV462.sweepGain * lightingV542.sweepGain * lightingV551.sweepGain * lightingV608.sweep * lightingMixV749Now.sweep * concertGenreV610.sweep * lightingV621.sweep * concertContinuityV611.sweep : 0;
       if(scenicCueV762.current.active&&sceneFlags.beamSweep&&!lyricsProtectedV542&&

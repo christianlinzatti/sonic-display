@@ -57,7 +57,7 @@ test('V682 precedes every later camera pass and final V351 guard',()=>{
     assert(position>previous,`${stage} must follow the preceding camera composition`);
     previous=position;
   }
-  const finalGuard='const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(danceCameraV898.pose,composition):to;';
+  const finalGuard='const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(cinematicV1025.pose,composition):to;';
   assert(src.includes(finalGuard),'V351 must guard final V898 after V897 and V848, not an earlier intermediate frame');
   assert(src.indexOf(finalGuard)>previous,'V351 guard must run after all camera effects');
 });

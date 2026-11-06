@@ -61,13 +61,13 @@ const view=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');
 const dancer=fs.readFileSync('components/visualizer/ThreeAvatar.tsx','utf8');
 const panel=fs.readFileSync('components/visualizer/ExpressiveRapDirectorPanelV425.tsx','utf8');
 for(const token of ['rapCameraBlockedV429','authoredCueV400','timelineCue?.active','shotV377.active',
-  'showCue?.cameraEnabled','studioProfileV398.enabled','rapCameraHoldV429','composeRapCameraV429','guardAutomaticCameraV351(danceCameraV898.pose,composition)'])
+  'showCue?.cameraEnabled','studioProfileV398.enabled','rapCameraHoldV429','composeRapCameraV429','guardAutomaticCameraV351(cinematicV1025.pose,composition)'])
   assert(stage.includes(token),`camera precedence: ${token}`);
 // V865.11: the V429 overlay remains upstream of all later camera stages.
 // The LAST V351 guard applies to the V898 camera choice, after V848 and V655.
 const rapOverlay=stage.indexOf('const rapFramedV429=composeRapCameraV429(');
 const finalPose=stage.indexOf('const framedV848=composeCinematicCameraDirectorV848(');
-const finalGuard=stage.indexOf('const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(danceCameraV898.pose,composition):to;');
+const finalGuard=stage.indexOf('const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(cinematicV1025.pose,composition):to;');
 assert(rapOverlay>=0 && finalPose>rapOverlay && finalGuard>finalPose,
   'V429 overlay must precede V848 and the final V351 lyrics guard');
 assert(stage.includes('const rapCameraBlockedV429=!automaticShot||!!timelineCue?.active||'),

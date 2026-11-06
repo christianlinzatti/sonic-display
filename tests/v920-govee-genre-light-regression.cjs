@@ -179,7 +179,7 @@ test('live integration layers V920 after V919 and before bass and group',()=>{
  assert.ok(sync.indexOf('const unboosted=genreDecision')>sync.indexOf('const sectionLook='));
  assert.ok(sync.indexOf('const bassLook=')>sync.indexOf('const unboosted=genreDecision'));
  assert.ok(sync.indexOf('const target=applyGoveeGroupBrightnessV915')>sync.indexOf('const unboosted=genreDecision'));
- assert.match(sync,/sectionSettings,genreSettings,cinematicSettings(?:,shockSettings)?(?:,neonSettings)?(?:,energySettings)?(?:,festivalSettings)?(?:,spatialSettings)?(?:,calibrationSettings)?(?:,roadmapSettings)?\]/); // V958 optional postprocessing preserves V920 dependencies.
+ assert.match(sync,/sectionSettings,genreSettings,cinematicSettings(?:,shockSettings)?(?:,neonSettings)?(?:,energySettings)?(?:,festivalSettings)?(?:,spatialSettings)?(?:,calibrationSettings)?(?:,roadmapSettings)?(?:,syncSettingsV1027)?\]/); // V958 optional postprocessing preserves V920 dependencies.
 });
 test('settings UI is mounted in existing Govee settings',()=>{
  const panel=read('components/GoveeLanPanelV909.tsx'),ui=read('components/GoveeGenreStudioV920.tsx');

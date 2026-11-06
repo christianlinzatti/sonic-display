@@ -85,7 +85,7 @@ const requires={
  'components/visualizer/VisualizerStage.tsx':['sampleSmartCameraChoreographyV792','smartCameraChoreographyV792={smartCameraV792}','data-v792-move'],
  'components/visualizer/registry.tsx':['smartCameraChoreographyV792?:'],
  'components/visualizer/ThreeAvatar.tsx':['choreographyV792={props.smartCameraChoreographyV792}'],
- 'components/visualizer/StageCameraDirectorV289.tsx':['composeSmartCameraChoreographyV792','const framedV792=','guardAutomaticCameraV351(danceCameraV898.pose','!studioProfileV398.enabled','!lipSync?.rapCameraOverridesV430?.length'],
+ 'components/visualizer/StageCameraDirectorV289.tsx':['composeSmartCameraChoreographyV792','const framedV792=','guardAutomaticCameraV351(cinematicV1025.pose','!studioProfileV398.enabled','!lipSync?.rapCameraOverridesV430?.length'],
 };
 for(const [file,words] of Object.entries(requires)){
  const content=fs.readFileSync(path.join(root,file),'utf8');

@@ -39,6 +39,7 @@ export interface ConcertFxSettingsV810 {
   reactiveParticles:boolean;particleSparks:boolean;particleShards:boolean;particleConfetti:boolean;particleEnergyRings:boolean;
   particleIntensity:number;particleDensity:'subtle'|'balanced'|'epic';
   kineticStage:boolean;kineticIntensity:number;foamCannon:boolean;foamIntensity:number;foamSide:'both'|'left'|'right';
+  immersiveFxV1028:boolean;immersiveFxStrengthV1028:number;
   festivalFxV844:boolean;festivalIntensityV844:number;festivalStyleV844:'balanced'|'festival';
   festivalCoordinationV871:boolean;festivalClarityV871:number;
   festivalCo2V844:boolean;festivalSparksV844:boolean;festivalConfettiV844:boolean;
@@ -100,6 +101,7 @@ export const DEFAULT_CONCERT_FX_V810:Readonly<ConcertFxSettingsV810>={
   reactiveParticles:true,particleSparks:true,particleShards:true,particleConfetti:true,particleEnergyRings:true,
   particleIntensity:65,particleDensity:'balanced',
   kineticStage:true,kineticIntensity:65,foamCannon:true,foamIntensity:65,foamSide:'both',
+  immersiveFxV1028:true,immersiveFxStrengthV1028:65,
   festivalFxV844:true,festivalIntensityV844:65,festivalStyleV844:'balanced',
   festivalCoordinationV871:true,festivalClarityV871:70,
   festivalCo2V844:true,festivalSparksV844:true,festivalConfettiV844:true,
@@ -234,6 +236,8 @@ export function normalizeConcertFxV810(raw?:Partial<ConcertFxSettingsV810>|null)
  foamCannon:typeof raw?.foamCannon==='boolean'?raw.foamCannon:d.foamCannon,
  foamIntensity:finite(raw?.foamIntensity)?Math.round(clamp(raw.foamIntensity,0,100)):d.foamIntensity,
  foamSide:raw?.foamSide==='left'||raw?.foamSide==='right'?raw.foamSide:'both',
+ immersiveFxV1028:typeof raw?.immersiveFxV1028==='boolean'?raw.immersiveFxV1028:d.immersiveFxV1028,
+ immersiveFxStrengthV1028:finite(raw?.immersiveFxStrengthV1028)?Math.round(clamp(raw.immersiveFxStrengthV1028,0,100)):d.immersiveFxStrengthV1028,
  festivalFxV844:typeof raw?.festivalFxV844==='boolean'?raw.festivalFxV844:d.festivalFxV844,
  festivalCoordinationV871:typeof raw?.festivalCoordinationV871==='boolean'?raw.festivalCoordinationV871:d.festivalCoordinationV871,
  festivalClarityV871:finite(raw?.festivalClarityV871)?Math.round(clamp(raw.festivalClarityV871,0,100)):d.festivalClarityV871,

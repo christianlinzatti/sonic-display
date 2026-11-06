@@ -93,7 +93,7 @@ check('stage applies after V880',()=>{const src=read('components/visualizer/Dyna
 check('stage does not allocate new meshes',()=>{const s=read('components/visualizer/DynamicStage.tsx');assert(!s.includes('<AdvancedParticleRendererV889'));});
 check('UI persists settings',()=>{const s=read('components/visualizer/LiveFxDeckV881.tsx');assert(s.includes('window.localStorage.getItem(PARTICLE_STORAGE_KEY_V889)'));assert(s.includes('window.localStorage.setItem(PARTICLE_STORAGE_KEY_V889'));assert(s.includes('particleSettingsV889:normalizeParticleV889'));});
 check('UI exposes sliders and switches',()=>{const s=read('components/visualizer/LiveFxDeckV881.tsx');for(const k of ['V889 · Advanced Particle FX','particleSettingsV889.mode','particleSettingsV889.focus','particleSettingsV889.intensity','exportParticleV889'])assert(s.includes(k));});
-check('version and lock sync',()=>{const p=JSON.parse(read('package.json')),l=JSON.parse(read('package-lock.json'));assert.match(p.version,/^0\.1\.0-v(?:889|890|891|892|893|894|895|896|897|898|899|900|901|902|903|904|905|906|907|908)$/);assert.equal(l.version,p.version);assert.equal(l.packages[''].version,p.version);});
+check('version and lock sync',()=>{const p=JSON.parse(read('package.json')),l=JSON.parse(read('package-lock.json'));assert(Number(/^0\.1\.0-v(\d+)$/.exec(p.version)?.[1])>=889);assert.equal(l.version,p.version);assert.equal(l.packages[''].version,p.version);});
 check('CI gate',()=>assert(read('.github/workflows/v832-continuous-validation.yml').includes('npm run test:v889:ui-types')));
 check('Windows gate',()=>assert(read('scripts/verify-v889-windows.ps1').includes('verify:v889:focused')));
 check('release docs',()=>assert(read('docs/features/stage/ADVANCED_PARTICLE_FX_V889.md').includes('V889')));

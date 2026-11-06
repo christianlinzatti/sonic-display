@@ -31,6 +31,11 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1028 Immersive Concert FX 5.0','tests/v1028-immersive-concert-fx-regression.cjs');
+  run('V1027 Govee Concert Sync 3.0','tests/v1027-govee-concert-sync-regression.cjs');
+  run('V1026 Intelligent Stage Lighting 4.0','tests/v1026-intelligent-stage-lighting-regression.cjs');
+  run('V1025 Cinematic Camera Intelligence 4.0','tests/v1025-cinematic-camera-intelligence-regression.cjs');
+  run('V1024 AI Dance Choreography 4.0','tests/v1024-ai-dance-choreography-regression.cjs');
   run('V1023 Advanced Rap Performance 6.0','tests/v1023-advanced-rap-performance-regression.cjs');
   run('V1022 AI Live Show Adaptation','tests/v1022-live-show-adaptation-regression.cjs');
   run('V1017 intelligent cache manager','tests/v1017-intelligent-cache-regression.cjs');

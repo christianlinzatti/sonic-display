@@ -1,3 +1,15 @@
+## V1026 – Intelligent Stage Lighting 4.0
+
+Verifizierte Songakte (V604) und filmische Kameraabschnitte (V761) stimmen nun die **vier vorhandenen virtuellen Lichtkanäle** präziser auf Sänger, Duette, Hooks und Breaks ab. Handgeschriebene Licht-Timelines/Blackout sowie Lyrics-Lesbarkeit bleiben oberste Priorität. Das Feature enthält **keine physische Govee-Steuerung** und keine zusätzliche Lichtquelle. Einzelheiten: `changelog/V1026-INTELLIGENT-STAGE-LIGHTING-4.md`.
+
+# V1025 – Cinematic Camera Intelligence 4.0
+
+Die Konzertkamera fährt sanfter durch verifizierte Song-Akte (V604/V895) und berücksichtigt tatsächliche Avatar-Anker sowie bestätigte V528-Sänger-/Ensemble-Rollen. Leise Lead-Nahaufnahme, Song-Handoff, Ensemble- und Hook-/Arena-Fahrten mit V540/V550-Framingprüfung für jeden Avatar. Lyrics, manuelle Keyframes/Presets, Pause, Seek, reduzierte Bewegung und schwache Hardware bleiben geschützt. Integration direkt in `StageCameraDirectorV289.tsx`, **eine** bestehende R3F-Kamera. Keine erfundene KI-Erkennung, keine zusätzlichen Timer oder Geräte-Kommandos. `npm run test:v1025`, `npm run test:v1025:types` und Release-Preflight prüfen alle Sicherheitsregeln. Siehe `changelog/V1025-CINEMATIC-CAMERA-INTELLIGENCE-4.md`.
+
+# V1024 – AI Dance Choreography 4.0
+
+Die Live-GLB-Dancer erhalten eine dezente, kontakterhaltende Phrasenvariation und Ensemble-Rollen ohne zusätzliche Animationen oder konkurrierende Foot-IK. Es werden nur vorhandene additive Oberkörperkanäle und die vorhandene BPM-/Songabschnitts-Evidenz verwendet. `npm run test:v1024` prüft Glättung, Wiederholungsvermeidung, Kontaktschutz und manuelle Vorrangschaltung; `npm run test:v1024:types` prüft die Modul-Typen. Vollständiger Next.js-Produktionsbuild bleibt GitHub Actions vorbehalten. Details: `changelog/V1024-AI-DANCE-CHOREOGRAPHY-4.md`.
+
 # V1023 – Advanced Rap Performance 6.0
 
 Die produktive Avatar-Pipeline verfeinert verifizierte Wort-Gesten und die Geschwindigkeit des vorhandenen Lip-Sync-Interpolators, ohne zusätzliche Viseme oder Stimmen zu erfinden. Der V1016–V1022-Schutz für manuelle Eingriffe, Sängerzuordnung, GLB-Kurven, Foot-IK und reduzierte Bewegung gilt weiterhin. Tests: `npm run test:v1023`, `npm run test:v1023:types`. Details: `changelog/V1023-ADVANCED-RAP-PERFORMANCE-6.md`.
@@ -2691,3 +2703,11 @@ Browserlokaler, kontogebundener LRU-Antwortcache mit 120 Einträgen und 2-MiB-Sp
 ## V1020 – AI Concert Storytelling
 
 Die Live-FX-Ansicht enthält eine **lesende, songgebundene Dramaturgie** aus verifizierten V604/V763-Akten: Auftakt, Fokus, Build, Peak, Atempause und ggf. Finale. Der Plan zeigt Soll-Intensität und genrebezogene Bühnen-/Kamera-/Avatar-/Licht-Vorschläge, ohne echte Messwerte zu erfinden oder Geräte zu steuern. V1019 und die vorhandene Konzertregie behalten die alleinige Autorität über aktive Cues. Pause, Seek, Blackout, manuelle Regie, fehlende oder unvollständige Timeline unterdrücken die Vorschau. Tests: `npm run test:v1020`.
+
+## V1027 · Govee Concert Sync 3.0
+
+Four-zone, explicitly enabled Govee LAN room-light sync with selected fixture mapping, manually observed visual delay, soft color/brightness adjustments, and manual pause. Only verified V318 song sections; no new polling or automatic power commands. Existing V909/V915/V927/V961 protections remain authoritative. See `changelog/V1027-GOVEE-CONCERT-SYNC-3.md`.
+
+## V1028 – Immersive Concert FX 5.0
+
+Visuelle Showchoreografie für die vorhandenen Lichtwellen, Nebel, Konfetti und Schaum-Effekte. V604/V761/V810 bestätigte Abschnitte und gemessene V822-Audioakzente sind die einzige musikalische Evidenz. Reduktion nur nach den vorhandenen Effekt-/Performance-Gates; keine zusätzlichen Draw Calls oder Hardwareaktionen. Einstellbar im Concert FX Studio. Siehe `changelog/V1028-IMMERSIVE-CONCERT-FX-5.md`.

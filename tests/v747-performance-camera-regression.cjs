@@ -121,7 +121,7 @@ ok(camera.indexOf('const framedV747=')>=0 &&
   camera.indexOf('const framedV747=')<camera.indexOf('const framedV848=') &&
   camera.indexOf('const framedV848=')<camera.indexOf('const stageFramed=automaticShot') &&
   camera.includes('const framedV848=composeCinematicCameraDirectorV848(framedV838,sceneV528,') &&
-  camera.includes('const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(danceCameraV898.pose,composition):to;'),
+  camera.includes('const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(cinematicV1025.pose,composition):to;'),
   'final V351 guard must protect the current V898 pose after V747 and V848');
 const registry=fs.readFileSync('components/visualizer/registry.tsx','utf8');ok(registry.includes('performanceCameraV747?:'));
 const visual=fs.readFileSync('components/visualizer/VisualizerStage.tsx','utf8');ok(visual.includes('performanceCameraV747:coordinatedCameraV750')&&visual.includes('normalizePerformanceCameraV747(preferences.avatarPerformanceCameraV747)')&&visual.includes('scaleAutomaticPercentV750(cameraSettingsV750.strength,applyTuneMultiplierV755(qualityV750.camera'), 'V750 camera budget retains V747 settings and source');

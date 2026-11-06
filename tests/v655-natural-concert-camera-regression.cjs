@@ -76,12 +76,12 @@ const camera=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx'
 assert(camera.includes('advanceNaturalCameraV655(')&&camera.includes('composeNaturalCameraV655('));
 assert(camera.includes('composePerformanceCameraV747(\n      naturalFramedV655,') &&
   camera.includes('const framedV848=composeCinematicCameraDirectorV848(framedV838,sceneV528,') &&
-  camera.includes('const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(danceCameraV898.pose,composition):to;') &&
+  camera.includes('const stageFramed=automaticShot\n      ?guardAutomaticCameraV351(cinematicV1025.pose,composition):to;') &&
   camera.includes('const cinematicCameraV897=sampleCinematicCameraV897({') &&
   camera.indexOf('const framedV747=')<camera.indexOf('const framedV848=') &&
   camera.indexOf('const framedV848=')<camera.indexOf('const cinematicCameraV897=') &&
   camera.indexOf('const cinematicCameraV897=')<camera.indexOf('const danceCameraV898=')&&
-  camera.indexOf('const danceCameraV898=')<camera.indexOf('guardAutomaticCameraV351(danceCameraV898.pose,composition)'));
+  camera.indexOf('const danceCameraV898=')<camera.indexOf('guardAutomaticCameraV351(cinematicV1025.pose,composition)'));
 assert(camera.includes('naturalV655.cue.cameraRate'));
 assert(Number(require('../package.json').version.match(/v(\d+)/)?.[1])>=655);
 console.log(`PASS V655: verified vocalist focus, 3 shot variants, hold + seek + manual guards, ${transitions} switches over 154s, safe 3D frame`);

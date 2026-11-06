@@ -130,7 +130,7 @@ check('bridge normalizes camera settings and preserves verified plan',()=>{
 check('V897 positioned after V848 but before V351 final guard',()=>{
  const src=read('components/visualizer/StageCameraDirectorV289.tsx');
  const a=src.indexOf('const framedV848='),b=src.indexOf('const cinematicCameraV897='),
-  d=src.indexOf('const danceCameraV898='),c=src.indexOf('guardAutomaticCameraV351(danceCameraV898.pose');
+  d=src.indexOf('const danceCameraV898='),c=src.indexOf('guardAutomaticCameraV351(cinematicV1025.pose');
  assert(a>=0&&b>a&&d>b&&c>d);
  assert(src.includes('cinematicCameraV897.cameraRate'));
  assert(!src.includes('new PerspectiveCamera'));

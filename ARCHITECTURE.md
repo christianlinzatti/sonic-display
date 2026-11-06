@@ -1,3 +1,11 @@
+# V1026 – Intelligent Stage Lighting 4.0
+
+`DynamicStage.tsx` komponiert unverändert die existierenden V462/V542/V551/V749/V762-Key-, Fill-, Spot- und Bodenlichter. `intelligentStageLightingV1026.ts` wertet danach read-only die V604-verifizierte Song-Timeline und den V761-Camera-Cue aus, validiert Track/Dauer/Akt sowie V749-Sänger-Slots und ergänzt **ausschließlich kleine Multiplikatoren** und einen 4.5%-Farbmix ohne weitere Lights, Shadows oder Renderer-Loops. Gespeicherte Timelines, manueller FX-Modus, Blackout, Seek, Pause, Low Tier und reduzierte Bewegung blockieren den Layer; sichtbare Lyrics begrenzen den Beam und schützen Gesicht/Fill. Der V1026-Layer sendet keine Govee-, Matter-, Alexa- oder Netzwerk-Kommandos.
+
+# V1025 – Cinematic Camera Intelligence 4.0
+
+Der deterministische Planer `cinematicCameraIntelligenceV1025.ts` führt verifizierte V604/V895 Songakte mit aktuellen V528-Sänger-/Handoff-Cues und tatsächlich gesampelten V377-Avatarwurzeln zusammen. Er formt ausschließlich die bereits laufende R3F-Kamera in `StageCameraDirectorV289.tsx`, nach V898 und vor dem letzten V351-Lyrics-Wächter. V540/V550-Prüfungen erfassen Gesamtbild und jeden Einzelavatar; jede Verschlechterung verwirft den Vorschlag ohne Pose-Mutation. Authored-Cues, manuelle Kameras, sichtbare Lyrics, Pause/Seek, reduzierte Bewegung und niedrige Qualitätsstufe sperren den Effekt. Neue Song- oder Sängererkennung, eigene Hardware-Aktionen, Timer, zweite Kamera oder Persistenz existieren nicht. Details: `changelog/V1025-CINEMATIC-CAMERA-INTELLIGENCE-4.md`.
+
 # V1022 – AI Live Show Adaptation
 
 Der pure Planer `lib/aiLiveShowAdaptationV1022.ts` liest den V1021-Genreplan und passt die vorgeschlagene Intensität nur bei track- und positionsgleichen V896-Messungen an. V826-Rendererfenster mit plausibler Stichprobe begrenzen FX-Dichte und bewegte Looks. Kein eigenständiger Dispatch, keine Zusatzaufrufe, kein Speicher; alle Sicherheitsflags führen zu einer inaktiven Vorschau. `LiveShowAdaptationPanelV1022` zeigt Evidenz und Empfehlungen im Live-FX-Deck.
@@ -1257,7 +1265,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1023
+**Dokumentationsstand:** V1028
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -4131,3 +4139,16 @@ Die Kanonischen `Track`- und `Lyrics`-DTOs liegen in `types/playbackCore.ts`; `t
 ## V1023 – Advanced Rap Performance 6.0
 
 Die produktive GLB-Avatar-Pipeline verfeinert die bereits verifizierten V472/V567 Wort-Gesten mit `advancedRapPerformanceV1023.ts`. Die Verfeinerung benötigt bestätigte Wortzeiten und eine erlaubte Sängerrolle; V515 bleibt der letzte additive Bewegungsbegrenzer. In `VocalRigV368.tsx` wird ausschließlich die Antwortgeschwindigkeit vorhandener Mundziele (jaw/round/wide) innerhalb der bestätigten V837 Wortintervalle vorsichtig angepasst. B/P/M-Lippenverschlüsse, manuelle V644-Viseme, audio-/stem-basierte Prioritäten, importierte Clips, Foot-IK und reduzierte Bewegung bleiben geschützt. Keine neue Phonem-/Stimmidentifikation, kein Hardware- oder Netzwerkkontakt, keine zusätzlichen Ticker. In V1023 sind Regression und isolierter TypeScript-Check Pflicht in GitHub Actions und Vercel.
+
+
+## V1024 – AI Dance Choreography 4.0
+
+`components/visualizer/aiDanceChoreographyV1024.ts` ergänzt im produktiven `GltfDancerAvatarV492`-Frame die bereits generierten additiven Oberkörper- und Armbewegungen. Die deterministische Phrasenvariation nutzt vorhandenen Song-Takt (BPM) und die vorhandene Songabschnitts-Klassifikation, nicht ein neues Audio-/Stimm-/Beat-Erkennungsverfahren. Eine Zweier-Historie verhindert unmittelbar wiederkehrende Motive; zeitkonstante Glättung und ein gemeinsamer Phrasenanker koordinieren mehrere Avatare. Nur bereits vorhandene Rig-Kanäle erhalten kleine Multiplikatoren; fehlende Kanäle bleiben fehlend und Nullen bleiben Null. Nur bei bestätigtem Foot-IK-Kontakt und ohne manuelle Priorität wird moduliert. Beide gepflanzten Füße reduzieren die Akzente sofort. Importierte GLB-Clips, Root, Hüften, Beine, IK-Solver, Morph-/Lip-Sync und manuelle Choreografien werden nicht angefasst. Kein zusätzlicher Renderloop, Speicherpersistenz, API- oder Govee-Kontakt. Die Regression und der isolierte TypeScript-Check sind verpflichtend im V931-/Vercel-Gate.
+
+## V1027 – Govee Concert Sync 3.0
+
+`lib/goveeConcertSyncV1027.ts` is pure, opt-in four-zone mapping and bounded lighting overlay. `components/GoveeConcertSyncStudioV1027.tsx` only changes browser-local settings in the existing Govee settings panel. `GoveeMusicSyncV909` consumes these settings in its existing paced per-device dispatch after group-capped/voice cues and before the V961 governor, never adding a network loop. Verified V318 song markers are required; opt-in, manual cues, saved shows, playback/visibility, lyrics, recovery, voice and reduced motion gate V1027. Optical lag is manually entered and combined by max with V927, never measured from status HTTP.
+
+## V1028 – Immersive Concert FX 5.0
+
+Der `immersiveConcertFxV1028.ts`-Planer wird im **bestehenden** `DynamicStage.tsx`-`useFrame` einmal aus der V810-verifizierten Song-Autorität berechnet. Seine ausschließlich begrenzenden Multiplikatoren verändern die Uniforms des existierenden V814/V887-Fogs und nach V889 die bereits zugeteilten V882-Ringe, V816-Instanzen und V817-Foam-Cues. Gespeicherte Timelines, Blackout, Lyrics, Vocal-Porträts, Seek und V825-Performance-Grenzen gelten unverändert. Kein neues Netzwerk, kein Licht-/Stroboskopkommando, keine neue Canvas-/Renderer-Schleife.

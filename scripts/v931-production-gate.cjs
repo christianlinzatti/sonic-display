@@ -11,6 +11,11 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1028 Immersive Concert FX 5.0','tests/v1028-immersive-concert-fx-regression.cjs'],
+  ['V1027 Govee Concert Sync 3.0','tests/v1027-govee-concert-sync-regression.cjs'],
+  ['V1026 Intelligent Stage Lighting 4.0','tests/v1026-intelligent-stage-lighting-regression.cjs'],
+  ['V1025 Cinematic Camera Intelligence 4.0','tests/v1025-cinematic-camera-intelligence-regression.cjs'],
+  ['V1024 AI Dance Choreography 4.0','tests/v1024-ai-dance-choreography-regression.cjs'],
   ['V1023 Advanced Rap Performance 6.0','tests/v1023-advanced-rap-performance-regression.cjs'],
   ['V1022 AI Live Show Adaptation','tests/v1022-live-show-adaptation-regression.cjs'],
   ['V1021 Genre Intelligence 3.0','tests/v1021-genre-intelligence-regression.cjs'],
@@ -90,6 +95,8 @@ const regressions = [
   ['Source syntax + duplicate imports', 'tests/check-source-syntax.cjs'],
 ];
 const productionChecks = [
+  ['V1025 Cinematic Camera isolated TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','components/visualizer/cinematicCameraIntelligenceV1025.ts']],
+  ['V1024 Dance Choreography isolated TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','components/visualizer/aiDanceChoreographyV1024.ts']],
   ['V1023 Rap Performance strict TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','components/visualizer/advancedRapPerformanceV1023.ts']],
   ['V1022 Live Show Adaptation strict TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','lib/aiLiveShowAdaptationV1022.ts']],
   ['V1021 Genre Intelligence strict TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','lib/genreIntelligenceV1021.ts']],

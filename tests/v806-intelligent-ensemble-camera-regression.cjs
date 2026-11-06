@@ -123,7 +123,7 @@ test('2500 deterministic real-position probes with monotone safety limits',()=>{
 const camera=fs.readFileSync('components/visualizer/StageCameraDirectorV289.tsx','utf8');
 test('V806 is a real live camera finish',()=>{
  for(const fragment of ['composeIntelligentEnsembleCameraV806(framedV797,vocalSpotlightV797',
- 'sceneV528,duetAnchorSampleV377.current.anchors','guardAutomaticCameraV351(danceCameraV898.pose,composition)'])
+ 'sceneV528,duetAnchorSampleV377.current.anchors','guardAutomaticCameraV351(cinematicV1025.pose,composition)'])
   assert(camera.includes(fragment),fragment);
 });
 test('the original V797 camera composition stays in place',()=>assert(camera.includes('composeMultiVocalSpotlightCameraV797(framedV792')));

@@ -32,6 +32,7 @@ import {previousVerifiedConcertSceneV960,applyConcertContinuityV960} from '@/lib
 import {governConcertLookV961} from '@/lib/goveeConcertGovernorV961';
 import {GOVEE_ROOM_ATMOSPHERE_EVENT_V987,normalizeRoomAtmosphereSessionV987,planRoomAtmosphereV987,applyRoomAtmosphereV987,type RoomAtmosphereSessionV987} from '@/lib/goveeAtmosphereSyncV987';
 import {getConcertTimelineV763} from '@/components/visualizer/concertTimelineBridgeV763';
+import {GOVEE_SYNC_EVENT_V1027,GOVEE_SYNC_KEY_V1027,loadGoveeSyncV1027,visualAdvanceV1027,safeGoveeSyncProgressV1027,planGoveeSyncV1027,applyGoveeSyncV1027,type GoveeSyncSettingsV1027} from '@/lib/goveeConcertSyncV1027';
 import {planConcertNarrativeV962,dimConcertNarrativeLookV962} from '@/lib/concertNarrativeV962';
 import {planVerifiedConcertBridgeV963,dimConcertBridgeLookV963} from '@/lib/concertBridgeV963';
 import {planConcertPeakRecoveryV964,dimConcertPeakRecoveryLookV964} from '@/lib/concertPeakRecoveryV964';
@@ -62,6 +63,7 @@ export function GoveeMusicSyncV909(){
  const [festivalSettings,setFestivalSettings]=useState<GoveeFestivalSettingsV925>(loadGoveeFestivalV925);
  const [spatialSettings,setSpatialSettings]=useState<GoveeSpatialSettingsV926>(loadGoveeSpatialV926);
  const [calibrationSettings,setCalibrationSettings]=useState<GoveeRoomCalibrationV927>(loadGoveeCalibrationV927);
+ const [syncSettingsV1027,setSyncSettingsV1027]=useState<GoveeSyncSettingsV1027>(loadGoveeSyncV1027);
  const [roadmapSettings,setRoadmapSettings]=useState<ConcertSettingsV958>(loadConcertRoadmapV958);
  const stageCueV921=useRef<GoveeStageCueV921|null>(null);
  const roomAtmosphereV987=useRef<RoomAtmosphereSessionV987|null>(null);
@@ -228,6 +230,13 @@ export function GoveeMusicSyncV909(){
   const storage=(event:StorageEvent)=>{if(!event.key||event.key===GOVEE_FESTIVAL_KEY_V925)refresh();};
   refresh();window.addEventListener(GOVEE_FESTIVAL_EVENT_V925,refresh);window.addEventListener('storage',storage);
   return()=>{window.removeEventListener(GOVEE_FESTIVAL_EVENT_V925,refresh);window.removeEventListener('storage',storage);};
+ },[]);
+ // V1027 is an explicit opt-in layer inside the existing sender. No extra LAN timer.
+ useEffect(()=>{
+  const refresh=()=>setSyncSettingsV1027(loadGoveeSyncV1027());
+  const storage=(e:StorageEvent)=>{if(!e.key||e.key===GOVEE_SYNC_KEY_V1027)refresh();};
+  refresh();window.addEventListener(GOVEE_SYNC_EVENT_V1027,refresh);window.addEventListener('storage',storage);
+  return()=>{window.removeEventListener(GOVEE_SYNC_EVENT_V1027,refresh);window.removeEventListener('storage',storage);};
  },[]);
  // Never use section cues imported for a different track; refresh immediately on V318 imports.
  useEffect(()=>{
@@ -512,7 +521,35 @@ export function GoveeMusicSyncV909(){
        consent:loadAlexaGoveeConsentV970(),playing:state.isPlaying,visible:!document.hidden,
        savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
        recovering:recoveringDevices.has(ip),now:Date.now()});
-      const finalLook=governConcertLookV961(previous,voiceLookV970,{
+      // V1027 uses only selected, explicitly assigned fixtures and verified V318
+      // phase markers. The V927 and manual visual advances are MAXed, not added.
+      // V915 group/master caps and V961 governor remain authoritative; no second LAN request.
+      const advanceV1027=visualAdvanceV1027(syncSettingsV1027,ip,visualAdvance);
+      // Never pre-trigger the NEXT section: V927's optical guard uses the same
+      // rule. The greatest manual delay is applied only inside the present
+      // verified section, so even an overlapping/adjacent hook is not invented.
+      const nextStartV1027=sourceSections[sectionIndex+1]?.startMs??Infinity;
+      const safeProgressV1027=safeGoveeSyncProgressV1027(progress,advanceV1027,
+       sourceSection?.startMs??null,sourceSection?.durationMs??null,nextStartV1027);
+      const verifiedPhaseV1027=resolveGoveePhaseV911(analysis.current,state.track.id,
+       safeProgressV1027,syncSettingsV1027.transitionMs);
+      const syncDecisionV1027=planGoveeSyncV1027({settings:syncSettingsV1027,ip,
+       selectedIps:config.selectedIps,bridgeEnabled:config.enabled,autoSync:config.autoSync,
+       directorEnabled:config.directorEnabledV911,playing:state.isPlaying,visible:!document.hidden,
+       progressMs:progress,durationMs:state.track.durationMs,phase:verifiedPhaseV1027,
+       savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
+       roomAtmosphereActive:roomDecisionV987.active,groupUnisonActive:group?.mode==='unison',
+       recovering:recoveringDevices.has(ip),reducedMotion:Boolean(stage?.reducedMotion||
+        window.matchMedia?.('(prefers-reduced-motion: reduce)').matches),
+       lyricsVisible:stage?.lyricsVisible??false,
+       voiceActive:Boolean(alexaGoveeCueV970.current&&loadAlexaGoveeConsentV970().enabled&&
+        now>=alexaGoveeCueV970.current.receivedAt&&now-alexaGoveeCueV970.current.receivedAt<=ALEXA_GOVEE_CUE_TTL_MS_V970),
+       stageCamera:stage?.cameraShot});
+      // The original V915 group-capped look is an additional ceiling; the
+      // V1027 overlay cannot undo that cap even if an earlier overlay differs.
+      const syncedLookV1027=applyGoveeSyncV1027(voiceLookV970,previous,syncDecisionV1027,
+       Math.min(config.masterBrightness,festivalDeliveredLook.brightness));
+      const finalLook=governConcertLookV961(previous,syncedLookV1027,{
        enabled:roadmapSettings.enabled&&roadmapSettings.hardwareSync&&roadmapSettings.lightGovernorV961,
        playing:state.isPlaying,verified:Boolean(roadmapScene?.verified),
        savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
@@ -540,6 +577,6 @@ export function GoveeMusicSyncV909(){
    :bassSettings.enabled||shockSettings.enabled?window.setInterval(()=>void tick(),900)
    :neonBassEnabled?window.setInterval(()=>void tick(),900):window.setInterval(()=>void tick(),1700);
   return()=>{cancelled=true;window.clearInterval(interval);window.clearInterval(sampler);};
- },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings]);
+ },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings,syncSettingsV1027]);
  return null;
 }

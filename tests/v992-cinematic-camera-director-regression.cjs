@@ -139,7 +139,7 @@ check('single camera rendering chain, UI, and production gate are connected',()=
  assert(stage.includes('pose:cinemaV992.pose,plan:cameraSignalV897.directorPlanV895'));
  assert(stage.indexOf('const cinemaV992=')<stage.indexOf('const danceCameraV898='));
  assert(stage.includes('cinematicCameraV897.cameraRate*cinemaV992.cameraRate*danceCameraV898.cameraRate'));
- assert(stage.includes('guardAutomaticCameraV351(danceCameraV898.pose,composition)'));
+ assert(stage.includes('guardAutomaticCameraV351(cinematicV1025.pose,composition)'));
  assert(stage.includes('measuredKick:lipSync?.rapCameraKickV433'));
  assert(ui.includes('CINEMA_KEY_V992')&&ui.includes('updateCinemaV992'));
  assert(sync.includes('normalizeCinemaV992(input.cameraSettingsV992)'));

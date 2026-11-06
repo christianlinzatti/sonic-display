@@ -152,7 +152,7 @@ check('camera remains separate and protected by V351',()=>{
  assert(src.includes('composeCinematicCameraDirectorV848'));
  assert(src.includes('pose:framedV848'), 'V848 must feed the V897 camera');
  assert(src.includes('pose:cinematicCameraV897.pose'), 'V897 must feed V898');
- assert(src.includes('guardAutomaticCameraV351(danceCameraV898.pose,composition)'), 'V351 must guard the final automatic camera pose');
+ assert(src.includes('guardAutomaticCameraV351(cinematicV1025.pose,composition)'), 'V351 must guard the final automatic camera pose');
 });
 check('package and lock versions match V868 or newer',()=>{
  const pkg=require('../package.json'),lock=require('../package-lock.json');

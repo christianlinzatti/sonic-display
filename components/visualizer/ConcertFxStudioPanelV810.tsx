@@ -168,7 +168,20 @@ export function ConcertFxStudioV810({value,onChange}:{value?:Partial<ConcertFxSe
    playing:true,reducedMotion:false,blackout:false,manualLighting:false,
    lyricsProtected:false,vocalFocus:false,cameraCloseup:false,groupCount:1,tier:'high',
    authoredLanes:[]});
- return <fieldset><legend>V810–V871 · Concert FX Studio 4.0</legend>
+ return <fieldset><legend>V810–V1028 · Concert FX Studio 5.0</legend>
+  <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
+   <legend>V1028 · Immersive Concert FX 5.0</legend>
+   <label className="setting-check"><input type="checkbox" checked={s.immersiveFxV1028}
+     onChange={e=>patch({immersiveFxV1028:e.target.checked})}/>
+     Konzert-Höhepunkte gemeinsam choreografieren (Lichtwellen, Nebel, Konfetti, Schaum)</label>
+   <label>Inszenierungs-Kontrast ({s.immersiveFxStrengthV1028} %)
+    <input type="range" min="0" max="100" step="5" value={s.immersiveFxStrengthV1028}
+     disabled={!s.immersiveFxV1028} onChange={e=>patch({immersiveFxStrengthV1028:+e.target.value})}/></label>
+   <small>Nur bestätigte Songabschnitte und tatsächlich gemessene Audioakzente.
+    Nutzt vorhandene 3D-Emitter nach den Performance-Grenzen, ohne zusätzliche Draw Calls.
+    Lyrics, manuelle Timelines, Pause, Blackout, Seek und Gerätebudgets haben Vorrang.
+    Keine Stroboskopblitze und keine Govee-Befehle.</small>
+  </fieldset>
   <fieldset style={{border:'1px solid #56566a',borderRadius:8,padding:12}}>
    <legend>V850 · Smart Festival Show Director 4.0</legend>
    <label className="setting-check"><input type="checkbox" checked={s.festivalDirectorV850}

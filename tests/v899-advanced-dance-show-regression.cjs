@@ -94,7 +94,7 @@ for(const [name,src,needle] of [['actor',actor,'sampleDanceShowV899({'],['camera
  ['bridge',sync,'normalizeDanceShowV899(input.danceShowSettingsV899)'],['UI',deck,'Advanced Dance Show Director'],
  ['UI export',deck,'exportDanceShowV899Json'],['manual guard',actor,'manualFormation:!!manualPose||!!manualActive'],
  ['footlock guard',actor,'footLocked:readFootLockV322().enabled'],['position offsets',actor,'leadTarget[0]-=showDanceV899.spacing'],
- ['last camera guard',camera,'guardAutomaticCameraV351(danceCameraV898.pose,composition)'],
+ ['last camera guard',camera,'guardAutomaticCameraV351(cinematicV1025.pose,composition)'],
  ['camera rate',camera,'*danceShowCameraV899.cameraRate']])check(`integration ${name}`,()=>assert(src.includes(needle)));
 check('bridge published settings',()=>{bridge.publishConcertStageSyncV882({trackId:plan.trackId,durationMs:plan.durationMs,playing:true,
  enabled:true,reducedMotion:false,intensity:.7,sceneSource:'verified',section:'hook',look:'neon',sceneStartMs:60000,

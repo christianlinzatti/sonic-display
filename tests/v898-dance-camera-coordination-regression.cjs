@@ -136,7 +136,7 @@ const deck=read('components/visualizer/LiveFxDeckV881.tsx');
 const signal=read('components/visualizer/concertStageSyncV882.ts');
 check('R3F camera uses V898 after V897 before V351',()=>{
  assert(camera.indexOf('sampleDanceCameraV898({')>camera.indexOf('sampleCinematicCameraV897({'));
- assert(camera.indexOf('guardAutomaticCameraV351(danceCameraV898.pose')>camera.indexOf('sampleDanceCameraV898({'));
+ assert(camera.indexOf('guardAutomaticCameraV351(cinematicV1025.pose')>camera.indexOf('sampleDanceCameraV898({'));
 });
 check('one existing R3F camera, not second or new render loop',()=>{assert(!read('components/visualizer/danceCameraCoordinationV898.ts').includes('useFrame('));assert(camera.includes('danceCameraV898.cameraRate'));});
 check('camera reads real V377 anchors from existing stage',()=>assert(camera.includes('duetAnchorSampleV377.current.anchors,\n      anchorAgeMs')));
