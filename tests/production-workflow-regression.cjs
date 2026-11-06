@@ -12,6 +12,7 @@ const workflows = Object.fromEntries(fs.readdirSync(directory).filter(x => x.end
   return [name, document.toJS()];
 }));
 for(const [name,workflow]of Object.entries(workflows))for(const job of Object.values(workflow.jobs||{}))for(const step of job.steps||[]){
+ if((step.uses||'').startsWith('actions/download-artifact@'))assert.match(step.uses,/@v7$/,name+' must use the Node 24 download runtime');
  if(/^actions\/(checkout|setup-node|upload-artifact)@/.test(step.uses||''))assert.match(step.uses,/@v6$/,name+' must use the Node 24 action runtime');
 }
 const production = workflows['v965-room-wave-production.yml'];

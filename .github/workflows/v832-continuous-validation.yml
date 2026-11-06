@@ -209,7 +209,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Download per-OS technical reports
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           pattern: v832-*-technical-report
           path: v867-artifacts
