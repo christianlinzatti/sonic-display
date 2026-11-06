@@ -44,7 +44,9 @@ let currentScopes = 'user-read-currently-playing user-follow-read user-follow-mo
 let canned = [];
 const mockSession = () => ({session:{accessToken:'test-token',refreshToken:'test-refresh',expiresAt:Date.now()+100000,scopes:currentScopes},refreshed:false});
 const routes = transpile('app/api/spotify/artists/follow/route.ts', {
-  'next/server': {NextResponse: {json(body, {status = 200} = {}) {return {body, status, cookies:{set(){}}};}}},
+  'next/server': {NextResponse: {json(body, {status = 200} = {}) {
+    const headers=new Map();return {body,status,cookies:{set(){}},headers:{get:name=>headers.get(name)??null,set:(name,value)=>headers.set(name,value)}};
+  }}},
   '@/lib/spotify': {getValidSession: async()=>mockSession(), refreshSession: async()=>{throw new Error('unexpected refresh');}, ReauthRequiredError: class extends Error{}},
   '@/lib/session': {clearSessionCookie(){},setSessionCookie(){}},
   '@/lib/artist-follow-v359': lib,
@@ -54,7 +56,8 @@ global.fetch = async (url, options) => {
   calls.push({url,method:options.method});
   const response = canned.shift();
   assert(response, 'unexpected Spotify API request');
-  return {ok:response.status >= 200 && response.status < 300, status:response.status, json:async()=>response.body};
+  return {ok:response.status >= 200 && response.status < 300, status:response.status,
+    headers:{get:name=>response.headers?.[name]??null},json:async()=>response.body};
 };
 const reqGet = ids=>({nextUrl:new URL(`http://127.0.0.1:3000/api/spotify/artists/follow?ids=${ids}`)});
 const reqPost = (artistId, follow)=>({headers:{get(name){return name==='origin'?'http://127.0.0.1:3000':null;}},json:async()=>({artistId, follow})});
@@ -80,6 +83,11 @@ const reqPost = (artistId, follow)=>({headers:{get(name){return name==='origin'?
   calls.length=0;canned=[{status:400}];
   result=await routes.POST(reqPost(A,true));
   assert.equal(result.status,503);assert.equal(result.body.code,'unsupported');assert.equal(calls.length,1);
+
+  calls.length=0;canned=[{status:429,headers:{'Retry-After':'3'}}];
+  result=await routes.POST(reqPost(A,true));
+  assert.equal(result.status,429);assert.equal(result.body.code,'rate_limited');
+  assert.equal(result.headers.get('Retry-After'),'3');assert.equal(calls.length,1);
 
   calls.length=0;canned=[{status:200},{status:200,body:[false]}];
   result=await routes.POST(reqPost(A,true));
