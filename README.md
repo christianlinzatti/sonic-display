@@ -1,3 +1,7 @@
+# V1023 – Advanced Rap Performance 6.0
+
+Die produktive Avatar-Pipeline verfeinert verifizierte Wort-Gesten und die Geschwindigkeit des vorhandenen Lip-Sync-Interpolators, ohne zusätzliche Viseme oder Stimmen zu erfinden. Der V1016–V1022-Schutz für manuelle Eingriffe, Sängerzuordnung, GLB-Kurven, Foot-IK und reduzierte Bewegung gilt weiterhin. Tests: `npm run test:v1023`, `npm run test:v1023:types`. Details: `changelog/V1023-ADVANCED-RAP-PERFORMANCE-6.md`.
+
 # V1022 — AI Live Show Adaptation
 
 V1022 verknüpft verifizierte V604/V763 Songakte mit frischen V896-Audiomessungen und echten V826-Rendererfenstern. Genreabhängige Showintensität wird nur vorsichtig vorgeschlagen; bei begrenzter Framerate sinken FX-Dichte und Kamerabewegung. Pause, Seek, manuelle Regie, Lyrics und reduzierte Bewegung haben Vorrang. Keine neue HTTP-Anfrage, keine Govee-/FX-/Kamera-Befehle, keine Speicherung. Details: `changelog/V1022-AI-LIVE-SHOW-ADAPTATION.md`.

@@ -28,6 +28,7 @@ import {planVocalPerformanceV994,vocalRateV994,addVocalFaceV994} from "./vocalPe
 import {readConcertStageSyncV882} from "./concertStageSyncV882";
 import {planVocalTimingPrecisionV686,vocalTimingRateV686} from "./vocalTimingPrecisionV686";
 import {planAdvancedDeutschrapLipSyncV837,deutschrapLipRateV837} from "./advancedDeutschrapLipSyncV837";
+import {rapMouthResponseV1023} from "./advancedRapPerformanceV1023";
 import {planDeutschrapVocalV869,deutschrapVocalRateV869,deutschrapVocalExpressionV869} from "./deutschrapVocalDirectorV869";
 import {multiArtistMouthTargetV632} from "./multiArtistVocalDirectorV632";
 import {sampleLiveVocalEnvelopeV661,refineVocalJawV661,getLiveVocalEnvelopeV661} from "./vocalAnalysisStudioV661";
@@ -498,6 +499,17 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
       hasLipClosure:targets.morphs.some(m=>m.channel==='lipsClosed')&&profileV370?.gains?.lipsClosed!==0,
       previewRap:demoV370==='rap'||demoV370==='fast-rap',
     });
+    // One shared V1023 context per render frame; no extra mouth owner or allocations per morph.
+    const mouthContextV1023={
+      playing:lipSync?.playing===true,rap:coordinated?.vocal.style==='rap',
+      verifiedSinger:castVerifiedV581&&optionsV538.roleAllowed&&!manualSilentV453,
+      manualPriority:authoredPriorityV499||demoV370!=='off'||!!previewPoseV370||
+        !!previewTargetV383||!!lipSync?.rapSyllableEditsEnabledV420&&!!editsV453?.length,
+      protectedMouth:!!protectedMouthV686||!!manualVisemeV644||
+        !!lipSync?.rapAudioEnabledV423&&lipSync.rapAudioTrackIdV423===trackId,
+      reducedMotion:reducedMotion||!!lipSync?.reducedMotionV390,
+      tier:getActivePerformanceTier(),effectiveTimeMs:optionsV538.effectiveTimeMs,
+    };
     for (const c of channels) {
       const articulatingV384=!!coordinated?.articulationV384.active;
       const mouthTargetV476=lipV476.activeV476?lipV476.face[c]:lipV459.face[c];
@@ -563,7 +575,8 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
         (authoredAdlibV869?1:vocalTimingRateV686(precisionV686,c,current.current[c],finalMouthTargetV644))*
         (authoredAdlibV869?1:deutschrapLipRateV837(articulationV837,c,current.current[c],finalMouthTargetV644))*
         deutschrapVocalRateV869(vocalCueV869,c,current.current[c],finalMouthTargetV644)*
-        (authoredAdlibV869?1:rapMouthRateV798(precisionV798,c,finalMouthTargetV644>current.current[c]))*delta));
+        (authoredAdlibV869?1:rapMouthRateV798(precisionV798,c,finalMouthTargetV644>current.current[c]))*
+        rapMouthResponseV1023(articulationV837,mouthContextV1023,c,current.current[c],finalMouthTargetV644)*delta));
     }
     // V562 is opt-in per-avatar; keep solo morph audition unmodified.
     // The same post-filter applies to live show and real-GLB close-up preview.

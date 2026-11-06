@@ -1257,7 +1257,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1022
+**Dokumentationsstand:** V1023
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -4126,3 +4126,8 @@ Die Live-FX-Ansicht enthält eine **lesende, songgebundene Dramaturgie** aus ver
 ### V1021 – CI-Typgrenze
 
 Die Kanonischen `Track`- und `Lyrics`-DTOs liegen in `types/playbackCore.ts`; `types/music.ts` bleibt der rückwärtskompatible Reexport. Das Netzwerk-Subsystem importiert nicht mehr die UI-Preferences-Typreferenzen. Das behebt V1020 TS2307-Fehler der isolierten V1014-Netzwerkprüfung auf Windows und Ubuntu; keine produktiven Typen werden durch Test-Deklarationen ersetzt.
+
+
+## V1023 – Advanced Rap Performance 6.0
+
+Die produktive GLB-Avatar-Pipeline verfeinert die bereits verifizierten V472/V567 Wort-Gesten mit `advancedRapPerformanceV1023.ts`. Die Verfeinerung benötigt bestätigte Wortzeiten und eine erlaubte Sängerrolle; V515 bleibt der letzte additive Bewegungsbegrenzer. In `VocalRigV368.tsx` wird ausschließlich die Antwortgeschwindigkeit vorhandener Mundziele (jaw/round/wide) innerhalb der bestätigten V837 Wortintervalle vorsichtig angepasst. B/P/M-Lippenverschlüsse, manuelle V644-Viseme, audio-/stem-basierte Prioritäten, importierte Clips, Foot-IK und reduzierte Bewegung bleiben geschützt. Keine neue Phonem-/Stimmidentifikation, kein Hardware- oder Netzwerkkontakt, keine zusätzlichen Ticker. In V1023 sind Regression und isolierter TypeScript-Check Pflicht in GitHub Actions und Vercel.

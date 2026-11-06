@@ -31,6 +31,7 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1023 Advanced Rap Performance 6.0','tests/v1023-advanced-rap-performance-regression.cjs');
   run('V1022 AI Live Show Adaptation','tests/v1022-live-show-adaptation-regression.cjs');
   run('V1017 intelligent cache manager','tests/v1017-intelligent-cache-regression.cjs');
   run('V1017 release readiness','scripts/v1017-release-readiness.cjs');

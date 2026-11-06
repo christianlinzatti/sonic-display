@@ -11,6 +11,7 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1023 Advanced Rap Performance 6.0','tests/v1023-advanced-rap-performance-regression.cjs'],
   ['V1022 AI Live Show Adaptation','tests/v1022-live-show-adaptation-regression.cjs'],
   ['V1021 Genre Intelligence 3.0','tests/v1021-genre-intelligence-regression.cjs'],
   ['V1020 AI Concert Storytelling','tests/v1020-concert-storytelling-regression.cjs'],
@@ -89,6 +90,7 @@ const regressions = [
   ['Source syntax + duplicate imports', 'tests/check-source-syntax.cjs'],
 ];
 const productionChecks = [
+  ['V1023 Rap Performance strict TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','components/visualizer/advancedRapPerformanceV1023.ts']],
   ['V1022 Live Show Adaptation strict TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','lib/aiLiveShowAdaptationV1022.ts']],
   ['V1021 Genre Intelligence strict TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','lib/genreIntelligenceV1021.ts']],
   ['V1020 AI Concert Storytelling strict TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','lib/aiConcertStorytellingV1020.ts']],

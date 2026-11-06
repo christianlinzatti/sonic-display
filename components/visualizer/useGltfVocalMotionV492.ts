@@ -12,6 +12,7 @@ import {resolveVocalDanceAccentV472} from "./vocalAwareChoreographyV472";
 import {enhanceRapAccentV473} from "./rapFlowIntelligenceV473";
 import {resolveNaturalRapGestureV474} from "./naturalRapGestureVarietyV474";
 import {planRapPerformanceDynamicsV583} from "./rapPerformanceDynamicsV583";
+import {refineAdvancedRapGestureV1023} from "./advancedRapPerformanceV1023";
 import {refineNaturalConcertPerformanceV586} from "./naturalConcertPerformanceV586";
 import {synchronizeRapAccentV516} from "./naturalDeutschrapSyncV516";
 import {coordinateRapDanceV526} from "./unifiedConcertPerformanceV526";
@@ -135,13 +136,29 @@ export function useGltfVocalMotionV492({model,audio,isPlaying,reducedMotion,genr
       enabled:(audioMotionEnabledV468??true)&&propsLipSyncV367?.bodyEnabledV371!==false&&propsLipSyncV367?.gesturesV371!==false,
       tier:getActivePerformanceTier(),mode:dynamicRapV583.mode,
     });
-    const wordDanceV567=getActivePerformanceTier()==='low'?concertV586.accent:coordinateWordDanceV567(concertV586.accent,sampleWordConcertV567({
+    const rawWordDanceV567=getActivePerformanceTier()==='low'?concertV586.accent:coordinateWordDanceV567(concertV586.accent,sampleWordConcertV567({
       lyrics:propsLipSyncV367?.lyrics,timeMs:(propsLipSyncV367?.progressMs??-1)+
         (propsLipSyncV367?.coordinationOffsetMsV372??0),
       playing:isPlaying&&propsLipSyncV367?.playing!==false,reducedMotion,
     }),{trackId:track?.id,slot:workloadSlot,count:propsLipSyncV367?.ensembleCountV374??1,
       authored:avatarMotionMode==='choreography',
       casting:authoredVocalV472?.active?authoredVocalV472:assignedDuetV472});
+    // V1023: refine only the already-authorized, word-timed additive gesture.
+    // V515 remains the final correction/smoothing authority; clips and IK are untouched.
+    const advancedRapV1023=refineAdvancedRapGestureV1023(rawWordDanceV567,{
+      lyrics:propsLipSyncV367?.lyrics,trackId:track?.id,
+      effectiveTimeMs:(propsLipSyncV367?.progressMs??-1)+(propsLipSyncV367?.coordinationOffsetMsV372??0),
+      playing:isPlaying&&propsLipSyncV367?.playing!==false&&propsLipSyncV367?.enabled!==false,
+      rap:genreCue?.family==='rap',reducedMotion,authored:avatarMotionMode==='choreography',
+      enabled:(audioMotionEnabledV468??true)&&propsLipSyncV367?.bodyEnabledV371!==false&&
+        propsLipSyncV367?.gesturesV371!==false,
+      slot:workloadSlot,count:propsLipSyncV367?.ensembleCountV374??1,
+      casting:authoredVocalV472?.active?authoredVocalV472:assignedDuetV472,
+      section:showCue?.enabled?showCue.section:cameraDirectorSection,
+      tier:getActivePerformanceTier(),
+    });
+    // Retain the established V515 call contract for older dancer integrations.
+    const wordDanceV567=advancedRapV1023.accent;
     const correctedVocalV515=correctAutomaticAccentV515(wordDanceV567,motionCorrectionV515.current,delta,{
       playing:isPlaying&&propsLipSyncV367?.playing!==false,
       reducedMotion,authored:avatarMotionMode==='choreography',
