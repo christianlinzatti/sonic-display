@@ -60,4 +60,39 @@ check('future ZIP imports always run conservative structure repair', () => {
   assert(workflow.includes('node scripts/organize-project-structure.cjs'));
   assert(workflow.includes('node tests/v974-repository-cleanup-regression.cjs'));
 });
+check('new full ZIP safely updates an already-organized version document', () => {
+  const os = require('node:os');
+  const crypto = require('node:crypto');
+  const { moveChecked } = require('../scripts/organize-project-structure.cjs');
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'sonic-doc-revision-'));
+  try {
+    const old = 'V1031 archived 360 arena documentation';
+    const revised = 'V1041 updated 360 arena documentation';
+    const src = path.join(temp, 'V1031-360-ARENA.md');
+    const dest = path.join(temp, 'docs', 'versions', 'V1031-360-ARENA.md');
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.writeFileSync(src, revised);
+    fs.writeFileSync(dest, old);
+    moveChecked(src, dest, { allowVersionUpdate: true, archiveRoot: temp });
+    assert.equal(fs.readFileSync(dest, 'utf8'), revised);
+    assert(!fs.existsSync(src));
+    const digest = crypto.createHash('sha256').update(old).digest('hex');
+    const archive = path.join(temp, 'artifacts', 'historical', 'document-revisions',
+      'V1031-360-ARENA.md.' + digest + '.bak');
+    assert.equal(fs.readFileSync(archive, 'utf8'), old);
+    fs.writeFileSync(src, revised);
+    moveChecked(src, dest, { allowVersionUpdate: true, archiveRoot: temp });
+    assert.equal(fs.readFileSync(archive, 'utf8'), old);
+    const unsafe = path.join(temp, 'README.md');
+    const unsafeDest = path.join(temp, 'docs', 'versions', 'README.md');
+    fs.writeFileSync(unsafe, 'untrusted replacement');
+    fs.writeFileSync(unsafeDest, 'existing canonical document');
+    assert.throws(() => moveChecked(unsafe, unsafeDest,
+      { allowVersionUpdate: true, archiveRoot: temp }), /Conflicting documents/);
+    assert.equal(fs.readFileSync(unsafeDest, 'utf8'), 'existing canonical document');
+  } finally {
+    fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
+
 console.log('V974 Repository Cleanup: PASS ' + checks + ' checks');
