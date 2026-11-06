@@ -88,6 +88,26 @@ jobs:
             git commit -m "chore: import full Sonic Display V$VERSION project"
             git push origin HEAD:master
           fi
+      - name: Version GitHub Action run titles from the imported release
+        if: ${{ hashFiles('scripts/version-action-titles-v1016.cjs') != '' }}
+        shell: bash
+        env:
+          VERSION: ${{ steps.imported.outputs.version }}
+        run: |
+          node scripts/version-action-titles-v1016.cjs --apply
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -u -- .github/workflows/
+          if git diff --cached --quiet; then
+            echo "All GitHub Actions already display V$VERSION"
+          else
+            git commit -m "ci: label all GitHub Action runs V$VERSION [skip ci]"
+            if ! git push origin HEAD:master; then
+              echo "::warning::Action titles need GitHub workflow-write permission; source ZIP import remains valid."
+              git reset --soft HEAD~1
+              git reset -q -- .github/workflows/
+            fi
+          fi
       - name: Publish audited cleanup manifest
         if: always()
         uses: actions/upload-artifact@v6
