@@ -25,8 +25,8 @@ class ArchiveImportTest(unittest.TestCase):
         (self.root / 'scripts').mkdir()
         (self.root / 'scripts/project-archive-import.py').write_text('safeguarded', encoding='utf8')
 
-    def build(self, num=969, marker=None, extras=()):
-        archive = self.root / 'releases' / f'SonicDisplay-V{num}.zip'
+    def build(self, num=969, marker=None, extras=(), name=None):
+        archive = self.root / 'releases' / (name or f'SonicDisplay-V{num}.zip')
         required = {x: 'hello' for x in mod.REQUIRED}
         required['package.json'] = json.dumps({'sonicRoadmapRelease': marker or f'v{num}'})
         with ZipFile(archive, 'w', ZIP_DEFLATED) as z:
@@ -77,6 +77,56 @@ class ArchiveImportTest(unittest.TestCase):
             with self.subTest(bad=bad):
                 with self.assertRaises(ValueError):
                     mod.checked_name(bad)
+
+    def test_long_descriptive_name_imports_without_renaming(self):
+        name = 'SonicDisplay-V1037-Arena-Transformation-2-Long-Filename-Support.zip'
+        archive = self.build(num=1037, name=name)
+        self.assertEqual(mod.checked_name(f'releases/{name}'), (name, 1037))
+        self.assertEqual(mod.select_archive(self.root, name, '', ''), name)
+        mod.import_archive(self.root, name)
+        self.assertFalse(archive.exists())
+        self.assertEqual(json.loads((self.root / 'package.json').read_text())['sonicRoadmapRelease'], 'v1037')
+
+    def test_long_filename_near_filesystem_limit(self):
+        prefix = 'SonicDisplay-V1037-'
+        name = prefix + ('A' * (255 - len(prefix) - len('.zip'))) + '.zip'
+        self.assertEqual(len(name.encode('utf-8')), 255)
+        self.assertEqual(mod.checked_name(name), (name, 1037))
+        self.assertEqual(mod.checked_name('SonicDisplay-V1037.zip'), ('SonicDisplay-V1037.zip', 1037))
+        with self.assertRaisesRegex(ValueError, '255-byte'):
+            mod.checked_name(prefix + 'A' * (256 - len(prefix) - len('.zip')) + '.zip')
+
+    def test_reject_unsafe_descriptive_names(self):
+        rejected = [
+            'SonicDisplay-V1037-.zip', 'SonicDisplay-V1037-foo-.zip',
+            'SonicDisplay-V1037-foo bar.zip', 'SonicDisplay-V1037-../evil.zip',
+            'SonicDisplay-V1037-ä.zip', 'SonicDisplay-V1037-foo\\bar.zip',
+            'releases/nested/SonicDisplay-V1037-foo.zip',
+            'releases/SonicDisplay-V1037-foo.zip\narchive=evil',
+        ]
+        for name in rejected:
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                mod.checked_name(name)
+
+    def test_long_filename_version_still_checked(self):
+        name = 'SonicDisplay-V1037-Immersive-Concert-Arena.zip'
+        self.build(num=1037, marker='v1036', name=name)
+        with self.assertRaisesRegex(ValueError, 'Release mismatch'):
+            mod.import_archive(self.root, name)
+
+    def test_select_push_diff_with_long_name(self):
+        before, head = 'a' * 40, 'b' * 40
+        name = 'SonicDisplay-V1037-Arena-Transformation-2.zip'
+        with patch.object(mod.subprocess, 'check_output', return_value=f'releases/{name}\n'):
+            self.assertEqual(mod.select_archive(self.root, '', before, head), name)
+        with patch.object(mod.subprocess, 'check_output', return_value=
+                          f'releases/nested/{name}\n'):
+            with self.assertRaisesRegex(ValueError, 'exactly one'):
+                mod.select_archive(self.root, '', before, head)
+        with patch.object(mod.subprocess, 'check_output', return_value=
+                          f'releases/{name}\nreleases/SonicDisplay-V1038.zip\n'):
+            with self.assertRaisesRegex(ValueError, 'exactly one'):
+                mod.select_archive(self.root, '', before, head)
 
     def test_select_manual(self):
         self.build()
