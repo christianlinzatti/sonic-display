@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Import owner-uploaded, versioned full-project ZIP files safely.
 
-On push, select precisely one newly added/modified releases/SonicDisplay-VNNN.zip.
+On push, select precisely one newly added/modified
+releases/SonicDisplay-VNNN[-descriptive-name].zip.
 On manual dispatch, require an explicit ZIP filename. Version in package.json
 must match the filename; do not trust or import CI workflow definitions from ZIPs.
 """
@@ -16,7 +17,13 @@ import sys
 from pathlib import Path, PurePosixPath
 from zipfile import BadZipFile, ZipFile
 
-ARCHIVE_NAME = re.compile(r"SonicDisplay-V([1-9][0-9]*)\.zip\Z")
+# Optional descriptive suffixes support real release ZIP names, including the
+# long archives produced by Sonic Display. Versions must stay at the front and
+# filenames must remain single, safe path components on common filesystems.
+ARCHIVE_NAME = re.compile(
+    r"SonicDisplay-V([1-9][0-9]*)(?:-[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)?\.zip\Z"
+)
+MAX_ARCHIVE_NAME_BYTES = 255
 REQUIRED = {
     "package.json", "package-lock.json", "tsconfig.json", "app/page.tsx",
     "README.md", "lib/ultimateConcertRoadmapV958.ts",
@@ -106,10 +113,15 @@ def prune_tracked_files(root, stale):
 
 def checked_name(value):
     """Return (basename, version); never accept arbitrary checkout paths."""
+    if not isinstance(value, str):
+        raise ValueError("Archive filename must be text")
     name = value.removeprefix("releases/")
+    if len(name.encode("utf-8")) > MAX_ARCHIVE_NAME_BYTES:
+        raise ValueError("Release ZIP filename exceeds the 255-byte filesystem limit")
     match = ARCHIVE_NAME.fullmatch(name)
     if not match or name != Path(name).name:
-        raise ValueError("Expected a filename like SonicDisplay-V969.zip in releases/")
+        raise ValueError("Expected releases/SonicDisplay-V969[-description].zip "
+                         "(letters, digits, dots, hyphens or underscores in description)")
     return name, int(match.group(1))
 
 
@@ -137,8 +149,16 @@ def select_archive(root, manual, before, head):
         ["git", "diff", "--name-only", "--diff-filter=AM", before, head, "--", "releases/"],
         cwd=root, text=True,
     ).splitlines()
-    valid = [PurePosixPath(entry).name for entry in changed
-             if entry.startswith("releases/") and ARCHIVE_NAME.fullmatch(PurePosixPath(entry).name)]
+    valid = []
+    for entry in changed:
+        if not entry.startswith("releases/"):
+            continue
+        try:
+            # This also rejects nested paths such as releases/tmp/SonicDisplay-V969.zip.
+            name, _ = checked_name(entry)
+        except ValueError:
+            continue
+        valid.append(name)
     if len(valid) != 1:
         raise ValueError(f"Expected exactly one newly added/modified versioned ZIP, found {len(valid)}. "
                          "Use workflow_dispatch with an explicit ZIP name for a retry")
