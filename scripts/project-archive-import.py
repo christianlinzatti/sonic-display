@@ -217,8 +217,11 @@ def import_archive(root, requested, output=None, dry_run=False, sync_tracked=Fal
         planned = []
         skipped = []
         for entry, rel in zip(entries, all_paths):
-            # Uploaded ZIPs never get to replace GitHub Actions or their own validator.
-            if rel.parts[0].casefold() == ".github" or str(rel).casefold() == "scripts/project-archive-import.py":
+            # Trustworthy importer, workflow and structure helpers are protected
+            # from both removal AND replacement by an older full-project ZIP.
+            # Otherwise importing a release restores a stale organizer and can
+            # undo fixes needed to import that very release.
+            if rel.parts[0].casefold() == ".github" or str(rel) in SYNC_PROTECTED:
                 skipped.append(str(rel))
                 continue
             dest = root.joinpath(*rel.parts)
