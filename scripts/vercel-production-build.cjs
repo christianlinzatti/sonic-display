@@ -31,6 +31,7 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1022 AI Live Show Adaptation','tests/v1022-live-show-adaptation-regression.cjs');
   run('V1017 intelligent cache manager','tests/v1017-intelligent-cache-regression.cjs');
   run('V1017 release readiness','scripts/v1017-release-readiness.cjs');
   run('V1016 offline experience and Actions release titles','tests/v1016-smart-offline-regression.cjs');

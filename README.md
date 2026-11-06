@@ -1,3 +1,7 @@
+# V1022 — AI Live Show Adaptation
+
+V1022 verknüpft verifizierte V604/V763 Songakte mit frischen V896-Audiomessungen und echten V826-Rendererfenstern. Genreabhängige Showintensität wird nur vorsichtig vorgeschlagen; bei begrenzter Framerate sinken FX-Dichte und Kamerabewegung. Pause, Seek, manuelle Regie, Lyrics und reduzierte Bewegung haben Vorrang. Keine neue HTTP-Anfrage, keine Govee-/FX-/Kamera-Befehle, keine Speicherung. Details: `changelog/V1022-AI-LIVE-SHOW-ADAPTATION.md`.
+
 # V1021 — Genre Intelligence 3.0
 
 Genrebezogene Show-Vorschau für Deutschrap, Hardtekk, Hardstyle, Deutschrock/NDH und unbekannte Genres. Ausschließlich verifizierte Songstruktur; keine erfundenen Drops, Beats oder BPM. Safety: Pause, Seek, Blackout, manuelle Übersteuerung, Lyrics-Schutz, reduzierte Bewegung. UI im Live-FX-Deck. Tests: `npm run test:v1021` und `npm run test:v1021:types`. Außerdem wurde der V1020-CI-Fehler `TS2307` in isolierten Netzwerk-TypeScript-Prüfungen durch die kompatible Extraktion von `types/playbackCore.ts` behoben. Details: `changelog/V1021-GENRE-INTELLIGENCE-3.md`.

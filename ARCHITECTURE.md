@@ -1,3 +1,7 @@
+# V1022 – AI Live Show Adaptation
+
+Der pure Planer `lib/aiLiveShowAdaptationV1022.ts` liest den V1021-Genreplan und passt die vorgeschlagene Intensität nur bei track- und positionsgleichen V896-Messungen an. V826-Rendererfenster mit plausibler Stichprobe begrenzen FX-Dichte und bewegte Looks. Kein eigenständiger Dispatch, keine Zusatzaufrufe, kein Speicher; alle Sicherheitsflags führen zu einer inaktiven Vorschau. `LiveShowAdaptationPanelV1022` zeigt Evidenz und Empfehlungen im Live-FX-Deck.
+
 # V1021 — Genre Intelligence 3.0 (Stand 2026-11-06)
 
 V1021 trennt Meta-Genre-Hinweise strikt von verifizierten V604/V763-Songabschnitten. Eine reine, lesende Regievorschau differenziert Deutschrap, Hardtekk, Hardstyle, Deutschrock/NDH und unbekannte Genres, ohne Beats, Tempo oder Vocals zu erfinden. Manuelle Regie, Pause, Seek, Blackout, Bewegungsreduktion und Lyrics-Schutz haben Vorrang. Details: `changelog/V1021-GENRE-INTELLIGENCE-3.md`.
@@ -1253,7 +1257,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1021
+**Dokumentationsstand:** V1022
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
