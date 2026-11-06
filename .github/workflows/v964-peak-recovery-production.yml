@@ -1,5 +1,5 @@
 name: V964 Peak Recovery and Vercel Production Gate
-run-name: Sonic Display · V1017 · V964 Peak Recovery and Vercel Production Gate
+run-name: Sonic Display · V1020 · V964 Peak Recovery and Vercel Production Gate
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:

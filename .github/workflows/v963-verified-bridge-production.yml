@@ -1,5 +1,5 @@
 name: V963 Verified Concert Transition Bridge Production Gate
-run-name: Sonic Display · V1017 · V963 Verified Concert Transition Bridge Production Gate
+run-name: Sonic Display · V1020 · V963 Verified Concert Transition Bridge Production Gate
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:

@@ -1,5 +1,5 @@
 name: V999 Intelligent Performance Governor production validation
-run-name: Sonic Display · V1017 · V999 Intelligent Performance Governor production validation
+run-name: Sonic Display · V1020 · V999 Intelligent Performance Governor production validation
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:
