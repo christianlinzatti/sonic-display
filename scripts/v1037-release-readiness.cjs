@@ -7,10 +7,10 @@ function inspectReleaseV1037(root){
  const exists=f=>fs.existsSync(path.join(root,f));
  try{
   const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-  add('version',pkg.version==='0.1.0-v1037'&&pkg.sonicFeatureRelease==='v1037'&&pkg.sonicRoadmapRelease==='v1037');
+  add('version',Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1])>=1037&&pkg.sonicFeatureRelease===pkg.version.split('-')[1]&&pkg.sonicRoadmapRelease===pkg.version.split('-')[1]);
   add('lock',lock.version===pkg.version&&lock.packages?.['']?.version===pkg.version);
   add('node24',pkg.engines?.node==='24.x');
-  add('prebuild',pkg.scripts.prebuild.startsWith('npm run test:v1037 && npm run test:v1037:types && npm run test:v1036 &&'));
+  add('prebuild',pkg.scripts.prebuild.includes('npm run test:v1037 && npm run test:v1037:types && npm run test:v1036 &&')&&pkg.scripts.prebuild.startsWith(`npm run test:${pkg.sonicFeatureRelease} &&`));
   add('scripts',pkg.scripts['test:v1037']==='node tests/v1037-transforming-arena-regression.cjs'&&
    pkg.scripts['test:v1037:types']==='tsc -p tests/tsconfig.v1037-core.json');
   for(const f of ['lib/arena360TransformationV1037.ts','components/visualizer/stages/ArenaTransformingDeckV1037.tsx',

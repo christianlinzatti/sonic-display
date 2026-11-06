@@ -174,7 +174,8 @@ function RockStage(p: Props) {
 export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabled, audienceEnabled, lightsEnabled, dropEnabled, wavesEnabled, phoneSyncEnabled, phoneMode, domeEnabled, showDirectorEnabled,secondLevelEnabled,skyFormationEnabled,section,
   fullSongDirectorEnabled,ledColumnsEnabled,virtualPyroEnabled,crowdChantEnabled,showIntensity,progressMs,durationMs,
   lasersEnabled,movingSkyEnabled,groundFogEnabled,arenaPeaksEnabled,
-  transformingDeckEnabled,transformingDeckMode,transformingDeckStrength, ...props }:
+  transformingDeckEnabled,transformingDeckMode,transformingDeckStrength,
+  floatingStageEnabled,floatingStageMode,floatingStageIntensity, ...props }:
   Props & { theme: StageEnvironmentId; children?: React.ReactNode; rotationSpeed?: number; rotationEnabled?: boolean;
     audienceEnabled?: boolean; lightsEnabled?: boolean; dropEnabled?: boolean;
     wavesEnabled?:boolean;phoneSyncEnabled?:boolean;phoneMode?:import("@/lib/arena360ImmersionV1033").ArenaPhoneModeV1033;domeEnabled?:boolean;
@@ -183,7 +184,8 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     crowdChantEnabled?:boolean;showIntensity?:number;progressMs?:number;durationMs?:number;
     lasersEnabled?:boolean;movingSkyEnabled?:boolean;groundFogEnabled?:boolean;arenaPeaksEnabled?:boolean;
     transformingDeckEnabled?:boolean;transformingDeckMode?:import('@/lib/arena360TransformationV1037').ArenaTransformationModeV1037;
-    transformingDeckStrength?:number }) {
+    transformingDeckStrength?:number;floatingStageEnabled?:boolean;
+    floatingStageMode?:import('@/lib/arena360FloatingStageV1038').FloatingStageModeV1038;floatingStageIntensity?:number }) {
   if (theme === "arena360") {
     return <Arena360StageV1031 {...props} rotationSpeed={rotationSpeed} rotationEnabled={rotationEnabled}
       audienceEnabled={audienceEnabled} lightsEnabled={lightsEnabled} dropEnabled={dropEnabled}
@@ -195,7 +197,9 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       lasersEnabled={lasersEnabled} movingSkyEnabled={movingSkyEnabled}
       groundFogEnabled={groundFogEnabled} arenaPeaksEnabled={arenaPeaksEnabled}
       transformingDeckEnabled={transformingDeckEnabled} transformingDeckMode={transformingDeckMode}
-      transformingDeckStrength={transformingDeckStrength}>
+      transformingDeckStrength={transformingDeckStrength}
+      floatingStageEnabled={floatingStageEnabled} floatingStageMode={floatingStageMode}
+      floatingStageIntensity={floatingStageIntensity}>
       {children}
     </Arena360StageV1031>;
   }

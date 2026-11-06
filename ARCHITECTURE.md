@@ -1,4 +1,4 @@
-# V1037 · Arena Transformation 2.0
+# V1038 · Floating Stage (aufbauend auf V1037)
 
 ## Implementiert
 
@@ -1351,7 +1351,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1037
+**Dokumentationsstand:** V1038
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -4247,3 +4247,9 @@ Der `immersiveConcertFxV1028.ts`-Planer wird im **bestehenden** `DynamicStage.ts
 ## V1030 · Intelligent Concert Atmosphere 5.0
 
 `intelligentConcertAtmosphereV1030.ts` is pure, deterministic and evidence-gated (V604/V761/V810), uses same current track/act/time and capped performance budget. The only R3F integration is the existing `DynamicStage` `useFrame`: V814 haze opacity, post-V999 virtual crowd movement/phone glow, V882 beams, V885 scene/background tint and existing V1026 fill palette. All gains are <=1; no new draw calls, hardware commands, React state or extra scene loop. Protected if manually authored, seek/pause/blackout, low tier, reduced motion or invalid act evidence.
+
+## V1038 floating scenic platforms (2026-11-06)
+
+`lib/arena360FloatingStageV1038.ts` is a dependency-free pure planner/stepper and sampler. It never owns cameras, lights, network requests, animation controllers, or UI timers. `components/visualizer/stages/ArenaFloatingPlatformsV1038.tsx` animates world-fixed decorative satellite stages around radius 3.35, above the petal perimeter, separate from the rotating avatar cast root. It is intentionally not a dancer load-bearing surface. Lifts stay in [0.42,1.32] stage units; per-platform bob is clamped, and outer bounding radius remains under 3.74. Counts are 2 / 4 / 6 for low / balanced / high performance tiers. Settings originate in `types/music.ts`, are given defaults in `context/UiPreferencesContext.tsx`, presented in `components/SettingsPanel.tsx`, and passed via `VisualizerStage` → `ThreeAvatar` → `StageEnvironment` → `Arena360StageV1031`.
+
+Tests: `tests/v1038-floating-stage-regression.cjs`, `tests/tsconfig.v1038-core.json`, `scripts/v1038-release-readiness.cjs`. CI extends the existing V1032 arena workflow on push; V1038 has a manual multi-OS workflow, not another push-triggered job. No moving-avatar foot IK or physics constraints are introduced.

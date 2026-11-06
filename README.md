@@ -1,4 +1,4 @@
-# V1037 · Arena Transformation 2.0
+# V1038 · Floating Stage (aufbauend auf V1037)
 
 ## GitHub-Release-ZIPs mit langen Namen (V1037 Import-Fix)
 
@@ -2823,3 +2823,9 @@ In **Concert FX Studio** activate/deactivate `AI Visual Director 5.0` and adjust
 ## V1030 – Intelligent Concert Atmosphere 5.0
 
 Atmosphere composer in the existing DynamicStage render loop: evidence-gated cinematic mood, reduction-only crowd lights/movement/phone glow, ambient background/floor tint, haze and beam balance. Enabled and strength-controlled in the Concert FX Studio. No extra scene objects, no hardware calls, no invented music segments. See changelog/V1030-INTELLIGENT-CONCERT-ATMOSPHERE-5.md.
+
+## V1038 — Floating Stage
+
+The 360° Arena now supports 2–6 floating, independently animated decorative platforms on the perimeter. Modes: `auto`, `wave`, `orbit`, `rise`; intensity slider 0–100%. Only rendered in `arena360`. They are not avatar-bearing; performers keep their existing stable 360° deck and Foot-IK. The satellites freeze on pause, park on reduced-motion, and adapt to performance tiers. Use `npm run test:v1038`, `npm run test:v1038:types`, and `npm run check:architecture` to validate. See `changelog/V1038-FLOATING-STAGE.md` for the integration details.
+
+Release ZIP filenames may retain descriptive suffixes, e.g. `SonicDisplay-V1038-Floating-Stage-360-Arena.zip`. The GitHub importer accepts safe descriptive names up to 255 bytes.

@@ -20,6 +20,8 @@ import {ArenaMovingLedSkyV1036} from "./ArenaMovingLedSkyV1036";
 import {ArenaLowFogV1036} from "./ArenaLowFogV1036";
 import {ArenaTransformingDeckV1037} from './ArenaTransformingDeckV1037';
 import type {ArenaTransformationModeV1037} from '@/lib/arena360TransformationV1037';
+import {ArenaFloatingPlatformsV1038} from './ArenaFloatingPlatformsV1038';
+import type {FloatingStageModeV1038} from '@/lib/arena360FloatingStageV1038';
 import {INITIAL_ARENA_LIFT_V1034,stepArenaLiftV1034} from "@/lib/arena360ShowV1034";
 import type {ArenaPhoneModeV1033} from "@/lib/arena360ImmersionV1033";
 
@@ -37,7 +39,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   fullSongDirectorEnabled=true,ledColumnsEnabled=true,virtualPyroEnabled=true,crowdChantEnabled=true,
   showIntensity=65,progressMs=0,durationMs=0,
   lasersEnabled=true,movingSkyEnabled=true,groundFogEnabled=true,arenaPeaksEnabled=true,
-  transformingDeckEnabled=true,transformingDeckMode='auto',transformingDeckStrength=70}: {
+  transformingDeckEnabled=true,transformingDeckMode='auto',transformingDeckStrength=70,
+  floatingStageEnabled=true,floatingStageMode='auto',floatingStageIntensity=70}: {
   children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
   reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
   audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
@@ -47,6 +50,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   crowdChantEnabled?:boolean;showIntensity?:number;progressMs?:number;durationMs?:number;
   lasersEnabled?:boolean;movingSkyEnabled?:boolean;groundFogEnabled?:boolean;arenaPeaksEnabled?:boolean;
   transformingDeckEnabled?:boolean;transformingDeckMode?:ArenaTransformationModeV1037;transformingDeckStrength?:number;
+  floatingStageEnabled?:boolean;floatingStageMode?:FloatingStageModeV1038;floatingStageIntensity?:number;
 }){
   const turntable=useRef<Group>(null);
   const scenicTier=useRef<Group>(null);
@@ -170,6 +174,9 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaLowFogV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={groundFogEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={showIntensity} peakRef={sharedPeak}/>
+    <ArenaFloatingPlatformsV1038 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
+      reactive={reactive} enabled={floatingStageEnabled} mode={floatingStageMode}
+      intensity={floatingStageIntensity} section={section}/>
     <ArenaLightsV1032 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={lightsEnabled} dropEnabled={dropEnabled} reactive={reactive}/>
     {/* The turntable and the performer root share precisely the same transform. */}
     <group ref={turntable} name="v1031-rotating-platform-and-cast">

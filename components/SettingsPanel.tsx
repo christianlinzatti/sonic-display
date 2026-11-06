@@ -437,6 +437,31 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
         <label className="setting-check"><input type="checkbox" checked={preferences.stageReactive ?? true} onChange={e => updatePreferences({stageReactive: e.target.checked})}/> Musikreaktive Beleuchtung</label>
         <label>Lichtreaktion ({preferences.stageLightStrength ?? 60} %)<input type="range" min="0" max="100" step="5" value={preferences.stageLightStrength ?? 60} onChange={e => updatePreferences({stageLightStrength:Number(e.target.value)})}/></label>
         {(preferences.stageTheme === "arena360") && <div className="arena360-settings-v1031">
+          <strong>V1038 · Floating Stage</strong>
+          <div className="arena360-experience-options-v1032">
+            <strong>Schwebende LED-Plattformen</strong>
+            <label className="setting-check"><input type="checkbox"
+              checked={preferences.arenaFloatingStageEnabledV1038 ?? true}
+              onChange={e=>updatePreferences({arenaFloatingStageEnabledV1038:e.target.checked})}/>
+              Bis zu sechs schwebende Satelliten-Plattformen rund um die 360°-Bühne</label>
+            <label>Bewegungsmuster
+              <select value={preferences.arenaFloatingStageModeV1038 ?? 'auto'}
+                disabled={!(preferences.arenaFloatingStageEnabledV1038 ?? true)}
+                onChange={e=>updatePreferences({arenaFloatingStageModeV1038:e.target.value as 'auto'|'wave'|'orbit'|'rise'})}>
+                <option value="auto">Automatisch nach Songabschnitt</option>
+                <option value="wave">Schwebende Welle</option>
+                <option value="orbit">Langsame Umrundung</option>
+                <option value="rise">Sanfte Höhenfahrt</option>
+              </select>
+            </label>
+            <label>Schwebeintensität: {preferences.arenaFloatingStageIntensityV1038 ?? 70} %
+              <input type="range" min={0} max={100} step={5}
+                disabled={!(preferences.arenaFloatingStageEnabledV1038 ?? true)}
+                value={preferences.arenaFloatingStageIntensityV1038 ?? 70}
+                onChange={e=>updatePreferences({arenaFloatingStageIntensityV1038:Number(e.target.value)})}/>
+            </label>
+            <small>Dekorative, separat schwebende Mini-Bühnen; keine Avatare auf den Plattformen. Die Hauptbühne und Foot-IK bleiben unverändert. Bei Pause friert die Bewegung ein, bei reduzierter Bewegung ruhen die Plattformen.</small>
+          </div>
           <strong>V1037 · Arena Transformation 2.0</strong>
           <div className="arena360-experience-options-v1032">
             <strong>Transformierende 360°-Bühne</strong>

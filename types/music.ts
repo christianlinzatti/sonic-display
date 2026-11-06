@@ -31,6 +31,9 @@ export interface UiPreferences {
   arenaTransformingDeckEnabledV1037?: boolean;
   arenaTransformingDeckModeV1037?: 'auto' | 'fan' | 'spiral' | 'halo';
   arenaTransformingDeckStrengthV1037?: number;
+  arenaFloatingStageEnabledV1038?: boolean;
+  arenaFloatingStageModeV1038?: 'auto'|'wave'|'orbit'|'rise';
+  arenaFloatingStageIntensityV1038?: number;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;

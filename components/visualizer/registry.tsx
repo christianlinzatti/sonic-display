@@ -132,6 +132,9 @@ export interface VisualizerProps {
   arenaTransformingDeckEnabledV1037?: boolean;
   arenaTransformingDeckModeV1037?: 'auto' | 'fan' | 'spiral' | 'halo';
   arenaTransformingDeckStrengthV1037?: number;
+  arenaFloatingStageEnabledV1038?: boolean;
+  arenaFloatingStageModeV1038?: 'auto'|'wave'|'orbit'|'rise';
+  arenaFloatingStageIntensityV1038?: number;
   dancePostEnabledV468?: boolean;
   shaderEnvironmentV468?: import('./ProceduralShaderEnvironmentV468').ShaderEnvironmentModeV468;
   wardrobeModeV468?: import('./avatarWardrobeV468').WardrobeModeV468;

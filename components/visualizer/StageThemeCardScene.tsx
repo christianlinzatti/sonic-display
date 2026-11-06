@@ -584,6 +584,19 @@ function Arena360CardSetV1031({palette,animate}:{palette:StagePalette;animate:bo
       <ringGeometry args={[1.68,2.05,48]}/>
       <meshBasicMaterial color="#668ea9" transparent opacity={.16} depthWrite={false}/>
     </mesh>
+    {/* V1038 preview: floating satellite platforms above the outer stage ring. */}
+    {Array.from({length:4},(_,i)=>{
+      const angle=i*Math.PI/2;
+      return <group key={`v1038-preview-floating-${i}`} name={`v1038-preview-floating-${i}`}
+        position={[Math.cos(angle)*2.12,-.53+(i%2)*.19,Math.sin(angle)*2.12]}>
+        <mesh><cylinderGeometry args={[.19,.17,.07,16]}/>
+          <meshStandardMaterial color="#283f57" metalness={.7}/></mesh>
+        <mesh position={[0,.038,0]} rotation={[-Math.PI/2,0,0]}>
+          <ringGeometry args={[.13,.18,16]}/>
+          <meshBasicMaterial color={i%2===0?'#44e5f5':'#dd72ee'} toneMapped={false}/>
+        </mesh>
+      </group>;
+    })}
     {/* V1035 preview: illuminated columns suggest the new independent kinetic perimeter. */}
     {Array.from({length:10},(_,i)=>{
       const angle=Math.PI*2*(i+.5)/10;
