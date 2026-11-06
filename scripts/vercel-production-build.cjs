@@ -31,6 +31,9 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1013 production stability and release metadata','tests/v1013-production-stability-regression.cjs');
+  run('V1013 pre-install release readiness','scripts/v1013-release-readiness.cjs');
+  run('V1012 network health & auto recovery','tests/v1012-network-health-regression.cjs');
   run('V1011 network performance dashboard','tests/v1011-network-dashboard-regression.cjs');
   run('V1010 central network governor','tests/v1010-network-coordination-regression.cjs');
   run('V1009 private avatar resources','tests/v1009-avatar-resources-regression.cjs');
@@ -103,6 +106,7 @@ try {
   run('V962 narrative regression','tests/v962-concert-narrative-regression.cjs');
   run('V961 light governor regression','tests/v961-govee-concert-governor-regression.cjs');
   run('Vercel deployment configuration regression','tests/vercel-production-parity-regression.cjs');
+  run('V1012 health and governor isolated TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','lib/networkCoordinatorV1010.ts','lib/networkJsonV1010.ts','lib/networkHealthV1012.ts']);
   run('V1010 network governor isolated TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','lib/networkCoordinatorV1010.ts','lib/networkJsonV1010.ts']);
   run('V1002 QA Core isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v1002-core.json','--noEmit']);
   run('V1003 Auto Improvement isolated TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v1003-core.json','--noEmit']);

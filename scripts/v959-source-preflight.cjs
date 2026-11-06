@@ -11,5 +11,8 @@ for (const report of ['v959-build-proof.json', 'v959-build-summary.md', 'v931-pr
   if (fs.existsSync(output)) fs.unlinkSync(output);
 }
 const report = inspect(root, { requireDependencies: false });
+const {inspectReleaseV1013}=require('./v1013-release-readiness.cjs');
+const release=inspectReleaseV1013(root);
+for(const check of release.checks)console.log(`${check.ok?'PASS':'FAIL'} V1013 ${check.id}${check.ok?'':': '+check.reason}`);
 for (const c of report.checks) console.log(`${c.passed ? 'PASS' : 'FAIL'} V959 ${c.id}: ${c.detail}`);
-if (!report.passed) process.exitCode = 1;
+if (!report.passed || !release.passed) process.exitCode = 1;

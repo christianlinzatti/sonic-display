@@ -1,3 +1,7 @@
+## V1012 – Intelligent Network Health & Auto Recovery (2026-11-06)
+
+Der lokale Netzwerk-Koordinator führt den Circuit Breaker, Recovery-Zähler und gestaffelte Warteschlangen fort. `lib/networkHealthV1012.ts` leitet daraus sichere Diagnose- und Handlungstexte ab. Die Darstellung erfolgt im bestehenden `components/NetworkPerformanceDashboardV1011.tsx`, ohne eigene Internetabfragen. Nach Wiederverbindung starten optionale Aufträge in kleinen zeitlich versetzten Wellen; Benutzeraktionen bleiben bevorzugt.
+
 ## V1011 – Netzwerkdiagnose und Release-Sicherheit (2026-11-06)
 
 `components/NetworkPerformanceDashboardV1011.tsx` visualisiert die tatsächlich gemessene
@@ -1229,7 +1233,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1011
+**Dokumentationsstand:** V1013
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -4060,3 +4064,11 @@ SkeletonUtils-Klons. Eigene Geometrien, Materialien und Texturobjekte verhindern
 Dispose-Listener früherer WebGL-Renderer über den GLTF-Cache alte Canvas-/DOM-Bäume halten.
 Die Originale und Bilddaten bleiben im Cache; ein gemeinsamer Ressourcentest und der
 Produktions-Speichertest prüfen Wiederverwendung, Freigabe und begrenztes Wachstum.
+
+## V1012 – Network Health & Auto Recovery
+
+Das Browser-Tab behält getrennte Priority-Lanes und Account-Caches. Optionale Anbieter werden nach drei vorübergehenden Fehlern durch einen auf maximal zwei Minuten begrenzten Circuit Breaker geschützt. Eine halb offene Anfrage prüft den Dienst; andere optionale Requests warten. Benutzeraktionen bleiben unabhängig von dieser optionalen Pause, beachten jedoch providerweite HTTP-429-Wartezeiten. Beim Online-Wiederverbinden werden bereits wartende optionale Abrufe gestaffelt ausgeführt. Diagnosemodelle arbeiten ausschließlich auf aggregierten, kontogetrennten Telemetriedaten und erzeugen keinen zusätzlichen Traffic.
+
+## V1013 – Production Build Stabilization
+
+`scripts/v959-source-preflight.cjs` startet ohne `node_modules` die V1013-Release-Readiness. Sie validiert automatisch die tatsächliche Version, die Konto-/Netzwerkregressionen, den Windows-/Linux-Hauptworkflow und den Vercel-Gate. `scripts/v931-production-gate.cjs` führt alle V1010–V1013-Funktionstests im Hauptgate aus. Der vollständige TypeScript- und Next.js-Build sowie Playwright bleiben unverändert verpflichtend, und ein fehlender Report wird nie als Erfolg gewertet.

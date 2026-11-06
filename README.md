@@ -1,3 +1,7 @@
+> **V1013 – Production Build Stabilization:** Release-/Lockfile-Prüfungen vor npm ci, Pflichtregressionen V1010–V1013 in der gesamten Produktionspipeline und Fail-Closed-Negativtests. Siehe `changelog/V1013-PRODUCTION-BUILD-STABILIZATION.md`.
+
+> **V1012 – Intelligent Network Health & Auto Recovery:** Automatische Diagnose für Offline-, Authentifizierungs-, Rate-Limit- und Dienstfehler, gestaffelte Wiederaufnahme und geschützte Benutzeraktionen. Siehe `changelog/V1012-INTELLIGENT-NETWORK-HEALTH-AUTO-RECOVERY.md`. Das GitHub-Import-Skript übernimmt neue `.github/workflows/`-Dateien nicht automatisch; die zusätzliche V1012-Validierung kann bei Bedarf separat committed werden.
+
 ## V1011 – Network Performance Dashboard & CI-Fix (2026-11-06)
 
 Unter **Einstellungen → Dashboard** gibt es jetzt den Bereich „Internetabfragen in

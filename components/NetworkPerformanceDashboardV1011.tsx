@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {clientNetworkV1010,type NetworkTelemetryV1011,type NetworkLaneV1010} from '@/lib/networkCoordinatorV1010';
+import {evaluateNetworkHealthV1012} from '@/lib/networkHealthV1012';
 
 const laneLabels:Record<NetworkLaneV1010,string>={
   action:'Benutzeraktionen',playback:'Wiedergabe',regular:'Lyrics & Genre',optional:'Optionale Inhalte',
@@ -23,6 +24,7 @@ export function NetworkPerformanceDashboardV1011(){
       document.removeEventListener('visibilitychange',update);
       window.removeEventListener('online',update);window.removeEventListener('offline',update);};
   },[]);
+  const health=evaluateNetworkHealthV1012(state);
   const inflight=lanes.reduce((sum,lane)=>sum+state.inFlight[lane],0);
   const cacheReads=state.counters.cacheHits+state.counters.staleHits;
   const joined=state.counters.joined;
@@ -37,6 +39,29 @@ export function NetworkPerformanceDashboardV1011(){
         {state.offline?'Offline':state.hidden?'Tab im Hintergrund':'Monitoring aktiv'}
       </span>
     </header>
+    <div className="network-v1012-health" data-v1012-network-health aria-label="Intelligent Network Health">
+      <div className="network-v1012-head">
+        <div><span className="network-v1011-kicker">AUTO RECOVERY / V1012</span>
+          <h4>Netzwerkdiagnose: {health.title}</h4>
+          <p>{health.detail}</p></div>
+        <span className="network-v1012-state" data-health={health.level}>{health.level==='healthy'?'Erfolgreich':health.level==='unverified'?'Ungeprüft':health.level==='recovering'?'Erholung':'Achtung'}</span>
+      </div>
+      <div className="network-v1012-actions" aria-label="Empfohlene Maßnahmen">
+        {health.advice.map(item=><div key={item.code} className="network-v1012-advice">
+          <strong>{item.title}</strong><span>{item.detail}</span>
+        </div>)}
+      </div>
+      <div className="network-v1012-metrics">
+        <span>{state.recovery.circuitsOpened} Dienstpausen</span>
+        <span>{state.recovery.probes} einzelne Prüfanfragen</span>
+        <span>{state.recovery.restored} Erholungen</span>
+        <span>{state.recovery.staged} gestaffelte Abrufe</span>
+      </div>
+      <button type="button" className="network-v1012-wake" onClick={()=>clientNetworkV1010.wake()}
+        disabled={state.offline} title="Gibt nur bereits wartende Aufträge frei; erzeugt keine neue Internetanfrage">
+        Wartende Abfragen erneut prüfen
+      </button>
+    </div>
     <div className="network-v1011-stats" aria-label="Netzwerk-Kennzahlen">
       <div><strong>{inflight}</strong><span>Aktive Anfragen</span></div>
       <div><strong>{state.queue}<small> / {state.queueLimit}</small></strong><span>Warteschlange (Spitze {state.peakQueue})</span></div>
@@ -62,12 +87,13 @@ export function NetworkPerformanceDashboardV1011(){
     </div>
     <h4>Dienste & Schutzmechanismen</h4>
     {state.providers.length>0?<div className="network-v1011-scroll"><table className="network-v1011-table">
-      <thead><tr><th>Dienst</th><th>Aktiv</th><th>Wartend</th><th>HTTP 429</th><th>Dienstpause</th><th>Fehlerversuche</th></tr></thead>
+      <thead><tr><th>Dienst</th><th>Aktiv</th><th>Wartend</th><th>HTTP 429</th><th>Dienstpause</th><th>Fehlerversuche</th><th>Gesundheit</th></tr></thead>
       <tbody>{state.providers.map(provider=><tr key={provider.name}>
         <th scope="row">{provider.name==='Buehneninhalte'?'Bühneninhalte':provider.name}</th>
         <td>{provider.active}</td><td>{provider.queued}</td>
         <td>{remaining(provider.blockedForMs)}</td><td>{remaining(provider.circuitForMs)}</td>
         <td>{provider.failures}{provider.lastFailure?` · ${provider.lastFailure}`:''}</td>
+        <td>{health.providerHealth.find(item=>item.name===provider.name)?.message??'Ungeprüft'}</td>
       </tr>)}</tbody>
     </table></div>:<p className="network-v1011-empty">Noch keine koordinierten Dienstabfragen in dieser Sitzung beobachtet.</p>}
     <p className="network-v1011-note">{haveTraffic?'Die Zähler erfassen nur die über den V1010-Koordinator laufenden Browser-Anfragen.':'Nach den ersten koordinierten Abrufen erscheinen hier echte Messwerte.'}

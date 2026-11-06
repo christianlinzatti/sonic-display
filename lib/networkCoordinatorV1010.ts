@@ -23,8 +23,11 @@ export type NetworkTelemetryV1011 = {
   counters:{started:number;completed:number;failed:number;joined:number;cacheHits:number;staleHits:number;
     cancelled:number;retries:number;rateLimits:number;queueDropped:number};
   averageLatencyMs:number;lastFailure:NetworkFailureKindV1011|null;
+  /** V1012: aggregated, account-resettable recovery evidence; no endpoint or identity. */
+  recovery:{staged:number;probes:number;restored:number;circuitsOpened:number};
   providers:Array<{name:NetworkProviderIdV1011;queued:number;active:number;failures:number;
-    blockedForMs:number;circuitForMs:number;lastFailure:NetworkFailureKindV1011|null}>;
+    blockedForMs:number;circuitForMs:number;lastFailure:NetworkFailureKindV1011|null;
+    failureStreak:number;lastSuccessAgoMs:number|null;probing:boolean}>;
 };
 const safeProviderV1011=(provider:string):NetworkProviderIdV1011=>{
   switch(provider.toLowerCase()){
@@ -79,6 +82,9 @@ export class NetworkCoordinatorV1010 {
   private readonly providerFailures=new Map<NetworkProviderIdV1011,{count:number;last:NetworkFailureKindV1011|null}>();
   private readonly telemetryListeners=new Set<()=>void>();
   private telemetryPending=false;
+  private readonly providerHealth=new Map<string,{failureStreak:number;lastSuccessAt:number|null}>();
+  private recoveryCounters={staged:0,probes:0,restored:0,circuitsOpened:0};
+  private recoveryPending=false;
   private changedV1011(){
     if(this.telemetryPending)return;
     this.telemetryPending=true;
@@ -93,10 +99,12 @@ export class NetworkCoordinatorV1010 {
   }
   /** Read-only, tab-local and account-resettable. Never stores request identities. */
   snapshotV1011(now=Date.now()):NetworkTelemetryV1011{
-    const grouped=new Map<NetworkProviderIdV1011,{queued:number;active:number;blockedForMs:number;circuitForMs:number}>();
+    const grouped=new Map<NetworkProviderIdV1011,{queued:number;active:number;blockedForMs:number;circuitForMs:number;
+      failureStreak:number;lastSuccessAgoMs:number|null;probing:boolean}>();
     const ensure=(name:NetworkProviderIdV1011)=>{
       let entry=grouped.get(name);
-      if(!entry){entry={queued:0,active:0,blockedForMs:0,circuitForMs:0};grouped.set(name,entry);}
+      if(!entry){entry={queued:0,active:0,blockedForMs:0,circuitForMs:0,
+        failureStreak:0,lastSuccessAgoMs:null,probing:false};grouped.set(name,entry);}
       return entry;
     };
     for(const job of this.jobs.values()){
@@ -108,9 +116,17 @@ export class NetworkCoordinatorV1010 {
       if(until>now){const entry=ensure(safeProviderV1011(provider));entry.blockedForMs=Math.max(entry.blockedForMs,until-now);}
     }
     for(const [provider,circuit] of this.circuits){
-      if(circuit.openUntil>now){const entry=ensure(safeProviderV1011(provider));entry.circuitForMs=Math.max(entry.circuitForMs,circuit.openUntil-now);}
+      const entry=ensure(safeProviderV1011(provider));
+      if(circuit.openUntil>now)entry.circuitForMs=Math.max(entry.circuitForMs,circuit.openUntil-now);
+      if(circuit.probe)entry.probing=true;
     }
     for(const provider of this.providerFailures.keys())ensure(provider);
+    for(const [provider,state] of this.providerHealth){
+      const entry=ensure(safeProviderV1011(provider));
+      entry.failureStreak=Math.max(entry.failureStreak,state.failureStreak);
+      if(state.lastSuccessAt!==null){const ago=Math.max(0,now-state.lastSuccessAt);
+        entry.lastSuccessAgoMs=entry.lastSuccessAgoMs===null?ago:Math.min(entry.lastSuccessAgoMs,ago);}
+    }
     const providers=[...grouped.entries()].map(([name,entry])=>({name,...entry,
       failures:this.providerFailures.get(name)?.count??0,
       lastFailure:this.providerFailures.get(name)?.last??null})).sort((a,b)=>a.name.localeCompare(b.name));
@@ -121,7 +137,7 @@ export class NetworkCoordinatorV1010 {
       hidden:typeof document!=='undefined'&&document.visibilityState==='hidden',
       counters:{...this.telemetryCounters},
       averageLatencyMs:this.telemetryCounters.completed?Math.round(this.totalLatency/this.telemetryCounters.completed):0,
-      lastFailure:this.lastFailure,providers};
+      lastFailure:this.lastFailure,recovery:{...this.recoveryCounters},providers};
   }
   private peakQueue=0;
   private noteFailureV1011(provider:string,error:unknown){
@@ -129,7 +145,14 @@ export class NetworkCoordinatorV1010 {
     this.lastFailure=kind;
     const state=this.providerFailures.get(name)??{count:0,last:null};
     state.count++;state.last=kind;this.providerFailures.set(name,state);
+    const health=this.providerHealth.get(provider)??{failureStreak:0,lastSuccessAt:null};
+    health.failureStreak++;this.providerHealth.set(provider,health);
     this.changedV1011();
+  }
+  private noteSuccessV1012(provider:string){
+    const health=this.providerHealth.get(provider)??{failureStreak:0,lastSuccessAt:null};
+    if(health.failureStreak>0)this.recoveryCounters.restored++;
+    health.failureStreak=0;health.lastSuccessAt=Date.now();this.providerHealth.set(provider,health);
   }
   constructor(private readonly limits:Record<NetworkLaneV1010,number>=DEFAULT_LIMITS,
     private readonly maxQueue=48,private readonly maxCache=120,private readonly backoffMs=750){}
@@ -199,7 +222,7 @@ export class NetworkCoordinatorV1010 {
       else if(this.queue.length>=this.maxQueue){this.telemetryCounters.queueDropped++;this.changedV1011();return null;}
     }
     const provider=options.provider??'generic';
-    job={key,provider,priority,lane,run:options.execute as (signal:AbortSignal)=>Promise<unknown>,controller:new AbortController(),waiters:new Set(),ttl,stale,retry:finite(options.retry??2,2,4),tries:0,readyAt:Date.now(),retain,started:false,order:this.serial++,cacheWhen:options.cacheWhen as ((value:unknown)=>boolean)|undefined,retainers:new Map()};
+    job={key,provider,priority,lane,run:options.execute as (signal:AbortSignal)=>Promise<unknown>,controller:new AbortController(),waiters:new Set(),ttl,stale,retry:finite(options.retry??(priority==='action'?0:2),2,4),tries:0,readyAt:Date.now(),retain,started:false,order:this.serial++,cacheWhen:options.cacheWhen as ((value:unknown)=>boolean)|undefined,retainers:new Map()};
     this.jobs.set(key,job);this.queue.push(job);
     this.peakQueue=Math.max(this.peakQueue,this.queue.length);this.changedV1011();
     // Queue first, install subscriber synchronously, then dispatch on microtask.
@@ -225,8 +248,12 @@ export class NetworkCoordinatorV1010 {
     this.telemetryCounters.cancelled++;this.changedV1011();this.pump();
   }
   private offlineOrHidden(job:Job){
-    if(typeof navigator!=='undefined'&&navigator.onLine===false)return true;
-    return job.priority==='optional'&&typeof document!=='undefined'&&document.visibilityState==='hidden';
+    if(typeof navigator!=='undefined'&&navigator.onLine===false){this.recoveryPending=true;return true;}
+    if(job.priority==='optional'&&typeof document!=='undefined'&&document.visibilityState==='hidden'){
+      this.recoveryPending=true;return true;
+    }
+    // Optional requests resume only after a wake signal, avoiding a reconnect burst.
+    return this.recoveryPending&&job.priority==='optional';
   }
   private pump(){
     if(this.timer){clearTimeout(this.timer);this.timer=null;}
@@ -235,7 +262,9 @@ export class NetworkCoordinatorV1010 {
     for(const [provider,until] of this.blocked)if(until<=now)this.blocked.delete(provider);
     for(const job of [...this.queue]){
       if(this.jobs.get(job.key)!==job)continue;
-      const circuit=this.circuits.get(job.provider);
+      // Circuit breakers protect speculative work, but never prevent intentional
+      // user actions or playback. A provider-wide Spotify 429 still blocks all lanes.
+      const circuit=job.priority==='optional'?this.circuits.get(job.provider):undefined;
       const block=Math.max(job.readyAt,this.blocked.get(job.provider)??0,circuit?.openUntil??0);
       if(block>now){next=Math.min(next,block-now);continue;}
       if(this.offlineOrHidden(job))continue;
@@ -243,7 +272,8 @@ export class NetworkCoordinatorV1010 {
       if(this.running[job.lane]>=this.limits[job.lane])continue;
       this.queue.splice(this.queue.indexOf(job),1);
       this.running[job.lane]++;
-      if(circuit&&circuit.failures>=3)circuit.probe=true;
+      if(circuit&&circuit.failures>=3){circuit.probe=true;
+        this.recoveryCounters.probes++;this.changedV1011();}
       job.started=true;
       this.telemetryCounters.started++;this.changedV1011();
       void this.execute(job);
@@ -275,6 +305,7 @@ export class NetworkCoordinatorV1010 {
       if(this.jobs.get(job.key)!==job)return;
       const circuit=this.circuits.get(job.provider);
       if(circuit){circuit.failures=0;circuit.openUntil=0;circuit.probe=false;}
+      this.noteSuccessV1012(job.provider);
       if(job.ttl>0&&(!job.cacheWhen||job.cacheWhen(result))){
         const now=Date.now();this.cache.delete(job.key);
         this.cache.set(job.key,{value:result,freshUntil:now+job.ttl,staleUntil:now+job.ttl+job.stale});
@@ -302,7 +333,11 @@ export class NetworkCoordinatorV1010 {
     if(retryable&&job.priority==='optional'&&status!==429){
       const circuit=this.circuits.get(job.provider)??{failures:0,openUntil:0,probe:false};
       circuit.failures++;
-      if(circuit.failures>=3)circuit.openUntil=Date.now()+30000;
+      if(circuit.failures>=3){
+        // Repeated half-open failures lengthen the pause up to two minutes.
+        const pause=Math.min(120000,30000*2**Math.min(2,circuit.failures-3));
+        circuit.openUntil=Date.now()+pause;this.recoveryCounters.circuitsOpened++;
+      }
       this.circuits.set(job.provider,circuit);
     }
     if(retryable&&job.tries<=job.retry&&!job.controller.signal.aborted){
@@ -319,12 +354,27 @@ export class NetworkCoordinatorV1010 {
     this.blocked.set(provider,Math.max(this.blocked.get(provider)??0,Date.now()+Math.max(1000,finite(waitMs,1000,300000))));
     this.changedV1011();this.pump();
   }
-  wake(){this.pump();}
+  /** Resume queued reads in small staggered waves; no synthetic requests. */
+  wake(){
+    if(this.recoveryPending && (typeof navigator==='undefined'||navigator.onLine!==false)){
+      this.recoveryPending=false;
+      const now=Date.now();let index=0;
+      for(const job of this.queue){
+        if(job.priority!=='optional')continue;
+        job.readyAt=Math.max(job.readyAt,now+Math.min(3000,250+index*250));
+        index++;this.recoveryCounters.staged++;
+      }
+      if(index)this.changedV1011();
+    }
+    this.pump();
+  }
   reset(){
     this.generation++;
     for(const job of [...this.jobs.values()])this.cancel(job);
     this.cache.clear();this.listeners.clear();this.blocked.clear();this.circuits.clear();
-    this.providerFailures.clear();this.telemetrySince=Date.now();
+    this.providerFailures.clear();this.providerHealth.clear();
+    this.recoveryCounters={staged:0,probes:0,restored:0,circuitsOpened:0};
+    this.recoveryPending=false;this.telemetrySince=Date.now();
     for(const key of Object.keys(this.telemetryCounters) as Array<keyof typeof this.telemetryCounters>)this.telemetryCounters[key]=0;
     this.totalLatency=0;this.peakQueue=0;this.lastFailure=null;this.changedV1011();
     if(this.timer)clearTimeout(this.timer);this.timer=null;

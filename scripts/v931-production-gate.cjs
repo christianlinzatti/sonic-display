@@ -11,6 +11,10 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1013 production stability and release metadata','tests/v1013-production-stability-regression.cjs'],
+  ['V1012 network health and recovery','tests/v1012-network-health-regression.cjs'],
+  ['V1011 network performance dashboard','tests/v1011-network-dashboard-regression.cjs'],
+  ['V1010 network coordination','tests/v1010-network-coordination-regression.cjs'],
   ['V1009 private avatar resources and renderer release','tests/v1009-avatar-resources-regression.cjs'],
   ['V1009 native providers and background deadlines','tests/v1009-network-regression.cjs'],
   ['V1008 receiver and bulk undo lifecycle','tests/v1008-receiver-regression.cjs'],
