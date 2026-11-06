@@ -33,6 +33,18 @@ function inspectReleaseV1028(root){
   check('production-gate',read('scripts/v931-production-gate.cjs').includes('tests/v1028-immersive-concert-fx-regression.cjs'));
   check('vercel-gate',read('scripts/vercel-production-build.cjs').includes('tests/v1028-immersive-concert-fx-regression.cjs'));
   check('preflight-hook',read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1028(root)'));
+  // The ZIP importer preserves protected workflows; verify the actual installed set.
+  check('manual-validation-workflows-installed',[
+    '.github/workflows/v1010-central-network-validation.yml',
+    '.github/workflows/v1011-network-dashboard-validation.yml',
+    '.github/workflows/v1012-network-health-validation.yml',
+    '.github/workflows/v1014-network-diagnostics-validation.yml',
+    '.github/workflows/v1017-intelligent-cache-validation.yml',
+    '.github/workflows/v1025-cinematic-camera-validation.yml',
+    '.github/workflows/v1026-intelligent-stage-lighting-validation.yml',
+    '.github/workflows/v1027-govee-concert-sync-validation.yml',
+    '.github/workflows/v1028-immersive-concert-fx-validation.yml',
+  ].every(exists));
   const titles=require('./version-action-titles-v1016.cjs').formatActionTitlesV1016(root,false);
   check('workflow-titles',titles.total>=25&&titles.changed===0);
   check('production-workflow',read('.github/workflows/v965-room-wave-production.yml').includes('node scripts/v965-production-verify.cjs'));
