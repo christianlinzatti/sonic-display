@@ -176,7 +176,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
   lasersEnabled,movingSkyEnabled,groundFogEnabled,arenaPeaksEnabled,
   transformingDeckEnabled,transformingDeckMode,transformingDeckStrength,
   floatingStageEnabled,floatingStageMode,floatingStageIntensity,
-  hologramsEnabled,laserArchitectureEnabled,hologramPattern,hologramStrength,genre, ...props }:
+  hologramsEnabled,laserArchitectureEnabled,hologramPattern,hologramStrength,showDesignerEnabled,showPlan,genre, ...props }:
   Props & { theme: StageEnvironmentId; children?: React.ReactNode; rotationSpeed?: number; rotationEnabled?: boolean;
     audienceEnabled?: boolean; lightsEnabled?: boolean; dropEnabled?: boolean;
     wavesEnabled?:boolean;phoneSyncEnabled?:boolean;phoneMode?:import("@/lib/arena360ImmersionV1033").ArenaPhoneModeV1033;domeEnabled?:boolean;
@@ -189,7 +189,8 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     floatingStageMode?:import('@/lib/arena360FloatingStageV1038').FloatingStageModeV1038;floatingStageIntensity?:number;
     hologramsEnabled?:boolean;laserArchitectureEnabled?:boolean;
     hologramPattern?:import('@/lib/arena360HolographyV1039').HologramPatternV1039;
-    hologramStrength?:number;genre?:string|null }) {
+    hologramStrength?:number;showDesignerEnabled?:boolean;
+    showPlan?:import('@/lib/arena360ShowDesignerV1040').ArenaShowPlanV1040;genre?:string|null }) {
   if (theme === "arena360") {
     return <Arena360StageV1031 {...props} rotationSpeed={rotationSpeed} rotationEnabled={rotationEnabled}
       audienceEnabled={audienceEnabled} lightsEnabled={lightsEnabled} dropEnabled={dropEnabled}
@@ -205,7 +206,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       floatingStageEnabled={floatingStageEnabled} floatingStageMode={floatingStageMode}
       floatingStageIntensity={floatingStageIntensity}
       hologramsEnabled={hologramsEnabled} laserArchitectureEnabled={laserArchitectureEnabled}
-      hologramPattern={hologramPattern} hologramStrength={hologramStrength} genre={genre}>
+      hologramPattern={hologramPattern} hologramStrength={hologramStrength} showDesignerEnabled={showDesignerEnabled} showPlan={showPlan} genre={genre}>
       {children}
     </Arena360StageV1031>;
   }

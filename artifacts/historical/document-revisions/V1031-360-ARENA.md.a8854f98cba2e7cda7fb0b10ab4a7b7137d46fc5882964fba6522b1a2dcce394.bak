@@ -1,0 +1,37 @@
+## V1037 Erweiterung
+
+Siehe `changelog/V1037-TRANSFORMING-ARENA.md`.
+
+## V1036 Erweiterung
+
+Siehe `changelog/V1036-ATMOSPHERIC-ARENA.md`.
+
+## V1035 Erweiterung
+
+Siehe `changelog/V1035-AI-ARENA-SHOW.md` für die regelbasierte, songsynchrone Show.
+
+# Sonic Display V1031 – Rotating 360° Arena
+
+## New
+
+- Select **360° Rotating Arena** in Settings → Dynamic Stage or use the **360° Rotating Arena** stage preset.
+- Rotating physical circular turntable with a dark metallic deck, dual cyan/pink edge rings, 32 instanced RGB LED segments, illuminated audience concourse, and a stationary overhead ring truss with decorative fixtures.
+- Performers are **children of the same Three.js transform as the turntable**, so solo avatars, duets and group performances rotate in sync with the deck, including the existing world-space camera tracking root.
+- Speed can be set from 0 to 180 degrees per minute (default 90), with an independent on/off control.
+- Rotation stops on playback pause, with reduced-motion preference, or when disabled. Bass adds only a small acceleration (<=15%); frame delta is capped to prevent big jumps after tab suspension.
+- Does not take camera control from existing automatic/manual concert directors; does not introduce network requests, strobe, new shadows, or independent animation timers.
+- New appearance for the stage preview card, 3D preview palette, cinematic transition palette, and stage preset.
+- A new regression test and GitHub Actions validation workflow guard the core rotation logic, actual performer parent integration, accessibility and settings.
+
+## Run
+
+```bash
+npm ci
+npm run test:v1031
+npm run typecheck
+npm run build:next
+```
+
+## Notes
+
+Existing rear-projection effects are controlled separately by the concert stage director. Individual avatar animation clips remain unchanged; only the concert turntable group rotates. The same stage is selectable independently of genre auto-selection. Performance on Raspberry Pi should be verified with a real GLB load test.

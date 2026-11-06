@@ -1,3 +1,9 @@
+## V1041 · Intelligent Avatar Choreography Director
+
+Der opt-in Showplan aus V1040 steuert jetzt die bestehenden Solo-/Duo-Tanzformationen der 360°-Arena. Eigene Freigabe und Intensität in Einstellungen → Display → 360° Arena. Manuelle Bühnen-, Gruppen-, Gesangs- und GLB-Animationen behalten Vorrang. Auf niedriger Grafikstufe keine zusätzlichen Darsteller.
+
+# V1040 · AI Show Designer (aufbauend auf V1039)
+
 # V1038 · Floating Stage (aufbauend auf V1037)
 
 ## GitHub-Release-ZIPs mit langen Namen (V1037 Import-Fix)
@@ -2837,3 +2843,8 @@ Wählbare Hologramm-Portale, 360°-Laser-Tunnel, Spirale und Halo mit Genre-Look
 leistungsbegrenzt und berühren weder Avatare noch Hardware-Lichter. Der zentrale
 GitHub-Produktionsworkflow bleibt für Ubuntu/Windows maßgeblich; die neuen
 Workflows im ZIP werden von der geschützten GitHub-Importlogik nicht übertragen.
+
+
+## V1040 · AI Show Designer
+
+Siehe `changelog/V1040-AI-SHOW-DESIGNER.md`. Der lokale, regelbasierte Showdesigner erstellt eine editierbare 7-Szenen-Timeline aus Freitext und Genre. Die Vorlage kann **explizit** aktiviert werden; sie steuert die bestehende 360°-Arena und deren rein virtuelle Bühnen-, Schwebe- und Laserformationen entlang der tatsächlichen Wiedergabeposition. Erkannten Beats, echten Drops, manuellen Kamera-Timelines, individuellen Tänzen und deaktivierten Effekten wird stets Vorrang gegeben. Eine externe LLM-Integration ist in dieser Version **nicht** enthalten. 

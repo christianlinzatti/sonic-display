@@ -38,6 +38,11 @@ export interface UiPreferences {
   arenaLaserArchitectureEnabledV1039?: boolean;
   arenaHologramPatternV1039?: 'auto'|'tunnel'|'spiral'|'halo';
   arenaHologramStrengthV1039?: number;
+  arenaShowDesignerEnabledV1040?: boolean;
+  arenaShowPlanV1040?: import('@/lib/arena360ShowDesignerV1040').ArenaShowPlanV1040;
+  arenaChoreographyEnabledV1041?: boolean;
+  arenaChoreographyStrengthV1041?: number;
+  arenaChoreographyFormationV1041?: import('@/lib/arena360ChoreographyV1041').ArenaChoreoFormationV1041;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;

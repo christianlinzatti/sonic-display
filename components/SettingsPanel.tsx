@@ -22,6 +22,7 @@ import {normalizeLyricsPerformanceV748} from "./visualizer/lyricsPerformanceStud
 import {DEFAULT_PERFORMANCE_CAMERA_V747,normalizePerformanceCameraV747} from "@/components/visualizer/performanceCameraDirectorV747";
 import {DEFAULT_GENRE_HIP_V742,normalizeGenreHipV742,GENRE_HIP_STYLES_V742} from "@/components/visualizer/genreHipIntelligenceV742";
 import { STAGE_ENVIRONMENTS, type StageEnvironmentId } from "@/components/visualizer/stages";
+import {ArenaShowDesignerPanelV1040} from "@/components/visualizer/ArenaShowDesignerPanelV1040";
 import { StageThemePreviewGrid } from "@/components/visualizer/StageThemePreviewGrid";
 import { ConcertDetailPreviewLauncherV556 } from "@/components/visualizer/ConcertDetailPreviewLauncherV556";
 import { StageThemeLivePreview } from "@/components/visualizer/StageThemeLivePreview";
@@ -437,6 +438,7 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
         <label className="setting-check"><input type="checkbox" checked={preferences.stageReactive ?? true} onChange={e => updatePreferences({stageReactive: e.target.checked})}/> Musikreaktive Beleuchtung</label>
         <label>Lichtreaktion ({preferences.stageLightStrength ?? 60} %)<input type="range" min="0" max="100" step="5" value={preferences.stageLightStrength ?? 60} onChange={e => updatePreferences({stageLightStrength:Number(e.target.value)})}/></label>
         {(preferences.stageTheme === "arena360") && <div className="arena360-settings-v1031">
+          <ArenaShowDesignerPanelV1040/>
           <strong>V1039 · Holographic Laser Architecture</strong>
           <div className="arena360-experience-options-v1032">
             <strong>Hologramm-Portale und 360°-Laserformationen</strong>

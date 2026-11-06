@@ -1,3 +1,5 @@
+# V1040 · AI Show Designer (aufbauend auf V1039)
+
 # V1038 · Floating Stage (aufbauend auf V1037)
 
 ## Implementiert
@@ -1351,7 +1353,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1039
+**Dokumentationsstand:** V1041
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -1860,7 +1862,7 @@ Neue Fußkontakte führen unmittelbar zur Reduktion additiver Fußrotationen. De
 `services/show/liveConcertComparisonV544.ts` ergänzt eine reine A/B-Projektionsanalyse auf der bereits opt-in etwa sekündlich messenden V466-WebGL-Qualitätsprobe. `components/visualizer/ConcertVisualCompareV544.tsx` ist unter dem bestehenden QA-Knopf erreichbar und speichert maximal zwei manuell aufgenommene Momentaufnahmen (A/B) im React-UI-Zustand; die Schemabilder verwenden echte normalisierte Kopf- und Lyrics-Rechtecke und zeigen die vorhandenen FPS an, **keine Pixel/Fotos und keine optische Gesichts-/Tanzprüfung**. Der Anwender markiert Fußarbeit, Gesicht/Lip-Sync und Lyrics getrennt; `createComparisonReportV544` exportiert auf Klick einen JSON-Bericht, keine Auto-Freigabe. Bildrand-/Lyrics-Nähe werden heuristisch beurteilt, nicht über Objekt-Okklusion. Original-Bühnenkamera, Motion, Beleuchtung, GLBs, FPS-Messintervall und QA-Gating bleiben unangetastet. `tests/v544-visual-quality-regression.cjs`, `tests/tsconfig.v544-core.json`. Der Next.js-Build braucht vollständig installierte Abhängigkeiten.
 
 
-> **Dokumentationsstand:** V1039 (28.10.2026)
+> **Dokumentationsstand:** V1041 (28.10.2026)
 
 ## V539 – Multi-Avatar Concert Interaction 5.0
 
@@ -3341,7 +3343,7 @@ Details: `docs/versions/V802-INTELLIGENT-CONCERT-IMPROVEMENT-ASSISTANT.md`.
 
 `components/visualizer/naturalMultiArtistStageInteractionV807.ts` berechnet ausschliesslich aus bestaetigten, songgebundenen V416/V496-Saengerrollen, vorhandenen Buehnenpositionen und Wiedergabezeit begrenzte Blicke und Gesten fuer Lead, Support, Duett, Handoff und gemeinsamen Hook. Die bestehenden 2er- und 3/4er-Avatar-Renderer verwenden die identische, reine Planungslogik ueber V144/V145-Overlays. Manuelle Animationen, Buehnenformationen, Gesichts-/Lippensynchronisation und Fuss-IK bleiben unberuehrt. V506/V508-Kollisionsschutz ist final. Keine neuen GLB-Mixer, Renderloops oder GPU-Ressourcen. Tests: `tests/v807-natural-multi-artist-stage-interaction-regression.cjs`.
 
-> **Dokumentationsstand:** V1039 (31.10.2026)
+> **Dokumentationsstand:** V1041 (31.10.2026)
 
 ## V808 Natural Performer Positioning
 
@@ -3633,7 +3635,7 @@ V844 verifies section/audio cues, schedules at most one dominant side-stage effe
 - No display/UI overlay; flash cannot be guaranteed photosensitive-safe.
 - Release requires full typecheck, Next.js build, and actual visual test.
 
-> **Dokumentationsstand:** V1039 (01.11.2026)
+> **Dokumentationsstand:** V1041 (01.11.2026)
 
 
 ## V846 - Paper Streamers
@@ -4253,3 +4255,12 @@ Der `immersiveConcertFxV1028.ts`-Planer wird im **bestehenden** `DynamicStage.ts
 `lib/arena360FloatingStageV1038.ts` is a dependency-free pure planner/stepper and sampler. It never owns cameras, lights, network requests, animation controllers, or UI timers. `components/visualizer/stages/ArenaFloatingPlatformsV1038.tsx` animates world-fixed decorative satellite stages around radius 3.35, above the petal perimeter, separate from the rotating avatar cast root. It is intentionally not a dancer load-bearing surface. Lifts stay in [0.42,1.32] stage units; per-platform bob is clamped, and outer bounding radius remains under 3.74. Counts are 2 / 4 / 6 for low / balanced / high performance tiers. Settings originate in `types/music.ts`, are given defaults in `context/UiPreferencesContext.tsx`, presented in `components/SettingsPanel.tsx`, and passed via `VisualizerStage` → `ThreeAvatar` → `StageEnvironment` → `Arena360StageV1031`.
 
 Tests: `tests/v1038-floating-stage-regression.cjs`, `tests/tsconfig.v1038-core.json`, `scripts/v1038-release-readiness.cjs`. CI extends the existing V1032 arena workflow on push; V1038 has a manual multi-OS workflow, not another push-triggered job. No moving-avatar foot IK or physics constraints are introduced.
+
+
+## V1040 · AI Show Designer
+
+Siehe `changelog/V1040-AI-SHOW-DESIGNER.md`. Der lokale, regelbasierte Showdesigner erstellt eine editierbare 7-Szenen-Timeline aus Freitext und Genre. Die Vorlage kann **explizit** aktiviert werden; sie steuert die bestehende 360°-Arena und deren rein virtuelle Bühnen-, Schwebe- und Laserformationen entlang der tatsächlichen Wiedergabeposition. Erkannten Beats, echten Drops, manuellen Kamera-Timelines, individuellen Tänzen und deaktivierten Effekten wird stets Vorrang gegeben. Eine externe LLM-Integration ist in dieser Version **nicht** enthalten. 
+
+
+## V1041 · Choreografie als untergeordnete Regie
+`lib/arena360ChoreographyV1041.ts` übersetzt V1040-Show-Cues in vorhandene V206-Duo-Cues. Keine parallelen Action-Mixer, keine neuen Speicher- oder Netzwerkaktivitäten. Explicit manual V325/V326/V354 overrides, GLB-Clip-Modus, Low-Tier und Reduced Motion blockieren die automatische Choreografie.

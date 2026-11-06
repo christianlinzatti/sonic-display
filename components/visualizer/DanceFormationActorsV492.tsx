@@ -237,8 +237,12 @@ export function FormationDancers({props, mode, choreography}: {props: Visualizer
     const smart = choreography && "interactionMode" in choreography ? choreography as ChoreographyCueV312 : null;
     const leadTarget: [number,number,number] = [...scene.lead];
     const partnerTarget: [number,number,number] = [...scene.partner];
-    if (mode !== "solo" && formation === "diagonal") { leadTarget[2] -= .32; partnerTarget[2] += .32; }
-    if (mode !== "solo" && formation === "wide") { leadTarget[0] -= .34; partnerTarget[0] += .34; }
+    // V1041: the new stage-plan gain scales only its own optional formation
+    // offset. All legacy/manual V206 cues preserve their original spacing.
+    const arenaWeightV1041=choreography&&'strength' in choreography&&
+      typeof choreography.strength==='number'?Math.max(0,Math.min(1,choreography.strength)):1;
+    if (mode !== "solo" && formation === "diagonal") { leadTarget[2] -= .32*arenaWeightV1041; partnerTarget[2] += .32*arenaWeightV1041; }
+    if (mode !== "solo" && formation === "wide") { leadTarget[0] -= .34*arenaWeightV1041; partnerTarget[0] += .34*arenaWeightV1041; }
     if(manualPose){leadTarget[0]=manualPose.lead[0];leadTarget[1]=manualPose.lead[1];leadTarget[2]=manualPose.lead[2];
       partnerTarget[0]=manualPose.partner[0];partnerTarget[1]=manualPose.partner[1];partnerTarget[2]=manualPose.partner[2];}
     // V899 runs after automatic V230 targets and before existing V324 collision/foot ownership.

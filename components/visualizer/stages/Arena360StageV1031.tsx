@@ -25,6 +25,7 @@ import type {FloatingStageModeV1038} from '@/lib/arena360FloatingStageV1038';
 import {ArenaHologramPortalsV1039} from './ArenaHologramPortalsV1039';
 import {ArenaLaserTunnelsV1039} from './ArenaLaserTunnelsV1039';
 import type {HologramPatternV1039} from '@/lib/arena360HolographyV1039';
+import {sampleArenaShowPlanV1040,type ArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
 import {INITIAL_ARENA_LIFT_V1034,stepArenaLiftV1034} from "@/lib/arena360ShowV1034";
 import type {ArenaPhoneModeV1033} from "@/lib/arena360ImmersionV1033";
 
@@ -44,7 +45,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   lasersEnabled=true,movingSkyEnabled=true,groundFogEnabled=true,arenaPeaksEnabled=true,
   transformingDeckEnabled=true,transformingDeckMode='auto',transformingDeckStrength=70,
   floatingStageEnabled=true,floatingStageMode='auto',floatingStageIntensity=70,
-  hologramsEnabled=true,laserArchitectureEnabled=true,hologramPattern='auto',hologramStrength=65,genre}: {
+  hologramsEnabled=true,laserArchitectureEnabled=true,hologramPattern='auto',hologramStrength=65,
+  showDesignerEnabled=false,showPlan,genre}: {
   children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
   reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
   audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
@@ -56,7 +58,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   transformingDeckEnabled?:boolean;transformingDeckMode?:ArenaTransformationModeV1037;transformingDeckStrength?:number;
   floatingStageEnabled?:boolean;floatingStageMode?:FloatingStageModeV1038;floatingStageIntensity?:number;
   hologramsEnabled?:boolean;laserArchitectureEnabled?:boolean;hologramPattern?:HologramPatternV1039;
-  hologramStrength?:number;genre?:string|null;
+  hologramStrength?:number;showDesignerEnabled?:boolean;showPlan?:ArenaShowPlanV1040;genre?:string|null;
 }){
   const turntable=useRef<Group>(null);
   const scenicTier=useRef<Group>(null);
@@ -68,9 +70,21 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   const blue=useMemo(()=>new Color('#29e9ff'),[]);
   const pink=useMemo(()=>new Color('#ef4ce9'),[]);
   const speed=normalizedArenaSpeedV1031(rotationSpeed);
+  // Authored templates steer visuals only when explicitly enabled. The observed section
+  // still owns the real audio/pyro triggers; manual modes and disabled effects win.
+  const showCueV1040=sampleArenaShowPlanV1040(showPlan,{enabled:showDesignerEnabled&&showDirectorEnabled,
+    playing:isPlaying,reducedMotion,progressMs,durationMs,observedSection:section});
+  const plannedIntensity=showCueV1040.active?Math.min(showIntensity,showCueV1040.intensity):showIntensity;
+  const plannedDeck=showCueV1040.active&&transformingDeckMode==='auto'?showCueV1040.deck:transformingDeckMode;
+  const plannedFloat=showCueV1040.active&&floatingStageMode==='auto'?showCueV1040.floating:floatingStageMode;
+  const plannedLasers=showCueV1040.active&&hologramPattern==='auto'?showCueV1040.lasers:hologramPattern;
+  const plannedHoloStrength=showCueV1040.active?Math.min(hologramStrength,showCueV1040.intensity):hologramStrength;
+  const plannedDeckStrength=showCueV1040.active?Math.min(transformingDeckStrength,showCueV1040.intensity):transformingDeckStrength;
+  const plannedFloatStrength=showCueV1040.active?Math.min(floatingStageIntensity,showCueV1040.intensity):floatingStageIntensity;
+  const plannedGenre=showCueV1040.active&&showPlan?showPlan.genre:genre;
   const cueV1035=planArenaTimelineV1035({enabled:fullSongDirectorEnabled&&showDirectorEnabled,
     playing:isPlaying,reducedMotion,reactive,progressMs,durationMs,section,
-    energy:audio.energyEnvelope,intensity:showIntensity});
+    energy:audio.energyEnvelope,intensity:plannedIntensity});
 
   // One instance batch instead of 32 separate geometries/draw calls.
   useLayoutEffect(()=>{
@@ -167,28 +181,28 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       showAmbience={fullSongDirectorEnabled?cueV1035.ambience:undefined}/>
     <ArenaLedColumnsV1035 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={ledColumnsEnabled} directorEnabled={fullSongDirectorEnabled&&showDirectorEnabled}
-      progressMs={progressMs} durationMs={durationMs} section={section} intensity={showIntensity}/>
+      progressMs={progressMs} durationMs={durationMs} section={section} intensity={plannedIntensity}/>
     <ArenaVirtualPyroV1035 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={virtualPyroEnabled} directorEnabled={fullSongDirectorEnabled&&showDirectorEnabled}
-      progressMs={progressMs} durationMs={durationMs} section={section} intensity={showIntensity}/>
+      progressMs={progressMs} durationMs={durationMs} section={section} intensity={plannedIntensity}/>
     <ArenaLaserFansV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={lasersEnabled} directorEnabled={showDirectorEnabled} section={section}
-      progressMs={progressMs} durationMs={durationMs} intensity={showIntensity} peakRef={sharedPeak}/>
+      progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak}/>
     <ArenaMovingLedSkyV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={movingSkyEnabled} directorEnabled={showDirectorEnabled} section={section}
-      progressMs={progressMs} durationMs={durationMs} intensity={showIntensity} peakRef={sharedPeak}/>
+      progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak}/>
     <ArenaLowFogV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={groundFogEnabled} directorEnabled={showDirectorEnabled} section={section}
-      progressMs={progressMs} durationMs={durationMs} intensity={showIntensity} peakRef={sharedPeak}/>
+      progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak}/>
     <ArenaHologramPortalsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={hologramsEnabled&&showDirectorEnabled}
-      genre={genre} section={section} pattern={hologramPattern} strength={hologramStrength}/>
+      genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}/>
     <ArenaLaserTunnelsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={laserArchitectureEnabled&&showDirectorEnabled&&lasersEnabled}
-      genre={genre} section={section} pattern={hologramPattern} strength={hologramStrength}/>
+      genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}/>
     <ArenaFloatingPlatformsV1038 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
-      reactive={reactive} enabled={floatingStageEnabled} mode={floatingStageMode}
-      intensity={floatingStageIntensity} section={section}/>
+      reactive={reactive} enabled={floatingStageEnabled} mode={plannedFloat}
+      intensity={plannedFloatStrength} section={section}/>
     <ArenaLightsV1032 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={lightsEnabled} dropEnabled={dropEnabled} reactive={reactive}/>
     {/* The turntable and the performer root share precisely the same transform. */}
     <group ref={turntable} name="v1031-rotating-platform-and-cast">
@@ -237,7 +251,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
         })}
       </group>}
       <ArenaTransformingDeckV1037 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
-        enabled={transformingDeckEnabled} mode={transformingDeckMode} strength={transformingDeckStrength} section={section}/>
+        enabled={transformingDeckEnabled} mode={plannedDeck} strength={plannedDeckStrength} section={section}/>
       {children}
     </group>
   </group>;

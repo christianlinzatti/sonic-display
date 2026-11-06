@@ -64,6 +64,8 @@ import { AdaptivePerformanceController,getActivePerformanceTier } from "./adapti
 import {planIntelligentConcertTransitionV849} from "./intelligentConcertTransitionsV849";
 import { RaspberryPiProfileBootstrap } from "./RaspberryPiEdition";
 import { Dancer, DuoDirectorTick, FormationDancers, IntelligentChoreographyTickV312, MultiAvatarDirectorTick } from './DanceFormationActorsV492';
+import {sampleArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
+import {planArenaChoreographyV1041} from '@/lib/arena360ChoreographyV1041';
 import { GroupDancersV326 } from './GroupDancersV326SceneV492';
 
 class SceneErrorBoundary extends Component<{ children: ReactNode; onFailure: () => void }, { failed: boolean }> {
@@ -278,7 +280,28 @@ export function ThreeAvatar(props: VisualizerProps) {
   const intelligentEnabled = intelligentSettings.enabled && !!props.showCue?.enabled && !!props.showCue.formationsEnabled
     && !multiEnabled && (props.duoDirectorEnabled === true || (props.multiAvatarMode ?? "solo") === "solo");
   const auto = !multiEnabled && !intelligentEnabled && props.duoDirectorEnabled === true;
-  const mode = manualFormationV354 ? timelineCueV354.danceFormation! : authoredEnabled ? "sync" : multiEnabled ? (choreography?.scene ?? "sync") : intelligentEnabled ? (intelligentCue?.scene ?? props.showCue!.formation) : auto ? autoScene : showFormation ? props.showCue!.formation : (props.multiAvatarMode ?? "solo");
+  // V1041: the V1040 timeline is only a proposal. An explicit saved duo/group,
+  // authored score, active cinematic formation, or user-selected motion wins.
+  const showCueV1041=sampleArenaShowPlanV1040(props.arenaShowPlanV1040,{
+    enabled:props.arenaShowDesignerEnabledV1040===true,playing:props.isPlaying,
+    reducedMotion:props.reducedMotion,progressMs:props.cameraDirectorProgressMs,
+    durationMs:props.track?.durationMs,observedSection:props.cameraDirectorSection,
+  });
+  const arenaChoreoV1041=planArenaChoreographyV1041({
+    enabled:props.arenaChoreographyEnabledV1041===true,show:showCueV1041,
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,
+    trackId:props.track?.id,progressMs:props.cameraDirectorProgressMs,
+    genre:props.genre,stageIsArena:props.stageTheme==='arena360',
+    strength:props.arenaChoreographyStrengthV1041??60,
+    formation:props.arenaChoreographyFormationV1041??'auto',
+    performanceTier:getActivePerformanceTier(),
+    manualPriority:authoredEnabled||authoredCueV354.active||manualFormationV354||
+      !!groupOnV326||multiEnabled||intelligentEnabled||auto||!!showFormation||
+      (props.multiAvatarMode??'solo')!=='solo'||
+      props.avatarMotionMode==='choreography'||!!props.smartDanceOverride||
+      props.avatarTimelineEnabled===true||props.lipSync?.manualVocalEnabledV385===true,
+  });
+  const mode = manualFormationV354 ? timelineCueV354.danceFormation! : authoredEnabled ? "sync" : multiEnabled ? (choreography?.scene ?? "sync") : intelligentEnabled ? (intelligentCue?.scene ?? props.showCue!.formation) : auto ? autoScene : showFormation ? props.showCue!.formation : arenaChoreoV1041.active ? arenaChoreoV1041.scene : (props.multiAvatarMode ?? "solo");
   // V921 publishes the EXISTING stage's show decision, never a second camera/
   // choreographer plan. Live Govee listeners require fresh matching-track events.
   // A single 1.4s heartbeat keeps a static (non-changing) camera cue fresh.
@@ -579,10 +602,12 @@ export function ThreeAvatar(props: VisualizerProps) {
         laserArchitectureEnabled={props.arenaLaserArchitectureEnabledV1039 ?? true}
         hologramPattern={props.arenaHologramPatternV1039 ?? 'auto'}
         hologramStrength={props.arenaHologramStrengthV1039 ?? 65}
+        showDesignerEnabled={props.arenaShowDesignerEnabledV1040 ?? false}
+        showPlan={props.arenaShowPlanV1040}
         genre={props.genre}
         progressMs={props.cameraDirectorProgressMs ?? 0} durationMs={props.track?.durationMs ?? 0}
         section={props.cameraDirectorSection ?? "verse"}>
-      <group name={TRACKING_ROOT_NAME}>{groupOnV326 ? <GroupDancersV326 props={autoGroupOnV442?dancerPropsV356:{...dancerPropsV356,multiArtistMotionsV442:undefined}} settings={effectiveGroupSettingsV442} vocalDuetV838={vocalDuetV838}/> : (dual || auto || multiEnabled || showFormation) ? <FormationDancers props={dancerPropsV356} mode={mode} choreography={authoredEnabled ? null : multiEnabled ? choreography : intelligentEnabled ? intelligentCue : null} /> : <group><Dancer props={dancerPropsV356}/><ArtistNameBubbleV441 plan={props.artistBubblePlanV441} slot={0} reducedMotion={props.reducedMotion}/></group>}</group>
+      <group name={TRACKING_ROOT_NAME}>{groupOnV326 ? <GroupDancersV326 props={autoGroupOnV442?dancerPropsV356:{...dancerPropsV356,multiArtistMotionsV442:undefined}} settings={effectiveGroupSettingsV442} vocalDuetV838={vocalDuetV838}/> : (dual || auto || multiEnabled || showFormation) ? <FormationDancers props={dancerPropsV356} mode={mode} choreography={authoredEnabled ? null : multiEnabled ? choreography : intelligentEnabled ? intelligentCue : arenaChoreoV1041.active ? arenaChoreoV1041 : null} /> : <group><Dancer props={dancerPropsV356}/><ArtistNameBubbleV441 plan={props.artistBubblePlanV441} slot={0} reducedMotion={props.reducedMotion}/></group>}</group>
       </StageEnvironment>
     </Canvas></SceneErrorBoundary>}
     <ConcertQualityInspectorV466 enabled={qualityInspectorEnabledV466} onToggle={()=>{
