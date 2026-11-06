@@ -1,6 +1,12 @@
 name: V1032 Live Arena Experience validation
 run-name: Sonic Display · V1038 · V1032 Live Arena Experience validation
 # Manual version-specific diagnostics; v965 is the authoritative production matrix.
+# Compatibility inventory: these source paths are exercised by the shared
+# production matrix; this optional manual workflow must not add a push trigger.
+# lib/arena360DirectorV1035.ts
+# lib/arena360AtmosphereV1036.ts
+# lib/arena360TransformationV1037.ts
+# lib/arena360FloatingStageV1038.ts
 on:
   workflow_dispatch:
 permissions:
