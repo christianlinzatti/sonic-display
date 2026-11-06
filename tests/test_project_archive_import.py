@@ -48,6 +48,23 @@ class ArchiveImportTest(unittest.TestCase):
             self.assertEqual((self.root / 'scripts/project-archive-import.py').read_text(), 'safeguarded')
             self.assertEqual(json.loads((self.root / 'package.json').read_text())['sonicRoadmapRelease'], f'v{release}')
 
+    def test_protected_structure_and_ci_helpers_cannot_be_replaced_by_zip(self):
+        helpers = [
+            'scripts/organize-project-structure.cjs',
+            'tests/v974-repository-cleanup-regression.cjs',
+            'scripts/production-workflow-metadata.cjs',
+            'tests/production-workflow-regression.cjs',
+        ]
+        for name in helpers:
+            dest = self.root / name
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_text('trusted-current-code', encoding='utf8')
+        self.build(extras=[(name, 'outdated-archive-copy') for name in helpers])
+        mod.import_archive(self.root, 'SonicDisplay-V969.zip')
+        for name in helpers:
+            self.assertEqual((self.root / name).read_text(encoding='utf8'),
+                             'trusted-current-code', name)
+
     def test_bad_marker_refused_without_writing(self):
         self.build(971, marker='v965')
         with self.assertRaisesRegex(ValueError, 'Release mismatch'):
