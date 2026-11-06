@@ -1,4 +1,4 @@
-import type {Track,Lyrics} from '../types/music';
+import type {Track,Lyrics} from '../types/playbackCore';
 /** Session-only offline fallback; never persists Spotify or third-party lyrics. */
 export type LastKnownV1016={track:Track;lyrics:Lyrics|null;progressMs:number;fetchedAt:number;seenAt:number};
 type RecordV1016=LastKnownV1016 & {lyricSeenAt:number};
