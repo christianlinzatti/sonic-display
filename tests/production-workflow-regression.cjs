@@ -53,10 +53,11 @@ for (const version of [982,983,984,985,986,987,988,989,990,991,992,993,994,995,9
 assert.ok(commands.includes('node scripts/v965-production-verify.cjs'));
 const revision = 'a'.repeat(40);
 for (const version of [1005,1006,1100]) {
-  const result = resolveMetadata({ version: `0.1.0-v${version}`, sonicRoadmapRelease: `v${version}` }, { revision });
+  const result = resolveMetadata({ version: `0.1.0-v${version}`, sonicRoadmapRelease: `v${version}`, sonicFeatureRelease: `v${version}` }, { revision });
   assert.deepEqual(result, { release: `V${version}`, revision });
 }
-const metadata = { version: '0.1.0-v1005', sonicRoadmapRelease: 'v1005' };
+const metadata = { version: '0.1.0-v1005', sonicRoadmapRelease: 'v1005', sonicFeatureRelease: 'v1005' };
+assert.throws(() => resolveMetadata({ ...metadata, sonicFeatureRelease: 'v1004' }, { revision }), /Feature release/);
 assert.throws(() => resolveMetadata(metadata, { revision, expectedRelease: 'V1004' }), /release differs/);
 assert.throws(() => resolveMetadata(metadata, { revision, expectedRevision: 'b'.repeat(40) }), /revision differs/);
 assert.throws(() => resolveMetadata(metadata, { revision: 'master' }), /full checked-out/);
