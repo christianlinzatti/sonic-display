@@ -23,7 +23,7 @@ try{
  console.log('PASS V1013 rejects stale feature metadata');
  mutate('package-lock.json',s=>{const p=JSON.parse(s);p.packages[''].version='0.1.0-v1012';return JSON.stringify(p);});
  console.log('PASS V1013 rejects drifted npm root lockfile');
- mutate('package.json',s=>{const p=JSON.parse(s);p.scripts.prebuild=p.scripts.prebuild.replace('test:v1013','test:v1012');return JSON.stringify(p);});
+ mutate('package.json',s=>{const p=JSON.parse(s);const current=p.version.split('-v')[1];p.scripts.prebuild=p.scripts.prebuild.replace('test:v'+current,'test:v'+(Number(current)-1));return JSON.stringify(p);});
  console.log('PASS V1013 rejects historical prebuild entry point');
  mutate('scripts/v931-production-gate.cjs',s=>s.replace('tests/v1012-network-health-regression.cjs','tests/obsolete-v1012.cjs'));
  console.log('PASS V1013 rejects omitted network regression in full CI');
@@ -34,7 +34,7 @@ try{
  mutate('.github/workflows/v965-room-wave-production.yml',s=>s.replace('os: [ubuntu-24.04, windows-latest]','os: [ubuntu-24.04]'));
  console.log('PASS V1013 rejects missing Windows CI runner');
  const p=JSON.parse(fs.readFileSync(path.join(fixture,'package.json'),'utf8'));
- const revision='a'.repeat(40);assert.deepEqual(resolveMetadata(p,{revision,expectedRelease:'V1013',expectedRevision:revision}),{release:'V1013',revision});
+ const revision='a'.repeat(40);const expectedRelease='V'+p.version.split('-v')[1];assert.deepEqual(resolveMetadata(p,{revision,expectedRelease,expectedRevision:revision}),{release:expectedRelease,revision});
  assert.throws(()=>resolveMetadata({...p,sonicFeatureRelease:'v1012'},{revision}),/Feature release/);
  assert.throws(()=>resolveMetadata(p,{revision,expectedRevision:'b'.repeat(40)}),/revision differs/);
  console.log('PASS V1013 exact revision and feature release validation');

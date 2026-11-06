@@ -2,6 +2,7 @@
 import {useEffect,useState} from 'react';
 import {clientNetworkV1010,type NetworkTelemetryV1011,type NetworkLaneV1010} from '@/lib/networkCoordinatorV1010';
 import {evaluateNetworkHealthV1012} from '@/lib/networkHealthV1012';
+import {evaluateNetworkDiagnosticsV1014} from '@/lib/networkDiagnosticsV1014';
 
 const laneLabels:Record<NetworkLaneV1010,string>={
   action:'Benutzeraktionen',playback:'Wiedergabe',regular:'Lyrics & Genre',optional:'Optionale Inhalte',
@@ -25,6 +26,8 @@ export function NetworkPerformanceDashboardV1011(){
       window.removeEventListener('online',update);window.removeEventListener('offline',update);};
   },[]);
   const health=evaluateNetworkHealthV1012(state);
+  const diagnostic=evaluateNetworkDiagnosticsV1014(state);
+  const windowData=state.diagnostics;
   const inflight=lanes.reduce((sum,lane)=>sum+state.inFlight[lane],0);
   const cacheReads=state.counters.cacheHits+state.counters.staleHits;
   const joined=state.counters.joined;
@@ -62,6 +65,31 @@ export function NetworkPerformanceDashboardV1011(){
         Wartende Abfragen erneut prüfen
       </button>
     </div>
+    <section className="network-v1014-diagnostics" data-v1014-network-diagnostics aria-label="Netzwerkengpässe und Laufzeiten">
+      <div className="network-v1014-heading"><div>
+        <span className="network-v1011-kicker">NETWORK DIAGNOSTICS 2.0 / V1014</span>
+        <h4>Wo entsteht die Verzögerung?</h4>
+      </div><span className="network-v1014-window">Letzte 5 Minuten · {windowData.samples} / {windowData.sampleLimit} Messungen</span></div>
+      <div className="network-v1014-stats">
+        <div><strong>{windowData.latencyP50Ms} ms</strong><span>Antwortzeit P50</span></div>
+        <div><strong>{windowData.latencyP95Ms} ms</strong><span>Antwortzeit P95</span></div>
+        <div><strong>{windowData.queueP95Ms} ms</strong><span>Wartezeit P95</span></div>
+        <div><strong>{windowData.oldestActiveMs} ms</strong><span>Ältester aktiver Abruf</span></div>
+        <div><strong>{windowData.oldestQueuedMs} ms</strong><span>Längste aktuelle Wartezeit</span></div>
+      </div>
+      <div className="network-v1014-findings" aria-label="Ermittelte Engpässe">
+        {diagnostic.findings.map(finding=><div key={finding.code} data-level={finding.level}>
+          <strong>{finding.title}</strong><p>{finding.detail}</p></div>)}
+      </div>
+      <div className="network-v1011-scroll"><table className="network-v1011-table network-v1014-table">
+        <thead><tr><th>Dienst</th><th>Versuche</th><th>Antwort P50</th><th>Antwort P95</th><th>Warten P95</th><th>Fehler</th></tr></thead>
+        <tbody>{windowData.providers.map(provider=><tr key={provider.name}>
+          <th scope="row">{provider.name==='Buehneninhalte'?'Bühneninhalte':provider.name}</th>
+          <td>{provider.samples}</td><td>{provider.latencyP50Ms} ms</td><td>{provider.latencyP95Ms} ms</td>
+          <td>{provider.queueP95Ms} ms</td><td>{provider.failures}</td></tr>)}</tbody>
+      </table></div>
+      <p className="network-v1011-note">P50/P95 beruhen auf abgeschlossenen Versuchen in diesem Browser-Tab. Bei wenigen Messungen sind sie noch kein stabiler Trend. Es werden keine zusätzlichen Anfragen, URLs, Songtitel, Kontonamen oder Fehlertexte gespeichert.</p>
+    </section>
     <div className="network-v1011-stats" aria-label="Netzwerk-Kennzahlen">
       <div><strong>{inflight}</strong><span>Aktive Anfragen</span></div>
       <div><strong>{state.queue}<small> / {state.queueLimit}</small></strong><span>Warteschlange (Spitze {state.peakQueue})</span></div>

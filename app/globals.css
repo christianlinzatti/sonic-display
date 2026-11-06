@@ -4930,3 +4930,18 @@
 .network-v1012-metrics { display:flex; gap:.45rem .85rem; flex-wrap:wrap; font-size:.77rem; font-variant-numeric:tabular-nums; opacity:.8; }
 .network-v1012-wake { margin-top:.8rem; padding:.45rem .7rem; border:1px solid currentColor; border-radius:.5rem; font-size:.79rem; }
 .network-v1012-wake:disabled { opacity:.45; cursor:not-allowed; }
+
+/* V1014: passive, bounded and accessible five-minute diagnostic view. */
+.network-v1014-diagnostics{padding:.85rem;margin:1rem 0;border:1px solid var(--border,rgba(128,128,128,.3));border-radius:.8rem}
+.network-v1014-heading{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:space-between}
+.network-v1014-heading h4{margin:.1rem 0 .4rem}
+.network-v1014-window{opacity:.8;font-size:.74rem;font-variant-numeric:tabular-nums}
+.network-v1014-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.5rem;margin:.8rem 0}
+.network-v1014-stats>div{padding:.65rem;border:1px solid var(--border,rgba(128,128,128,.3));border-radius:.6rem}
+.network-v1014-stats strong{display:block;font-size:1.15rem;font-variant-numeric:tabular-nums}
+.network-v1014-stats span{font-size:.76rem;opacity:.8}
+.network-v1014-findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:.5rem;margin:.8rem 0}
+.network-v1014-findings>div{padding:.6rem;border:1px solid var(--border,rgba(128,128,128,.3));border-radius:.6rem}
+.network-v1014-findings>div[data-level='warning']{border-inline-start:3px solid #d8a24e}
+.network-v1014-findings strong{font-size:.81rem}
+.network-v1014-findings p{font-size:.76rem;margin:.25rem 0 0;line-height:1.45;opacity:.82}

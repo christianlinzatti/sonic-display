@@ -15,4 +15,7 @@ const {inspectReleaseV1013}=require('./v1013-release-readiness.cjs');
 const release=inspectReleaseV1013(root);
 for(const check of release.checks)console.log(`${check.ok?'PASS':'FAIL'} V1013 ${check.id}${check.ok?'':': '+check.reason}`);
 for (const c of report.checks) console.log(`${c.passed ? 'PASS' : 'FAIL'} V959 ${c.id}: ${c.detail}`);
-if (!report.passed || !release.passed) process.exitCode = 1;
+const {inspectReleaseV1014}=require('./v1014-release-readiness.cjs');
+const v1014=inspectReleaseV1014(root);
+for(const check of v1014.checks)console.log(`${check.ok?'PASS':'FAIL'} V1014 ${check.name}`);
+if (!report.passed || !release.passed || !v1014.passed) process.exitCode = 1;

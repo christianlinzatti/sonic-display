@@ -10,24 +10,42 @@ type Listener<T> = (value:T)=>void;
 type Waiter = {resolve:(value:unknown)=>void;reject:(error:unknown)=>void;remove?:()=>void};
 type Job = {key:string;provider:string;priority:NetworkPriorityV1010;lane:NetworkLaneV1010;
   run:(signal:AbortSignal)=>Promise<unknown>;controller:AbortController;waiters:Set<Waiter>;
-  ttl:number;stale:number;retry:number;tries:number;readyAt:number;retain:boolean;started:boolean;order:number;cacheWhen?:(value:unknown)=>boolean;retainers:Map<AbortSignal,()=>void>};
+  ttl:number;stale:number;retry:number;tries:number;readyAt:number;queuedAt:number;startedAt:number;queueWaitMs:number;retain:boolean;started:boolean;order:number;cacheWhen?:(value:unknown)=>boolean;retainers:Map<AbortSignal,()=>void>};
 type CacheEntry = {value:unknown;freshUntil:number;staleUntil:number};
 type Circuit = {failures:number;openUntil:number;probe:boolean};
 /** V1011 telemetry contains counts only: NEVER request URLs, keys, tokens or account identifiers. */
 export type NetworkProviderIdV1011 = 'Spotify'|'Lyrics'|'Genius'|'LRCLIB'|'Buehneninhalte'|'Weitere';
 export type NetworkFailureKindV1011 = 'Rate-Limit'|'Anmeldung'|'Timeout'|'Serverfehler'|'Netzwerk'|'Sonstiger Fehler';
+/** V1014: bounded, aggregate-only five-minute performance window. */
+export type NetworkDiagnosticRowV1014 = {samples:number;latencyP50Ms:number;latencyP95Ms:number;
+  queueP95Ms:number;failures:number;oldestActiveMs:number;oldestQueuedMs:number};
+export type NetworkDiagnosticsV1014 = NetworkDiagnosticRowV1014 & {
+  windowMs:number;sampleLimit:number;
+  lanes:Array<NetworkDiagnosticRowV1014 & {name:NetworkLaneV1010}>;
+  providers:Array<NetworkDiagnosticRowV1014 & {name:NetworkProviderIdV1011}>;
+  failureKinds:Record<NetworkFailureKindV1011,number>;
+};
 export type NetworkTelemetryV1011 = {
   since:number; queue:number; queueLimit:number; peakQueue:number;
   inFlight:Record<NetworkLaneV1010,number>;limits:Record<NetworkLaneV1010,number>;
   cacheEntries:number;cacheLimit:number;offline:boolean;hidden:boolean;
   counters:{started:number;completed:number;failed:number;joined:number;cacheHits:number;staleHits:number;
     cancelled:number;retries:number;rateLimits:number;queueDropped:number};
-  averageLatencyMs:number;lastFailure:NetworkFailureKindV1011|null;
+  averageLatencyMs:number;lastFailure:NetworkFailureKindV1011|null;diagnostics:NetworkDiagnosticsV1014;
   /** V1012: aggregated, account-resettable recovery evidence; no endpoint or identity. */
   recovery:{staged:number;probes:number;restored:number;circuitsOpened:number};
   providers:Array<{name:NetworkProviderIdV1011;queued:number;active:number;failures:number;
     blockedForMs:number;circuitForMs:number;lastFailure:NetworkFailureKindV1011|null;
     failureStreak:number;lastSuccessAgoMs:number|null;probing:boolean}>;
+};
+const DIAGNOSTIC_WINDOW_V1014=300000;
+const DIAGNOSTIC_MAX_SAMPLES_V1014=120;
+const DIAGNOSTIC_FAILURE_KINDS_V1014:NetworkFailureKindV1011[]=[
+  'Rate-Limit','Anmeldung','Timeout','Serverfehler','Netzwerk','Sonstiger Fehler'];
+const percentileV1014=(numbers:number[],fraction:number):number=>{
+  if(!numbers.length)return 0;
+  const sorted=[...numbers].sort((a,b)=>a-b);
+  return sorted[Math.max(0,Math.ceil(sorted.length*fraction)-1)];
 };
 const safeProviderV1011=(provider:string):NetworkProviderIdV1011=>{
   switch(provider.toLowerCase()){
@@ -80,6 +98,10 @@ export class NetworkCoordinatorV1010 {
   private totalLatency=0;
   private lastFailure:NetworkFailureKindV1011|null=null;
   private readonly providerFailures=new Map<NetworkProviderIdV1011,{count:number;last:NetworkFailureKindV1011|null}>();
+  /** No keys, account IDs, URLs, raw errors or response bodies may enter this ring buffer. */
+  private readonly diagnosticSamplesV1014:Array<{at:number;lane:NetworkLaneV1010;
+    provider:NetworkProviderIdV1011;queueMs:number;latencyMs:number;
+    outcome:'success'|'failure'|'cancelled';failureKind:NetworkFailureKindV1011|null}>=[];
   private readonly telemetryListeners=new Set<()=>void>();
   private telemetryPending=false;
   private readonly providerHealth=new Map<string,{failureStreak:number;lastSuccessAt:number|null}>();
@@ -137,7 +159,50 @@ export class NetworkCoordinatorV1010 {
       hidden:typeof document!=='undefined'&&document.visibilityState==='hidden',
       counters:{...this.telemetryCounters},
       averageLatencyMs:this.telemetryCounters.completed?Math.round(this.totalLatency/this.telemetryCounters.completed):0,
-      lastFailure:this.lastFailure,recovery:{...this.recoveryCounters},providers};
+      lastFailure:this.lastFailure,diagnostics:this.snapshotDiagnosticsV1014(now),recovery:{...this.recoveryCounters},providers};
+  }
+  /** Aggregate only, never a trace: bounded to 120 latest completed attempts. */
+  private noteAttemptV1014(job:Job,success:boolean,error:unknown){
+    const now=Date.now();
+    this.diagnosticSamplesV1014.push({at:now,lane:job.lane,provider:safeProviderV1011(job.provider),
+      queueMs:Math.max(0,job.queueWaitMs),latencyMs:Math.max(0,now-job.startedAt),
+      outcome:success?'success':job.controller.signal.aborted?'cancelled':'failure',
+      failureKind:success||job.controller.signal.aborted?null:failureKindV1011(error)});
+    while(this.diagnosticSamplesV1014.length>DIAGNOSTIC_MAX_SAMPLES_V1014)this.diagnosticSamplesV1014.shift();
+    this.changedV1011();
+  }
+  /** Read-only diagnostic snapshot; no new network activity, URL logging or stored identity. */
+  snapshotDiagnosticsV1014(now=Date.now()):NetworkDiagnosticsV1014{
+    const samples=this.diagnosticSamplesV1014.filter(x=>x.at>=now-DIAGNOSTIC_WINDOW_V1014&&x.at<=now);
+    type Observation=typeof samples[number];
+    const aggregate=(data:Observation[],active:number,queued:number):NetworkDiagnosticRowV1014=>({
+      samples:data.length,
+      latencyP50Ms:percentileV1014(data.map(x=>x.latencyMs),0.5),
+      latencyP95Ms:percentileV1014(data.map(x=>x.latencyMs),0.95),
+      queueP95Ms:percentileV1014(data.map(x=>x.queueMs),0.95),
+      failures:data.filter(x=>x.outcome==='failure').length,
+      oldestActiveMs:active,oldestQueuedMs:queued,
+    });
+    const current=[...this.jobs.values()];
+    const active=current.filter(job=>job.started&&!this.queue.includes(job));
+    const waiting=this.queue.filter(job=>this.jobs.get(job.key)===job);
+    const oldest=(jobs:Job[],timestamp:(job:Job)=>number)=>jobs.length?
+      Math.max(...jobs.map(job=>Math.max(0,now-timestamp(job)))):0;
+    const lanes:NetworkLaneV1010[]=['action','playback','regular','optional'];
+    const laneRows=lanes.map(name=>({...aggregate(samples.filter(x=>x.lane===name),
+      oldest(active.filter(x=>x.lane===name),x=>x.startedAt),
+      oldest(waiting.filter(x=>x.lane===name),x=>x.queuedAt)),name}));
+    const providerNames=new Set<NetworkProviderIdV1011>(samples.map(x=>x.provider));
+    for(const job of current)providerNames.add(safeProviderV1011(job.provider));
+    const providerRows=[...providerNames].sort((a,b)=>a.localeCompare(b)).map(name=>({
+      ...aggregate(samples.filter(x=>x.provider===name),
+        oldest(active.filter(x=>safeProviderV1011(x.provider)===name),x=>x.startedAt),
+        oldest(waiting.filter(x=>safeProviderV1011(x.provider)===name),x=>x.queuedAt)),name}));
+    const failureKinds=Object.fromEntries(DIAGNOSTIC_FAILURE_KINDS_V1014.map(k=>[k,0])) as Record<NetworkFailureKindV1011,number>;
+    for(const sample of samples)if(sample.failureKind)failureKinds[sample.failureKind]++;
+    return {...aggregate(samples,oldest(active,x=>x.startedAt),oldest(waiting,x=>x.queuedAt)),
+      windowMs:DIAGNOSTIC_WINDOW_V1014,sampleLimit:DIAGNOSTIC_MAX_SAMPLES_V1014,
+      lanes:laneRows,providers:providerRows,failureKinds};
   }
   private peakQueue=0;
   private noteFailureV1011(provider:string,error:unknown){
@@ -222,7 +287,7 @@ export class NetworkCoordinatorV1010 {
       else if(this.queue.length>=this.maxQueue){this.telemetryCounters.queueDropped++;this.changedV1011();return null;}
     }
     const provider=options.provider??'generic';
-    job={key,provider,priority,lane,run:options.execute as (signal:AbortSignal)=>Promise<unknown>,controller:new AbortController(),waiters:new Set(),ttl,stale,retry:finite(options.retry??(priority==='action'?0:2),2,4),tries:0,readyAt:Date.now(),retain,started:false,order:this.serial++,cacheWhen:options.cacheWhen as ((value:unknown)=>boolean)|undefined,retainers:new Map()};
+    job={key,provider,priority,lane,run:options.execute as (signal:AbortSignal)=>Promise<unknown>,controller:new AbortController(),waiters:new Set(),ttl,stale,retry:finite(options.retry??(priority==='action'?0:2),2,4),tries:0,readyAt:Date.now(),queuedAt:Date.now(),startedAt:0,queueWaitMs:0,retain,started:false,order:this.serial++,cacheWhen:options.cacheWhen as ((value:unknown)=>boolean)|undefined,retainers:new Map()};
     this.jobs.set(key,job);this.queue.push(job);
     this.peakQueue=Math.max(this.peakQueue,this.queue.length);this.changedV1011();
     // Queue first, install subscriber synchronously, then dispatch on microtask.
@@ -275,6 +340,7 @@ export class NetworkCoordinatorV1010 {
       if(circuit&&circuit.failures>=3){circuit.probe=true;
         this.recoveryCounters.probes++;this.changedV1011();}
       job.started=true;
+      job.startedAt=Date.now();job.queueWaitMs=Math.max(0,job.startedAt-job.queuedAt);
       this.telemetryCounters.started++;this.changedV1011();
       void this.execute(job);
     }
@@ -298,6 +364,8 @@ export class NetworkCoordinatorV1010 {
   }
   private async execute(job:Job){
     let failure:unknown;
+    let succeeded=false;
+    const generationAtStart=this.generation;
     const startedAt=Date.now();
     try{
       job.tries++;
@@ -313,11 +381,14 @@ export class NetworkCoordinatorV1010 {
         for(const listener of this.listeners.get(job.key)??[])try{listener(result);}catch{/* user subscriber */}
       }
       this.jobs.delete(job.key);this.releaseRetainers(job);
+      succeeded=true;
       this.telemetryCounters.completed++;this.totalLatency+=Date.now()-startedAt;this.changedV1011();
       for(const w of job.waiters){w.remove?.();w.resolve(result);}job.waiters.clear();
       return;
     }catch(error){failure=error;}
     finally{
+      // Old-account completions must never appear in the new account's diagnostics.
+      if(this.generation===generationAtStart)this.noteAttemptV1014(job,succeeded,failure);
       this.running[job.lane]--;this.changedV1011();
       const circuit=this.circuits.get(job.provider);
       if(circuit)circuit.probe=false;
@@ -342,7 +413,7 @@ export class NetworkCoordinatorV1010 {
     }
     if(retryable&&job.tries<=job.retry&&!job.controller.signal.aborted){
       job.readyAt=Date.now()+Math.max(retryAfter,Math.min(30000,this.backoffMs*2**(job.tries-1)));
-      this.telemetryCounters.retries++;this.queue.push(job);
+      job.queuedAt=Date.now();this.telemetryCounters.retries++;this.queue.push(job);
       this.peakQueue=Math.max(this.peakQueue,this.queue.length);this.changedV1011();this.pump();return;
     }
     this.jobs.delete(job.key);this.releaseRetainers(job);
@@ -372,7 +443,7 @@ export class NetworkCoordinatorV1010 {
     this.generation++;
     for(const job of [...this.jobs.values()])this.cancel(job);
     this.cache.clear();this.listeners.clear();this.blocked.clear();this.circuits.clear();
-    this.providerFailures.clear();this.providerHealth.clear();
+    this.providerFailures.clear();this.providerHealth.clear();this.diagnosticSamplesV1014.length=0;
     this.recoveryCounters={staged:0,probes:0,restored:0,circuitsOpened:0};
     this.recoveryPending=false;this.telemetrySince=Date.now();
     for(const key of Object.keys(this.telemetryCounters) as Array<keyof typeof this.telemetryCounters>)this.telemetryCounters[key]=0;

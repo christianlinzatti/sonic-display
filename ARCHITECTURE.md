@@ -1233,7 +1233,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1013
+**Dokumentationsstand:** V1014
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -4072,3 +4072,7 @@ Das Browser-Tab behält getrennte Priority-Lanes und Account-Caches. Optionale A
 ## V1013 – Production Build Stabilization
 
 `scripts/v959-source-preflight.cjs` startet ohne `node_modules` die V1013-Release-Readiness. Sie validiert automatisch die tatsächliche Version, die Konto-/Netzwerkregressionen, den Windows-/Linux-Hauptworkflow und den Vercel-Gate. `scripts/v931-production-gate.cjs` führt alle V1010–V1013-Funktionstests im Hauptgate aus. Der vollständige TypeScript- und Next.js-Build sowie Playwright bleiben unverändert verpflichtend, und ein fehlender Report wird nie als Erfolg gewertet.
+
+## V1014 – Network Diagnostics 2.0
+
+Der browserlokale `NetworkCoordinatorV1010` misst ausschließlich sichere Zeit- und Statuskategorien je abgeschlossenem Versuch in einem auf 120 Einträge begrenzten Ringpuffer. `snapshotV1011().diagnostics` berechnet P50/P95 der letzten fünf Minuten und das Alter wartender/aktiver Aufträge; es verlassen keine Schlüssel oder Inhalte den Koordinator. `evaluateNetworkDiagnosticsV1014` leitet daraus deterministische und lesende Hinweise ab. Der bisherige `NetworkPerformanceDashboardV1011` zeigt die neuen Werte passiv an. Datenverarbeitung und Kontolöschung bleiben unverändert auf den aktuellen Browser/Account beschränkt. Die Haupt-CI und Vercel-Gates testen V1014 zusammen mit allen bisherigen Netzwerk-Regressionen.

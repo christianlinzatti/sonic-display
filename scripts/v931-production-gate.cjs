@@ -11,6 +11,7 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1014 network diagnostics 2.0','tests/v1014-network-diagnostics-regression.cjs'],
   ['V1013 production stability and release metadata','tests/v1013-production-stability-regression.cjs'],
   ['V1012 network health and recovery','tests/v1012-network-health-regression.cjs'],
   ['V1011 network performance dashboard','tests/v1011-network-dashboard-regression.cjs'],
@@ -80,6 +81,8 @@ const regressions = [
   ['Source syntax + duplicate imports', 'tests/check-source-syntax.cjs'],
 ];
 const productionChecks = [
+  ['V1014 network diagnostics isolated TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','lib/networkCoordinatorV1010.ts','lib/networkDiagnosticsV1014.ts','lib/networkHealthV1012.ts']],
+  ['V1014 network diagnostics isolated TypeScript','node_modules/typescript/bin/tsc',['--noEmit','--strict','--target','es2022','--moduleResolution','bundler','--module','esnext','--skipLibCheck','--lib','dom,es2022','lib/networkCoordinatorV1010.ts','lib/networkDiagnosticsV1014.ts','lib/networkHealthV1012.ts']],
   ['V990 Living LED Wall 3.0 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v990-core.json']],
   ['V989 Volumetric Atmosphere 2.0 core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v989-core.json']],
   ['V988 Holographic Stage Portal core TypeScript','node_modules/typescript/bin/tsc',['-p','tests/tsconfig.v988-core.json']],
