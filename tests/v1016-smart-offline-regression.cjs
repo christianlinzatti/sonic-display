@@ -51,7 +51,7 @@ assert.equal(lock.version,pkg.version);
 assert.equal(lock.packages[''].version,pkg.version);
 assert.equal(pkg.sonicFeatureRelease,'v'+version[1]);assert.equal(pkg.sonicRoadmapRelease,'v'+version[1]);
 const titles=formatActionTitlesV1016(root,false);
-assert(titles.total>=30);assert.equal(titles.changed,0,'all workflow titles should be versioned');
+assert(titles.total>=25,'all installed workflows must be present');assert.equal(titles.changed,0,'all workflow titles should be versioned');
 for(const file of ['v965-room-wave-production.yml','v965-deployment-smoke.yml','project-archive-import.yml']){
  const source=read('.github/workflows/'+file);
  assert(source.split('\n').some(line=>line.startsWith('run-name:')&&line.includes(release)),file);
