@@ -22,8 +22,8 @@ jobs:
       NEXT_TELEMETRY_DISABLED: '1'
       SONIC_TEST_CONCURRENCY: '3' # independent regressions; max 4, lower to 1 if runners are memory constrained
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm
@@ -38,7 +38,7 @@ jobs:
         run: node scripts/v959-ci-finalize.cjs
       - name: Publish build evidence even on failure
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: v959-${{ matrix.os }}-build-proof
           path: |

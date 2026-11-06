@@ -22,8 +22,8 @@ jobs:
       NEXT_TELEMETRY_DISABLED: '1'
       SONIC_TEST_CONCURRENCY: '3'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: npm
@@ -37,7 +37,7 @@ jobs:
         run: node scripts/check-next-build-v964.cjs
       - name: Upload release evidence, including failure evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: sonic-v964-${{ matrix.os }}-production
           path: |

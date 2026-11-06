@@ -5,6 +5,8 @@ const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
 const cp=require('node:child_process');
+const {bashExecutable}=require('./helpers/bash-runtime.cjs');
+const bash=bashExecutable();
 const ts=require('./typescript-loader.cjs');
 const ROOT=path.resolve(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(ROOT,p),'utf8');
@@ -59,11 +61,8 @@ test('standalone Pi package has four scripts and README',()=>{
 });
 test('all Pi scripts pass Bash syntax validation',()=>{
  for(const name of ['start-govee-bridge.sh','start-for-vercel.sh','check-bridge.sh','show-token.sh']){
-  const check=cp.spawnSync('bash',['-n',path.join(ROOT,pi,name)],{encoding:'utf8',timeout:4000});
-  if(check.error?.code==='ENOENT'){
-   if(process.platform==='win32'){assert(read(pi+name).startsWith('#!/usr/bin/env bash'));continue;}
-   throw check.error;
-  }
+  const check=cp.spawnSync(bash,['-n',path.join(ROOT,pi,name).replace(/\\/g,'/')],{encoding:'utf8',timeout:4000});
+  assert.ifError(check.error);
   assert.equal(check.status,0,check.stderr);
  }
 });
@@ -79,8 +78,9 @@ test('Pi Vercel launcher requires HTTPS exact origin and delegates validation',(
  assert(src.includes('^https://'));
  assert(src.includes('exec "$HERE/start-govee-bridge.sh" --origin "$ORIGIN"'));
  for(const example of ['https://example.com/a','http://example.com','https://example.com?a=1']){
-  const test=cp.spawnSync('bash',[path.join(ROOT,pi+'start-for-vercel.sh'),example],{encoding:'utf8',timeout:4000});
-  if(test.error?.code==='ENOENT'&&process.platform==='win32')break;
+  const test=cp.spawnSync(bash,[path.join(ROOT,pi+'start-for-vercel.sh').replace(/\\/g,'/'),example],{encoding:'utf8',timeout:4000});
+  assert.ifError(test.error);
+  assert.equal(typeof test.status,'number','launcher must actually exit, not time out');
   assert.notEqual(test.status,0,example);
  }
 });
