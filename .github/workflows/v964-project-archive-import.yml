@@ -1,4 +1,5 @@
 name: V964 Import Complete Project ZIP
+run-name: Sonic Display · V1017 · V964 Import Complete Project ZIP
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:
