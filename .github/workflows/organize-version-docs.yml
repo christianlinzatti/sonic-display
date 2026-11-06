@@ -1,4 +1,5 @@
 name: Organize Version Documentation
+run-name: Sonic Display · V1017 · Organize Version Documentation
 on:
   push:
     branches: [master]
