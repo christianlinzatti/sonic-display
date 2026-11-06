@@ -80,6 +80,8 @@ jobs:
         run: npm ci --include=dev --no-audit --no-fund
       - name: Verify workflow routing and release metadata
         run: node tests/production-workflow-regression.cjs
+      - name: Pi scripts and standalone bridge on native Bash
+        run: node tests/v971-integration-setup-regression.cjs
       - name: Release reliability regressions
         run: npm run verify:v1004:focused
       - name: V1003 Auto Improvement Director (regression and isolated type checks)
