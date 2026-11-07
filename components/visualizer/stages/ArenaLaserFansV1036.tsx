@@ -53,7 +53,7 @@ export function ArenaLaserFansV1036({audio,playing,reducedMotion,reactive,enable
    const spread=(atmosphereV1045?.active?atmosphereV1045.laserSpread:1)*(v1057?.fanSpread??1);
    const lift=(atmosphereV1045?.active?atmosphereV1045.laserLift:0)+(v1057?.fanLift??0);
    // Existing fixtures only: a limited musical sweep cannot reach outside the arena.
-   const sweep=v1057?Math.sin(clock.current*.28+f.index*.41)*v1057.sweep:0;
+   const sweep=v1057?Math.sin(clock.current*.28+i*.41)*v1057.sweep:0;
    const cos=Math.cos(sweep),sin=Math.sin(sweep);
    const x=sample.targetX*spread,z=sample.targetZ*spread;
    end.set(Math.max(-4.4,Math.min(4.4,x*cos-z*sin)),

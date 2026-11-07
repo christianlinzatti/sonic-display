@@ -473,7 +473,7 @@ export function ThreeAvatar(props: VisualizerProps) {
     lyrics:props.lipSync?.enabled&&props.lipSync?.playing?props.lipSync.lyrics:
       props.lyricsScene?.playing?props.lyricsScene.lyrics:null,
     lyricsPlaying:Boolean(props.lipSync?.enabled&&props.lipSync?.playing||props.lyricsScene?.playing),
-    castCount:groupOnV326?effectiveGroupSettingsV442.count:dual||auto||multiEnabled?2:1,
+    castCount:groupOnV326?effectiveGroupSettingsV442.count:(auto||multiEnabled||intelligentEnabled||Boolean(showFormation)||manualFormationV354||authoredEnabled||(props.multiAvatarMode??"solo")!=="solo")?2:1,
   });
   const arenaChoreoV1041=planArenaChoreographyV1041({
     enabled:props.arenaChoreographyEnabledV1041===true,show:showCueV1041,
