@@ -1,3 +1,7 @@
+## V1045 · Intelligent Concert Atmosphere 2.0
+
+Die 360°-Arena inszeniert virtuellen Bodennebel, Laserfächer und den LED-Himmel mit passenden Genre-Farbpaletten und fließenden Szenenwechseln. In **Einstellungen → Display → AI Show Designer** einen Showplan aktivieren und **Intelligent Concert Atmosphere 2.0** einschalten (Intensität 0–75 %). Die bestehenden GPU-instanzbasierten Effekte werden wiederverwendet; keine zusätzlichen Render-Passes, Hardware-Ansteuerung oder automatischen Stroboskop-Effekte. Pause, Reduced Motion und manuell deaktivierte Effekte bleiben vorrangig. Details: `changelog/V1045-INTELLIGENT-CONCERT-ATMOSPHERE-2.md`.
+
 ## V1044 · Audience Light Orchestra
 
 Jetzt bekommt die 360°-Arena eine zusätzliche, optional aktivierbare Publikums-Lichtshow. Die virtuellen Handylichter erzeugen sechs ruhige, showphasenabhängige Muster (Intro, Verse, Aufbau, Hook, Zwischenspiel, Finale) mit Genre-Farbpaletten. Unter **Einstellungen → Display → AI Show Designer** einen Showplan erzeugen/aktivieren und **Audience Light Orchestra** einschalten. Verwendet nur die bestehenden virtuellen Publikumslichter – keine zusätzlichen Leuchten oder Govee-Kommandos. Bei Pause, Reduced Motion, niedriger Grafikstufe oder manuellen Handylichtmodi bleibt die bisherige Darstellung erhalten. Details: `changelog/V1044-AUDIENCE-LIGHT-ORCHESTRA.md`.

@@ -617,6 +617,8 @@ export function ThreeAvatar(props: VisualizerProps) {
         showPlan={props.arenaShowPlanV1040}
         audienceDirectorEnabled={props.arenaAudienceDirectorEnabledV1044 ?? false}
         audienceDirectorStrength={props.arenaAudienceDirectorStrengthV1044 ?? 50}
+        atmosphereDirectorEnabled={props.arenaAtmosphereDirectorEnabledV1045 ?? false}
+        atmosphereDirectorStrength={props.arenaAtmosphereDirectorStrengthV1045 ?? 55}
         trackId={props.track?.id}
         genre={props.genre}
         progressMs={props.cameraDirectorProgressMs ?? 0} durationMs={props.track?.durationMs ?? 0}

@@ -1,6 +1,20 @@
 # V1040 · AI Show Designer (aufbauend auf V1039)
 
 
+## V1045 · Intelligent Concert Atmosphere 2.0
+
+Ein optionaler, deterministischer Atmosphären-Showdirector unter
+`lib/arena360AtmosphereDirectorV1045.ts` interpoliert die sieben lokalen V1040-Szenen
+über einen weichen Übergang und liefert begrenzte Gains, Laser-Fächer-Öffnung,
+Sky-/Laser-/Nebelfarben und Nebeldrift. Die drei bestehenden instanzierten
+Arena-Renderer (`components/visualizer/stages/ArenaLowFogV1036.tsx`,
+`components/visualizer/stages/ArenaLaserFansV1036.tsx`,
+`components/visualizer/stages/ArenaMovingLedSkyV1036.tsx`) setzen die Cues
+mit GPU-Materialuniforms und gepufferten Farben um; keine zusätzlichen
+Renderpasses, Objektbatches, Timer, Hardware- oder Netzwerkbefehle.
+Die Steuerung bleibt per Show Designer opt-in, Reduced Motion/Pause sowie
+sämtliche manuellen Render- und Leistungs-Schalter behalten Vorrang.
+
 ## V1044 · Audience Light Orchestra
 
 Die reine, lokal ausführbare Planungsfunktion `lib/arena360AudienceDirectorV1044.ts` interpretiert den ausdrücklich aktiven V1040-Showplan als Vorschlag für virtuelle Handylichtmuster im Publikum. `components/visualizer/stages/Arena360StageV1031.tsx` prüft Playstatus, Songposition, Grafikstufe, Reduced Motion und manuelle Handylichtmodi, bevor die neue Cue in `components/visualizer/stages/ArenaAudienceV1032.tsx` einfließt. Die vorhandene InstancedMesh-Gruppe und deren Render-Loop bleiben Eigentümer der Animation. Die Steuerung kommt aus `components/visualizer/ArenaShowDesignerPanelV1040.tsx`, neue Typen aus `types/music.ts`. Kein Zugriff auf echte Govee-Lampen, keine neuen Timer oder zusätzlichen WebGL-Lichter. Getestet mit `tests/v1044-audience-orchestra-regression.cjs`.
@@ -1358,7 +1372,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1044
+**Dokumentationsstand:** V1045
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

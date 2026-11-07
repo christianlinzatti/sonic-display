@@ -31,6 +31,7 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1045 Intelligent Concert Atmosphere 2.0','tests/v1045-atmosphere-orchestra-regression.cjs');
   run('V1044 Audience Light Orchestra','tests/v1044-audience-orchestra-regression.cjs');
   run('V1043 Intelligent Show Camera Director','tests/v1043-show-camera-regression.cjs');
   run('V1042 Intelligent Govee Show Integration','tests/v1042-govee-show-integration-regression.cjs');

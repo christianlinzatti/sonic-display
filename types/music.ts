@@ -49,6 +49,8 @@ export interface UiPreferences {
   arenaShowCameraStrengthV1043?: number;
   arenaAudienceDirectorEnabledV1044?: boolean;
   arenaAudienceDirectorStrengthV1044?: number;
+  arenaAtmosphereDirectorEnabledV1045?: boolean;
+  arenaAtmosphereDirectorStrengthV1045?: number;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;

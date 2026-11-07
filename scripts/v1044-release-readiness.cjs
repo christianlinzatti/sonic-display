@@ -7,9 +7,9 @@ function inspectReleaseV1044(root){
  const exists=p=>fs.existsSync(path.join(root,p));
  try{
   const p=JSON.parse(read('package.json')),l=JSON.parse(read('package-lock.json'));
-  add('version',p.version==='0.1.0-v1044'&&p.sonicFeatureRelease==='v1044'&&p.sonicRoadmapRelease==='v1044');
+  add('version',['v1044','v1045'].includes(p.sonicFeatureRelease)&&p.sonicFeatureRelease===p.sonicRoadmapRelease&&p.version==='0.1.0-'+p.sonicFeatureRelease);
   add('lockfile',p.version===l.version&&p.version===l.packages?.['']?.version);
-  add('prebuild',p.scripts.prebuild.startsWith('npm run test:v1044 && npm run test:v1044:types &&'));
+  add('prebuild',p.scripts.prebuild.includes('npm run test:v1044 && npm run test:v1044:types &&'));
   add('scripts',p.scripts['test:v1044']==='node tests/v1044-audience-orchestra-regression.cjs'&&
    p.scripts['test:v1044:types']==='tsc -p tests/tsconfig.v1044-core.json --noEmit');
   for(const f of ['lib/arena360AudienceDirectorV1044.ts','tests/v1044-audience-orchestra-regression.cjs',

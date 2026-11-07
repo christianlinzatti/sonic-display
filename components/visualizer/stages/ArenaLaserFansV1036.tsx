@@ -3,6 +3,7 @@ import {useFrame} from '@react-three/fiber';
 import {useLayoutEffect,useMemo,useRef} from 'react';
 import {Color,Object3D,Quaternion,Vector3,type InstancedMesh} from 'three';
 import type {AudioFeatures} from '@/types/audio';
+import type {ArenaAtmosphereDirectorCueV1045} from '@/lib/arena360AtmosphereDirectorV1045';
 import {useAdaptivePerformance} from '../adaptivePerformance';
 import type {ArenaPeakStateV1036} from '@/lib/arena360AtmosphereV1036';
 import {createArenaLasersV1036,planArenaAtmosphereV1036,sampleArenaLaserV1036} from '@/lib/arena360AtmosphereV1036';
@@ -10,10 +11,10 @@ import {createArenaLasersV1036,planArenaAtmosphereV1036,sampleArenaLaserV1036} f
  * Fixed in arena coordinates: the rotating performer deck is never affected.
  */
 export function ArenaLaserFansV1036({audio,playing,reducedMotion,reactive,enabled,directorEnabled,
- section,progressMs,durationMs,intensity,peakRef}: {
+ section,progressMs,durationMs,intensity,peakRef,atmosphereV1045}: {
  audio:AudioFeatures;playing:boolean;reducedMotion:boolean;reactive:boolean;enabled:boolean;directorEnabled:boolean;
  section?:string;progressMs?:number;durationMs?:number;intensity?:number;
- peakRef?:{readonly current:ArenaPeakStateV1036};
+ peakRef?:{readonly current:ArenaPeakStateV1036};atmosphereV1045?:ArenaAtmosphereDirectorCueV1045;
 }){
  const tier=useAdaptivePerformance().tier;
  const fixtures=useMemo(()=>createArenaLasersV1036(tier),[tier]);
@@ -22,28 +23,38 @@ export function ArenaLaserFansV1036({audio,playing,reducedMotion,reactive,enable
  const start=useMemo(()=>new Vector3(),[]),end=useMemo(()=>new Vector3(),[]),direction=useMemo(()=>new Vector3(),[]);
  const quaternion=useMemo(()=>new Quaternion(),[]),tint=useMemo(()=>new Color(),[]);
  const blue=useMemo(()=>new Color('#49d8ff'),[]),purple=useMemo(()=>new Color('#dc78f5'),[]);
+ const softBlue=useMemo(()=>new Color('#49d8ff'),[]),softPurple=useMemo(()=>new Color('#dc78f5'),[]);
+ const targetBlue=useMemo(()=>new Color(),[]),targetPurple=useMemo(()=>new Color(),[]);
  const budget=useRef(.2),clock=useRef(0),wasActive=useRef(true);
  useLayoutEffect(()=>{budget.current=.2;},[fixtures]);
  useFrame((_,delta)=>{
   if(!enabled||!rays.current)return;
   const dt=Number.isFinite(delta)?Math.max(0,Math.min(.1,delta)):0;
   const active=playing&&!reducedMotion&&reactive&&directorEnabled;
-  if(active)clock.current+=dt;
+  if(active)clock.current+=dt*(atmosphereV1045?.active?atmosphereV1045.drift:1);
   if(!active&&!wasActive.current)return;
   budget.current+=dt;
   if(active&&budget.current<(tier==='low'?.14:.065))return;
   budget.current=0;wasActive.current=active;
   const cue=planArenaAtmosphereV1036({enabled:directorEnabled,playing,reducedMotion,reactive,
     section,progressMs,durationMs,energy:audio.energyEnvelope,intensity,peak:peakRef?.current.energy});
+  const mix=Math.min(1,dt*1.5);
+  softBlue.lerp(targetBlue.copy(blue).set(atmosphereV1045?.active?atmosphereV1045.laserB:'#49d8ff'),mix);
+  softPurple.lerp(targetPurple.copy(purple).set(atmosphereV1045?.active?atmosphereV1045.laserA:'#dc78f5'),mix);
+  const gain=atmosphereV1045?.active?atmosphereV1045.laserGain:1;
   for(let i=0;i<fixtures.length;i++){
    const f=fixtures[i],sample=sampleArenaLaserV1036(f,clock.current,cue);
-   start.set(f.originX,f.originY,f.originZ);end.set(sample.targetX,sample.targetY,sample.targetZ);
+   start.set(f.originX,f.originY,f.originZ);
+   // Bounded stage-only targets; show phases open the laser fan and lift its horizon.
+   const spread=atmosphereV1045?.active?atmosphereV1045.laserSpread:1;
+   const lift=atmosphereV1045?.active?atmosphereV1045.laserLift:0;
+   end.set(sample.targetX*spread,Math.max(.64,Math.min(2.20,sample.targetY+lift)),sample.targetZ*spread);
    direction.subVectors(end,start);const length=direction.length();
    quaternion.setFromUnitVectors(up,direction.normalize());
    dummy.position.copy(start).add(end).multiplyScalar(.5);
    dummy.quaternion.copy(quaternion);dummy.scale.set(.75,Math.max(.001,length),.75);dummy.updateMatrix();
    rays.current.setMatrixAt(i,dummy.matrix);
-   rays.current.setColorAt(i,tint.copy(i%2?blue:purple).multiplyScalar(active?sample.brightness:.008));
+   rays.current.setColorAt(i,tint.copy(i%2?softBlue:softPurple).multiplyScalar(active?Math.min(.74,sample.brightness*gain):.008));
   }
   rays.current.instanceMatrix.needsUpdate=true;
   if(rays.current.instanceColor)rays.current.instanceColor.needsUpdate=true;

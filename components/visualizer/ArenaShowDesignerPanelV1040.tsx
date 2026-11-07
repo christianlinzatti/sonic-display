@@ -108,6 +108,25 @@ export function ArenaShowDesignerPanelV1040(){
     Showplan, 360°-Bühne und Wiedergabe. Manuelle Handylichtmodi, Pause, Reduced Motion und
     niedrige Grafikstufe bleiben vorrangig. Kein Stroboskop.</small>
   </fieldset>
+  <fieldset className="arena-v1045-atmosphere" aria-label="V1045 Intelligent Concert Atmosphere 2.0">
+   <legend>V1045 · Intelligent Concert Atmosphere 2.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaAtmosphereDirectorEnabledV1045)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaAtmosphereDirectorEnabledV1045:e.target.checked})}/>
+    Atmosphärischen Nebel, Laserfarben und LED-Himmel an die Showphasen anpassen
+   </label>
+   <label>Atmosphäre-Intensität: {preferences.arenaAtmosphereDirectorStrengthV1045??55}%
+    <input type="range" min="0" max="75" step="5"
+     disabled={!plan||!preferences.arenaAtmosphereDirectorEnabledV1045}
+     value={preferences.arenaAtmosphereDirectorStrengthV1045??55}
+     onChange={e=>updatePreferences({arenaAtmosphereDirectorStrengthV1045:Number(e.target.value)})}/>
+   </label>
+   <small>Genreabhängige sanfte Farben; gleitende Übergänge zwischen Intro, Strophe, Aufbau,
+    Hook, Break und Finale. Nur virtuelle Effekte der 360°-Arena; aktiviert keine Nebelmaschine,
+    echten Laser, Govee-Leuchten oder Pyrotechnik. Deaktivierte Effekte, Pause, Reduced Motion,
+    Grafikleistungsgrenzen und die vorhandene manuelle Showregie behalten Vorrang.
+    Keine schnellen Blitze.</small>
+  </fieldset>
   <fieldset className="arena-v1043-show-camera" aria-label="V1043 Show Camera Director">
    <legend>V1043 · Intelligent Show Camera Director</legend>
    <label className="setting-check"><input type="checkbox"
@@ -148,7 +167,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}
