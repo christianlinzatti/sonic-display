@@ -84,6 +84,16 @@ jobs:
         run: node tests/v971-integration-setup-regression.cjs
       - name: Release reliability regressions
         run: npm run verify:v1004:focused
+      - name: V1080 Laser Show Experience (regression and isolated type checks)
+        run: npm run test:v1080 && npm run test:v1080:types
+      - name: Active imported release (regression and isolated type checks)
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(node -p "require('./package.json').version.match(/-v([0-9]+)$/)?.[1] || ''")
+          if [[ ! "$version" =~ ^[0-9]+$ ]]; then echo 'Invalid release version'; exit 1; fi
+          npm run "test:v${version}"
+          npm run "test:v${version}:types"
       - name: V1003 Auto Improvement Director (regression and isolated type checks)
         run: npm run test:v1003 && npm run test:v1003:types
       - name: V1002 Concert Quality Assurance (regression and isolated type checks)
