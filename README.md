@@ -1,3 +1,19 @@
+## V1080 · Laser Show Experience 5.0
+
+Die 360°-Bühne erhält mehrdimensionale virtuelle **Laserfächer, Lichttunnel,
+Helix- und Kronenformationen**. Sie werden entlang des vorhandenen siebenteiligen
+Showplans variiert; ein zusätzlicher Puls wird nur bei tatsächlich beobachteten
+Beat-Signalen aktiviert. Die Umsetzung verwendet die bestehenden Instanced-Mesh-
+Laser aus V1036/V1039, erzeugt keine neuen GPU-Batches und steuert keine physischen
+Laser oder Govee-Geräte an. Manuelle Muster, Low-GPU-Qualität, Pausen und
+„Reduced Motion“ haben Vorrang. Aktivierung über **AI Show Designer → V1057
+Intelligent Laser Director** bei automatischem Lasermuster.
+
+Lokale Prüfungen: `npm run verify:v1080:focused` und
+`node scripts/v959-source-preflight.cjs`. Die vollständige Produktionsfreigabe
+(Windows/Ubuntu, Next.js, Playwright, Vercel) erfolgt erst durch GitHub Actions
+**nach dem Import** des vollständigen Projekt-ZIPs.
+
 ## V1071 · Smart Concert Flow 3.0
 
 V1071 ergänzt eine lokale, optionale Acht-Kanal-Übergangsregie für den **geplanten** V1040-Showablauf. Sie gewichtet die bereits aktiven Bühnen-, Floating-, Hologramm-, Laser-, LED-, Kamera-, Rap- und Gruppenkanäle mit begrenzten Faktoren von 0,50 bis 1,00. Die zweite Strophe erhält einen anderen Fokus. Ein sanfter Übergang zur neutralen Regie übergibt das Finale an V1070. Manuelle Vorgaben und deaktivierte Effekte bleiben unverändert. Weder echte Songstruktur noch Beats werden hier erkannt oder ausgelöst. Keine zusätzlichen Timer, Govee-Kommandos oder WebGL-Objekte.

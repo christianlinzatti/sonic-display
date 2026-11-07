@@ -603,7 +603,7 @@ export function ArenaShowDesignerPanelV1040(){
     ungültigem Showplan oder abgeschalteten Effekten greift ausschließlich der bisherige Look.</small>
   </fieldset>
   <fieldset className="arena-v1057-intelligent-laser" aria-label="V1057 Intelligent Laser Director">
-   <legend>V1057 · Intelligent Laser Director</legend>
+   <legend>V1057 · Intelligent Laser Director + V1080 Laser Show Experience 5.0</legend>
    <label className="setting-check"><input type="checkbox"
     checked={Boolean(preferences.arenaIntelligentLaserEnabledV1057)&&Boolean(plan)} disabled={!plan}
     onChange={e=>updatePreferences({arenaIntelligentLaserEnabledV1057:e.target.checked})}/>
@@ -615,7 +615,10 @@ export function ArenaShowDesignerPanelV1040(){
      value={preferences.arenaIntelligentLaserStrengthV1057??55}
      onChange={e=>updatePreferences({arenaIntelligentLaserStrengthV1057:Number(e.target.value)})}/>
    </label>
-   <small>V1057 steuert ausschließlich die bereits vorhandenen virtuellen V1036-Laserfächer
+   <small>V1080 ergänzt mehrdimensionale Laserfächer, 3D-Tunnel, Helix- und Kronenformationen
+    innerhalb der vorhandenen Strahlen, inklusive begrenzter Akzente nur bei gemessenen Beats.
+    Mit dem V1057-Schalter wird auch V1080 aktiviert, solange das Lasermuster auf Automatisch steht.
+    V1057 steuert ausschließlich die bereits vorhandenen virtuellen V1036-Laserfächer
     und V1039-Lasertunnel. Farben und langsame Schwenks folgen sieben geplanten
     Showkapiteln; manuell gewählte Lasermuster behalten Vorrang. Die Planung ist
     keine Echtzeit-Erkennung von Drops oder Gesangsrollen. Keine zusätzlichen

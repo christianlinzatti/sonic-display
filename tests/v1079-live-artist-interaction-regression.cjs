@@ -92,7 +92,9 @@ assert(read('context/UiPreferencesContext.tsx').includes('arenaLiveArtistEnabled
 for(const bad of ['setInterval(','setTimeout(','Math.random(','Date.now(','fetch(','navigator.','localStorage','requestAnimationFrame(','new AnimationMixer(','position.y','footIK'])
  assert(!read('lib/arena360LiveArtistInteractionV1079.ts').includes(bad),bad);
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert(pkg.version==='0.1.0-v1079'&&lock.version===pkg.version);
+const release=Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1]||0);
+assert(release>=1079&&lock.version===pkg.version&&lock.packages?.['']?.version===pkg.version,
+ 'V1079 regression stays valid for subsequent correctly versioned releases');
 for(const f of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(f).includes('tests/v1079-live-artist-interaction-regression.cjs'));
 console.log(`PASS V1079: ${trials} lyric-gap trials, ${active} timed interactions, partner/look/crowd, manual overrides, UI and production gates`);

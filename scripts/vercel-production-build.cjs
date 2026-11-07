@@ -31,6 +31,7 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1080 Laser Show Experience 5.0','tests/v1080-laser-experience-regression.cjs');
   run('V1079 Live Artist Interaction','tests/v1079-live-artist-interaction-regression.cjs');
   run('V1078 Natural Dance Intelligence 4.0','tests/v1078-natural-dance-intelligence-regression.cjs');
   run('V1077 Duet Performance 3.0','tests/v1077-duet-performance-regression.cjs');

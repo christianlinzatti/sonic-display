@@ -1,3 +1,15 @@
+## V1080 · Laser Show Experience 5.0
+
+Ein reiner, deterministischer Stage-Planner in `lib/arena360LaserExperienceV1080.ts`
+wandelt den vorhandenen V1057-Show-Cue (7 Kapitel) in sanfte, begrenzte
+Endpunktverschiebungen um. `Arena360StageV1031` gibt denselben Cue an die
+bestehenden V1036- und V1039-Instanced-Meshes weiter; die Geometrie wird nur
+im vorhandenen `useFrame` aktualisiert. Keine zusätzlichen `useFrame`-Loops,
+GPU-Meshes, Audiopoller oder Gerätekommandos. Sicherheits- und
+Performance-Gates: opt-in, auto pattern, gültige Uhr, vorhandener
+Director-Cue, observed beat, Reduced Motion, Pause, Low-Tier. Die alte
+Rendering-Logik bleibt bei abgeschalteter Funktion erhalten.
+
 ## V1071 · Smart Concert Flow 3.0
 
 V1071 ergänzt eine lokale, optionale Acht-Kanal-Übergangsregie für den **geplanten** V1040-Showablauf. Sie gewichtet die bereits aktiven Bühnen-, Floating-, Hologramm-, Laser-, LED-, Kamera-, Rap- und Gruppenkanäle mit begrenzten Faktoren von 0,50 bis 1,00. Die zweite Strophe erhält einen anderen Fokus. Ein sanfter Übergang zur neutralen Regie übergibt das Finale an V1070. Manuelle Vorgaben und deaktivierte Effekte bleiben unverändert. Weder echte Songstruktur noch Beats werden hier erkannt oder ausgelöst. Keine zusätzlichen Timer, Govee-Kommandos oder WebGL-Objekte.

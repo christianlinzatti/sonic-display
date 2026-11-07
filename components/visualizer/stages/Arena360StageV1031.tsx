@@ -11,6 +11,7 @@ import {ArenaAudienceV1032} from "./ArenaAudienceV1032";
 import {ArenaLightsV1032} from "./ArenaLightsV1032";
 import {planCinematicLightingV1056} from "@/lib/arena360CinematicLightingV1056";
 import {planIntelligentLaserV1057} from "@/lib/arena360IntelligentLaserV1057";
+import {planLaserExperienceV1080} from "@/lib/arena360LaserExperienceV1080";
 import {planVolumetricLightingV1058} from '@/lib/arena360VolumetricLightingV1058';
 import {planLedWallV1059,type LedWallPatternV1059} from '@/lib/arena360LedWallV1059';
 import {ArenaLedWallV1059} from './ArenaLedWallV1059';
@@ -301,6 +302,15 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   const flowLasersV1071=smartFlowV1071.active&&finaleLasersV1070.active?
     {...finaleLasersV1070,fanGain:finaleLasersV1070.fanGain*smartFlowV1071.lasers,
       beamGain:finaleLasersV1070.beamGain*smartFlowV1071.lasers}:finaleLasersV1070;
+  // V1080 reuses both existing instanced ray batches; opt-in via V1057's laser control.
+  // An explicit V1039 manual pattern takes precedence, and no synthetic drop is assumed.
+  const laserExperienceV1080=planLaserExperienceV1080({
+    enabled:intelligentLaserEnabledV1057&&lasersEnabled&&showDirectorEnabled&&showDesignerEnabled,
+    playing:isPlaying,reducedMotion,reactive,manualPattern:hologramPattern!=='auto',
+    performanceTier:getActivePerformanceTier(),progressMs,durationMs,
+    director:flowLasersV1071,energy:audio.energyEnvelope,beat:audio.beat,
+    beatStrength:audio.beatStrength,strength:intelligentLaserStrengthV1057,
+  });
   const flowLedV1071=smartFlowV1071.active&&finaleLedV1070.active?
     {...finaleLedV1070,gain:finaleLedV1070.gain*smartFlowV1071.led}:finaleLedV1070;
   const audienceCueV1044=planArenaAudienceV1044({
@@ -482,7 +492,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaLaserFansV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={lasersEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045} finaleV1046={finaleV1046}
-      laserCueV1057={flowLasersV1071}/>
+      laserCueV1057={flowLasersV1071} laserExperienceCueV1080={laserExperienceV1080}/>
     <ArenaMovingLedSkyV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={movingSkyEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}/>
@@ -503,7 +513,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaLaserTunnelsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={laserArchitectureEnabled&&showDirectorEnabled&&lasersEnabled}
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}
-      laserCueV1057={flowLasersV1071}/>
+      laserCueV1057={flowLasersV1071} laserExperienceCueV1080={laserExperienceV1080}/>
     <ArenaFloatingPlatformsV1038 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={floatingStageEnabled} mode={plannedFloat}
       intensity={plannedFloatStrength} section={section}

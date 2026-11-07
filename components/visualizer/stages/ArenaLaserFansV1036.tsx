@@ -5,6 +5,7 @@ import {Color,Object3D,Quaternion,Vector3,type InstancedMesh} from 'three';
 import type {AudioFeatures} from '@/types/audio';
 import type {ArenaFinaleCueV1046} from '@/lib/arena360CinematicFinaleV1046';
 import type {IntelligentLaserCueV1057} from '@/lib/arena360IntelligentLaserV1057';
+import {sampleLaserEndpointV1080,type LaserExperienceCueV1080} from '@/lib/arena360LaserExperienceV1080';
 import type {ArenaAtmosphereDirectorCueV1045} from '@/lib/arena360AtmosphereDirectorV1045';
 import {useAdaptivePerformance} from '../adaptivePerformance';
 import type {ArenaPeakStateV1036} from '@/lib/arena360AtmosphereV1036';
@@ -13,11 +14,11 @@ import {createArenaLasersV1036,planArenaAtmosphereV1036,sampleArenaLaserV1036} f
  * Fixed in arena coordinates: the rotating performer deck is never affected.
  */
 export function ArenaLaserFansV1036({audio,playing,reducedMotion,reactive,enabled,directorEnabled,
- section,progressMs,durationMs,intensity,peakRef,atmosphereV1045,finaleV1046,laserCueV1057}: {
+ section,progressMs,durationMs,intensity,peakRef,atmosphereV1045,finaleV1046,laserCueV1057,laserExperienceCueV1080}: {
  audio:AudioFeatures;playing:boolean;reducedMotion:boolean;reactive:boolean;enabled:boolean;directorEnabled:boolean;
  section?:string;progressMs?:number;durationMs?:number;intensity?:number;
  peakRef?:{readonly current:ArenaPeakStateV1036};atmosphereV1045?:ArenaAtmosphereDirectorCueV1045;finaleV1046?:ArenaFinaleCueV1046;
- laserCueV1057?:IntelligentLaserCueV1057;
+ laserCueV1057?:IntelligentLaserCueV1057;laserExperienceCueV1080?:LaserExperienceCueV1080;
 }){
  const tier=useAdaptivePerformance().tier;
  const fixtures=useMemo(()=>createArenaLasersV1036(tier),[tier]);
@@ -59,12 +60,14 @@ export function ArenaLaserFansV1036({audio,playing,reducedMotion,reactive,enable
    end.set(Math.max(-4.4,Math.min(4.4,x*cos-z*sin)),
     Math.max(.64,Math.min(2.20,sample.targetY+lift+(finaleV1046?.active?finaleV1046.deckAccent*2:0))),
     Math.max(-4.4,Math.min(4.4,x*sin+z*cos)));
+   if(laserExperienceCueV1080?.active)sampleLaserEndpointV1080(
+    laserExperienceCueV1080,i,fixtures.length,clock.current,'fan',end);
    direction.subVectors(end,start);const length=direction.length();
    quaternion.setFromUnitVectors(up,direction.normalize());
    dummy.position.copy(start).add(end).multiplyScalar(.5);
    dummy.quaternion.copy(quaternion);dummy.scale.set(.75,Math.max(.001,length),.75);dummy.updateMatrix();
    rays.current.setMatrixAt(i,dummy.matrix);
-   rays.current.setColorAt(i,tint.copy(i%2?softBlue:softPurple).multiplyScalar(active?Math.min(.74,sample.brightness*gain*(laserCueV1057?.active?laserCueV1057.fanGain:1)):.008));
+   rays.current.setColorAt(i,tint.copy(i%2?softBlue:softPurple).multiplyScalar(active?Math.min(.74,sample.brightness*gain*(laserCueV1057?.active?laserCueV1057.fanGain:1)*(laserExperienceCueV1080?.active?laserExperienceCueV1080.gain:1)):.008));
   }
   rays.current.instanceMatrix.needsUpdate=true;
   if(rays.current.instanceColor)rays.current.instanceColor.needsUpdate=true;
