@@ -1,3 +1,20 @@
+## V1085 · 360° Projection Mapping
+
+`lib/arena360ProjectionMappingV1085.ts` is the pure optical show planner. Real song-clock
+and authored show cues choose bounded, finite ripples, lattices, orbit sweeps and
+ambient ribbons. Only measured audio beats may add a transient highlight.
+
+`ArenaProjectionMappingV1085.tsx` draws two pooled InstancedMesh overlays: projected
+floor strokes are children of the performer turntable, while scenic panels remain
+world-fixed and require the V1082 architecture. Small satellite decals are
+attached to the existing V1038 moving platform transforms; no new 3D scene root,
+light sources, physics or external devices. At high tier at most 32 + 24 instanced
+strokes are drawn; balanced tier uses 16 + 12; low tier and Reduced Motion draw none.
+The feature is opt-in, preserves paused/seek safety and never generates musical
+structure or triggers Govee / hardware projectors.
+
+**Dokumentationsstand:** V1085
+
 ## V1084 · Festival Atmosphere FX
 
 V1084 adds `lib/arena360FestivalAtmosphereV1084.ts` as a pure, deterministic
@@ -1762,7 +1779,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1084
+**Dokumentationsstand:** V1085
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

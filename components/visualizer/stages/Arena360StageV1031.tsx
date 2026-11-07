@@ -18,6 +18,8 @@ import {ArenaLedWallV1059} from './ArenaLedWallV1059';
 import {planLedWallExperienceV1083,type LedExperienceModeV1083} from '@/lib/arena360LedWallExperienceV1083';
 import {planFestivalAtmosphereV1084,type FestivalModeV1084} from '@/lib/arena360FestivalAtmosphereV1084';
 import {ArenaFestivalAtmosphereV1084} from './ArenaFestivalAtmosphereV1084';
+import {planProjectionMappingV1085,type ProjectionModeV1085} from '@/lib/arena360ProjectionMappingV1085';
+import {ArenaProjectionMappingV1085} from './ArenaProjectionMappingV1085';
 import {planLightingChoreographerV1060} from '@/lib/arena360LightingChoreographerV1060';
 import {ArenaLedDomeV1033} from "./ArenaLedDomeV1033";
 import {ArenaSkyFormationV1034} from "./ArenaSkyFormationV1034";
@@ -95,6 +97,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   ledWallEnabledV1059=false,ledWallStrengthV1059=55,ledWallPatternV1059='auto',
   advancedLedEnabledV1083=false,advancedLedStrengthV1083=55,advancedLedModeV1083='auto',lyricTextV1083='',
   festivalFxEnabledV1084=false,festivalFxStrengthV1084=55,festivalFxModeV1084='auto',
+  projectionEnabledV1085=false,projectionStrengthV1085=55,projectionModeV1085='auto',
   lightingChoreographerEnabledV1060=false,lightingChoreographerStrengthV1060=55,
   transformingStageEnabledV1066=false,transformingStageStrengthV1066=55,
   floatingExperienceEnabledV1067=false,floatingExperienceStrengthV1067=55,
@@ -132,6 +135,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   ledWallEnabledV1059?:boolean;ledWallStrengthV1059?:number;ledWallPatternV1059?:LedWallPatternV1059;
   advancedLedEnabledV1083?:boolean;advancedLedStrengthV1083?:number;advancedLedModeV1083?:LedExperienceModeV1083;lyricTextV1083?:string;
   festivalFxEnabledV1084?:boolean;festivalFxStrengthV1084?:number;festivalFxModeV1084?:FestivalModeV1084;
+  projectionEnabledV1085?:boolean;projectionStrengthV1085?:number;projectionModeV1085?:ProjectionModeV1085;
   lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
   transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
   floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
@@ -367,6 +371,16 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     mode:festivalFxModeV1084,observedSection:section,genre:showPlan?.genre??genre,
     fogEnabled:groundFogEnabled,
   });
+  // V1085: song-clock deterministic optical patterns, never real projectors.
+  // The floor is in the rotating cast group; satellites/architecture are world-fixed.
+  const projectionCueV1085=planProjectionMappingV1085({
+    enabled:projectionEnabledV1085,stageIsArena:true,playing:isPlaying,reducedMotion,reactive,
+    showDesignerEnabled,showDirectorEnabled,performanceTier:getActivePerformanceTier(),
+    progressMs,durationMs,strength:projectionStrengthV1085,mode:projectionModeV1085,
+    show:showCueV1040,beat:audio.beat,beatStrength:audio.beatStrength,energy:audio.energyEnvelope,
+    floorEnabled:true,satellitesEnabled:floatingStageEnabled,
+    sceneryEnabled:dynamicArchitectureEnabledV1082&&dynamicArchitectureV1082.active,
+  });
   const audienceCueV1044=planArenaAudienceV1044({
     enabled:audienceDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,show:showCueV1040,
     stageIsArena:true,playing:isPlaying,reducedMotion,phoneEnabled:phoneSyncEnabled&&audienceEnabled,
@@ -571,7 +585,9 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       laserCueV1057={flowLasersV1071} laserExperienceCueV1080={laserExperienceV1080}/>
     {dynamicArchitectureEnabledV1082 && <ArenaDynamicArchitectureV1082 enabled={dynamicArchitectureEnabledV1082}
       playing={isPlaying} reducedMotion={reducedMotion} cue={dynamicArchitectureV1082}/>}
-    <ArenaFloatingPlatformsV1038 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
+    {projectionCueV1085.active&&projectionCueV1085.scenery&&
+      <ArenaProjectionMappingV1085 cue={projectionCueV1085} surface="scenery"/>}
+    <ArenaFloatingPlatformsV1038 mappingCueV1085={projectionCueV1085} audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={floatingStageEnabled} mode={plannedFloat}
       intensity={plannedFloatStrength} section={section}
       floatingCueV1067={flowFloatingV1071} floatingEnabledV1067={floatingExperienceEnabledV1067&&floatingStageMode==='auto'}/>
@@ -625,6 +641,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
           </mesh>;
         })}
       </group>}
+      {projectionCueV1085.active&&projectionCueV1085.floor&&
+        <ArenaProjectionMappingV1085 cue={projectionCueV1085} surface="floor"/>}
       <ArenaTransformingDeckV1037 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
         enabled={transformingDeckEnabled} mode={plannedDeck} strength={plannedDeckStrength} section={section}
         stageCueV1066={flowStageV1071} stageEnabledV1066={transformingStageEnabledV1066&&transformingDeckMode==='auto'}/>

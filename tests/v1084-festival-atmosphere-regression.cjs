@@ -75,8 +75,8 @@ assert.deepEqual(sample('bubble',0,8,Infinity,drop,b),sample('bubble',0,8,0,{...
 assert.equal(sample('co2',0,8,1000,cue,b).scaleX,0,'unverified CO2 never draws');
 assert.equal(sample('bubble',100,8,1000,cue,b).scaleX,0);
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1084');assert.equal(pkg.version,lock.version);assert.equal(pkg.version,lock.packages[''].version);
-assert(pkg.scripts.prebuild.startsWith('npm run test:v1084 && npm run test:v1084:types'));
+assert(Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1]||0)>=1084);assert.equal(pkg.version,lock.version);assert.equal(pkg.version,lock.packages[''].version);
+assert(pkg.scripts.prebuild.includes('npm run test:v1084 && npm run test:v1084:types'));
 const stage=read('components/visualizer/stages/Arena360StageV1031.tsx');
 assert(stage.includes('planFestivalAtmosphereV1084({')&&stage.includes('observedSection:section'));
 assert(stage.includes('festivalCueV1084.active && <ArenaFestivalAtmosphereV1084'));

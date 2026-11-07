@@ -1,3 +1,11 @@
+## V1085 · 360° Projection Mapping
+
+Enable **Arena Show Designer → V1085 360° Projection Mapping** to project virtual
+floor ripples, orbital light strips, platform accents and scenic washes, using
+existing show timeline and verified audio beats. Requires an active show plan;
+platform and scenery accents follow their corresponding V1038/V1082 controls.
+Disabled by default. Nothing sends commands to real projectors.
+
 ## Neu in V1084 · Festival Atmosphere FX
 
 Im Arena Show Designer einen aktiven Showplan wählen und anschließend **V1084

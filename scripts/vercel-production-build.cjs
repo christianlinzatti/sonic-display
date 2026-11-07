@@ -31,6 +31,7 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1085 Projection Mapping','tests/v1085-projection-mapping-regression.cjs');
   run('V1084 Festival Atmosphere FX','tests/v1084-festival-atmosphere-regression.cjs');
   run('V1083 Advanced LED Wall 5.0','tests/v1083-advanced-led-wall-regression.cjs');
   run('V1082 Dynamic Stage Architecture','tests/v1082-stage-architecture-regression.cjs');

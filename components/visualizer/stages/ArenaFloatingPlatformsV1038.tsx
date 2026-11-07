@@ -7,6 +7,7 @@ import type {AudioFeatures} from '@/types/audio';
 import {REST_FLOAT_V1067,sampleFloatingExperienceV1067,stepFloatingExperienceV1067,
  type FloatCueV1067,type FloatOffsetV1067} from '@/lib/arena360FloatingExperienceV1067';
 import {useAdaptivePerformance} from '../adaptivePerformance';
+import {sampleProjectionMappingV1085,type ProjectionCueV1085} from '@/lib/arena360ProjectionMappingV1085';
 import {floatingStagePlatformCountV1038,INITIAL_FLOATING_STAGE_V1038,
  planFloatingStageV1038,sampleFloatingPlatformV1038,stepFloatingStageV1038,
  type FloatingStageModeV1038,type FloatingStageStateV1038} from '@/lib/arena360FloatingStageV1038';
@@ -15,16 +16,18 @@ import {floatingStagePlatformCountV1038,INITIAL_FLOATING_STAGE_V1038,
  * for avatar ground and never inside the rotating performer root. The small
  * platform count is tier-capped, with no shadows, new dynamic lights or IO.
  */
-export function ArenaFloatingPlatformsV1038({audio,playing,reducedMotion,reactive,enabled=true,mode='auto',intensity=70,section='verse',floatingCueV1067,floatingEnabledV1067=false}:{
+export function ArenaFloatingPlatformsV1038({audio,playing,reducedMotion,reactive,enabled=true,mode='auto',intensity=70,section='verse',floatingCueV1067,floatingEnabledV1067=false,mappingCueV1085}:{
  audio:AudioFeatures;playing:boolean;reducedMotion:boolean;reactive:boolean;
  enabled?:boolean;mode?:FloatingStageModeV1038;intensity?:number;section?:string;
- floatingCueV1067?:FloatCueV1067;floatingEnabledV1067?:boolean;
+ floatingCueV1067?:FloatCueV1067;floatingEnabledV1067?:boolean;mappingCueV1085?:ProjectionCueV1085;
 }) {
  const {tier}=useAdaptivePerformance();
  const count=floatingStagePlatformCountV1038(tier);
  const indices=useMemo(()=>Array.from({length:count},(_,index)=>index),[count]);
  const platforms=useRef<(Group|null)[]>([]);
  const glow=useRef<(MeshBasicMaterial|null)[]>([]);
+ const mappingGlow=useRef<(MeshBasicMaterial|null)[]>([]);
+ const mappingBands=useRef<(Group|null)[]>([]);
  const state=useRef<FloatingStageStateV1038>({...INITIAL_FLOATING_STAGE_V1038});
  const offsetsV1067=useRef<FloatOffsetV1067[]>([]);
  const heldCue=useRef(planFloatingStageV1038({enabled:true,playing:true,reducedMotion:false,
@@ -50,6 +53,11 @@ export function ArenaFloatingPlatformsV1038({audio,playing,reducedMotion,reactiv
    p.position.set(Math.cos(theta)*radius,sample.y+offset.rise,Math.sin(theta)*radius);
    p.rotation.y=-state.current.angle*.32+offset.yaw;
    const led=glow.current[i];if(led)led.opacity=Math.min(.75,sample.glow+offset.glow);
+   if(mappingCueV1085?.active&&mappingCueV1085.satellites){
+    const mapped=sampleProjectionMappingV1085('satellite',i,count,mappingCueV1085);
+    const band=mappingBands.current[i];if(band)band.rotation.y=mapped.angle;
+    const m=mappingGlow.current[i];if(m)m.opacity=Math.min(.60,mapped.glow);
+   }
   }
  });
  if(!enabled)return null;
@@ -68,6 +76,14 @@ export function ArenaFloatingPlatformsV1038({audio,playing,reducedMotion,reactiv
     <meshBasicMaterial ref={node=>{glow.current[i]=node;}} color={i%2===0?'#37dffa':'#ee75ff'}
      transparent opacity={.54} depthWrite={false} toneMapped={false} side={2}/>
    </mesh>
+   {mappingCueV1085?.active&&mappingCueV1085.satellites&&tier!=='low'&&
+    <group position={[0,.078,0]} ref={node=>{mappingBands.current[i]=node;}} name={`v1085-satellite-projection-${i}`}>
+     <mesh position={[.12,0,0]} rotation={[-Math.PI/2,0,0]}>
+      <planeGeometry args={[.16,.065]}/>
+      <meshBasicMaterial ref={node=>{mappingGlow.current[i]=node;}} color={i%2?'#e866ff':'#26caff'}
+        transparent opacity={.25} depthWrite={false} toneMapped={false} side={2}/>
+     </mesh>
+    </group>}
    <mesh position={[0,-.070,0]} rotation={[-Math.PI/2,0,0]}>
     <ringGeometry args={[.22,.29,24]}/>
     <meshBasicMaterial color="#7697e5" transparent opacity={.32} depthWrite={false} toneMapped={false} side={2}/>

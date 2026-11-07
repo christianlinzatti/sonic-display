@@ -116,6 +116,9 @@ export interface UiPreferences {
   arenaFestivalFxEnabledV1084?:boolean;
   arenaFestivalFxStrengthV1084?:number;
   arenaFestivalFxModeV1084?:import('@/lib/arena360FestivalAtmosphereV1084').FestivalModeV1084;
+  arenaProjectionEnabledV1085?:boolean;
+  arenaProjectionStrengthV1085?:number;
+  arenaProjectionModeV1085?:import('@/lib/arena360ProjectionMappingV1085').ProjectionModeV1085;
   arenaEpicDropEnabledV1069?:boolean;
   arenaEpicDropStrengthV1069?:number;
   arenaUltimateFinaleEnabledV1070?:boolean;
