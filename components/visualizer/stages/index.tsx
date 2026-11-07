@@ -186,6 +186,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
   volumetricLightingEnabledV1058,volumetricLightingStrengthV1058,
   ledWallEnabledV1059,ledWallStrengthV1059,ledWallPatternV1059,
   advancedLedEnabledV1083,advancedLedStrengthV1083,advancedLedModeV1083,lyricTextV1083,
+  festivalFxEnabledV1084,festivalFxStrengthV1084,festivalFxModeV1084,
   lightingChoreographerEnabledV1060,lightingChoreographerStrengthV1060,
   transformingStageEnabledV1066,transformingStageStrengthV1066,
   floatingExperienceEnabledV1067,floatingExperienceStrengthV1067,
@@ -224,6 +225,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     volumetricLightingEnabledV1058?:boolean;volumetricLightingStrengthV1058?:number;
     ledWallEnabledV1059?:boolean;ledWallStrengthV1059?:number;ledWallPatternV1059?:import('@/lib/arena360LedWallV1059').LedWallPatternV1059;
     advancedLedEnabledV1083?:boolean;advancedLedStrengthV1083?:number;advancedLedModeV1083?:import('@/lib/arena360LedWallExperienceV1083').LedExperienceModeV1083;lyricTextV1083?:string;
+    festivalFxEnabledV1084?:boolean;festivalFxStrengthV1084?:number;festivalFxModeV1084?:import('@/lib/arena360FestivalAtmosphereV1084').FestivalModeV1084;
     lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
     transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
     floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
@@ -289,6 +291,9 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       advancedLedEnabledV1083={advancedLedEnabledV1083}
       advancedLedStrengthV1083={advancedLedStrengthV1083}
       advancedLedModeV1083={advancedLedModeV1083}
+      festivalFxEnabledV1084={festivalFxEnabledV1084}
+      festivalFxStrengthV1084={festivalFxStrengthV1084}
+      festivalFxModeV1084={festivalFxModeV1084}
       lyricTextV1083={lyricTextV1083}
       lightingChoreographerEnabledV1060={lightingChoreographerEnabledV1060}
       lightingChoreographerStrengthV1060={lightingChoreographerStrengthV1060}

@@ -26,7 +26,7 @@ function inspectReleaseV1083(root){
   add('gpu-budget',(read('components/visualizer/stages/ArenaLedWallV1059.tsx').match(/<instancedMesh\b/g)||[]).length===1);
   add('texture-disposal',read('components/visualizer/stages/ArenaLedLyricsV1083.tsx').includes('tex.dispose()'));
   add('default-disabled',read('context/UiPreferencesContext.tsx').includes('arenaAdvancedLedEnabledV1083:false'));
-  add('clear-button',read('components/visualizer/ArenaShowDesignerPanelV1040.tsx').includes('arenaAdvancedLedEnabledV1083:false}'));
+  add('clear-button',read('components/visualizer/ArenaShowDesignerPanelV1040.tsx').includes('arenaAdvancedLedEnabledV1083:false,'));
   add('production-gate',read('scripts/v931-production-gate.cjs').includes('tests/v1083-advanced-led-wall-regression.cjs'));
   add('vercel-gate',read('scripts/vercel-production-build.cjs').includes('tests/v1083-advanced-led-wall-regression.cjs'));
   add('source-preflight',read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1083(root)'));

@@ -62,9 +62,9 @@ assert.equal(noDrop.look,'tunnel','authored hook alone is not a confirmed drop')
 assert.equal(sample(pixels[0],{...c,active:false},strong,4),0);
 assert.equal(sample(pixels[0],c,strong,Infinity),0);
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1083');assert.equal(pkg.version,lock.version);
+assert(Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1]||0)>=1083);assert.equal(pkg.version,lock.version);
 assert.equal(pkg.version,lock.packages[''].version);
-assert(pkg.scripts.prebuild.startsWith('npm run test:v1083 && npm run test:v1083:types'));
+assert(pkg.scripts.prebuild.includes('npm run test:v1083 && npm run test:v1083:types'));
 const stage=read('components/visualizer/stages/Arena360StageV1031.tsx');
 assert(stage.includes('planLedWallExperienceV1083({'));
 assert(stage.includes('baseCue:flowLedV1071'));

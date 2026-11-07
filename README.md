@@ -1,3 +1,13 @@
+## Neu in V1084 · Festival Atmosphere FX
+
+Im Arena Show Designer einen aktiven Showplan wählen und anschließend **V1084
+Festival Atmosphere FX** einschalten. Wählbar sind automatische Festivaleffekte,
+ein ruhiges Arrangement, Seifenblasen, Konfetti, Papierluftschlangen und rein
+virtuelle CO₂-Jets. Der vorhandene Bodennebel lässt sich separat zuschalten.
+V1084 erzeugt **keine physischen Gerätebefehle**; CO₂-Stöße erscheinen nur bei
+tatsächlich beobachtetem Drop und gemessenen Beats. Ältere Szenen und Settings
+bleiben erhalten. Niedrige Qualitätsstufe oder Reduced Motion schaltet ab.
+
 ## Neu in V1083 · Advanced LED Wall 5.0
 
 Im Arena Show Designer zuerst **V1059 LED-Wand** einschalten, dort **Auto** wählen,

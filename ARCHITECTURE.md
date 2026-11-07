@@ -1,3 +1,21 @@
+## V1084 · Festival Atmosphere FX
+
+V1084 adds `lib/arena360FestivalAtmosphereV1084.ts` as a pure, deterministic
+song-timeline / observed-audio planner. Per-chapter atmosphere switches among
+bubbles, falling paper, streamers and virtual CO₂ plumes. `stepFestivalBurstsV1084`
+requires a fresh beat edge + measured bass, beat strength and energy for jets;
+a planned hook or finale is not a musical observation. Jets are enabled only if
+the observed section is `drop`. Cooldown: six seconds; seeks clear envelopes.
+
+`ArenaFestivalAtmosphereV1084.tsx` pools three InstancedMesh groups (high:
+28 bubbles, 58 paper pieces, 8 jet puffs; balanced: 16 / 26 / 4; low: 0).
+The existing ground fog remains the authoritative fog renderer; V1084 only
+increases its bounded gain when the user enables the existing fog switch.
+All effects are virtual; no real fog, pyro, CO₂, Govee or other device commands.
+No new GPU lights, timers, network requests, textures or new microphone APIs.
+The show configuration is opt-in. Pause, Reduced Motion, low-tier and invalid
+song-clock data fail closed. Render update budget is 20 fps/high and 12 fps/balanced.
+
 ## V1083 · Advanced LED Wall 5.0
 
 Der reine `planLedWallExperienceV1083` erzeugt Kapitel-Looks und virtuelle
@@ -1744,7 +1762,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1083
+**Dokumentationsstand:** V1084
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

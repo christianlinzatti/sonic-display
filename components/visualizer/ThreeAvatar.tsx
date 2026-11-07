@@ -926,6 +926,9 @@ export function ThreeAvatar(props: VisualizerProps) {
         advancedLedEnabledV1083={props.arenaAdvancedLedEnabledV1083 ?? false}
         advancedLedStrengthV1083={props.arenaAdvancedLedStrengthV1083 ?? 55}
         advancedLedModeV1083={props.arenaAdvancedLedModeV1083 ?? 'auto'}
+        festivalFxEnabledV1084={props.arenaFestivalFxEnabledV1084 ?? false}
+        festivalFxStrengthV1084={props.arenaFestivalFxStrengthV1084 ?? 55}
+        festivalFxModeV1084={props.arenaFestivalFxModeV1084 ?? 'auto'}
         // Only an active, synchronized lyric line from the owned player is projected.
         lyricTextV1083={currentSyncedLedLyricV1083(props.lyricsScene?.lyrics,
           props.lyricsScene?.progressMs,Boolean(props.lyricsScene?.playing&&props.isPlaying))}

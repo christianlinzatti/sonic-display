@@ -113,6 +113,9 @@ export interface UiPreferences {
   arenaAdvancedLedEnabledV1083?:boolean;
   arenaAdvancedLedStrengthV1083?:number;
   arenaAdvancedLedModeV1083?:import('@/lib/arena360LedWallExperienceV1083').LedExperienceModeV1083;
+  arenaFestivalFxEnabledV1084?:boolean;
+  arenaFestivalFxStrengthV1084?:number;
+  arenaFestivalFxModeV1084?:import('@/lib/arena360FestivalAtmosphereV1084').FestivalModeV1084;
   arenaEpicDropEnabledV1069?:boolean;
   arenaEpicDropStrengthV1069?:number;
   arenaUltimateFinaleEnabledV1070?:boolean;

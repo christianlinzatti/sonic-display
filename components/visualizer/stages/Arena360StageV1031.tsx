@@ -16,6 +16,8 @@ import {planVolumetricLightingV1058} from '@/lib/arena360VolumetricLightingV1058
 import {planLedWallV1059,type LedWallPatternV1059} from '@/lib/arena360LedWallV1059';
 import {ArenaLedWallV1059} from './ArenaLedWallV1059';
 import {planLedWallExperienceV1083,type LedExperienceModeV1083} from '@/lib/arena360LedWallExperienceV1083';
+import {planFestivalAtmosphereV1084,type FestivalModeV1084} from '@/lib/arena360FestivalAtmosphereV1084';
+import {ArenaFestivalAtmosphereV1084} from './ArenaFestivalAtmosphereV1084';
 import {planLightingChoreographerV1060} from '@/lib/arena360LightingChoreographerV1060';
 import {ArenaLedDomeV1033} from "./ArenaLedDomeV1033";
 import {ArenaSkyFormationV1034} from "./ArenaSkyFormationV1034";
@@ -92,6 +94,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   volumetricLightingEnabledV1058=false,volumetricLightingStrengthV1058=55,
   ledWallEnabledV1059=false,ledWallStrengthV1059=55,ledWallPatternV1059='auto',
   advancedLedEnabledV1083=false,advancedLedStrengthV1083=55,advancedLedModeV1083='auto',lyricTextV1083='',
+  festivalFxEnabledV1084=false,festivalFxStrengthV1084=55,festivalFxModeV1084='auto',
   lightingChoreographerEnabledV1060=false,lightingChoreographerStrengthV1060=55,
   transformingStageEnabledV1066=false,transformingStageStrengthV1066=55,
   floatingExperienceEnabledV1067=false,floatingExperienceStrengthV1067=55,
@@ -128,6 +131,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   volumetricLightingEnabledV1058?:boolean;volumetricLightingStrengthV1058?:number;
   ledWallEnabledV1059?:boolean;ledWallStrengthV1059?:number;ledWallPatternV1059?:LedWallPatternV1059;
   advancedLedEnabledV1083?:boolean;advancedLedStrengthV1083?:number;advancedLedModeV1083?:LedExperienceModeV1083;lyricTextV1083?:string;
+  festivalFxEnabledV1084?:boolean;festivalFxStrengthV1084?:number;festivalFxModeV1084?:FestivalModeV1084;
   lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
   transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
   floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
@@ -354,6 +358,15 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     baseCue:flowLedV1071,strength:advancedLedStrengthV1083,
     observedSection:section,lyricText:lyricTextV1083,
   });
+  // V1084: purely virtual FX, bounded particle instances and real beat-edge jets.
+  // No scheduled hook/segment alone can trigger CO2; existing fog switch wins.
+  const festivalCueV1084=planFestivalAtmosphereV1084({
+    enabled:festivalFxEnabledV1084,stageIsArena:true,playing:isPlaying,reducedMotion,reactive,
+    performanceTier:getActivePerformanceTier(),showDesignerEnabled,showDirectorEnabled,
+    show:showCueV1040,progressMs,durationMs,strength:festivalFxStrengthV1084,
+    mode:festivalFxModeV1084,observedSection:section,genre:showPlan?.genre??genre,
+    fogEnabled:groundFogEnabled,
+  });
   const audienceCueV1044=planArenaAudienceV1044({
     enabled:audienceDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,show:showCueV1040,
     stageIsArena:true,playing:isPlaying,reducedMotion,phoneEnabled:phoneSyncEnabled&&audienceEnabled,
@@ -540,7 +553,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaLowFogV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={groundFogEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}
-      volumetricCueV1058={volumetricLightingEnabledV1058?coordinatedVolumeV1060:undefined}/>
+      volumetricCueV1058={volumetricLightingEnabledV1058?coordinatedVolumeV1060:undefined} festivalCueV1084={festivalCueV1084}/>
+    {festivalCueV1084.active && <ArenaFestivalAtmosphereV1084 cue={festivalCueV1084} audio={audio} progressMs={progressMs}/>}
     <ArenaImmersiveExperienceV1047 cue={immersiveV1047}
       hologramsEnabled={hologramsEnabled&&showDirectorEnabled}
       lasersEnabled={laserArchitectureEnabled&&lasersEnabled&&showDirectorEnabled}/>
