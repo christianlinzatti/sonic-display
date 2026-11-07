@@ -179,7 +179,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
   hologramsEnabled,laserArchitectureEnabled,hologramPattern,hologramStrength,showDesignerEnabled,showPlan,audienceDirectorEnabled,audienceDirectorStrength,atmosphereDirectorEnabled,atmosphereDirectorStrength,cinematicFinaleEnabled,cinematicFinaleStrength,immersiveEnabled,immersiveStrength,concertDirectorEnabled,concertDirectorStrength,
   liveConcertEnabledV1049,liveConcertStrengthV1049,microphoneActiveV1049,
   storytellingEnabledV1050,storytellingStrengthV1050,
-  crowdExperienceEnabledV1051,crowdExperienceStrengthV1051,audienceExperienceEnabledV1073,audienceExperienceStrengthV1073,avatarAudienceCueV1074,
+  crowdExperienceEnabledV1051,crowdExperienceStrengthV1051,audienceExperienceEnabledV1073,audienceExperienceStrengthV1073,avatarAudienceCueV1074,crowdEnergyEnabledV1075,crowdEnergyStrengthV1075,
   ultimateConcertEnabledV1052,ultimateConcertStrengthV1052,
   cinematicLightingEnabledV1056,cinematicLightingStrengthV1056,
   intelligentLaserEnabledV1057,intelligentLaserStrengthV1057,
@@ -214,6 +214,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     crowdExperienceEnabledV1051?:boolean;crowdExperienceStrengthV1051?:number;
     audienceExperienceEnabledV1073?:boolean;audienceExperienceStrengthV1073?:number;
     avatarAudienceCueV1074?:import('@/lib/arena360AvatarAudienceInteractionV1074').AvatarAudienceCueV1074;
+    crowdEnergyEnabledV1075?:boolean;crowdEnergyStrengthV1075?:number;
     ultimateConcertEnabledV1052?:boolean;ultimateConcertStrengthV1052?:number;
     cinematicLightingEnabledV1056?:boolean;cinematicLightingStrengthV1056?:number;
     intelligentLaserEnabledV1057?:boolean;intelligentLaserStrengthV1057?:number;
@@ -264,7 +265,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       microphoneActiveV1049={microphoneActiveV1049}
       storytellingEnabledV1050={storytellingEnabledV1050} storytellingStrengthV1050={storytellingStrengthV1050}
       crowdExperienceEnabledV1051={crowdExperienceEnabledV1051} crowdExperienceStrengthV1051={crowdExperienceStrengthV1051}
-      audienceExperienceEnabledV1073={audienceExperienceEnabledV1073} audienceExperienceStrengthV1073={audienceExperienceStrengthV1073} avatarAudienceCueV1074={avatarAudienceCueV1074}
+      audienceExperienceEnabledV1073={audienceExperienceEnabledV1073} audienceExperienceStrengthV1073={audienceExperienceStrengthV1073} avatarAudienceCueV1074={avatarAudienceCueV1074} crowdEnergyEnabledV1075={crowdEnergyEnabledV1075} crowdEnergyStrengthV1075={crowdEnergyStrengthV1075}
       ultimateConcertEnabledV1052={ultimateConcertEnabledV1052} ultimateConcertStrengthV1052={ultimateConcertStrengthV1052}
       cinematicLightingEnabledV1056={cinematicLightingEnabledV1056}
       cinematicLightingStrengthV1056={cinematicLightingStrengthV1056}

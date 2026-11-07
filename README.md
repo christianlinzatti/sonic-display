@@ -3243,3 +3243,12 @@ für 1–4 Sänger. Keine erkannten Publikumszurufe, kein Audio, keine zusätzli
 Meshes und keine Gerätebefehle. Automatische Szenen sind Vorlagen, keine
 analysierten Vocal-Ereignisse. Aus bei manueller Choreografie, Pause, Reduced
 Motion und Low-Grafiktier. `npm run verify:v1074:focused`.
+
+### V1075 – Crowd Energy Engine
+
+Im AI Show Designer optional aktivierbar: sanfte Publikumswellen und dynamische
+Jubelbewegungen zwischen Strophe, Hook und Finale; Live-Bass und verifizierte
+Beat-Stärke verändern nur die visuelle Amplitude. Keine Geräuscherkennung, neue
+Meshes, Timer oder Gerätebefehle. Bei manuellen Handylicht-Modi, Pause,
+Reduced Motion und Low-Tier automatisch deaktiviert.
+Tests: `npm run verify:v1075:focused`.

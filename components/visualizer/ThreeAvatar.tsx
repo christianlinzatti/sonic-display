@@ -881,7 +881,7 @@ export function ThreeAvatar(props: VisualizerProps) {
         storytellingEnabledV1050={props.arenaStorytellingEnabledV1050 ?? false}
         storytellingStrengthV1050={props.arenaStorytellingStrengthV1050 ?? 55}
         avatarAudienceCueV1074={avatarAudienceV1074} audienceExperienceEnabledV1073={props.arenaAudienceExperienceEnabledV1073 ?? false}
-        audienceExperienceStrengthV1073={props.arenaAudienceExperienceStrengthV1073 ?? 55}
+        audienceExperienceStrengthV1073={props.arenaAudienceExperienceStrengthV1073 ?? 55} crowdEnergyEnabledV1075={props.arenaCrowdEnergyEnabledV1075 ?? false} crowdEnergyStrengthV1075={props.arenaCrowdEnergyStrengthV1075 ?? 55}
         crowdExperienceEnabledV1051={props.arenaCrowdExperienceEnabledV1051 ?? false}
         crowdExperienceStrengthV1051={(props.arenaCrowdExperienceStrengthV1051 ?? 55)*stageInteractionV1055.crowdGain}
         ultimateConcertEnabledV1052={props.arenaUltimateConcertEnabledV1052 ?? false}

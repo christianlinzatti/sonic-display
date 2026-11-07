@@ -176,6 +176,26 @@ export function ArenaShowDesignerPanelV1040(){
     Reduced Motion und individuelle Helligkeitsgrenzen behalten Vorrang.
     Keine zusätzlichen Gerätebefehle, Impulse, Blinklichter oder Timer.</small>
   </fieldset>
+  <fieldset className="arena-v1075-crowd-energy" aria-label="V1075 Crowd Energy Engine">
+   <legend>V1075 · Crowd Energy Engine</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaCrowdEnergyEnabledV1075)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaCrowdEnergyEnabledV1075:e.target.checked})}/>
+    Zuschauerdynamik über den Song steuern: ruhig, Wellen, Hook-Jubel und Finale
+   </label>
+   <label>Energie-Variation: {preferences.arenaCrowdEnergyStrengthV1075??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaCrowdEnergyEnabledV1075}
+     value={preferences.arenaCrowdEnergyStrengthV1075??55}
+     onChange={e=>updatePreferences({arenaCrowdEnergyStrengthV1075:Number(e.target.value)})}/>
+   </label>
+   <small>Lokale, rein visuelle Regie auf den bestehenden Instanced-Mesh-Zuschauern:
+    musikalisch langsamere Bewegungen und sanfte La-Ola-Wellen; Hook und Finale
+    erhalten mehr Energie. Vorhandene gemessene Bass-/Beatwerte verändern nur die
+    Amplitude, nicht den Showabschnitt. Keine echten Publikumsgeräusche, Audio-
+    Ausgaben, neue 3D-Meshes, Timer oder Govee-Befehle. Manuelle Handylichtmodi,
+    Pause, Low-Tier und Reduced Motion haben Vorrang.</small>
+  </fieldset>
   <fieldset className="arena-v1074-avatar-audience" aria-label="V1074 Avatar & Audience Interaction 2.0">
    <legend>V1074 · Avatar & Audience Interaction 2.0</legend>
    <label className="setting-check"><input type="checkbox"
@@ -774,7 +794,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false,arenaCrowdEnergyEnabledV1075:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

@@ -110,6 +110,8 @@ export interface UiPreferences {
   arenaAudienceExperienceStrengthV1073?:number;
   arenaAvatarAudienceEnabledV1074?:boolean;
   arenaAvatarAudienceStrengthV1074?:number;
+  arenaCrowdEnergyEnabledV1075?:boolean;
+  arenaCrowdEnergyStrengthV1075?:number;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;

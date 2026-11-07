@@ -212,6 +212,8 @@ export interface VisualizerProps {
   arenaAudienceExperienceStrengthV1073?:number;
   arenaAvatarAudienceEnabledV1074?:boolean;
   arenaAvatarAudienceStrengthV1074?:number;
+  arenaCrowdEnergyEnabledV1075?:boolean;
+  arenaCrowdEnergyStrengthV1075?:number;
   arenaAvatarAudienceCueV1074?:import('@/lib/arena360AvatarAudienceInteractionV1074').AvatarAudienceCueV1074;
   dancePostEnabledV468?: boolean;
   shaderEnvironmentV468?: import('./ProceduralShaderEnvironmentV468').ShaderEnvironmentModeV468;

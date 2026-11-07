@@ -11,6 +11,7 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1075 Crowd Energy Engine','tests/v1075-crowd-energy-regression.cjs'],
   ['V1074 Avatar & Audience Interaction 2.0','tests/v1074-avatar-audience-regression.cjs'],
   ['V1073 Concert Audience Experience 3.0','tests/v1073-audience-experience-regression.cjs'],
   ['V1072 Concert Camera Director 4.0','tests/v1072-concert-camera-director-regression.cjs'],

@@ -10,6 +10,7 @@ import {sampleArenaAudienceV1044,type ArenaAudienceCueV1044} from "@/lib/arena36
 import {sampleCrowdExperienceV1051,type CrowdCueV1051} from "@/lib/arena360CrowdExperienceV1051";
 import {sampleAudienceExperienceV1073,type AudienceCueV1073} from "@/lib/arena360AudienceExperienceV1073";
 import {sampleAvatarAudienceInteractionV1074,type AvatarAudienceCueV1074} from "@/lib/arena360AvatarAudienceInteractionV1074";
+import {sampleCrowdEnergyV1075,type CrowdEnergyCueV1075} from "@/lib/arena360CrowdEnergyV1075";
 import {INITIAL_ARENA_WAVE_V1033,stepArenaWaveV1033,sampleArenaCrowdWaveV1033,
   sampleArenaPhoneV1033,type ArenaPhoneModeV1033} from "@/lib/arena360ImmersionV1033";
 
@@ -21,11 +22,11 @@ const PHONE_COLORS=['#7af4ff','#ef73ff','#faf1a9'];
  */
 export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,reactive=true,
   wavesEnabled=true,phoneSyncEnabled=true,phoneMode='wave',hookCueEnabled=true,
-  progressMs=0,durationMs=0,fullSongDirectorEnabled=true,showIntensity=65,section='verse',audienceCueV1044,crowdCueV1051,audienceCueV1073,avatarAudienceCueV1074}:{
+  progressMs=0,durationMs=0,fullSongDirectorEnabled=true,showIntensity=65,section='verse',audienceCueV1044,crowdCueV1051,audienceCueV1073,avatarAudienceCueV1074,crowdEnergyCueV1075}:{
   audio:AudioFeatures;playing:boolean;reducedMotion:boolean;enabled?:boolean;reactive?:boolean;
   wavesEnabled?:boolean;phoneSyncEnabled?:boolean;phoneMode?:ArenaPhoneModeV1033;
   hookCueEnabled?:boolean;progressMs?:number;durationMs?:number;
-  fullSongDirectorEnabled?:boolean;showIntensity?:number;section?:string;audienceCueV1044?:ArenaAudienceCueV1044;crowdCueV1051?:CrowdCueV1051;audienceCueV1073?:AudienceCueV1073;avatarAudienceCueV1074?:AvatarAudienceCueV1074;
+  fullSongDirectorEnabled?:boolean;showIntensity?:number;section?:string;audienceCueV1044?:ArenaAudienceCueV1044;crowdCueV1051?:CrowdCueV1051;audienceCueV1073?:AudienceCueV1073;avatarAudienceCueV1074?:AvatarAudienceCueV1074;crowdEnergyCueV1075?:CrowdEnergyCueV1075;
 }){
   const tier=useAdaptivePerformance().tier;
   const members=useMemo(()=>createArenaAudienceV1032(tier,enabled),[tier,enabled]);
@@ -42,7 +43,8 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
   const arms=useRef<InstancedMesh>(null);
   const audienceActiveV1073=Boolean(enabled&&audienceCueV1073?.active&&phoneSyncEnabled&&tier!=='low');
   const interactionActiveV1074=Boolean(enabled&&avatarAudienceCueV1074?.active&&tier!=='low');
-  const crowdActive=Boolean(enabled&&(crowdCueV1051?.active||audienceActiveV1073||interactionActiveV1074)&&tier!=='low');
+  const energyActiveV1075=Boolean(enabled&&crowdEnergyCueV1075?.active&&tier!=='low');
+  const crowdActive=Boolean(enabled&&(crowdCueV1051?.active||audienceActiveV1073||interactionActiveV1074||energyActiveV1075)&&tier!=='low');
   const wristbandsV1073=useRef<InstancedMesh>(null); // one optional draw call, same capped clock
   const braceletTintV1073=useMemo(()=>new Color(),[]);
   const clock=useRef(0),budget=useRef(0),lastWaveAnimation=useRef(false),lastPhoneAnimation=useRef(false);
@@ -144,15 +146,18 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
         const reaction=animateCrowd?sampleCrowdExperienceV1051(crowdCueV1051,Math.atan2(m.z,m.x),t):null;
         const v1073=audienceActiveV1073?
           sampleAudienceExperienceV1073(audienceCueV1073,Math.atan2(m.z,m.x),t,audio.beat?audio.beatStrength:0):null;
-        const sway=animateWave ? .023*Math.sin(t*1.9+i*.47)*(.28+.72*bass) : 0;
+        const energyV1075=energyActiveV1075?
+          sampleCrowdEnergyV1075(crowdEnergyCueV1075,Math.atan2(m.z,m.x),t,
+            audio.beat?audio.beatStrength:0,bass):null;
+        const sway=(animateWave ? .023*Math.sin(t*1.9+i*.47)*(.28+.72*bass) : 0)+(energyV1075?.sway??0);
         const hookRise=hookCueEnabled?sampleArenaCrowdHookV1035(hookCue,Math.atan2(m.z,m.x),t):0;
-        const rise=crest*.20+hookRise+(reaction?.rise??0)*.24+(v1073?.lift??0);
+        const rise=crest*.20+hookRise+(reaction?.rise??0)*.24+(v1073?.lift??0)+(energyV1075?.rise??0);
         dummy.position.set(m.x+sway,m.y+m.height*.43+rise,m.z);
         dummy.rotation.set(0,Math.atan2(-m.x,-m.z),0);
         dummy.scale.set(.20,m.height*.75,.12);
         dummy.updateMatrix();bodies.current?.setMatrixAt(i,dummy.matrix);
         dummy.position.set(m.x+sway,m.y+m.height*.89+rise,m.z);
-        dummy.rotation.set(0,0,(v1073?.faceStage??0)*.12*Math.sin(t*.42+i*.5)+(replyV1074?.audienceHead??0));dummy.scale.set(.102,.107,.103);
+        dummy.rotation.set(0,0,(v1073?.faceStage??0)*.12*Math.sin(t*.42+i*.5)+(replyV1074?.audienceHead??0)+(energyV1075?.head??0));dummy.scale.set(.102,.107,.103);
         dummy.updateMatrix();heads.current?.setMatrixAt(i,dummy.matrix);
       }
       if(bodies.current)bodies.current.instanceMatrix.needsUpdate=true;
@@ -164,7 +169,11 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
         const reaction=sampleCrowdExperienceV1051(crowdCueV1051,Math.atan2(m.z,m.x),t);
         const v1073=audienceActiveV1073?
           sampleAudienceExperienceV1073(audienceCueV1073,Math.atan2(m.z,m.x),t,audio.beat?audio.beatStrength:0):null;
-        const gestureArms=Math.min(.8,reaction.arms+(v1073?.arms??0)+(replyV1074?.audienceArms??0));
+        const energyV1075=energyActiveV1075?
+          sampleCrowdEnergyV1075(crowdEnergyCueV1075,Math.atan2(m.z,m.x),t,
+            audio.beat?audio.beatStrength:0,bass):null;
+        const gestureArms=Math.min(.8,reaction.arms+(v1073?.arms??0)+
+          (replyV1074?.audienceArms??0)+(energyV1075?.arms??0));
         for(let side=0;side<2;side++){
           const sign=side===0?-1:1;
           dummy.position.set(m.x+sign*.18,m.y+m.height*(.62+gestureArms*.20)+reaction.rise*.24+(v1073?.lift??0),m.z);
@@ -188,9 +197,12 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
         // New choreography can only affect default wave mode, never manual pulse/chase.
         const reaction=animateCrowd&&phoneMode==='wave'?sampleCrowdExperienceV1051(crowdCueV1051,angle,t):null;
         const light=reaction?Math.max(0,Math.min(1,orchestraLight*(.70+.60*reaction.light))):orchestraLight;
+        const energyV1075=energyActiveV1075?
+          sampleCrowdEnergyV1075(crowdEnergyCueV1075,angle,t,
+            audio.beat?audio.beatStrength:0,bass):null;
         tint.copy(phoneColors[i%phoneColors.length]);
         if(audienceOrchestra)tint.lerp(sceneTint,Math.min(.55,audienceCueV1044!.gain*.65));
-        phones.current?.setColorAt(i,tint.multiplyScalar(Math.min(1,light*(1+.20*hookCue.crowdEnergy))));
+        phones.current?.setColorAt(i,tint.multiplyScalar(Math.min(1,light*(1+.20*hookCue.crowdEnergy))*(energyV1075?.light??1)));
         const hookRise=hookCueEnabled?sampleArenaCrowdHookV1035(hookCue,angle,t):0;
         dummy.position.set(m.x+.17,m.y+m.height*(m.armRaised?1.39:1.12)+crest*.20+hookRise,m.z);
         dummy.rotation.set(0,Math.atan2(-m.x,-m.z),0);

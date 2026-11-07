@@ -304,3 +304,8 @@ const {inspectReleaseV1074}=require('./v1074-release-readiness.cjs');
 const v1074=inspectReleaseV1074(root);
 for(const c of v1074.checks)console.log(`${c.ok?'PASS':'FAIL'} V1074 ${c.id}`);
 if(!v1074.passed)process.exitCode=1;
+
+const {inspectReleaseV1075}=require('./v1075-release-readiness.cjs');
+const v1075=inspectReleaseV1075(root);
+for(const c of v1075.checks)console.log(`${c.ok?'PASS':'FAIL'} V1075 ${c.id}`);
+if(!v1075.passed)process.exitCode=1;

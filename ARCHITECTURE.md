@@ -1682,7 +1682,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1074
+**Dokumentationsstand:** V1075
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -2191,7 +2191,7 @@ Neue Fußkontakte führen unmittelbar zur Reduktion additiver Fußrotationen. De
 `services/show/liveConcertComparisonV544.ts` ergänzt eine reine A/B-Projektionsanalyse auf der bereits opt-in etwa sekündlich messenden V466-WebGL-Qualitätsprobe. `components/visualizer/ConcertVisualCompareV544.tsx` ist unter dem bestehenden QA-Knopf erreichbar und speichert maximal zwei manuell aufgenommene Momentaufnahmen (A/B) im React-UI-Zustand; die Schemabilder verwenden echte normalisierte Kopf- und Lyrics-Rechtecke und zeigen die vorhandenen FPS an, **keine Pixel/Fotos und keine optische Gesichts-/Tanzprüfung**. Der Anwender markiert Fußarbeit, Gesicht/Lip-Sync und Lyrics getrennt; `createComparisonReportV544` exportiert auf Klick einen JSON-Bericht, keine Auto-Freigabe. Bildrand-/Lyrics-Nähe werden heuristisch beurteilt, nicht über Objekt-Okklusion. Original-Bühnenkamera, Motion, Beleuchtung, GLBs, FPS-Messintervall und QA-Gating bleiben unangetastet. `tests/v544-visual-quality-regression.cjs`, `tests/tsconfig.v544-core.json`. Der Next.js-Build braucht vollständig installierte Abhängigkeiten.
 
 
-> **Dokumentationsstand:** V1074 (28.10.2026)
+> **Dokumentationsstand:** V1075 (28.10.2026)
 
 ## V539 – Multi-Avatar Concert Interaction 5.0
 
@@ -3672,7 +3672,7 @@ Details: `docs/versions/V802-INTELLIGENT-CONCERT-IMPROVEMENT-ASSISTANT.md`.
 
 `components/visualizer/naturalMultiArtistStageInteractionV807.ts` berechnet ausschliesslich aus bestaetigten, songgebundenen V416/V496-Saengerrollen, vorhandenen Buehnenpositionen und Wiedergabezeit begrenzte Blicke und Gesten fuer Lead, Support, Duett, Handoff und gemeinsamen Hook. Die bestehenden 2er- und 3/4er-Avatar-Renderer verwenden die identische, reine Planungslogik ueber V144/V145-Overlays. Manuelle Animationen, Buehnenformationen, Gesichts-/Lippensynchronisation und Fuss-IK bleiben unberuehrt. V506/V508-Kollisionsschutz ist final. Keine neuen GLB-Mixer, Renderloops oder GPU-Ressourcen. Tests: `tests/v807-natural-multi-artist-stage-interaction-regression.cjs`.
 
-> **Dokumentationsstand:** V1074 (31.10.2026)
+> **Dokumentationsstand:** V1075 (31.10.2026)
 
 ## V808 Natural Performer Positioning
 
@@ -3964,7 +3964,7 @@ V844 verifies section/audio cues, schedules at most one dominant side-stage effe
 - No display/UI overlay; flash cannot be guaranteed photosensitive-safe.
 - Release requires full typecheck, Next.js build, and actual visual test.
 
-> **Dokumentationsstand:** V1074 (01.11.2026)
+> **Dokumentationsstand:** V1075 (01.11.2026)
 
 
 ## V846 - Paper Streamers
@@ -4691,3 +4691,18 @@ keine zusätzlichen Szenenobjekte, kein Device-I/O und keine neue Kamera.
 Vorrang für manuelle Animation/Choreografie, Songzeit, Live-Pause,
 Reduced Motion, Show-Opt-in und Grafik-Tier sind Sicherheitsbedingungen.
 Kapitel-Vorgaben behaupten keine Erkennung eines echten Zurufs.
+
+## V1075 – Crowd Energy Engine
+
+Der streng optionale, rein visuelle Planer `lib/arena360CrowdEnergyV1075.ts`
+verwendet den vorhandenen autorisierten V1040-Showabschnitt und echte Liedzeit,
+um sanfte Publikumsschwingungen, Kopfbewegungen, Armwellen und zurückhaltende
+Handylicht-Modulationen im Instanced-Mesh-Renderer `ArenaAudienceV1032`
+zu koordinieren. V1073-Armbänder und V1074-Publikumsantworten bleiben auf ihren
+bereits existierenden Renderpfaden. Die Live-Beat-/Basswerte verändern nur die
+Amplitude, erkennen keinen Zuruf und erzeugen keine neuen Drops.
+
+Bei Pause, Reduced Motion, Low-Tier, ausgeschalteter Arena, deaktiviertem
+Showplan, manuellen Phone-Looks oder fehlerhafter Trackzeit ist der Cue inaktiv.
+Keine Audioausgabe, keine Govee-Befehle, keine Timer oder neuen Meshes. Die
+Lichtmodulation ist multiplikativ und überschreitet nie das vorhandene Budget.

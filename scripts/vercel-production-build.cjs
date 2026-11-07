@@ -31,6 +31,7 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1075 Crowd Energy Engine','tests/v1075-crowd-energy-regression.cjs');
   run('V1074 Avatar & Audience Interaction 2.0','tests/v1074-avatar-audience-regression.cjs');
   run('V1073 Concert Audience Experience 3.0','tests/v1073-audience-experience-regression.cjs');
   run('V1072 Concert Camera Director 4.0','tests/v1072-concert-camera-director-regression.cjs');
