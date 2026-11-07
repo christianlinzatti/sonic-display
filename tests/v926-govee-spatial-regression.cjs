@@ -85,7 +85,17 @@ test('preview does not change saved settings',()=>{const before=storage.get(f.GO
 test('preview simulates even if live opt-in off',()=>{const p=f.previewGoveeSpatialV926(ips,{...settings,enabled:false},4000,'Deutschrock');assert.equal(p.every(v=>v.decision.active),true);});
 test('preview devices have no token or endpoint fields',()=>{assert.doesNotMatch(JSON.stringify(f.previewGoveeSpatialV926(ips,settings,500,'rap')),/token|endpoint|password/);});
 test('whole-lamp logic only (no segments, strobe, power)',()=>{const src=read('lib/goveeSpatialDirectorV926.ts');assert.doesNotMatch(src,/\bsetInterval\s*\(|\bfetch\s*\(|goveeBridgeRequestV909\s*\(|action:\s*['"](?:power|strobe)/);});
-test('live integration has only one LAN command and one scheduler',()=>{const src=read('components/GoveeMusicSyncV909.tsx');assert.equal((src.match(/goveeBridgeRequestV909\(config,'\/command'/g)||[]).length,1);assert.ok(src.includes('spatialIndexV926'));assert.ok(src.includes('applyGoveeSpatialV926'));assert.ok(/spatialSettings(?:,calibrationSettings)?(?:,roadmapSettings)?(?:,syncSettingsV1027)?,goveeShowEnabledV1042,goveeShowStrengthV1042,arenaShowEnabledV1040,arenaShowPlanV1040,showStageIsArenaV1042,reducedMotionV1042\]/.test(src));});
+test('live integration has only one LAN command and one scheduler',()=>{
+ const src=read('components/GoveeMusicSyncV909.tsx');
+ assert.equal((src.match(/goveeBridgeRequestV909\(config,'\/command'/g)||[]).length,1);
+ assert.ok(src.includes('spatialIndexV926'));
+ assert.ok(src.includes('applyGoveeSpatialV926'));
+ const deps=new Set((/},\[(config,showLibrary,groups,[^\]]+)\]\);/.exec(src)?.[1]??'').split(',').map(x=>x.trim()));
+ for(const name of ['spatialSettings','calibrationSettings','roadmapSettings','syncSettingsV1027',
+  'goveeShowEnabledV1042','goveeShowStrengthV1042','arenaShowEnabledV1040',
+  'arenaShowPlanV1040','showStageIsArenaV1042','reducedMotionV1042'])
+  assert.ok(deps.has(name),`Govee effect must track ${name}`);
+});
 test('saved V915 group dimmer is last before V911 smoothing',()=>{const src=read('components/GoveeMusicSyncV909.tsx');assert.match(src,/festivalDeliveredLook=easeGoveeLookV911\(previous,\s*applyGoveeGroupBrightnessV915\(spatialUngrouped,group,config\.masterBrightness\)\)/);});
 test('UI has save/revert and separate preview',()=>{const src=read('components/GoveeSpatialStudioV926.tsx');for(const t of ['Raumaufstellung speichern','Änderungen verwerfen','Raumwellen-Vorschau','Bühne → Publikum','Kreis im Raum'])assert.ok(src.includes(t));});
 test('UI connected to Govee panel and CI runs guard',()=>{const p=read('components/GoveeLanPanelV909.tsx'),ci=read('.github/workflows/v832-continuous-validation.yml');assert.ok(p.includes('<GoveeSpatialStudioV926 config={config} devices={devices}/>'));assert.ok(ci.includes('npm run test:v926 && npm run test:v926:types && npm run test:v926:ui-types'));});
