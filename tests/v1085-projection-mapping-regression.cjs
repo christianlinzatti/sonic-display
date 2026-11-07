@@ -58,9 +58,11 @@ const a=sample('floor',5,24,plan(input('hook',{progressMs:75000}))),
  b=sample('floor',5,24,plan(input('hook',{progressMs:150000})));
 assert.notDeepEqual(a,b,'patterns progress with authoritative song clock');
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1085');assert.equal(lock.version,pkg.version);
+assert(/^0\.1\.0-v\d+$/.test(pkg.version)&&Number(pkg.version.split('-v')[1])>=1085,
+ 'V1085 must remain installed on V1085 and later releases');assert.equal(lock.version,pkg.version);
 assert.equal(lock.packages[''].version,pkg.version);
-assert(pkg.scripts.prebuild.startsWith('npm run test:v1085 && npm run test:v1085:types'));
+assert(pkg.scripts.prebuild.includes('npm run test:v1085 && npm run test:v1085:types'),
+ 'V1085 checks must remain part of subsequent release prebuilds');
 const stage=read('components/visualizer/stages/Arena360StageV1031.tsx');
 assert(stage.includes('planProjectionMappingV1085({'));
 assert(stage.includes('projectionCueV1085.active&&projectionCueV1085.floor'));

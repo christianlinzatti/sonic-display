@@ -21,7 +21,9 @@ function inspectReleaseV1080(root){
    'changelog/V1080-LASER-SHOW-EXPERIENCE-5.md'])add('file:'+f,exists(f));
   const stage=read('components/visualizer/stages/Arena360StageV1031.tsx');
   add('stage-plan',stage.includes('planLaserExperienceV1080({'));
-  add('two-batches',(stage.match(/laserExperienceCueV1080={laserExperienceV1080}/g)||[]).length===2);
+  add('two-batches',((stage.match(/laserExperienceCueV1080={laserExperienceV1080}/g)||[]).length===2||
+ ((stage.match(/laserExperienceCueV1080={epicTransformedV1086.laser}/g)||[]).length===2&&
+ stage.includes('laser:laserExperienceV1080'))));
   add('manual',stage.includes("manualPattern:hologramPattern!=='auto'"));
   add('audio',stage.includes('beat:audio.beat')&&stage.includes('beatStrength:audio.beatStrength'));
   for(const f of ['components/visualizer/stages/ArenaLaserFansV1036.tsx',

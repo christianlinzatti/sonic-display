@@ -19,6 +19,7 @@ import {planLedWallExperienceV1083,type LedExperienceModeV1083} from '@/lib/aren
 import {planFestivalAtmosphereV1084,type FestivalModeV1084} from '@/lib/arena360FestivalAtmosphereV1084';
 import {ArenaFestivalAtmosphereV1084} from './ArenaFestivalAtmosphereV1084';
 import {planProjectionMappingV1085,type ProjectionModeV1085} from '@/lib/arena360ProjectionMappingV1085';
+import {planEpicStageTransformationV1086,coordinateEpicStageTransformationV1086,type EpicStageModeV1086} from '@/lib/arena360EpicStageTransformationV1086';
 import {ArenaProjectionMappingV1085} from './ArenaProjectionMappingV1085';
 import {planLightingChoreographerV1060} from '@/lib/arena360LightingChoreographerV1060';
 import {ArenaLedDomeV1033} from "./ArenaLedDomeV1033";
@@ -98,6 +99,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   advancedLedEnabledV1083=false,advancedLedStrengthV1083=55,advancedLedModeV1083='auto',lyricTextV1083='',
   festivalFxEnabledV1084=false,festivalFxStrengthV1084=55,festivalFxModeV1084='auto',
   projectionEnabledV1085=false,projectionStrengthV1085=55,projectionModeV1085='auto',
+  epicTransformationEnabledV1086=false,epicTransformationStrengthV1086=55,epicTransformationModeV1086='auto',
   lightingChoreographerEnabledV1060=false,lightingChoreographerStrengthV1060=55,
   transformingStageEnabledV1066=false,transformingStageStrengthV1066=55,
   floatingExperienceEnabledV1067=false,floatingExperienceStrengthV1067=55,
@@ -136,6 +138,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   advancedLedEnabledV1083?:boolean;advancedLedStrengthV1083?:number;advancedLedModeV1083?:LedExperienceModeV1083;lyricTextV1083?:string;
   festivalFxEnabledV1084?:boolean;festivalFxStrengthV1084?:number;festivalFxModeV1084?:FestivalModeV1084;
   projectionEnabledV1085?:boolean;projectionStrengthV1085?:number;projectionModeV1085?:ProjectionModeV1085;
+  epicTransformationEnabledV1086?:boolean;epicTransformationStrengthV1086?:number;epicTransformationModeV1086?:EpicStageModeV1086;
   lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
   transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
   floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
@@ -381,6 +384,27 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     floorEnabled:true,satellitesEnabled:floatingStageEnabled,
     sceneryEnabled:dynamicArchitectureEnabledV1082&&dynamicArchitectureV1082.active,
   });
+  // V1086 coordinates EXISTING active, manually unmodified optical channels.
+  // No additional geometry or independent clock. A low tier, pause, manual
+  // pattern, missing chapter or insufficient enabled channels turns it off.
+  const epicTransformationCueV1086=planEpicStageTransformationV1086({
+    enabled:epicTransformationEnabledV1086,stageIsArena:true,playing:isPlaying,
+    reducedMotion,reactive,showDesignerEnabled,showDirectorEnabled,
+    performanceTier:getActivePerformanceTier(),progressMs,durationMs,
+    strength:epicTransformationStrengthV1086,mode:epicTransformationModeV1086,
+    show:showCueV1040,
+    channels:{
+      architecture:dynamicArchitectureV1082.active&&transformingDeckMode==='auto',
+      laser:laserExperienceV1080.active&&hologramPattern==='auto',
+      led:ledExperienceV1083.active&&advancedLedModeV1083==='auto'&&ledWallPatternV1059==='auto',
+      holograms:flowHologramsV1071.active&&hologramPattern==='auto',
+      projection:projectionCueV1085.active&&projectionModeV1085==='auto',
+    },
+  });
+  const epicTransformedV1086=coordinateEpicStageTransformationV1086(epicTransformationCueV1086,{
+    architecture:dynamicArchitectureV1082,laser:laserExperienceV1080,
+    led:ledExperienceV1083,holograms:flowHologramsV1071,projection:projectionCueV1085,
+  });
   const audienceCueV1044=planArenaAudienceV1044({
     enabled:audienceDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,show:showCueV1040,
     stageIsArena:true,playing:isPlaying,reducedMotion,phoneEnabled:phoneSyncEnabled&&audienceEnabled,
@@ -545,7 +569,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       crowdEnergyCueV1075={crowdEnergyV1075}/>
     <ArenaLedDomeV1033 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={domeEnabled} reactive={reactive}/>
     <ArenaLedWallV1059 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
-      cue={flowLedV1071} progressMs={progressMs} experienceCueV1083={ledExperienceV1083}
+      cue={flowLedV1071} progressMs={progressMs} experienceCueV1083={epicTransformedV1086.led}
       epicDropCueV1069={epicDropV1069}/>
     <ArenaSkyFormationV1034 audio={audio} section={section} playing={isPlaying} reducedMotion={reducedMotion}
       enabled={skyFormationEnabled} directorEnabled={showDirectorEnabled} reactive={reactive}
@@ -560,7 +584,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaLaserFansV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={lasersEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045} finaleV1046={finaleV1046}
-      laserCueV1057={flowLasersV1071} laserExperienceCueV1080={laserExperienceV1080}/>
+      laserCueV1057={flowLasersV1071} laserExperienceCueV1080={epicTransformedV1086.laser}/>
     <ArenaMovingLedSkyV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={movingSkyEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}/>
@@ -578,16 +602,16 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaHologramPortalsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={hologramsEnabled&&showDirectorEnabled}
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}
-      concertCueV1068={flowHologramsV1071} dancerCueV1081={holographicDancersV1081}/>
+      concertCueV1068={epicTransformedV1086.holograms} dancerCueV1081={holographicDancersV1081}/>
     <ArenaLaserTunnelsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={laserArchitectureEnabled&&showDirectorEnabled&&lasersEnabled}
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}
-      laserCueV1057={flowLasersV1071} laserExperienceCueV1080={laserExperienceV1080}/>
+      laserCueV1057={flowLasersV1071} laserExperienceCueV1080={epicTransformedV1086.laser}/>
     {dynamicArchitectureEnabledV1082 && <ArenaDynamicArchitectureV1082 enabled={dynamicArchitectureEnabledV1082}
-      playing={isPlaying} reducedMotion={reducedMotion} cue={dynamicArchitectureV1082}/>}
+      playing={isPlaying} reducedMotion={reducedMotion} cue={epicTransformedV1086.architecture}/>}
     {projectionCueV1085.active&&projectionCueV1085.scenery&&
-      <ArenaProjectionMappingV1085 cue={projectionCueV1085} surface="scenery"/>}
-    <ArenaFloatingPlatformsV1038 mappingCueV1085={projectionCueV1085} audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
+      <ArenaProjectionMappingV1085 cue={epicTransformedV1086.projection} surface="scenery"/>}
+    <ArenaFloatingPlatformsV1038 mappingCueV1085={epicTransformedV1086.projection} audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={floatingStageEnabled} mode={plannedFloat}
       intensity={plannedFloatStrength} section={section}
       floatingCueV1067={flowFloatingV1071} floatingEnabledV1067={floatingExperienceEnabledV1067&&floatingStageMode==='auto'}/>
@@ -642,7 +666,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
         })}
       </group>}
       {projectionCueV1085.active&&projectionCueV1085.floor&&
-        <ArenaProjectionMappingV1085 cue={projectionCueV1085} surface="floor"/>}
+        <ArenaProjectionMappingV1085 cue={epicTransformedV1086.projection} surface="floor"/>}
       <ArenaTransformingDeckV1037 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
         enabled={transformingDeckEnabled} mode={plannedDeck} strength={plannedDeckStrength} section={section}
         stageCueV1066={flowStageV1071} stageEnabledV1066={transformingStageEnabledV1066&&transformingDeckMode==='auto'}/>

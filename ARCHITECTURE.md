@@ -1,3 +1,7 @@
+## V1086 · Epic Stage Transformation 4.0
+
+Eine optische, regelbasierte Regie koordiniert die bereits vorhandenen Kulissen, Laser, LED-Wand, Hologramme und Projektionen auf Basis der gültigen Showkapitel. Keine zusätzlichen Meshes, keine Hardwaresteuerung, keine neu erzeugten Beats. Manuelle Muster und deaktivierte Subsysteme bleiben unverändert. Mindestens zwei aktive Kanäle, ausreichend GPU-Leistung und gültige Songzeit sind erforderlich.
+
 ## V1085 · 360° Projection Mapping
 
 `lib/arena360ProjectionMappingV1085.ts` is the pure optical show planner. Real song-clock
@@ -13,7 +17,7 @@ strokes are drawn; balanced tier uses 16 + 12; low tier and Reduced Motion draw 
 The feature is opt-in, preserves paused/seek safety and never generates musical
 structure or triggers Govee / hardware projectors.
 
-**Dokumentationsstand:** V1085
+**Dokumentationsstand:** V1086
 
 ## V1084 · Festival Atmosphere FX
 
@@ -1779,7 +1783,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1085
+**Dokumentationsstand:** V1086
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

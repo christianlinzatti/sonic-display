@@ -932,6 +932,9 @@ export function ThreeAvatar(props: VisualizerProps) {
         projectionEnabledV1085={props.arenaProjectionEnabledV1085 ?? false}
         projectionStrengthV1085={props.arenaProjectionStrengthV1085 ?? 55}
         projectionModeV1085={props.arenaProjectionModeV1085 ?? 'auto'}
+        epicTransformationEnabledV1086={props.arenaEpicTransformationEnabledV1086 ?? false}
+        epicTransformationStrengthV1086={props.arenaEpicTransformationStrengthV1086 ?? 55}
+        epicTransformationModeV1086={props.arenaEpicTransformationModeV1086 ?? 'auto'}
         // Only an active, synchronized lyric line from the owned player is projected.
         lyricTextV1083={currentSyncedLedLyricV1083(props.lyricsScene?.lyrics,
           props.lyricsScene?.progressMs,Boolean(props.lyricsScene?.playing&&props.isPlaying))}

@@ -221,6 +221,9 @@ export interface VisualizerProps {
   arenaProjectionEnabledV1085?:boolean;
   arenaProjectionStrengthV1085?:number;
   arenaProjectionModeV1085?:import('@/lib/arena360ProjectionMappingV1085').ProjectionModeV1085;
+  arenaEpicTransformationEnabledV1086?:boolean;
+  arenaEpicTransformationStrengthV1086?:number;
+  arenaEpicTransformationModeV1086?:import('@/lib/arena360EpicStageTransformationV1086').EpicStageModeV1086;
   arenaEpicDropEnabledV1069?:boolean;
   arenaEpicDropStrengthV1069?:number;
   arenaUltimateFinaleEnabledV1070?:boolean;

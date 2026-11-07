@@ -69,7 +69,9 @@ const stage=read('components/visualizer/stages/Arena360StageV1031.tsx');
 assert(stage.includes('planLedWallExperienceV1083({'));
 assert(stage.includes('baseCue:flowLedV1071'));
 assert(stage.includes('manualPattern:ledWallPatternV1059'));
-assert(stage.includes('experienceCueV1083={ledExperienceV1083}'));
+assert(stage.includes('experienceCueV1083={ledExperienceV1083}')||
+ (stage.includes('experienceCueV1083={epicTransformedV1086.led}')&&
+  stage.includes('led:ledExperienceV1083')),'V1083 cue must remain rendered, directly or via opt-in V1086');
 const render=read('components/visualizer/stages/ArenaLedWallV1059.tsx');
 assert(render.includes('sampleLedWallExperienceV1083('));
 assert.equal((render.match(/<instancedMesh\b/g)||[]).length,1,'one existing pixel draw batch');

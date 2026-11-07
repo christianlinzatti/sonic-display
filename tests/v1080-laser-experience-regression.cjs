@@ -60,7 +60,9 @@ const tunnel=read('components/visualizer/stages/ArenaLaserTunnelsV1039.tsx');
 const stage=read('components/visualizer/stages/Arena360StageV1031.tsx');
 assert(fans.includes('sampleLaserEndpointV1080(')&&tunnel.includes('sampleLaserEndpointV1080('));
 assert(stage.includes('planLaserExperienceV1080(')&&
- (stage.match(/laserExperienceCueV1080={laserExperienceV1080}/g)||[]).length===2);
+ ((stage.match(/laserExperienceCueV1080={laserExperienceV1080}/g)||[]).length===2||
+ ((stage.match(/laserExperienceCueV1080={epicTransformedV1086.laser}/g)||[]).length===2&&
+ stage.includes('laser:laserExperienceV1080'))),'V1080 must feed both original laser batches');
 assert(stage.includes("manualPattern:hologramPattern!=='auto'"),'manual pattern precedence');
 assert.equal((fans.match(/<instancedMesh\b/g)||[]).length,1);
 assert.equal((tunnel.match(/<instancedMesh\b/g)||[]).length,1);

@@ -589,6 +589,34 @@ export function ArenaShowDesignerPanelV1040(){
     erfundenen Beats. Bei Pause, reduzierter Bewegung, niedrigem Grafikprofil
     oder ungültigem Showplan bleibt der zusätzliche Choreograf inaktiv.</small>
   </fieldset>
+  <fieldset className="arena-v1086-epic-stage-transformation" aria-label="V1086 Epic Stage Transformation 4.0">
+   <legend>V1086 · Epic Stage Transformation 4.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaEpicTransformationEnabledV1086)&&Boolean(plan)}
+    disabled={!plan} onChange={e=>updatePreferences({arenaEpicTransformationEnabledV1086:e.target.checked})}/>
+    Gemeinsame Transformation von Architektur, Lasern, LED, Hologrammen und Projektionen
+   </label>
+   <label>Transformationsintensität: {preferences.arenaEpicTransformationStrengthV1086??55}%
+    <input type="range" min="0" max="80" step="5"
+     value={preferences.arenaEpicTransformationStrengthV1086??55}
+     disabled={!plan||!preferences.arenaEpicTransformationEnabledV1086}
+     onChange={e=>updatePreferences({arenaEpicTransformationStrengthV1086:Number(e.target.value)})}/>
+   </label>
+   <label>Bühneninszenierung
+    <select value={preferences.arenaEpicTransformationModeV1086??'auto'}
+      disabled={!plan||!preferences.arenaEpicTransformationEnabledV1086}
+      onChange={e=>updatePreferences({arenaEpicTransformationModeV1086:e.target.value as import('@/lib/arena360EpicStageTransformationV1086').EpicStageModeV1086})}>
+      <option value="auto">Automatisch – sechs Songkapitel</option>
+      <option value="cinematic">Cinematic – schwebende Atmosphäre</option>
+      <option value="festival">Festival – großer Arena-Look</option>
+      <option value="minimal">Minimal – klare geometrische Bühne</option>
+    </select>
+   </label>
+   <small>Mindestens zwei separat freigeschaltete optische Systeme erforderlich. Die Regie
+    verändert keine manuellen Muster, erfindet keine Drops, erhöht niemals die
+    vorhandenen Helligkeitsgrenzen und steuert keine Hardware. Niedrige Grafikqualität,
+    Pause oder reduzierte Bewegung schalten die Zusatzregie automatisch ab.</small>
+  </fieldset>
   <fieldset className="arena-v1085-projection-mapping" aria-label="V1085 360 Grad Projection Mapping">
    <legend>V1085 · 360° Projection Mapping</legend>
    <label className="setting-check"><input type="checkbox" checked={Boolean(preferences.arenaProjectionEnabledV1085)&&Boolean(plan)}
@@ -1001,7 +1029,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false,arenaCrowdEnergyEnabledV1075:false,arenaRapGesturesEnabledV1076:false,arenaDuetPerformanceEnabledV1077:false,arenaNaturalDanceEnabledV1078:false,arenaLiveArtistEnabledV1079:false,arenaDynamicArchitectureEnabledV1082:false,arenaAdvancedLedEnabledV1083:false,arenaFestivalFxEnabledV1084:false,arenaProjectionEnabledV1085:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false,arenaCrowdEnergyEnabledV1075:false,arenaRapGesturesEnabledV1076:false,arenaDuetPerformanceEnabledV1077:false,arenaNaturalDanceEnabledV1078:false,arenaLiveArtistEnabledV1079:false,arenaDynamicArchitectureEnabledV1082:false,arenaAdvancedLedEnabledV1083:false,arenaFestivalFxEnabledV1084:false,arenaProjectionEnabledV1085:false,arenaEpicTransformationEnabledV1086:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

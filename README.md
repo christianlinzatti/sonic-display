@@ -1,3 +1,7 @@
+## V1086 · Epic Stage Transformation 4.0
+
+Im Arena Show Designer lassen sich eine gemeinsame optische Bühnenregie, Intensität und die Modi Automatisch, Cinematic, Festival oder Minimal aktivieren. Die Regie koordiniert ausschließlich separat aktivierte Systeme, respektiert die manuelle Musterauswahl und dimmt innerhalb der vorhandenen Grenzen.
+
 ## V1085 · 360° Projection Mapping
 
 Enable **Arena Show Designer → V1085 360° Projection Mapping** to project virtual
