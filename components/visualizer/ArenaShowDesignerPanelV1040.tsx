@@ -72,6 +72,25 @@ export function ArenaShowDesignerPanelV1040(){
     keine erfundenen Beats oder Stroboblitze; bei Pause, reduzierter Bewegung oder niedrigem
     Grafikprofil wird die zusätzliche Regie deaktiviert.</small>
   </fieldset>
+  <fieldset className="arena-v1049-live-concert" aria-label="V1049 Live Concert Intelligence">
+   <legend>V1049 · Live Concert Intelligence Engine</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaLiveConcertEnabledV1049)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaLiveConcertEnabledV1049:e.target.checked})}/>
+    Konzertlicht an tatsächlich gemessene Musikenergie anpassen</label>
+   <label>Live-Dynamik: {preferences.arenaLiveConcertStrengthV1049??50}%
+    <input type="range" min="0" max="70" step="5"
+     disabled={!plan||!preferences.arenaLiveConcertEnabledV1049}
+     value={preferences.arenaLiveConcertStrengthV1049??50}
+     onChange={e=>updatePreferences({arenaLiveConcertStrengthV1049:Number(e.target.value)})}/>
+   </label>
+   <small>Benötigt einen aktivierten, funktionierenden Mikrofoneingang. Erkannte
+    Energieanstiege, Abklingen und verlässlich bestätigte Beats beeinflussen die
+    vorhandenen Bühnen- und optionalen Govee-Akzente. Ohne frisches Live-Signal bleibt
+    der Showplan unverändert. Die Funktion erhöht niemals die eingestellte
+    Helligkeit, erfindet keine Drops und startet keine zusätzlichen Gerätebefehle.
+    Manuelle Kamera- und Choreografieentscheidungen behalten Vorrang.</small>
+  </fieldset>
   <fieldset className="arena-v1041-choreography" aria-label="V1041 intelligente Avatar-Choreografie">
    <legend>V1041 · Intelligent Avatar Choreography Director</legend>
    <label className="setting-check"><input type="checkbox"
@@ -226,7 +245,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

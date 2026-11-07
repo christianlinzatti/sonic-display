@@ -68,6 +68,7 @@ import {planArenaCinematicFinaleV1046} from '@/lib/arena360CinematicFinaleV1046'
 import {planArenaImmersiveCameraV1047} from '@/lib/arena360ImmersiveArenaV1047';
 import {sampleArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
 import {directArenaShowV1048} from '@/lib/arena360ConcertDirectorV1048';
+import {directLiveConcertV1049} from '@/lib/arena360LiveConcertIntelligenceV1049';
 import {planArenaShowCameraV1043} from "@/lib/arena360ShowCameraV1043";
 import {planArenaChoreographyV1041} from '@/lib/arena360ChoreographyV1041';
 import { GroupDancersV326 } from './GroupDancersV326SceneV492';
@@ -291,13 +292,18 @@ export function ThreeAvatar(props: VisualizerProps) {
     reducedMotion:props.reducedMotion,progressMs:props.cameraDirectorProgressMs,
     durationMs:props.track?.durationMs,observedSection:props.cameraDirectorSection,
   });
-  const showCueV1041=directArenaShowV1048({enabled:props.arenaConcertDirectorEnabledV1048===true&&
+  const arrangedShowV1048=directArenaShowV1048({enabled:props.arenaConcertDirectorEnabledV1048===true&&
     props.arenaShowDesignerEnabledV1040===true,stageIsArena:props.stageTheme==='arena360',
     playing:props.isPlaying,reducedMotion:props.reducedMotion,reactive:props.stageReactive??true,
     show:authoredShowCueV1040,plan:props.arenaShowPlanV1040,
     trackId:props.track?.id,progressMs:props.cameraDirectorProgressMs,
     durationMs:props.track?.durationMs,strength:props.arenaConcertDirectorStrengthV1048??50,
     performanceTier:getActivePerformanceTier()}).show;
+  const showCueV1041=directLiveConcertV1049({enabled:props.arenaLiveConcertEnabledV1049===true&&
+    props.arenaShowDesignerEnabledV1040===true,stageIsArena:props.stageTheme==='arena360',
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,reactive:props.stageReactive??true,
+    show:arrangedShowV1048,audio:props.audio,microphoneActive:props.microphoneActiveV1049===true,
+    strength:props.arenaLiveConcertStrengthV1049??50,performanceTier:getActivePerformanceTier()}).show;
   // V1043: optional show-shot request only. Both existing directors retain camera authority.
   const arenaCameraV1043=planArenaShowCameraV1043({
     enabled:props.arenaShowCameraEnabledV1043===true&&(props.arenaCameraEnabledV1032??true),
@@ -661,6 +667,9 @@ export function ThreeAvatar(props: VisualizerProps) {
         immersiveStrength={props.arenaImmersiveStrengthV1047 ?? 55}
         concertDirectorEnabled={props.arenaConcertDirectorEnabledV1048 ?? false}
         concertDirectorStrength={props.arenaConcertDirectorStrengthV1048 ?? 50}
+        liveConcertEnabledV1049={props.arenaLiveConcertEnabledV1049 ?? false}
+        liveConcertStrengthV1049={props.arenaLiveConcertStrengthV1049 ?? 50}
+        microphoneActiveV1049={props.microphoneActiveV1049 ?? false}
         trackId={props.track?.id}
         genre={props.genre}
         progressMs={props.cameraDirectorProgressMs ?? 0} durationMs={props.track?.durationMs ?? 0}

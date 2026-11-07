@@ -27,6 +27,7 @@ import {ArenaLaserTunnelsV1039} from './ArenaLaserTunnelsV1039';
 import type {HologramPatternV1039} from '@/lib/arena360HolographyV1039';
 import {sampleArenaShowPlanV1040,type ArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
 import {directArenaShowV1048} from '@/lib/arena360ConcertDirectorV1048';
+import {directLiveConcertV1049} from '@/lib/arena360LiveConcertIntelligenceV1049';
 import {planArenaCinematicFinaleV1046} from '@/lib/arena360CinematicFinaleV1046';
 import {ArenaCinematicFinaleV1046} from './ArenaCinematicFinaleV1046';
 import {planArenaImmersionV1047} from '@/lib/arena360ImmersiveArenaV1047';
@@ -56,7 +57,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   showDesignerEnabled=false,showPlan,audienceDirectorEnabled=false,audienceDirectorStrength=50,
   atmosphereDirectorEnabled=false,atmosphereDirectorStrength=55,
   cinematicFinaleEnabled=false,cinematicFinaleStrength=60,
-  immersiveEnabled=false,immersiveStrength=55,concertDirectorEnabled=false,concertDirectorStrength=50,trackId,genre}: {
+  immersiveEnabled=false,immersiveStrength=55,concertDirectorEnabled=false,concertDirectorStrength=50,
+  liveConcertEnabledV1049=false,liveConcertStrengthV1049=50,microphoneActiveV1049=false,trackId,genre}: {
   children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
   reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
   audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
@@ -72,7 +74,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   audienceDirectorEnabled?:boolean;audienceDirectorStrength?:number;
   atmosphereDirectorEnabled?:boolean;atmosphereDirectorStrength?:number;
   cinematicFinaleEnabled?:boolean;cinematicFinaleStrength?:number;
-  immersiveEnabled?:boolean;immersiveStrength?:number;concertDirectorEnabled?:boolean;concertDirectorStrength?:number;trackId?:string|null;genre?:string|null;
+  immersiveEnabled?:boolean;immersiveStrength?:number;concertDirectorEnabled?:boolean;concertDirectorStrength?:number;
+  liveConcertEnabledV1049?:boolean;liveConcertStrengthV1049?:number;microphoneActiveV1049?:boolean;trackId?:string|null;genre?:string|null;
 }){
   const turntable=useRef<Group>(null);
   const scenicTier=useRef<Group>(null);
@@ -89,9 +92,13 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   const authoredShowCueV1040=sampleArenaShowPlanV1040(showPlan,{enabled:showDesignerEnabled&&showDirectorEnabled,
     playing:isPlaying,reducedMotion,progressMs,durationMs,observedSection:section});
   // V1048: a single reproducible song-specific cue feeds all EXISTING 360° systems.
-  const showCueV1040=directArenaShowV1048({enabled:concertDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,
+  const arrangedShowV1048=directArenaShowV1048({enabled:concertDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,
     stageIsArena:true,playing:isPlaying,reducedMotion,reactive,show:authoredShowCueV1040,
     plan:showPlan,trackId,progressMs,durationMs,strength:concertDirectorStrength,
+    performanceTier:getActivePerformanceTier()}).show;
+  const showCueV1040=directLiveConcertV1049({enabled:liveConcertEnabledV1049&&showDesignerEnabled&&showDirectorEnabled,
+    stageIsArena:true,playing:isPlaying,reducedMotion,reactive,show:arrangedShowV1048,audio,
+    microphoneActive:microphoneActiveV1049,strength:liveConcertStrengthV1049,
     performanceTier:getActivePerformanceTier()}).show;
   const audienceCueV1044=planArenaAudienceV1044({
     enabled:audienceDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,show:showCueV1040,

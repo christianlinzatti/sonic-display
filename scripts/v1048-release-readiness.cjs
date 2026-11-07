@@ -11,7 +11,8 @@ function inspectReleaseV1048(root){
   add('version',v>=1048&&p.sonicRoadmapRelease==='v'+v&&p.sonicFeatureRelease==='v'+v);
   add('lock',p.version===l.version&&p.version===l.packages?.['']?.version);
   add('node24',p.engines?.node==='24.x');
-  add('prebuild',p.scripts.prebuild.startsWith('npm run test:v1048 && npm run test:v1048:types && npm run test:v1047'));
+  add('prebuild',p.scripts.prebuild.startsWith('npm run test:v1048 && npm run test:v1048:types && npm run test:v1047')||
+   (v>1048&&p.scripts.prebuild.includes('&& npm run test:v1048 && npm run test:v1048:types && npm run test:v1047')));
   add('scripts',p.scripts['test:v1048']==='node tests/v1048-nextgen-concert-director-regression.cjs'&&
    p.scripts['test:v1048:types']==='tsc -p tests/tsconfig.v1048-core.json --noEmit');
   for(const f of ['lib/arena360ConcertDirectorV1048.ts',
@@ -21,7 +22,9 @@ function inspectReleaseV1048(root){
    'context/UiPreferencesContext.tsx','types/music.ts',
    'tests/v1048-nextgen-concert-director-regression.cjs', 'tests/tsconfig.v1048-core.json',
    'changelog/V1048-NEXT-GENERATION-CONCERT-DIRECTOR.md',
-   '.github/workflows/v1048-nextgen-concert-validation.yml'])add('file:'+f,exists(f));
+   '.github/workflows/v1048-nextgen-concert-validation.yml'])add('file:'+f,exists(f)||
+     (v>1048&&f==='.github/workflows/v1048-nextgen-concert-validation.yml'&&
+      read('scripts/v931-production-gate.cjs').includes('tests/v1048-nextgen-concert-director-regression.cjs')));
   add('opt-in',read('context/UiPreferencesContext.tsx').includes('arenaConcertDirectorEnabledV1048:false'));
   add('all-clients',['components/visualizer/stages/Arena360StageV1031.tsx',
    'components/visualizer/ThreeAvatar.tsx','components/GoveeMusicSyncV909.tsx'].every(f=>read(f).includes('directArenaShowV1048')));

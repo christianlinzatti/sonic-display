@@ -4,6 +4,7 @@ import {useMusic} from '@/context/MusicContext';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
 import {sampleArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
 import {directArenaShowV1048} from '@/lib/arena360ConcertDirectorV1048';
+import {directLiveConcertV1049} from '@/lib/arena360LiveConcertIntelligenceV1049';
 import {planGoveeShowV1042,applyGoveeShowV1042} from '@/lib/goveeShowSyncV1042';
 import {useAudioAnalysis} from '@/context/AudioAnalysisContext';
 import {GOVEE_CONFIG_EVENT_V909,GOVEE_CONFIG_KEY_V909,loadGoveeConfigV909,goveeBridgeRequestV909,planGoveeLookV909,
@@ -58,6 +59,8 @@ export function GoveeMusicSyncV909(){
  const goveeShowStrengthV1042=preferences.goveeShowSyncStrengthV1042??45;
  const concertDirectorEnabledV1048=preferences.arenaConcertDirectorEnabledV1048===true;
  const concertDirectorStrengthV1048=preferences.arenaConcertDirectorStrengthV1048??50;
+ const liveConcertEnabledV1049=preferences.arenaLiveConcertEnabledV1049===true;
+ const liveConcertStrengthV1049=preferences.arenaLiveConcertStrengthV1049??50;
  const arenaShowEnabledV1040=preferences.arenaShowDesignerEnabledV1040===true;
  const arenaShowPlanV1040=preferences.arenaShowPlanV1040;
  const showStageIsArenaV1042=preferences.stageTheme==='arena360';
@@ -317,12 +320,19 @@ export function GoveeMusicSyncV909(){
      playing:state.isPlaying,reducedMotion:reducedMotionV1042,
      progressMs:progress,durationMs:state.track.durationMs,
      observedSection:phase.verified?phase.phase:null});
-    const authoredGoveeShowV1042=directArenaShowV1048({
+    const arrangedGoveeShowV1048=directArenaShowV1048({
       enabled:concertDirectorEnabledV1048&&arenaShowEnabledV1040&&goveeShowEnabledV1042,
       stageIsArena:showStageIsArenaV1042,playing:state.isPlaying,
       reducedMotion:reducedMotionV1042,show:baseGoveeShowV1040,
       plan:arenaShowPlanV1040,trackId:state.track.id,progressMs:progress,
       durationMs:state.track.durationMs,strength:concertDirectorStrengthV1048}).show;
+    // V1049 only attenuates the existing optional Govee cue, using fresh microphone data.
+    const authoredGoveeShowV1042=directLiveConcertV1049({
+      enabled:liveConcertEnabledV1049&&goveeShowEnabledV1042&&arenaShowEnabledV1040,
+      stageIsArena:showStageIsArenaV1042,playing:state.isPlaying,
+      microphoneActive:state.microphoneActive,reducedMotion:reducedMotionV1042,
+      show:arrangedGoveeShowV1048,audio:state.metrics,strength:liveConcertStrengthV1049,
+      sampleAgeMs:now-state.observedAt}).show;
     const sectionDecision=config.directorEnabledV911?planGoveeSectionV919(analysis.current,state.track.id,progress,sectionSettings):null;
     const genreDecision=sectionDecision?planGoveeGenreV920(analysis.current,state.track.id,progress,state.genre,sectionDecision,genreSettings):null;
     const energyDecision=sectionDecision?planGoveeEnergyV924(analysis.current,state.track.id,progress,state.genre,sectionDecision,energySettings):null;
@@ -618,6 +628,6 @@ export function GoveeMusicSyncV909(){
    :bassSettings.enabled||shockSettings.enabled?window.setInterval(()=>void tick(),900)
    :neonBassEnabled?window.setInterval(()=>void tick(),900):window.setInterval(()=>void tick(),1700);
   return()=>{cancelled=true;window.clearInterval(interval);window.clearInterval(sampler);};
- },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings,syncSettingsV1027,goveeShowEnabledV1042,goveeShowStrengthV1042,concertDirectorEnabledV1048,concertDirectorStrengthV1048,arenaShowEnabledV1040,arenaShowPlanV1040,showStageIsArenaV1042,reducedMotionV1042]);
+ },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings,syncSettingsV1027,goveeShowEnabledV1042,goveeShowStrengthV1042,concertDirectorEnabledV1048,concertDirectorStrengthV1048,liveConcertEnabledV1049,liveConcertStrengthV1049,arenaShowEnabledV1040,arenaShowPlanV1040,showStageIsArenaV1042,reducedMotionV1042]);
  return null;
 }

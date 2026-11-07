@@ -1,3 +1,30 @@
+## V1049 · Live Concert Intelligence Engine
+
+Die optionale Live-Regie koppelt die bestehende V1040/V1048-Konzertshow an
+**tatsächlich gemessene Mikrofonwerte**: Energie, Attack/Decay und qualifiziert
+bestätigte Beats. Auf- und Abbau musikalischer Energie verändern ausschließlich
+die bestehende Intensität innerhalb des vom Nutzer festgelegten Grenzwerts.
+Keine automatische Abschnittserkennung, kein Cloud-KI-Aufruf, keine neuen GPU-Objekte,
+keine zusätzlichen Govee-Netzwerkbefehle oder stroboskopischen Vollblitze.
+
+**Einschalten:** Einstellungen → Display → AI Show Designer →
+V1049 Live Concert Intelligence Engine. Erst einen Showplan erzeugen und aktivieren,
+danach Mikrofonzugriff separat erlauben. Bei deaktiviertem/fehlendem Mikrofon,
+Pause, reduzierter Bewegung oder niedrigem Performance-Profil bleibt V1048
+unverändert. Govee benötigt zusätzlich die bisherige V1042-/LAN-Freigabe.
+
+**GitHub-Import:** Neue `.github/workflows`-Dateien im ZIP werden vom vorhandenen
+Importer bewusst geschützt/nicht übernommen. Die V1049-Tests sind deshalb
+zusätzlich im bestehenden Vercel-Build und Production-Gate registriert.
+Für einen neuen eigenständigen Actions-Workflow ist eine separate, berechtigte
+GitHub-Änderung erforderlich.
+
+**Prüfen:** `npm run verify:v1049:focused`,
+`node scripts/v959-source-preflight.cjs`. Der vollständige `npm run build:next`
+benötigt installierte npm-Abhängigkeiten.
+
+---
+
 ## V1048 · Next Generation Concert Director
 
 Die optionale V1048-Regie macht die lokale 360°-Konzertshow pro Song einzigartiger:

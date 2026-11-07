@@ -1,3 +1,23 @@
+## V1049 · Live Concert Intelligence Engine
+
+`lib/arena360LiveConcertIntelligenceV1049.ts` ist eine reine Funktion ohne Timer,
+Netzwerk, Zustand oder zufällige Effekte. Die UI verwendet die gemessenen
+`AudioFeatures` aus `AudioAnalysisContext`; Govee bekommt zusätzlich das Alter
+seiner Messung und verwirft sie nach 450 ms. Nur `microphoneActive` legitimiert
+Live-Effekte, Beat-Kriterien erfordern gleichzeitig `beat`, `phaseLocked`,
+`phaseConfidence >= .55`, `beatStrength >= .55` und Beat-Akzent.
+
+Die Regie verändert ausschließlich die Intensität eines autorisierten V1040-/V1048-
+Cues (nie höher als vorher); alle benutzerdefinierten Deck-/Laser-/Kamera-/Tanzwerte
+bleiben erhalten. `GoveeMusicSyncV909` wendet weiterhin V1042 mit Verifikation,
+Gerätefreigabe, Gruppenlimit und manuellen Prioritäten an; kein zusätzlicher Polling
+und kein zusätzliches Senden. V1049 erkennt keine verifizierten Songabschnitte.
+
+Tests: `tests/v1049-live-concert-intelligence-regression.cjs`,
+`tests/tsconfig.v1049-core.json`, `scripts/v1049-release-readiness.cjs`.
+
+---
+
 ## V1048 · Next Generation Concert Director
 
 `lib/arena360ConcertDirectorV1048.ts` arrangiert den bereits vorhandenen V1040-Showplan
@@ -1438,7 +1458,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1048
+**Dokumentationsstand:** V1049
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

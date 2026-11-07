@@ -166,3 +166,8 @@ if(!v1031.passed)process.exitCode=1;
 const v1030=inspectReleaseV1030(root);
 for(const c of v1030.checks)console.log(`${c.ok?'PASS':'FAIL'} V1030 ${c.name}`);
 if(!v1030.passed)process.exitCode=1;
+
+const {inspectReleaseV1049}=require('./v1049-release-readiness.cjs');
+const v1049=inspectReleaseV1049(root);
+for(const c of v1049.checks)console.log((c.ok?'PASS':'FAIL')+' V1049 '+c.name);
+if(!v1049.passed)process.exitCode=1;
