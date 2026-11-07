@@ -161,6 +161,18 @@ export interface VisualizerProps {
   arenaLiveConcertEnabledV1049?:boolean;
   arenaLiveConcertStrengthV1049?:number;
   microphoneActiveV1049?:boolean;
+  arenaStorytellingEnabledV1050?:boolean;
+  arenaStorytellingStrengthV1050?:number;
+  arenaCrowdExperienceEnabledV1051?:boolean;
+  arenaCrowdExperienceStrengthV1051?:number;
+  arenaUltimateConcertEnabledV1052?:boolean;
+  arenaUltimateConcertStrengthV1052?:number;
+  arenaCinematicCameraEnabledV1053?:boolean;
+  arenaCinematicCameraStrengthV1053?:number;
+  arenaAvatarPerformanceEnabledV1054?:boolean;
+  arenaAvatarPerformanceStrengthV1054?:number;
+  arenaStageInteractionEnabledV1055?:boolean;
+  arenaStageInteractionStrengthV1055?:number;
   dancePostEnabledV468?: boolean;
   shaderEnvironmentV468?: import('./ProceduralShaderEnvironmentV468').ShaderEnvironmentModeV468;
   wardrobeModeV468?: import('./avatarWardrobeV468').WardrobeModeV468;
