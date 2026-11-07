@@ -10,6 +10,13 @@ for (const report of ['v959-build-proof.json', 'v959-build-summary.md', 'v931-pr
   const output = path.join(root, 'reports', report);
   if (fs.existsSync(output)) fs.unlinkSync(output);
 }
+// The ZIP importer deliberately preserves trusted GitHub workflows. Their run-name
+// defaults may therefore lag behind package.json. Normalize only the local
+// checkout before evaluating historical release-readiness assertions; no commit
+// or workflow permission is required. The version comes from checked-in metadata.
+const { formatActionTitlesV1016 } = require('./version-action-titles-v1016.cjs');
+const actionTitles = formatActionTitlesV1016(root, true);
+console.log(`CI checkout: synchronized ${actionTitles.changed} protected workflow titles to ${actionTitles.release}`);
 const report = inspect(root, { requireDependencies: false });
 const {inspectReleaseV1013}=require('./v1013-release-readiness.cjs');
 const release=inspectReleaseV1013(root);
