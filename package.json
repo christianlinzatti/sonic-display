@@ -2167,7 +2167,7 @@
     "test:v1042:types": "tsc -p tests/tsconfig.v1042-core.json --noEmit",
     "test:v1043": "node tests/v1043-show-camera-regression.cjs",
     "test:v1043:types": "tsc -p tests/tsconfig.v1043-core.json --noEmit",
-    "test:v1044": "node tests/v1044-concert-transitions-regression.cjs",
+    "test:v1044": "node tests/v1044-audience-orchestra-regression.cjs",
     "test:v1044:types": "tsc -p tests/tsconfig.v1044-core.json --noEmit"
   },
   "engines": {

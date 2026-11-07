@@ -25,8 +25,8 @@ import type {FloatingStageModeV1038} from '@/lib/arena360FloatingStageV1038';
 import {ArenaHologramPortalsV1039} from './ArenaHologramPortalsV1039';
 import {ArenaLaserTunnelsV1039} from './ArenaLaserTunnelsV1039';
 import type {HologramPatternV1039} from '@/lib/arena360HolographyV1039';
-import {planArenaTransitionsV1044,applyArenaTransitionV1044} from '@/lib/arena360TransitionsV1044';
 import {sampleArenaShowPlanV1040,type ArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
+import {planArenaAudienceV1044} from '@/lib/arena360AudienceDirectorV1044';
 import {INITIAL_ARENA_LIFT_V1034,stepArenaLiftV1034} from "@/lib/arena360ShowV1034";
 import type {ArenaPhoneModeV1033} from "@/lib/arena360ImmersionV1033";
 
@@ -47,7 +47,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   transformingDeckEnabled=true,transformingDeckMode='auto',transformingDeckStrength=70,
   floatingStageEnabled=true,floatingStageMode='auto',floatingStageIntensity=70,
   hologramsEnabled=true,laserArchitectureEnabled=true,hologramPattern='auto',hologramStrength=65,
-  showDesignerEnabled=false,showPlan,arenaTransitionsEnabledV1044=false,arenaTransitionsStrengthV1044=60,genre}: {
+  showDesignerEnabled=false,showPlan,audienceDirectorEnabled=false,audienceDirectorStrength=50,trackId,genre}: {
   children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
   reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
   audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
@@ -60,7 +60,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   floatingStageEnabled?:boolean;floatingStageMode?:FloatingStageModeV1038;floatingStageIntensity?:number;
   hologramsEnabled?:boolean;laserArchitectureEnabled?:boolean;hologramPattern?:HologramPatternV1039;
   hologramStrength?:number;showDesignerEnabled?:boolean;showPlan?:ArenaShowPlanV1040;
-  arenaTransitionsEnabledV1044?:boolean;arenaTransitionsStrengthV1044?:number;genre?:string|null;
+  audienceDirectorEnabled?:boolean;audienceDirectorStrength?:number;trackId?:string|null;genre?:string|null;
 }){
   const turntable=useRef<Group>(null);
   const scenicTier=useRef<Group>(null);
@@ -74,14 +74,14 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   const speed=normalizedArenaSpeedV1031(rotationSpeed);
   // Authored templates steer visuals only when explicitly enabled. The observed section
   // still owns the real audio/pyro triggers; manual modes and disabled effects win.
-  const sampledShowV1040=sampleArenaShowPlanV1040(showPlan,{enabled:showDesignerEnabled&&showDirectorEnabled,
+  const showCueV1040=sampleArenaShowPlanV1040(showPlan,{enabled:showDesignerEnabled&&showDirectorEnabled,
     playing:isPlaying,reducedMotion,progressMs,durationMs,observedSection:section});
-  const transitionV1044=planArenaTransitionsV1044({
-    enabled:arenaTransitionsEnabledV1044&&showDesignerEnabled,
-    playing:isPlaying,reducedMotion,stageIsArena:true,plan:showPlan,
-    progressMs,durationMs,strength:arenaTransitionsStrengthV1044,
+  const audienceCueV1044=planArenaAudienceV1044({
+    enabled:audienceDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,show:showCueV1040,
+    stageIsArena:true,playing:isPlaying,reducedMotion,phoneEnabled:phoneSyncEnabled&&audienceEnabled,
+    phoneMode,performanceTier:getActivePerformanceTier(),trackId,progressMs,strength:audienceDirectorStrength,
+    genre:showCueV1040.active&&showPlan?showPlan.genre:genre,
   });
-  const showCueV1040=applyArenaTransitionV1044(sampledShowV1040,transitionV1044,'stage');
   const plannedIntensity=showCueV1040.active?Math.min(showIntensity,showCueV1040.intensity):showIntensity;
   const plannedDeck=showCueV1040.active&&transformingDeckMode==='auto'?showCueV1040.deck:transformingDeckMode;
   const plannedFloat=showCueV1040.active&&floatingStageMode==='auto'?showCueV1040.floating:floatingStageMode;
@@ -182,7 +182,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaAudienceV1032 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={audienceEnabled} reactive={reactive}
       wavesEnabled={wavesEnabled} phoneSyncEnabled={phoneSyncEnabled} phoneMode={phoneMode}
       hookCueEnabled={crowdChantEnabled} progressMs={progressMs} durationMs={durationMs}
-      fullSongDirectorEnabled={fullSongDirectorEnabled&&showDirectorEnabled} showIntensity={showIntensity} section={section}/>
+      fullSongDirectorEnabled={fullSongDirectorEnabled&&showDirectorEnabled} showIntensity={showIntensity} section={section}
+      audienceCueV1044={audienceCueV1044}/>
     <ArenaLedDomeV1033 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={domeEnabled} reactive={reactive}/>
     <ArenaSkyFormationV1034 audio={audio} section={section} playing={isPlaying} reducedMotion={reducedMotion}
       enabled={skyFormationEnabled} directorEnabled={showDirectorEnabled} reactive={reactive}

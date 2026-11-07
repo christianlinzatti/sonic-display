@@ -1,3 +1,7 @@
+## V1044 · Audience Light Orchestra
+
+Jetzt bekommt die 360°-Arena eine zusätzliche, optional aktivierbare Publikums-Lichtshow. Die virtuellen Handylichter erzeugen sechs ruhige, showphasenabhängige Muster (Intro, Verse, Aufbau, Hook, Zwischenspiel, Finale) mit Genre-Farbpaletten. Unter **Einstellungen → Display → AI Show Designer** einen Showplan erzeugen/aktivieren und **Audience Light Orchestra** einschalten. Verwendet nur die bestehenden virtuellen Publikumslichter – keine zusätzlichen Leuchten oder Govee-Kommandos. Bei Pause, Reduced Motion, niedriger Grafikstufe oder manuellen Handylichtmodi bleibt die bisherige Darstellung erhalten. Details: `changelog/V1044-AUDIENCE-LIGHT-ORCHESTRA.md`.
+
 ## V1043 · Intelligent Show Camera Director
 
 Der editierbare V1040-Showplan kann nun optional und ohne externe KI die bestehende 360°-Kameraregie mit Totalen, Orbit, Lead- und Gruppenperspektiven ergänzen. Die Kamera-Option ist separat deaktiviert, bis sie unter Einstellungen → Display → 360° Arena eingeschaltet wird. Manuelle Kamerapresets, Sänger- und Lyrics-Szenen sowie `Reduced Motion` behalten Vorrang. Siehe `changelog/V1043-INTELLIGENT-SHOW-CAMERA-DIRECTOR.md`.
@@ -2856,5 +2860,3 @@ Siehe `changelog/V1040-AI-SHOW-DESIGNER.md`. Der lokale, regelbasierte Showdesig
 ## V1042 – Intelligent Govee Concert Integration
 
 Der V1040-Showplan kann jetzt optional in der bestehenden Govee-LAN-Autosync-Schleife bis zu vier zugeordnete Leuchten mit dezenten Genre- und Songabschnittsfarben begleiten. Manuelle Regie, Helligkeitsobergrenzen und Vorhandensein der lokalen Bridge bleiben zwingend. Siehe `changelog/V1042-INTELLIGENT-GOVEE-CONCERT-INTEGRATION.md`.
-
-V1044: Optional concert-scene transitions with one playback timeline, existing camera/avatars/arena/Govee show overlays, and default-off safety. See changelog/V1044-INTELLIGENT-CONCERT-TRANSITIONS.md.

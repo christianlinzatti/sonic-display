@@ -47,8 +47,8 @@ export interface UiPreferences {
   arenaChoreographyFormationV1041?: import('@/lib/arena360ChoreographyV1041').ArenaChoreoFormationV1041;
   arenaShowCameraEnabledV1043?: boolean;
   arenaShowCameraStrengthV1043?: number;
-  arenaTransitionsEnabledV1044?: boolean;
-  arenaTransitionsStrengthV1044?: number;
+  arenaAudienceDirectorEnabledV1044?: boolean;
+  arenaAudienceDirectorStrengthV1044?: number;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;

@@ -65,7 +65,6 @@ import {planIntelligentConcertTransitionV849} from "./intelligentConcertTransiti
 import { RaspberryPiProfileBootstrap } from "./RaspberryPiEdition";
 import { Dancer, DuoDirectorTick, FormationDancers, IntelligentChoreographyTickV312, MultiAvatarDirectorTick } from './DanceFormationActorsV492';
 import {sampleArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
-import {planArenaTransitionsV1044,applyArenaTransitionV1044} from '@/lib/arena360TransitionsV1044';
 import {planArenaShowCameraV1043} from "@/lib/arena360ShowCameraV1043";
 import {planArenaChoreographyV1041} from '@/lib/arena360ChoreographyV1041';
 import { GroupDancersV326 } from './GroupDancersV326SceneV492';
@@ -289,20 +288,10 @@ export function ThreeAvatar(props: VisualizerProps) {
     reducedMotion:props.reducedMotion,progressMs:props.cameraDirectorProgressMs,
     durationMs:props.track?.durationMs,observedSection:props.cameraDirectorSection,
   });
-  const transitionV1044=planArenaTransitionsV1044({
-    enabled:props.arenaTransitionsEnabledV1044===true &&
-      props.arenaShowDesignerEnabledV1040===true,
-    playing:props.isPlaying,reducedMotion:props.reducedMotion,
-    stageIsArena:props.stageTheme==='arena360',plan:props.arenaShowPlanV1040,
-    progressMs:props.cameraDirectorProgressMs,durationMs:props.track?.durationMs,
-    strength:props.arenaTransitionsStrengthV1044??60,
-  });
-  const showCameraV1044=applyArenaTransitionV1044(showCueV1041,transitionV1044,'camera');
-  const showDanceV1044=applyArenaTransitionV1044(showCueV1041,transitionV1044,'dance');
   // V1043: optional show-shot request only. Both existing directors retain camera authority.
   const arenaCameraV1043=planArenaShowCameraV1043({
     enabled:props.arenaShowCameraEnabledV1043===true&&(props.arenaCameraEnabledV1032??true),
-    stageIsArena:props.stageTheme==='arena360',show:showCameraV1044,
+    stageIsArena:props.stageTheme==='arena360',show:showCueV1041,
     playing:props.isPlaying,reducedMotion:props.reducedMotion,
     manualPriority:props.cameraNarrativeV605?.manualCamera===true||
       props.lipSync?.cameraManualStagePriorityV377===true,
@@ -310,7 +299,7 @@ export function ThreeAvatar(props: VisualizerProps) {
     strength:props.arenaShowCameraStrengthV1043??45,
   });
   const arenaChoreoV1041=planArenaChoreographyV1041({
-    enabled:props.arenaChoreographyEnabledV1041===true,show:showDanceV1044,
+    enabled:props.arenaChoreographyEnabledV1041===true,show:showCueV1041,
     playing:props.isPlaying,reducedMotion:props.reducedMotion,
     trackId:props.track?.id,progressMs:props.cameraDirectorProgressMs,
     genre:props.genre,stageIsArena:props.stageTheme==='arena360',
@@ -626,8 +615,9 @@ export function ThreeAvatar(props: VisualizerProps) {
         hologramStrength={props.arenaHologramStrengthV1039 ?? 65}
         showDesignerEnabled={props.arenaShowDesignerEnabledV1040 ?? false}
         showPlan={props.arenaShowPlanV1040}
-        arenaTransitionsEnabledV1044={props.arenaTransitionsEnabledV1044 ?? false}
-        arenaTransitionsStrengthV1044={props.arenaTransitionsStrengthV1044 ?? 60}
+        audienceDirectorEnabled={props.arenaAudienceDirectorEnabledV1044 ?? false}
+        audienceDirectorStrength={props.arenaAudienceDirectorStrengthV1044 ?? 50}
+        trackId={props.track?.id}
         genre={props.genre}
         progressMs={props.cameraDirectorProgressMs ?? 0} durationMs={props.track?.durationMs ?? 0}
         section={props.cameraDirectorSection ?? "verse"}>

@@ -1,5 +1,10 @@
 # V1040 · AI Show Designer (aufbauend auf V1039)
 
+
+## V1044 · Audience Light Orchestra
+
+Die reine, lokal ausführbare Planungsfunktion `lib/arena360AudienceDirectorV1044.ts` interpretiert den ausdrücklich aktiven V1040-Showplan als Vorschlag für virtuelle Handylichtmuster im Publikum. `components/visualizer/stages/Arena360StageV1031.tsx` prüft Playstatus, Songposition, Grafikstufe, Reduced Motion und manuelle Handylichtmodi, bevor die neue Cue in `components/visualizer/stages/ArenaAudienceV1032.tsx` einfließt. Die vorhandene InstancedMesh-Gruppe und deren Render-Loop bleiben Eigentümer der Animation. Die Steuerung kommt aus `components/visualizer/ArenaShowDesignerPanelV1040.tsx`, neue Typen aus `types/music.ts`. Kein Zugriff auf echte Govee-Lampen, keine neuen Timer oder zusätzlichen WebGL-Lichter. Getestet mit `tests/v1044-audience-orchestra-regression.cjs`.
+
 # V1038 · Floating Stage (aufbauend auf V1037)
 
 ## Implementiert
@@ -4272,5 +4277,3 @@ Der V1040-Showplan kann jetzt optional in der bestehenden Govee-LAN-Autosync-Sch
 ## V1043 – Intelligent Show Camera Director
 
 `lib/arena360ShowCameraV1043.ts` plant opt-in-Kameraakzente aus dem lokal generierten V1040-Showplan. Die vorhandenen `StageCameraDirectorV289` und `SmartStageCameraV236` bleiben alleinige Besitzer der Kameraposition. Nach manuellen Presets, Lyrics-, Gesangs-, Duett- und Timeline-Aufnahmen wird nicht eingegriffen. `Reduced Motion`, Pause, unklare Trackposition, fehlender Showplan oder nicht gewählte Arena deaktivieren die Wirkung. Die vier Vorgaben sind Totale, Orbit, Lead und Gruppenaufnahme; Kamerafahrten sind begrenzt und weich geglättet. Keine externen KI-Aufrufe, keine zweite Camera, kein eigener Timer.
-
-V1044 follows V1040/V1041/V1042/V1043: a bounded deterministic scene-boundary envelope only attenuates opted-in overlays; no second camera, dancer mixer, light bridge or playback clock is created.

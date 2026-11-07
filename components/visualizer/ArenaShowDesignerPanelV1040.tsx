@@ -90,22 +90,23 @@ export function ArenaShowDesignerPanelV1040(){
     Wiederverbindungen und Gruppen-Unison behalten Vorrang. Die Showregie bleibt bei Pause,
     verdecktem Tab oder reduzierter Bewegung aus.</small>
   </fieldset>
-  <fieldset className="arena-v1044-transitions" aria-label="V1044 Intelligent Concert Transitions">
-   <legend>V1044 · Intelligent Concert Transitions</legend>
+  <fieldset className="arena-v1044-audience" aria-label="V1044 Audience Light Orchestra">
+   <legend>V1044 · Audience Light Orchestra</legend>
    <label className="setting-check"><input type="checkbox"
-    checked={Boolean(preferences.arenaTransitionsEnabledV1044)&&Boolean(plan)} disabled={!plan}
-    onChange={e=>updatePreferences({arenaTransitionsEnabledV1044:e.target.checked})}/>
-    Sanfte Szenenübergänge für Bühne, Kamera, Tänzer und Govee-Showakzente aktivieren
+    checked={Boolean(preferences.arenaAudienceDirectorEnabledV1044)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaAudienceDirectorEnabledV1044:e.target.checked})}/>
+    Das virtuelle Publikum mit Show-Mustern aus Handylichtern inszenieren
    </label>
-   <label>Übergangsintensität: {preferences.arenaTransitionsStrengthV1044??60}%
-    <input type="range" min="0" max="100" step="5"
-     value={preferences.arenaTransitionsStrengthV1044??60}
-     onChange={e=>updatePreferences({arenaTransitionsStrengthV1044:Number(e.target.value)})}/>
+   <label>Publikumslicht-Intensität: {preferences.arenaAudienceDirectorStrengthV1044??50}%
+    <input type="range" min="0" max="75" step="5"
+     value={preferences.arenaAudienceDirectorStrengthV1044??50}
+     onChange={e=>updatePreferences({arenaAudienceDirectorStrengthV1044:Number(e.target.value)})}/>
    </label>
-   <small>Nutzt die tatsächliche Songposition, keine eigenen Timer oder Kameras.
-    Nur optionale Show-Akzente werden weich überblendet; manuelle Regie,
-    bestätigte Musikphasen, Govee-Schutzlimits und Reduced Motion bleiben vorrangig.
-    Standardmäßig ausgeschaltet.</small>
+   <small>Intro: langsames Atmen · Strophe: umlaufende Lichtwelle · Aufbau: Doppelwelle ·
+    Hook: gemeinsames Leuchten · Break: Sternenlichter · Finale: Lichtkrone. Nutzt ausschließlich
+    die vorhandenen instanzierten Handylichter, keine echten Govee-Leuchten. Nur bei aktivem
+    Showplan, 360°-Bühne und Wiedergabe. Manuelle Handylichtmodi, Pause, Reduced Motion und
+    niedrige Grafikstufe bleiben vorrangig. Kein Stroboskop.</small>
   </fieldset>
   <fieldset className="arena-v1043-show-camera" aria-label="V1043 Show Camera Director">
    <legend>V1043 · Intelligent Show Camera Director</legend>
@@ -147,7 +148,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}
