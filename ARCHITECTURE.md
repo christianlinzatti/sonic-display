@@ -4272,3 +4272,5 @@ Der V1040-Showplan kann jetzt optional in der bestehenden Govee-LAN-Autosync-Sch
 ## V1043 – Intelligent Show Camera Director
 
 `lib/arena360ShowCameraV1043.ts` plant opt-in-Kameraakzente aus dem lokal generierten V1040-Showplan. Die vorhandenen `StageCameraDirectorV289` und `SmartStageCameraV236` bleiben alleinige Besitzer der Kameraposition. Nach manuellen Presets, Lyrics-, Gesangs-, Duett- und Timeline-Aufnahmen wird nicht eingegriffen. `Reduced Motion`, Pause, unklare Trackposition, fehlender Showplan oder nicht gewählte Arena deaktivieren die Wirkung. Die vier Vorgaben sind Totale, Orbit, Lead und Gruppenaufnahme; Kamerafahrten sind begrenzt und weich geglättet. Keine externen KI-Aufrufe, keine zweite Camera, kein eigener Timer.
+
+V1044 follows V1040/V1041/V1042/V1043: a bounded deterministic scene-boundary envelope only attenuates opted-in overlays; no second camera, dancer mixer, light bridge or playback clock is created.

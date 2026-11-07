@@ -25,6 +25,7 @@ import type {FloatingStageModeV1038} from '@/lib/arena360FloatingStageV1038';
 import {ArenaHologramPortalsV1039} from './ArenaHologramPortalsV1039';
 import {ArenaLaserTunnelsV1039} from './ArenaLaserTunnelsV1039';
 import type {HologramPatternV1039} from '@/lib/arena360HolographyV1039';
+import {planArenaTransitionsV1044,applyArenaTransitionV1044} from '@/lib/arena360TransitionsV1044';
 import {sampleArenaShowPlanV1040,type ArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
 import {INITIAL_ARENA_LIFT_V1034,stepArenaLiftV1034} from "@/lib/arena360ShowV1034";
 import type {ArenaPhoneModeV1033} from "@/lib/arena360ImmersionV1033";
@@ -46,7 +47,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   transformingDeckEnabled=true,transformingDeckMode='auto',transformingDeckStrength=70,
   floatingStageEnabled=true,floatingStageMode='auto',floatingStageIntensity=70,
   hologramsEnabled=true,laserArchitectureEnabled=true,hologramPattern='auto',hologramStrength=65,
-  showDesignerEnabled=false,showPlan,genre}: {
+  showDesignerEnabled=false,showPlan,arenaTransitionsEnabledV1044=false,arenaTransitionsStrengthV1044=60,genre}: {
   children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
   reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
   audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
@@ -58,7 +59,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   transformingDeckEnabled?:boolean;transformingDeckMode?:ArenaTransformationModeV1037;transformingDeckStrength?:number;
   floatingStageEnabled?:boolean;floatingStageMode?:FloatingStageModeV1038;floatingStageIntensity?:number;
   hologramsEnabled?:boolean;laserArchitectureEnabled?:boolean;hologramPattern?:HologramPatternV1039;
-  hologramStrength?:number;showDesignerEnabled?:boolean;showPlan?:ArenaShowPlanV1040;genre?:string|null;
+  hologramStrength?:number;showDesignerEnabled?:boolean;showPlan?:ArenaShowPlanV1040;
+  arenaTransitionsEnabledV1044?:boolean;arenaTransitionsStrengthV1044?:number;genre?:string|null;
 }){
   const turntable=useRef<Group>(null);
   const scenicTier=useRef<Group>(null);
@@ -72,8 +74,14 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   const speed=normalizedArenaSpeedV1031(rotationSpeed);
   // Authored templates steer visuals only when explicitly enabled. The observed section
   // still owns the real audio/pyro triggers; manual modes and disabled effects win.
-  const showCueV1040=sampleArenaShowPlanV1040(showPlan,{enabled:showDesignerEnabled&&showDirectorEnabled,
+  const sampledShowV1040=sampleArenaShowPlanV1040(showPlan,{enabled:showDesignerEnabled&&showDirectorEnabled,
     playing:isPlaying,reducedMotion,progressMs,durationMs,observedSection:section});
+  const transitionV1044=planArenaTransitionsV1044({
+    enabled:arenaTransitionsEnabledV1044&&showDesignerEnabled,
+    playing:isPlaying,reducedMotion,stageIsArena:true,plan:showPlan,
+    progressMs,durationMs,strength:arenaTransitionsStrengthV1044,
+  });
+  const showCueV1040=applyArenaTransitionV1044(sampledShowV1040,transitionV1044,'stage');
   const plannedIntensity=showCueV1040.active?Math.min(showIntensity,showCueV1040.intensity):showIntensity;
   const plannedDeck=showCueV1040.active&&transformingDeckMode==='auto'?showCueV1040.deck:transformingDeckMode;
   const plannedFloat=showCueV1040.active&&floatingStageMode==='auto'?showCueV1040.floating:floatingStageMode;

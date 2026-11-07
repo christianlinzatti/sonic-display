@@ -2856,3 +2856,5 @@ Siehe `changelog/V1040-AI-SHOW-DESIGNER.md`. Der lokale, regelbasierte Showdesig
 ## V1042 – Intelligent Govee Concert Integration
 
 Der V1040-Showplan kann jetzt optional in der bestehenden Govee-LAN-Autosync-Schleife bis zu vier zugeordnete Leuchten mit dezenten Genre- und Songabschnittsfarben begleiten. Manuelle Regie, Helligkeitsobergrenzen und Vorhandensein der lokalen Bridge bleiben zwingend. Siehe `changelog/V1042-INTELLIGENT-GOVEE-CONCERT-INTEGRATION.md`.
+
+V1044: Optional concert-scene transitions with one playback timeline, existing camera/avatars/arena/Govee show overlays, and default-off safety. See changelog/V1044-INTELLIGENT-CONCERT-TRANSITIONS.md.

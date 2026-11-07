@@ -2,6 +2,7 @@
 import {useEffect,useRef,useState} from 'react';
 import {useMusic} from '@/context/MusicContext';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
+import {planArenaTransitionsV1044,applyArenaTransitionV1044} from '@/lib/arena360TransitionsV1044';
 import {sampleArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
 import {planGoveeShowV1042,applyGoveeShowV1042} from '@/lib/goveeShowSyncV1042';
 import {useAudioAnalysis} from '@/context/AudioAnalysisContext';
@@ -53,6 +54,8 @@ export function GoveeMusicSyncV909(){
  const {track,isPlaying,genre,progressMs,fetchedAt}=useMusic();
  const {metrics,active:microphoneActive}=useAudioAnalysis();
  const {preferences}=useUiPreferences();
+ const arenaTransitionsEnabledV1044=preferences.arenaTransitionsEnabledV1044===true;
+ const arenaTransitionsStrengthV1044=preferences.arenaTransitionsStrengthV1044??60;
  const goveeShowEnabledV1042=preferences.goveeShowSyncEnabledV1042===true;
  const goveeShowStrengthV1042=preferences.goveeShowSyncStrengthV1042??45;
  const arenaShowEnabledV1040=preferences.arenaShowDesignerEnabledV1040===true;
@@ -309,11 +312,18 @@ export function GoveeMusicSyncV909(){
     const phase=resolveGoveePhaseV911(analysis.current,state.track.id,progress);
     // V1042 uses the SAME absolute Spotify timeline as the 360° stage.
     // The local scene template cannot invent verified drops or downbeats.
-    const authoredGoveeShowV1042=sampleArenaShowPlanV1040(arenaShowPlanV1040,{
+    const rawGoveeShowV1042=sampleArenaShowPlanV1040(arenaShowPlanV1040,{
      enabled:arenaShowEnabledV1040&&goveeShowEnabledV1042,
      playing:state.isPlaying,reducedMotion:reducedMotionV1042,
      progressMs:progress,durationMs:state.track.durationMs,
      observedSection:phase.verified?phase.phase:null});
+    const transitionV1044=planArenaTransitionsV1044({
+     enabled:arenaTransitionsEnabledV1044&&arenaShowEnabledV1040&&goveeShowEnabledV1042,
+     playing:state.isPlaying,reducedMotion:reducedMotionV1042,
+     stageIsArena:showStageIsArenaV1042,plan:arenaShowPlanV1040,
+     progressMs:progress,durationMs:state.track.durationMs,strength:arenaTransitionsStrengthV1044,
+    });
+    const authoredGoveeShowV1042=applyArenaTransitionV1044(rawGoveeShowV1042,transitionV1044,'govee');
     const sectionDecision=config.directorEnabledV911?planGoveeSectionV919(analysis.current,state.track.id,progress,sectionSettings):null;
     const genreDecision=sectionDecision?planGoveeGenreV920(analysis.current,state.track.id,progress,state.genre,sectionDecision,genreSettings):null;
     const energyDecision=sectionDecision?planGoveeEnergyV924(analysis.current,state.track.id,progress,state.genre,sectionDecision,energySettings):null;
@@ -609,6 +619,6 @@ export function GoveeMusicSyncV909(){
    :bassSettings.enabled||shockSettings.enabled?window.setInterval(()=>void tick(),900)
    :neonBassEnabled?window.setInterval(()=>void tick(),900):window.setInterval(()=>void tick(),1700);
   return()=>{cancelled=true;window.clearInterval(interval);window.clearInterval(sampler);};
- },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings,syncSettingsV1027,goveeShowEnabledV1042,goveeShowStrengthV1042,arenaShowEnabledV1040,arenaShowPlanV1040,showStageIsArenaV1042,reducedMotionV1042]);
+ },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings,syncSettingsV1027,goveeShowEnabledV1042,goveeShowStrengthV1042,arenaShowEnabledV1040,arenaShowPlanV1040,arenaTransitionsEnabledV1044,arenaTransitionsStrengthV1044,showStageIsArenaV1042,reducedMotionV1042]);
  return null;
 }

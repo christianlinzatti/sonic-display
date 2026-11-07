@@ -1,5 +1,5 @@
 name: V1041 Intelligent Avatar Choreography manual validation
-run-name: Sonic Display · V1043 · V1041 Intelligent Avatar Choreography manual validation
+run-name: Sonic Display · V1044 · V1041 Intelligent Avatar Choreography manual validation
 # Manual diagnostic workflow; the v965 production matrix is the only automatic CI workflow.
 on:
   workflow_dispatch:
