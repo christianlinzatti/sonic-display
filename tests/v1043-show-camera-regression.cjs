@@ -16,6 +16,11 @@ for(const bad of [NaN,Infinity,-100,999,undefined]){
  const result=planArenaShowCameraV1043({...base,strength:bad});
  assert(Number.isFinite(result.strength)&&result.strength>=0&&result.strength<=.8);
 }
+// An inactive template, zero-strength show and playback seek cannot cause a cut.
+assert.equal(planArenaShowCameraV1043({...base,show:{...show,intensity:0}}).active,false);
+assert.equal(planArenaShowCameraV1043({...base,show:{...show,fade:0}}).active,false);
+assert.equal(planArenaShowCameraV1043({...base,strength:0}).active,false);
+assert.equal(planArenaShowCameraV1043({...base,progressMs:4000}).seconds,4);
 const pose={x:0,y:1.35,z:8,fov:45,targetY:.2,targetX:0,targetZ:0};
 for(const shot of ['wide','orbit','lead','group']){
  const a=planArenaShowCameraV1043({...base,show:{...show,camera:shot}});
