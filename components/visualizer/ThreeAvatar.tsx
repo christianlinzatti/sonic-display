@@ -71,6 +71,7 @@ import {planUltimateConcertFinaleV1070} from '@/lib/arena360UltimateFinaleV1070'
 import {planSmartConcertFlowV1071} from '@/lib/arena360SmartConcertFlowV1071';
 import {planConcertCameraDirectorV1072} from '@/lib/arena360ConcertCameraDirectorV1072';
 import {planAvatarAudienceInteractionV1074} from '@/lib/arena360AvatarAudienceInteractionV1074';
+import {planLiveArtistInteractionV1079} from '@/lib/arena360LiveArtistInteractionV1079';
 import { Dancer, DuoDirectorTick, FormationDancers, IntelligentChoreographyTickV312, MultiAvatarDirectorTick } from './DanceFormationActorsV492';
 import {planArenaCinematicFinaleV1046} from '@/lib/arena360CinematicFinaleV1046';
 import {planArenaImmersiveCameraV1047} from '@/lib/arena360ImmersiveArenaV1047';
@@ -667,6 +668,26 @@ export function ThreeAvatar(props: VisualizerProps) {
     strength:props.arenaAvatarAudienceStrengthV1074??55,
     observedSection:props.cameraDirectorSection,
   });
+  // V1079: only current, time-aligned synced lyric gaps can accent the
+  // existing avatar/audience cue. Manual vocal roles and authored clips win.
+  const liveArtistV1079=planLiveArtistInteractionV1079({
+    enabled:props.arenaLiveArtistEnabledV1079===true,
+    playing:props.isPlaying,stageIsArena:props.stageTheme==='arena360',
+    audienceEnabled:props.arenaAudienceEnabledV1032!==false,
+    showDesignerEnabled:props.arenaShowDesignerEnabledV1040===true,
+    reducedMotion:props.reducedMotion,reactive:props.stageReactive,
+    performanceTier:getActivePerformanceTier(),
+    manualPriority:authoredEnabled||props.avatarMotionMode==='choreography'||
+      props.avatarTimelineEnabled===true||!!props.smartDanceOverride||
+      !!props.avatarAnimationUrl||!!props.secondaryAvatarAnimationUrl||
+      props.lipSync?.manualVocalEnabledV385===true||
+      props.lipSync?.rapDuetEnabledV416===true,
+    show:authoredShowCueV1040,baseline:avatarAudienceV1074,
+    trackId:props.track?.id,durationMs:props.track?.durationMs,
+    progressMs:props.cameraDirectorProgressMs,
+    lyricsProgressMs:props.lipSync?.progressMs,lyrics:props.lipSync?.lyrics,
+    performerCount:castCountV497,strength:props.arenaLiveArtistStrengthV1079??55,
+  });
   // Rap/V1062 remains the sole gesture and lip-sync owner. Only its opt-in
   // strength is lowered from the same V1040 cue; manual syllables win earlier.
   const rapFlowGainV1071=smartFlowCastV1071.rap;
@@ -677,8 +698,8 @@ export function ThreeAvatar(props: VisualizerProps) {
         arenaRapGesturesStrengthV1076:
         (props.arenaRapGesturesStrengthV1076??55)*rapCombinedGainV1071}
     :dancerPropsV356;
-  const dancerPropsV1074:VisualizerProps=avatarAudienceV1074.active
-    ?{...dancerPropsV1065,arenaAvatarAudienceCueV1074:avatarAudienceV1074}
+  const dancerPropsV1074:VisualizerProps=liveArtistV1079.active
+    ?{...dancerPropsV1065,arenaAvatarAudienceCueV1074:liveArtistV1079}
     :{...dancerPropsV1065,arenaAvatarAudienceCueV1074:undefined};
   const directedThemeV352=genreCueV352.theme;
   const directedPaletteV352=genreCueV352.palette??props.stagePalette;
@@ -882,7 +903,7 @@ export function ThreeAvatar(props: VisualizerProps) {
         liveConcertStrengthV1049={props.arenaLiveConcertStrengthV1049 ?? 50}
         storytellingEnabledV1050={props.arenaStorytellingEnabledV1050 ?? false}
         storytellingStrengthV1050={props.arenaStorytellingStrengthV1050 ?? 55}
-        avatarAudienceCueV1074={avatarAudienceV1074} audienceExperienceEnabledV1073={props.arenaAudienceExperienceEnabledV1073 ?? false}
+        avatarAudienceCueV1074={liveArtistV1079} audienceExperienceEnabledV1073={props.arenaAudienceExperienceEnabledV1073 ?? false}
         audienceExperienceStrengthV1073={props.arenaAudienceExperienceStrengthV1073 ?? 55} crowdEnergyEnabledV1075={props.arenaCrowdEnergyEnabledV1075 ?? false} crowdEnergyStrengthV1075={props.arenaCrowdEnergyStrengthV1075 ?? 55}
         crowdExperienceEnabledV1051={props.arenaCrowdExperienceEnabledV1051 ?? false}
         crowdExperienceStrengthV1051={(props.arenaCrowdExperienceStrengthV1051 ?? 55)*stageInteractionV1055.crowdGain}

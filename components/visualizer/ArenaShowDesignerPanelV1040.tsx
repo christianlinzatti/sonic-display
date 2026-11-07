@@ -414,6 +414,25 @@ export function ArenaShowDesignerPanelV1040(){
     Platztausch. Manuelle Aufstellungen, Sängerrollen, Fußkontakt-,
     Kollisions- und Low-GPU-Schutz behalten Vorrang.</small>
   </fieldset>
+  <fieldset className="arena-v1079-live-artist" aria-label="V1079 Live Artist Interaction">
+   <legend>V1079 · Live Artist Interaction</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaLiveArtistEnabledV1079)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaLiveArtistEnabledV1079:e.target.checked})}/>
+    Künstler-Blickwechsel und Publikumsreaktionen in Lyrics-Pausen
+   </label>
+   <label>Interaktions-Stärke: {preferences.arenaLiveArtistStrengthV1079??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaLiveArtistEnabledV1079}
+     value={preferences.arenaLiveArtistStrengthV1079??55}
+     onChange={e=>updatePreferences({arenaLiveArtistStrengthV1079:Number(e.target.value)})}/>
+   </label>
+   <small>Nur mit synchronisierten Lyrics und zwei korrekt übereinstimmenden
+    Musikzeitstempeln: kurze Blick- und Armgesten zwischen den Textzeilen.
+    Eine Textlücke ist kein Beweis für instrumentale Musik; keine Erkennung
+    realen Publikumsjubels, keine zusätzlichen Soundeffekte oder Gerätebefehle.
+    Eigene Sängerrollen und Clips, Pause, Low-GPU und Reduced Motion haben Vorrang.</small>
+  </fieldset>
   <fieldset className="arena-v1078-natural-dance" aria-label="V1078 Natural Dance Intelligence 4.0">
    <legend>V1078 · Natural Dance Intelligence 4.0</legend>
    <label className="setting-check"><input type="checkbox"
@@ -849,7 +868,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false,arenaCrowdEnergyEnabledV1075:false,arenaRapGesturesEnabledV1076:false,arenaDuetPerformanceEnabledV1077:false,arenaNaturalDanceEnabledV1078:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false,arenaCrowdEnergyEnabledV1075:false,arenaRapGesturesEnabledV1076:false,arenaDuetPerformanceEnabledV1077:false,arenaNaturalDanceEnabledV1078:false,arenaLiveArtistEnabledV1079:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

@@ -25,8 +25,8 @@ function inspectReleaseV1074(root){
   add('panel',read('components/visualizer/ArenaShowDesignerPanelV1040.tsx').includes('V1074 · Avatar & Audience Interaction 2.0'));
   const three=read('components/visualizer/ThreeAvatar.tsx');
   add('cue-planned-once',three.includes('planAvatarAudienceInteractionV1074('));
-  add('cast-cue',three.includes('arenaAvatarAudienceCueV1074:avatarAudienceV1074'));
-  add('stage-cue',three.includes('avatarAudienceCueV1074={avatarAudienceV1074}'));
+  add('cast-cue',three.includes('arenaAvatarAudienceCueV1074:liveArtistV1079')&&three.includes('baseline:avatarAudienceV1074'));
+  add('stage-cue',three.includes('avatarAudienceCueV1074={liveArtistV1079}'));
   add('stage-adapter',read('components/visualizer/stages/index.tsx').includes('avatarAudienceCueV1074={avatarAudienceCueV1074}'));
   add('stage-forward',read('components/visualizer/stages/Arena360StageV1031.tsx').includes('avatarAudienceCueV1074={avatarAudienceCueV1074}'));
   add('crowd',read('components/visualizer/stages/ArenaAudienceV1032.tsx').includes('gestureArms'));

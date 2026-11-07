@@ -1682,7 +1682,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1078
+**Dokumentationsstand:** V1079
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -2191,7 +2191,7 @@ Neue Fußkontakte führen unmittelbar zur Reduktion additiver Fußrotationen. De
 `services/show/liveConcertComparisonV544.ts` ergänzt eine reine A/B-Projektionsanalyse auf der bereits opt-in etwa sekündlich messenden V466-WebGL-Qualitätsprobe. `components/visualizer/ConcertVisualCompareV544.tsx` ist unter dem bestehenden QA-Knopf erreichbar und speichert maximal zwei manuell aufgenommene Momentaufnahmen (A/B) im React-UI-Zustand; die Schemabilder verwenden echte normalisierte Kopf- und Lyrics-Rechtecke und zeigen die vorhandenen FPS an, **keine Pixel/Fotos und keine optische Gesichts-/Tanzprüfung**. Der Anwender markiert Fußarbeit, Gesicht/Lip-Sync und Lyrics getrennt; `createComparisonReportV544` exportiert auf Klick einen JSON-Bericht, keine Auto-Freigabe. Bildrand-/Lyrics-Nähe werden heuristisch beurteilt, nicht über Objekt-Okklusion. Original-Bühnenkamera, Motion, Beleuchtung, GLBs, FPS-Messintervall und QA-Gating bleiben unangetastet. `tests/v544-visual-quality-regression.cjs`, `tests/tsconfig.v544-core.json`. Der Next.js-Build braucht vollständig installierte Abhängigkeiten.
 
 
-> **Dokumentationsstand:** V1078 (28.10.2026)
+> **Dokumentationsstand:** V1079 (28.10.2026)
 
 ## V539 – Multi-Avatar Concert Interaction 5.0
 
@@ -3672,7 +3672,7 @@ Details: `docs/versions/V802-INTELLIGENT-CONCERT-IMPROVEMENT-ASSISTANT.md`.
 
 `components/visualizer/naturalMultiArtistStageInteractionV807.ts` berechnet ausschliesslich aus bestaetigten, songgebundenen V416/V496-Saengerrollen, vorhandenen Buehnenpositionen und Wiedergabezeit begrenzte Blicke und Gesten fuer Lead, Support, Duett, Handoff und gemeinsamen Hook. Die bestehenden 2er- und 3/4er-Avatar-Renderer verwenden die identische, reine Planungslogik ueber V144/V145-Overlays. Manuelle Animationen, Buehnenformationen, Gesichts-/Lippensynchronisation und Fuss-IK bleiben unberuehrt. V506/V508-Kollisionsschutz ist final. Keine neuen GLB-Mixer, Renderloops oder GPU-Ressourcen. Tests: `tests/v807-natural-multi-artist-stage-interaction-regression.cjs`.
 
-> **Dokumentationsstand:** V1078 (31.10.2026)
+> **Dokumentationsstand:** V1079 (31.10.2026)
 
 ## V808 Natural Performer Positioning
 
@@ -3964,7 +3964,7 @@ V844 verifies section/audio cues, schedules at most one dominant side-stage effe
 - No display/UI overlay; flash cannot be guaranteed photosensitive-safe.
 - Release requires full typecheck, Next.js build, and actual visual test.
 
-> **Dokumentationsstand:** V1078 (01.11.2026)
+> **Dokumentationsstand:** V1079 (01.11.2026)
 
 
 ## V846 - Paper Streamers
@@ -4754,3 +4754,20 @@ Kontaktanker, Animationstimer, neuen 3D-Objekte, Ton- oder Govee-Befehle.
 Manuell gewählte Choreografien, Pausen, reduzierte Bewegungen und Low-Tier
 haben Vorrang. Der prozedurale Ersatzavatar erhält keine zusätzlichen
 Schrittakzente ohne verifizierte Fußkontakt-Daten.
+
+## V1079 – Live Artist Interaction
+
+`lib/arena360LiveArtistInteractionV1079.ts` legt sich als ausdrücklich
+aktivierbare, zustandslose Regie über die existierende V1074-Pose. Die
+Aktivierung erfordert eine gültige Live-Songposition, auf maximal 400 ms
+übereinstimmende Lyrics-/Bühnenzeit, aktuell synchronisierte Textzeilen und
+einen echten **Zwischenraum von 1,8 bis 16 Sekunden zwischen zwei Zeilen**.
+Das belegt keine echten instrumentalen Passagen oder Stille; unsichere Daten
+werden ohne Interaktion übergangen. Drei lokale Varianten wechseln zwischen
+Publikumseinladung, angedeutetem Partnerblick und ruhiger Beobachtung; der
+Partnerblick richtet sich nur näherungsweise nach dem Avatar-Slot, nicht nach
+verifizierten Weltkoordinaten. Für Avatar und Publikum wird **derselbe
+Cue** in bereits existierenden Frames und Instanzen verwendet. Die bestehende
+V1074-Blen­ding-Schicht glättet Ein-/Austritte. Manuelle Clips, Vocal-Casting,
+Pause, Low-GPU und Reduced Motion sperren die neue Regie. Keine neuen Mixer,
+IK-Regeln, Avatare, Gerätebefehle oder Soundeffekte.

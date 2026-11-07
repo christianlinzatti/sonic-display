@@ -3279,3 +3279,13 @@ und kleine vorhandene Fuß-/Gewichts-Grooves. Keine neuen Schrittanimationen.
 Für Fußbewegungen sind stabile IK-Kontakte erforderlich; manuelle Clips,
 Low-GPU, Pause und Reduced Motion sperren V1078. Tests:
 `npm run verify:v1078:focused`.
+
+### V1079 – Live Artist Interaction
+
+Im **AI Show Designer** können subtile Künstler-/Publikumsinteraktionen bei
+nachweislich synchronisierten Lyrics-Pausen zugeschaltet werden (standardmäßig
+**aus**). Lücken zwischen Textzeilen sind keine automatische Gesangs- oder
+Instrumentalerkennung. Vorhandene V1074-Avatar- und Zuschauerinstanzen
+werden weiterverwendet; Partner-Blicke sind visuell angedeutet. Manuelle
+Animationen, Vocal-Casting, Low-GPU und Reduced Motion bleiben vorrangig.
+Tests: `npm run verify:v1079:focused`.

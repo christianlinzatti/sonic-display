@@ -13,6 +13,8 @@ export interface AvatarAudienceCueV1074 {
  gain:number;
  phase:number;
  audienceReply:number;
+ /** V1079 explicit lyric-gap intent; absent for the original V1074 planner. */
+ interactionIntentV1079?:'partner'|'audience'|'quiet';
 }
 export interface AvatarAudiencePoseV1074 {
  headYaw:number;headPitch:number;leftLift:number;rightLift:number;
@@ -92,7 +94,9 @@ export function sampleAvatarAudienceInteractionV1074(
  const hand=clamp(cue.gain*rest,0,.7);
  const left=clamp(hand*(.10+.42*arc),0,.22);
  const right=clamp(hand*(.10+.42*answer),0,.22);
- const yaw=clamp(cue.gain*.12*Math.sin(t*.47+phase),-.075,.075);
+ const yaw=cue.interactionIntentV1079==='partner'
+   ?clamp((slot%2===0?1:-1)*cue.gain*.10+cue.gain*.018*Math.sin(t*.47+phase),-.075,.075)
+   :clamp(cue.gain*.12*Math.sin(t*.47+phase),-.075,.075);
  const nod=clamp(cue.gain*.06*Math.sin(t*.73+phase),-.04,.04);
  const beat=clamp(beatStrength,0,1); // evidence only affects amplitude
  return {headYaw:yaw,headPitch:nod,leftLift:left*(.88+.12*beat),rightLift:right*(.88+.12*beat),

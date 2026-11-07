@@ -86,7 +86,7 @@ for(const bad of ['fetch(','setInterval(','setTimeout(','Math.random(','Date.now
  'localStorage','new AnimationMixer(','morphTargetInfluences','navigator.','footIK.current','position.y'])
  assert(!read('lib/naturalDanceIntelligenceV1078.ts').includes(bad),bad);
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1078');assert.equal(lock.version,pkg.version);
+assert(/^0\.1\.0-v\d+$/.test(pkg.version)&&Number(pkg.version.split('-v')[1])>=1078);assert.equal(lock.version,pkg.version);
 for(const file of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(file).includes('tests/v1078-natural-dance-intelligence-regression.cjs'));
 console.log(`PASS V1078: ${total.toLocaleString('en-US')} bounded motion samples, 4 motifs, foot-IK, manual override, all stage props and production gates`);

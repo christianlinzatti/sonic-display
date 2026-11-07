@@ -92,6 +92,8 @@ export interface UiPreferences {
   arenaDuetPerformanceStrengthV1077?:number;
   arenaNaturalDanceEnabledV1078?:boolean;
   arenaNaturalDanceStrengthV1078?:number;
+  arenaLiveArtistEnabledV1079?:boolean;
+  arenaLiveArtistStrengthV1079?:number;
   arenaEnsembleEnabledV1063?:boolean;
   arenaEnsembleStrengthV1063?:number;
   arenaStageMovementEnabledV1064?:boolean;
