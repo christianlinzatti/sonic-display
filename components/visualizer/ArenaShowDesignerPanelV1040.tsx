@@ -154,6 +154,46 @@ export function ArenaShowDesignerPanelV1040(){
     Bei Pause, reduzierter Bewegung oder niedrigem Grafikprofil wird die
     Zusatzregie ausgeschaltet.</small>
   </fieldset>
+  <fieldset className="arena-v1062-rap-performance" aria-label="V1062 Advanced Rap Performance">
+   <legend>V1062 · Advanced Rap Performance 7.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaRapPerformanceEnabledV1062)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaRapPerformanceEnabledV1062:e.target.checked})}/>
+    Rap-Gesten, Wortakzente und dezente Gesichtsmimik verbessern
+   </label>
+   <label>Performance-Stärke: {preferences.arenaRapPerformanceStrengthV1062??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaRapPerformanceEnabledV1062}
+     value={preferences.arenaRapPerformanceStrengthV1062??55}
+     onChange={e=>updatePreferences({arenaRapPerformanceStrengthV1062:Number(e.target.value)})}/>
+   </label>
+   <small>Nur bei verifizierten, zeitlich synchronisierten Rap-Wörtern und eindeutigem
+    Sänger-Slot. Geringe Ergänzungen an bestehenden Gesten, Lippen-Reaktionszeiten
+    und Augenbrauen/Wangen; die bestehenden Mundformen, manuellen Viseme,
+    geschlossenen Lippen und Fußkontakte bleiben unangetastet.
+    Bei Pause, Low-GPU, Reduced Motion, manueller Choreografie oder fehlender
+    Wort-/Sänger-Zuordnung aus. Keine neuen Animationen oder KI-Cloud-Abfragen.</small>
+  </fieldset>
+  <fieldset className="arena-v1061-natural-motion" aria-label="V1061 Natural Avatar Motion 3.0">
+   <legend>V1061 · Natural Avatar Motion 3.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaNaturalMotionEnabledV1061)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaNaturalMotionEnabledV1061:e.target.checked})}/>
+    Natürliche Schulter-, Oberkörper- und vorsichtige Hüftbewegungen
+   </label>
+   <label>Bewegungsstärke: {preferences.arenaNaturalMotionStrengthV1061??55}%
+    <input type="range" min="0" max="80" step="5"
+      disabled={!plan||!preferences.arenaNaturalMotionEnabledV1061}
+      value={preferences.arenaNaturalMotionStrengthV1061??55}
+      onChange={e=>updatePreferences({arenaNaturalMotionStrengthV1061:Number(e.target.value)})}/>
+   </label>
+   <small>Nur additive, sehr kleine Bewegungen zum vorhandenen Songtempo;
+    keine neue Animation, kein Beat-Tracking und keine neue IK. Bei manuell
+    gewählten Choreografien, Pause, Reduced Motion und niedriger Qualität aus.
+    Die Hüftbewegung wird bei zwei stehenden Füßen oder unbekanntem Kontakt
+    nicht hinzugefügt. GLB-Avatare verwenden vorhandene Rig-Kanäle;
+    prozedurale Avatare nur den sichtbaren Oberkörper.</small>
+  </fieldset>
   <fieldset className="arena-v1060-lighting-choreographer" aria-label="V1060 AI Lighting Choreographer">
    <legend>V1060 · AI Lighting Choreographer</legend>
    <label className="setting-check"><input type="checkbox"
@@ -494,7 +534,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

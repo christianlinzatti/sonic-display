@@ -93,7 +93,7 @@ for(const file of ['types/music.ts','context/UiPreferencesContext.tsx',
  assert(read(file).includes('LightingChoreographerEnabledV1060')||read(file).includes('lightingChoreographerEnabledV1060'),file);
 assert(read('context/UiPreferencesContext.tsx').includes('arenaLightingChoreographerEnabledV1060:false'));
 assert(read('components/visualizer/ArenaShowDesignerPanelV1040.tsx').includes('V1060 · AI Lighting Choreographer'));
-assert(read('components/visualizer/ArenaShowDesignerPanelV1040.tsx').includes('arenaLightingChoreographerEnabledV1060:false}'));
+assert(read('components/visualizer/ArenaShowDesignerPanelV1040.tsx').includes('arenaLightingChoreographerEnabledV1060:false'));
 assert(read('scripts/v931-production-gate.cjs').includes('tests/v1060-lighting-choreographer-regression.cjs'));
 assert(read('scripts/vercel-production-build.cjs').includes('tests/v1060-lighting-choreographer-regression.cjs'));
 console.log('PASS V1060 seven chapters, four genre plans, manual off, opt-in, 8000 bounded samples, optical budget, four existing render channels');

@@ -13,6 +13,7 @@ import {enhanceRapAccentV473} from "./rapFlowIntelligenceV473";
 import {resolveNaturalRapGestureV474} from "./naturalRapGestureVarietyV474";
 import {planRapPerformanceDynamicsV583} from "./rapPerformanceDynamicsV583";
 import {refineAdvancedRapGestureV1023} from "./advancedRapPerformanceV1023";
+import {refineRapGestureV1062} from "@/lib/advancedRapPerformanceV1062";
 import {refineNaturalConcertPerformanceV586} from "./naturalConcertPerformanceV586";
 import {synchronizeRapAccentV516} from "./naturalDeutschrapSyncV516";
 import {coordinateRapDanceV526} from "./unifiedConcertPerformanceV526";
@@ -25,13 +26,14 @@ import {createMotionCorrectionStateV515,correctAutomaticAccentV515,resetMotionCo
 type Args = Pick<VisualizerProps, 'audio'|'isPlaying'|'reducedMotion'|'genre'|'genreFusion'|'stagePalette'|
   'wardrobeModeV468'|'wardrobeColorV468'|'wardrobePatternV468'|'wardrobeGlowV468'|
   'audioMotionEnabledV468'|'audioMotionStrengthV468'|'avatarFootIKEnabled'|'track'|
-  'cameraDirectorSection'|'showCue'|'avatarMotionMode'> & {
+  'cameraDirectorSection'|'showCue'|'avatarMotionMode'|'arenaRapPerformanceEnabledV1062'|'arenaRapPerformanceStrengthV1062'> & {
   model:Object3D; propsLipSyncV367:VisualizerProps['lipSync']; workloadSlot:number;
 };
 export function useGltfVocalMotionV492({model,audio,isPlaying,reducedMotion,genre,genreFusion,
   stagePalette,wardrobeModeV468,wardrobeColorV468,wardrobePatternV468,wardrobeGlowV468,
   audioMotionEnabledV468,audioMotionStrengthV468,avatarFootIKEnabled,track,
-  cameraDirectorSection,showCue,avatarMotionMode,propsLipSyncV367,workloadSlot}:Args) {
+  cameraDirectorSection,showCue,avatarMotionMode,propsLipSyncV367,workloadSlot,
+  arenaRapPerformanceEnabledV1062,arenaRapPerformanceStrengthV1062}:Args) {
   const motionCorrectionV515=useRef(createMotionCorrectionStateV515());
   const correctionTrackV515=useRef<string|null>(null);
   useEffect(()=>{resetMotionCorrectionV515(motionCorrectionV515.current);correctionTrackV515.current=null;},[model]);
@@ -158,7 +160,18 @@ export function useGltfVocalMotionV492({model,audio,isPlaying,reducedMotion,genr
       tier:getActivePerformanceTier(),
     });
     // Retain the established V515 call contract for older dancer integrations.
-    const wordDanceV567=advancedRapV1023.accent;
+    const directedRapV1062=refineRapGestureV1062(advancedRapV1023,{
+      enabled:arenaRapPerformanceEnabledV1062===true,
+      strength:arenaRapPerformanceStrengthV1062??55,trackId:track?.id,
+      lyrics:propsLipSyncV367?.lyrics,
+      effectiveTimeMs:(propsLipSyncV367?.progressMs??-1)+
+        (propsLipSyncV367?.coordinationOffsetMsV372??0),
+      playing:isPlaying&&propsLipSyncV367?.playing!==false,
+      reducedMotion,manualPriority:avatarMotionMode==='choreography',
+      section:showCue?.enabled?showCue.section:cameraDirectorSection,
+      tier:getActivePerformanceTier(),
+    });
+    const wordDanceV567=directedRapV1062.accent;
     const correctedVocalV515=correctAutomaticAccentV515(wordDanceV567,motionCorrectionV515.current,delta,{
       playing:isPlaying&&propsLipSyncV367?.playing!==false,
       reducedMotion,authored:avatarMotionMode==='choreography',

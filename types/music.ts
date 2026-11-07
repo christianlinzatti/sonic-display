@@ -82,6 +82,10 @@ export interface UiPreferences {
   arenaLedWallPatternV1059?:import('@/lib/arena360LedWallV1059').LedWallPatternV1059;
   arenaLightingChoreographerEnabledV1060?:boolean;
   arenaLightingChoreographerStrengthV1060?:number;
+  arenaNaturalMotionEnabledV1061?:boolean;
+  arenaNaturalMotionStrengthV1061?:number;
+  arenaRapPerformanceEnabledV1062?:boolean;
+  arenaRapPerformanceStrengthV1062?:number;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;

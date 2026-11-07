@@ -1,3 +1,15 @@
+## V1062 · Advanced Rap Performance 7.0
+
+Die optionale **Advanced Rap Performance 7.0** erweitert bestehende, bereits verifizierte Rap-Wort-Cues. Sie verfeinert bei GLB-Avataren gestische Betonungen von Kopf, Brust und Armen mit weicher Einschwing-/Ausblendkurve; vorhandene V515-Korrekturen und Clip-/IK-Priorität bleiben erhalten. Der vorhandene V837-Lip-Sync gewinnt winzige additive Rate-Anpassungen für Kiefer, `wide` und `round` sowie minimale Augenbrauen-/Wangenakzente. **Keine** Änderung an `lipsClosed`, manuell gesetzten Visemen, morph targets, Lippen-Quellinformationen, Sängerrollen oder Fußkontakten. Nur bei beobachteten synchronisierten Wörtern, verifiziertem Slot, laufendem Deutschrap/Rap und ausreichender GPU-Qualität aktiv. Die Funktion ist im **AI Show Designer → V1062 Advanced Rap Performance 7.0** abschaltbar und standardmäßig deaktiviert. Keine neuen Ticker, Audio-Abfragen, KI-Dienste, Kameras oder Gerätebefehle.
+
+Qualitätsprüfungen: `npm run test:v1062`, `npm run test:v1062:types`, `npm run verify:v1062:focused`, `node scripts/v959-source-preflight.cjs`. Produktionsfreigabe weiterhin über GitHub Actions (Windows/Ubuntu, Next.js/Playwright).
+
+
+## V1061 · Natural Avatar Motion 3.0
+
+Die optionale **Natural Avatar Motion 3.0** ergänzt die GLB-Rig-Bewegung um winzige, musikalisch modulierte Schulter-, Brust- und Wirbelsäulenakzente sowie eine **rotatorische** Hüftbewegung nur bei beobachteter Fußkontakt-Freigabe. Bei zwei gepflanzten Füßen oder unbekanntem Kontakt bleibt die Hüftzugabe null. Der vorhandene finale V839-Footwork-Guardian und Foot IK bleiben verantwortlich. Für den prozeduralen Fallback wird ausschließlich der Oberkörper animiert. Aktivierung unter **AI Show Designer → V1061 Natural Avatar Motion 3.0**, standardmäßig aus; gültiger Showplan und 360°-Bühne erforderlich. Manuelle GLB-Clips, explizite Timelines, Pausen, Reduced Motion und Low-GPU-Voreinstellungen haben Vorrang. Der Planner nutzt den vorhandenen Songfortschritt und ein beobachtetes BPM; er erkennt keine eigenen Beats und ruft keine Cloud-KI auf.
+
+Prüfung: `npm run test:v1061`, `npm run test:v1061:types`, `npm run verify:v1061:focused`, `node scripts/v959-source-preflight.cjs`. Die GitHub-Matrix für Windows und Ubuntu mit Next.js/Playwright bleibt die Produktionsfreigabe.
 
 ## V1060 · AI Lighting Choreographer
 
@@ -1630,7 +1642,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1060
+**Dokumentationsstand:** V1062
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

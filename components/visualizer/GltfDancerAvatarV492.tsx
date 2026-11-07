@@ -101,6 +101,7 @@ import { AnimationClip, type Group } from "three";
 import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUtils.js";
 import {disposeClonedAvatarSkeletonsV654} from "./disposeClonedAvatarSkeletonsV654";
 import type { VisualizerProps } from "./registry";
+import {planNaturalMotionV1061,overlayNaturalMotionV1061} from "@/lib/naturalAvatarMotionV1061";
 import { VocalRigV368 } from "./VocalRigV368";
 import { normalizeRapPresetV412, sampleRapLiveV412, liveRapClipNameV412, type RapLiveSampleV412 } from "./rapChoreographyPresetsV412";
 import { sampleRapLyricsCueV413, lyricsRapGainV413 } from "./lyricsAwareRapChoreographyV413";
@@ -171,7 +172,7 @@ export function SharedEmbeddedAvatarV531(props: VisualizerProps & {workloadSlot?
   return <GltfAvatar {...props} importedClips={source.animations} importedAnimationScene={source.scene} sharedMotionV531 />;
 }
 
-export function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, sharedMotionV531=false, url, assetUrl, audio, isPlaying, reducedMotion, genre, genreFusion, stagePalette, wardrobeModeV468, wardrobeColorV468, wardrobePatternV468, wardrobeGlowV468, audioMotionEnabledV468, audioMotionStrengthV468, avatarModelId, avatarScale = 1, avatarOffsetY = 0, avatarAnimationIntensity = 1, avatarRigProfile = "auto", preferredMotionUrlV440, avatarDancePreset = "auto", danceAggression = 0.5, danceVariation = 0.5, danceMotionStyle = "balanced", avatarMotionMode = "hybrid", smartDanceEnabled = false, smartDanceOverride = "", avatarClipSpeed = 1, avatarBlendEnabled = false, avatarBlendClip = "", avatarBlendWeight = 0.3, avatarBlendSpeed = 1, avatarBlendAutoEnergy = false, avatarBlendBpmSync = false, avatarBlendReferenceBpm = 120, avatarBlendSmoothing = 0.28, avatarBlendCurve = "smooth", avatarBlendMask = "full", avatarCrossfadeSeconds = 0.35, avatarArmResponse = 1, avatarLegResponse = 1, avatarFootIKEnabled = true, avatarFootIKStrength = 70, avatarFootIKContact = 50, avatarFootIKLock = 50, cameraDirectorSection, cameraDirectorProgressMs, track, autonomousShowPhraseV356, showCue, lipSync: propsLipSyncV367, ensembleCountV745, workloadSlot = 0 }: VisualizerProps & { url: string; assetUrl?: string; importedClips?: AnimationClip[]; importedAnimationScene?: Group; animationUrl?: string; sharedMotionV531?:boolean; avatarRigProfile?: AvatarRigProfileId; workloadSlot?: number }) {
+export function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, sharedMotionV531=false, url, assetUrl, audio, isPlaying, reducedMotion, genre, genreFusion, stagePalette, wardrobeModeV468, wardrobeColorV468, wardrobePatternV468, wardrobeGlowV468, audioMotionEnabledV468, audioMotionStrengthV468, avatarModelId, avatarScale = 1, avatarOffsetY = 0, avatarAnimationIntensity = 1, avatarRigProfile = "auto", preferredMotionUrlV440, avatarDancePreset = "auto", danceAggression = 0.5, danceVariation = 0.5, danceMotionStyle = "balanced", avatarMotionMode = "hybrid", smartDanceEnabled = false, smartDanceOverride = "", avatarClipSpeed = 1, avatarBlendEnabled = false, avatarBlendClip = "", avatarBlendWeight = 0.3, avatarBlendSpeed = 1, avatarBlendAutoEnergy = false, avatarBlendBpmSync = false, avatarBlendReferenceBpm = 120, avatarBlendSmoothing = 0.28, avatarBlendCurve = "smooth", avatarBlendMask = "full", avatarCrossfadeSeconds = 0.35, avatarArmResponse = 1, avatarLegResponse = 1, avatarFootIKEnabled = true, avatarFootIKStrength = 70, avatarFootIKContact = 50, avatarFootIKLock = 50, arenaNaturalMotionEnabledV1061=false, arenaNaturalMotionStrengthV1061=55, arenaRapPerformanceEnabledV1062=false, arenaRapPerformanceStrengthV1062=55, stageTheme, cameraDirectorSection, cameraDirectorProgressMs, track, autonomousShowPhraseV356, showCue, lipSync: propsLipSyncV367, ensembleCountV745, workloadSlot = 0 }: VisualizerProps & { url: string; assetUrl?: string; importedClips?: AnimationClip[]; importedAnimationScene?: Group; animationUrl?: string; sharedMotionV531?:boolean; avatarRigProfile?: AvatarRigProfileId; workloadSlot?: number }) {
   const schedulerInstance = useId();
   useEffect(() => () => releaseAvatarFrame(schedulerInstance), [schedulerInstance]);
   useEffect(() => () => releaseScheduledInstance(schedulerInstance), [schedulerInstance]);
@@ -306,7 +307,8 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   useGltfVocalMotionV492({model,audio,isPlaying,reducedMotion,genre,genreFusion,stagePalette,
     wardrobeModeV468,wardrobeColorV468,wardrobePatternV468,wardrobeGlowV468,
     audioMotionEnabledV468,audioMotionStrengthV468,avatarFootIKEnabled,track,
-    cameraDirectorSection,showCue,avatarMotionMode,propsLipSyncV367,workloadSlot});
+    cameraDirectorSection,showCue,avatarMotionMode,propsLipSyncV367,workloadSlot,
+    arenaRapPerformanceEnabledV1062:arenaRapPerformanceEnabledV1062&&stageTheme==='arena360',arenaRapPerformanceStrengthV1062});
   // Match humanoid bones across Mixamo/Blender-style names and preserve rest-pose differences.
   // Unsupported tracks are safely ignored; original avatar/animation files are unchanged.
   const [calibrationVersion, setCalibrationVersion] = useState(0);
@@ -875,7 +877,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       settings:readNaturalDanceMotionV545(),trackId:track?.id,modelKey:avatarModelId??url,
       seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
       delta,playing:isPlaying,reducedMotion,genre,quality:getActivePerformanceTier(),
-      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||!!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride,
+      manualPriority:hipManualPriorityV735||avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||!!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride,
       footIKEnabled:avatarFootIKEnabled,contactKnown:!!footIK.current.left&&!!footIK.current.right,
       plantedLeft:footIK.current.left?.contact.phase==='planted',plantedRight:footIK.current.right?.contact.phase==='planted',
     });
@@ -886,7 +888,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
         progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
       playing:isPlaying,reducedMotion,genre,section:performance.section,
       quality:getActivePerformanceTier(),
-      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+      manualPriority:hipManualPriorityV735||avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
         !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride,
       contactKnown:!!footIK.current.left&&!!footIK.current.right,
       plantedLeft:footIK.current.left?.contact.phase==='planted',
@@ -899,7 +901,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,
         progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
       delta,playing:isPlaying,reducedMotion,genre,quality:getActivePerformanceTier(),
-      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+      manualPriority:hipManualPriorityV735||avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
         !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride,
       footIKEnabled:avatarFootIKEnabled,contactKnown:!!footIK.current.left&&!!footIK.current.right,
       plantedLeft:footIK.current.left?.contact.phase==='planted',
@@ -913,7 +915,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,
         progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
       delta,playing:isPlaying,reducedMotion,
-      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+      manualPriority:hipManualPriorityV735||avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
         !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride,
       quality:getActivePerformanceTier(),footIKEnabled:avatarFootIKEnabled,
       contactKnown:!!footIK.current.left&&!!footIK.current.right,
@@ -930,7 +932,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,
         progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
       delta,playing:isPlaying,reducedMotion,genre,section:performance.section,
-      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+      manualPriority:hipManualPriorityV735||avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
         !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride,
       quality:getActivePerformanceTier(),energy:audio.energyEnvelope,
       kick:audio.kickAccentIntensity,snare:audio.snare,
@@ -952,7 +954,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       directorEnabled:!!choreographySignalV993.directorSettingsV895?.enabled,
       danceEnabled:!!choreographySignalV993.directorSettingsV895?.dance,
       tier:getActivePerformanceTier(),reducedMotion,
-      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+      manualPriority:hipManualPriorityV735||avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
         !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride||!!clipChoiceV328||
         !!phraseChoiceV329||!!rapLiveEnabledV412||!!lowClipV481&&selectedClip===lowClipV481,
       manualFx:!!choreographySignalV993.manual,blackout:!choreographySignalV993.playing,
@@ -972,7 +974,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
         progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
       delta,bpm:audio.bpm,genre,section:showCue?.enabled?showCue.section:performance.section,
       slot:workloadSlot,playing:isPlaying,reducedMotion,
-      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+      manualPriority:hipManualPriorityV735||avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
         !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride||!!clipChoiceV328||!!phraseChoiceV329||
         !!rapLiveEnabledV412|| (!!lowClipV481&&selectedClip===lowClipV481),
       quality:getActivePerformanceTier(),qualityGain:propsLipSyncV367?.qualityDanceGainV750??1,
@@ -986,7 +988,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
         progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
       playing:isPlaying,reducedMotion,genre,section:performance.section,
       slot:Math.max(0,Math.min(3,workloadSlot??0)),quality:getActivePerformanceTier(),
-      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+      manualPriority:hipManualPriorityV735||avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
         !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride,
       footContactKnown:avatarFootIKEnabled&&!!footIK.current.left&&!!footIK.current.right,
       plantedLeft:footIK.current.left?.contact.phase==='planted',
@@ -1007,7 +1009,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
         progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
       playing:isPlaying,reducedMotion,genre,section:performance.section,
       slot:Math.max(0,Math.min(3,workloadSlot??0)),quality:getActivePerformanceTier(),
-      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+      manualPriority:hipManualPriorityV735||avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
         !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride||!!rapLiveEnabledV412,
       footContactKnown:avatarFootIKEnabled&&!!footIK.current.left&&!!footIK.current.right,
       plantedLeft:footIK.current.left?.contact.phase==='planted',
@@ -1155,7 +1157,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
         progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),
       delta,bpm:audio.bpm,section:showCue?.enabled?showCue.section:performance.section,genre,
       playing:isPlaying,reducedMotion,
-      manualPriority:avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+      manualPriority:hipManualPriorityV735||avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
         !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride||
         !!clipChoiceV328||!!phraseChoiceV329||!!rapLiveEnabledV412||
         (!!lowClipV481&&selectedClip===lowClipV481),
@@ -1168,7 +1170,25 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       qualityGain:propsLipSyncV367?.qualityDanceGainV750??1,
     });
     danceStateV1024.current=danceV1024.state;
-    const debugMotion = danceV1024.motion;
+    // V1061 only adds bounded rotation accents before V839's final footwork
+    // guardian and the existing IK solve. No new animation action or root movement.
+    const naturalCueV1061=planNaturalMotionV1061({
+      enabled:arenaNaturalMotionEnabledV1061&&stageTheme==='arena360',
+      strength:arenaNaturalMotionStrengthV1061,
+      playing:isPlaying,reducedMotion,
+      manualPriority:hipManualPriorityV735||avatarMotionMode==='choreography'||!!stableLibraryClip||!!activeSequence||
+        !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride||
+        !!clipChoiceV328||!!phraseChoiceV329||!!rapLiveEnabledV412,
+      quality:getActivePerformanceTier(),trackId:track?.id,
+      seconds:cameraDirectorProgressMs===undefined?NaN:cameraDirectorProgressMs/1000,
+      bpm:audio.bpm,energy:audio.energyEnvelope??0,
+      beat:audio.beatStrength??0,snare:audio.snare??0,genre,section:performance.section,
+      slot:workloadSlot,footIKEnabled:avatarFootIKEnabled,
+      contactKnown:!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+    });
+    const debugMotion = overlayNaturalMotionV1061(danceV1024.motion,naturalCueV1061);
     // V839 is an additive-only, contact-evidenced FINAL dance guard. It never
     // edits source GLB clips, IK anchors, root motion, lips or manual cues.
     const footworkV839=refineNaturalFootworkRigV839(naturalFootworkV839.current,debugMotion,{
@@ -1616,7 +1636,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     modelUrl:url,assetUrl,avatarScale,isPlaying,reducedMotion,castCount:propsLipSyncV367?.ensembleCountV374??1});
   return <group ref={root} userData={{sonicV592GlbActor:true}} scale={avatarScale} position={[0, avatarOffsetY, 0]}><primitive object={model} /><GlbMaterialQualityV560 session={materialSessionV560}
     enabled={groovePreferences.concertGlbMaterialQualityV560??true}
-    strength={groovePreferences.concertGlbMaterialStrengthV560??65}/><VocalRigV368 model={model} trackId={track?.id??""} sectionV503={showCue?.enabled?showCue.section:null} authoredPriorityV499={avatarMotionMode==="choreography"||!!stableLibraryClip} footIKV618={footIK} footIKEnabledV618={avatarFootIKEnabled} lipSync={propsLipSyncV367} audio={audio} genre={genre} reducedMotion={reducedMotion} avatarSlot={workloadSlot} profileV370={propsLipSyncV367?.profilesV370?.[avatarModelId??""]}/><AvatarSmartLOD model={model} /></group>;
+    strength={groovePreferences.concertGlbMaterialStrengthV560??65}/><VocalRigV368 model={model} trackId={track?.id??""} sectionV503={showCue?.enabled?showCue.section:null} authoredPriorityV499={avatarMotionMode==="choreography"||!!stableLibraryClip} footIKV618={footIK} footIKEnabledV618={avatarFootIKEnabled} lipSync={propsLipSyncV367} audio={audio} genre={genre} reducedMotion={reducedMotion} avatarSlot={workloadSlot} profileV370={propsLipSyncV367?.profilesV370?.[avatarModelId??""]} arenaRapPerformanceEnabledV1062={arenaRapPerformanceEnabledV1062&&stageTheme==='arena360'} arenaRapPerformanceStrengthV1062={arenaRapPerformanceStrengthV1062}/><AvatarSmartLOD model={model} /></group>;
 }
 
 /** Each dancer receives its own animation mixer and cloned GLB scene. */

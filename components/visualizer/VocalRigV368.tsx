@@ -29,6 +29,7 @@ import {readConcertStageSyncV882} from "./concertStageSyncV882";
 import {planVocalTimingPrecisionV686,vocalTimingRateV686} from "./vocalTimingPrecisionV686";
 import {planAdvancedDeutschrapLipSyncV837,deutschrapLipRateV837} from "./advancedDeutschrapLipSyncV837";
 import {rapMouthResponseV1023} from "./advancedRapPerformanceV1023";
+import {rapMouthRateV1062,rapFaceAccentV1062} from "@/lib/advancedRapPerformanceV1062";
 import {planDeutschrapVocalV869,deutschrapVocalRateV869,deutschrapVocalExpressionV869} from "./deutschrapVocalDirectorV869";
 import {multiArtistMouthTargetV632} from "./multiArtistVocalDirectorV632";
 import {sampleLiveVocalEnvelopeV661,refineVocalJawV661,getLiveVocalEnvelopeV661} from "./vocalAnalysisStudioV661";
@@ -50,7 +51,7 @@ type Channel = FacialChannelV370;
 const channels:Channel[]=["jaw","wide","round","lipsClosed","smile","brow","blink","cheek","squint"];
 const ZERO:Record<Channel,number>={jaw:0,wide:0,round:0,lipsClosed:0,smile:0,brow:0,blink:0,cheek:0,squint:0};
 /** Morph overlays preserve authored animation and release their own previous contributions. */
-export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avatarSlot=0,trackId="",sectionV503=null,authoredPriorityV499=false,footIKV618,footIKEnabledV618=false,profileV370,previewPoseV370,demoV370="off",previewTargetV383}: {
+export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avatarSlot=0,trackId="",sectionV503=null,authoredPriorityV499=false,footIKV618,footIKEnabledV618=false,profileV370,previewPoseV370,demoV370="off",previewTargetV383,arenaRapPerformanceEnabledV1062=false,arenaRapPerformanceStrengthV1062=55}: {
   model:Object3D;
   lipSync?:VisualizerProps["lipSync"];
   audio:VisualizerProps["audio"];
@@ -64,6 +65,8 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
   footIKV618?:{current:{left?:{contact:{phase:string;confidence:number}}|null;right?:{contact:{phase:string;confidence:number}}|null}};
   footIKEnabledV618?:boolean;
   profileV370?:FacialProfileV370;
+  arenaRapPerformanceEnabledV1062?:boolean;
+  arenaRapPerformanceStrengthV1062?:number;
   /** Preview overrides lyric analysis but uses the exact same rendering/overlay path. */
   previewPoseV370?:Partial<FacialPoseV369>;
   demoV370?: "off" | "rap" | "singing" | "fast-rap";
@@ -536,6 +539,9 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
         authoredPriorityV499||!!lipSync?.rapSyllableEditsEnabledV420&&!!editsV453?.length||
         !!lipSync?.rapAudioEnabledV423&&!!lipSync.rapAudioDocumentV423&&
           lipSync.rapAudioTrackIdV423===lipSync.rapAudioDocumentV423.trackId);
+      const rapFaceTargetV1062=rapFaceAccentV1062(directedTargetV632,
+        articulationV837,mouthContextV1023,c,arenaRapPerformanceEnabledV1062,
+        arenaRapPerformanceStrengthV1062);
       const alignedMouthV644=manualVisemeV644&&
         (c==='jaw'||c==='wide'||c==='round'||c==='lipsClosed')?manualVisemeV644[c]:null;
       // V661 uses ONLY a user-provided isolated stem, explicitly activated in
@@ -549,7 +555,7 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
         !(lipSync?.rapAudioEnabledV423&&!!lipSync.rapAudioDocumentV423&&
           lipSync.rapAudioTrackIdV423===trackId);
       const v661Signal=v661Allowed?sampleLiveVocalEnvelopeV661(trackId,avatarSlot,clockV453,lipSync?.playing===true):null;
-      let finalMouthTargetV644=alignedMouthV644??directedTargetV632;
+      let finalMouthTargetV644=alignedMouthV644??rapFaceTargetV1062;
       if(v661Signal&&alignedMouthV644===null){
         finalMouthTargetV644=refineVocalJawV661(finalMouthTargetV644,
           lipV499.face.lipsClosed,v661Signal);
@@ -576,7 +582,9 @@ export function VocalRigV368({model,lipSync,audio,genre,reducedMotion=false,avat
         (authoredAdlibV869?1:deutschrapLipRateV837(articulationV837,c,current.current[c],finalMouthTargetV644))*
         deutschrapVocalRateV869(vocalCueV869,c,current.current[c],finalMouthTargetV644)*
         (authoredAdlibV869?1:rapMouthRateV798(precisionV798,c,finalMouthTargetV644>current.current[c]))*
-        rapMouthResponseV1023(articulationV837,mouthContextV1023,c,current.current[c],finalMouthTargetV644)*delta));
+        rapMouthResponseV1023(articulationV837,mouthContextV1023,c,current.current[c],finalMouthTargetV644)*
+        rapMouthRateV1062(articulationV837,mouthContextV1023,c,current.current[c],finalMouthTargetV644,
+          arenaRapPerformanceEnabledV1062,arenaRapPerformanceStrengthV1062)*delta));
     }
     // V562 is opt-in per-avatar; keep solo morph audition unmodified.
     // The same post-filter applies to live show and real-GLB close-up preview.
