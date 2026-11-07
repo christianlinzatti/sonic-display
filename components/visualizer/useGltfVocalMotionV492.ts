@@ -14,6 +14,8 @@ import {resolveNaturalRapGestureV474} from "./naturalRapGestureVarietyV474";
 import {planRapPerformanceDynamicsV583} from "./rapPerformanceDynamicsV583";
 import {refineAdvancedRapGestureV1023} from "./advancedRapPerformanceV1023";
 import {refineRapGestureV1062} from "@/lib/advancedRapPerformanceV1062";
+import {refineRapGesturesV1076} from "@/lib/advancedRapGesturesV1076";
+import {refineDuetPerformanceV1077} from "@/lib/arena360DuetPerformanceV1077";
 import {refineNaturalConcertPerformanceV586} from "./naturalConcertPerformanceV586";
 import {synchronizeRapAccentV516} from "./naturalDeutschrapSyncV516";
 import {coordinateRapDanceV526} from "./unifiedConcertPerformanceV526";
@@ -26,14 +28,18 @@ import {createMotionCorrectionStateV515,correctAutomaticAccentV515,resetMotionCo
 type Args = Pick<VisualizerProps, 'audio'|'isPlaying'|'reducedMotion'|'genre'|'genreFusion'|'stagePalette'|
   'wardrobeModeV468'|'wardrobeColorV468'|'wardrobePatternV468'|'wardrobeGlowV468'|
   'audioMotionEnabledV468'|'audioMotionStrengthV468'|'avatarFootIKEnabled'|'track'|
-  'cameraDirectorSection'|'showCue'|'avatarMotionMode'|'arenaRapPerformanceEnabledV1062'|'arenaRapPerformanceStrengthV1062'> & {
+  'cameraDirectorSection'|'showCue'|'avatarMotionMode'|'arenaRapPerformanceEnabledV1062'|'arenaRapPerformanceStrengthV1062'|
+  'arenaRapGesturesEnabledV1076'|'arenaRapGesturesStrengthV1076'|
+  'arenaDuetPerformanceEnabledV1077'|'arenaDuetPerformanceStrengthV1077'> & {
   model:Object3D; propsLipSyncV367:VisualizerProps['lipSync']; workloadSlot:number;
 };
 export function useGltfVocalMotionV492({model,audio,isPlaying,reducedMotion,genre,genreFusion,
   stagePalette,wardrobeModeV468,wardrobeColorV468,wardrobePatternV468,wardrobeGlowV468,
   audioMotionEnabledV468,audioMotionStrengthV468,avatarFootIKEnabled,track,
   cameraDirectorSection,showCue,avatarMotionMode,propsLipSyncV367,workloadSlot,
-  arenaRapPerformanceEnabledV1062,arenaRapPerformanceStrengthV1062}:Args) {
+  arenaRapPerformanceEnabledV1062,arenaRapPerformanceStrengthV1062,
+  arenaRapGesturesEnabledV1076,arenaRapGesturesStrengthV1076,
+  arenaDuetPerformanceEnabledV1077,arenaDuetPerformanceStrengthV1077}:Args) {
   const motionCorrectionV515=useRef(createMotionCorrectionStateV515());
   const correctionTrackV515=useRef<string|null>(null);
   useEffect(()=>{resetMotionCorrectionV515(motionCorrectionV515.current);correctionTrackV515.current=null;},[model]);
@@ -171,7 +177,35 @@ export function useGltfVocalMotionV492({model,audio,isPlaying,reducedMotion,genr
       section:showCue?.enabled?showCue.section:cameraDirectorSection,
       tier:getActivePerformanceTier(),
     });
-    const wordDanceV567=directedRapV1062.accent;
+    // V1076: only refine the already-authorized singer/word cue. The V515
+    // correction still owns the final smoothing; no clip, leg or mouth edits.
+    const directedRapV1076=refineRapGesturesV1076(directedRapV1062,{
+      enabled:arenaRapGesturesEnabledV1076===true,
+      strength:arenaRapGesturesStrengthV1076??55,trackId:track?.id,
+      lyrics:propsLipSyncV367?.lyrics,
+      effectiveTimeMs:(propsLipSyncV367?.progressMs??-1)+
+        (propsLipSyncV367?.coordinationOffsetMsV372??0),
+      playing:isPlaying&&propsLipSyncV367?.playing!==false&&propsLipSyncV367?.enabled!==false,
+      reducedMotion,manualPriority:avatarMotionMode==='choreography',
+      section:showCue?.enabled?showCue.section:cameraDirectorSection,
+      tier:getActivePerformanceTier(),
+    });
+    // V1077: the existing track-bound authored V385/V416 singer mask is the
+    // sole authority for duet partners. Only V1023-approved word gestures
+    // are refined; V515 continues to smooth the bounded additive result.
+    const directedDuetV1077=refineDuetPerformanceV1077(directedRapV1076,{
+      enabled:arenaDuetPerformanceEnabledV1077===true,
+      strength:arenaDuetPerformanceStrengthV1077??55,trackId:track?.id,
+      lyrics:propsLipSyncV367?.lyrics,
+      effectiveTimeMs:(propsLipSyncV367?.progressMs??-1)+
+        (propsLipSyncV367?.coordinationOffsetMsV372??0),
+      playing:isPlaying&&propsLipSyncV367?.playing!==false&&propsLipSyncV367?.enabled!==false,
+      reducedMotion,manualPriority:avatarMotionMode==='choreography',
+      tier:getActivePerformanceTier(),
+      slot:workloadSlot,count:propsLipSyncV367?.ensembleCountV374??1,
+      casting:authoredVocalV472?.active?authoredVocalV472:assignedDuetV472,
+    });
+    const wordDanceV567=directedDuetV1077.accent;
     const correctedVocalV515=correctAutomaticAccentV515(wordDanceV567,motionCorrectionV515.current,delta,{
       playing:isPlaying&&propsLipSyncV367?.playing!==false,
       reducedMotion,authored:avatarMotionMode==='choreography',

@@ -3252,3 +3252,21 @@ Beat-Stärke verändern nur die visuelle Amplitude. Keine Geräuscherkennung, ne
 Meshes, Timer oder Gerätebefehle. Bei manuellen Handylicht-Modi, Pause,
 Reduced Motion und Low-Tier automatisch deaktiviert.
 Tests: `npm run verify:v1075:focused`.
+
+### V1076 – Advanced Rap Gestures 8.0
+
+Die neue opt-in-Gestenregie im AI Show Designer gibt Deutschrap bei
+verifizierten synchronisierten Worten zurückhaltendere Armbewegungen bei
+schnellem Flow sowie präzisere Kopf- und Oberkörperbetonungen. Keine zusätzlichen
+Animationen, Web-Anfragen oder Gerätebefehle. Manuelle Clips, Rollen,
+Fußkontakte und Mundformen bleiben geschützt. Fokus-Tests:
+`npm run verify:v1076:focused`.
+
+### V1077 – Duet Performance 3.0
+
+Die optionale Duett-Regie unter AI Show Designer variiert subtile Rap-Gesten
+für Hauptstimme und Antwortpartner sowie gemeinsame Hook-Gesten anhand
+bereits **manuell zugewiesener** V385/V416-Sängerrollen und tatsächlich
+synchronisierter Wörter. Sie weist keine Sänger selbst zu. Clip-/Lippen-
+und Fußsteuerung bleiben unverändert, bei Pause oder manueller Animation
+hat der Benutzer Vorrang. Tests: `npm run verify:v1077:focused`.

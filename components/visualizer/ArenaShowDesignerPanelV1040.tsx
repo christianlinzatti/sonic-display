@@ -414,6 +414,43 @@ export function ArenaShowDesignerPanelV1040(){
     Platztausch. Manuelle Aufstellungen, Sängerrollen, Fußkontakt-,
     Kollisions- und Low-GPU-Schutz behalten Vorrang.</small>
   </fieldset>
+  <fieldset className="arena-v1077-duet-performance" aria-label="V1077 Duet Performance 3.0">
+   <legend>V1077 · Duet Performance 3.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaDuetPerformanceEnabledV1077)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaDuetPerformanceEnabledV1077:e.target.checked})}/>
+    Abwechselnde Rap-Gesten und gemeinsame Hook-Betonungen für Duette
+   </label>
+   <label>Duett-Stärke: {preferences.arenaDuetPerformanceStrengthV1077??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaDuetPerformanceEnabledV1077}
+     value={preferences.arenaDuetPerformanceStrengthV1077??55}
+     onChange={e=>updatePreferences({arenaDuetPerformanceStrengthV1077:Number(e.target.value)})}/>
+   </label>
+   <small>Nur bei synchronisierten Wort-Zeitstempeln und bereits manuell zugewiesenen
+    V385/V416-Sängerrollen: subtile Antwortgesten, alternierende Partnerbetonungen
+    und gemeinsame Hook-Akzente. Kein Sängerraten, keine neuen Clips, Lippen- oder
+    Fußänderungen. Manuelle Choreografie, Pause, Low-GPU und Reduced Motion haben Vorrang.</small>
+  </fieldset>
+  <fieldset className="arena-v1076-rap-gestures" aria-label="V1076 Advanced Rap Gestures 8.0">
+   <legend>V1076 · Advanced Rap Gestures 8.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaRapGesturesEnabledV1076)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaRapGesturesEnabledV1076:e.target.checked})}/>
+    Natürlichere Wortbetonungen und variablere Rap-Gesten aktivieren
+   </label>
+   <label>Gesten-Stärke: {preferences.arenaRapGesturesStrengthV1076??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaRapGesturesEnabledV1076}
+     value={preferences.arenaRapGesturesStrengthV1076??55}
+     onChange={e=>updatePreferences({arenaRapGesturesStrengthV1076:Number(e.target.value)})}/>
+   </label>
+   <small>Wort-Timing statt Beat-Raten: kompakte Arme bei schnellem Flow,
+    sanfte Kopf- und Oberkörperbetonungen, stärkere Punchline-Akzente und
+    ruhigere Phrasenenden. Nur wenn V1023 bereits ein Wort und den Sänger-Slot
+    geprüft hat. Bei Pause, manuellen Animationen, fehlenden Wort-Timings,
+    Low-GPU und Reduced Motion aus. Kein neues Rig, IK, Lip-Sync, keine Cloud-KI.</small>
+  </fieldset>
   <fieldset className="arena-v1062-rap-performance" aria-label="V1062 Advanced Rap Performance">
    <legend>V1062 · Advanced Rap Performance 7.0</legend>
    <label className="setting-check"><input type="checkbox"
@@ -794,7 +831,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false,arenaCrowdEnergyEnabledV1075:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false,arenaCrowdEnergyEnabledV1075:false,arenaRapGesturesEnabledV1076:false,arenaDuetPerformanceEnabledV1077:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

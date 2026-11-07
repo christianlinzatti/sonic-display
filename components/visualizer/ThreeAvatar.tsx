@@ -673,7 +673,9 @@ export function ThreeAvatar(props: VisualizerProps) {
   const rapCombinedGainV1071=performanceDirectorV1065.rapGain*rapFlowGainV1071;
   const dancerPropsV1065:VisualizerProps=rapCombinedGainV1071<1
     ?{...dancerPropsV356,arenaRapPerformanceStrengthV1062:
-        (props.arenaRapPerformanceStrengthV1062??55)*rapCombinedGainV1071}
+        (props.arenaRapPerformanceStrengthV1062??55)*rapCombinedGainV1071,
+        arenaRapGesturesStrengthV1076:
+        (props.arenaRapGesturesStrengthV1076??55)*rapCombinedGainV1071}
     :dancerPropsV356;
   const dancerPropsV1074:VisualizerProps=avatarAudienceV1074.active
     ?{...dancerPropsV1065,arenaAvatarAudienceCueV1074:avatarAudienceV1074}

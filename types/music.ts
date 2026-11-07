@@ -86,6 +86,10 @@ export interface UiPreferences {
   arenaNaturalMotionStrengthV1061?:number;
   arenaRapPerformanceEnabledV1062?:boolean;
   arenaRapPerformanceStrengthV1062?:number;
+  arenaRapGesturesEnabledV1076?:boolean;
+  arenaRapGesturesStrengthV1076?:number;
+  arenaDuetPerformanceEnabledV1077?:boolean;
+  arenaDuetPerformanceStrengthV1077?:number;
   arenaEnsembleEnabledV1063?:boolean;
   arenaEnsembleStrengthV1063?:number;
   arenaStageMovementEnabledV1064?:boolean;
