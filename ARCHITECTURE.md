@@ -1,3 +1,26 @@
+## V1048 · Next Generation Concert Director
+
+`lib/arena360ConcertDirectorV1048.ts` arrangiert den bereits vorhandenen V1040-Showplan
+optional auf Titel-ID-Basis neu. Ein FNV-1a-Seed plus vier Regiemotive in sieben Szenen
+macht jede Songinszenierung **reproduzierbar**, ohne zufällige Frame-Wechsel.
+Die Autorität des Showplans bleibt bestehen: geänderte Szenenfelder werden
+nicht überschrieben, keine Regieintensität erhöht und die kurzen Übergänge
+bleiben in der V1040-Timeline gebunden. Kein Cloud-KI-Modell, keine Aussage
+über tatsächlich erkannte Songabschnitte oder Beats.
+
+Die Bühne (`components/visualizer/stages/Arena360StageV1031.tsx`) und die
+Avatar-/Kameraregie (`components/visualizer/ThreeAvatar.tsx`) beziehen ihren Cue
+über denselben reinen Adapter. `components/GoveeMusicSyncV909.tsx` nutzt ihn
+nur als zusätzlichen Eingang des **bereits bestehenden** V1042-Overlays:
+Bestätigte V318-Phasen, manuelle Freigaben und der V961-Governor gelten
+unverändert. Keine neuen Netzwerkaufrufe, Timer, Geräte oder Renderer.
+Aktivierung unter AI Show Designer; standardmäßig AUS. Pause, reduzierte
+Bewegung, fehlende Songposition und Low-Tier deaktivieren die zusätzliche
+Bühnenregie. Die bestehende manuelle Kamera- und Duo-Priorität bleibt erhalten.
+
+Tests: `tests/v1048-nextgen-concert-director-regression.cjs`,
+`tests/tsconfig.v1048-core.json` und `scripts/v1048-release-readiness.cjs`.
+
 ## V1047 · Immersive Arena Experience 3.0
 
 `lib/arena360ImmersiveArenaV1047.ts` interpretiert ausschließlich einen vom
@@ -1415,7 +1438,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1047
+**Dokumentationsstand:** V1048
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

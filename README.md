@@ -1,3 +1,25 @@
+## V1048 · Next Generation Concert Director
+
+Die optionale V1048-Regie macht die lokale 360°-Konzertshow pro Song einzigartiger:
+vier Regiemotive kombinieren vorhandene Bühnenformen, Laser/Hologramme,
+Kameravorschläge und Avatarformationen in unterschiedlichen Folgen. Keine
+zwei benachbarten Abschnitte benutzen dasselbe Motiv. Die Song-ID erzeugt
+**reproduzierbare** Abläufe, die auch nach Pause oder Neustart gleich bleiben.
+
+**Aktivieren:** 360° Ultimate Concert Arena → AI Show Designer → einen Showplan
+anlegen und aktivieren → **V1048 Next Generation Concert Director** einschalten.
+Variation einstellbar von 0–70 %. Manuell bearbeitete Abschnitte werden
+nicht überschrieben; andere Effekte müssen weiterhin einzeln aktiviert sein.
+Die Govee-Ausgabe bleibt separat bei V1042/LAN-Sync freizugeben und verlangt
+verifizierte Musikphasen. Keine KI-Cloud, keine neuen Hardware-Kommandos und
+keine erfundenen Audioereignisse. Bei Pause/Reduced Motion/Low-Tier wird die
+virtuelle Regie zurückgenommen. Standardmäßig AUS.
+
+**Tests:** `npm run verify:v1048:focused` sowie
+`node scripts/v959-source-preflight.cjs`. Ein vollständiger Next.js-Build ist
+mit installiertem `npm ci` und Node 24.x auf GitHub/Vercel vorgesehen.
+Details: `changelog/V1048-NEXT-GENERATION-CONCERT-DIRECTOR.md`.
+
 ## V1047 · Immersive Arena Experience 3.0
 
 Die 360°-Arena erhält **bewegliche virtuelle Hologramme über dem Publikum**,

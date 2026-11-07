@@ -31,6 +31,7 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1048 Next Generation Concert Director','tests/v1048-nextgen-concert-director-regression.cjs');
   run('V1047 Immersive Arena Experience 3.0','tests/v1047-immersive-arena-regression.cjs');
   run('V1046 Cinematic Concert Finale Engine','tests/v1046-cinematic-finale-regression.cjs');
   run('V1045 Intelligent Concert Atmosphere 2.0','tests/v1045-atmosphere-orchestra-regression.cjs');

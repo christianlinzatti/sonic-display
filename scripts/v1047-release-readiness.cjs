@@ -7,10 +7,11 @@ function inspectReleaseV1047(root){
  const exists=f=>fs.existsSync(path.join(root,f));
  try{
   const p=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-  add('version',p.version==='0.1.0-v1047'&&p.sonicRoadmapRelease==='v1047'&&p.sonicFeatureRelease==='v1047');
+  const current=Number(/^0\.1\.0-v(\d+)$/.exec(p.version)?.[1]);
+  add('version',current>=1047&&p.sonicRoadmapRelease==='v'+current&&p.sonicFeatureRelease==='v'+current);
   add('lockfile',lock.version===p.version&&lock.packages?.['']?.version===p.version);
   add('node24',p.engines?.node==='24.x');
-  add('prebuild',p.scripts.prebuild.startsWith('npm run test:v1047 && npm run test:v1047:types && npm run test:v1046'));
+  add('prebuild',p.scripts.prebuild.includes('npm run test:v1047 && npm run test:v1047:types && npm run test:v1046'));
   add('focused',p.scripts['verify:v1047:focused'].includes('verify:v1046:focused'));
   for(const f of ['lib/arena360ImmersiveArenaV1047.ts',
    'components/visualizer/stages/ArenaImmersiveExperienceV1047.tsx',

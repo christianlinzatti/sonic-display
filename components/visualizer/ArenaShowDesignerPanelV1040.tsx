@@ -51,6 +51,27 @@ export function ArenaShowDesignerPanelV1040(){
    checked={Boolean(preferences.arenaShowDesignerEnabledV1040)&&Boolean(plan)} disabled={!plan}
    onChange={e=>updatePreferences({arenaShowDesignerEnabledV1040:e.target.checked})}/>
    Diesen Showplan live auf die 360°-Bühne anwenden</label>
+  <fieldset className="arena-v1048-concert-director" aria-label="V1048 Next Generation Concert Director">
+   <legend>V1048 · Next Generation Concert Director</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaConcertDirectorEnabledV1048)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaConcertDirectorEnabledV1048:e.target.checked})}/>
+    Jeden Song mit eigenen, abwechslungsreichen Show-Motiven inszenieren
+   </label>
+   <label>Regievariation: {preferences.arenaConcertDirectorStrengthV1048??50}%
+    <input type="range" min="0" max="70" step="5" disabled={!plan||!preferences.arenaConcertDirectorEnabledV1048}
+     value={preferences.arenaConcertDirectorStrengthV1048??50}
+     onChange={e=>updatePreferences({arenaConcertDirectorStrengthV1048:Number(e.target.value)})}/>
+   </label>
+   <small>Lokale songabhängige Arrangements für Bühnenform, Laser/Hologramme,
+    Kamera und Avatar-Gruppenbilder. Gleiches Lied = gleicher Ablauf, neue Songs = neue Motive.
+    Nur automatisch erzeugte Einstellungen werden variiert; manuell bearbeitete
+    Showplan-Szenen, Kamera-/Duo-/Lyrics-Regie und einzelne Effekt-Schalter behalten Vorrang.
+    Govee nutzt weiterhin ausschließlich V1042 mit bestätigter Musikphase, Helligkeitsgrenzen
+    und gesonderter LAN-Freigabe. Keine KI-Cloud, kein Mikrofon, keine neuen Gerätebefehle,
+    keine erfundenen Beats oder Stroboblitze; bei Pause, reduzierter Bewegung oder niedrigem
+    Grafikprofil wird die zusätzliche Regie deaktiviert.</small>
+  </fieldset>
   <fieldset className="arena-v1041-choreography" aria-label="V1041 intelligente Avatar-Choreografie">
    <legend>V1041 · Intelligent Avatar Choreography Director</legend>
    <label className="setting-check"><input type="checkbox"
@@ -205,7 +226,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}
