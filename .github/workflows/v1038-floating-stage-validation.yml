@@ -1,5 +1,5 @@
 name: V1038 Floating Stage manual validation
-run-name: Sonic Display · V1041 · V1038 Floating Stage manual validation
+run-name: Sonic Display · V1042 · V1038 Floating Stage manual validation
 # Manual version-specific diagnostics; v965 is the authoritative production matrix.
 on:
   workflow_dispatch:

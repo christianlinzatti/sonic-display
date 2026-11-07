@@ -1,5 +1,5 @@
 name: V1002 Concert Quality Assurance production validation
-run-name: Sonic Display · V1041 · V1002 Concert Quality Assurance production validation
+run-name: Sonic Display · V1042 · V1002 Concert Quality Assurance production validation
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:
