@@ -108,6 +108,8 @@ export interface UiPreferences {
   arenaHolographicConcertStrengthV1068?:number;
   arenaHolographicDancersEnabledV1081?:boolean;
   arenaHolographicDancersStrengthV1081?:number;
+  arenaDynamicArchitectureEnabledV1082?:boolean;
+  arenaDynamicArchitectureStrengthV1082?:number;
   arenaEpicDropEnabledV1069?:boolean;
   arenaEpicDropStrengthV1069?:number;
   arenaUltimateFinaleEnabledV1070?:boolean;

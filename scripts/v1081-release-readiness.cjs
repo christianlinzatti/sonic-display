@@ -11,7 +11,7 @@ function inspectReleaseV1081(root){
   add('version',version>=1081&&pkg.sonicRoadmapRelease==='v'+version&&pkg.sonicFeatureRelease==='v'+version);
   add('lockfile',pkg.version===lock.version&&pkg.version===lock.packages?.['']?.version);
   add('node24',pkg.engines?.node==='24.x');
-  add('prebuild',pkg.scripts.prebuild.startsWith('npm run test:v1081 && npm run test:v1081:types &&'));
+  add('prebuild',pkg.scripts.prebuild.includes('npm run test:v1081 && npm run test:v1081:types &&'));
   add('focused',pkg.scripts['verify:v1081:focused']?.includes('verify:v1080:focused'));
   add('test',pkg.scripts['test:v1081']==='node tests/v1081-holographic-dancers-regression.cjs');
   add('types',pkg.scripts['test:v1081:types']==='tsc -p tests/tsconfig.v1081-core.json --noEmit');

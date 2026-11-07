@@ -876,6 +876,8 @@ export function ThreeAvatar(props: VisualizerProps) {
         holographicConcertStrengthV1068={props.arenaHolographicConcertStrengthV1068 ?? 55}
         holographicDancersEnabledV1081={props.arenaHolographicDancersEnabledV1081 ?? false}
         holographicDancersStrengthV1081={props.arenaHolographicDancersStrengthV1081 ?? 55}
+        dynamicArchitectureEnabledV1082={props.arenaDynamicArchitectureEnabledV1082 ?? false}
+        dynamicArchitectureStrengthV1082={props.arenaDynamicArchitectureStrengthV1082 ?? 55}
         epicDropEnabledV1069={props.arenaEpicDropEnabledV1069 ?? false}
         epicDropStrengthV1069={props.arenaEpicDropStrengthV1069 ?? 55}
         ultimateFinaleEnabledV1070={props.arenaUltimateFinaleEnabledV1070 ?? false}

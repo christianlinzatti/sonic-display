@@ -1,3 +1,20 @@
+## V1082 · Dynamic Stage Architecture
+
+V1082 bringt sechs dynamische **mehrstöckige Kulissenformationen** für die
+360°-Konzertbühne: Gate, Arcade, Staircase, Terraces, Colonnade und Crown.
+Außerhalb der zentralen Künstlerplattform werden drei Ebenen aus
+Traversen, Verbindungen und LED-Kanten optisch arrangiert, ohne Avatare
+zu bewegen. Die neue Architektur ist freiwillig aktivierbar unter
+**AI Show Designer → V1082** und folgt ausschließlich einem gültigen,
+automatisch geführten Showplan. Nur beobachtete Beat-Signale erzeugen
+rhythmische Lichtakzente. Manuelle Steuerung, Pause, Reduced Motion und
+Low-Tier genießen Vorrang. Höchstens drei zusätzliche Instanced-Mesh-Batches
+mit 64 Segmenten; keine physische Laser-/Govee-Ausgabe.
+
+Lokale Tests: `npm run test:v1082`, `npm run test:v1082:types`,
+`npm run verify:v1082:focused`, `node scripts/v959-source-preflight.cjs`.
+Die Produktionsfreigabe braucht gesondert grünes GitHub Actions und Vercel.
+
 ## V1081 · Holographic Dancers 2.0
 
 V1081 erweitert die **bestehenden** holografischen Silhouetten zu virtuellen

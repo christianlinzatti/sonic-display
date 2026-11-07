@@ -359,6 +359,25 @@ export function ArenaShowDesignerPanelV1040(){
     keine neuen Meshes, kein Netzwerk und keine Govee-Befehle. Bei Pause werden
     Positionen gehalten; Reduced Motion und niedrige GPU-Qualität parken die Zusatzbewegung.</small>
   </fieldset>
+  <fieldset className="arena-v1082-dynamic-architecture" aria-label="V1082 Dynamic Stage Architecture">
+   <legend>V1082 · Dynamic Stage Architecture</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaDynamicArchitectureEnabledV1082)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaDynamicArchitectureEnabledV1082:e.target.checked})}/>
+    Drei gestaffelte Bühnenebenen mit bewegten Traversen und farbigen LED-Kanten
+   </label>
+   <label>Architekturintensität: {preferences.arenaDynamicArchitectureStrengthV1082??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaDynamicArchitectureEnabledV1082}
+     value={preferences.arenaDynamicArchitectureStrengthV1082??55}
+     onChange={e=>updatePreferences({arenaDynamicArchitectureStrengthV1082:Number(e.target.value)})}/>
+   </label>
+   <small>Sechs Formationen vom Intro bis zum Finale; nur ein vorhandener Showplan
+    und automatischer Bühnendeck-Modus können die Kulisse bewegen. Bleibt außerhalb
+    der rotierenden Künstlerplattform und des Publikums; 3 Instanced-Mesh-Batches
+    (max. 64 Segmente), ohne zusätzliche Lichtquellen, Avatare oder Gerätesteuerung.
+    Pause hält die Pose, Reduced Motion und niedrige Qualität parken die Effekte.</small>
+  </fieldset>
   <fieldset className="arena-v1066-transforming-stage" aria-label="V1066 Transforming Stage 3.0">
    <legend>V1066 · Transforming Stage 3.0</legend>
    <label className="setting-check"><input type="checkbox"
@@ -890,7 +909,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false,arenaCrowdEnergyEnabledV1075:false,arenaRapGesturesEnabledV1076:false,arenaDuetPerformanceEnabledV1077:false,arenaNaturalDanceEnabledV1078:false,arenaLiveArtistEnabledV1079:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false,arenaCrowdEnergyEnabledV1075:false,arenaRapGesturesEnabledV1076:false,arenaDuetPerformanceEnabledV1077:false,arenaNaturalDanceEnabledV1078:false,arenaLiveArtistEnabledV1079:false,arenaDynamicArchitectureEnabledV1082:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

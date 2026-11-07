@@ -190,6 +190,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
   floatingExperienceEnabledV1067,floatingExperienceStrengthV1067,
   holographicConcertEnabledV1068,holographicConcertStrengthV1068,
   holographicDancersEnabledV1081,holographicDancersStrengthV1081,
+  dynamicArchitectureEnabledV1082,dynamicArchitectureStrengthV1082,
   epicDropEnabledV1069,epicDropStrengthV1069,ultimateFinaleEnabledV1070,ultimateFinaleStrengthV1070,smartConcertFlowEnabledV1071,smartConcertFlowStrengthV1071,trackId,genre, ...props }:
   Props & { theme: StageEnvironmentId; children?: React.ReactNode; rotationSpeed?: number; rotationEnabled?: boolean;
     audienceEnabled?: boolean; lightsEnabled?: boolean; dropEnabled?: boolean;
@@ -226,6 +227,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
     holographicConcertEnabledV1068?:boolean;holographicConcertStrengthV1068?:number;
     holographicDancersEnabledV1081?:boolean;holographicDancersStrengthV1081?:number;
+    dynamicArchitectureEnabledV1082?:boolean;dynamicArchitectureStrengthV1082?:number;
     epicDropEnabledV1069?:boolean;epicDropStrengthV1069?:number;
     ultimateFinaleEnabledV1070?:boolean;ultimateFinaleStrengthV1070?:number;
     smartConcertFlowEnabledV1071?:boolean;smartConcertFlowStrengthV1071?:number;
@@ -258,6 +260,8 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       holographicConcertStrengthV1068={holographicConcertStrengthV1068}
       holographicDancersEnabledV1081={holographicDancersEnabledV1081}
       holographicDancersStrengthV1081={holographicDancersStrengthV1081}
+      dynamicArchitectureEnabledV1082={dynamicArchitectureEnabledV1082}
+      dynamicArchitectureStrengthV1082={dynamicArchitectureStrengthV1082}
       epicDropEnabledV1069={epicDropEnabledV1069}
       epicDropStrengthV1069={epicDropStrengthV1069}
       ultimateFinaleEnabledV1070={ultimateFinaleEnabledV1070}

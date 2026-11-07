@@ -31,6 +31,7 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1082 Dynamic Stage Architecture','tests/v1082-stage-architecture-regression.cjs');
   run('V1081 Holographic Dancers 2.0','tests/v1081-holographic-dancers-regression.cjs');
   run('V1080 Laser Show Experience 5.0','tests/v1080-laser-experience-regression.cjs');
   run('V1079 Live Artist Interaction','tests/v1079-live-artist-interaction-regression.cjs');

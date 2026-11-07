@@ -30,6 +30,8 @@ import {planStageFormationV1066} from '@/lib/arena360TransformingStageV1066';
 import {planFloatingExperienceV1067} from '@/lib/arena360FloatingExperienceV1067';
 import {planHolographicConcertV1068} from '@/lib/arena360HolographicConcertV1068';
 import {planHolographicDancersV1081} from '@/lib/arena360HolographicDancersV1081';
+import {planStageArchitectureV1082} from '@/lib/arena360StageArchitectureV1082';
+import {ArenaDynamicArchitectureV1082} from './ArenaDynamicArchitectureV1082';
 import {planEpicDropV1069} from '@/lib/arena360EpicDropV1069';
 import {planUltimateConcertFinaleV1070} from '@/lib/arena360UltimateFinaleV1070';
 import {planSmartConcertFlowV1071} from '@/lib/arena360SmartConcertFlowV1071';
@@ -93,6 +95,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   floatingExperienceEnabledV1067=false,floatingExperienceStrengthV1067=55,
   holographicConcertEnabledV1068=false,holographicConcertStrengthV1068=55,
   holographicDancersEnabledV1081=false,holographicDancersStrengthV1081=55,
+  dynamicArchitectureEnabledV1082=false,dynamicArchitectureStrengthV1082=55,
   epicDropEnabledV1069=false,epicDropStrengthV1069=55,
   ultimateFinaleEnabledV1070=false,ultimateFinaleStrengthV1070=55,
   smartConcertFlowEnabledV1071=false,smartConcertFlowStrengthV1071=55,trackId,genre}: {
@@ -127,6 +130,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
   holographicConcertEnabledV1068?:boolean;holographicConcertStrengthV1068?:number;
   holographicDancersEnabledV1081?:boolean;holographicDancersStrengthV1081?:number;
+  dynamicArchitectureEnabledV1082?:boolean;dynamicArchitectureStrengthV1082?:number;
   epicDropEnabledV1069?:boolean;epicDropStrengthV1069?:number;
   ultimateFinaleEnabledV1070?:boolean;ultimateFinaleStrengthV1070?:number;
   smartConcertFlowEnabledV1071?:boolean;smartConcertFlowStrengthV1071?:number;
@@ -304,6 +308,16 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     {...finaleHologramsV1070,power:finaleHologramsV1070.power*smartFlowV1071.holograms}:finaleHologramsV1070;
   // V1081: lightweight dance cues for world-fixed holographic silhouettes.
   // Neither disabled/manual V1039 portals nor unapproved V1068 channels are enabled.
+  // V1082: three multi-level, world-fixed scenic truss layers. Existing
+  // manually selected deck modes, reduced motion, pause and low tiers win.
+  const dynamicArchitectureV1082=planStageArchitectureV1082({
+    enabled:dynamicArchitectureEnabledV1082,stageIsArena:true,
+    playing:isPlaying,reducedMotion,reactive,showDesignerEnabled,showDirectorEnabled,
+    outerStageEnabled:transformingDeckEnabled,manualDeckMode:transformingDeckMode,
+    performanceTier:getActivePerformanceTier(),progressMs,durationMs,
+    strength:dynamicArchitectureStrengthV1082,show:showCueV1040,
+    beat:audio.beat,beatStrength:audio.beatStrength,energy:audio.energyEnvelope,
+  });
   const holographicDancersV1081=planHolographicDancersV1081({
     enabled:holographicDancersEnabledV1081&&holographicConcertEnabledV1068,
     stageIsArena:true,hologramsEnabled,showDesignerEnabled,showDirectorEnabled,
@@ -528,6 +542,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       reactive={reactive} enabled={laserArchitectureEnabled&&showDirectorEnabled&&lasersEnabled}
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}
       laserCueV1057={flowLasersV1071} laserExperienceCueV1080={laserExperienceV1080}/>
+    {dynamicArchitectureEnabledV1082 && <ArenaDynamicArchitectureV1082 enabled={dynamicArchitectureEnabledV1082}
+      playing={isPlaying} reducedMotion={reducedMotion} cue={dynamicArchitectureV1082}/>}
     <ArenaFloatingPlatformsV1038 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={floatingStageEnabled} mode={plannedFloat}
       intensity={plannedFloatStrength} section={section}

@@ -91,9 +91,9 @@ for(const banned of ['Math.random(','Date.now(','fetch(','setInterval(','setTime
  'requestAnimationFrame(','navigator.','localStorage','Govee','new AnimationMixer(',
  'new AudioContext(','new Light('])assert(!pure.includes(banned),'pure planner: '+banned);
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1081');assert.equal(pkg.version,lock.version);
+assert(Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1]||0)>=1081);assert.equal(pkg.version,lock.version);
 assert.equal(pkg.version,lock.packages[''].version);
-assert(pkg.scripts.prebuild.startsWith('npm run test:v1081 && npm run test:v1081:types'));
+assert(pkg.scripts.prebuild.includes('npm run test:v1081 && npm run test:v1081:types'));
 for(const f of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(f).includes('v1081-holographic-dancers-regression.cjs'),f);
 const workflow=read('.github/workflows/v965-room-wave-production.yml');
