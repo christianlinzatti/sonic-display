@@ -86,7 +86,17 @@ test('preview uses same timings as live plan',()=>{const rows=f.previewGoveeCali
 test('preview never edits stored settings',()=>{const before=storage.get(f.GOVEE_CALIBRATION_KEY_V927);f.previewGoveeCalibrationV927(ips,seeded,3000);assert.equal(storage.get(f.GOVEE_CALIBRATION_KEY_V927),before);});
 test('preview never contains bridge credentials',()=>{assert.doesNotMatch(JSON.stringify(f.previewGoveeCalibrationV927(ips,seeded)),/token|password|endpoint/);});
 test('no automatic RTT-to-visual delay formula',()=>{const s=f.recordGoveeStatusRoundtripV927(enabled(),ips[1],[800,900,1000],999);assert.equal(advance(ips[1],s),0);});
-test('live integration uses only one LAN command sender',()=>{const src=read('components/GoveeMusicSyncV909.tsx');assert.equal((src.match(/goveeBridgeRequestV909\(config,'\/command'/g)||[]).length,1);for(const part of ['compensatedGoveeWaveTimeV927','compensatedGoveeVerifiedTimeV927','GOVEE_CALIBRATION_EVENT_V927','calibrationSettings,roadmapSettings,syncSettingsV1027,goveeShowEnabledV1042,goveeShowStrengthV1042,arenaShowEnabledV1040,arenaShowPlanV1040,showStageIsArenaV1042,reducedMotionV1042]'])assert.ok(src.includes(part));});
+test('live integration uses only one LAN command sender',()=>{
+ const src=read('components/GoveeMusicSyncV909.tsx');
+ assert.equal((src.match(/goveeBridgeRequestV909\(config,'\/command'/g)||[]).length,1);
+ for(const part of ['compensatedGoveeWaveTimeV927','compensatedGoveeVerifiedTimeV927',
+  'GOVEE_CALIBRATION_EVENT_V927'])assert.ok(src.includes(part));
+ const deps=new Set((/},\[(config,showLibrary,groups,[^\]]+)\]\);/.exec(src)?.[1]??'').split(',').map(x=>x.trim()));
+ for(const name of ['calibrationSettings','roadmapSettings','syncSettingsV1027',
+  'goveeShowEnabledV1042','goveeShowStrengthV1042','arenaShowEnabledV1040',
+  'arenaShowPlanV1040','showStageIsArenaV1042','reducedMotionV1042'])
+  assert.ok(deps.has(name),`Govee effect must track ${name}`);
+});
 test('existing V915 group limiter preserved after V927',()=>{const src=read('components/GoveeMusicSyncV909.tsx');assert.match(src,/festivalDeliveredLook=easeGoveeLookV911\(previous,\s*applyGoveeGroupBrightnessV915\(spatialUngrouped,group,config\.masterBrightness\)\)/);});
 test('UI never sends power or color commands for calibration',()=>{const src=read('components/GoveeRoomCalibrationStudioV927.tsx');assert.doesNotMatch(src,/action:\s*['"](?:power|strobe|look|brightness|color)['"]/);assert.ok(src.includes("'/status','POST'"));assert.ok(src.includes('config.autoSync'));});
 test('UI exposes manual lag and explicit save/revert',()=>{const src=read('components/GoveeRoomCalibrationStudioV927.tsx');for(const text of ['Sichtbare Verzögerung','Kalibrierung speichern','Änderungen verwerfen','Vorschau','nicht</strong>, wann die LEDs'])assert.ok(src.includes(text));});
