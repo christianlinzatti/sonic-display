@@ -3,6 +3,7 @@ import {useFrame} from '@react-three/fiber';
 import {useLayoutEffect,useMemo,useRef} from 'react';
 import {Color,Object3D,type InstancedMesh,type ShaderMaterial} from 'three';
 import type {ArenaAtmosphereDirectorCueV1045} from '@/lib/arena360AtmosphereDirectorV1045';
+import type {VolumetricLightCueV1058} from '@/lib/arena360VolumetricLightingV1058';
 import type {AudioFeatures} from '@/types/audio';
 import {useAdaptivePerformance} from '../adaptivePerformance';
 import type {ArenaPeakStateV1036} from '@/lib/arena360AtmosphereV1036';
@@ -17,10 +18,11 @@ float wisps=.86+.14*sin(p.x*5.+uTime*.2)*cos(p.y*4.-uTime*.13);
 float alpha=uOpacity*(1.-smoothstep(.13,1.,r))*wisps;
 gl_FragColor=vec4(uTint,alpha);}`;
 export function ArenaLowFogV1036({audio,playing,reducedMotion,reactive,enabled,directorEnabled,
- section,progressMs,durationMs,intensity,peakRef,atmosphereV1045}: {
+ section,progressMs,durationMs,intensity,peakRef,atmosphereV1045,volumetricCueV1058}: {
  audio:AudioFeatures;playing:boolean;reducedMotion:boolean;reactive:boolean;enabled:boolean;directorEnabled:boolean;
  section?:string;progressMs?:number;durationMs?:number;intensity?:number;
  peakRef?:{readonly current:ArenaPeakStateV1036};atmosphereV1045?:ArenaAtmosphereDirectorCueV1045;
+ volumetricCueV1058?:VolumetricLightCueV1058|null;
 }){
  const tier=useAdaptivePerformance().tier;
  const banks=useMemo(()=>createArenaFogBanksV1036(tier),[tier]);
@@ -41,9 +43,12 @@ export function ArenaLowFogV1036({audio,playing,reducedMotion,reactive,enabled,d
   budget.current=0;wasActive.current=active;
   const cue=planArenaAtmosphereV1036({enabled:directorEnabled,playing,reducedMotion,reactive,
    section,progressMs,durationMs,energy:audio.energyEnvelope,intensity,peak:peakRef?.current.energy});
-  const gain=atmosphereV1045?.active?atmosphereV1045.fogGain:1;
+  // V1058 never overrides manually disabled fog; preserve V1045 tint priority.
+  // Both the existing floor and wisp batches retain their original opacity caps.
+  const volume=volumetricCueV1058?.active&&tier!=='low'&&active?volumetricCueV1058:null;
+  const gain=(atmosphereV1045?.active?atmosphereV1045.fogGain:1)*(volume?.fogGain??1);
   const blend=Math.min(1,dt*1.5);
-  targetTint.set(atmosphereV1045?.active?atmosphereV1045.fogColor:'#478eae');
+  targetTint.set(atmosphereV1045?.active?atmosphereV1045.fogColor:volume?.fogTint??'#478eae');
   material.current.uniforms.uTint.value.lerp(targetTint,blend);
   plumeMaterial.current.uniforms.uTint.value.lerp(targetTint,blend);
   material.current.uniforms.uTime.value=clock.current;

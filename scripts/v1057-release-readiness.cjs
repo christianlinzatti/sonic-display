@@ -11,7 +11,7 @@ function inspectReleaseV1057(root){
   add('metadata',!!v&&Number(v[1])>=1057&&p.sonicRoadmapRelease==='v'+v[1]&&p.sonicFeatureRelease==='v'+v[1]);
   add('lockfile',p.version===lock.version&&p.version===lock.packages?.['']?.version);
   add('Node24',p.engines?.node==='24.x');
-  add('prebuild first',p.scripts.prebuild.startsWith('npm run test:v1057 && npm run test:v1057:types && npm run test:v1056'));
+  add('prebuild chain',p.scripts.prebuild.includes('npm run test:v1057 && npm run test:v1057:types && npm run test:v1056'));
   add('previous focused tests',p.scripts['verify:v1057:focused'].includes('verify:v1056:focused'));
   for(const f of ['lib/arena360IntelligentLaserV1057.ts','tests/v1057-intelligent-laser-regression.cjs',
    'tests/tsconfig.v1057-core.json','scripts/v1057-release-readiness.cjs',

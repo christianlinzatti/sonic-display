@@ -154,6 +154,80 @@ export function ArenaShowDesignerPanelV1040(){
     Bei Pause, reduzierter Bewegung oder niedrigem Grafikprofil wird die
     Zusatzregie ausgeschaltet.</small>
   </fieldset>
+  <fieldset className="arena-v1060-lighting-choreographer" aria-label="V1060 AI Lighting Choreographer">
+   <legend>V1060 · AI Lighting Choreographer</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaLightingChoreographerEnabledV1060)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaLightingChoreographerEnabledV1060:e.target.checked})}/>
+    Verfolger-Spots, Laser, LED-Wand und Nebel dramaturgisch aufeinander abstimmen
+   </label>
+   <label>Koordination: {preferences.arenaLightingChoreographerStrengthV1060??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaLightingChoreographerEnabledV1060}
+     value={preferences.arenaLightingChoreographerStrengthV1060??55}
+     onChange={e=>updatePreferences({arenaLightingChoreographerStrengthV1060:Number(e.target.value)})}/>
+   </label>
+   <small>Lokale, regelbasierte Show-Koordination – kein Cloud-KI-Aufruf. Die vier
+    bereits separat aktivierten V1056–V1059-Effekte erhalten wechselnde Priorität:
+    in der Strophe Sängerfokus, im Aufbau Laser, in der Hook LED-Panorama,
+    im Zwischenspiel Lichtatmosphäre. Nur Abdunklung innerhalb bisheriger
+    Sicherheitsgrenzen; manuell deaktivierte Effekte und manuell gewählte
+    Muster bleiben unverändert. Mindestens einen Effekt V1056–V1059
+    separat aktivieren. Keine neuen Leuchten, Govee-Befehle, Blitze oder
+    erfundenen Beats. Bei Pause, reduzierter Bewegung, niedrigem Grafikprofil
+    oder ungültigem Showplan bleibt der zusätzliche Choreograf inaktiv.</small>
+  </fieldset>
+  <fieldset className="arena-v1059-led-wall" aria-label="V1059 Advanced LED Wall 4.0">
+   <legend>V1059 · Advanced LED Wall 4.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaLedWallEnabledV1059)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaLedWallEnabledV1059:e.target.checked})}/>
+    360°-LED-Panorama mit Equalizer, Geometrie und Showkapitel-Looks aktivieren
+   </label>
+   <label>LED-Intensität: {preferences.arenaLedWallStrengthV1059??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaLedWallEnabledV1059}
+     value={preferences.arenaLedWallStrengthV1059??55}
+     onChange={e=>updatePreferences({arenaLedWallStrengthV1059:Number(e.target.value)})}/>
+   </label>
+   <label>LED-Look
+    <select disabled={!plan||!preferences.arenaLedWallEnabledV1059}
+     value={preferences.arenaLedWallPatternV1059??'auto'}
+     onChange={e=>updatePreferences({arenaLedWallPatternV1059:e.target.value as import('@/lib/arena360LedWallV1059').LedWallPatternV1059})}>
+     <option value="auto">Automatisch – je Showkapitel</option>
+     <option value="equalizer">Equalizer – echte Audioenergie</option>
+     <option value="geometry">Geometrie</option>
+     <option value="orbit">Orbit-Wellen</option>
+     <option value="pulse">Sanfte Pulse</option>
+    </select>
+   </label>
+   <small>Nur virtuelle, offene LED-Pixel rund um den Arenaboden; ein Instanced-Draw-Call,
+    maximal 256 Pixel, begrenzte Helligkeit. Die Equalizerhöhe reagiert auf vorhandene
+    Bass-/Mitten-/Höhenwerte, nicht auf behauptete Tonspuren oder erfundene Drops.
+    Manuelle LED-Look-Auswahl hat Vorrang vor dem Showplan. Auf niedriger GPU-Qualität,
+    bei Pause, reduzierter Bewegung oder ungültigem Showplan bleibt der Effekt aus.
+    Keine neuen Hardware-, Govee- oder Audio-Befehle.</small>
+  </fieldset>
+  <fieldset className="arena-v1058-volumetric-light" aria-label="V1058 Volumetric Light Experience">
+   <legend>V1058 · Volumetric Light Experience</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaVolumetricLightingEnabledV1058)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaVolumetricLightingEnabledV1058:e.target.checked})}/>
+    Sanfte Lichtkegel und Bühnennebel mit dem Konzert-Showplan synchronisieren
+   </label>
+   <label>Volumetrische Lichtwirkung: {preferences.arenaVolumetricLightingStrengthV1058??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaVolumetricLightingEnabledV1058}
+     value={preferences.arenaVolumetricLightingStrengthV1058??55}
+     onChange={e=>updatePreferences({arenaVolumetricLightingStrengthV1058:Number(e.target.value)})}/>
+   </label>
+   <small>V1058 erzeugt eine ressourcenschonende Annäherung an volumetrische Lichtkegel:
+    ein sanftes Transparenzprofil in den zwei vorhandenen Bühnen-Spots und
+    dezente Farb-/Nebelakzente in den bestehenden Nebel-Batches. Keine echten
+    Raymarch-Volumetrics, neuen Leuchten, zusätzliche Nebelpartikel, Mikrofone,
+    API-Aufrufe oder Govee-Befehle. Bei Pause, Reduced Motion, niedriger GPU-Qualität,
+    ungültigem Showplan oder abgeschalteten Effekten greift ausschließlich der bisherige Look.</small>
+  </fieldset>
   <fieldset className="arena-v1057-intelligent-laser" aria-label="V1057 Intelligent Laser Director">
    <legend>V1057 · Intelligent Laser Director</legend>
    <label className="setting-check"><input type="checkbox"
@@ -420,7 +494,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

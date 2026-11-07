@@ -752,6 +752,13 @@ export function ThreeAvatar(props: VisualizerProps) {
         cinematicLightingStrengthV1056={props.arenaCinematicLightingStrengthV1056 ?? 55}
         intelligentLaserEnabledV1057={props.arenaIntelligentLaserEnabledV1057 ?? false}
         intelligentLaserStrengthV1057={props.arenaIntelligentLaserStrengthV1057 ?? 55}
+        volumetricLightingEnabledV1058={props.arenaVolumetricLightingEnabledV1058 ?? false}
+        volumetricLightingStrengthV1058={props.arenaVolumetricLightingStrengthV1058 ?? 55}
+        ledWallEnabledV1059={props.arenaLedWallEnabledV1059 ?? false}
+        ledWallStrengthV1059={props.arenaLedWallStrengthV1059 ?? 55}
+        ledWallPatternV1059={props.arenaLedWallPatternV1059 ?? "auto"}
+        lightingChoreographerEnabledV1060={props.arenaLightingChoreographerEnabledV1060 ?? false}
+        lightingChoreographerStrengthV1060={props.arenaLightingChoreographerStrengthV1060 ?? 55}
         microphoneActiveV1049={props.microphoneActiveV1049 ?? false}
         trackId={props.track?.id}
         genre={props.genre}

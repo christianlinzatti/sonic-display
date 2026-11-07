@@ -31,6 +31,9 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1060 AI Lighting Choreographer','tests/v1060-lighting-choreographer-regression.cjs');
+  run('V1059 Advanced LED Wall 4.0','tests/v1059-led-wall-regression.cjs');
+  run('V1058 Volumetric Light Experience','tests/v1058-volumetric-light-regression.cjs');
   run('V1057 Intelligent Laser Director','tests/v1057-intelligent-laser-regression.cjs');
   run('V1056 Cinematic Concert Lighting 2.0','tests/v1056-cinematic-lighting-regression.cjs');
   run('V1055 Dynamic Concert Stage & Avatar Interaction','tests/v1055-stage-interaction-regression.cjs');

@@ -69,7 +69,8 @@ assert(fans.includes('tier===\'low\'')&&tunnels.includes('createLaserArchitectur
 assert.equal((fans.match(/<instancedMesh\b/g)||[]).length,1);
 assert.equal((tunnels.match(/<instancedMesh\b/g)||[]).length,1);
 assert(arena.includes('planIntelligentLaserV1057(')&&
- (arena.match(/laserCueV1057={intelligentLaserV1057}/g)||[]).length===2);
+ (arena.match(/laserCueV1057={(?:intelligentLaserV1057|coordinatedLasersV1060)}/g)||[]).length===2);
+assert(!arena.includes('coordinatedLasersV1060')||arena.includes('intelligentLaserV1057.active'),'coordination must require active original laser cue');
 assert(arena.includes('hologramPattern===\'auto\''),'manual laser selection still wins');
 for(const file of ['types/music.ts','context/UiPreferencesContext.tsx',
  'components/visualizer/VisualizerStage.tsx','components/visualizer/registry.tsx',
@@ -78,5 +79,5 @@ for(const file of ['types/music.ts','context/UiPreferencesContext.tsx',
  assert(read(file).includes('IntelligentLaserEnabledV1057')||read(file).includes('intelligentLaserEnabledV1057'),file);
 assert(read('context/UiPreferencesContext.tsx').includes('arenaIntelligentLaserEnabledV1057:false'));
 assert(read('components/visualizer/ArenaShowDesignerPanelV1040.tsx').includes('V1057 · Intelligent Laser Director'));
-assert(read('components/visualizer/ArenaShowDesignerPanelV1040.tsx').includes('arenaIntelligentLaserEnabledV1057:false}'));
+assert(/arenaIntelligentLaserEnabledV1057:false(?:,|})/.test(read('components/visualizer/ArenaShowDesignerPanelV1040.tsx')));
 console.log('PASS V1057 · 7 authored laser looks, manual precedence, 6500 bounded samples, reduced-motion/quality gates, no extra lights/commands/draw calls, full UI wiring');

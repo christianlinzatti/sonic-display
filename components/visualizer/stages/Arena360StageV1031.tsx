@@ -11,6 +11,10 @@ import {ArenaAudienceV1032} from "./ArenaAudienceV1032";
 import {ArenaLightsV1032} from "./ArenaLightsV1032";
 import {planCinematicLightingV1056} from "@/lib/arena360CinematicLightingV1056";
 import {planIntelligentLaserV1057} from "@/lib/arena360IntelligentLaserV1057";
+import {planVolumetricLightingV1058} from '@/lib/arena360VolumetricLightingV1058';
+import {planLedWallV1059,type LedWallPatternV1059} from '@/lib/arena360LedWallV1059';
+import {ArenaLedWallV1059} from './ArenaLedWallV1059';
+import {planLightingChoreographerV1060} from '@/lib/arena360LightingChoreographerV1060';
 import {ArenaLedDomeV1033} from "./ArenaLedDomeV1033";
 import {ArenaSkyFormationV1034} from "./ArenaSkyFormationV1034";
 import {ArenaLedColumnsV1035} from "./ArenaLedColumnsV1035";
@@ -68,7 +72,10 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   crowdExperienceEnabledV1051=false,crowdExperienceStrengthV1051=55,
   ultimateConcertEnabledV1052=false,ultimateConcertStrengthV1052=60,
   cinematicLightingEnabledV1056=false,cinematicLightingStrengthV1056=55,
-  intelligentLaserEnabledV1057=false,intelligentLaserStrengthV1057=55,trackId,genre}: {
+  intelligentLaserEnabledV1057=false,intelligentLaserStrengthV1057=55,
+  volumetricLightingEnabledV1058=false,volumetricLightingStrengthV1058=55,
+  ledWallEnabledV1059=false,ledWallStrengthV1059=55,ledWallPatternV1059='auto',
+  lightingChoreographerEnabledV1060=false,lightingChoreographerStrengthV1060=55,trackId,genre}: {
   children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
   reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
   audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
@@ -91,6 +98,9 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   ultimateConcertEnabledV1052?:boolean;ultimateConcertStrengthV1052?:number;
   cinematicLightingEnabledV1056?:boolean;cinematicLightingStrengthV1056?:number;
   intelligentLaserEnabledV1057?:boolean;intelligentLaserStrengthV1057?:number;
+  volumetricLightingEnabledV1058?:boolean;volumetricLightingStrengthV1058?:number;
+  ledWallEnabledV1059?:boolean;ledWallStrengthV1059?:number;ledWallPatternV1059?:LedWallPatternV1059;
+  lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
   trackId?:string|null;genre?:string|null;
 }){
   const turntable=useRef<Group>(null);
@@ -144,6 +154,45 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     show:showCueV1040,plan:showPlan,trackId,progressMs,durationMs,
     strength:intelligentLaserStrengthV1057,performanceTier:getActivePerformanceTier(),
   });
+  // V1058: purely optical, bounded cue for two existing cone meshes + fog batches.
+  const volumetricLightingV1058=planVolumetricLightingV1058({
+    enabled:volumetricLightingEnabledV1058&&showDesignerEnabled&&showDirectorEnabled,
+    stageIsArena:true,lightsEnabled,fogEnabled:groundFogEnabled,
+    playing:isPlaying,reducedMotion,reactive,
+    show:showCueV1040,plan:showPlan,trackId,progressMs,durationMs,
+    strength:volumetricLightingStrengthV1058,performanceTier:getActivePerformanceTier(),
+  });
+  // V1059: authored concert chapter + VERIFIED audio features feed one open LED pixel belt.
+  const ledWallV1059=planLedWallV1059({
+    enabled:ledWallEnabledV1059&&showDesignerEnabled&&showDirectorEnabled,
+    stageIsArena:true,playing:isPlaying,reducedMotion,reactive,
+    performanceTier:getActivePerformanceTier(),trackId,progressMs,durationMs,
+    plan:showPlan,show:showCueV1040,strength:ledWallStrengthV1059,pattern:ledWallPatternV1059,
+  });
+  // V1060 coordinates only individually authorized, already computed optical cues.
+  // It cannot enable a manually disabled effect or create any physical light command.
+  const choreographyV1060=planLightingChoreographerV1060({
+    enabled:lightingChoreographerEnabledV1060&&showDesignerEnabled&&showDirectorEnabled,
+    stageIsArena:true,playing:isPlaying,reducedMotion,reactive,
+    performanceTier:getActivePerformanceTier(),trackId,progressMs,durationMs,
+    plan:showPlan,show:showCueV1040,strength:lightingChoreographerStrengthV1060,
+    channels:{spots:cinematicLightingV1056.active&&lightsEnabled,
+      lasers:intelligentLaserV1057.active&&lasersEnabled,
+      fog:volumetricLightingV1058.active&&(groundFogEnabled||lightsEnabled),
+      led:ledWallV1059.active},
+  });
+  const coordinatedSpotsV1060=choreographyV1060.active&&cinematicLightingV1056.active?
+    {...cinematicLightingV1056,gainA:cinematicLightingV1056.gainA*choreographyV1060.spots,
+      gainB:cinematicLightingV1056.gainB*choreographyV1060.spots}:cinematicLightingV1056;
+  const coordinatedLasersV1060=choreographyV1060.active&&intelligentLaserV1057.active?
+    {...intelligentLaserV1057,fanGain:intelligentLaserV1057.fanGain*choreographyV1060.lasers,
+      beamGain:intelligentLaserV1057.beamGain*choreographyV1060.lasers}:intelligentLaserV1057;
+  const coordinatedVolumeV1060=choreographyV1060.active&&volumetricLightingV1058.active?
+    {...volumetricLightingV1058,
+      beamOpacity:.075+(volumetricLightingV1058.beamOpacity-.075)*choreographyV1060.fog,
+      fogGain:1+(volumetricLightingV1058.fogGain-1)*choreographyV1060.fog}:volumetricLightingV1058;
+  const coordinatedLedV1060=choreographyV1060.active&&ledWallV1059.active?
+    {...ledWallV1059,gain:ledWallV1059.gain*choreographyV1060.led}:ledWallV1059;
   const audienceCueV1044=planArenaAudienceV1044({
     enabled:audienceDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,show:showCueV1040,
     stageIsArena:true,playing:isPlaying,reducedMotion,phoneEnabled:phoneSyncEnabled&&audienceEnabled,
@@ -289,6 +338,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       fullSongDirectorEnabled={fullSongDirectorEnabled&&showDirectorEnabled} showIntensity={showIntensity} section={section}
       audienceCueV1044={coordinatedAudienceCue} crowdCueV1051={crowdCueV1051}/>
     <ArenaLedDomeV1033 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={domeEnabled} reactive={reactive}/>
+    <ArenaLedWallV1059 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
+      cue={coordinatedLedV1060} progressMs={progressMs}/>
     <ArenaSkyFormationV1034 audio={audio} section={section} playing={isPlaying} reducedMotion={reducedMotion}
       enabled={skyFormationEnabled} directorEnabled={showDirectorEnabled} reactive={reactive}
       showAmbience={fullSongDirectorEnabled?cueV1035.ambience:undefined}/>
@@ -301,13 +352,14 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaLaserFansV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={lasersEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045} finaleV1046={finaleV1046}
-      laserCueV1057={intelligentLaserV1057}/>
+      laserCueV1057={coordinatedLasersV1060}/>
     <ArenaMovingLedSkyV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={movingSkyEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}/>
     <ArenaLowFogV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={groundFogEnabled} directorEnabled={showDirectorEnabled} section={section}
-      progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}/>
+      progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}
+      volumetricCueV1058={volumetricLightingEnabledV1058?coordinatedVolumeV1060:undefined}/>
     <ArenaImmersiveExperienceV1047 cue={immersiveV1047}
       hologramsEnabled={hologramsEnabled&&showDirectorEnabled}
       lasersEnabled={laserArchitectureEnabled&&lasersEnabled&&showDirectorEnabled}/>
@@ -319,13 +371,14 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaLaserTunnelsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={laserArchitectureEnabled&&showDirectorEnabled&&lasersEnabled}
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}
-      laserCueV1057={intelligentLaserV1057}/>
+      laserCueV1057={coordinatedLasersV1060}/>
     <ArenaFloatingPlatformsV1038 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={floatingStageEnabled} mode={plannedFloat}
       intensity={plannedFloatStrength} section={section}/>
     <ArenaLightsV1032 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       enabled={lightsEnabled} dropEnabled={dropEnabled} reactive={reactive}
-      lightCueV1056={cinematicLightingV1056}/>
+      lightCueV1056={coordinatedSpotsV1060}
+      volumetricCueV1058={volumetricLightingEnabledV1058?coordinatedVolumeV1060:undefined}/>
     {/* The turntable and the performer root share precisely the same transform. */}
     <group ref={turntable} name="v1031-rotating-platform-and-cast">
       <mesh position={[0,-1.99,0]}>

@@ -177,6 +177,13 @@ export interface VisualizerProps {
   arenaCinematicLightingStrengthV1056?:number;
   arenaIntelligentLaserEnabledV1057?:boolean;
   arenaIntelligentLaserStrengthV1057?:number;
+  arenaVolumetricLightingEnabledV1058?:boolean;
+  arenaVolumetricLightingStrengthV1058?:number;
+  arenaLedWallEnabledV1059?:boolean;
+  arenaLedWallStrengthV1059?:number;
+  arenaLedWallPatternV1059?:import('@/lib/arena360LedWallV1059').LedWallPatternV1059;
+  arenaLightingChoreographerEnabledV1060?:boolean;
+  arenaLightingChoreographerStrengthV1060?:number;
   dancePostEnabledV468?: boolean;
   shaderEnvironmentV468?: import('./ProceduralShaderEnvironmentV468').ShaderEnvironmentModeV468;
   wardrobeModeV468?: import('./avatarWardrobeV468').WardrobeModeV468;

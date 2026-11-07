@@ -1,23 +1,45 @@
 "use client";
 import {useFrame} from "@react-three/fiber";
 import {useMemo,useRef} from "react";
-import {Color,Object3D,Vector3,type Group,type MeshBasicMaterial,type SpotLight} from "three";
+import {Color,Object3D,Vector3,type Group,type MeshBasicMaterial,type ShaderMaterial,type SpotLight} from "three";
 import type {CinematicLightCueV1056} from "@/lib/arena360CinematicLightingV1056";
+import type {VolumetricLightCueV1058} from "@/lib/arena360VolumetricLightingV1058";
 import {TRACKING_ROOT_NAME} from "../smartCameraTrackingV297";
 import type {AudioFeatures} from "@/types/audio";
-import {getActivePerformanceTier} from "../adaptivePerformance";
+import {getActivePerformanceTier,useAdaptivePerformance} from "../adaptivePerformance";
 import {INITIAL_ARENA_DROP_V1032,stepArenaDropV1032} from "@/lib/arena360ExperienceV1032";
 
+/** V1058: translucent depth-faded cones are a bounded optical approximation,
+ * not ray-marched volumes. Existing cone geometry and fixture count are reused.
+ * No texture, extra spotlight, animation loop or camera-specific effect.
+ */
+const beamVertexV1058=`varying vec2 vUv;
+ void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`;
+const beamFragmentV1058=`varying vec2 vUv;
+ uniform vec3 uTint;uniform float uOpacity;uniform float uFeather;
+ void main(){float h=clamp(vUv.y,0.0,1.0);
+ float envelope=smoothstep(0.0,uFeather,h)*(1.0-smoothstep(0.74,1.0,h));
+ float alpha=clamp(uOpacity*(0.32+0.68*envelope),0.0,0.14);
+ gl_FragColor=vec4(uTint,alpha);}`;
 /** Actual moving target spots + subtle translucent fixtures. A single soft drop
  * ring replaces any strobe/full-screen white flash. Uses the existing R3F clock.
  */
-export function ArenaLightsV1032({audio,playing,reducedMotion,reactive=true,enabled=true,dropEnabled=true,lightCueV1056}:{
+export function ArenaLightsV1032({audio,playing,reducedMotion,reactive=true,enabled=true,dropEnabled=true,lightCueV1056,volumetricCueV1058}:{
   audio:AudioFeatures;playing:boolean;reducedMotion:boolean;reactive?:boolean;
   enabled?:boolean;dropEnabled?:boolean;lightCueV1056?:CinematicLightCueV1056|null;
+  volumetricCueV1058?:VolumetricLightCueV1058|null;
 }){
   const left=useRef<Group>(null),right=useRef<Group>(null);
   const spotlightA=useRef<SpotLight>(null),spotlightB=useRef<SpotLight>(null);
   const ringA=useRef<MeshBasicMaterial>(null),ringB=useRef<MeshBasicMaterial>(null);
+  const beamA=useRef<ShaderMaterial>(null),beamB=useRef<ShaderMaterial>(null);
+  const renderTier=useAdaptivePerformance().tier;
+  const showVolumeShader=Boolean(volumetricCueV1058?.active)&&playing&&!reducedMotion&&reactive&&renderTier!=='low';
+  const desiredBeamA=useMemo(()=>new Color('#4cbdff'),[]);
+  const desiredBeamB=useMemo(()=>new Color('#ce71ff'),[]);
+  // Stable uniforms preserve optical fades across React rerenders.
+  const beamUniformsA=useMemo(()=>({uTint:{value:new Color('#4cbdff')},uOpacity:{value:.075},uFeather:{value:.40}}),[]);
+  const beamUniformsB=useMemo(()=>({uTint:{value:new Color('#ce71ff')},uOpacity:{value:.075},uFeather:{value:.40}}),[]);
   const targetA=useMemo(()=>new Object3D(),[]),targetB=useMemo(()=>new Object3D(),[]);
   // V1056: reuse both real spotlights. Cache scene actors and vectors; do not
   // allocate a mesh, light, interval or vector on each animation frame.
@@ -91,6 +113,22 @@ export function ArenaLightsV1032({audio,playing,reducedMotion,reactive=true,enab
       desiredColorB.set(cue?.colorB??'#f57bfb');
       spotlightB.current.color.lerp(desiredColorB,1-Math.exp(-dt*3));
     }
+    // V1058 only modulates the existing two cone materials (no new meshes).
+    // Slow optical crossfades prevent one-frame brightness jumps.
+    const volume=volumetricCueV1058?.active&&moving&&tier!=='low'?volumetricCueV1058:null;
+    if(beamA.current&&beamB.current){
+      const mix=1-Math.exp(-dt*3);
+      desiredBeamA.set(volume?(cue?.colorA??volume.colorA):'#4cbdff');
+      desiredBeamB.set(volume?(cue?.colorB??volume.colorB):'#ce71ff');
+      beamA.current.uniforms.uTint.value.lerp(desiredBeamA,mix);
+      beamB.current.uniforms.uTint.value.lerp(desiredBeamB,mix);
+      const opacity=volume?volume.beamOpacity:.075;
+      const feather=volume?volume.beamFeather:.40;
+      beamA.current.uniforms.uOpacity.value+=(opacity-beamA.current.uniforms.uOpacity.value)*mix;
+      beamB.current.uniforms.uOpacity.value+=(opacity-beamB.current.uniforms.uOpacity.value)*mix;
+      beamA.current.uniforms.uFeather.value+=(feather-beamA.current.uniforms.uFeather.value)*mix;
+      beamB.current.uniforms.uFeather.value+=(feather-beamB.current.uniforms.uFeather.value)*mix;
+    }
     // Cap the number of extra *real* lights. Existing concert director keeps
     // ownership of its own fixtures; none of these cast dynamic shadows.
     if(spotlightA.current){
@@ -119,11 +157,17 @@ export function ArenaLightsV1032({audio,playing,reducedMotion,reactive=true,enab
       color="#f57bfb" intensity={.46} distance={10} decay={2} angle={.48} penumbra={.94} castShadow={false}/>
     <group ref={left} position={[-2.50,2.86,1.55]}>
       <mesh position={[0,-1.42,0]}><coneGeometry args={[.64,2.84,12,1,true]}/>
-        <meshBasicMaterial color="#4cbdff" transparent opacity={.075} depthWrite={false} side={2}/></mesh>
+        {showVolumeShader ? <shaderMaterial ref={beamA} vertexShader={beamVertexV1058}
+         fragmentShader={beamFragmentV1058} transparent depthWrite={false} side={2}
+         uniforms={beamUniformsA}/>
+         : <meshBasicMaterial color="#4cbdff" transparent opacity={.075} depthWrite={false} side={2}/>}</mesh>
     </group>
     <group ref={right} position={[2.50,2.86,-1.55]}>
       <mesh position={[0,-1.42,0]}><coneGeometry args={[.64,2.84,12,1,true]}/>
-        <meshBasicMaterial color="#ce71ff" transparent opacity={.075} depthWrite={false} side={2}/></mesh>
+        {showVolumeShader ? <shaderMaterial ref={beamB} vertexShader={beamVertexV1058}
+         fragmentShader={beamFragmentV1058} transparent depthWrite={false} side={2}
+         uniforms={beamUniformsB}/>
+         : <meshBasicMaterial color="#ce71ff" transparent opacity={.075} depthWrite={false} side={2}/>}</mesh>
     </group>
     <mesh position={[0,-2.025,0]} rotation={[-Math.PI/2,0,0]}>
       <ringGeometry args={[3.24,3.32,80]}/>

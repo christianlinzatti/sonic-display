@@ -1,3 +1,25 @@
+
+## V1060 · AI Lighting Choreographer
+
+Die lokale Konzertlichtregie koordiniert die bisher getrennten Effekte V1056–V1059. Aktivierung: **AI Show Designer → V1060 AI Lighting Choreographer** (standardmäßig aus). Ein gültiger Showplan und mindestens ein bereits separat eingeschalteter visueller Effekt sind erforderlich. Die sieben Kapitel wechseln die Aufmerksamkeit zwischen Scheinwerfern, Lasern, Nebel und LED-Panorama; alle Modulationen **senken höchstens** vorhandene optische Werte ab. Der Choreograf führt keine Cloud-KI-Abfragen durch, besitzt keine Geräte-/Musiksteuerung und umgeht keine manuellen Vorgaben oder Performance-Schutzmechanismen.
+
+```sh
+npm run verify:v1060:focused
+node scripts/v959-source-preflight.cjs
+```
+
+## V1059 · Advanced LED Wall 4.0
+
+Die opt-in 360°-LED-Panoramabänder sind über **AI Show Designer → Advanced LED Wall 4.0** steuerbar. Das LED-Muster folgt dem siebenaktigen Showplan (Auto) oder einer manuellen Auswahl (Equalizer, Geometrie, Orbit, Pulse). Der Equalizer verwendet ausschließlich bereits vorhandene Audioenergie. Ein einzelnes Instanced-Mesh mit höchstens 256 offenen LED-Pixeln, kein zusätzliches Licht, keine neuen Govee- oder Netzwerkbefehle. Bei Low-Tier, Pause, Reduced Motion, ungültigem Plan oder ohne Song ist die Funktion ausgeschaltet. Tests: `npm run test:v1059`, `npm run test:v1059:types`, `npm run verify:v1059:focused`.
+
+## V1058 · Volumetric Light Experience
+
+Die 360°-Konzertbühne verfügt nun über **optionale, weiche Lichtkegel und dramaturgisch abgestimmten Nebel**. V1058 nutzt weiterhin die zwei bereits vorhandenen Spot-Kegel der V1032-Bühne sowie beide GPU-Instanz-Batches des V1036-Nebels. Ein sparsamer Transparenz-Shader verleiht den vorhandenen Kegeln einen sanfteren Tiefenverlauf; Nebelfarben und die auf 0,16/0,095 gedeckelten Nebel-Deckkräfte werden mit dem siebenkapiteligen V1040-Showplan abgestimmt. Die Atmosphäre-Regie V1045 und manuell abgeschaltete Effekte behalten Vorrang. **Keine echten Raymarch-Volumetrics** und keine zusätzlichen Lampen, Shader-Meshes oder Nebelpartikel.
+
+**Aktivierung:** Display → 360°-Bühne → AI Show Designer → gültigen Showplan aktivieren → *V1058 Volumetric Light Experience* einschalten (0–80 %, standardmäßig AUS). Bei Pause, Reduced Motion, fehlendem Zeitbezug, niedriger Grafikqualität oder deaktivierten Lichtern/Nebel bleibt der bisherige Look. V1056-Verfolger und V1057-Laser bleiben unabhängig; keine Govee-Befehle oder physischen Laser.
+
+Änderungen: `lib/arena360VolumetricLightingV1058.ts`, `components/visualizer/stages/ArenaLightsV1032.tsx`, `components/visualizer/stages/ArenaLowFogV1036.tsx`, `tests/v1058-volumetric-light-regression.cjs`, `changelog/V1058-VOLUMETRIC-LIGHT-EXPERIENCE.md`. Lokal: `npm run verify:v1058:focused`. Vollständiger Next-/Playwright-Build erfolgt in GitHub Actions (Node 24).
+
 ## V1057 · Intelligent Laser Director
 
 Die bestehende **360°-Konzertbühne** nutzt ihre vorhandenen V1036-Laserfächer und V1039-Lasertunnel für eine neue optionale Laserdramaturgie. Ein selbst erzeugter oder bearbeiteter **V1040-Showplan** lenkt über sieben Kapitel langsam die Fächer, Farbakzente und Tunnel-/Spiral-/Halo-Looks. Ein manuell ausgewähltes Lasermuster hat weiterhin Vorrang; die geplanten Szenen simulieren **keine erkannten Echtzeit-Drops**.

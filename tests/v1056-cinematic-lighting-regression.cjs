@@ -63,7 +63,8 @@ assert(light.includes('getWorldPosition(out)')&&light.includes('TRACKING_ROOT_NA
 assert(light.includes("actor.scale.x<.15"),'hidden partner must not attract beam');
 assert(light.includes("Math.hypot(out.x,out.z)<=2.85"),'bounds on observed stage coordinates');
 assert(light.includes('lightCueV1056?.active')&&stage.includes('planCinematicLightingV1056('));
-assert(stage.includes('lightCueV1056={cinematicLightingV1056}'));
+assert(stage.includes('lightCueV1056={cinematicLightingV1056}')||stage.includes('lightCueV1056={coordinatedSpotsV1060}'));
+assert(!stage.includes('coordinatedSpotsV1060')||stage.includes('cinematicLightingV1056.active'),'coordination must require active spots');
 assert.equal((light.match(/<spotLight\b/g)||[]).length,2,'reuse exactly two existing spotlights');
 assert(light.includes('tier!==\'low\'')&&light.includes("tier==='high'"),'respect existing light budget');
 assert(light.includes('castShadow={false}'),'no shadow GPU regression');

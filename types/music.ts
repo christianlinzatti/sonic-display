@@ -75,6 +75,13 @@ export interface UiPreferences {
   arenaCinematicLightingStrengthV1056?:number;
   arenaIntelligentLaserEnabledV1057?:boolean;
   arenaIntelligentLaserStrengthV1057?:number;
+  arenaVolumetricLightingEnabledV1058?:boolean;
+  arenaVolumetricLightingStrengthV1058?:number;
+  arenaLedWallEnabledV1059?:boolean;
+  arenaLedWallStrengthV1059?:number;
+  arenaLedWallPatternV1059?:import('@/lib/arena360LedWallV1059').LedWallPatternV1059;
+  arenaLightingChoreographerEnabledV1060?:boolean;
+  arenaLightingChoreographerStrengthV1060?:number;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;
