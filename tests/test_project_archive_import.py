@@ -51,6 +51,7 @@ class ArchiveImportTest(unittest.TestCase):
     def test_protected_structure_and_ci_helpers_cannot_be_replaced_by_zip(self):
         helpers = [
             'scripts/organize-project-structure.cjs',
+            'scripts/organize-version-docs.cjs',
             'tests/v974-repository-cleanup-regression.cjs',
             'scripts/production-workflow-metadata.cjs',
             'tests/production-workflow-regression.cjs',
