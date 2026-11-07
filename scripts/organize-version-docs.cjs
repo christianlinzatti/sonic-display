@@ -61,7 +61,10 @@ function main() {
   let updated = 0;
   for (const file of allRelevantFiles(root)) {
     const rel = normalize(path.relative(root, file));
-    if (rel.startsWith('docs/versions/') || rel.startsWith('changelog/')) continue;
+    // These regression fixtures deliberately use version filenames as test data,
+    // not documentation links. Rewriting them corrupts the safe ZIP-import checks.
+    if (rel.startsWith('docs/versions/') || rel.startsWith('changelog/') ||
+        rel === 'tests/v974-repository-cleanup-regression.cjs') continue;
     const old = readUtf8(file);
     let next = old.replace(ref, (whole, _prefix, _name, offset, source, groups) => {
       const name = groups.file;
