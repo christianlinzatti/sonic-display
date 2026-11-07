@@ -1,3 +1,19 @@
+## V1047 · Immersive Arena Experience 3.0
+
+Die 360°-Arena erhält **bewegliche virtuelle Hologramme über dem Publikum**,
+**360°-Lichttunnel** und subtile **Kamerafahrten**, jeweils passend zu Intro,
+Strophe, Aufbau, Hook und Finale des **lokalen V1040-Showplans**.
+In **Einstellungen → Display → AI Show Designer** den V1047-Schalter aktivieren
+und die Intensität (0–75 %) wählen. Standardmäßig bleibt er AUS.
+Die bisherigen Hologramm- und Laserschalter sowie die V1043-Automatik für
+Kamera-Akzente gelten weiterhin. Manuelle/geschützte Kameraperspektiven,
+Pause, Reduced Motion und Grafikleistungsgrenzen haben Vorrang. Keine echten
+Laser, Govee-Kommandos, künstlichen Drops oder Stroboskope.
+
+Tests: `npm run verify:v1047:focused` und
+`node scripts/v1047-release-readiness.cjs`.
+Details: `changelog/V1047-IMMERSIVE-ARENA-EXPERIENCE-3.md`.
+
 ## V1046 · Cinematic Concert Finale Engine
 
 In der **360° Ultimate Concert Arena** lässt sich im **AI Show Designer** die

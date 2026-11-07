@@ -53,6 +53,8 @@ export interface UiPreferences {
   arenaAtmosphereDirectorStrengthV1045?: number;
   arenaFinaleEnabledV1046?: boolean;
   arenaFinaleStrengthV1046?: number;
+  arenaImmersiveEnabledV1047?: boolean;
+  arenaImmersiveStrengthV1047?: number;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;

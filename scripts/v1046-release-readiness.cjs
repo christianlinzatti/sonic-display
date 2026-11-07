@@ -11,7 +11,7 @@ function inspectReleaseV1046(root){
   add('version',v>=1046&&p.sonicFeatureRelease==='v'+v&&p.sonicRoadmapRelease==='v'+v);
   add('lock',p.version===l.version&&p.version===l.packages?.['']?.version);
   add('node24',p.engines?.node==='24.x');
-  add('prebuild',p.scripts.prebuild.startsWith('npm run test:v1046 && npm run test:v1046:types && npm run test:v1045'));
+  add('prebuild',p.scripts.prebuild.includes('npm run test:v1046 && npm run test:v1046:types && npm run test:v1045'));
   add('scripts',p.scripts['test:v1046']==='node tests/v1046-cinematic-finale-regression.cjs'&&
    p.scripts['test:v1046:types']==='tsc -p tests/tsconfig.v1046-core.json --noEmit');
   for(const f of ['lib/arena360CinematicFinaleV1046.ts',

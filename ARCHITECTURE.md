@@ -1,3 +1,26 @@
+## V1047 · Immersive Arena Experience 3.0
+
+`lib/arena360ImmersiveArenaV1047.ts` interpretiert ausschließlich einen vom
+Benutzer aktivierten, lokalen V1040-Showplan. Es erzeugt begrenzte Cues für
+fünf virtuelle Arena-Muster und für eine dezente Kamerafahrt. Das Modell
+arbeitet deterministisch anhand der realen Songposition und erfindet keine
+Audio-Beats. `components/visualizer/stages/ArenaImmersiveExperienceV1047.tsx`
+zeichnet maximal 24 schwebende Hologramm-Ringe und 12 Tunnel-Ringe in nur
+zwei InstancedMesh-Batches, ohne zusätzliche Lichter oder Frame-React-Updates.
+Bei niedriger Grafikstufe sind beide Batches deaktiviert.
+
+Der Kamera-Akzent wird durch die bereits vorhandenen Directors
+`StageCameraDirectorV289` und `SmartStageCameraV236` **nach** V1043
+komponiert, aber vor der bestehenden Smooth-Interpolation. Die vorhandenen
+Schutz-/Manual-Prioritäten gelten weiterhin; es wird keine Kamera erzeugt.
+Alle Cues sind hinter `arenaImmersiveEnabledV1047` (default AUS) sowie den
+V1040-/V1043-Schaltern abgeschirmt. Die Visuals respektieren zusätzlich die
+bestehenden V1039-Hologramm-/Laser-Optionen und Pause/Reduced Motion.
+Keine Steuerung von echten Lasern, Govee, Nebel oder Pyrotechnik.
+
+Tests: `tests/v1047-immersive-arena-regression.cjs`,
+`tests/tsconfig.v1047-core.json`, `scripts/v1047-release-readiness.cjs`.
+
 # V1040 · AI Show Designer (aufbauend auf V1039)
 
 
@@ -1392,7 +1415,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1046
+**Dokumentationsstand:** V1047
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

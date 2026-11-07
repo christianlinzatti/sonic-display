@@ -147,6 +147,24 @@ export function ArenaShowDesignerPanelV1040(){
     wenn sie bereits aktiviert sind. Keine echten Geräte, Pyrotechnik oder Stroboblitze.
     Pause, reduzierte Bewegung, manuelle Regie und Leistungsgrenzen haben Vorrang.</small>
   </fieldset>
+  <fieldset className="arena-v1047-immersive-arena" aria-label="V1047 Immersive Arena Experience 3.0">
+   <legend>V1047 · Immersive Arena Experience 3.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaImmersiveEnabledV1047)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaImmersiveEnabledV1047:e.target.checked})}/>
+    Bewegliche Hologramme über dem Publikum, 360°-Lichttunnel und dezente Kinokamera-Akzente
+   </label>
+   <label>Immersion: {preferences.arenaImmersiveStrengthV1047??55}%
+    <input type="range" min="0" max="75" step="5"
+     disabled={!plan||!preferences.arenaImmersiveEnabledV1047}
+     value={preferences.arenaImmersiveStrengthV1047??55}
+     onChange={e=>updatePreferences({arenaImmersiveStrengthV1047:Number(e.target.value)})}/>
+   </label>
+   <small>Nur virtuelle 3D-Lichtobjekte. Vorhandene Hologramm- und Laser-Schalter
+    gelten weiterhin. Kamera-Akzente nur mit aktivierter V1043-Automatik und ohne
+    manuelle, Sänger-, Lyrics- oder Timeline-Kamera. Kein echtes Lasergerät, kein
+    Stroboskop, kein Govee-Befehl. Pause, Reduced Motion und Performance-Limits haben Vorrang.</small>
+  </fieldset>
   <fieldset className="arena-v1043-show-camera" aria-label="V1043 Show Camera Director">
    <legend>V1043 · Intelligent Show Camera Director</legend>
    <label className="setting-check"><input type="checkbox"
@@ -187,7 +205,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}
