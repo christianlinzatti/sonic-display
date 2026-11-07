@@ -3224,3 +3224,22 @@ Kamera- und Sänger-Zielsuche bleibt maßgeblich; manuelle Einstellungen werden
 nie durch den neuen Director überschrieben. Standardmäßig deaktiviert.
 Tests: `npm run test:v1072`, `npm run test:v1072:types`,
 `npm run verify:v1072:focused`.
+
+### V1073 – Concert Audience Experience 3.0
+
+Opt-in im AI Show Designer: virtuelle synchronisierte Lichtarmbänder, sanfte
+Jubelgesten und unterschiedliche Publikumswellen je Showkapitel; vorhandene
+beobachtete Hooks/Drops steuern nur die optische Intensität. Keine Audio-
+Jubelerzeugung, keine neuen Publikums-Avatare und keine Gerätebefehle.
+Benötigt 360°-Bühne, aktiven Showplan, Publikum und automatischen Phone-Wave-
+Modus; aus bei Low-Tier, Reduced Motion und Pause. Tests: `npm run test:v1073`,
+`npm run test:v1073:types`, `npm run verify:v1073:focused`.
+
+### V1074 – Avatar & Audience Interaction 2.0
+
+Optional unter AI Show Designer: sanfte Künstler-Blicke/Armgesten und optische
+Antworten des vorhandenen Publikums in derselben Liedzeit; kleine Variationen
+für 1–4 Sänger. Keine erkannten Publikumszurufe, kein Audio, keine zusätzlichen
+Meshes und keine Gerätebefehle. Automatische Szenen sind Vorlagen, keine
+analysierten Vocal-Ereignisse. Aus bei manueller Choreografie, Pause, Reduced
+Motion und Low-Grafiktier. `npm run verify:v1074:focused`.

@@ -48,6 +48,8 @@ import {ArenaImmersiveExperienceV1047} from './ArenaImmersiveExperienceV1047';
 import {planArenaAtmosphereDirectorV1045} from '@/lib/arena360AtmosphereDirectorV1045';
 import {planArenaAudienceV1044} from '@/lib/arena360AudienceDirectorV1044';
 import {planCrowdExperienceV1051} from '@/lib/arena360CrowdExperienceV1051';
+import {planAudienceExperienceV1073} from '@/lib/arena360AudienceExperienceV1073';
+import type {AvatarAudienceCueV1074} from '@/lib/arena360AvatarAudienceInteractionV1074';
 import {directUltimateConcertV1052} from '@/lib/arena360UltimateConcertV1052';
 import {INITIAL_ARENA_LIFT_V1034,stepArenaLiftV1034} from "@/lib/arena360ShowV1034";
 import type {ArenaPhoneModeV1033} from "@/lib/arena360ImmersionV1033";
@@ -76,6 +78,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   liveConcertEnabledV1049=false,liveConcertStrengthV1049=50,microphoneActiveV1049=false,
   storytellingEnabledV1050=false,storytellingStrengthV1050=55,
   crowdExperienceEnabledV1051=false,crowdExperienceStrengthV1051=55,
+  audienceExperienceEnabledV1073=false,audienceExperienceStrengthV1073=55,avatarAudienceCueV1074,
   ultimateConcertEnabledV1052=false,ultimateConcertStrengthV1052=60,
   cinematicLightingEnabledV1056=false,cinematicLightingStrengthV1056=55,
   intelligentLaserEnabledV1057=false,intelligentLaserStrengthV1057=55,
@@ -107,6 +110,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   liveConcertEnabledV1049?:boolean;liveConcertStrengthV1049?:number;microphoneActiveV1049?:boolean;
   storytellingEnabledV1050?:boolean;storytellingStrengthV1050?:number;
   crowdExperienceEnabledV1051?:boolean;crowdExperienceStrengthV1051?:number;
+  audienceExperienceEnabledV1073?:boolean;audienceExperienceStrengthV1073?:number;avatarAudienceCueV1074?:AvatarAudienceCueV1074;
   ultimateConcertEnabledV1052?:boolean;ultimateConcertStrengthV1052?:number;
   cinematicLightingEnabledV1056?:boolean;cinematicLightingStrengthV1056?:number;
   intelligentLaserEnabledV1057?:boolean;intelligentLaserStrengthV1057?:number;
@@ -310,6 +314,14 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     show:showCueV1040,trackId,progressMs,durationMs,strength:crowdExperienceStrengthV1051,
     performanceTier:getActivePerformanceTier(),
   });
+  // V1073 uses the existing instanced audience: no second animation clock or hardware actions.
+  const audienceExperienceV1073=planAudienceExperienceV1073({
+    enabled:audienceExperienceEnabledV1073,stageIsArena:true,audienceEnabled,
+    phoneEnabled:phoneSyncEnabled,phoneMode,showDesignerEnabled,showDirectorEnabled,
+    playing:isPlaying,reducedMotion,reactive,performanceTier:getActivePerformanceTier(),
+    show:showCueV1040,trackId,progressMs,durationMs,strength:audienceExperienceStrengthV1073,
+    observedSection:section,genre:showPlan?.genre??genre,
+  });
   const crowdCueV1051=plannedCrowdV1051.active&&ultimateConcertV1052.active?
     {...plannedCrowdV1051,gain:plannedCrowdV1051.gain*ultimateConcertV1052.crowdGain}:plannedCrowdV1051;
   const atmosphereV1045=planArenaAtmosphereDirectorV1045({
@@ -439,7 +451,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       wavesEnabled={wavesEnabled} phoneSyncEnabled={phoneSyncEnabled} phoneMode={phoneMode}
       hookCueEnabled={crowdChantEnabled} progressMs={progressMs} durationMs={durationMs}
       fullSongDirectorEnabled={fullSongDirectorEnabled&&showDirectorEnabled} showIntensity={showIntensity} section={section}
-      audienceCueV1044={coordinatedAudienceCue} crowdCueV1051={crowdCueV1051}/>
+      audienceCueV1044={coordinatedAudienceCue} crowdCueV1051={crowdCueV1051}
+      audienceCueV1073={audienceExperienceV1073} avatarAudienceCueV1074={avatarAudienceCueV1074}/>
     <ArenaLedDomeV1033 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={domeEnabled} reactive={reactive}/>
     <ArenaLedWallV1059 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       cue={flowLedV1071} progressMs={progressMs}

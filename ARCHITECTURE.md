@@ -1682,7 +1682,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1072
+**Dokumentationsstand:** V1074
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -2191,7 +2191,7 @@ Neue Fußkontakte führen unmittelbar zur Reduktion additiver Fußrotationen. De
 `services/show/liveConcertComparisonV544.ts` ergänzt eine reine A/B-Projektionsanalyse auf der bereits opt-in etwa sekündlich messenden V466-WebGL-Qualitätsprobe. `components/visualizer/ConcertVisualCompareV544.tsx` ist unter dem bestehenden QA-Knopf erreichbar und speichert maximal zwei manuell aufgenommene Momentaufnahmen (A/B) im React-UI-Zustand; die Schemabilder verwenden echte normalisierte Kopf- und Lyrics-Rechtecke und zeigen die vorhandenen FPS an, **keine Pixel/Fotos und keine optische Gesichts-/Tanzprüfung**. Der Anwender markiert Fußarbeit, Gesicht/Lip-Sync und Lyrics getrennt; `createComparisonReportV544` exportiert auf Klick einen JSON-Bericht, keine Auto-Freigabe. Bildrand-/Lyrics-Nähe werden heuristisch beurteilt, nicht über Objekt-Okklusion. Original-Bühnenkamera, Motion, Beleuchtung, GLBs, FPS-Messintervall und QA-Gating bleiben unangetastet. `tests/v544-visual-quality-regression.cjs`, `tests/tsconfig.v544-core.json`. Der Next.js-Build braucht vollständig installierte Abhängigkeiten.
 
 
-> **Dokumentationsstand:** V1072 (28.10.2026)
+> **Dokumentationsstand:** V1074 (28.10.2026)
 
 ## V539 – Multi-Avatar Concert Interaction 5.0
 
@@ -3672,7 +3672,7 @@ Details: `docs/versions/V802-INTELLIGENT-CONCERT-IMPROVEMENT-ASSISTANT.md`.
 
 `components/visualizer/naturalMultiArtistStageInteractionV807.ts` berechnet ausschliesslich aus bestaetigten, songgebundenen V416/V496-Saengerrollen, vorhandenen Buehnenpositionen und Wiedergabezeit begrenzte Blicke und Gesten fuer Lead, Support, Duett, Handoff und gemeinsamen Hook. Die bestehenden 2er- und 3/4er-Avatar-Renderer verwenden die identische, reine Planungslogik ueber V144/V145-Overlays. Manuelle Animationen, Buehnenformationen, Gesichts-/Lippensynchronisation und Fuss-IK bleiben unberuehrt. V506/V508-Kollisionsschutz ist final. Keine neuen GLB-Mixer, Renderloops oder GPU-Ressourcen. Tests: `tests/v807-natural-multi-artist-stage-interaction-regression.cjs`.
 
-> **Dokumentationsstand:** V1072 (31.10.2026)
+> **Dokumentationsstand:** V1074 (31.10.2026)
 
 ## V808 Natural Performer Positioning
 
@@ -3964,7 +3964,7 @@ V844 verifies section/audio cues, schedules at most one dominant side-stage effe
 - No display/UI overlay; flash cannot be guaranteed photosensitive-safe.
 - Release requires full typecheck, Next.js build, and actual visual test.
 
-> **Dokumentationsstand:** V1072 (01.11.2026)
+> **Dokumentationsstand:** V1074 (01.11.2026)
 
 
 ## V846 - Paper Streamers
@@ -4662,3 +4662,32 @@ NACH V1053 in **beiden** bestehenden Kamera-Ownern aufgerufen. Gespeicherte
 Presets, manuelle Kameras, Lyrics-Fokus, Duette, Keyframes, Low-Tier und
 Reduced Motion behalten Vorrang. Keine zusätzliche Kamera, kein useFrame,
 keine neuen Draw Calls, kein externer Dienst.
+
+## V1073 – Concert Audience Experience 3.0
+
+Die opt-in `lib/arena360AudienceExperienceV1073.ts` plant Publikumslightshows
+über V1040-Showkapitel und gemeldete Hook-/Drop-Abschnitte. Geplante Kapitel
+sind **keine** Erkennung von Jubel, Gesang oder Audioereignissen. Der bestehende
+V1032-Publikum-Renderer führt alle optischen Bewegungen auf seinem gekappten
+`useFrame`-Takt aus. Ein einziges zusätzliches `InstancedMesh` zeichnet maximal
+so viele Lichtarmbänder wie ohnehin Handylichter vorhanden sind (20 balanced,
+38 high). Körper, Jubelarme und ihre bestehenden Positionsbegrenzungen bleiben
+maßgeblich. Keine zusätzlichen Lichtquellen, Audioausgabe, Avatarinstanzen,
+Govee-Kommandos, Netzwerkanfragen oder Animations-Timer. Manuelle Phone-Modi,
+fehlender gültiger Showplan, Pause, reduzierte Bewegung, Low-Tier, ungültige
+Timing-Informationen und ausgeschaltete Effekte verhindern jede Aktivierung.
+
+## V1074 – Avatar & Audience Interaction 2.0
+
+Der optionale und deterministische Planer `lib/arena360AvatarAudienceInteractionV1074.ts`
+koordiniert ein gemeinsames, musikalisch langsames Gesten- und Blickmuster für
+Sänger und bereits instanziertes Publikum. `ThreeAvatar` berechnet genau eine
+Cue für GLB-/prozedurale Darsteller und die `ArenaAudienceV1032`-Bühne. Bestehende
+Kopf-/Schulter-/Armkanäle nehmen nur konservative Zusatzrotationen auf; der
+bestehende Avatar-Mixer, Lippen, Fuß-IK und Bühnenroots bleiben unangetastet.
+Die Antwort des Publikums nutzt die vorhandene Instanced-Mesh-Armgruppe und
+deren gekappten Takt. Es gibt keine neue Timer-/Renderschleife, kein Audio,
+keine zusätzlichen Szenenobjekte, kein Device-I/O und keine neue Kamera.
+Vorrang für manuelle Animation/Choreografie, Songzeit, Live-Pause,
+Reduced Motion, Show-Opt-in und Grafik-Tier sind Sicherheitsbedingungen.
+Kapitel-Vorgaben behaupten keine Erkennung eines echten Zurufs.

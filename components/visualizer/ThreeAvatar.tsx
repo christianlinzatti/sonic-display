@@ -70,6 +70,7 @@ import {planPerformanceDirectorV1065} from '@/lib/arena360PerformanceDirectorV10
 import {planUltimateConcertFinaleV1070} from '@/lib/arena360UltimateFinaleV1070';
 import {planSmartConcertFlowV1071} from '@/lib/arena360SmartConcertFlowV1071';
 import {planConcertCameraDirectorV1072} from '@/lib/arena360ConcertCameraDirectorV1072';
+import {planAvatarAudienceInteractionV1074} from '@/lib/arena360AvatarAudienceInteractionV1074';
 import { Dancer, DuoDirectorTick, FormationDancers, IntelligentChoreographyTickV312, MultiAvatarDirectorTick } from './DanceFormationActorsV492';
 import {planArenaCinematicFinaleV1046} from '@/lib/arena360CinematicFinaleV1046';
 import {planArenaImmersiveCameraV1047} from '@/lib/arena360ImmersiveArenaV1047';
@@ -648,6 +649,24 @@ export function ThreeAvatar(props: VisualizerProps) {
   // Pass only an optional phrase hint to the existing GLB mixer; no second mixer or timers.
   const dancerPropsV356:VisualizerProps=autoPlanV356.active&&autoShowSettingsV356.motions&&!groupOnV326&&!multiSettings.enabled&&!authoredEnabled&&!props.duoDirectorEnabled
     ? {...props,autonomousShowPhraseV356:{index:autoPlanV356.index,enabled:true}}:props;
+  // V1074 shares a single deterministic opt-in cue with the avatar and the
+  // already-instanced arena audience. Authored clips and manual vocal cues win.
+  const avatarAudienceV1074=planAvatarAudienceInteractionV1074({
+    enabled:props.arenaAvatarAudienceEnabledV1074===true,
+    stageIsArena:props.stageTheme==='arena360',
+    audienceEnabled:props.arenaAudienceEnabledV1032!==false,
+    showDesignerEnabled:props.arenaShowDesignerEnabledV1040===true,
+    playing:props.isPlaying,reducedMotion:props.reducedMotion,
+    reactive:props.stageReactive,performanceTier:getActivePerformanceTier(),
+    manualPriority:authoredEnabled||props.avatarMotionMode==='choreography'||
+      props.avatarTimelineEnabled===true||!!props.smartDanceOverride||
+      !!props.avatarAnimationUrl||!!props.secondaryAvatarAnimationUrl||
+      props.lipSync?.manualVocalEnabledV385===true,
+    show:authoredShowCueV1040,trackId:props.track?.id,
+    progressMs:props.cameraDirectorProgressMs,durationMs:props.track?.durationMs,
+    strength:props.arenaAvatarAudienceStrengthV1074??55,
+    observedSection:props.cameraDirectorSection,
+  });
   // Rap/V1062 remains the sole gesture and lip-sync owner. Only its opt-in
   // strength is lowered from the same V1040 cue; manual syllables win earlier.
   const rapFlowGainV1071=smartFlowCastV1071.rap;
@@ -656,6 +675,9 @@ export function ThreeAvatar(props: VisualizerProps) {
     ?{...dancerPropsV356,arenaRapPerformanceStrengthV1062:
         (props.arenaRapPerformanceStrengthV1062??55)*rapCombinedGainV1071}
     :dancerPropsV356;
+  const dancerPropsV1074:VisualizerProps=avatarAudienceV1074.active
+    ?{...dancerPropsV1065,arenaAvatarAudienceCueV1074:avatarAudienceV1074}
+    :{...dancerPropsV1065,arenaAvatarAudienceCueV1074:undefined};
   const directedThemeV352=genreCueV352.theme;
   const directedPaletteV352=genreCueV352.palette??props.stagePalette;
   // V395: browser context restoration gets a grace period; repeated renderer errors
@@ -858,6 +880,8 @@ export function ThreeAvatar(props: VisualizerProps) {
         liveConcertStrengthV1049={props.arenaLiveConcertStrengthV1049 ?? 50}
         storytellingEnabledV1050={props.arenaStorytellingEnabledV1050 ?? false}
         storytellingStrengthV1050={props.arenaStorytellingStrengthV1050 ?? 55}
+        avatarAudienceCueV1074={avatarAudienceV1074} audienceExperienceEnabledV1073={props.arenaAudienceExperienceEnabledV1073 ?? false}
+        audienceExperienceStrengthV1073={props.arenaAudienceExperienceStrengthV1073 ?? 55}
         crowdExperienceEnabledV1051={props.arenaCrowdExperienceEnabledV1051 ?? false}
         crowdExperienceStrengthV1051={(props.arenaCrowdExperienceStrengthV1051 ?? 55)*stageInteractionV1055.crowdGain}
         ultimateConcertEnabledV1052={props.arenaUltimateConcertEnabledV1052 ?? false}
@@ -896,7 +920,7 @@ export function ThreeAvatar(props: VisualizerProps) {
         count:effectiveGroupSettingsV442.count,trackId:props.track?.id,
         progressMs:props.cameraDirectorProgressMs,durationMs:props.track?.durationMs,
         show:authoredShowCueV1040,strength:(props.arenaEnsembleStrengthV1063??55)*performanceDirectorV1065.ensembleGain,
-       })} props={autoGroupOnV442?dancerPropsV1065:{...dancerPropsV1065,multiArtistMotionsV442:undefined}} settings={effectiveGroupSettingsV442} vocalDuetV838={vocalDuetV838}/> : (dual || auto || multiEnabled || showFormation) ? <FormationDancers ensembleV1063={planEnsembleChoreographyV1063({
+       })} props={autoGroupOnV442?dancerPropsV1074:{...dancerPropsV1074,multiArtistMotionsV442:undefined}} settings={effectiveGroupSettingsV442} vocalDuetV838={vocalDuetV838}/> : (dual || auto || multiEnabled || showFormation) ? <FormationDancers ensembleV1063={planEnsembleChoreographyV1063({
         enabled:props.arenaEnsembleEnabledV1063===true&&props.arenaShowDesignerEnabledV1040===true,
         stageIsArena:props.stageTheme==='arena360',playing:props.isPlaying,reducedMotion:props.reducedMotion,
         manualPriority:!!manualFormationV354||authoredEnabled||multiEnabled||intelligentEnabled||
@@ -907,7 +931,7 @@ export function ThreeAvatar(props: VisualizerProps) {
         count:2,trackId:props.track?.id,progressMs:props.cameraDirectorProgressMs,
         durationMs:props.track?.durationMs,show:authoredShowCueV1040,
         strength:(props.arenaEnsembleStrengthV1063??55)*performanceDirectorV1065.ensembleGain,
-       })} props={dancerPropsV1065} mode={mode} performanceV1054={avatarPerformanceV1054} stageInteractionV1055={arenaChoreoV1041.active?stageInteractionV1055:null} choreography={authoredEnabled ? null : multiEnabled ? choreography : intelligentEnabled ? intelligentCue : arenaChoreoV1041.active ? performanceChoreoV1054 : null} /> : <group><Dancer props={dancerPropsV1065}/><ArtistNameBubbleV441 plan={props.artistBubblePlanV441} slot={0} reducedMotion={props.reducedMotion}/></group>}</group>
+       })} props={dancerPropsV1074} mode={mode} performanceV1054={avatarPerformanceV1054} stageInteractionV1055={arenaChoreoV1041.active?stageInteractionV1055:null} choreography={authoredEnabled ? null : multiEnabled ? choreography : intelligentEnabled ? intelligentCue : arenaChoreoV1041.active ? performanceChoreoV1054 : null} /> : <group><Dancer props={dancerPropsV1074}/><ArtistNameBubbleV441 plan={props.artistBubblePlanV441} slot={0} reducedMotion={props.reducedMotion}/></group>}</group>
       </StageEnvironment>
     </Canvas></SceneErrorBoundary>}
     <ConcertQualityInspectorV466 enabled={qualityInspectorEnabledV466} onToggle={()=>{

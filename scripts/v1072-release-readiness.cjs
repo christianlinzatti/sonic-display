@@ -11,7 +11,7 @@ function inspectReleaseV1072(root){
   add('version',num>=1072&&p.sonicRoadmapRelease==='v'+num&&p.sonicFeatureRelease==='v'+num);
   add('lockfile',p.version===l.version&&p.version===l.packages?.['']?.version);
   add('node24',p.engines?.node==='24.x');
-  add('prebuild',p.scripts.prebuild.startsWith('npm run test:v'+num+' && npm run test:v'+num+':types &&'));
+  add('prebuild',p.scripts.prebuild.includes('npm run test:v1072 && npm run test:v1072:types &&'));
   add('focused',p.scripts['verify:v1072:focused']?.includes('verify:v1071:focused'));
   add('test-command',p.scripts['test:v1072']==='node tests/v1072-concert-camera-director-regression.cjs');
   for(const file of ['lib/arena360ConcertCameraDirectorV1072.ts',

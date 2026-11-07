@@ -102,6 +102,8 @@ import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUti
 import {disposeClonedAvatarSkeletonsV654} from "./disposeClonedAvatarSkeletonsV654";
 import type { VisualizerProps } from "./registry";
 import {planNaturalMotionV1061,overlayNaturalMotionV1061} from "@/lib/naturalAvatarMotionV1061";
+import {sampleAvatarAudienceInteractionV1074,blendAvatarAudiencePoseV1074,
+ ZERO_AVATAR_AUDIENCE_POSE_V1074} from '@/lib/arena360AvatarAudienceInteractionV1074';
 import { VocalRigV368 } from "./VocalRigV368";
 import { normalizeRapPresetV412, sampleRapLiveV412, liveRapClipNameV412, type RapLiveSampleV412 } from "./rapChoreographyPresetsV412";
 import { sampleRapLyricsCueV413, lyricsRapGainV413 } from "./lyricsAwareRapChoreographyV413";
@@ -172,7 +174,7 @@ export function SharedEmbeddedAvatarV531(props: VisualizerProps & {workloadSlot?
   return <GltfAvatar {...props} importedClips={source.animations} importedAnimationScene={source.scene} sharedMotionV531 />;
 }
 
-export function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, sharedMotionV531=false, url, assetUrl, audio, isPlaying, reducedMotion, genre, genreFusion, stagePalette, wardrobeModeV468, wardrobeColorV468, wardrobePatternV468, wardrobeGlowV468, audioMotionEnabledV468, audioMotionStrengthV468, avatarModelId, avatarScale = 1, avatarOffsetY = 0, avatarAnimationIntensity = 1, avatarRigProfile = "auto", preferredMotionUrlV440, avatarDancePreset = "auto", danceAggression = 0.5, danceVariation = 0.5, danceMotionStyle = "balanced", avatarMotionMode = "hybrid", smartDanceEnabled = false, smartDanceOverride = "", avatarClipSpeed = 1, avatarBlendEnabled = false, avatarBlendClip = "", avatarBlendWeight = 0.3, avatarBlendSpeed = 1, avatarBlendAutoEnergy = false, avatarBlendBpmSync = false, avatarBlendReferenceBpm = 120, avatarBlendSmoothing = 0.28, avatarBlendCurve = "smooth", avatarBlendMask = "full", avatarCrossfadeSeconds = 0.35, avatarArmResponse = 1, avatarLegResponse = 1, avatarFootIKEnabled = true, avatarFootIKStrength = 70, avatarFootIKContact = 50, avatarFootIKLock = 50, arenaNaturalMotionEnabledV1061=false, arenaNaturalMotionStrengthV1061=55, arenaRapPerformanceEnabledV1062=false, arenaRapPerformanceStrengthV1062=55, stageTheme, cameraDirectorSection, cameraDirectorProgressMs, track, autonomousShowPhraseV356, showCue, lipSync: propsLipSyncV367, ensembleCountV745, workloadSlot = 0 }: VisualizerProps & { url: string; assetUrl?: string; importedClips?: AnimationClip[]; importedAnimationScene?: Group; animationUrl?: string; sharedMotionV531?:boolean; avatarRigProfile?: AvatarRigProfileId; workloadSlot?: number }) {
+export function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, sharedMotionV531=false, url, assetUrl, audio, isPlaying, reducedMotion, genre, genreFusion, stagePalette, wardrobeModeV468, wardrobeColorV468, wardrobePatternV468, wardrobeGlowV468, audioMotionEnabledV468, audioMotionStrengthV468, avatarModelId, avatarScale = 1, avatarOffsetY = 0, avatarAnimationIntensity = 1, avatarRigProfile = "auto", preferredMotionUrlV440, avatarDancePreset = "auto", danceAggression = 0.5, danceVariation = 0.5, danceMotionStyle = "balanced", avatarMotionMode = "hybrid", smartDanceEnabled = false, smartDanceOverride = "", avatarClipSpeed = 1, avatarBlendEnabled = false, avatarBlendClip = "", avatarBlendWeight = 0.3, avatarBlendSpeed = 1, avatarBlendAutoEnergy = false, avatarBlendBpmSync = false, avatarBlendReferenceBpm = 120, avatarBlendSmoothing = 0.28, avatarBlendCurve = "smooth", avatarBlendMask = "full", avatarCrossfadeSeconds = 0.35, avatarArmResponse = 1, avatarLegResponse = 1, avatarFootIKEnabled = true, avatarFootIKStrength = 70, avatarFootIKContact = 50, avatarFootIKLock = 50, arenaNaturalMotionEnabledV1061=false, arenaNaturalMotionStrengthV1061=55, arenaRapPerformanceEnabledV1062=false, arenaRapPerformanceStrengthV1062=55, arenaAvatarAudienceCueV1074, stageTheme, cameraDirectorSection, cameraDirectorProgressMs, track, autonomousShowPhraseV356, showCue, lipSync: propsLipSyncV367, ensembleCountV745, workloadSlot = 0 }: VisualizerProps & { url: string; assetUrl?: string; importedClips?: AnimationClip[]; importedAnimationScene?: Group; animationUrl?: string; sharedMotionV531?:boolean; avatarRigProfile?: AvatarRigProfileId; workloadSlot?: number }) {
   const schedulerInstance = useId();
   useEffect(() => () => releaseAvatarFrame(schedulerInstance), [schedulerInstance]);
   useEffect(() => () => releaseScheduledInstance(schedulerInstance), [schedulerInstance]);
@@ -198,6 +200,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   const torsoIK = useRef(createPartnerTorsoState());
   const lastPartnerLook = useRef({ yaw: 0, pitch: 0, eye: 0 });
   const lastPartnerGesture = useRef<PartnerGestureCue>({...NEUTRAL_GESTURE});
+  const lastAudiencePoseV1074=useRef({...ZERO_AVATAR_AUDIENCE_POSE_V1074});
   const root = useRef<Group>(null);
   const groupLowPoseV481=useContext(GroupLowPoseContextV481);
   const {preferences: timelinePrefs} = useUiPreferences();
@@ -1216,6 +1219,25 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     measureProfilerPhase("rigging", () => applyAvatarRigMotion(rigTargets.current, footworkV839.motion, delta * (danceMotionStyle === "sharp" ? 1.8 : danceMotionStyle === "smooth" ? 0.55 : 1)));
     applyPartnerLook(rigTargets.current, partnerLook?.current ?? NEUTRAL_LOOK, delta, lastPartnerLook.current);
     applyPartnerGesture(rigTargets.current, partnerGesture?.current ?? NEUTRAL_GESTURE, delta, lastPartnerGesture.current);
+    // V1074: only additive gaze/upper-arm offsets. Source clips, feet,
+    // lip-sync, root motion and the existing IK solver retain ownership.
+    const audienceSampleV1074=sampleAvatarAudienceInteractionV1074(
+      avatarMotionMode==='choreography'||timelineEnabled||!!stableLibraryClip||
+      !!activeSequence||!!activeLoop||avatarBlendEnabled||!!smartDanceOverride||
+      !!clipChoiceV328||!!phraseChoiceV329||!!rapLiveEnabledV412||
+      !isPlaying||reducedMotion||getActivePerformanceTier()==='low'
+       ?null:arenaAvatarAudienceCueV1074,
+      cameraDirectorProgressMs,workloadSlot,audio.beat?audio.beatStrength:0);
+    const beforeV1074=lastAudiencePoseV1074.current;
+    const nextV1074=blendAvatarAudiencePoseV1074(beforeV1074,audienceSampleV1074,delta);
+    const rigV1074=rigTargets.current;
+    if(rigV1074.head){
+      rigV1074.head.rotation.y+=nextV1074.headYaw-beforeV1074.headYaw;
+      rigV1074.head.rotation.x+=nextV1074.headPitch-beforeV1074.headPitch;
+    }
+    if(rigV1074.leftArm)rigV1074.leftArm.rotation.z+=nextV1074.leftLift-beforeV1074.leftLift;
+    if(rigV1074.rightArm)rigV1074.rightArm.rotation.z-=nextV1074.rightLift-beforeV1074.rightLift;
+    lastAudiencePoseV1074.current=nextV1074;
     applyGltfVocalPerformanceV492({propsLipSyncV367,trackId:track?.id??"",audio,genre,showCue,reducedMotion,isPlaying,
       workloadSlot,avatarMotionMode,stableLibraryClip,partnerGesture,partnerLook,partnerHand,
       groovePreferences,rapLiveEnabledV412,rapLiveFrameV412,rapLyricsFrameV414,preferencesRap,

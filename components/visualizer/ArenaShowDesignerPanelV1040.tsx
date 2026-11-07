@@ -176,6 +176,46 @@ export function ArenaShowDesignerPanelV1040(){
     Reduced Motion und individuelle Helligkeitsgrenzen behalten Vorrang.
     Keine zusätzlichen Gerätebefehle, Impulse, Blinklichter oder Timer.</small>
   </fieldset>
+  <fieldset className="arena-v1074-avatar-audience" aria-label="V1074 Avatar & Audience Interaction 2.0">
+   <legend>V1074 · Avatar & Audience Interaction 2.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaAvatarAudienceEnabledV1074)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaAvatarAudienceEnabledV1074:e.target.checked})}/>
+    Künstler-Blickkontakt, Publikums-Gesten und leise optische Jubelantworten aktivieren
+   </label>
+   <label>Interaktion: {preferences.arenaAvatarAudienceStrengthV1074??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaAvatarAudienceEnabledV1074}
+     value={preferences.arenaAvatarAudienceStrengthV1074??55}
+     onChange={e=>updatePreferences({arenaAvatarAudienceStrengthV1074:Number(e.target.value)})}/>
+   </label>
+   <small>Eine lokale Showregie verbindet die bestehenden Kopf-/Arm-Kanäle
+    der Avatare mit der vorhandenen Publikumsgestik. Für zwei bis vier Künstler
+    werden die Gesten leicht versetzt. Keine neue Animation, kein zusätzliches
+    3D-Objekt, kein Jubelton und keine Aussage über tatsächlich erkannte Zurufe.
+    Manuell gewählte Animationsclips, Choreografien, Lipsync-Zuordnungen,
+    niedrige Grafikqualität und Reduced Motion haben Vorrang.</small>
+  </fieldset>
+  <fieldset className="arena-v1073-audience-experience" aria-label="V1073 Concert Audience Experience 3.0">
+   <legend>V1073 · Concert Audience Experience 3.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaAudienceExperienceEnabledV1073)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaAudienceExperienceEnabledV1073:e.target.checked})}/>
+    Virtuelle Lichtarmbänder, abgestufte Jubelbewegungen und Bühnenreaktionen aktivieren
+   </label>
+   <label>Publikums-Erlebnis: {preferences.arenaAudienceExperienceStrengthV1073??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaAudienceExperienceEnabledV1073}
+     value={preferences.arenaAudienceExperienceStrengthV1073??55}
+     onChange={e=>updatePreferences({arenaAudienceExperienceStrengthV1073:Number(e.target.value)})}/>
+   </label>
+   <small>Opt-in für die 360°-Bühne mit aktivem Showplan, Publikum und Handylicht im
+    automatischen Wellenmodus. Intro, Aufbau, Hook, Zwischenspiel und Finale erhalten
+    unterschiedliche Reaktionswellen; bestätigte Hook/Drop-Abschnitte verstärken nur
+    die optische Stimmung. Kein erfasster oder erzeugter Publikums-Ton, keine zusätzlichen
+    Avatare oder Govee-Kommandos. Ein optionales Instanced-Mesh-Batch für Armbänder;
+    pausiert bei Reduced Motion oder niedriger Grafikqualität. Manuelle Lichtmodi bleiben vorrangig.</small>
+  </fieldset>
   <fieldset className="arena-v1072-camera-director" aria-label="V1072 Concert Camera Director 4.0">
    <legend>V1072 · Concert Camera Director 4.0</legend>
    <label className="setting-check"><input type="checkbox"
@@ -734,7 +774,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

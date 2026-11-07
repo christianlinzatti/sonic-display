@@ -106,6 +106,10 @@ export interface UiPreferences {
   arenaSmartConcertFlowStrengthV1071?:number;
   arenaCameraDirectorEnabledV1072?:boolean;
   arenaCameraDirectorStrengthV1072?:number;
+  arenaAudienceExperienceEnabledV1073?:boolean;
+  arenaAudienceExperienceStrengthV1073?:number;
+  arenaAvatarAudienceEnabledV1074?:boolean;
+  arenaAvatarAudienceStrengthV1074?:number;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;

@@ -15,6 +15,7 @@ import { useId, useContext, useEffect, useRef } from "react";
 import { type Group, type Mesh } from "three";
 import type { VisualizerProps } from "./registry";
 import {planNaturalMotionV1061} from "@/lib/naturalAvatarMotionV1061";
+import {sampleAvatarAudienceInteractionV1074} from '@/lib/arena360AvatarAudienceInteractionV1074';
 import { resolveVocalPerformanceQualityV374 } from "./vocalPerformanceQualityV374";
 import { composeVocalBodyV393 } from "./vocalPerformanceIntelligenceV393";
 import { composeRapFaceV406, composeRapStageV406 } from "./rapStagePerformanceV406";
@@ -61,7 +62,7 @@ import { getActivePerformanceTier } from "./adaptivePerformance";
 import { rapGroovePose, DEFAULT_RAP_GROOVE } from "./rapGrooveEngine";
 import { GroupDanceMotionContextV485, GroupFootworkContextV486, GroupLowPoseContextV481, usePartnerGesture, usePartnerLook } from './ThreeAvatarContextsV492';
 
-export function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genreFusion, avatarScale = 1, avatarOffsetY = 0, avatarAnimationIntensity = 1, avatarDancePreset = "auto", danceAggression = 0.5, danceMotionStyle = "balanced", avatarMotionMode = "hybrid", avatarArmResponse = 1, avatarLegResponse = 1, track, lipSync, showCue, stageTheme, arenaNaturalMotionEnabledV1061=false,arenaNaturalMotionStrengthV1061=55, workloadSlot = 0 }: VisualizerProps & {workloadSlot?:number}) {
+export function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genreFusion, avatarScale = 1, avatarOffsetY = 0, avatarAnimationIntensity = 1, avatarDancePreset = "auto", danceAggression = 0.5, danceMotionStyle = "balanced", avatarMotionMode = "hybrid", avatarArmResponse = 1, avatarLegResponse = 1, track, lipSync, showCue, stageTheme, cameraDirectorProgressMs, arenaNaturalMotionEnabledV1061=false,arenaNaturalMotionStrengthV1061=55, arenaAvatarAudienceCueV1074, workloadSlot = 0 }: VisualizerProps & {workloadSlot?:number}) {
   const argumentsLipSync = lipSync ?? {lyrics:null,progressMs:0,playing:false,enabled:false,strength:90,mode:"lyrics" as const};
   const schedulerInstance = useId();
   useEffect(() => () => releaseAvatarFrame(schedulerInstance), [schedulerInstance]);
@@ -432,13 +433,20 @@ export function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genre
       // The procedural fallback does not expose IK foot contact evidence.
       footIKEnabled:false,contactKnown:false,plantedLeft:false,plantedRight:false,
     });
+    // V1074 adds only small visual gaze/arm targets to the existing smoothed
+    // procedural motion. Authored choreography, timeline and manual clips win.
+    const audiencePoseV1074=sampleAvatarAudienceInteractionV1074(
+      avatarMotionMode==='choreography'||!!groovePreferences.avatarTimelineEnabled||
+      !isPlaying||reducedMotion||getActivePerformanceTier()==='low'
+        ?null:arenaAvatarAudienceCueV1074,
+      cameraDirectorProgressMs,workloadSlot,audio.beat?audio.beatStrength:0);
     const genreAccentV471=(genreMotionV471?.weight??0)*Math.min(1,audio.beatStrength??0)*.07;
     head.current.scale.y += (1 + (motion.beatImpulse + kickAccent * 0.55 + patternKick + learnedAccent) * 0.18 * (0.7 + danceAggression * 0.6) * intelligenceMultipliers.kick * performance.danceMultiplier * motionMix + performance.poseImpulse * 0.08 + performance.buildUp * 0.025 - preKick * 0.055 - head.current.scale.y) * smooth;
     head.current.rotation.z += (emotion.headTilt + rap.shoulder*.6 + performanceV391.expressionHeadTilt + rapBodyV510.headTilt + variationV474.headTilt - head.current.rotation.z) * smooth;
     head.current.rotation.x += (rap.headNod + performanceV391.headNod + genreAccentV471*((genreMotionV471?.head??1)-.8) + (partnerLook?.current.pitch ?? 0) + emotion.gazePitch + rapBodyV453.headPitch + wordDanceV567.head + vocalV994.headPitch - head.current.rotation.x) * smooth;
-    head.current.rotation.y += ((partnerLook?.current.yaw ?? 0) + emotion.gazeYaw + performanceV391.headTurn + rapBodyV510.headYaw + variationV474.headTurn+rapDynamicsV583.headTurn+(concertV586.pose?.headYaw??0) - head.current.rotation.y) * smooth;
-    if (leftArm.current) leftArm.current.rotation.z += ((-0.25 + genreAccentV471*((genreMotionV471?.arms??1)-.6) + (partnerGesture?.current.leftLift ?? 0) + (performanceV391.leftArmAccent ?? 0) + (performanceV391.counterArm ?? 0) + rapBodyV510.leftArm + wordDanceV567.arms*Math.max(0,wordDanceV567.side)+Math.max(0,concertV586.pose?.armSwing??0)+naturalCueV1061.shoulder) - leftArm.current.rotation.z) * smooth;
-    if (rightArm.current) rightArm.current.rotation.z += ((0.25 - genreAccentV471*((genreMotionV471?.arms??1)-.6) - (partnerGesture?.current.rightLift ?? 0) + (performanceV391.rightArmAccent ?? 0) - (performanceV391.counterArm ?? 0) + rapBodyV510.rightArm - wordDanceV567.arms*Math.max(0,-wordDanceV567.side)-Math.max(0,-(concertV586.pose?.armSwing??0))-naturalCueV1061.shoulder) - rightArm.current.rotation.z) * smooth;
+    head.current.rotation.y += ((partnerLook?.current.yaw ?? 0) + emotion.gazeYaw + performanceV391.headTurn + rapBodyV510.headYaw + variationV474.headTurn+rapDynamicsV583.headTurn+(concertV586.pose?.headYaw??0)+audiencePoseV1074.headYaw - head.current.rotation.y) * smooth;
+    if (leftArm.current) leftArm.current.rotation.z += ((-0.25 + genreAccentV471*((genreMotionV471?.arms??1)-.6) + (partnerGesture?.current.leftLift ?? 0)+audiencePoseV1074.leftLift + (performanceV391.leftArmAccent ?? 0) + (performanceV391.counterArm ?? 0) + rapBodyV510.leftArm + wordDanceV567.arms*Math.max(0,wordDanceV567.side)+Math.max(0,concertV586.pose?.armSwing??0)+naturalCueV1061.shoulder) - leftArm.current.rotation.z) * smooth;
+    if (rightArm.current) rightArm.current.rotation.z += ((0.25 - genreAccentV471*((genreMotionV471?.arms??1)-.6) - (partnerGesture?.current.rightLift ?? 0)+audiencePoseV1074.rightLift + (performanceV391.rightArmAccent ?? 0) - (performanceV391.counterArm ?? 0) + rapBodyV510.rightArm - wordDanceV567.arms*Math.max(0,-wordDanceV567.side)-Math.max(0,-(concertV586.pose?.armSwing??0))-naturalCueV1061.shoulder) - rightArm.current.rotation.z) * smooth;
     // V484: restrained forward/back counter-swing while the procedural legs
     // crouch. Existing V481 IK remains responsible for feet, and authored
     // choreography never receives this extra arm-axis motion.
@@ -497,7 +505,7 @@ export function ProceduralAvatar({ audio, isPlaying, reducedMotion, genre, genre
     const headPitchTargetV488=rap.headNod + performanceV391.headNod
       + genreAccentV471*((genreMotionV471?.head??1)-.8)
       + (partnerLook?.current.pitch ?? 0) + emotion.gazePitch + rapBodyV453.headPitch
-      + concertV586.accent.head + fullBodyV488.headCounterPitch;
+      + concertV586.accent.head + fullBodyV488.headCounterPitch+audiencePoseV1074.headPitch;
     head.current.rotation.x+=(headPitchTargetV488-head.current.rotation.x)*smooth;
     // V488 counter-roll is a target offset with its own state so it cannot
     // accumulate frame after frame (unlike adding a constant every tick).

@@ -208,6 +208,11 @@ export interface VisualizerProps {
   arenaSmartConcertFlowStrengthV1071?:number;
   arenaCameraDirectorEnabledV1072?:boolean;
   arenaCameraDirectorStrengthV1072?:number;
+  arenaAudienceExperienceEnabledV1073?:boolean;
+  arenaAudienceExperienceStrengthV1073?:number;
+  arenaAvatarAudienceEnabledV1074?:boolean;
+  arenaAvatarAudienceStrengthV1074?:number;
+  arenaAvatarAudienceCueV1074?:import('@/lib/arena360AvatarAudienceInteractionV1074').AvatarAudienceCueV1074;
   dancePostEnabledV468?: boolean;
   shaderEnvironmentV468?: import('./ProceduralShaderEnvironmentV468').ShaderEnvironmentModeV468;
   wardrobeModeV468?: import('./avatarWardrobeV468').WardrobeModeV468;

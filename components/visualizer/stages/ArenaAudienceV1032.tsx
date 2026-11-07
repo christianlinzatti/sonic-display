@@ -8,6 +8,8 @@ import {createArenaAudienceV1032} from "@/lib/arena360ExperienceV1032";
 import {planArenaTimelineV1035,sampleArenaCrowdHookV1035} from "@/lib/arena360DirectorV1035";
 import {sampleArenaAudienceV1044,type ArenaAudienceCueV1044} from "@/lib/arena360AudienceDirectorV1044";
 import {sampleCrowdExperienceV1051,type CrowdCueV1051} from "@/lib/arena360CrowdExperienceV1051";
+import {sampleAudienceExperienceV1073,type AudienceCueV1073} from "@/lib/arena360AudienceExperienceV1073";
+import {sampleAvatarAudienceInteractionV1074,type AvatarAudienceCueV1074} from "@/lib/arena360AvatarAudienceInteractionV1074";
 import {INITIAL_ARENA_WAVE_V1033,stepArenaWaveV1033,sampleArenaCrowdWaveV1033,
   sampleArenaPhoneV1033,type ArenaPhoneModeV1033} from "@/lib/arena360ImmersionV1033";
 
@@ -19,11 +21,11 @@ const PHONE_COLORS=['#7af4ff','#ef73ff','#faf1a9'];
  */
 export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,reactive=true,
   wavesEnabled=true,phoneSyncEnabled=true,phoneMode='wave',hookCueEnabled=true,
-  progressMs=0,durationMs=0,fullSongDirectorEnabled=true,showIntensity=65,section='verse',audienceCueV1044,crowdCueV1051}:{
+  progressMs=0,durationMs=0,fullSongDirectorEnabled=true,showIntensity=65,section='verse',audienceCueV1044,crowdCueV1051,audienceCueV1073,avatarAudienceCueV1074}:{
   audio:AudioFeatures;playing:boolean;reducedMotion:boolean;enabled?:boolean;reactive?:boolean;
   wavesEnabled?:boolean;phoneSyncEnabled?:boolean;phoneMode?:ArenaPhoneModeV1033;
   hookCueEnabled?:boolean;progressMs?:number;durationMs?:number;
-  fullSongDirectorEnabled?:boolean;showIntensity?:number;section?:string;audienceCueV1044?:ArenaAudienceCueV1044;crowdCueV1051?:CrowdCueV1051;
+  fullSongDirectorEnabled?:boolean;showIntensity?:number;section?:string;audienceCueV1044?:ArenaAudienceCueV1044;crowdCueV1051?:CrowdCueV1051;audienceCueV1073?:AudienceCueV1073;avatarAudienceCueV1074?:AvatarAudienceCueV1074;
 }){
   const tier=useAdaptivePerformance().tier;
   const members=useMemo(()=>createArenaAudienceV1032(tier,enabled),[tier,enabled]);
@@ -38,7 +40,11 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
   // Only a small subset receives arms; both sides use a single instanced draw call.
   const cheeringMembers=useMemo(()=>members.filter((_,i)=>i%3===0),[members]);
   const arms=useRef<InstancedMesh>(null);
-  const crowdActive=Boolean(enabled&&crowdCueV1051?.active&&tier!=='low');
+  const audienceActiveV1073=Boolean(enabled&&audienceCueV1073?.active&&phoneSyncEnabled&&tier!=='low');
+  const interactionActiveV1074=Boolean(enabled&&avatarAudienceCueV1074?.active&&tier!=='low');
+  const crowdActive=Boolean(enabled&&(crowdCueV1051?.active||audienceActiveV1073||interactionActiveV1074)&&tier!=='low');
+  const wristbandsV1073=useRef<InstancedMesh>(null); // one optional draw call, same capped clock
+  const braceletTintV1073=useMemo(()=>new Color(),[]);
   const clock=useRef(0),budget=useRef(0),lastWaveAnimation=useRef(false),lastPhoneAnimation=useRef(false);
   const wave=useRef({...INITIAL_ARENA_WAVE_V1033});
 
@@ -61,6 +67,19 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
       dummy.scale.set(.095,.055,.014);
       dummy.updateMatrix();phones.current?.setMatrixAt(i,dummy.matrix);
       phones.current?.setColorAt(i,phoneColors[i%phoneColors.length]);
+    }
+    if(audienceActiveV1073&&wristbandsV1073.current){
+      for(let i=0;i<phoneMembers.length;i++){
+        const m=phoneMembers[i];
+        dummy.position.set(m.x-.16,m.y+m.height*.96,m.z);
+        dummy.rotation.set(0,Math.atan2(-m.x,-m.z),0);
+        dummy.scale.set(.065,.065,.065);dummy.updateMatrix();
+        wristbandsV1073.current.setMatrixAt(i,dummy.matrix);
+        wristbandsV1073.current.setColorAt(i,phoneColors[i%phoneColors.length]);
+      }
+      wristbandsV1073.current.instanceMatrix.needsUpdate=true;
+      if(wristbandsV1073.current.instanceColor)wristbandsV1073.current.instanceColor.needsUpdate=true;
+      wristbandsV1073.current.computeBoundingSphere();
     }
     for(const mesh of [bodies.current,heads.current,phones.current]){
       if(!mesh)continue;
@@ -85,7 +104,7 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
       arms.current.computeBoundingSphere();
     }
     lastWaveAnimation.current=false;lastPhoneAnimation.current=false;
-  },[count,members,phoneMembers,cheeringMembers,crowdActive,dummy,bodyColors,phoneColors]);
+  },[count,members,phoneMembers,cheeringMembers,crowdActive,audienceActiveV1073,dummy,bodyColors,phoneColors]);
 
   useFrame((_,delta)=>{
     if(!enabled||!crowd.current)return;
@@ -113,21 +132,27 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
     if(budget.current<(tier==='low' ? .12 : .066)&&active)return;
     budget.current=0;
     const t=clock.current;
+    // V1074 samples one shared reply per capped crowd tick, rather than once
+    // for every audience instance. No new renderer or audio clock.
+    const replyV1074=interactionActiveV1074?
+      sampleAvatarAudienceInteractionV1074(avatarAudienceCueV1074,progressMs,0,audio.beat?audio.beatStrength:0):null;
     const waveAge=animateWave?wave.current.age:-1;
     if(animateWave||lastWaveAnimation.current){
       for(let i=0;i<count;i++){
         const m=members[i];
         const crest=animateWave?sampleArenaCrowdWaveV1033(m.x,m.z,waveAge):0;
         const reaction=animateCrowd?sampleCrowdExperienceV1051(crowdCueV1051,Math.atan2(m.z,m.x),t):null;
+        const v1073=audienceActiveV1073?
+          sampleAudienceExperienceV1073(audienceCueV1073,Math.atan2(m.z,m.x),t,audio.beat?audio.beatStrength:0):null;
         const sway=animateWave ? .023*Math.sin(t*1.9+i*.47)*(.28+.72*bass) : 0;
         const hookRise=hookCueEnabled?sampleArenaCrowdHookV1035(hookCue,Math.atan2(m.z,m.x),t):0;
-        const rise=crest*.20+hookRise+(reaction?.rise??0)*.24;
+        const rise=crest*.20+hookRise+(reaction?.rise??0)*.24+(v1073?.lift??0);
         dummy.position.set(m.x+sway,m.y+m.height*.43+rise,m.z);
         dummy.rotation.set(0,Math.atan2(-m.x,-m.z),0);
         dummy.scale.set(.20,m.height*.75,.12);
         dummy.updateMatrix();bodies.current?.setMatrixAt(i,dummy.matrix);
         dummy.position.set(m.x+sway,m.y+m.height*.89+rise,m.z);
-        dummy.rotation.set(0,0,0);dummy.scale.set(.102,.107,.103);
+        dummy.rotation.set(0,0,(v1073?.faceStage??0)*.12*Math.sin(t*.42+i*.5)+(replyV1074?.audienceHead??0));dummy.scale.set(.102,.107,.103);
         dummy.updateMatrix();heads.current?.setMatrixAt(i,dummy.matrix);
       }
       if(bodies.current)bodies.current.instanceMatrix.needsUpdate=true;
@@ -137,10 +162,13 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
       for(let i=0;i<cheeringMembers.length;i++){
         const m=cheeringMembers[i];
         const reaction=sampleCrowdExperienceV1051(crowdCueV1051,Math.atan2(m.z,m.x),t);
+        const v1073=audienceActiveV1073?
+          sampleAudienceExperienceV1073(audienceCueV1073,Math.atan2(m.z,m.x),t,audio.beat?audio.beatStrength:0):null;
+        const gestureArms=Math.min(.8,reaction.arms+(v1073?.arms??0)+(replyV1074?.audienceArms??0));
         for(let side=0;side<2;side++){
           const sign=side===0?-1:1;
-          dummy.position.set(m.x+sign*.18,m.y+m.height*(.62+reaction.arms*.20)+reaction.rise*.24,m.z);
-          dummy.rotation.set(0,0,sign*(.26+reaction.arms*.95));
+          dummy.position.set(m.x+sign*.18,m.y+m.height*(.62+gestureArms*.20)+reaction.rise*.24+(v1073?.lift??0),m.z);
+          dummy.rotation.set(0,0,sign*(.26+gestureArms*.95));
           dummy.scale.set(.05,.29,.06);dummy.updateMatrix();
           arms.current.setMatrixAt(i*2+side,dummy.matrix);
         }
@@ -169,6 +197,24 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
         dummy.scale.set(.095,.055,.014);dummy.updateMatrix();
         phones.current?.setMatrixAt(i,dummy.matrix);
       }
+      // V1073 reuses the phone-member subset for tiny virtual wrist lights.
+      // Bounded continuous brightness; manual pulse/chase disables the whole cue.
+      if(audienceActiveV1073&&wristbandsV1073.current){
+        const band=wristbandsV1073.current;
+        const color=audienceCueV1073!.color;
+        for(let i=0;i<phoneMembers.length;i++){
+          const m=phoneMembers[i];
+          const angle=Math.atan2(m.z,m.x);
+          const sample=sampleAudienceExperienceV1073(audienceCueV1073,angle,t,audio.beat?audio.beatStrength:0);
+          braceletTintV1073.setRGB(color[0],color[1],color[2]);
+          band.setColorAt(i,braceletTintV1073.multiplyScalar(sample.light));
+          dummy.position.set(m.x-.16,m.y+m.height*(.96+sample.arms*.28)+sample.lift,m.z);
+          dummy.rotation.set(0,Math.atan2(-m.x,-m.z),0);
+          dummy.scale.set(.065,.065,.065);dummy.updateMatrix();band.setMatrixAt(i,dummy.matrix);
+        }
+        band.instanceMatrix.needsUpdate=true;
+        if(band.instanceColor)band.instanceColor.needsUpdate=true;
+      }
       if(phones.current){
         if(phones.current.instanceColor)phones.current.instanceColor.needsUpdate=true;
         phones.current.instanceMatrix.needsUpdate=true;
@@ -193,6 +239,11 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
       {crowdActive&&!!cheeringMembers.length&&<instancedMesh ref={arms}
         args={[undefined,undefined,cheeringMembers.length*2]} frustumCulled={false} name="v1051-audience-cheer-arms">
         <boxGeometry args={[1,1,1]}/><meshStandardMaterial color="#ffffff" roughness={.93}/>
+      </instancedMesh>}
+      {audienceActiveV1073&&!!phoneMembers.length&&<instancedMesh ref={wristbandsV1073}
+        args={[undefined,undefined,phoneMembers.length]} frustumCulled={false} name="v1073-audience-wristbands">
+        <torusGeometry args={[1,.22,4,8]}/>
+        <meshBasicMaterial color="#ffffff" toneMapped={false} depthWrite={false}/>
       </instancedMesh>}
       {!!phoneMembers.length&&<instancedMesh ref={phones} args={[undefined,undefined,phoneMembers.length]} frustumCulled={false} name="v1032-audience-phone-lights">
         <planeGeometry args={[1,1]}/><meshBasicMaterial ref={pulseMaterial} transparent opacity={.38} toneMapped={false} depthWrite={false} side={2}/>
