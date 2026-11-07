@@ -60,6 +60,11 @@ check('future ZIP imports always run conservative structure repair', () => {
   assert(workflow.includes('node scripts/organize-project-structure.cjs'));
   assert(workflow.includes('node tests/v974-repository-cleanup-regression.cjs'));
 });
+check('docs migration does not rewrite importer version-file fixtures', () => {
+  const docsMigration = read('scripts/organize-version-docs.cjs');
+  assert(docsMigration.includes("rel === 'tests/v974-repository-cleanup-regression.cjs'"));
+});
+
 check('new full ZIP safely updates an already-organized version document', () => {
   const os = require('node:os');
   const crypto = require('node:crypto');
@@ -68,8 +73,8 @@ check('new full ZIP safely updates an already-organized version document', () =>
   try {
     const old = 'V1031 archived 360 arena documentation';
     const revised = 'V1041 updated 360 arena documentation';
-    const src = path.join(temp, 'docs/versions/V1031-360-ARENA.md');
-    const dest = path.join(temp, 'docs', 'versions', 'docs/versions/V1031-360-ARENA.md');
+    const src = path.join(temp, 'V1031-360-ARENA.md');
+    const dest = path.join(temp, 'docs', 'versions', 'V1031-360-ARENA.md');
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     fs.writeFileSync(src, revised);
     fs.writeFileSync(dest, old);
@@ -78,7 +83,7 @@ check('new full ZIP safely updates an already-organized version document', () =>
     assert(!fs.existsSync(src));
     const digest = crypto.createHash('sha256').update(old).digest('hex');
     const archive = path.join(temp, 'artifacts', 'historical', 'document-revisions',
-      'docs/versions/V1031-360-ARENA.md.' + digest + '.bak');
+      'V1031-360-ARENA.md.' + digest + '.bak');
     assert.equal(fs.readFileSync(archive, 'utf8'), old);
     fs.writeFileSync(src, revised);
     moveChecked(src, dest, { allowVersionUpdate: true, archiveRoot: temp });
