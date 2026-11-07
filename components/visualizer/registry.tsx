@@ -152,6 +152,8 @@ export interface VisualizerProps {
   arenaAudienceDirectorStrengthV1044?: number;
   arenaAtmosphereDirectorEnabledV1045?: boolean;
   arenaAtmosphereDirectorStrengthV1045?: number;
+  arenaFinaleEnabledV1046?: boolean;
+  arenaFinaleStrengthV1046?: number;
   dancePostEnabledV468?: boolean;
   shaderEnvironmentV468?: import('./ProceduralShaderEnvironmentV468').ShaderEnvironmentModeV468;
   wardrobeModeV468?: import('./avatarWardrobeV468').WardrobeModeV468;

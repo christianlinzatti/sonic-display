@@ -1,6 +1,26 @@
 # V1040 · AI Show Designer (aufbauend auf V1039)
 
 
+## V1046 · Cinematic Concert Finale Engine
+
+`lib/arena360CinematicFinaleV1046.ts` liefert ausschließlich lokalisierte,
+begrenzte Cues für die vier Teilakte des **authored** V1040-Finales. Ein
+freigegebener Showplan, passende Track-ID, Songdauer, Wiedergabe und
+Motion-/Reaktivitätsfreigabe sind Voraussetzungen. Der neue opt-in Schalter
+ist standardmäßig ausgeschaltet. `components/visualizer/stages/Arena360StageV1031.tsx`
+leitet die Cues an die vorhandenen Laser- und Zuschauerinstanzen weiter;
+manuelle Stage-/Handylichtmodi bleiben vorrangig.
+`components/visualizer/stages/ArenaCinematicFinaleV1046.tsx` zeichnet das
+virtuelle, GPU-instanzierte Konfetti (maximal 96 Stück) und einen Ring, der
+nur auf einen **realen steigenden Beat** mit ausreichendem Bassniveau
+reagiert. Er besitzt eine 1,45-s-Sperrzeit; keine realen Lichter, Blitze,
+Govee-, Nebel- oder Pyrokommandos. Die vorhandene opt-in V1041-Avatarregie
+kann im Höhepunkt einen kleinen gemeinsamen Akzent erhalten, ohne manuelle
+Tanz-/Duo-/GLB-Steuerung zu ersetzen. Die Renderer verwenden den bestehenden
+R3F-Frame-Loop und stellen bei Pause/Trackwechsel den Zustand zurück.
+Tests: `tests/v1046-cinematic-finale-regression.cjs`,
+`tests/tsconfig.v1046-core.json` und `scripts/v1046-release-readiness.cjs`.
+
 ## V1045 · Intelligent Concert Atmosphere 2.0
 
 Ein optionaler, deterministischer Atmosphären-Showdirector unter
@@ -1372,7 +1392,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1045
+**Dokumentationsstand:** V1046
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

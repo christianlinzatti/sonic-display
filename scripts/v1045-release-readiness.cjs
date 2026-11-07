@@ -7,9 +7,9 @@ function inspectReleaseV1045(root){
  const exists=f=>fs.existsSync(path.join(root,f));
  try{
   const p=JSON.parse(read('package.json')),l=JSON.parse(read('package-lock.json'));
-  add('version',p.version==='0.1.0-v1045'&&p.sonicFeatureRelease==='v1045'&&p.sonicRoadmapRelease==='v1045');
+  add('version',['v1045','v1046'].includes(p.sonicFeatureRelease)&&p.sonicFeatureRelease===p.sonicRoadmapRelease&&p.version==='0.1.0-'+p.sonicFeatureRelease);
   add('lockfile',p.version===l.version&&p.version===l.packages?.['']?.version);
-  add('prebuild',p.scripts.prebuild.startsWith('npm run test:v1045 && npm run test:v1045:types &&'));
+  add('prebuild',p.scripts.prebuild.includes('npm run test:v1045 && npm run test:v1045:types &&'));
   add('scripts',p.scripts['test:v1045']==='node tests/v1045-atmosphere-orchestra-regression.cjs'&&
    p.scripts['test:v1045:types']==='tsc -p tests/tsconfig.v1045-core.json --noEmit');
   for(const f of ['lib/arena360AtmosphereDirectorV1045.ts','tests/v1045-atmosphere-orchestra-regression.cjs',

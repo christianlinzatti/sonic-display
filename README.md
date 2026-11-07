@@ -1,3 +1,20 @@
+## V1046 · Cinematic Concert Finale Engine
+
+In der **360° Ultimate Concert Arena** lässt sich im **AI Show Designer** die
+optionale **Cinematic Concert Finale Engine** aktivieren (Intensität 0–80 %).
+Die letzten 12 % des Songs folgen einem vierteiligen dramaturgischen Finale:
+Sammeln, Steigern, Höhepunkt und Ausklang. Ein virtueller 360°-Konfettiregen
+und ein 3D-Bass-Schockwellenring erweitern die Bühne; **die Schockwelle
+benötigt einen echten starken, neu erkannten Beat**. Bereits aktive Laser,
+Publikums-Handylichter, die Bühnenbeleuchtung und optional die V1041-Avatare
+werden sanft akzentuiert. Keine echten Govee- oder Lasersignale, keine
+Stroboskopblitze, kein zusätzlicher Audiozugriff. Pausen, manuelle Modi,
+Reduced Motion und Leistungsgrenzen behalten Vorrang.
+
+Tests: `npm run verify:v1046:focused` und
+`node scripts/v1046-release-readiness.cjs`.
+Details: `changelog/V1046-CINEMATIC-CONCERT-FINALE-ENGINE.md`.
+
 ## V1045 · Intelligent Concert Atmosphere 2.0
 
 Die 360°-Arena inszeniert virtuellen Bodennebel, Laserfächer und den LED-Himmel mit passenden Genre-Farbpaletten und fließenden Szenenwechseln. In **Einstellungen → Display → AI Show Designer** einen Showplan aktivieren und **Intelligent Concert Atmosphere 2.0** einschalten (Intensität 0–75 %). Die bestehenden GPU-instanzbasierten Effekte werden wiederverwendet; keine zusätzlichen Render-Passes, Hardware-Ansteuerung oder automatischen Stroboskop-Effekte. Pause, Reduced Motion und manuell deaktivierte Effekte bleiben vorrangig. Details: `changelog/V1045-INTELLIGENT-CONCERT-ATMOSPHERE-2.md`.

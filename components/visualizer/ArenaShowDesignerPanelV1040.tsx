@@ -127,6 +127,26 @@ export function ArenaShowDesignerPanelV1040(){
     Grafikleistungsgrenzen und die vorhandene manuelle Showregie behalten Vorrang.
     Keine schnellen Blitze.</small>
   </fieldset>
+  <fieldset className="arena-v1046-cinematic-finale" aria-label="V1046 Cinematic Concert Finale Engine">
+   <legend>V1046 · Cinematic Concert Finale Engine</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaFinaleEnabledV1046)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaFinaleEnabledV1046:e.target.checked})}/>
+    Dramatisches 360°-Finale mit Konfetti, Beat-Schockwelle, Laser- und Bühnenakzenten
+   </label>
+   <label>Finale-Intensität: {preferences.arenaFinaleStrengthV1046??60}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaFinaleEnabledV1046}
+     value={preferences.arenaFinaleStrengthV1046??60}
+     onChange={e=>updatePreferences({arenaFinaleStrengthV1046:Number(e.target.value)})}/>
+   </label>
+   <small>Finale dramaturgisch in Sammeln, Steigern, Höhepunkt und Abklingen gegliedert.
+    Konfetti ist ausschließlich virtuell. Die Ring-Schockwelle benötigt einen echten starken
+    Beat aus der Audioanalyse; keine erfundenen Drops. Die vorhandenen Laser, Bühne,
+    Publikums-Handylichter und optional die V1041-Avatar-Choreografie werden nur akzentuiert,
+    wenn sie bereits aktiviert sind. Keine echten Geräte, Pyrotechnik oder Stroboblitze.
+    Pause, reduzierte Bewegung, manuelle Regie und Leistungsgrenzen haben Vorrang.</small>
+  </fieldset>
   <fieldset className="arena-v1043-show-camera" aria-label="V1043 Show Camera Director">
    <legend>V1043 · Intelligent Show Camera Director</legend>
    <label className="setting-check"><input type="checkbox"
@@ -167,7 +187,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

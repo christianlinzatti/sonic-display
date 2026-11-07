@@ -26,6 +26,8 @@ import {ArenaHologramPortalsV1039} from './ArenaHologramPortalsV1039';
 import {ArenaLaserTunnelsV1039} from './ArenaLaserTunnelsV1039';
 import type {HologramPatternV1039} from '@/lib/arena360HolographyV1039';
 import {sampleArenaShowPlanV1040,type ArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
+import {planArenaCinematicFinaleV1046} from '@/lib/arena360CinematicFinaleV1046';
+import {ArenaCinematicFinaleV1046} from './ArenaCinematicFinaleV1046';
 import {planArenaAtmosphereDirectorV1045} from '@/lib/arena360AtmosphereDirectorV1045';
 import {planArenaAudienceV1044} from '@/lib/arena360AudienceDirectorV1044';
 import {INITIAL_ARENA_LIFT_V1034,stepArenaLiftV1034} from "@/lib/arena360ShowV1034";
@@ -49,7 +51,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   floatingStageEnabled=true,floatingStageMode='auto',floatingStageIntensity=70,
   hologramsEnabled=true,laserArchitectureEnabled=true,hologramPattern='auto',hologramStrength=65,
   showDesignerEnabled=false,showPlan,audienceDirectorEnabled=false,audienceDirectorStrength=50,
-  atmosphereDirectorEnabled=false,atmosphereDirectorStrength=55,trackId,genre}: {
+  atmosphereDirectorEnabled=false,atmosphereDirectorStrength=55,
+  cinematicFinaleEnabled=false,cinematicFinaleStrength=60,trackId,genre}: {
   children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
   reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
   audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
@@ -63,7 +66,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   hologramsEnabled?:boolean;laserArchitectureEnabled?:boolean;hologramPattern?:HologramPatternV1039;
   hologramStrength?:number;showDesignerEnabled?:boolean;showPlan?:ArenaShowPlanV1040;
   audienceDirectorEnabled?:boolean;audienceDirectorStrength?:number;
-  atmosphereDirectorEnabled?:boolean;atmosphereDirectorStrength?:number;trackId?:string|null;genre?:string|null;
+  atmosphereDirectorEnabled?:boolean;atmosphereDirectorStrength?:number;
+  cinematicFinaleEnabled?:boolean;cinematicFinaleStrength?:number;trackId?:string|null;genre?:string|null;
 }){
   const turntable=useRef<Group>(null);
   const scenicTier=useRef<Group>(null);
@@ -90,6 +94,17 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     playing:isPlaying,reducedMotion,reactive,show:showCueV1040,showPlan,
     progressMs,durationMs,strength:atmosphereDirectorStrength,performanceTier:getActivePerformanceTier(),
   });
+  const finaleV1046=planArenaCinematicFinaleV1046({
+    enabled:cinematicFinaleEnabled&&showDesignerEnabled&&showDirectorEnabled,
+    playing:isPlaying,reducedMotion,reactive,show:showCueV1040,trackId,
+    progressMs,durationMs,strength:cinematicFinaleStrength,
+    performanceTier:getActivePerformanceTier(),
+  });
+  // Enhance existing synchronized phone lights only if the V1044 director was enabled.
+  // The manually selected phone modes, tier restrictions and safety gates still win.
+  const finalAudienceCue=audienceCueV1044.active&&finaleV1046.active?
+    {...audienceCueV1044,gain:Math.min(.75,audienceCueV1044.gain+finaleV1046.audienceAccent)}:
+    audienceCueV1044;
   const plannedIntensity=showCueV1040.active?Math.min(showIntensity,showCueV1040.intensity):showIntensity;
   const plannedDeck=showCueV1040.active&&transformingDeckMode==='auto'?showCueV1040.deck:transformingDeckMode;
   const plannedFloat=showCueV1040.active&&floatingStageMode==='auto'?showCueV1040.floating:floatingStageMode;
@@ -141,7 +156,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     if(glow.current){
       const bass=reactive&&isPlaying&&!reducedMotion?Math.max(0,Math.min(1,audio.bass??0)):0;
       const tier=getActivePerformanceTier();
-      const scale=tier==='low'||reducedMotion?1:1+bass*.035;
+      const scale=tier==='low'||reducedMotion?1:1+bass*.035+(finaleV1046.active?finaleV1046.deckAccent:0);
       glow.current.scale.set(scale,1,scale);
     }
   });
@@ -191,7 +206,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       wavesEnabled={wavesEnabled} phoneSyncEnabled={phoneSyncEnabled} phoneMode={phoneMode}
       hookCueEnabled={crowdChantEnabled} progressMs={progressMs} durationMs={durationMs}
       fullSongDirectorEnabled={fullSongDirectorEnabled&&showDirectorEnabled} showIntensity={showIntensity} section={section}
-      audienceCueV1044={audienceCueV1044}/>
+      audienceCueV1044={finalAudienceCue}/>
     <ArenaLedDomeV1033 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={domeEnabled} reactive={reactive}/>
     <ArenaSkyFormationV1034 audio={audio} section={section} playing={isPlaying} reducedMotion={reducedMotion}
       enabled={skyFormationEnabled} directorEnabled={showDirectorEnabled} reactive={reactive}
@@ -204,13 +219,15 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       progressMs={progressMs} durationMs={durationMs} section={section} intensity={plannedIntensity}/>
     <ArenaLaserFansV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={lasersEnabled} directorEnabled={showDirectorEnabled} section={section}
-      progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}/>
+      progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045} finaleV1046={finaleV1046}/>
     <ArenaMovingLedSkyV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={movingSkyEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}/>
     <ArenaLowFogV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={groundFogEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}/>
+    <ArenaCinematicFinaleV1046 cue={finaleV1046} audio={audio} trackId={trackId}
+      playing={isPlaying} reducedMotion={reducedMotion}/>
     <ArenaHologramPortalsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={hologramsEnabled&&showDirectorEnabled}
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}/>

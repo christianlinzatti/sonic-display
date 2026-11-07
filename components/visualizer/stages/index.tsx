@@ -176,7 +176,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
   lasersEnabled,movingSkyEnabled,groundFogEnabled,arenaPeaksEnabled,
   transformingDeckEnabled,transformingDeckMode,transformingDeckStrength,
   floatingStageEnabled,floatingStageMode,floatingStageIntensity,
-  hologramsEnabled,laserArchitectureEnabled,hologramPattern,hologramStrength,showDesignerEnabled,showPlan,audienceDirectorEnabled,audienceDirectorStrength,atmosphereDirectorEnabled,atmosphereDirectorStrength,trackId,genre, ...props }:
+  hologramsEnabled,laserArchitectureEnabled,hologramPattern,hologramStrength,showDesignerEnabled,showPlan,audienceDirectorEnabled,audienceDirectorStrength,atmosphereDirectorEnabled,atmosphereDirectorStrength,cinematicFinaleEnabled,cinematicFinaleStrength,trackId,genre, ...props }:
   Props & { theme: StageEnvironmentId; children?: React.ReactNode; rotationSpeed?: number; rotationEnabled?: boolean;
     audienceEnabled?: boolean; lightsEnabled?: boolean; dropEnabled?: boolean;
     wavesEnabled?:boolean;phoneSyncEnabled?:boolean;phoneMode?:import("@/lib/arena360ImmersionV1033").ArenaPhoneModeV1033;domeEnabled?:boolean;
@@ -192,7 +192,8 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     hologramStrength?:number;showDesignerEnabled?:boolean;
     showPlan?:import('@/lib/arena360ShowDesignerV1040').ArenaShowPlanV1040;
     audienceDirectorEnabled?:boolean;audienceDirectorStrength?:number;
-    atmosphereDirectorEnabled?:boolean;atmosphereDirectorStrength?:number;trackId?:string|null;genre?:string|null }) {
+    atmosphereDirectorEnabled?:boolean;atmosphereDirectorStrength?:number;
+    cinematicFinaleEnabled?:boolean;cinematicFinaleStrength?:number;trackId?:string|null;genre?:string|null }) {
   if (theme === "arena360") {
     return <Arena360StageV1031 {...props} rotationSpeed={rotationSpeed} rotationEnabled={rotationEnabled}
       audienceEnabled={audienceEnabled} lightsEnabled={lightsEnabled} dropEnabled={dropEnabled}
@@ -211,6 +212,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       hologramPattern={hologramPattern} hologramStrength={hologramStrength} showDesignerEnabled={showDesignerEnabled} showPlan={showPlan}
       audienceDirectorEnabled={audienceDirectorEnabled} audienceDirectorStrength={audienceDirectorStrength}
       atmosphereDirectorEnabled={atmosphereDirectorEnabled} atmosphereDirectorStrength={atmosphereDirectorStrength}
+      cinematicFinaleEnabled={cinematicFinaleEnabled} cinematicFinaleStrength={cinematicFinaleStrength}
       trackId={trackId} genre={genre}>
       {children}
     </Arena360StageV1031>;
