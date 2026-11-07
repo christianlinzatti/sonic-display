@@ -5,6 +5,7 @@ import {useUiPreferences} from '@/context/UiPreferencesContext';
 import {sampleArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
 import {directArenaShowV1048} from '@/lib/arena360ConcertDirectorV1048';
 import {directLiveConcertV1049} from '@/lib/arena360LiveConcertIntelligenceV1049';
+import {directAdaptiveStoryV1050} from '@/lib/arena360AdaptiveStorytellingV1050';
 import {planGoveeShowV1042,applyGoveeShowV1042} from '@/lib/goveeShowSyncV1042';
 import {useAudioAnalysis} from '@/context/AudioAnalysisContext';
 import {GOVEE_CONFIG_EVENT_V909,GOVEE_CONFIG_KEY_V909,loadGoveeConfigV909,goveeBridgeRequestV909,planGoveeLookV909,
@@ -61,6 +62,8 @@ export function GoveeMusicSyncV909(){
  const concertDirectorStrengthV1048=preferences.arenaConcertDirectorStrengthV1048??50;
  const liveConcertEnabledV1049=preferences.arenaLiveConcertEnabledV1049===true;
  const liveConcertStrengthV1049=preferences.arenaLiveConcertStrengthV1049??50;
+ const storytellingEnabledV1050=preferences.arenaStorytellingEnabledV1050===true;
+ const storytellingStrengthV1050=preferences.arenaStorytellingStrengthV1050??55;
  const arenaShowEnabledV1040=preferences.arenaShowDesignerEnabledV1040===true;
  const arenaShowPlanV1040=preferences.arenaShowPlanV1040;
  const showStageIsArenaV1042=preferences.stageTheme==='arena360';
@@ -326,12 +329,21 @@ export function GoveeMusicSyncV909(){
       reducedMotion:reducedMotionV1042,show:baseGoveeShowV1040,
       plan:arenaShowPlanV1040,trackId:state.track.id,progressMs:progress,
       durationMs:state.track.durationMs,strength:concertDirectorStrengthV1048}).show;
+    // V1050 never sends commands: V1042 keeps exclusive hardware/phase authority.
+    const storyGoveeShowV1050=directAdaptiveStoryV1050({
+      enabled:storytellingEnabledV1050&&arenaShowEnabledV1040&&goveeShowEnabledV1042,
+      stageIsArena:showStageIsArenaV1042,playing:state.isPlaying,
+      reducedMotion:reducedMotionV1042,plan:arenaShowPlanV1040,
+      show:arrangedGoveeShowV1048,trackId:state.track.id,
+      progressMs:progress,durationMs:state.track.durationMs,
+      strength:storytellingStrengthV1050,
+    }).show;
     // V1049 only attenuates the existing optional Govee cue, using fresh microphone data.
     const authoredGoveeShowV1042=directLiveConcertV1049({
       enabled:liveConcertEnabledV1049&&goveeShowEnabledV1042&&arenaShowEnabledV1040,
       stageIsArena:showStageIsArenaV1042,playing:state.isPlaying,
       microphoneActive:state.microphoneActive,reducedMotion:reducedMotionV1042,
-      show:arrangedGoveeShowV1048,audio:state.metrics,strength:liveConcertStrengthV1049,
+      show:storyGoveeShowV1050,audio:state.metrics,strength:liveConcertStrengthV1049,
       sampleAgeMs:now-state.observedAt}).show;
     const sectionDecision=config.directorEnabledV911?planGoveeSectionV919(analysis.current,state.track.id,progress,sectionSettings):null;
     const genreDecision=sectionDecision?planGoveeGenreV920(analysis.current,state.track.id,progress,state.genre,sectionDecision,genreSettings):null;

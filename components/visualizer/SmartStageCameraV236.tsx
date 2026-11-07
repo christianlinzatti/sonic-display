@@ -1,6 +1,7 @@
 "use client";
 import {composeArenaShowCameraV1043,type ArenaShowCameraCueV1043} from "@/lib/arena360ShowCameraV1043";
 import {composeArenaImmersiveCameraV1047,type ArenaImmersiveCameraCueV1047} from "@/lib/arena360ImmersiveArenaV1047";
+import {composeArenaCinematicCameraV1053,type ConcertCameraCueV1053} from "@/lib/arena360CinematicCameraV1053";
 import {composeArenaCameraV1032,type ArenaCameraModeV1032} from "@/lib/arena360ExperienceV1032";
 import {INITIAL_ARENA_FLYOVER_V1033,stepArenaFlyoverV1033,composeArenaFlyoverV1033} from "@/lib/arena360ImmersionV1033";
 import {composeArenaSectionCameraV1034} from "@/lib/arena360ShowV1034";
@@ -17,8 +18,8 @@ import type { PerspectiveCamera } from "three";
 import type { AudioFeatures } from "@/types/audio";
 import {advanceStageDirector,createStageDirectorState} from "./smartStageDirectorV236";
 /** Moves only the active scene camera; no new render passes or per-frame React state. */
-export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,composition,genreCue,timelineCue,lipSync,arena360=false,arenaCameraEnabled=true,arenaCameraMode="arc",arenaFlyoverEnabled=true,arenaSectionCameraEnabled=true,arenaShowCameraCueV1043,arenaImmersiveCameraCueV1047,section="verse"}:{
- arena360?:boolean;arenaCameraEnabled?:boolean;arenaCameraMode?:ArenaCameraModeV1032;arenaFlyoverEnabled?:boolean;arenaSectionCameraEnabled?:boolean;arenaShowCameraCueV1043?:ArenaShowCameraCueV1043;arenaImmersiveCameraCueV1047?:ArenaImmersiveCameraCueV1047;section?:string;audio:AudioFeatures;genre?:string|null;playing:boolean;reducedMotion:boolean;duo:boolean;composition?:SmartStageCueV351;genreCue?:GenreVisualCueV352;timelineCue?:ShowTimelineCueV354;lipSync?:VisualizerProps["lipSync"]}){
+export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,composition,genreCue,timelineCue,lipSync,arena360=false,arenaCameraEnabled=true,arenaCameraMode="arc",arenaFlyoverEnabled=true,arenaSectionCameraEnabled=true,arenaShowCameraCueV1043,arenaImmersiveCameraCueV1047,arenaCinematicCameraCueV1053,section="verse"}:{
+ arena360?:boolean;arenaCameraEnabled?:boolean;arenaCameraMode?:ArenaCameraModeV1032;arenaFlyoverEnabled?:boolean;arenaSectionCameraEnabled?:boolean;arenaShowCameraCueV1043?:ArenaShowCameraCueV1043;arenaImmersiveCameraCueV1047?:ArenaImmersiveCameraCueV1047;arenaCinematicCameraCueV1053?:ConcertCameraCueV1053;section?:string;audio:AudioFeatures;genre?:string|null;playing:boolean;reducedMotion:boolean;duo:boolean;composition?:SmartStageCueV351;genreCue?:GenreVisualCueV352;timelineCue?:ShowTimelineCueV354;lipSync?:VisualizerProps["lipSync"]}){
  const director=useRef(createStageDirectorState());
  const arenaFlyoverV1033=useRef({...INITIAL_ARENA_FLYOVER_V1033});
  const focusV369=useRef(0);
@@ -63,14 +64,15 @@ export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,comp
   });
   const safeV1043=composeArenaShowCameraV1043(safeV1034,arenaShowCameraCueV1043,protectedShotV1033);
   const safeV1047=composeArenaImmersiveCameraV1047(safeV1043,arenaImmersiveCameraCueV1047,protectedShotV1033);
+  const safeV1053=composeArenaCinematicCameraV1053(safeV1047,arenaCinematicCameraCueV1053,protectedShotV1033);
   const t=1-Math.exp(-Math.min(Math.max(delta,0),.1)*3);
-  camera.position.x+=(safeV1047.x-camera.position.x)*t;
-  camera.position.y+=(safeV1047.y-camera.position.y)*t;
-  camera.position.z+=(safeV1047.z-camera.position.z)*t;
+  camera.position.x+=(safeV1053.x-camera.position.x)*t;
+  camera.position.y+=(safeV1053.y-camera.position.y)*t;
+  camera.position.z+=(safeV1053.z-camera.position.z)*t;
   // Restore original FOV when V351 is disabled, rather than leaving the wider lens latched.
   const pc=camera as PerspectiveCamera;
-  if(Math.abs(pc.fov-safeV1047.fov)>.015){pc.fov+=(safeV1047.fov-pc.fov)*t;pc.updateProjectionMatrix();}
-  lookV369.current+=(safeV1047.targetY-lookV369.current)*t;
+  if(Math.abs(pc.fov-safeV1053.fov)>.015){pc.fov+=(safeV1053.fov-pc.fov)*t;pc.updateProjectionMatrix();}
+  lookV369.current+=(safeV1053.targetY-lookV369.current)*t;
   camera.lookAt(0,lookV369.current,0);
  });
  return null;

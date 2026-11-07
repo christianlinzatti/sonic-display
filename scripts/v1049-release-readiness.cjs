@@ -7,10 +7,12 @@ function inspectReleaseV1049(root){
  const exists=f=>fs.existsSync(path.join(root,f));
  try{
   const p=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-  add('version',p.version==='0.1.0-v1049'&&p.sonicFeatureRelease==='v1049'&&p.sonicRoadmapRelease==='v1049');
+  const release=Number(/^0\.1\.0-v(\d+)$/.exec(p.version)?.[1]);
+  add('version',release>=1049&&p.sonicFeatureRelease==='v'+release&&p.sonicRoadmapRelease==='v'+release);
   add('lock',p.version===lock.version&&p.version===lock.packages[''].version);
   add('node24',p.engines?.node==='24.x');
-  add('prebuild',p.scripts.prebuild.startsWith('npm run test:v1049 && npm run test:v1049:types && npm run test:v1048'));
+  add('prebuild',p.scripts.prebuild.startsWith('npm run test:v1049 && npm run test:v1049:types && npm run test:v1048')||
+   (release>1049&&p.scripts.prebuild.includes('&& npm run test:v1049 && npm run test:v1049:types && npm run test:v1048')));
   add('focused',p.scripts['verify:v1049:focused'].includes('verify:v1048:focused'));
   for(const f of ['lib/arena360LiveConcertIntelligenceV1049.ts','tests/v1049-live-concert-intelligence-regression.cjs',
    'tests/tsconfig.v1049-core.json','changelog/V1049-LIVE-CONCERT-INTELLIGENCE-ENGINE.md'])add('file:'+f,exists(f));

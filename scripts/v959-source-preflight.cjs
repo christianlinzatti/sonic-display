@@ -171,3 +171,34 @@ const {inspectReleaseV1049}=require('./v1049-release-readiness.cjs');
 const v1049=inspectReleaseV1049(root);
 for(const c of v1049.checks)console.log((c.ok?'PASS':'FAIL')+' V1049 '+c.name);
 if(!v1049.passed)process.exitCode=1;
+
+const {inspectReleaseV1050}=require('./v1050-release-readiness.cjs');
+const v1050=inspectReleaseV1050(root);
+for(const c of v1050.checks)console.log((c.ok?'PASS':'FAIL')+' V1050 '+c.name);
+if(!v1050.passed)process.exitCode=1;
+
+const {inspectReleaseV1051}=require('./v1051-release-readiness.cjs');
+const v1051=inspectReleaseV1051(root);
+for(const c of v1051.checks)console.log((c.ok?'PASS':'FAIL')+' V1051 '+c.name);
+if(!v1051.passed)process.exitCode=1;
+
+const {inspectReleaseV1052}=require('./v1052-release-readiness.cjs');
+const v1052=inspectReleaseV1052(root);
+for(const c of v1052.checks)console.log((c.ok?'PASS':'FAIL')+' V1052 '+c.name);
+if(!v1052.passed)process.exitCode=1;
+
+const {inspectReleaseV1053}=require('./v1053-release-readiness.cjs');
+const v1053=inspectReleaseV1053(root);
+for(const c of v1053.checks)console.log((c.ok?'PASS':'FAIL')+' V1053 '+c.name);
+if(!v1053.passed)process.exitCode=1;
+
+
+const {inspectReleaseV1054}=require('./v1054-release-readiness.cjs');
+const v1054=inspectReleaseV1054(root);
+for(const c of v1054.checks)console.log((c.ok?'PASS':'FAIL')+' V1054 '+c.name);
+if(!v1054.passed)process.exitCode=1;
+
+const {inspectReleaseV1055}=require('./v1055-release-readiness.cjs');
+const v1055=inspectReleaseV1055(root);
+for(const c of v1055.checks)console.log((c.ok?'PASS':'FAIL')+' V1055 '+c.name);
+if(!v1055.passed)process.exitCode=1;

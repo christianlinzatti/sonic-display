@@ -1,0 +1,4 @@
+{
+  "compilerOptions":{"target":"ES2022","module":"CommonJS","moduleResolution":"node","noEmit":true,"strict":true,"skipLibCheck":true,"types":[]},
+  "files":["../lib/arena360CinematicCameraV1053.ts","../lib/arena360ShowDesignerV1040.ts","../types/playbackCore.ts"]
+}

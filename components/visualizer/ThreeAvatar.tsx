@@ -69,8 +69,13 @@ import {planArenaImmersiveCameraV1047} from '@/lib/arena360ImmersiveArenaV1047';
 import {sampleArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
 import {directArenaShowV1048} from '@/lib/arena360ConcertDirectorV1048';
 import {directLiveConcertV1049} from '@/lib/arena360LiveConcertIntelligenceV1049';
+import {directAdaptiveStoryV1050} from '@/lib/arena360AdaptiveStorytellingV1050';
+import {directUltimateConcertV1052} from '@/lib/arena360UltimateConcertV1052';
+import {planStageInteractionV1055} from '@/lib/arena360StageInteractionV1055';
 import {planArenaShowCameraV1043} from "@/lib/arena360ShowCameraV1043";
+import {planArenaCinematicCameraV1053} from '@/lib/arena360CinematicCameraV1053';
 import {planArenaChoreographyV1041} from '@/lib/arena360ChoreographyV1041';
+import {planAvatarPerformanceV1054} from '@/lib/arena360AvatarPerformanceV1054';
 import { GroupDancersV326 } from './GroupDancersV326SceneV492';
 
 class SceneErrorBoundary extends Component<{ children: ReactNode; onFailure: () => void }, { failed: boolean }> {
@@ -299,11 +304,45 @@ export function ThreeAvatar(props: VisualizerProps) {
     trackId:props.track?.id,progressMs:props.cameraDirectorProgressMs,
     durationMs:props.track?.durationMs,strength:props.arenaConcertDirectorStrengthV1048??50,
     performanceTier:getActivePerformanceTier()}).show;
-  const showCueV1041=directLiveConcertV1049({enabled:props.arenaLiveConcertEnabledV1049===true&&
+  const storyShowV1050=directAdaptiveStoryV1050({
+    enabled:props.arenaStorytellingEnabledV1050===true&&props.arenaShowDesignerEnabledV1040===true,
+    stageIsArena:props.stageTheme==='arena360',playing:props.isPlaying,
+    reducedMotion:props.reducedMotion,reactive:props.stageReactive??true,
+    plan:props.arenaShowPlanV1040,show:arrangedShowV1048,trackId:props.track?.id,
+    progressMs:props.cameraDirectorProgressMs,durationMs:props.track?.durationMs,
+    strength:props.arenaStorytellingStrengthV1050??55,performanceTier:getActivePerformanceTier(),
+  }).show;
+  const composedShowV1049=directLiveConcertV1049({enabled:props.arenaLiveConcertEnabledV1049===true&&
     props.arenaShowDesignerEnabledV1040===true,stageIsArena:props.stageTheme==='arena360',
     playing:props.isPlaying,reducedMotion:props.reducedMotion,reactive:props.stageReactive??true,
-    show:arrangedShowV1048,audio:props.audio,microphoneActive:props.microphoneActiveV1049===true,
+    show:storyShowV1050,audio:props.audio,microphoneActive:props.microphoneActiveV1049===true,
     strength:props.arenaLiveConcertStrengthV1049??50,performanceTier:getActivePerformanceTier()}).show;
+  const ultimateConcertV1052=directUltimateConcertV1052({
+    enabled:props.arenaUltimateConcertEnabledV1052===true&&props.arenaShowDesignerEnabledV1040===true,
+    stageIsArena:props.stageTheme==='arena360',playing:props.isPlaying,
+    reducedMotion:props.reducedMotion,reactive:props.stageReactive??true,
+    plan:props.arenaShowPlanV1040,show:composedShowV1049,trackId:props.track?.id,
+    progressMs:props.cameraDirectorProgressMs,durationMs:props.track?.durationMs,
+    strength:props.arenaUltimateConcertStrengthV1052??60,performanceTier:getActivePerformanceTier(),
+  });
+  const showCueV1041=ultimateConcertV1052.show;
+  // V1055 shares this single song-clock stage-zone cue across ALL optional
+  // visual systems. Manually authored blocking and protected dancers win.
+  const stageInteractionV1055=planStageInteractionV1055({
+    enabled:props.arenaStageInteractionEnabledV1055===true&&
+      props.arenaShowDesignerEnabledV1040===true&&props.arenaChoreographyEnabledV1041===true,
+    stageIsArena:props.stageTheme==='arena360',playing:props.isPlaying,
+    reducedMotion:props.reducedMotion,reactive:props.stageReactive??true,
+    manualPriority:authoredEnabled||authoredCueV354.active||manualFormationV354||
+      !!groupOnV326||multiEnabled||intelligentEnabled||auto||!!showFormation||
+      (props.multiAvatarMode??'solo')!=='solo'||props.avatarMotionMode==='choreography'||
+      !!props.smartDanceOverride||props.avatarTimelineEnabled===true||
+      props.lipSync?.manualVocalEnabledV385===true,
+    plan:props.arenaShowPlanV1040,show:showCueV1041,
+    trackId:props.track?.id,progressMs:props.cameraDirectorProgressMs,
+    durationMs:props.track?.durationMs,strength:props.arenaStageInteractionStrengthV1055??55,
+    performanceTier:getActivePerformanceTier(),
+  });
   // V1043: optional show-shot request only. Both existing directors retain camera authority.
   const arenaCameraV1043=planArenaShowCameraV1043({
     enabled:props.arenaShowCameraEnabledV1043===true&&(props.arenaCameraEnabledV1032??true),
@@ -312,7 +351,7 @@ export function ThreeAvatar(props: VisualizerProps) {
     manualPriority:props.cameraNarrativeV605?.manualCamera===true||
       props.lipSync?.cameraManualStagePriorityV377===true,
     trackId:props.track?.id,progressMs:props.cameraDirectorProgressMs,
-    strength:props.arenaShowCameraStrengthV1043??45,
+    strength:(props.arenaShowCameraStrengthV1043??45)*ultimateConcertV1052.cameraGain*stageInteractionV1055.cameraGain,
   });
   const arenaImmersiveCameraV1047=planArenaImmersiveCameraV1047({
     enabled:props.arenaImmersiveEnabledV1047===true&&props.arenaShowDesignerEnabledV1040===true,
@@ -321,15 +360,32 @@ export function ThreeAvatar(props: VisualizerProps) {
     manualPriority:props.cameraNarrativeV605?.manualCamera===true||
       props.lipSync?.cameraManualStagePriorityV377===true,
     show:showCueV1041,trackId:props.track?.id,progressMs:props.cameraDirectorProgressMs,
-    durationMs:props.track?.durationMs,strength:props.arenaImmersiveStrengthV1047??55,
+    durationMs:props.track?.durationMs,strength:(props.arenaImmersiveStrengthV1047??55)*ultimateConcertV1052.cameraGain*stageInteractionV1055.cameraGain,
     performanceTier:getActivePerformanceTier(),
   });
+  // V1053: only word-timed lyrics may suggest a lead-facing CLOSE shot.
+ // The actual director still owns all saved/manual/lyrics/duet protections.
+ const arenaCameraV1053=planArenaCinematicCameraV1053({
+   enabled:props.arenaCinematicCameraEnabledV1053===true&&props.arenaShowDesignerEnabledV1040===true,
+   stageIsArena:props.stageTheme==='arena360',cameraEnabled:(props.arenaCameraEnabledV1032??true)&&
+     props.arenaShowCameraEnabledV1043===true,playing:props.isPlaying,
+   reducedMotion:props.reducedMotion,reactive:props.stageReactive??true,
+   manualPriority:props.cameraNarrativeV605?.manualCamera===true||
+     props.lipSync?.cameraManualStagePriorityV377===true,
+   show:showCueV1041,trackId:props.track?.id,
+   progressMs:props.cameraDirectorProgressMs,durationMs:props.track?.durationMs,
+   strength:(props.arenaCinematicCameraStrengthV1053??50)*ultimateConcertV1052.cameraGain*stageInteractionV1055.cameraGain,
+   performanceTier:getActivePerformanceTier(),
+   lyrics:props.lipSync?.enabled&&props.lipSync?.playing?props.lipSync.lyrics:
+     props.lyricsScene?.playing?props.lyricsScene.lyrics:null,
+   lyricsPlaying:Boolean(props.lipSync?.enabled&&props.lipSync?.playing||props.lyricsScene?.playing),
+ });
   const arenaChoreoV1041=planArenaChoreographyV1041({
     enabled:props.arenaChoreographyEnabledV1041===true,show:showCueV1041,
     playing:props.isPlaying,reducedMotion:props.reducedMotion,
     trackId:props.track?.id,progressMs:props.cameraDirectorProgressMs,
     genre:props.genre,stageIsArena:props.stageTheme==='arena360',
-    strength:props.arenaChoreographyStrengthV1041??60,
+    strength:(props.arenaChoreographyStrengthV1041??60)*ultimateConcertV1052.choreoGain,
     formation:props.arenaChoreographyFormationV1041??'auto',
     performanceTier:getActivePerformanceTier(),
     manualPriority:authoredEnabled||authoredCueV354.active||manualFormationV354||
@@ -354,7 +410,24 @@ export function ThreeAvatar(props: VisualizerProps) {
       leadGain:Math.min(1.18,arenaChoreoV1041.leadGain+castFinaleV1046.choreoAccent),
       partnerGain:Math.min(1.18,arenaChoreoV1041.partnerGain+castFinaleV1046.choreoAccent),
     }:arenaChoreoV1041;
-  const mode = manualFormationV354 ? timelineCueV354.danceFormation! : authoredEnabled ? "sync" : multiEnabled ? (choreography?.scene ?? "sync") : intelligentEnabled ? (intelligentCue?.scene ?? props.showCue!.formation) : auto ? autoScene : showFormation ? props.showCue!.formation : arenaChoreoV1041.active ? coordinatedChoreoV1046!.scene : (props.multiAvatarMode ?? "solo");
+  // V1054 adds gentle, song-clock-based accents to the ONE existing V1041 cue.
+  // Vocal role, authored formations, motion clips, collision and IK retain priority.
+  const avatarPerformanceV1054=planAvatarPerformanceV1054({
+    enabled:props.arenaAvatarPerformanceEnabledV1054===true&&
+      props.arenaChoreographyEnabledV1041===true&&props.arenaShowDesignerEnabledV1040===true,
+    stageIsArena:props.stageTheme==='arena360',playing:props.isPlaying,
+    reducedMotion:props.reducedMotion,reactive:props.stageReactive??true,
+    manualPriority:!arenaChoreoV1041.active,
+    base:coordinatedChoreoV1046,show:showCueV1041,trackId:props.track?.id,
+    progressMs:props.cameraDirectorProgressMs,durationMs:props.track?.durationMs,
+    genre:props.genre,strength:props.arenaAvatarPerformanceStrengthV1054??55,
+    performanceTier:getActivePerformanceTier(),
+    lyrics:props.lipSync?.enabled&&props.lipSync?.playing?props.lipSync.lyrics:
+      props.lyricsScene?.playing?props.lyricsScene.lyrics:null,
+    lyricsPlaying:Boolean((props.lipSync?.enabled&&props.lipSync?.playing)||props.lyricsScene?.playing),
+  });
+  const performanceChoreoV1054=avatarPerformanceV1054.choreography;
+  const mode = manualFormationV354 ? timelineCueV354.danceFormation! : authoredEnabled ? "sync" : multiEnabled ? (choreography?.scene ?? "sync") : intelligentEnabled ? (intelligentCue?.scene ?? props.showCue!.formation) : auto ? autoScene : showFormation ? props.showCue!.formation : arenaChoreoV1041.active ? performanceChoreoV1054.scene : (props.multiAvatarMode ?? "solo");
   // V921 publishes the EXISTING stage's show decision, never a second camera/
   // choreographer plan. Live Govee listeners require fresh matching-track events.
   // A single 1.4s heartbeat keeps a static (non-changing) camera cue fresh.
@@ -589,8 +662,8 @@ export function ThreeAvatar(props: VisualizerProps) {
       {!groupOnV326 && auto && <DuoDirectorTick props={props} onScene={setAutoScene} />}
       {!groupOnV326 && multiEnabled && <MultiAvatarDirectorTick props={props} settings={multiSettings} onCue={setChoreography} />}
       {!groupOnV326 && intelligentEnabled && <IntelligentChoreographyTickV312 props={props} settings={intelligentSettings} onCue={setIntelligentCue} />}
-      <AdaptivePerformanceController avatarCount={groupOnV326?effectiveGroupSettingsV442.count:dual||auto||multiEnabled||Boolean(showFormation)?2:1} playing={props.isPlaying}/>{props.cameraDirectorEnabled || props.lipSync?.concertCameraArmedV454===true || props.lipSync?.cinematicSceneV528?.active===true || props.lipSync?.rapCameraArmedV429===true || (props.lipSync?.vocalCameraModeV401!=="off" && props.lipSync?.vocalCameraModeV401!==undefined) || props.lipSync?.visualDirectorModeV397!=="off" && props.lipSync?.visualDirectorModeV397!==undefined || (props.lipSync?.cinematicLyricsModeV378!=="off" && props.lipSync?.cinematicLyricsSideV378 && props.lipSync?.cinematicLyricsVisibleV378 || (props.lipSync?.cinematicDuetCameraModeV377!=="off" && props.lipSync?.cinematicDuetCameraModeV377!==undefined && props.lipSync?.duetModeV376!=="off" && dual || props.lipSync?.manualVocalEnabledV385===true && props.lipSync.manualVocalCameraV385!==false && (dual||groupOnV326) || props.lipSync?.vocalTimeEnabledV496===true && props.lipSync.vocalTimeSegmentsV496?.length && props.lipSync.rapDuetCameraV416!==false && (dual||groupOnV326) || props.lipSync?.rapDuetEnabledV416===true && props.lipSync.rapDuetCameraV416!==false && (dual||groupOnV326) || props.lipSync?.concertModeV386!=="off" && props.lipSync?.concertModeV386!==undefined && props.lipSync?.concertCameraV386!==false && (dual||groupOnV326) || props.concertShowCueV387?.active && props.concertShowCameraV387!==false || props.festivalShowCueV394?.active && props.festivalShowCameraV394!==false)) ? <StageCameraDirectorV289 arenaImmersiveCameraCueV1047={arenaImmersiveCameraV1047} arenaShowCameraCueV1043={arenaCameraV1043} arena360={directedThemeV352 === "arena360"} arenaCameraEnabled={props.arenaCameraEnabledV1032 ?? true} arenaCameraMode={props.arenaCameraModeV1032 ?? "arc"} arenaFlyoverEnabled={props.arenaFlyoverEnabledV1033 ?? true} arenaSectionCameraEnabled={(props.arenaShowDirectorEnabledV1034 ?? true) && (props.arenaSectionCameraEnabledV1034 ?? true)} audio={props.audio} section={props.cameraDirectorSection ?? "verse"} progressMs={props.cameraDirectorProgressMs ?? 0} intensity={props.cameraDirectorIntensity ?? 55} playing={props.isPlaying} reducedMotion={props.reducedMotion} duo={dual || auto || !!showFormation || intelligentEnabled} showCue={props.showCue} concertShowCueV387={props.concertShowCueV387} festivalShowCueV394={props.festivalShowCueV394} festivalShowCameraV394={props.festivalShowCameraV394}
-      concertShowCameraV387={props.concertShowCameraV387} cinematicCueV497={cinematicCueV497} cameraNarrativeV605={props.cameraNarrativeV605} concertFlowV654={props.concertFlowV654} transitionV791={coordinatedTransitionV849.seam??undefined} choreographyV792={props.smartCameraChoreographyV792} vocalSpotlightV797={directedSpotlightV838} vocalDuetV838={vocalDuetV838} composition={compositionV497} genreCue={genreCueV352} timelineCue={timelineCueV354} lipSync={props.lipSync?{...props.lipSync,cameraCastCountV377:groupOnV326?effectiveGroupSettingsV442.count:dual?2:1,cameraManualStagePriorityV377:authoredEnabled||manualFormationV354||authoredCueV354.active||props.showCue?.formationsEnabled===true||manualGroupOnV326&&!!groupSettingsV326.trackId||canPlayEnsembleTimelineV325(readEnsembleTimelineV325(),props.track?.id)}:undefined} genre={props.genre} /> : <SmartStageCameraV236 arenaImmersiveCameraCueV1047={arenaImmersiveCameraV1047} arenaShowCameraCueV1043={arenaCameraV1043} arena360={directedThemeV352 === "arena360"} arenaCameraEnabled={props.arenaCameraEnabledV1032 ?? true} arenaCameraMode={props.arenaCameraModeV1032 ?? "arc"} arenaFlyoverEnabled={props.arenaFlyoverEnabledV1033 ?? true} arenaSectionCameraEnabled={(props.arenaShowDirectorEnabledV1034 ?? true) && (props.arenaSectionCameraEnabledV1034 ?? true)} section={props.cameraDirectorSection ?? "verse"} audio={props.audio} genre={props.genre} playing={props.isPlaying} reducedMotion={props.reducedMotion} duo={dual || auto} composition={compositionV497} genreCue={genreCueV352} timelineCue={timelineCueV354} lipSync={props.lipSync} />}<DynamicStage liveShowV827 stageEvolutionV795={props.stageEvolutionV795} vocalSpotlightV797={directedSpotlightV838} epicPeakV794={props.epicPeakV794} manualLightingV763={authoredCueV354.active&&authoredCueV354.activeLanes.includes("lighting")} transitionV791={coordinatedTransitionV849.seam??undefined} transitionV849={coordinatedTransitionV849} concertFxV810={props.concertFxV810} lyricsV813={props.lyricsScene?.lyrics??props.lipSync?.lyrics} lyricsVisibleV813={Boolean(props.lyricsScene?.lyrics?.synced)} scenicLightingV762={props.scenicLightingV762} cinematicCueV761={props.cinematicCueV761} performanceLightingV749={props.performanceLightingV749} lyricsProtectedV542={lyricsActiveV356} vocalFocusV542={Boolean(props.lipSync?.playing&&props.lipSync?.enabled)} groupCountV542={groupOnV326?effectiveGroupSettingsV442.count:dual||auto||multiEnabled||Boolean(showFormation)?2:1} musicPalette={directedPaletteV352} theme={directedThemeV352} genre={props.genre} audio={props.audio} showCue={props.showCue} isPlaying={props.isPlaying} reducedMotion={props.reducedMotion} reactive={props.stageReactive ?? true} strength={props.stageLightStrength ?? 60} cinematicCueV497={cinematicCueV497} cameraNarrativeV605={props.cameraNarrativeV605} cameraSectionV608={props.cameraDirectorSection} composition={compositionV497} glowGainV353={visualFxCueV355.glowGain} timelineGainV354={timelineCueV354.active&&timelineCueV354.activeLanes.includes("lighting")?timelineCueV354.lightGain:1}
+      <AdaptivePerformanceController avatarCount={groupOnV326?effectiveGroupSettingsV442.count:dual||auto||multiEnabled||Boolean(showFormation)?2:1} playing={props.isPlaying}/>{props.cameraDirectorEnabled || props.lipSync?.concertCameraArmedV454===true || props.lipSync?.cinematicSceneV528?.active===true || props.lipSync?.rapCameraArmedV429===true || (props.lipSync?.vocalCameraModeV401!=="off" && props.lipSync?.vocalCameraModeV401!==undefined) || props.lipSync?.visualDirectorModeV397!=="off" && props.lipSync?.visualDirectorModeV397!==undefined || (props.lipSync?.cinematicLyricsModeV378!=="off" && props.lipSync?.cinematicLyricsSideV378 && props.lipSync?.cinematicLyricsVisibleV378 || (props.lipSync?.cinematicDuetCameraModeV377!=="off" && props.lipSync?.cinematicDuetCameraModeV377!==undefined && props.lipSync?.duetModeV376!=="off" && dual || props.lipSync?.manualVocalEnabledV385===true && props.lipSync.manualVocalCameraV385!==false && (dual||groupOnV326) || props.lipSync?.vocalTimeEnabledV496===true && props.lipSync.vocalTimeSegmentsV496?.length && props.lipSync.rapDuetCameraV416!==false && (dual||groupOnV326) || props.lipSync?.rapDuetEnabledV416===true && props.lipSync.rapDuetCameraV416!==false && (dual||groupOnV326) || props.lipSync?.concertModeV386!=="off" && props.lipSync?.concertModeV386!==undefined && props.lipSync?.concertCameraV386!==false && (dual||groupOnV326) || props.concertShowCueV387?.active && props.concertShowCameraV387!==false || props.festivalShowCueV394?.active && props.festivalShowCameraV394!==false)) ? <StageCameraDirectorV289 arenaCinematicCameraCueV1053={arenaCameraV1053} arenaImmersiveCameraCueV1047={arenaImmersiveCameraV1047} arenaShowCameraCueV1043={arenaCameraV1043} arena360={directedThemeV352 === "arena360"} arenaCameraEnabled={props.arenaCameraEnabledV1032 ?? true} arenaCameraMode={props.arenaCameraModeV1032 ?? "arc"} arenaFlyoverEnabled={props.arenaFlyoverEnabledV1033 ?? true} arenaSectionCameraEnabled={(props.arenaShowDirectorEnabledV1034 ?? true) && (props.arenaSectionCameraEnabledV1034 ?? true)} audio={props.audio} section={props.cameraDirectorSection ?? "verse"} progressMs={props.cameraDirectorProgressMs ?? 0} intensity={props.cameraDirectorIntensity ?? 55} playing={props.isPlaying} reducedMotion={props.reducedMotion} duo={dual || auto || !!showFormation || intelligentEnabled} showCue={props.showCue} concertShowCueV387={props.concertShowCueV387} festivalShowCueV394={props.festivalShowCueV394} festivalShowCameraV394={props.festivalShowCameraV394}
+      concertShowCameraV387={props.concertShowCameraV387} cinematicCueV497={cinematicCueV497} cameraNarrativeV605={props.cameraNarrativeV605} concertFlowV654={props.concertFlowV654} transitionV791={coordinatedTransitionV849.seam??undefined} choreographyV792={props.smartCameraChoreographyV792} vocalSpotlightV797={directedSpotlightV838} vocalDuetV838={vocalDuetV838} composition={compositionV497} genreCue={genreCueV352} timelineCue={timelineCueV354} lipSync={props.lipSync?{...props.lipSync,cameraCastCountV377:groupOnV326?effectiveGroupSettingsV442.count:dual?2:1,cameraManualStagePriorityV377:authoredEnabled||manualFormationV354||authoredCueV354.active||props.showCue?.formationsEnabled===true||manualGroupOnV326&&!!groupSettingsV326.trackId||canPlayEnsembleTimelineV325(readEnsembleTimelineV325(),props.track?.id)}:undefined} genre={props.genre} /> : <SmartStageCameraV236 arenaCinematicCameraCueV1053={arenaCameraV1053} arenaImmersiveCameraCueV1047={arenaImmersiveCameraV1047} arenaShowCameraCueV1043={arenaCameraV1043} arena360={directedThemeV352 === "arena360"} arenaCameraEnabled={props.arenaCameraEnabledV1032 ?? true} arenaCameraMode={props.arenaCameraModeV1032 ?? "arc"} arenaFlyoverEnabled={props.arenaFlyoverEnabledV1033 ?? true} arenaSectionCameraEnabled={(props.arenaShowDirectorEnabledV1034 ?? true) && (props.arenaSectionCameraEnabledV1034 ?? true)} section={props.cameraDirectorSection ?? "verse"} audio={props.audio} genre={props.genre} playing={props.isPlaying} reducedMotion={props.reducedMotion} duo={dual || auto} composition={compositionV497} genreCue={genreCueV352} timelineCue={timelineCueV354} lipSync={props.lipSync} />}<DynamicStage liveShowV827 stageEvolutionV795={props.stageEvolutionV795} vocalSpotlightV797={directedSpotlightV838} epicPeakV794={props.epicPeakV794} manualLightingV763={authoredCueV354.active&&authoredCueV354.activeLanes.includes("lighting")} transitionV791={coordinatedTransitionV849.seam??undefined} transitionV849={coordinatedTransitionV849} concertFxV810={props.concertFxV810} lyricsV813={props.lyricsScene?.lyrics??props.lipSync?.lyrics} lyricsVisibleV813={Boolean(props.lyricsScene?.lyrics?.synced)} scenicLightingV762={props.scenicLightingV762} cinematicCueV761={props.cinematicCueV761} performanceLightingV749={props.performanceLightingV749} lyricsProtectedV542={lyricsActiveV356} vocalFocusV542={Boolean(props.lipSync?.playing&&props.lipSync?.enabled)} groupCountV542={groupOnV326?effectiveGroupSettingsV442.count:dual||auto||multiEnabled||Boolean(showFormation)?2:1} musicPalette={directedPaletteV352} theme={directedThemeV352} genre={props.genre} audio={props.audio} showCue={props.showCue} isPlaying={props.isPlaying} reducedMotion={props.reducedMotion} reactive={props.stageReactive ?? true} strength={props.stageLightStrength ?? 60} cinematicCueV497={cinematicCueV497} cameraNarrativeV605={props.cameraNarrativeV605} cameraSectionV608={props.cameraDirectorSection} composition={compositionV497} glowGainV353={visualFxCueV355.glowGain} timelineGainV354={timelineCueV354.active&&timelineCueV354.activeLanes.includes("lighting")?timelineCueV354.lightGain:1}
        performerLightingV557={{settings:props.concertDetailsV555??{...DEFAULT_CONCERT_DETAILS_V555},cue:concertDetailCueV557,scene:props.lipSync?.cinematicSceneV528,progressMs:props.cameraDirectorProgressMs??props.lipSync?.progressMs??0}}
        concertShowCueV387={props.concertShowCueV387} festivalShowCueV394={props.festivalShowCueV394} festivalShowLightingV394={props.festivalShowLightingV394} festivalShowAtmosphereV394={props.festivalShowAtmosphereV394} festivalShowLasersV394={props.festivalShowLasersV394} concertShowLightingV387={props.concertShowLightingV387}
        concertShowAtmosphereV387={props.concertShowAtmosphereV387} concertLipSyncV386={props.lipSync?{...props.lipSync,cameraCastCountV377:groupOnV326?effectiveGroupSettingsV442.count:dual?2:1,
@@ -650,7 +723,7 @@ export function ThreeAvatar(props: VisualizerProps) {
         transformingDeckStrength={props.arenaTransformingDeckStrengthV1037 ?? 70}
         floatingStageEnabled={props.arenaFloatingStageEnabledV1038 ?? true}
         floatingStageMode={props.arenaFloatingStageModeV1038 ?? 'auto'}
-        floatingStageIntensity={props.arenaFloatingStageIntensityV1038 ?? 70}
+        floatingStageIntensity={(props.arenaFloatingStageIntensityV1038 ?? 70)*stageInteractionV1055.platformGain}
         hologramsEnabled={props.arenaHologramsEnabledV1039 ?? true}
         laserArchitectureEnabled={props.arenaLaserArchitectureEnabledV1039 ?? true}
         hologramPattern={props.arenaHologramPatternV1039 ?? 'auto'}
@@ -658,7 +731,7 @@ export function ThreeAvatar(props: VisualizerProps) {
         showDesignerEnabled={props.arenaShowDesignerEnabledV1040 ?? false}
         showPlan={props.arenaShowPlanV1040}
         audienceDirectorEnabled={props.arenaAudienceDirectorEnabledV1044 ?? false}
-        audienceDirectorStrength={props.arenaAudienceDirectorStrengthV1044 ?? 50}
+        audienceDirectorStrength={(props.arenaAudienceDirectorStrengthV1044 ?? 50)*stageInteractionV1055.crowdGain}
         atmosphereDirectorEnabled={props.arenaAtmosphereDirectorEnabledV1045 ?? false}
         atmosphereDirectorStrength={props.arenaAtmosphereDirectorStrengthV1045 ?? 55}
         cinematicFinaleEnabled={props.arenaFinaleEnabledV1046 ?? false}
@@ -669,12 +742,18 @@ export function ThreeAvatar(props: VisualizerProps) {
         concertDirectorStrength={props.arenaConcertDirectorStrengthV1048 ?? 50}
         liveConcertEnabledV1049={props.arenaLiveConcertEnabledV1049 ?? false}
         liveConcertStrengthV1049={props.arenaLiveConcertStrengthV1049 ?? 50}
+        storytellingEnabledV1050={props.arenaStorytellingEnabledV1050 ?? false}
+        storytellingStrengthV1050={props.arenaStorytellingStrengthV1050 ?? 55}
+        crowdExperienceEnabledV1051={props.arenaCrowdExperienceEnabledV1051 ?? false}
+        crowdExperienceStrengthV1051={(props.arenaCrowdExperienceStrengthV1051 ?? 55)*stageInteractionV1055.crowdGain}
+        ultimateConcertEnabledV1052={props.arenaUltimateConcertEnabledV1052 ?? false}
+        ultimateConcertStrengthV1052={props.arenaUltimateConcertStrengthV1052 ?? 60}
         microphoneActiveV1049={props.microphoneActiveV1049 ?? false}
         trackId={props.track?.id}
         genre={props.genre}
         progressMs={props.cameraDirectorProgressMs ?? 0} durationMs={props.track?.durationMs ?? 0}
         section={props.cameraDirectorSection ?? "verse"}>
-      <group name={TRACKING_ROOT_NAME}>{groupOnV326 ? <GroupDancersV326 props={autoGroupOnV442?dancerPropsV356:{...dancerPropsV356,multiArtistMotionsV442:undefined}} settings={effectiveGroupSettingsV442} vocalDuetV838={vocalDuetV838}/> : (dual || auto || multiEnabled || showFormation) ? <FormationDancers props={dancerPropsV356} mode={mode} choreography={authoredEnabled ? null : multiEnabled ? choreography : intelligentEnabled ? intelligentCue : arenaChoreoV1041.active ? coordinatedChoreoV1046 : null} /> : <group><Dancer props={dancerPropsV356}/><ArtistNameBubbleV441 plan={props.artistBubblePlanV441} slot={0} reducedMotion={props.reducedMotion}/></group>}</group>
+      <group name={TRACKING_ROOT_NAME}>{groupOnV326 ? <GroupDancersV326 props={autoGroupOnV442?dancerPropsV356:{...dancerPropsV356,multiArtistMotionsV442:undefined}} settings={effectiveGroupSettingsV442} vocalDuetV838={vocalDuetV838}/> : (dual || auto || multiEnabled || showFormation) ? <FormationDancers props={dancerPropsV356} mode={mode} performanceV1054={avatarPerformanceV1054} stageInteractionV1055={arenaChoreoV1041.active?stageInteractionV1055:null} choreography={authoredEnabled ? null : multiEnabled ? choreography : intelligentEnabled ? intelligentCue : arenaChoreoV1041.active ? performanceChoreoV1054 : null} /> : <group><Dancer props={dancerPropsV356}/><ArtistNameBubbleV441 plan={props.artistBubblePlanV441} slot={0} reducedMotion={props.reducedMotion}/></group>}</group>
       </StageEnvironment>
     </Canvas></SceneErrorBoundary>}
     <ConcertQualityInspectorV466 enabled={qualityInspectorEnabledV466} onToggle={()=>{

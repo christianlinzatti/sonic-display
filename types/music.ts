@@ -59,6 +59,18 @@ export interface UiPreferences {
   arenaConcertDirectorStrengthV1048?: number;
   arenaLiveConcertEnabledV1049?:boolean;
   arenaLiveConcertStrengthV1049?:number;
+  arenaStorytellingEnabledV1050?:boolean;
+  arenaStorytellingStrengthV1050?:number;
+  arenaCrowdExperienceEnabledV1051?:boolean;
+  arenaCrowdExperienceStrengthV1051?:number;
+  arenaUltimateConcertEnabledV1052?:boolean;
+  arenaUltimateConcertStrengthV1052?:number;
+  arenaCinematicCameraEnabledV1053?:boolean;
+  arenaCinematicCameraStrengthV1053?:number;
+  arenaAvatarPerformanceEnabledV1054?:boolean;
+  arenaAvatarPerformanceStrengthV1054?:number;
+  arenaStageInteractionEnabledV1055?:boolean;
+  arenaStageInteractionStrengthV1055?:number;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;

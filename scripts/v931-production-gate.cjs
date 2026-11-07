@@ -11,6 +11,12 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1055 Dynamic Concert Stage & Avatar Interaction','tests/v1055-stage-interaction-regression.cjs'],
+  ['V1054 Advanced Avatar Performance Intelligence','tests/v1054-avatar-performance-regression.cjs'],
+  ['V1053 Intelligent Concert Camera Experience 2.0','tests/v1053-cinematic-camera-regression.cjs'],
+  ['V1052 Ultimate Live Concert Experience','tests/v1052-ultimate-live-concert-regression.cjs'],
+  ['V1051 Immersive Concert Crowd Experience','tests/v1051-immersive-crowd-experience-regression.cjs'],
+  ['V1050 Adaptive Concert Storytelling','tests/v1050-adaptive-concert-storytelling-regression.cjs'],
   ['V1049 Live Concert Intelligence','tests/v1049-live-concert-intelligence-regression.cjs'],
   ['V1048 Next Generation Concert Director','tests/v1048-nextgen-concert-director-regression.cjs'],
   ['V1047 Immersive Arena Experience 3.0','tests/v1047-immersive-arena-regression.cjs'],

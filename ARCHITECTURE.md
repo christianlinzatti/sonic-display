@@ -1,3 +1,137 @@
+## V1055 · Dynamic Concert Stage & Avatar Interaction Engine
+
+Eine neue optionale Arena-Regie erweitert die automatischen **prozeduralen Duos** um
+ruhige Positionswechsel auf der *mittleren drehenden 360°-Bühne*. Sieben
+Showkapitel verbinden sichere Innenbereich-Positionen, kleine Blickrichtungswechsel
+und einen gemeinsamen Fokus für Kamera, Publikum und schwebende Bühnendekoration.
+Schwebende Plattformen bleiben Kulisse, die Avatare steigen **nicht** darauf.
+
+**Einschalten:** Display → AI Show Designer → Showplan erstellen/aktivieren,
+V1041 automatische Avatar-Choreografie aktivieren und anschließend V1055
+Dynamic Concert Stage & Avatar Interaction (0–80 %) aktivieren.
+Standardmäßig ausgeschaltet. Optionale Kamera-, Publikums- und Plattformmodule
+werden nur koordiniert, wenn sie ohnehin aktiviert sind.
+
+Kein zusätzliches 3D-Objekt, Timer, Mikrofon, physischer Lichteffekt oder Govee-Aufruf.
+Beim Pausieren, bei Reduced Motion und niedrigem Grafikprofil ist die Zusatzregie
+inaktiv. Eigene Formationen, Foot-IK, Kollisionsschutz, Timeline und importierte
+Avatar-Animationen haben Vorrang. Die Planer sind lokal und deterministisch,
+kein echtes KI-Modell oder eine neue Beat-Erkennung.
+
+Details und Tests: `changelog/V1055-DYNAMIC-STAGE-AVATAR-INTERACTION.md`,
+`lib/arena360StageInteractionV1055.ts`, `tests/v1055-stage-interaction-regression.cjs`.
+`npm run verify:v1055:focused` prüft V1055 plus bisherige Konzertfunktionen.
+
+## V1054 · Advanced Avatar Performance Intelligence
+
+Die neue, zunächst deaktivierte Avatar-Regie verfeinert die vorhandene automatische
+V1041-Duo-Choreografie für die 360°-Arena. Sie wählt lokale genreabhängige
+Gestenakzente für Rap, Gesang und Gruppenszenen. Echte synchronisierte
+Wort-Zeitstempel können kleine Rap-Akzente oder länger gehaltene Gesangsgesten
+auslösen. Ohne Wort-Zeitstempel verwendet V1054 ausschließlich den bestehenden
+Showplan und eine lokale, deterministische Variation – keine Sängererkennung,
+keine künstlichen Beats.
+
+**Aktivierung:** Display → AI Show Designer → Showplan erzeugen und aktivieren,
+V1041 Avatar-Choreografie einschalten, dann **V1054** aktivieren.
+Stärke von 0–80 %. Standardmäßig deaktiviert. Das vorhandene Duo- und
+Fußkontakt-System bleibt alleiniger Besitzer der Bewegung. Keine zusätzlichen
+Animationsmixer, GLB-Clips, Netzwerkanfragen, Govee-Befehle oder 3D-Objekte.
+Eigene Formationen, manuelle Rollen, gespeicherte Animationen, Pausen,
+Reduced Motion und geringe Renderleistung behalten Vorrang.
+
+Implementierung: `lib/arena360AvatarPerformanceV1054.ts`, Integration in
+`components/visualizer/ThreeAvatar.tsx`, Funktionstests in
+`tests/v1054-avatar-performance-regression.cjs`. Release-Prüfung und
+isolierter TypeScript-Test: `npm run verify:v1054:focused`.
+Siehe `changelog/V1054-ADVANCED-AVATAR-PERFORMANCE-INTELLIGENCE.md`.
+
+## V1054 · Advanced Avatar Performance Intelligence
+
+Optionaler, lokaler Choreografie-Feinschliff für die **bestehende Zwei-Avatar-
+Formation** der V1041-360°-Arena. V1054 kombiniert sanfte Phrase-Einblendungen,
+leicht variierte Bewegungsintensitäten und dezente Reaktiv-Gesten passend zum
+Showplan. Bei wirklich synchronisierten Wort-Zeitstempeln unterscheidet die
+Steuerung kurze Akzente und länger gehaltene Silben. Das ist **keine**
+Sängeridentifikation oder Audio-Klassifikation; ohne Wortzeiten wird nur ein
+transparentes, genreabhängiges Bewegungsmotiv verwendet.
+
+**Aktivierung:** Display → AI Show Designer → Showplan aktivieren → V1041
+Choreografie einschalten → V1054 aktivieren (0–80 %). Standardmäßig aus.
+Bei Pause, reduzierter Bewegung, Low-Performance oder manuellen Choreografien
+bleiben die bisherigen Bewegungen unverändert. Gespeicherte Gruppen (3/4),
+Solo-Avatare, Duo-/Vocal-Rollen, importierte GLB-Clips, Fuß-IK und
+Kollisionsvermeidung behalten Vorrang. Keine zusätzliche Figur, kein Mixer,
+keine neuen Render-Pässe, keine Govee-Kommandos.
+
+Technik: `lib/arena360AvatarPerformanceV1054.ts` liefert nur begrenzte
+Zusatz-Cues an `components/visualizer/ThreeAvatar.tsx` und den vorhandenen
+`components/visualizer/DanceFormationActorsV492.tsx`. Die beiden
+Regressionstufen `tests/v1054-avatar-performance-regression.cjs` und
+`tests/tsconfig.v1054-core.json` sind in Prebuild und Produktionsgates
+integriert. Freigabe: `npm run verify:v1054:focused` sowie Full Build nach
+`npm ci` in GitHub/Vercel; das lokale Quellcode-Gate ist kein Browser-/GPU-Test.
+Details: `changelog/V1054-ADVANCED-AVATAR-PERFORMANCE.md`.
+
+---
+
+## V1053 · Intelligent Concert Camera Experience 2.0
+
+Die optionale, lokale Regie ergänzt die **bestehende** Konzertkamera um ruhige
+360°-Schwenks, automatische Höhenfahrten und weite Arenaperspektiven.
+Bei *tatsächlich synchronisierten Wort-Zeitstempeln* können sanfte
+Lead-Close-ups vorgeschlagen werden, ohne daraus Sängeridentität abzuleiten.
+Die Kamera im Vordergrund wird weiterhin von den vorhandenen Vocal-/Lyrics-/
+Duett-/Manuellregisseuren gesteuert; deren Priorität bleibt erhalten.
+
+**Einschalten:** Display → AI Show Designer → Showplan erzeugen und aktivieren,
+V1043 Kamera-Automatik aktivieren und danach V1053 einschalten. Standardmäßig
+ist V1053 aus. Stärke 0–80 %. Bei Pause, Reduced Motion, unvollständiger
+Zeitbasis, niedrigem Performance-Profil oder manueller Kamera bleibt der
+bisherige Bildausschnitt unverändert. Keine zusätzliche Kamera, kein Shader,
+kein separates Render-Pass, kein Mikrofon- oder Netzwerkeffekt.
+
+Neue Dateien: `lib/arena360CinematicCameraV1053.ts`,
+`tests/v1053-cinematic-camera-regression.cjs`,
+`tests/tsconfig.v1053-core.json` und `scripts/v1053-release-readiness.cjs`.
+Der Cue wird von `components/visualizer/ThreeAvatar.tsx` an
+`components/visualizer/StageCameraDirectorV289.tsx` und
+`components/visualizer/SmartStageCameraV236.tsx` weitergereicht. Beide
+wenden ihn erst nach der bestehenden Kamerakomposition und nur bei
+unprotected auto shots an. CI: `npm run verify:v1053:focused`.
+Siehe `changelog/V1053-INTELLIGENT-CONCERT-CAMERA.md`.
+
+---
+
+## V1052 · Ultimate Live Concert Experience
+
+Die neue, opt-in-aktivierbare V1052-Regie synchronisiert die vorhandenen 360°-Bühnenaktionen, V1051-Publikumsanimationen, V1044-Handylichter, V1043-Kameravorschläge und V1041-Choreografie über denselben deterministischen Songabschnittsplan. Fokuswechsel zwischen Bühne, Publikum, Kamera und Ensemble erfolgen sanft; das Interlude bleibt ruhig und das Finale klingt weich aus. Bestehende manuelle Einstellungen, Lyrics-/Gesangs-Kameraprioritäten, Pausen und Grafikgrenzen bleiben unangetastet. Keine neuen 3D-Objekte, keine Govee-Netzwerkbefehle, keine erfundenen Beats oder KI-Cloud-Abfragen. Die einzelnen Effekte müssen weiterhin separat aktiviert sein. Siehe `changelog/V1052-ULTIMATE-LIVE-CONCERT-EXPERIENCE.md`.
+
+## V1051 · Immersive Concert Crowd Experience
+
+Optional crowd reactions in the V1032 world-fixed instanced arena audience: genre-neutral smooth La-Ola, 360° wave, arms-up cheering, reduced interlude and finale ovation with phone-light coordination. The V1051 local planner uses authored V1040 chapters, not detected music events. Manual phone modes, pauses, reduced-motion and low-tier performance win; no additional Govee instructions or synthesized crowd audio. Off by default, intensity 0–80%. See `changelog/V1051-IMMERSIVE-CONCERT-CROWD-EXPERIENCE.md`.
+
+## V1050 · Adaptive Concert Storytelling
+
+`lib/arena360AdaptiveStorytellingV1050.ts` liefert reine, deterministische
+Story-Cues. Grundlage ist die validierte siebenaktige V1040-Timeline; sie wird
+nicht um neue angeblich erkannte musikalische Ereignisse ergänzt. Pro Kapitel
+wird ein weicher Intensitätsmultiplikator von maximal 1.0 berechnet, der weder
+einen Nutzerwert noch ein V1048-Arrangement überschreiten kann. Die finale
+Kamera und die schwebenden Plattformen dürfen nur bei ursprünglich unveränderten
+V1040-Standardfeldern variieren; manuelle Kamerapriorität bleibt beim V1043-
+Kameraregisseur. Kein eigener Kamera-Rig, Partikelsystem, Timer oder Netzwerkpfad.
+
+Die Kopplung `V1040 → V1048 → V1050 → V1049` gilt identisch für die virtuelle
+360°-Bühne, den Avatar-Kameravorschlag und die bestehende V1042-Govee-Regie.
+Nur V1042 darf verifizierte LAN-Geräteaktionen veranlassen. Pausen, reduzierte
+Bewegung, fehlende Zeitbasis oder niedrige Leistungsstufe schalten V1050 ab.
+
+Tests und Gates: `tests/v1050-adaptive-concert-storytelling-regression.cjs`,
+`tests/tsconfig.v1050-core.json`, `scripts/v1050-release-readiness.cjs`.
+
+---
+
 ## V1049 · Live Concert Intelligence Engine
 
 `lib/arena360LiveConcertIntelligenceV1049.ts` ist eine reine Funktion ohne Timer,
@@ -1458,7 +1592,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1049
+**Dokumentationsstand:** V1055
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

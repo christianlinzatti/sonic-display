@@ -28,12 +28,15 @@ import type {HologramPatternV1039} from '@/lib/arena360HolographyV1039';
 import {sampleArenaShowPlanV1040,type ArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
 import {directArenaShowV1048} from '@/lib/arena360ConcertDirectorV1048';
 import {directLiveConcertV1049} from '@/lib/arena360LiveConcertIntelligenceV1049';
+import {directAdaptiveStoryV1050} from '@/lib/arena360AdaptiveStorytellingV1050';
 import {planArenaCinematicFinaleV1046} from '@/lib/arena360CinematicFinaleV1046';
 import {ArenaCinematicFinaleV1046} from './ArenaCinematicFinaleV1046';
 import {planArenaImmersionV1047} from '@/lib/arena360ImmersiveArenaV1047';
 import {ArenaImmersiveExperienceV1047} from './ArenaImmersiveExperienceV1047';
 import {planArenaAtmosphereDirectorV1045} from '@/lib/arena360AtmosphereDirectorV1045';
 import {planArenaAudienceV1044} from '@/lib/arena360AudienceDirectorV1044';
+import {planCrowdExperienceV1051} from '@/lib/arena360CrowdExperienceV1051';
+import {directUltimateConcertV1052} from '@/lib/arena360UltimateConcertV1052';
 import {INITIAL_ARENA_LIFT_V1034,stepArenaLiftV1034} from "@/lib/arena360ShowV1034";
 import type {ArenaPhoneModeV1033} from "@/lib/arena360ImmersionV1033";
 
@@ -58,7 +61,10 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   atmosphereDirectorEnabled=false,atmosphereDirectorStrength=55,
   cinematicFinaleEnabled=false,cinematicFinaleStrength=60,
   immersiveEnabled=false,immersiveStrength=55,concertDirectorEnabled=false,concertDirectorStrength=50,
-  liveConcertEnabledV1049=false,liveConcertStrengthV1049=50,microphoneActiveV1049=false,trackId,genre}: {
+  liveConcertEnabledV1049=false,liveConcertStrengthV1049=50,microphoneActiveV1049=false,
+  storytellingEnabledV1050=false,storytellingStrengthV1050=55,
+  crowdExperienceEnabledV1051=false,crowdExperienceStrengthV1051=55,
+  ultimateConcertEnabledV1052=false,ultimateConcertStrengthV1052=60,trackId,genre}: {
   children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
   reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
   audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
@@ -75,7 +81,10 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   atmosphereDirectorEnabled?:boolean;atmosphereDirectorStrength?:number;
   cinematicFinaleEnabled?:boolean;cinematicFinaleStrength?:number;
   immersiveEnabled?:boolean;immersiveStrength?:number;concertDirectorEnabled?:boolean;concertDirectorStrength?:number;
-  liveConcertEnabledV1049?:boolean;liveConcertStrengthV1049?:number;microphoneActiveV1049?:boolean;trackId?:string|null;genre?:string|null;
+  liveConcertEnabledV1049?:boolean;liveConcertStrengthV1049?:number;microphoneActiveV1049?:boolean;
+  storytellingEnabledV1050?:boolean;storytellingStrengthV1050?:number;
+  crowdExperienceEnabledV1051?:boolean;crowdExperienceStrengthV1051?:number;
+  ultimateConcertEnabledV1052?:boolean;ultimateConcertStrengthV1052?:number;trackId?:string|null;genre?:string|null;
 }){
   const turntable=useRef<Group>(null);
   const scenicTier=useRef<Group>(null);
@@ -96,16 +105,41 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     stageIsArena:true,playing:isPlaying,reducedMotion,reactive,show:authoredShowCueV1040,
     plan:showPlan,trackId,progressMs,durationMs,strength:concertDirectorStrength,
     performanceTier:getActivePerformanceTier()}).show;
-  const showCueV1040=directLiveConcertV1049({enabled:liveConcertEnabledV1049&&showDesignerEnabled&&showDirectorEnabled,
-    stageIsArena:true,playing:isPlaying,reducedMotion,reactive,show:arrangedShowV1048,audio,
+  // V1050: the existing show-plan gets a restrained narrative intensity arc.
+  const storyShowV1050=directAdaptiveStoryV1050({
+    enabled:storytellingEnabledV1050&&showDesignerEnabled&&showDirectorEnabled,
+    stageIsArena:true,playing:isPlaying,reducedMotion,reactive,
+    plan:showPlan,show:arrangedShowV1048,trackId,progressMs,durationMs,
+    strength:storytellingStrengthV1050,performanceTier:getActivePerformanceTier(),
+  }).show;
+  const composedShowV1049=directLiveConcertV1049({enabled:liveConcertEnabledV1049&&showDesignerEnabled&&showDirectorEnabled,
+    stageIsArena:true,playing:isPlaying,reducedMotion,reactive,show:storyShowV1050,audio,
     microphoneActive:microphoneActiveV1049,strength:liveConcertStrengthV1049,
     performanceTier:getActivePerformanceTier()}).show;
+  // V1052: one shared, opt-in score for stage/crowd/cast/camera; no new scene owner.
+  const ultimateConcertV1052=directUltimateConcertV1052({
+    enabled:ultimateConcertEnabledV1052&&showDesignerEnabled&&showDirectorEnabled,
+    stageIsArena:true,playing:isPlaying,reducedMotion,reactive,
+    plan:showPlan,show:composedShowV1049,trackId,progressMs,durationMs,
+    strength:ultimateConcertStrengthV1052,performanceTier:getActivePerformanceTier(),
+  });
+  const showCueV1040=ultimateConcertV1052.show;
   const audienceCueV1044=planArenaAudienceV1044({
     enabled:audienceDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,show:showCueV1040,
     stageIsArena:true,playing:isPlaying,reducedMotion,phoneEnabled:phoneSyncEnabled&&audienceEnabled,
     phoneMode,performanceTier:getActivePerformanceTier(),trackId,progressMs,strength:audienceDirectorStrength,
     genre:showCueV1040.active&&showPlan?showPlan.genre:genre,
   });
+  // V1051: crowd-only animation layered after the existing composed show cue.
+  // It does not alter lasers, camera, show plan, real audio or Govee commands.
+  const plannedCrowdV1051=planCrowdExperienceV1051({
+    enabled:crowdExperienceEnabledV1051&&showDesignerEnabled&&showDirectorEnabled,
+    stageIsArena:true,playing:isPlaying,reducedMotion,reactive,audienceEnabled,
+    show:showCueV1040,trackId,progressMs,durationMs,strength:crowdExperienceStrengthV1051,
+    performanceTier:getActivePerformanceTier(),
+  });
+  const crowdCueV1051=plannedCrowdV1051.active&&ultimateConcertV1052.active?
+    {...plannedCrowdV1051,gain:plannedCrowdV1051.gain*ultimateConcertV1052.crowdGain}:plannedCrowdV1051;
   const atmosphereV1045=planArenaAtmosphereDirectorV1045({
     enabled:atmosphereDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,
     playing:isPlaying,reducedMotion,reactive,show:showCueV1040,showPlan,
@@ -129,6 +163,9 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   const finalAudienceCue=audienceCueV1044.active&&finaleV1046.active?
     {...audienceCueV1044,gain:Math.min(.75,audienceCueV1044.gain+finaleV1046.audienceAccent)}:
     audienceCueV1044;
+  // The existing phone-light director stays independent; only its opt-in cue gets dimmed.
+  const coordinatedAudienceCue=finalAudienceCue.active&&ultimateConcertV1052.active?
+    {...finalAudienceCue,gain:finalAudienceCue.gain*ultimateConcertV1052.crowdGain}:finalAudienceCue;
   const plannedIntensity=showCueV1040.active?Math.min(showIntensity,showCueV1040.intensity):showIntensity;
   const plannedDeck=showCueV1040.active&&transformingDeckMode==='auto'?showCueV1040.deck:transformingDeckMode;
   const plannedFloat=showCueV1040.active&&floatingStageMode==='auto'?showCueV1040.floating:floatingStageMode;
@@ -230,7 +267,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       wavesEnabled={wavesEnabled} phoneSyncEnabled={phoneSyncEnabled} phoneMode={phoneMode}
       hookCueEnabled={crowdChantEnabled} progressMs={progressMs} durationMs={durationMs}
       fullSongDirectorEnabled={fullSongDirectorEnabled&&showDirectorEnabled} showIntensity={showIntensity} section={section}
-      audienceCueV1044={finalAudienceCue}/>
+      audienceCueV1044={coordinatedAudienceCue} crowdCueV1051={crowdCueV1051}/>
     <ArenaLedDomeV1033 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={domeEnabled} reactive={reactive}/>
     <ArenaSkyFormationV1034 audio={audio} section={section} playing={isPlaying} reducedMotion={reducedMotion}
       enabled={skyFormationEnabled} directorEnabled={showDirectorEnabled} reactive={reactive}

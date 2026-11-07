@@ -31,6 +31,8 @@ import { refineNaturalCrewV458 } from "./naturalStageInteractionV458";
 import { VOCAL_CHANGE_EVENT_V445, advanceVocalEvidenceV445, emptyVocalEvidenceV445, vocalHintPulseV445 } from "./vocalChangeEvidenceV445";
 import { loadCharacterMotionStore } from "./characterMotionLibrary";
 import { type Group } from "three";
+import type {AvatarPerformanceCueV1054} from '@/lib/arena360AvatarPerformanceV1054';
+import {applyStageInteractionV1055,type StageInteractionCueV1055} from '@/lib/arena360StageInteractionV1055';
 import type { VisualizerProps } from "./registry";
 import { effectiveRapTimingOffsetV418 } from "./rapPerformanceQualityV418";
 import { resolveAdaptiveVocalPerformanceV375 } from "./adaptiveVocalPerformanceV375";
@@ -154,7 +156,7 @@ export function IntelligentChoreographyTickV312({props,settings,onCue}:{props:Vi
 }
 
 /** V142: groups persist across scene changes so animator state and foot anchors survive. */
-export function FormationDancers({props, mode, choreography}: {props: VisualizerProps; mode: DuoScene; choreography?: MultiAvatarCue | null}) {
+export function FormationDancers({props, mode, choreography, performanceV1054, stageInteractionV1055}: {props: VisualizerProps; mode: DuoScene; choreography?: MultiAvatarCue | null; performanceV1054?:AvatarPerformanceCueV1054|null; stageInteractionV1055?:StageInteractionCueV1055|null}) {
   const lead = useRef<Group>(null);
   const bodyRegistryV507=useRef(createBodyRegistryV507());
   const animatedRegistryV508=useRef(createAnimatedBodyRegistryV508());
@@ -170,18 +172,22 @@ export function FormationDancers({props, mode, choreography}: {props: Visualizer
   // V312: scale only reactive overlays for the background dancer. Authored GLB clips and IK remain untouched.
   const leadProps = useMemo(() => {
     const gain=choreography?.leadGain ?? 1;
+    const armV1054=performanceV1054?.active?performanceV1054.armGain:1;
+    const bodyV1054=performanceV1054?.active?performanceV1054.bodyGain:1;
     const syncedProps={...props,ensembleCountV745:dual?2:1,lipSync:props.lipSync?{...props.lipSync,performanceCueRefV375,interactionCueRefV376,manualVocalCueRefV385,concertCueRefV386}:undefined};
-    return choreography ? {...syncedProps, avatarArmResponse:(props.avatarArmResponse??1)*(.35+.65*gain),
+    return choreography ? {...syncedProps, avatarArmResponse:Math.min((props.avatarArmResponse??1)*1.13,(props.avatarArmResponse??1)*(.35+.65*gain)*armV1054),
       avatarLegResponse:(props.avatarLegResponse??1)*(.60+.40*gain),
-      danceAggression:Math.min(1,(props.danceAggression??.5)*(.50+.50*gain))} : syncedProps;
-  },[props,choreography?.leadGain]);
+      danceAggression:Math.min(1,(props.danceAggression??.5)*(.50+.50*gain)*bodyV1054)} : syncedProps;
+  },[props,choreography?.leadGain,performanceV1054?.active,performanceV1054?.armGain,performanceV1054?.bodyGain]);
   const partnerProps = useMemo(() => {
     const gain=choreography?.partnerGain ?? 1;
+    const armV1054=performanceV1054?.active?performanceV1054.armGain:1;
+    const bodyV1054=performanceV1054?.active?performanceV1054.bodyGain:1;
     return {...props,ensembleCountV745:dual?2:1,lipSync:props.lipSync?{...props.lipSync,performanceCueRefV375,interactionCueRefV376,manualVocalCueRefV385,concertCueRefV386}:undefined, multiAvatarMode: mode,
-      ...(choreography ? {avatarArmResponse:(props.avatarArmResponse??1)*(.35+.65*gain),
+      ...(choreography ? {avatarArmResponse:Math.min((props.avatarArmResponse??1)*1.13,(props.avatarArmResponse??1)*(.35+.65*gain)*armV1054),
         avatarLegResponse:(props.avatarLegResponse??1)*(.60+.40*gain),
-        danceAggression:Math.min(1,(props.danceAggression??.5)*(.50+.50*gain))} : {})};
-  }, [props,mode,choreography?.partnerGain]);
+        danceAggression:Math.min(1,(props.danceAggression??.5)*(.50+.50*gain)*bodyV1054)} : {})};
+  }, [props,mode,choreography?.partnerGain,performanceV1054?.active,performanceV1054?.armGain,performanceV1054?.bodyGain]);
   const leadLook = useRef<LookAtCue>({...NEUTRAL_LOOK});
   const partnerLook = useRef<LookAtCue>({...NEUTRAL_LOOK});
   const leadGesture = useRef<PartnerGestureCue>({...NEUTRAL_GESTURE});
@@ -273,6 +279,26 @@ export function FormationDancers({props, mode, choreography}: {props: Visualizer
       leadTarget[0]-=showDanceV899.spacing;partnerTarget[0]+=showDanceV899.spacing;
       leadTarget[2]-=showDanceV899.depth;partnerTarget[2]+=showDanceV899.depth;
     }
+    // V1055 only translates the two EXISTING root targets as one safe unit.
+    // No performer is sent onto the ornamental floating platforms.
+    // V322 foot lock, imported GLB/FBX, V325 manual score and V324 ensemble
+    // remain authoritative. Separation is still checked by V143 right below.
+    const placementV1055=applyStageInteractionV1055(leadTarget,partnerTarget,stageInteractionV1055,{
+      manual:mode==='solo'||!!manualPose||manualActive||!choreography||
+        props.avatarMotionMode==='choreography'||!!props.smartDanceOverride||
+        props.showCue?.formationsEnabled===true||showDanceV899.active,
+      footLocked:readFootLockV322().enabled,
+      importedAnimation:Boolean(props.avatarModelUrl||props.secondaryAvatarModelUrl||
+        props.avatarAnimationUrl||props.secondaryAvatarAnimationUrl),
+      ensembleOwns:ensembleSettings.enabled,
+      collisionRisk:collisionRiskV808.current.some(risk=>risk>.65),
+      isPlaying:props.isPlaying,reducedMotion:props.reducedMotion,
+      performanceTier:getActivePerformanceTier(),
+    });
+    if(placementV1055.active){
+      leadTarget[0]=placementV1055.lead[0];leadTarget[2]=placementV1055.lead[2];
+      partnerTarget[0]=placementV1055.partner[0];partnerTarget[2]=placementV1055.partner[2];
+    }
     const safe = separatePartners(leadTarget, partnerTarget, 1.35);
     const ensemble=advanceEnsembleBalanceV324(ensembleState.current,{
       trackId:props.track?.id??'',lead:safe.lead,partner:safe.partner,
@@ -354,11 +380,11 @@ export function FormationDancers({props, mode, choreography}: {props: Visualizer
     const leadInvitation = smart?.interactionMode === "exchange" && smart.role === "partner-solo" ? .2 * interactionStrength : 0;
     const partnerInvitation = smart?.interactionMode === "exchange" && smart.role === "lead-solo" ? -.2 * interactionStrength : 0;
     if (lead.current) {
-      lead.current.rotation.y = formationApproach(lead.current.rotation.y, cue.leadYaw + leadInvitation + (ensembleCueV392.current?.yaw[0]??0), delta, 3.5);
+      lead.current.rotation.y = formationApproach(lead.current.rotation.y, cue.leadYaw + leadInvitation + (ensembleCueV392.current?.yaw[0]??0) + (placementV1055.active ? stageInteractionV1055?.audienceYaw??0 : 0), delta, 3.5);
       lead.current.rotation.z = formationApproach(lead.current.rotation.z, -cue.leadLean, delta, 3.5);
     }
     if (partner.current) {
-      partner.current.rotation.y = formationApproach(partner.current.rotation.y, cue.partnerYaw + partnerInvitation + (ensembleCueV392.current?.yaw[1]??0), delta, 3.5);
+      partner.current.rotation.y = formationApproach(partner.current.rotation.y, cue.partnerYaw + partnerInvitation + (ensembleCueV392.current?.yaw[1]??0) + (placementV1055.active ? stageInteractionV1055?.audienceYaw??0 : 0), delta, 3.5);
       partner.current.rotation.z = formationApproach(partner.current.rotation.z, cue.partnerLean, delta, 3.5);
     }
     // V375: stage-root casting only. Manual V325 timelines, authored choreography and

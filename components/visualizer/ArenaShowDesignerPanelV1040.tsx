@@ -91,6 +91,118 @@ export function ArenaShowDesignerPanelV1040(){
     Helligkeit, erfindet keine Drops und startet keine zusätzlichen Gerätebefehle.
     Manuelle Kamera- und Choreografieentscheidungen behalten Vorrang.</small>
   </fieldset>
+  <fieldset className="arena-v1051-crowd" aria-label="V1051 Immersive Concert Crowd Experience">
+   <legend>V1051 · Immersive Concert Crowd Experience</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaCrowdExperienceEnabledV1051)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaCrowdExperienceEnabledV1051:e.target.checked})}/>
+    Virtuelles Publikum mit La-Ola-Wellen, Jubelgesten und Mitsinglicht aktivieren
+   </label>
+   <label>Publikums-Dynamik: {preferences.arenaCrowdExperienceStrengthV1051??55}%
+    <input type="range" min="0" max="80" step="5" disabled={!plan||!preferences.arenaCrowdExperienceEnabledV1051}
+     value={preferences.arenaCrowdExperienceStrengthV1051??55}
+     onChange={e=>updatePreferences({arenaCrowdExperienceStrengthV1051:Number(e.target.value)})}/>
+   </label>
+   <small>Rein virtuelle, lokale und kontinuierliche Animation der vorhandenen 360°-Zuschauer.
+    Die sieben geplanten Showabschnitte steuern La-Ola, sanfte Mitsingwellen,
+    ruhige Pausen und Finaljubel. Das ist keine Erkennung realen Publikumsjubels.
+    Bestehende manuelle Handylicht-Modi bleiben unverändert; keine Soundeffekte,
+    Govee-Befehle oder Stroboskopimpulse. Bei Pause, reduzierter Bewegung und
+    niedriger Grafikqualität deaktiviert.</small>
+  </fieldset>
+  <fieldset className="arena-v1052-ultimate-concert" aria-label="V1052 Ultimate Live Concert Experience">
+   <legend>V1052 · Ultimate Live Concert Experience</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaUltimateConcertEnabledV1052)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaUltimateConcertEnabledV1052:e.target.checked})}/>
+    Die 360°-Bühne, Publikumslichter, Kamera und Avatar-Choreografie gemeinsam inszenieren
+   </label>
+   <label>Regie-Zusammenarbeit: {preferences.arenaUltimateConcertStrengthV1052??60}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaUltimateConcertEnabledV1052}
+     value={preferences.arenaUltimateConcertStrengthV1052??60}
+     onChange={e=>updatePreferences({arenaUltimateConcertStrengthV1052:Number(e.target.value)})}/>
+   </label>
+   <small>Gemeinsamer, songabhängiger Spannungsverlauf: wechselnder Fokus auf Bühne,
+    Zuschauer, Kamera und Tänzer; ruhiges Zwischenspiel, volle Hook und sanfter
+    Schluss. V1052 koordiniert nur bereits einzeln aktivierte Effekte (für zusätzliche
+    Kameraregie V1043 und Avatar-Choreografie V1041 aktivieren). Keine neuen 3D-Objekte,
+    kein extra Mikrofon, keine Govee-Gerätebefehle und keine künstlich erkannten Drops.
+    Manuelle Schnitte, Lyrics, Tanzclips, Pause, reduzierte Bewegung und
+    Leistungsgrenzen behalten Vorrang.</small>
+  </fieldset>
+  <fieldset className="arena-v1050-storytelling" aria-label="V1050 Adaptive Concert Storytelling">
+   <legend>V1050 · Adaptive Concert Storytelling</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaStorytellingEnabledV1050)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaStorytellingEnabledV1050:e.target.checked})}/>
+    Dramaturgischen Spannungsbogen mit Ruhephasen und großem Finale aktivieren
+   </label>
+   <label>Storytelling-Intensität: {preferences.arenaStorytellingStrengthV1050??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaStorytellingEnabledV1050}
+     value={preferences.arenaStorytellingStrengthV1050??55}
+     onChange={e=>updatePreferences({arenaStorytellingStrengthV1050:Number(e.target.value)})}/>
+   </label>
+   <small>Die lokale Showregie nutzt die sieben bestehenden Szenen als geplante
+    Dramaturgie: Intro, Aufbau, Höhepunkte, Interlude als Atempause,
+    erneuter Anstieg, Finale und Ausklang. Keine Behauptung über tatsächlich
+    erkannte Songteile. Sie verändert nur bereits freigegebene Effektstärken;
+    automatische Kameravorschläge bleiben hinter manueller, Lyrics- und
+    Avatarregie zurück. Govee erfordert weiterhin eigene LAN-Freigabe und
+    verifizierte Musikphasen; keine zusätzlichen Befehle oder Stroboblitze.
+    Bei Pause, reduzierter Bewegung oder niedrigem Grafikprofil wird die
+    Zusatzregie ausgeschaltet.</small>
+  </fieldset>
+  <fieldset className="arena-v1055-stage-interaction" aria-label="V1055 Dynamic Concert Stage & Avatar Interaction">
+   <legend>V1055 · Dynamic Concert Stage & Avatar Interaction</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaStageInteractionEnabledV1055)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaStageInteractionEnabledV1055:e.target.checked})}/>
+    Die automatische Duo-Choreografie im Verlauf des Songs auf der Rundbühne inszenieren
+   </label>
+   <label>Bewegungs- und Regieintensität: {preferences.arenaStageInteractionStrengthV1055??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaStageInteractionEnabledV1055}
+     value={preferences.arenaStageInteractionStrengthV1055??55}
+     onChange={e=>updatePreferences({arenaStageInteractionStrengthV1055:Number(e.target.value)})}/>
+   </label>
+   <small>Erfordert den aktiven Showplan (V1040) und die automatische Duo-Choreografie (V1041).
+    Das Duo nutzt nacheinander geschützte Positionen auf der mittleren Drehbühne. Die
+    schwebenden Satellitenplattformen bleiben reine Dekoration und werden nicht betreten.
+    Bestehende optionale Kamerafahrten (V1043/V1047/V1053), Publikumsreaktionen (V1051)
+    und Plattformbewegungen (V1038) erhalten abgestimmte, nur abschwächende Akzente.
+    Nur prozedurale Duos ohne aktive Fußsperre dürfen ihre Gruppenposition versetzen.
+    Importierte GLB-/FBX-Animationen, Fußkontakte, manuelle Formationen, Timeline,
+    Kollisionsschutz und individuelle Kameravorgaben behalten Vorrang.
+    Keine zweite Kamera, künstlichen Beats oder neuen Govee-Befehle. Bei Pause,
+    reduzierter Bewegung und niedriger Grafikqualität automatisch deaktiviert.</small>
+  </fieldset>
+  <fieldset className="arena-v1054-avatar-performance" aria-label="V1054 Advanced Avatar Performance Intelligence">
+   <legend>V1054 · Advanced Avatar Performance Intelligence</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaAvatarPerformanceEnabledV1054)&&Boolean(plan)}
+    disabled={!plan}
+    onChange={e=>updatePreferences({arenaAvatarPerformanceEnabledV1054:e.target.checked})}/>
+    Ausdrucksstarke Duo-Akzente und weichere Rap-/Gesangsgesten aktivieren
+   </label>
+   <label>Gesten-Dynamik: {preferences.arenaAvatarPerformanceStrengthV1054??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaAvatarPerformanceEnabledV1054}
+     value={preferences.arenaAvatarPerformanceStrengthV1054??55}
+     onChange={e=>updatePreferences({arenaAvatarPerformanceStrengthV1054:Number(e.target.value)})}/>
+   </label>
+   <small>Erfordert die aktive V1041-Choreografie und eine automatisch gesteuerte
+    Zwei-Avatar-Formation. V1054 fügt nur begrenzte Bewegungsakzente hinzu und
+    blendet Phrasenanfänge weich ein. Bei echten synchronisierten Wortzeiten
+    wird ein dezenter Rap- oder Gesangsgesten-Akzent vorgeschlagen – ohne
+    einen Sänger zu identifizieren. Ohne Wortzeiten entstehen nur
+    genretypische visuelle Muster. Einzel-Avatare und manuell konfigurierte
+    Gruppen bleiben unverändert. Bereits importierte GLB-Clips,
+    Rollensteuerung, Fuß-IK, Kollisionen und gespeicherte Formationen behalten
+    Vorrang. Keine neuen Animationsmixer, Timer, Mikrofon- oder Govee-Befehle.
+    Bei Pause, Reduced Motion und niedriger Grafikstufe deaktiviert.</small>
+  </fieldset>
   <fieldset className="arena-v1041-choreography" aria-label="V1041 intelligente Avatar-Choreografie">
    <legend>V1041 · Intelligent Avatar Choreography Director</legend>
    <label className="setting-check"><input type="checkbox"
@@ -205,6 +317,28 @@ export function ArenaShowDesignerPanelV1040(){
     manuelle, Sänger-, Lyrics- oder Timeline-Kamera. Kein echtes Lasergerät, kein
     Stroboskop, kein Govee-Befehl. Pause, Reduced Motion und Performance-Limits haben Vorrang.</small>
   </fieldset>
+  <fieldset className="arena-v1053-cinematic-camera" aria-label="V1053 Intelligent Concert Camera Experience 2.0">
+   <legend>V1053 · Intelligent Concert Camera Experience 2.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaCinematicCameraEnabledV1053)&&Boolean(plan)}
+    disabled={!plan}
+    onChange={e=>updatePreferences({arenaCinematicCameraEnabledV1053:e.target.checked})}/>
+    Filmische 360°-Kamerafahrten und Lyrics-nahe Lead-Close-ups hinzufügen
+   </label>
+   <label>Kamera-Dynamik: {preferences.arenaCinematicCameraStrengthV1053??50}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaCinematicCameraEnabledV1053}
+     value={preferences.arenaCinematicCameraStrengthV1053??50}
+     onChange={e=>updatePreferences({arenaCinematicCameraStrengthV1053:Number(e.target.value)})}/>
+   </label>
+   <small>Benötigt den aktiven Showplan sowie V1043 Kamera-Automatik. Ruhige
+    Orbit-, Totale- und Höhenfahrten nutzen die bestehende Kamera. Lyrics-Close-ups
+    werden nur aus vorhandenen synchronisierten Wort-Zeitstempeln vorgeschlagen.
+    V1053 erkennt nicht selbst, welcher Avatar singt: Der vorhandene Kamera- und
+    Sängerregisseur bestimmt weiterhin das Motiv. Manuelle Schnitte, gespeicherte
+    Presets, Duo-, Rap-, Lyrics- und Sänger-Einstellungen sowie Pause, Reduced Motion
+    und Performance-Grenzen haben Vorrang. Keine harten Schnitte oder zweite Kamera.</small>
+  </fieldset>
   <fieldset className="arena-v1043-show-camera" aria-label="V1043 Show Camera Director">
    <legend>V1043 · Intelligent Show Camera Director</legend>
    <label className="setting-check"><input type="checkbox"
@@ -245,7 +379,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}
