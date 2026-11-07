@@ -84,8 +84,13 @@ const display=read('components/visualizer/VisualizerStage.tsx');
 for(const token of ['planSmartConcertFlowV1071(','const flowStageV1071=','const flowFloatingV1071=',
  'const flowHologramsV1071=','const flowLasersV1071=','const flowLedV1071=','cue={flowLedV1071}',
  'laserCueV1057={flowLasersV1071}','floatingCueV1067={flowFloatingV1071}',
- 'stageCueV1066={flowStageV1071}','concertCueV1068={flowHologramsV1071}'])
+ 'stageCueV1066={flowStageV1071}'])
  assert(stage.includes(token),'V1071 stage channel: '+token);
+assert(stage.includes('concertCueV1068={flowHologramsV1071}') ||
+ (stage.includes('holograms:flowHologramsV1071') &&
+ stage.includes('coordinateEpicStageTransformationV1086(') &&
+ stage.includes('concertCueV1068={epicTransformedV1086.holograms}')),
+ 'V1071 holograms must reach the renderer directly or via the enabled V1086 coordinator');
 for(const token of ['smartFlowCastV1071=planSmartConcertFlowV1071(','smartFlowCastV1071.camera',
  'smartFlowCastV1071.cast','rapFlowGainV1071=smartFlowCastV1071.rap',
  'props.lipSync?.rapSyllableEditsEnabledV420!==true'])

@@ -87,7 +87,11 @@ for(const f of ['types/music.ts','components/visualizer/registry.tsx',
 const stage=read('components/visualizer/stages/Arena360StageV1031.tsx');
 assert(stage.includes('portalPattern:hologramPattern'),'manual selection wins');
 assert(stage.includes('stageCueV1066:stageFormationV1066,floatCueV1067:floatingExperienceV1067'));
-assert(stage.includes('concertCueV1068={flowHologramsV1071}'));
+assert(stage.includes('concertCueV1068={flowHologramsV1071}') ||
+ (stage.includes('holograms:flowHologramsV1071') &&
+ stage.includes('coordinateEpicStageTransformationV1086(') &&
+ stage.includes('concertCueV1068={epicTransformedV1086.holograms}')),
+ 'V1068 active holograms must reach the existing renderer through V1071/V1086');
 assert(stage.includes('holographicConcertV1068.power*ultimateFinaleV1070.holograms')); // bounded V1070 forwarding
 assert(stage.indexOf('<ArenaHologramPortalsV1039')<stage.indexOf('ref={turntable}'),
  'virtual silhouettes and portals are world-fixed, outside the cast transform');
