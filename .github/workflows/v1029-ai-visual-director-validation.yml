@@ -1,5 +1,5 @@
 name: V1029 AI Visual Director 5.0 validation
-run-name: Sonic Display · V1042 · V1029 AI Visual Director 5.0 validation
+run-name: Sonic Display · V1043 · V1029 AI Visual Director 5.0 validation
 # Optional diagnostic; the full Linux/Windows production matrix remains authoritative.
 on:
   workflow_dispatch:

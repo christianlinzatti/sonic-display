@@ -1,5 +1,5 @@
 name: V1012 Network Health & Auto Recovery
-run-name: Sonic Display · V1042 · V1012 Network Health & Auto Recovery
+run-name: Sonic Display · V1043 · V1012 Network Health & Auto Recovery
 on:
   workflow_dispatch:
 permissions:

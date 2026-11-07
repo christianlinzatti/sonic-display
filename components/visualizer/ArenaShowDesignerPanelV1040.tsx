@@ -90,6 +90,20 @@ export function ArenaShowDesignerPanelV1040(){
     Wiederverbindungen und Gruppen-Unison behalten Vorrang. Die Showregie bleibt bei Pause,
     verdecktem Tab oder reduzierter Bewegung aus.</small>
   </fieldset>
+  <fieldset className="arena-v1043-show-camera" aria-label="V1043 Show Camera Director">
+   <legend>V1043 · Intelligent Show Camera Director</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaShowCameraEnabledV1043)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaShowCameraEnabledV1043:e.target.checked})}/>
+    Kameraperspektiven des Showplans in der 360°-Arena live anwenden
+   </label>
+   <label>Kamera-Akzent: {preferences.arenaShowCameraStrengthV1043??45}%
+    <input type="range" min="0" max="80" step="5"
+     value={preferences.arenaShowCameraStrengthV1043??45}
+     onChange={e=>updatePreferences({arenaShowCameraStrengthV1043:Number(e.target.value)})}/>
+   </label>
+   <small>Die vorhandene Kamera bleibt verantwortlich. Nur bei aktiviertem Showplan und laufendem Titel; manuelle Presets, Lyrics-, Sänger-, Rap-, Duett- und Timeline-Kameras sowie Reduced Motion haben Vorrang. Keine harten Schnitte und keine zusätzlichen Kameras.</small>
+  </fieldset>
   {status&&<small role="status">{status}</small>}
   {plan&&<>
    <p><strong>{plan.title}</strong> · {plan.genre} · Vorschau {minsec(plan.durationMs)} · sieben Szenen</p>

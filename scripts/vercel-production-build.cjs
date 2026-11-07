@@ -31,6 +31,7 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1043 Intelligent Show Camera Director','tests/v1043-show-camera-regression.cjs');
   run('V1042 Intelligent Govee Show Integration','tests/v1042-govee-show-integration-regression.cjs');
   run('V1041 Intelligent Avatar Choreography','tests/v1041-arena-choreography-regression.cjs');
   run('V1040 AI Show Designer','tests/v1040-show-designer-regression.cjs');

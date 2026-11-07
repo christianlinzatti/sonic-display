@@ -1,5 +1,5 @@
 name: V1039 Holographic Laser Architecture manual validation
-run-name: Sonic Display · V1042 · V1039 Holographic Laser Architecture manual validation
+run-name: Sonic Display · V1043 · V1039 Holographic Laser Architecture manual validation
 # Manual version-specific diagnostics; v965 is the authoritative production matrix.
 on:
   workflow_dispatch:
