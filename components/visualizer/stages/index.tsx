@@ -176,7 +176,11 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
   lasersEnabled,movingSkyEnabled,groundFogEnabled,arenaPeaksEnabled,
   transformingDeckEnabled,transformingDeckMode,transformingDeckStrength,
   floatingStageEnabled,floatingStageMode,floatingStageIntensity,
-  hologramsEnabled,laserArchitectureEnabled,hologramPattern,hologramStrength,showDesignerEnabled,showPlan,audienceDirectorEnabled,audienceDirectorStrength,atmosphereDirectorEnabled,atmosphereDirectorStrength,cinematicFinaleEnabled,cinematicFinaleStrength,immersiveEnabled,immersiveStrength,trackId,genre, ...props }:
+  hologramsEnabled,laserArchitectureEnabled,hologramPattern,hologramStrength,showDesignerEnabled,showPlan,audienceDirectorEnabled,audienceDirectorStrength,atmosphereDirectorEnabled,atmosphereDirectorStrength,cinematicFinaleEnabled,cinematicFinaleStrength,immersiveEnabled,immersiveStrength,concertDirectorEnabled,concertDirectorStrength,
+  liveConcertEnabledV1049,liveConcertStrengthV1049,microphoneActiveV1049,
+  storytellingEnabledV1050,storytellingStrengthV1050,
+  crowdExperienceEnabledV1051,crowdExperienceStrengthV1051,
+  ultimateConcertEnabledV1052,ultimateConcertStrengthV1052,trackId,genre, ...props }:
   Props & { theme: StageEnvironmentId; children?: React.ReactNode; rotationSpeed?: number; rotationEnabled?: boolean;
     audienceEnabled?: boolean; lightsEnabled?: boolean; dropEnabled?: boolean;
     wavesEnabled?:boolean;phoneSyncEnabled?:boolean;phoneMode?:import("@/lib/arena360ImmersionV1033").ArenaPhoneModeV1033;domeEnabled?:boolean;
@@ -194,7 +198,13 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     audienceDirectorEnabled?:boolean;audienceDirectorStrength?:number;
     atmosphereDirectorEnabled?:boolean;atmosphereDirectorStrength?:number;
     // V1047: optional immersive audience renderer.
-    cinematicFinaleEnabled?:boolean;cinematicFinaleStrength?:number;immersiveEnabled?:boolean;immersiveStrength?:number;trackId?:string|null;genre?:string|null }) {
+    cinematicFinaleEnabled?:boolean;cinematicFinaleStrength?:number;immersiveEnabled?:boolean;immersiveStrength?:number;
+    concertDirectorEnabled?:boolean;concertDirectorStrength?:number;
+    liveConcertEnabledV1049?:boolean;liveConcertStrengthV1049?:number;microphoneActiveV1049?:boolean;
+    storytellingEnabledV1050?:boolean;storytellingStrengthV1050?:number;
+    crowdExperienceEnabledV1051?:boolean;crowdExperienceStrengthV1051?:number;
+    ultimateConcertEnabledV1052?:boolean;ultimateConcertStrengthV1052?:number;
+    trackId?:string|null;genre?:string|null }) {
   if (theme === "arena360") {
     return <Arena360StageV1031 {...props} rotationSpeed={rotationSpeed} rotationEnabled={rotationEnabled}
       audienceEnabled={audienceEnabled} lightsEnabled={lightsEnabled} dropEnabled={dropEnabled}
@@ -215,6 +225,12 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       atmosphereDirectorEnabled={atmosphereDirectorEnabled} atmosphereDirectorStrength={atmosphereDirectorStrength}
       cinematicFinaleEnabled={cinematicFinaleEnabled} cinematicFinaleStrength={cinematicFinaleStrength}
       immersiveEnabled={immersiveEnabled} immersiveStrength={immersiveStrength}
+      concertDirectorEnabled={concertDirectorEnabled} concertDirectorStrength={concertDirectorStrength}
+      liveConcertEnabledV1049={liveConcertEnabledV1049} liveConcertStrengthV1049={liveConcertStrengthV1049}
+      microphoneActiveV1049={microphoneActiveV1049}
+      storytellingEnabledV1050={storytellingEnabledV1050} storytellingStrengthV1050={storytellingStrengthV1050}
+      crowdExperienceEnabledV1051={crowdExperienceEnabledV1051} crowdExperienceStrengthV1051={crowdExperienceStrengthV1051}
+      ultimateConcertEnabledV1052={ultimateConcertEnabledV1052} ultimateConcertStrengthV1052={ultimateConcertStrengthV1052}
       trackId={trackId} genre={genre}>
       {children}
     </Arena360StageV1031>;
