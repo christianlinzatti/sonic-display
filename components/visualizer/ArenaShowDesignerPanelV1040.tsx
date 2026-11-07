@@ -72,6 +72,24 @@ export function ArenaShowDesignerPanelV1040(){
    </label>
    <small>Nur bei aktivem Showplan, laufender Musik und gewählter 360°-Arena. Vorhandene Duo-/Gruppen-Timelines, manuelle Tanzmodi, Sängerrollen und GLB-Animationen bleiben vorrangig. Auf niedriger Grafikstufe ist der zusätzliche Duo-Auftritt deaktiviert.</small>
   </fieldset>
+  <fieldset className="arena-v1042-govee" aria-label="V1042 Govee Show-Integration">
+   <legend>V1042 · Intelligent Govee Concert Integration</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.goveeShowSyncEnabledV1042)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({goveeShowSyncEnabledV1042:e.target.checked})}/>
+    Den aktiven Showplan auf maximal vier zugeordnete Govee-LAN-Leuchten anwenden
+   </label>
+   <label>Govee-Showakzent: {preferences.goveeShowSyncStrengthV1042??45}%
+    <input type="range" min="0" max="65" step="5"
+     value={preferences.goveeShowSyncStrengthV1042??45}
+     onChange={e=>updatePreferences({goveeShowSyncStrengthV1042:Number(e.target.value)})}/>
+   </label>
+   <small>Nur mit aktivem V1040-Showplan, Govee-LAN-Bridge, automatischer Govee-Steuerung und
+    den bereits unter Govee Concert Sync V1027 zugeordneten Zonen (Wand, Rhythmus, Neon, Ambient).
+    Kein automatisches Einschalten oder Verbinden. Gespeicherte Govee-Shows, manuelle Eingriffe,
+    Wiederverbindungen und Gruppen-Unison behalten Vorrang. Die Showregie bleibt bei Pause,
+    verdecktem Tab oder reduzierter Bewegung aus.</small>
+  </fieldset>
   {status&&<small role="status">{status}</small>}
   {plan&&<>
    <p><strong>{plan.title}</strong> · {plan.genre} · Vorschau {minsec(plan.durationMs)} · sieben Szenen</p>
@@ -98,7 +116,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

@@ -40,6 +40,8 @@ export interface UiPreferences {
   arenaHologramStrengthV1039?: number;
   arenaShowDesignerEnabledV1040?: boolean;
   arenaShowPlanV1040?: import('@/lib/arena360ShowDesignerV1040').ArenaShowPlanV1040;
+  goveeShowSyncEnabledV1042?: boolean;
+  goveeShowSyncStrengthV1042?: number;
   arenaChoreographyEnabledV1041?: boolean;
   arenaChoreographyStrengthV1041?: number;
   arenaChoreographyFormationV1041?: import('@/lib/arena360ChoreographyV1041').ArenaChoreoFormationV1041;

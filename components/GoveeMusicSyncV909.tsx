@@ -1,6 +1,9 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import {useMusic} from '@/context/MusicContext';
+import {useUiPreferences} from '@/context/UiPreferencesContext';
+import {sampleArenaShowPlanV1040} from '@/lib/arena360ShowDesignerV1040';
+import {planGoveeShowV1042,applyGoveeShowV1042} from '@/lib/goveeShowSyncV1042';
 import {useAudioAnalysis} from '@/context/AudioAnalysisContext';
 import {GOVEE_CONFIG_EVENT_V909,GOVEE_CONFIG_KEY_V909,loadGoveeConfigV909,goveeBridgeRequestV909,planGoveeLookV909,
  type GoveeConfigV909,type GoveeLookV909,type GoveeDeviceV909} from '@/lib/goveeLanV909';
@@ -49,6 +52,13 @@ import {readTrackAnalysisV318,ANALYSIS_EVENT_V318,ANALYSIS_STORAGE_KEY_V318,
 export function GoveeMusicSyncV909(){
  const {track,isPlaying,genre,progressMs,fetchedAt}=useMusic();
  const {metrics,active:microphoneActive}=useAudioAnalysis();
+ const {preferences}=useUiPreferences();
+ const goveeShowEnabledV1042=preferences.goveeShowSyncEnabledV1042===true;
+ const goveeShowStrengthV1042=preferences.goveeShowSyncStrengthV1042??45;
+ const arenaShowEnabledV1040=preferences.arenaShowDesignerEnabledV1040===true;
+ const arenaShowPlanV1040=preferences.arenaShowPlanV1040;
+ const showStageIsArenaV1042=preferences.stageTheme==='arena360';
+ const reducedMotionV1042=preferences.reducedMotion===true;
  const [config,setConfig]=useState<GoveeConfigV909|null>(null);
  const [showLibrary,setShowLibrary]=useState<GoveeShowV912[]>([]);
  const [groups,setGroups]=useState<GoveeGroupLibraryV915>(EMPTY_GOVEE_GROUPS_V915);
@@ -297,6 +307,13 @@ export function GoveeMusicSyncV909(){
     if(roomAtmosphereV987.current?.trackId!==state.track.id)
      roomAtmosphereV987.current=null;
     const phase=resolveGoveePhaseV911(analysis.current,state.track.id,progress);
+    // V1042 uses the SAME absolute Spotify timeline as the 360° stage.
+    // The local scene template cannot invent verified drops or downbeats.
+    const authoredGoveeShowV1042=sampleArenaShowPlanV1040(arenaShowPlanV1040,{
+     enabled:arenaShowEnabledV1040&&goveeShowEnabledV1042,
+     playing:state.isPlaying,reducedMotion:reducedMotionV1042,
+     progressMs:progress,durationMs:state.track.durationMs,
+     observedSection:phase.verified?phase.phase:null});
     const sectionDecision=config.directorEnabledV911?planGoveeSectionV919(analysis.current,state.track.id,progress,sectionSettings):null;
     const genreDecision=sectionDecision?planGoveeGenreV920(analysis.current,state.track.id,progress,state.genre,sectionDecision,genreSettings):null;
     const energyDecision=sectionDecision?planGoveeEnergyV924(analysis.current,state.track.id,progress,state.genre,sectionDecision,energySettings):null;
@@ -549,7 +566,22 @@ export function GoveeMusicSyncV909(){
       // V1027 overlay cannot undo that cap even if an earlier overlay differs.
       const syncedLookV1027=applyGoveeSyncV1027(voiceLookV970,previous,syncDecisionV1027,
        Math.min(config.masterBrightness,festivalDeliveredLook.brightness));
-      const finalLook=governConcertLookV961(previous,syncedLookV1027,{
+      // V1042 is an optional post-V1027 accent. Higher-priority Govee looks,
+      // user-authored shows and the existing V915/V961 safety ceiling always win.
+      const authoredDecisionV1042=planGoveeShowV1042({enabled:goveeShowEnabledV1042,
+       strength:goveeShowStrengthV1042,show:authoredGoveeShowV1042,
+       genre:arenaShowPlanV1040?.genre??'pop',phase,settings:syncSettingsV1027,
+       ip,selectedIps:config.selectedIps,bridgeEnabled:config.enabled,
+       autoSync:config.autoSync,directorEnabled:config.directorEnabledV911,
+       playing:state.isPlaying,visible:!document.hidden,stageIsArena:showStageIsArenaV1042,
+       reducedMotion:reducedMotionV1042||Boolean(stage?.reducedMotion),
+       savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
+       groupUnisonActive:group?.mode==='unison',recovering:recoveringDevices.has(ip),
+       voiceActive:Boolean(alexaGoveeCueV970.current&&loadAlexaGoveeConsentV970().enabled),
+       roomAtmosphereActive:roomDecisionV987.active,higherPrioritySyncActive:syncDecisionV1027.active});
+      const showLookV1042=applyGoveeShowV1042(syncedLookV1027,previous,authoredDecisionV1042,
+       Math.min(config.masterBrightness,festivalDeliveredLook.brightness));
+      const finalLook=governConcertLookV961(previous,showLookV1042,{
        enabled:roadmapSettings.enabled&&roadmapSettings.hardwareSync&&roadmapSettings.lightGovernorV961,
        playing:state.isPlaying,verified:Boolean(roadmapScene?.verified),
        savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
@@ -577,6 +609,6 @@ export function GoveeMusicSyncV909(){
    :bassSettings.enabled||shockSettings.enabled?window.setInterval(()=>void tick(),900)
    :neonBassEnabled?window.setInterval(()=>void tick(),900):window.setInterval(()=>void tick(),1700);
   return()=>{cancelled=true;window.clearInterval(interval);window.clearInterval(sampler);};
- },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings,syncSettingsV1027]);
+ },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings,syncSettingsV1027,goveeShowEnabledV1042,goveeShowStrengthV1042,arenaShowEnabledV1040,arenaShowPlanV1040,showStageIsArenaV1042,reducedMotionV1042]);
  return null;
 }

@@ -2848,3 +2848,7 @@ Workflows im ZIP werden von der geschützten GitHub-Importlogik nicht übertrage
 ## V1040 · AI Show Designer
 
 Siehe `changelog/V1040-AI-SHOW-DESIGNER.md`. Der lokale, regelbasierte Showdesigner erstellt eine editierbare 7-Szenen-Timeline aus Freitext und Genre. Die Vorlage kann **explizit** aktiviert werden; sie steuert die bestehende 360°-Arena und deren rein virtuelle Bühnen-, Schwebe- und Laserformationen entlang der tatsächlichen Wiedergabeposition. Erkannten Beats, echten Drops, manuellen Kamera-Timelines, individuellen Tänzen und deaktivierten Effekten wird stets Vorrang gegeben. Eine externe LLM-Integration ist in dieser Version **nicht** enthalten. 
+
+## V1042 – Intelligent Govee Concert Integration
+
+Der V1040-Showplan kann jetzt optional in der bestehenden Govee-LAN-Autosync-Schleife bis zu vier zugeordnete Leuchten mit dezenten Genre- und Songabschnittsfarben begleiten. Manuelle Regie, Helligkeitsobergrenzen und Vorhandensein der lokalen Bridge bleiben zwingend. Siehe `changelog/V1042-INTELLIGENT-GOVEE-CONCERT-INTEGRATION.md`.
