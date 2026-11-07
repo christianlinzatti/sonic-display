@@ -202,6 +202,12 @@ export interface VisualizerProps {
   arenaHolographicConcertStrengthV1068?:number;
   arenaEpicDropEnabledV1069?:boolean;
   arenaEpicDropStrengthV1069?:number;
+  arenaUltimateFinaleEnabledV1070?:boolean;
+  arenaUltimateFinaleStrengthV1070?:number;
+  arenaSmartConcertFlowEnabledV1071?:boolean;
+  arenaSmartConcertFlowStrengthV1071?:number;
+  arenaCameraDirectorEnabledV1072?:boolean;
+  arenaCameraDirectorStrengthV1072?:number;
   dancePostEnabledV468?: boolean;
   shaderEnvironmentV468?: import('./ProceduralShaderEnvironmentV468').ShaderEnvironmentModeV468;
   wardrobeModeV468?: import('./avatarWardrobeV468').WardrobeModeV468;

@@ -11,6 +11,9 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1072 Concert Camera Director 4.0','tests/v1072-concert-camera-director-regression.cjs'],
+  ['V1071 Smart Concert Flow 3.0','tests/v1071-smart-concert-flow-regression.cjs'],
+  ['V1070 Ultimate Concert Finale 2.0','tests/v1070-ultimate-finale-regression.cjs'],
   ['V1069 Epic Drop Experience','tests/v1069-epic-drop-regression.cjs'],
   ['V1068 Holographic Concert FX 3.0','tests/v1068-holographic-concert-regression.cjs'],
   ['V1067 Floating Platform Experience 2.0','tests/v1067-floating-experience-regression.cjs'],

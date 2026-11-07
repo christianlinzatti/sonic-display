@@ -1,3 +1,16 @@
+## V1071 · Smart Concert Flow 3.0
+
+V1071 ergänzt eine lokale, optionale Acht-Kanal-Übergangsregie für den **geplanten** V1040-Showablauf. Sie gewichtet die bereits aktiven Bühnen-, Floating-, Hologramm-, Laser-, LED-, Kamera-, Rap- und Gruppenkanäle mit begrenzten Faktoren von 0,50 bis 1,00. Die zweite Strophe erhält einen anderen Fokus. Ein sanfter Übergang zur neutralen Regie übergibt das Finale an V1070. Manuelle Vorgaben und deaktivierte Effekte bleiben unverändert. Weder echte Songstruktur noch Beats werden hier erkannt oder ausgelöst. Keine zusätzlichen Timer, Govee-Kommandos oder WebGL-Objekte.
+
+## V1070 – Ultimate Concert Finale 2.0
+
+Eine optionale, gemeinsame Vier-Phasen-Regie fuer das letzte Achtel des Songs:
+Buehne (V1066), Satelliten (V1067), Hologramme (V1068), vorhandene
+Laser- und LED-Effekte sowie automatische Avatar- und Kameraregie folgen
+demselben Song-Zeitplan. Es werden nur bestehende Effekte abgeschwaecht,
+nie manuell deaktivierte Systeme eingeschaltet. Kein neuer Renderer, Beat,
+Pyro- oder Govee-Befehl. AI Show Designer: standardmaessig AUS.
+
 ## V1069 – Epic Drop Experience
 
 Neue optionale Drop-Regie für die 360°-Bühne: existierende Basswellen,
@@ -1669,7 +1682,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1069
+**Dokumentationsstand:** V1072
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -2178,7 +2191,7 @@ Neue Fußkontakte führen unmittelbar zur Reduktion additiver Fußrotationen. De
 `services/show/liveConcertComparisonV544.ts` ergänzt eine reine A/B-Projektionsanalyse auf der bereits opt-in etwa sekündlich messenden V466-WebGL-Qualitätsprobe. `components/visualizer/ConcertVisualCompareV544.tsx` ist unter dem bestehenden QA-Knopf erreichbar und speichert maximal zwei manuell aufgenommene Momentaufnahmen (A/B) im React-UI-Zustand; die Schemabilder verwenden echte normalisierte Kopf- und Lyrics-Rechtecke und zeigen die vorhandenen FPS an, **keine Pixel/Fotos und keine optische Gesichts-/Tanzprüfung**. Der Anwender markiert Fußarbeit, Gesicht/Lip-Sync und Lyrics getrennt; `createComparisonReportV544` exportiert auf Klick einen JSON-Bericht, keine Auto-Freigabe. Bildrand-/Lyrics-Nähe werden heuristisch beurteilt, nicht über Objekt-Okklusion. Original-Bühnenkamera, Motion, Beleuchtung, GLBs, FPS-Messintervall und QA-Gating bleiben unangetastet. `tests/v544-visual-quality-regression.cjs`, `tests/tsconfig.v544-core.json`. Der Next.js-Build braucht vollständig installierte Abhängigkeiten.
 
 
-> **Dokumentationsstand:** V1042 (28.10.2026)
+> **Dokumentationsstand:** V1072 (28.10.2026)
 
 ## V539 – Multi-Avatar Concert Interaction 5.0
 
@@ -3659,7 +3672,7 @@ Details: `docs/versions/V802-INTELLIGENT-CONCERT-IMPROVEMENT-ASSISTANT.md`.
 
 `components/visualizer/naturalMultiArtistStageInteractionV807.ts` berechnet ausschliesslich aus bestaetigten, songgebundenen V416/V496-Saengerrollen, vorhandenen Buehnenpositionen und Wiedergabezeit begrenzte Blicke und Gesten fuer Lead, Support, Duett, Handoff und gemeinsamen Hook. Die bestehenden 2er- und 3/4er-Avatar-Renderer verwenden die identische, reine Planungslogik ueber V144/V145-Overlays. Manuelle Animationen, Buehnenformationen, Gesichts-/Lippensynchronisation und Fuss-IK bleiben unberuehrt. V506/V508-Kollisionsschutz ist final. Keine neuen GLB-Mixer, Renderloops oder GPU-Ressourcen. Tests: `tests/v807-natural-multi-artist-stage-interaction-regression.cjs`.
 
-> **Dokumentationsstand:** V1042 (31.10.2026)
+> **Dokumentationsstand:** V1072 (31.10.2026)
 
 ## V808 Natural Performer Positioning
 
@@ -3951,7 +3964,7 @@ V844 verifies section/audio cues, schedules at most one dominant side-stage effe
 - No display/UI overlay; flash cannot be guaranteed photosensitive-safe.
 - Release requires full typecheck, Next.js build, and actual visual test.
 
-> **Dokumentationsstand:** V1042 (01.11.2026)
+> **Dokumentationsstand:** V1072 (01.11.2026)
 
 
 ## V846 - Paper Streamers
@@ -4635,3 +4648,17 @@ maximal sechs vorhandene Plattformen, keine weiteren Meshes oder Hardware-Befehl
 Die V1066-Petalenphase synchronisiert die Bewegung optional. Manuelle Modi,
 Spielpause, reduzierte Bewegung, Grafikqualität und die stabile Avatar-Mittelbühne
 haben Vorrang. Es werden keine echten Sänger/Beat-Ereignisse rekonstruiert.
+
+## V1072 – Concert Camera Director 4.0
+
+Opt-in 360°-Kameraregie über `lib/arena360ConcertCameraDirectorV1072.ts`.
+Sie arbeitet rein deterministisch aus dem lokal bearbeitbaren V1040-Showplan und
+der vorhandenen Songposition; geplante Szenen gelten nicht als erkannte Songstruktur.
+Die wenigen Sänger-freundlichen Einstellungen erfordern gültige, synchronisierte
+Wort-Zeitstempel und verwenden ausschließlich bestehende Kameraziele; es wird
+keine neue Sängerzuordnung erfunden. Einstellungen wechseln frühestens alle
+10–16 Sekunden mit 2,0–2,4 Sekunden sanftem Blend. Die reine Composition wird
+NACH V1053 in **beiden** bestehenden Kamera-Ownern aufgerufen. Gespeicherte
+Presets, manuelle Kameras, Lyrics-Fokus, Duette, Keyframes, Low-Tier und
+Reduced Motion behalten Vorrang. Keine zusätzliche Kamera, kein useFrame,
+keine neuen Draw Calls, kein externer Dienst.

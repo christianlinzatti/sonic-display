@@ -154,6 +154,72 @@ export function ArenaShowDesignerPanelV1040(){
     Bei Pause, reduzierter Bewegung oder niedrigem Grafikprofil wird die
     Zusatzregie ausgeschaltet.</small>
   </fieldset>
+  <fieldset className="arena-v1071-smart-concert-flow" aria-label="V1071 Smart Concert Flow 3.0">
+   <legend>V1071 · Smart Concert Flow 3.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaSmartConcertFlowEnabledV1071)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaSmartConcertFlowEnabledV1071:e.target.checked})}/>
+    Weiche Übergänge und wechselnden Konzertfokus über alle sieben Showkapitel aktivieren
+   </label>
+   <label>Übergangsregie: {preferences.arenaSmartConcertFlowStrengthV1071??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaSmartConcertFlowEnabledV1071}
+     value={preferences.arenaSmartConcertFlowStrengthV1071??55}
+     onChange={e=>updatePreferences({arenaSmartConcertFlowStrengthV1071:Number(e.target.value)})}/>
+   </label>
+   <small>Geglättete Überblendungen zwischen Intro, zwei unterschiedlich inszenierten
+    Strophen, Spannungsaufbau, Hook und Zwischenspiel; im Finale übernimmt V1070.
+    Die Regie nutzt nur den geplanten V1040-Songablauf und priorisiert bereits
+    aktivierte V1066/67/68-Elemente, V1057-Laser, V1059-LED, automatische Kamera,
+    Rap und Gruppen-Choreografie. Das ist keine Erkennung realer Songteile.
+    Manuelle Animationen, Rap-Silben, Kamera-/Effektmuster, Pause, Low-Tier,
+    Reduced Motion und individuelle Helligkeitsgrenzen behalten Vorrang.
+    Keine zusätzlichen Gerätebefehle, Impulse, Blinklichter oder Timer.</small>
+  </fieldset>
+  <fieldset className="arena-v1072-camera-director" aria-label="V1072 Concert Camera Director 4.0">
+   <legend>V1072 · Concert Camera Director 4.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaCameraDirectorEnabledV1072)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaCameraDirectorEnabledV1072:e.target.checked})}/>
+    360°-Kamerafahrten, Sänger-Nahaufnahmen und sanfte filmische Übergänge aktivieren
+   </label>
+   <label>Kameraregie: {preferences.arenaCameraDirectorStrengthV1072??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaCameraDirectorEnabledV1072}
+     value={preferences.arenaCameraDirectorStrengthV1072??55}
+     onChange={e=>updatePreferences({arenaCameraDirectorStrengthV1072:Number(e.target.value)})}/>
+   </label>
+   <small>Geplante Einstellungen mit 10–16 Sekunden Mindestabstand und rund 2 Sekunden
+    sanfter Überblendung: Weitwinkel, Kran, Dolly, Orbit und Gruppenansichten.
+    Sängerfreundliche Nahaufnahmen setzen synchronisierte Wort-Zeitstempel voraus;
+    das System ermittelt keine neue Sängeridentität und verwendet vorhandene Tracking-Ziele.
+    Manuelle, Lyrics-, Duett-, Keyframe- und Preset-Kameras behalten Vorrang.
+    Kein neuer Kamera-Controller, Timer oder WebGL-Renderpass. Aus bei Pause,
+    Reduced Motion oder niedriger Grafikqualität.</small>
+  </fieldset>
+  <fieldset className="arena-v1070-ultimate-finale" aria-label="V1070 Ultimate Concert Finale 2.0">
+   <legend>V1070 · Ultimate Concert Finale 2.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaUltimateFinaleEnabledV1070)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaUltimateFinaleEnabledV1070:e.target.checked})}/>
+    Bühne, schwebende Plattformen, Hologramme, Laser, LED und Avatare gemeinsam zum Finale führen
+   </label>
+   <label>Finale-Dramaturgie: {preferences.arenaUltimateFinaleStrengthV1070??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaUltimateFinaleEnabledV1070}
+     value={preferences.arenaUltimateFinaleStrengthV1070??55}
+     onChange={e=>updatePreferences({arenaUltimateFinaleStrengthV1070:Number(e.target.value)})}/>
+   </label>
+   <small>Die letzten 12% des Songs werden in Sammeln, Steigern, Höhepunkt und
+    Verbeugung unterteilt. Voraussetzung: aktiver V1040-Showplan und die jeweils
+    gesondert eingeschalteten V1066-/V1067-/V1068-/V1057-/V1059-Systeme bzw.
+    V1041-Choreografie und automatische Kamera. Manuelle Muster, gewählte
+    Tänze und Kamera haben Vorrang. Nur sanfte Abschwächungen bereits freigegebener
+    Effekte; keine neuen Avatare, Draw-Calls, Stroboskope, erfundene Drops oder
+    Govee-Befehle. Pause, Reduced Motion und niedrige Grafikqualität stoppen
+    die Zusatzregie. Das Finale ist eine geplante Dramaturgie, keine erkannte
+    musikalische Schlussphrase.</small>
+  </fieldset>
   <fieldset className="arena-v1069-epic-drop" aria-label="V1069 Epic Drop Experience">
    <legend>V1069 · Epic Drop Experience</legend>
    <label className="setting-check"><input type="checkbox"
@@ -668,7 +734,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

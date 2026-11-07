@@ -107,7 +107,8 @@ const stage=read('components/visualizer/stages/Arena360StageV1031.tsx');
 assert(stage.includes('planFloatingExperienceV1067({'));
 assert(stage.includes('floatMode:floatingStageMode'));
 assert(stage.includes('stageCueV1066:stageFormationV1066'));
-assert(stage.includes('floatingCueV1067={floatingExperienceV1067}'));
+assert(stage.includes('floatingCueV1067={flowFloatingV1071}'));
+assert(stage.includes('floatingExperienceV1067.power*ultimateFinaleV1070.floating')); // bounded V1070 forwarding
 assert(stage.indexOf('<ArenaFloatingPlatformsV1038')<stage.indexOf('ref={turntable}'),
  'platforms remain world-fixed outside the moving avatar floor');
 for(const f of ['types/music.ts','components/visualizer/registry.tsx','context/UiPreferencesContext.tsx',

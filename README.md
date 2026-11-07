@@ -1,3 +1,16 @@
+## V1071 · Smart Concert Flow 3.0
+
+V1071 ergänzt eine lokale, optionale Acht-Kanal-Übergangsregie für den **geplanten** V1040-Showablauf. Sie gewichtet die bereits aktiven Bühnen-, Floating-, Hologramm-, Laser-, LED-, Kamera-, Rap- und Gruppenkanäle mit begrenzten Faktoren von 0,50 bis 1,00. Die zweite Strophe erhält einen anderen Fokus. Ein sanfter Übergang zur neutralen Regie übergibt das Finale an V1070. Manuelle Vorgaben und deaktivierte Effekte bleiben unverändert. Weder echte Songstruktur noch Beats werden hier erkannt oder ausgelöst. Keine zusätzlichen Timer, Govee-Kommandos oder WebGL-Objekte.
+
+## V1070 – Ultimate Concert Finale 2.0
+
+Eine optionale, gemeinsame Vier-Phasen-Regie fuer das letzte Achtel des Songs:
+Buehne (V1066), Satelliten (V1067), Hologramme (V1068), vorhandene
+Laser- und LED-Effekte sowie automatische Avatar- und Kameraregie folgen
+demselben Song-Zeitplan. Es werden nur bestehende Effekte abgeschwaecht,
+nie manuell deaktivierte Systeme eingeschaltet. Kein neuer Renderer, Beat,
+Pyro- oder Govee-Befehl. AI Show Designer: standardmaessig AUS.
+
 ## V1069 – Epic Drop Experience
 
 Neue optionale Drop-Regie für die 360°-Bühne: existierende Basswellen,
@@ -3201,3 +3214,13 @@ Im AI Show Designer aktivierbar: Dekorative Plattformen wechseln zwischen
 Halo-, Wellen-, Treppen-, Orbit- und Finale-Formationen. Der Showplan
 (V1040) ist erforderlich, V1066 kann die Transformation zeitlich synchronisieren.
 Standardmäßig aus; kein Avatar-Transport und keine Govee-Gerätesteuerung.
+
+### V1072 – Concert Camera Director 4.0
+
+Aktivierung im AI Show Designer. Die neue Kamera-Regie komponiert sanft
+zwischen 360°-Orbit, Dollys, Kranfahrten, weiten Gruppenansichten und
+wortzeit-gestütztem, zentralem Sänger-Framing. Die bestehende automatische
+Kamera- und Sänger-Zielsuche bleibt maßgeblich; manuelle Einstellungen werden
+nie durch den neuen Director überschrieben. Standardmäßig deaktiviert.
+Tests: `npm run test:v1072`, `npm run test:v1072:types`,
+`npm run verify:v1072:focused`.

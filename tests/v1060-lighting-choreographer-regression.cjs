@@ -75,11 +75,13 @@ const stage=read('components/visualizer/stages/Arena360StageV1031.tsx');
 for(const marker of ['planLightingChoreographerV1060(',
  'channels:{spots:cinematicLightingV1056.active',
  'coordinatedSpotsV1060','coordinatedLasersV1060','coordinatedVolumeV1060','coordinatedLedV1060',
- 'cue={coordinatedLedV1060}','lightCueV1056={coordinatedSpotsV1060}',
- 'laserCueV1057={coordinatedLasersV1060}',
+ 'cue={flowLedV1071}','lightCueV1056={coordinatedSpotsV1060}',
+ 'laserCueV1057={flowLasersV1071}',
  'volumetricCueV1058={volumetricLightingEnabledV1058?coordinatedVolumeV1060:undefined}'])
  assert(stage.includes(marker),marker);
-assert.equal((stage.match(/laserCueV1057=\{coordinatedLasersV1060\}/g)||[]).length,2);
+assert.equal((stage.match(/laserCueV1057=\{flowLasersV1071\}/g)||[]).length,2);
+assert(stage.includes('coordinatedLasersV1060.fanGain*ultimateFinaleV1070.lasers'));
+assert(stage.includes('coordinatedLedV1060.gain*ultimateFinaleV1070.led')); // V1070 attenuation only
 assert.equal((stage.match(/volumetricCueV1058=\{volumetricLightingEnabledV1058\?coordinatedVolumeV1060:undefined\}/g)||[]).length,2);
 const pure=read('lib/arena360LightingChoreographerV1060.ts');
 for(const unsafe of ['fetch(','setInterval(','setTimeout(','Math.random(','Date.now(',

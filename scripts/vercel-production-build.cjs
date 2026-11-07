@@ -31,6 +31,9 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1072 Concert Camera Director 4.0','tests/v1072-concert-camera-director-regression.cjs');
+  run('V1071 Smart Concert Flow 3.0','tests/v1071-smart-concert-flow-regression.cjs');
+  run('V1070 Ultimate Concert Finale 2.0','tests/v1070-ultimate-finale-regression.cjs');
   run('V1069 Epic Drop Experience','tests/v1069-epic-drop-regression.cjs');
   run('V1068 Holographic Concert FX 3.0','tests/v1068-holographic-concert-regression.cjs');
   run('V1067 Floating Platform Experience 2.0','tests/v1067-floating-experience-regression.cjs');

@@ -29,6 +29,8 @@ import {planStageFormationV1066} from '@/lib/arena360TransformingStageV1066';
 import {planFloatingExperienceV1067} from '@/lib/arena360FloatingExperienceV1067';
 import {planHolographicConcertV1068} from '@/lib/arena360HolographicConcertV1068';
 import {planEpicDropV1069} from '@/lib/arena360EpicDropV1069';
+import {planUltimateConcertFinaleV1070} from '@/lib/arena360UltimateFinaleV1070';
+import {planSmartConcertFlowV1071} from '@/lib/arena360SmartConcertFlowV1071';
 import type {ArenaTransformationModeV1037} from '@/lib/arena360TransformationV1037';
 import {ArenaFloatingPlatformsV1038} from './ArenaFloatingPlatformsV1038';
 import type {FloatingStageModeV1038} from '@/lib/arena360FloatingStageV1038';
@@ -83,7 +85,9 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   transformingStageEnabledV1066=false,transformingStageStrengthV1066=55,
   floatingExperienceEnabledV1067=false,floatingExperienceStrengthV1067=55,
   holographicConcertEnabledV1068=false,holographicConcertStrengthV1068=55,
-  epicDropEnabledV1069=false,epicDropStrengthV1069=55,trackId,genre}: {
+  epicDropEnabledV1069=false,epicDropStrengthV1069=55,
+  ultimateFinaleEnabledV1070=false,ultimateFinaleStrengthV1070=55,
+  smartConcertFlowEnabledV1071=false,smartConcertFlowStrengthV1071=55,trackId,genre}: {
   children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
   reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
   audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
@@ -113,6 +117,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
   holographicConcertEnabledV1068?:boolean;holographicConcertStrengthV1068?:number;
   epicDropEnabledV1069?:boolean;epicDropStrengthV1069?:number;
+  ultimateFinaleEnabledV1070?:boolean;ultimateFinaleStrengthV1070?:number;
+  smartConcertFlowEnabledV1071?:boolean;smartConcertFlowStrengthV1071?:number;
   trackId?:string|null;genre?:string|null;
 }){
   const turntable=useRef<Group>(null);
@@ -244,6 +250,52 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       fogGain:1+(volumetricLightingV1058.fogGain-1)*choreographyV1060.fog}:volumetricLightingV1058;
   const coordinatedLedV1060=choreographyV1060.active&&ledWallV1059.active?
     {...ledWallV1059,gain:ledWallV1059.gain*choreographyV1060.led}:ledWallV1059;
+  // V1070: synchronized final 12% of the same song, using only ALREADY
+  // authorized V1066/67/68 stage effects and V1057/59 optical cues.
+  const ultimateFinaleV1070=planUltimateConcertFinaleV1070({
+    enabled:ultimateFinaleEnabledV1070,stageIsArena:true,playing:isPlaying,
+    reducedMotion,reactive,showDesignerEnabled,showDirectorEnabled,
+    trackId,progressMs,durationMs,show:showCueV1040,
+    strength:ultimateFinaleStrengthV1070,performanceTier:getActivePerformanceTier(),
+    channels:{deck:stageFormationV1066.active,floating:floatingExperienceV1067.active,
+      holograms:holographicConcertV1068.active,lasers:coordinatedLasersV1060.active&&hologramPattern==='auto',
+      led:coordinatedLedV1060.active},
+  });
+  // V1071: transition-aware, song-clock-only focus for ALREADY ACTIVE effects.
+  // It crossfades priority across chapters without touching raw audio or V1070.
+  const smartFlowV1071=planSmartConcertFlowV1071({
+    enabled:smartConcertFlowEnabledV1071,stageIsArena:true,playing:isPlaying,
+    reducedMotion,reactive,showDesignerEnabled,showDirectorEnabled,
+    trackId,progressMs,durationMs,show:showCueV1040,plan:showPlan,
+    strength:smartConcertFlowStrengthV1071,performanceTier:getActivePerformanceTier(),
+    channels:{deck:stageFormationV1066.active&&transformingDeckMode==='auto',
+      floating:floatingExperienceV1067.active&&floatingStageMode==='auto',
+      holograms:holographicConcertV1068.active&&hologramPattern==='auto',
+      lasers:coordinatedLasersV1060.active&&hologramPattern==='auto',
+      led:coordinatedLedV1060.active&&ledWallPatternV1059==='auto'},
+  });
+  const finaleStageV1070=ultimateFinaleV1070.active&&stageFormationV1066.active?
+    {...stageFormationV1066,amount:stageFormationV1066.amount*ultimateFinaleV1070.deck}:stageFormationV1066;
+  const finaleFloatingV1070=ultimateFinaleV1070.active&&floatingExperienceV1067.active?
+    {...floatingExperienceV1067,power:floatingExperienceV1067.power*ultimateFinaleV1070.floating}:floatingExperienceV1067;
+  const finaleHologramsV1070=ultimateFinaleV1070.active&&holographicConcertV1068.active?
+    {...holographicConcertV1068,power:holographicConcertV1068.power*ultimateFinaleV1070.holograms}:holographicConcertV1068;
+  const finaleLasersV1070=ultimateFinaleV1070.active&&coordinatedLasersV1060.active?
+    {...coordinatedLasersV1060,fanGain:coordinatedLasersV1060.fanGain*ultimateFinaleV1070.lasers,
+      beamGain:coordinatedLasersV1060.beamGain*ultimateFinaleV1070.lasers}:coordinatedLasersV1060;
+  const finaleLedV1070=ultimateFinaleV1070.active&&coordinatedLedV1060.active?
+    {...coordinatedLedV1060,gain:coordinatedLedV1060.gain*ultimateFinaleV1070.led}:coordinatedLedV1060;
+  const flowStageV1071=smartFlowV1071.active&&finaleStageV1070.active?
+    {...finaleStageV1070,amount:finaleStageV1070.amount*smartFlowV1071.deck}:finaleStageV1070;
+  const flowFloatingV1071=smartFlowV1071.active&&finaleFloatingV1070.active?
+    {...finaleFloatingV1070,power:finaleFloatingV1070.power*smartFlowV1071.floating}:finaleFloatingV1070;
+  const flowHologramsV1071=smartFlowV1071.active&&finaleHologramsV1070.active?
+    {...finaleHologramsV1070,power:finaleHologramsV1070.power*smartFlowV1071.holograms}:finaleHologramsV1070;
+  const flowLasersV1071=smartFlowV1071.active&&finaleLasersV1070.active?
+    {...finaleLasersV1070,fanGain:finaleLasersV1070.fanGain*smartFlowV1071.lasers,
+      beamGain:finaleLasersV1070.beamGain*smartFlowV1071.lasers}:finaleLasersV1070;
+  const flowLedV1071=smartFlowV1071.active&&finaleLedV1070.active?
+    {...finaleLedV1070,gain:finaleLedV1070.gain*smartFlowV1071.led}:finaleLedV1070;
   const audienceCueV1044=planArenaAudienceV1044({
     enabled:audienceDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,show:showCueV1040,
     stageIsArena:true,playing:isPlaying,reducedMotion,phoneEnabled:phoneSyncEnabled&&audienceEnabled,
@@ -390,7 +442,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       audienceCueV1044={coordinatedAudienceCue} crowdCueV1051={crowdCueV1051}/>
     <ArenaLedDomeV1033 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={domeEnabled} reactive={reactive}/>
     <ArenaLedWallV1059 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
-      cue={coordinatedLedV1060} progressMs={progressMs}
+      cue={flowLedV1071} progressMs={progressMs}
       epicDropCueV1069={epicDropV1069}/>
     <ArenaSkyFormationV1034 audio={audio} section={section} playing={isPlaying} reducedMotion={reducedMotion}
       enabled={skyFormationEnabled} directorEnabled={showDirectorEnabled} reactive={reactive}
@@ -405,7 +457,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaLaserFansV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={lasersEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045} finaleV1046={finaleV1046}
-      laserCueV1057={coordinatedLasersV1060}/>
+      laserCueV1057={flowLasersV1071}/>
     <ArenaMovingLedSkyV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={movingSkyEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}/>
@@ -422,15 +474,15 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaHologramPortalsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={hologramsEnabled&&showDirectorEnabled}
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}
-      concertCueV1068={holographicConcertV1068}/>
+      concertCueV1068={flowHologramsV1071}/>
     <ArenaLaserTunnelsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={laserArchitectureEnabled&&showDirectorEnabled&&lasersEnabled}
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}
-      laserCueV1057={coordinatedLasersV1060}/>
+      laserCueV1057={flowLasersV1071}/>
     <ArenaFloatingPlatformsV1038 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={floatingStageEnabled} mode={plannedFloat}
       intensity={plannedFloatStrength} section={section}
-      floatingCueV1067={floatingExperienceV1067} floatingEnabledV1067={floatingExperienceEnabledV1067&&floatingStageMode==='auto'}/>
+      floatingCueV1067={flowFloatingV1071} floatingEnabledV1067={floatingExperienceEnabledV1067&&floatingStageMode==='auto'}/>
     <ArenaLightsV1032 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       enabled={lightsEnabled} dropEnabled={dropEnabled} reactive={reactive}
       lightCueV1056={coordinatedSpotsV1060}
@@ -483,7 +535,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       </group>}
       <ArenaTransformingDeckV1037 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
         enabled={transformingDeckEnabled} mode={plannedDeck} strength={plannedDeckStrength} section={section}
-        stageCueV1066={stageFormationV1066} stageEnabledV1066={transformingStageEnabledV1066&&transformingDeckMode==='auto'}/>
+        stageCueV1066={flowStageV1071} stageEnabledV1066={transformingStageEnabledV1066&&transformingDeckMode==='auto'}/>
       {children}
     </group>
   </group>;

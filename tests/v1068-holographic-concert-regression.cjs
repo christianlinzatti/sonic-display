@@ -87,7 +87,8 @@ for(const f of ['types/music.ts','components/visualizer/registry.tsx',
 const stage=read('components/visualizer/stages/Arena360StageV1031.tsx');
 assert(stage.includes('portalPattern:hologramPattern'),'manual selection wins');
 assert(stage.includes('stageCueV1066:stageFormationV1066,floatCueV1067:floatingExperienceV1067'));
-assert(stage.includes('concertCueV1068={holographicConcertV1068}'));
+assert(stage.includes('concertCueV1068={flowHologramsV1071}'));
+assert(stage.includes('holographicConcertV1068.power*ultimateFinaleV1070.holograms')); // bounded V1070 forwarding
 assert(stage.indexOf('<ArenaHologramPortalsV1039')<stage.indexOf('ref={turntable}'),
  'virtual silhouettes and portals are world-fixed, outside the cast transform');
 assert(read('context/UiPreferencesContext.tsx').includes('arenaHolographicConcertEnabledV1068:false'));

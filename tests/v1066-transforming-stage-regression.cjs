@@ -88,7 +88,8 @@ assert(!deck.includes('setInterval(')&&!deck.includes('requestAnimationFrame('))
 const stage=read('components/visualizer/stages/Arena360StageV1031.tsx');
 assert(stage.includes('planStageFormationV1066({'));
 assert(stage.includes('manualDeckMode:transformingDeckMode'));
-assert(stage.includes('stageCueV1066={stageFormationV1066}'));
+assert(stage.includes('stageCueV1066={flowStageV1071}'));
+assert(stage.includes('stageFormationV1066.amount*ultimateFinaleV1070.deck')); // existing cue, attenuated only
 for(const f of ['types/music.ts','components/visualizer/registry.tsx',
  'context/UiPreferencesContext.tsx','components/visualizer/VisualizerStage.tsx',
  'components/visualizer/ThreeAvatar.tsx','components/visualizer/stages/index.tsx',

@@ -69,7 +69,7 @@ assert(fans.includes('tier===\'low\'')&&tunnels.includes('createLaserArchitectur
 assert.equal((fans.match(/<instancedMesh\b/g)||[]).length,1);
 assert.equal((tunnels.match(/<instancedMesh\b/g)||[]).length,1);
 assert(arena.includes('planIntelligentLaserV1057(')&&
- (arena.match(/laserCueV1057={(?:intelligentLaserV1057|coordinatedLasersV1060)}/g)||[]).length===2);
+ (arena.match(/laserCueV1057={(?:intelligentLaserV1057|coordinatedLasersV1060|finaleLasersV1070|flowLasersV1071)}/g)||[]).length===2);
 assert(!arena.includes('coordinatedLasersV1060')||arena.includes('intelligentLaserV1057.active'),'coordination must require active original laser cue');
 assert(arena.includes('hologramPattern===\'auto\''),'manual laser selection still wins');
 for(const file of ['types/music.ts','context/UiPreferencesContext.tsx',
