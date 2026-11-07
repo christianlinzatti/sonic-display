@@ -4,6 +4,8 @@ import {useFrame} from '@react-three/fiber';
 import {useMemo,useRef} from 'react';
 import type {Group,MeshBasicMaterial} from 'three';
 import type {AudioFeatures} from '@/types/audio';
+import {REST_FLOAT_V1067,sampleFloatingExperienceV1067,stepFloatingExperienceV1067,
+ type FloatCueV1067,type FloatOffsetV1067} from '@/lib/arena360FloatingExperienceV1067';
 import {useAdaptivePerformance} from '../adaptivePerformance';
 import {floatingStagePlatformCountV1038,INITIAL_FLOATING_STAGE_V1038,
  planFloatingStageV1038,sampleFloatingPlatformV1038,stepFloatingStageV1038,
@@ -13,9 +15,10 @@ import {floatingStagePlatformCountV1038,INITIAL_FLOATING_STAGE_V1038,
  * for avatar ground and never inside the rotating performer root. The small
  * platform count is tier-capped, with no shadows, new dynamic lights or IO.
  */
-export function ArenaFloatingPlatformsV1038({audio,playing,reducedMotion,reactive,enabled=true,mode='auto',intensity=70,section='verse'}:{
+export function ArenaFloatingPlatformsV1038({audio,playing,reducedMotion,reactive,enabled=true,mode='auto',intensity=70,section='verse',floatingCueV1067,floatingEnabledV1067=false}:{
  audio:AudioFeatures;playing:boolean;reducedMotion:boolean;reactive:boolean;
  enabled?:boolean;mode?:FloatingStageModeV1038;intensity?:number;section?:string;
+ floatingCueV1067?:FloatCueV1067;floatingEnabledV1067?:boolean;
 }) {
  const {tier}=useAdaptivePerformance();
  const count=floatingStagePlatformCountV1038(tier);
@@ -23,6 +26,7 @@ export function ArenaFloatingPlatformsV1038({audio,playing,reducedMotion,reactiv
  const platforms=useRef<(Group|null)[]>([]);
  const glow=useRef<(MeshBasicMaterial|null)[]>([]);
  const state=useRef<FloatingStageStateV1038>({...INITIAL_FLOATING_STAGE_V1038});
+ const offsetsV1067=useRef<FloatOffsetV1067[]>([]);
  const heldCue=useRef(planFloatingStageV1038({enabled:true,playing:true,reducedMotion:false,
   reactive:true,mode:'auto',intensity:0,section:'verse',energy:0}));
  useFrame((_,delta)=>{
@@ -36,9 +40,16 @@ export function ArenaFloatingPlatformsV1038({audio,playing,reducedMotion,reactiv
   for(let i=0;i<count;i++){
    const p=platforms.current[i];if(!p)continue;
    const sample=sampleFloatingPlatformV1038(i,count,state.current,reducedMotion?{...cue,wave:0}:cue);
-   p.position.set(sample.x,sample.y,sample.z);
-   p.rotation.y=-state.current.angle*.32;
-   const led=glow.current[i];if(led)led.opacity=sample.glow;
+   const offset=stepFloatingExperienceV1067(offsetsV1067.current[i]??REST_FLOAT_V1067,
+    delta,sampleFloatingExperienceV1067(i,count,floatingCueV1067??{active:false,formation:'halo',power:0,phase:0}),{
+     enabled:floatingEnabledV1067&&enabled,playing,reducedMotion,lowTier:tier==='low',
+    });
+   offsetsV1067.current[i]=offset;
+   const theta=Math.atan2(sample.z,sample.x)+offset.yaw;
+   const radius=Math.hypot(sample.x,sample.z)+offset.radial;
+   p.position.set(Math.cos(theta)*radius,sample.y+offset.rise,Math.sin(theta)*radius);
+   p.rotation.y=-state.current.angle*.32+offset.yaw;
+   const led=glow.current[i];if(led)led.opacity=Math.min(.75,sample.glow+offset.glow);
   }
  });
  if(!enabled)return null;

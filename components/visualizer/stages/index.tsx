@@ -185,7 +185,10 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
   intelligentLaserEnabledV1057,intelligentLaserStrengthV1057,
   volumetricLightingEnabledV1058,volumetricLightingStrengthV1058,
   ledWallEnabledV1059,ledWallStrengthV1059,ledWallPatternV1059,
-  lightingChoreographerEnabledV1060,lightingChoreographerStrengthV1060,trackId,genre, ...props }:
+  lightingChoreographerEnabledV1060,lightingChoreographerStrengthV1060,
+  transformingStageEnabledV1066,transformingStageStrengthV1066,
+  floatingExperienceEnabledV1067,floatingExperienceStrengthV1067,
+  holographicConcertEnabledV1068,holographicConcertStrengthV1068,trackId,genre, ...props }:
   Props & { theme: StageEnvironmentId; children?: React.ReactNode; rotationSpeed?: number; rotationEnabled?: boolean;
     audienceEnabled?: boolean; lightsEnabled?: boolean; dropEnabled?: boolean;
     wavesEnabled?:boolean;phoneSyncEnabled?:boolean;phoneMode?:import("@/lib/arena360ImmersionV1033").ArenaPhoneModeV1033;domeEnabled?:boolean;
@@ -214,6 +217,9 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     volumetricLightingEnabledV1058?:boolean;volumetricLightingStrengthV1058?:number;
     ledWallEnabledV1059?:boolean;ledWallStrengthV1059?:number;ledWallPatternV1059?:import('@/lib/arena360LedWallV1059').LedWallPatternV1059;
     lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
+    transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
+    floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
+    holographicConcertEnabledV1068?:boolean;holographicConcertStrengthV1068?:number;
     trackId?:string|null;genre?:string|null }) {
   if (theme === "arena360") {
     return <Arena360StageV1031 {...props} rotationSpeed={rotationSpeed} rotationEnabled={rotationEnabled}
@@ -235,6 +241,12 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       atmosphereDirectorEnabled={atmosphereDirectorEnabled} atmosphereDirectorStrength={atmosphereDirectorStrength}
       cinematicFinaleEnabled={cinematicFinaleEnabled} cinematicFinaleStrength={cinematicFinaleStrength}
       immersiveEnabled={immersiveEnabled} immersiveStrength={immersiveStrength}
+      transformingStageEnabledV1066={transformingStageEnabledV1066}
+      transformingStageStrengthV1066={transformingStageStrengthV1066}
+      floatingExperienceEnabledV1067={floatingExperienceEnabledV1067}
+      floatingExperienceStrengthV1067={floatingExperienceStrengthV1067}
+      holographicConcertEnabledV1068={holographicConcertEnabledV1068}
+      holographicConcertStrengthV1068={holographicConcertStrengthV1068}
       concertDirectorEnabled={concertDirectorEnabled} concertDirectorStrength={concertDirectorStrength}
       liveConcertEnabledV1049={liveConcertEnabledV1049} liveConcertStrengthV1049={liveConcertStrengthV1049}
       microphoneActiveV1049={microphoneActiveV1049}

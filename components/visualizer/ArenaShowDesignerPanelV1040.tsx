@@ -154,6 +154,117 @@ export function ArenaShowDesignerPanelV1040(){
     Bei Pause, reduzierter Bewegung oder niedrigem Grafikprofil wird die
     Zusatzregie ausgeschaltet.</small>
   </fieldset>
+  <fieldset className="arena-v1068-holographic-concert" aria-label="V1068 Holographic Concert FX 3.0">
+   <legend>V1068 · Holographic Concert FX 3.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaHolographicConcertEnabledV1068)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaHolographicConcertEnabledV1068:e.target.checked})}/>
+    Hologramm-Portale und virtuelle Künstler-Silhouetten passend zur Show inszenieren
+   </label>
+   <label>Hologramm-Choreografie: {preferences.arenaHolographicConcertStrengthV1068??55}%
+    <input type="range" min="0" max="80" step="5" disabled={!plan||!preferences.arenaHolographicConcertEnabledV1068}
+     value={preferences.arenaHolographicConcertStrengthV1068??55}
+     onChange={e=>updatePreferences({arenaHolographicConcertStrengthV1068:Number(e.target.value)})}/>
+   </label>
+   <small>Weltfeste Portal-Projektionen: sechs holografische Looks, Echo-Silhouetten und
+    optionales Timing mit V1066/V1067. Nur automatisch gesteuerte Portale und gültiger
+    Showplan; manuelle Halo-/Spiral-/Tunnel-Muster bleiben vorrangig. Die Projektionen
+    sind keine zusätzlichen Künstler, haben keine Sängerrollen und steuern keine Geräte.
+    Bei niedriger Grafikqualität, Pause oder Reduced Motion deaktiviert.</small>
+  </fieldset>
+  <fieldset className="arena-v1067-floating-platforms" aria-label="V1067 Floating Platform Experience 2.0">
+   <legend>V1067 · Floating Platform Experience 2.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaFloatingExperienceEnabledV1067)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaFloatingExperienceEnabledV1067:e.target.checked})}/>
+    Schwebende Bühnen-Satelliten mit synchronisierten Wellen, Höhenfahrten und Finale
+   </label>
+   <label>Schwebe-Choreografie: {preferences.arenaFloatingExperienceStrengthV1067??55}%
+    <input type="range" min="0" max="80" step="5" disabled={!plan||!preferences.arenaFloatingExperienceEnabledV1067}
+     value={preferences.arenaFloatingExperienceStrengthV1067??55}
+     onChange={e=>updatePreferences({arenaFloatingExperienceStrengthV1067:Number(e.target.value)})}/>
+   </label>
+   <small>Verwendet die maximal sechs vorhandenen V1038-Satelliten und auf Wunsch
+    die Bühnenformationen von V1066. Nur Showplan und automatischer Schwebe-Modus:
+    selbst gewählte Orbit-/Wellen-/Höhen-Modi haben Vorrang. Die Avatar-Bodenplattform
+    bleibt unbeweglich. Zusätzliche Höhenfahrt max. 18 cm, seitlich max. 3,5 cm;
+    keine neuen Meshes, kein Netzwerk und keine Govee-Befehle. Bei Pause werden
+    Positionen gehalten; Reduced Motion und niedrige GPU-Qualität parken die Zusatzbewegung.</small>
+  </fieldset>
+  <fieldset className="arena-v1066-transforming-stage" aria-label="V1066 Transforming Stage 3.0">
+   <legend>V1066 · Transforming Stage 3.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaTransformingStageEnabledV1066)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaTransformingStageEnabledV1066:e.target.checked})}/>
+    Bewegliche Bühnen-Petalen mit Iris-, Kronen-, Wellen- und Finale-Formationen inszenieren
+   </label>
+   <label>Transformationsstärke: {preferences.arenaTransformingStageStrengthV1066??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaTransformingStageEnabledV1066}
+     value={preferences.arenaTransformingStageStrengthV1066??55}
+     onChange={e=>updatePreferences({arenaTransformingStageStrengthV1066:Number(e.target.value)})}/>
+   </label>
+   <small>Nur vorhandene äußere Bühnensegmente (V1037): kein beweglicher Avatar-Boden,
+    keine zusätzlichen 3D-Meshes oder Gerätesteuerung. Automatischer Bühnenmodus
+    und aktiver Showplan sind erforderlich. Manuelle Fächer-/Spiral-/Ring-Wahl,
+    pausierte Wiedergabe, reduzierte Bewegung und niedrige Grafikqualität bleiben
+    vorrangig. Die maximale zusätzliche Auslenkung liegt bei 6,5 cm.</small>
+  </fieldset>
+  <fieldset className="arena-v1065-performance-director" aria-label="V1065 AI Performance Director">
+   <legend>V1065 · AI Performance Director</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaPerformanceDirectorEnabledV1065)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaPerformanceDirectorEnabledV1065:e.target.checked})}/>
+    Rap, Avatar-Tanz, Ensemble und Kameravorschläge gemeinsam inszenieren
+   </label>
+   <label>Koordination: {preferences.arenaPerformanceDirectorStrengthV1065??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaPerformanceDirectorEnabledV1065}
+     value={preferences.arenaPerformanceDirectorStrengthV1065??55}
+     onChange={e=>updatePreferences({arenaPerformanceDirectorStrengthV1065:Number(e.target.value)})}/>
+   </label>
+   <small>Lokale, regelbasierte Koordination über den bestehenden Showplan. V1065
+    priorisiert nur bereits eingeschaltete Effekte und kann sie höchstens abdunkeln;
+    es erkennt keine Sänger oder Wörter neu. Manuelle Rap-, Choreografie- und Kamera-
+    Einstellungen bleiben vorrangig. Keine zusätzlichen Kamera-, Audio- oder Govee-Loops.
+    Bei Pausen, Reduced Motion oder niedriger GPU-Qualität bleibt alles unverändert.</small>
+  </fieldset>
+  <fieldset className="arena-v1064-stage-movement" aria-label="V1064 Intelligent Stage Movement">
+   <legend>V1064 · Intelligent Stage Movement</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaStageMovementEnabledV1064)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaStageMovementEnabledV1064:e.target.checked})}/>
+    Sichere Bühnenwege und Vorder-/Hintergrundwechsel für 2–4 Avatare aktivieren
+   </label>
+   <label>Wegbewegung: {preferences.arenaStageMovementStrengthV1064??55}%
+    <input type="range" min="0" max="80" step="5" disabled={!plan||!preferences.arenaStageMovementEnabledV1064}
+     value={preferences.arenaStageMovementStrengthV1064??55}
+     onChange={e=>updatePreferences({arenaStageMovementStrengthV1064:Number(e.target.value)})}/>
+   </label>
+   <small>Nur automatische Gruppen auf der 360°-Bühne: kurze, langsame Wegpunkte innerhalb
+    der zugewiesenen Bühnenzone, ohne echte Spur-/Platztausche. Der vorhandene
+    Fußkontakt-, Kollisions- und Bühnenrand-Schutz kann jede Bewegung stoppen.
+    Manuelle Positionen, Sängerrollen und niedrige Grafikprofile bleiben vorrangig.
+    Keine neuen Uhren, Govee-Befehle oder automatischen GLB-Schrittclips.</small>
+  </fieldset>
+  <fieldset className="arena-v1063-ensemble" aria-label="V1063 Ensemble Choreography 4.0">
+   <legend>V1063 · Ensemble Choreography 4.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaEnsembleEnabledV1063)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaEnsembleEnabledV1063:e.target.checked})}/>
+    Sanfte Gruppenformationen und wechselnden Blickfokus für 2–4 Avatare aktivieren
+   </label>
+   <label>Ensemble-Stärke: {preferences.arenaEnsembleStrengthV1063??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaEnsembleEnabledV1063}
+     value={preferences.arenaEnsembleStrengthV1063??55}
+     onChange={e=>updatePreferences({arenaEnsembleStrengthV1063:Number(e.target.value)})}/>
+   </label>
+   <small>Nur automatische Arena-Formationen: leichte seitliche Staffelung,
+    dezente Bogen-/Fächer-Looks und optische Partner-Fokuswechsel ohne
+    Platztausch. Manuelle Aufstellungen, Sängerrollen, Fußkontakt-,
+    Kollisions- und Low-GPU-Schutz behalten Vorrang.</small>
+  </fieldset>
   <fieldset className="arena-v1062-rap-performance" aria-label="V1062 Advanced Rap Performance">
    <legend>V1062 · Advanced Rap Performance 7.0</legend>
    <label className="setting-check"><input type="checkbox"
@@ -534,7 +645,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

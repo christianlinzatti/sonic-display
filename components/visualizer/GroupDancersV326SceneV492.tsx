@@ -1,4 +1,6 @@
 "use client";
+import type {EnsembleCueV1063} from '@/lib/arena360EnsembleChoreographyV1063';
+import {isSafeStageRouteV1064,stepStageTravelV1064,type StagePathCueV1064,type StagePathSlotV1064} from '@/lib/arena360StageMovementV1064';
 import {getNaturalDuetModeV664} from "./naturalDuetFeatureInteractionV664";
 // Extracted unchanged from ThreeAvatar.tsx (V492 modular refactor).
 // --- Extracted dependencies (V492 refactor) ---
@@ -73,8 +75,9 @@ import { stepMultiAvatarFormationV495, newFormationStateV495, safeFormationTrave
 import { Dancer } from './DanceFormationActorsV492';
 import { GroupDanceMotionContextV485, GroupFootSupportContextV486, GroupFootworkContextV486, GroupGroundObservationContextV487, GroupLowPoseContextV481, GroupMotionClockContextV328, GroupPhraseContextV329, PartnerCalibrationContext, PartnerGestureContext, PartnerLookContext, AvatarBodyContextV507, AnimatedBodyContextV508 } from './ThreeAvatarContextsV492';
 
-export function GroupDancersV326({props,settings,vocalDuetV838}:{props:VisualizerProps;settings:GroupStudioV326;vocalDuetV838?:VocalDuetPlanV838}){
+export function GroupDancersV326({props,settings,vocalDuetV838,ensembleV1063,stageMovementV1064}:{props:VisualizerProps;settings:GroupStudioV326;vocalDuetV838?:VocalDuetPlanV838;ensembleV1063?:EnsembleCueV1063|null;stageMovementV1064?:StagePathCueV1064|null}){
  const refs=useRef<(Group|null)[]>([null,null,null,null]);
+ const routeOffsetsV1064=useRef<StagePathSlotV1064[]>(Array.from({length:4},()=>({x:0,z:0})));
  const bodyRegistryV507=useRef(createBodyRegistryV507());
  const animatedRegistryV508=useRef(createAnimatedBodyRegistryV508());
  // Stable mutable contexts: individual avatar rigs read these inside their existing
@@ -94,6 +97,7 @@ export function GroupDancersV326({props,settings,vocalDuetV838}:{props:Visualize
  const footworkStateV839=useRef(createGroupFootworkClockV839());
  const stageBlockingV840=useRef(createStageBlockingStateV840());
  useEffect(()=>{stageBlockingV840.current=createStageBlockingStateV840();},[props.track?.id]);
+ useEffect(()=>{routeOffsetsV1064.current=Array.from({length:4},()=>({x:0,z:0}));},[props.track?.id]);
  const groundingV494=useRef<GlbGroundStateV494[]>(Array.from({length:4},newGlbGroundStateV494));
  const calibrationsV494=useRef<GlbGroundCalibrationsV494>({});
  useEffect(()=>{
@@ -1041,6 +1045,32 @@ export function GroupDancersV326({props,settings,vocalDuetV838}:{props:Visualize
   });
   const groupSpreadV899=groupDanceV899.active&&groupDanceV899.spacing>0?
     groupDanceV899.spacing:0; // never compress the existing V326 safety lanes
+  // V1063 uses existing grounded reports. If any contact is uncertain, a
+  // collision is predicted or manual casting is active, preserve all slot roots.
+  const ensembleActiveV1063=ensembleV1063?.active===true&&!footLock&&
+    !settings.trackId&&settings===props.autoMultiArtistGroupV442&&
+    !manualCueV385.active&&!finalDuetV385.enabled&&
+    !collisionSlotsV508.some(s=>s?.risk>=.3)&&
+    groundDecisionsV494.every((g,i)=>
+      canRepositionWithGroundV808(g,footLock)&&
+      (contactReportV487.slots[i]?.travelMultiplier??0)>.5);
+  // V1064 uses the existing per-frame grounded/collision observations, not
+  // guessed feet or new clocks. A planned cue may be vetoed before any target
+  // is changed. No lane swaps or abrupt position jumps are possible.
+  const routeGroundSafeV1064=!footLock&&
+    groundDecisionsV494.every((g,i)=>canRepositionWithGroundV808(g,footLock)&&
+      (contactReportV487.slots[i]?.travelMultiplier??0)>.5);
+  const routeCollisionSafeV1064=!collisionSlotsV508.some(s=>(s?.risk??1)>=.3);
+  const routeManualSafeV1064=!settings.trackId&&settings===props.autoMultiArtistGroupV442&&
+    !manualCueV385.active&&!finalDuetV385.enabled&&
+    props.avatarMotionMode!=='choreography'&&!props.avatarTimelineEnabled&&!props.smartDanceOverride;
+  // Check the combined V1063 + V1064 destination rather than each offset alone.
+  const routeBaseV1064=pose.positions.map((p,i):[number,number,number]=>[
+    p[0]+(ensembleActiveV1063?(ensembleV1063!.slots[i]?.spreadX??0):0),p[1],
+    p[2]+(ensembleActiveV1063?(ensembleV1063!.slots[i]?.depth??0):0)]);
+  const stageRouteActiveV1064=stageMovementV1064?.active===true&&
+    routeGroundSafeV1064&&routeCollisionSafeV1064&&routeManualSafeV1064&&
+    isSafeStageRouteV1064(routeBaseV1064,stageMovementV1064.slots);
   const groundTravelV487=contactReportV487.slots.map(slot=>slot.travelMultiplier);
   const speed=props.reducedMotion?20:footLock?1.65:3.4;
   const beat=props.isPlaying&&!props.reducedMotion?Math.max(0,Math.min(1,props.audio.beatStrength??0)):0;
@@ -1078,12 +1108,19 @@ export function GroupDancersV326({props,settings,vocalDuetV838}:{props:Visualize
 
    const depthV760=safeEnsembleDepthV760(ensembleV760,ensembleV760.slots[i],groundDecisionsV494[i],collisionSlotV506);
    const accentScaleV506=collisionSlotV506?.accentScale??1;
+   // 14 cm/s maximum extra path travel, blended by the existing V326 root.
+   // During foot locks/pauses/collision danger freeze V1064 in its current spot;
+   // a manual override clears the old target without a new crossing path.
+   const nextRouteV1064=stepStageTravelV1064(routeOffsetsV1064.current[i],
+     stageRouteActiveV1064?stageMovementV1064!.slots[i]:{x:0,z:0},delta,
+     routeGroundSafeV1064&&routeCollisionSafeV1064&&props.isPlaying&&!props.reducedMotion);
+   routeOffsetsV1064.current[i]=routeManualSafeV1064?nextRouteV1064:{x:0,z:0};
    // V452 accents are stage-root translations, below 5 cm; spacing preserved
    // for hooks (all dancers receive the same lateral offset).
-   g.position.x=formationApproach(g.position.x,targetX+Math.sign(i-(settings.count-1)/2)*groupSpreadV899+(crewV458.slots[i]?.offsetX??0)*accentScaleV506+groundDecisionsV494[i].offsetX,delta,speed*finalFootworkV839.slots[i].rootSpeed*(groundTravelV487[i]??1));
-   g.position.z=formationApproach(g.position.z,targetZ+(crewV458.slots[i]?.offsetZ??0)*accentScaleV506+groundDecisionsV494[i].offsetZ+roleTravelV495+finalDepthV506+depthV509+depthV638+depthV760+(stageBlockingResultV840.active?stageBlockingResultV840.offsets[i]:(stageBlockingResultV840.reason==='existing-v808'?stageBlockingResultV840.offsets[i]:0)),delta,speed*finalFootworkV839.slots[i].rootSpeed*(groundTravelV487[i]??1));
+   g.position.x=formationApproach(g.position.x,targetX+routeOffsetsV1064.current[i].x+(ensembleActiveV1063?ensembleV1063!.slots[i].spreadX:0)+Math.sign(i-(settings.count-1)/2)*groupSpreadV899+(crewV458.slots[i]?.offsetX??0)*accentScaleV506+groundDecisionsV494[i].offsetX,delta,speed*finalFootworkV839.slots[i].rootSpeed*(groundTravelV487[i]??1));
+   g.position.z=formationApproach(g.position.z,targetZ+routeOffsetsV1064.current[i].z+(ensembleActiveV1063?ensembleV1063!.slots[i].depth:0)+(crewV458.slots[i]?.offsetZ??0)*accentScaleV506+groundDecisionsV494[i].offsetZ+roleTravelV495+finalDepthV506+depthV509+depthV638+depthV760+(stageBlockingResultV840.active?stageBlockingResultV840.offsets[i]:(stageBlockingResultV840.reason==='existing-v808'?stageBlockingResultV840.offsets[i]:0)),delta,speed*finalFootworkV839.slots[i].rootSpeed*(groundTravelV487[i]??1));
    g.position.y=0;
-   g.rotation.y=formationApproach(g.rotation.y,ensembleV392.yaw[i]+(spotlightV443.slots[i]?.turnY??0)+(crewV458.slots[i]?.turnY??0)+(formationV495.slots[i]?.turnY??0)*(spatialV505.slots[i]?.turnFactor??1)*accentScaleV506+(ensembleV509.slots[i]?.turnY??0)+(groupV517.slots[i]?.turnY??0)+(ensembleV638.slots[i]?.turnY??0)+(ensembleV760.slots[i]?.turnY??0)+(cinematicV527.slots[i]?.turnY??0),delta,props.reducedMotion?20:3.1);
+   g.rotation.y=formationApproach(g.rotation.y,(ensembleActiveV1063?ensembleV1063!.slots[i].turnY:0)+ensembleV392.yaw[i]+(spotlightV443.slots[i]?.turnY??0)+(crewV458.slots[i]?.turnY??0)+(formationV495.slots[i]?.turnY??0)*(spatialV505.slots[i]?.turnFactor??1)*accentScaleV506+(ensembleV509.slots[i]?.turnY??0)+(groupV517.slots[i]?.turnY??0)+(ensembleV638.slots[i]?.turnY??0)+(ensembleV760.slots[i]?.turnY??0)+(cinematicV527.slots[i]?.turnY??0),delta,props.reducedMotion?20:3.1);
    const desiredScale=present?1:.001;
    const scaled=formationApproach(g.scale.x,desiredScale,delta,props.reducedMotion?20:3.2);
    g.scale.setScalar(Math.max(.001,scaled));

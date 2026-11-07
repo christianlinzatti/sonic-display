@@ -86,6 +86,18 @@ export interface UiPreferences {
   arenaNaturalMotionStrengthV1061?:number;
   arenaRapPerformanceEnabledV1062?:boolean;
   arenaRapPerformanceStrengthV1062?:number;
+  arenaEnsembleEnabledV1063?:boolean;
+  arenaEnsembleStrengthV1063?:number;
+  arenaStageMovementEnabledV1064?:boolean;
+  arenaStageMovementStrengthV1064?:number;
+  arenaPerformanceDirectorEnabledV1065?:boolean;
+  arenaPerformanceDirectorStrengthV1065?:number;
+  arenaTransformingStageEnabledV1066?:boolean;
+  arenaTransformingStageStrengthV1066?:number;
+  arenaFloatingExperienceEnabledV1067?:boolean;
+  arenaFloatingExperienceStrengthV1067?:number;
+  arenaHolographicConcertEnabledV1068?:boolean;
+  arenaHolographicConcertStrengthV1068?:number;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;

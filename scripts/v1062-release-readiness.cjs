@@ -12,7 +12,7 @@ function inspectReleaseV1062(root){
    pkg.sonicRoadmapRelease==='v'+match[1]&&pkg.sonicFeatureRelease==='v'+match[1]);
   check('lockfile',pkg.version===lock.version&&pkg.version===lock.packages?.['']?.version);
   check('node24',pkg.engines?.node==='24.x');
-  check('prebuild',pkg.scripts.prebuild.startsWith('npm run test:v1062 && npm run test:v1062:types &&'));
+  check('prebuild',pkg.scripts.prebuild.includes('npm run test:v1062 && npm run test:v1062:types &&'));
   check('focused',pkg.scripts['verify:v1062:focused'].includes('verify:v1061:focused'));
   for(const f of ['lib/advancedRapPerformanceV1062.ts',
    'tests/v1062-advanced-rap-performance-regression.cjs','tests/tsconfig.v1062-core.json',

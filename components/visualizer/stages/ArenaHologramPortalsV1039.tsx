@@ -1,23 +1,38 @@
 "use client";
 import {useFrame} from '@react-three/fiber';
-import {useMemo,useRef} from 'react';
-import {Color,Object3D,type InstancedMesh} from 'three';
+import {useEffect,useMemo,useRef} from 'react';
+import {AdditiveBlending,Color,DoubleSide,Object3D,Shape,ShapeGeometry,type InstancedMesh} from 'three';
 import type {AudioFeatures} from '@/types/audio';
 import {useAdaptivePerformance} from '../adaptivePerformance';
 import {createHologramFixturesV1039,planArenaHolographyV1039,sampleHologramPortalV1039,
  type HologramPatternV1039} from '@/lib/arena360HolographyV1039';
+import {sampleHolographicConcertV1068,type HologramCueV1068} from '@/lib/arena360HolographicConcertV1068';
 /** Hologram-like floating rings, rendered as TWO bounded instance batches.
  * Not avatars, not projectors or physical lasers, no network, timers, camera, shadows.
  */
 export function ArenaHologramPortalsV1039({audio,playing,reducedMotion,reactive,enabled=true,genre,
- section,pattern='auto',strength=65}:{audio:AudioFeatures;playing:boolean;reducedMotion:boolean;
+ section,pattern='auto',strength=65,concertCueV1068}:{audio:AudioFeatures;playing:boolean;reducedMotion:boolean;
  reactive:boolean;enabled?:boolean;genre?:string|null;section?:string;
- pattern?:HologramPatternV1039;strength?:number}){
+ pattern?:HologramPatternV1039;strength?:number;concertCueV1068?:HologramCueV1068}){
  const {tier}=useAdaptivePerformance();
  const fixtures=useMemo(()=>createHologramFixturesV1039(tier),[tier]);
- const rings=useRef<InstancedMesh>(null),crystals=useRef<InstancedMesh>(null);
+ const rings=useRef<InstancedMesh>(null),crystals=useRef<InstancedMesh>(null),echoes=useRef<InstancedMesh>(null);
  const dummy=useMemo(()=>new Object3D(),[]),tint=useMemo(()=>new Color(),[]);
  const palette=useMemo(()=>[new Color(),new Color()],[]);
+ // One small 2-D performer outline repeated across existing portal positions.
+ // No GLB duplication, skeletal animation, extra audio stream or new frame owner.
+ const silhouetteGeometry=useMemo(()=>{
+  const outline=new Shape();
+  const contour:[number,number][]=[[-.20,-.52],[-.07,-.52],[-.02,-.22],[.02,-.22],
+   [.07,-.52],[.20,-.52],[.13,-.12],[.18,.07],[.26,-.08],[.31,-.04],
+   [.22,.20],[.12,.22],[.10,.28],[.14,.35],[.10,.44],[0,.48],
+   [-.10,.44],[-.14,.35],[-.10,.28],[-.12,.22],[-.22,.20],[-.31,-.04],
+   [-.26,-.08],[-.18,.07],[-.13,-.12]];
+  outline.moveTo(...contour[0]);
+  contour.slice(1).forEach(point=>outline.lineTo(...point));outline.closePath();
+  return new ShapeGeometry(outline);
+ },[]);
+ useEffect(()=>()=>silhouetteGeometry.dispose(),[silhouetteGeometry]);
  const time=useRef(0),budget=useRef(.2),lastActive=useRef(true);
  useFrame((_,delta)=>{
   if(!enabled||!rings.current||!crystals.current)return;
@@ -33,15 +48,30 @@ export function ArenaHologramPortalsV1039({audio,playing,reducedMotion,reactive,
   palette[0].set(cue.primary);palette[1].set(cue.secondary);
   for(let i=0;i<fixtures.length;i++){
    const sample=sampleHologramPortalV1039(fixtures[i],time.current,cue);
-   dummy.position.set(sample.x,sample.y,sample.z);
-   dummy.rotation.set(0,sample.rotY,sample.rotZ);dummy.scale.setScalar(sample.size);dummy.updateMatrix();
+   const fx=sampleHolographicConcertV1068(i,fixtures.length,
+    concertCueV1068??{active:false,look:'awakening',power:0,phase:0,sync:'show'});
+   const theta=Math.atan2(sample.z,sample.x)+fx.rotation;
+   const radius=Math.hypot(sample.x,sample.z)+fx.radial;
+   dummy.position.set(Math.cos(theta)*radius,sample.y+fx.rise,Math.sin(theta)*radius);
+   dummy.rotation.set(0,sample.rotY+fx.rotation,sample.rotZ);
+   dummy.scale.setScalar(sample.size*fx.scale);dummy.updateMatrix();
    rings.current.setMatrixAt(i,dummy.matrix);
-   rings.current.setColorAt(i,tint.copy(palette[i%2]).multiplyScalar(sample.light));
-   dummy.scale.setScalar(sample.size*.64);dummy.rotation.set(.3+time.current*cue.speed*.16,sample.rotY+time.current*cue.speed*.3,sample.rotZ);
+   rings.current.setColorAt(i,tint.copy(palette[i%2]).multiplyScalar(Math.min(.49,sample.light+fx.glow)));
+   dummy.scale.setScalar(sample.size*.64*fx.scale);dummy.rotation.set(.3+time.current*cue.speed*.16,sample.rotY+fx.rotation+time.current*cue.speed*.3,sample.rotZ);
    dummy.updateMatrix();crystals.current.setMatrixAt(i,dummy.matrix);
-   crystals.current.setColorAt(i,tint.copy(palette[1-i%2]).multiplyScalar(sample.light*.8));
+   crystals.current.setColorAt(i,tint.copy(palette[1-i%2]).multiplyScalar(Math.min(.49,sample.light*.8+fx.glow*.7)));
+   if(echoes.current){
+    // Visual echoes are bounded silhouettes, not real performers. Low tier parks them.
+    const visible=active&&tier!=='low'&&fx.echo>0;
+    dummy.rotation.set(0,-theta-Math.PI/2,0);
+    dummy.position.y=sample.y+fx.rise;
+    dummy.scale.setScalar(visible ? .65+fx.echo*.20 : .00001);dummy.updateMatrix();
+    echoes.current.setMatrixAt(i,dummy.matrix);
+    echoes.current.setColorAt(i,tint.copy(palette[i%2]).multiplyScalar(Math.min(.30,fx.echo*.28)));
+   }
   }
-  for(const mesh of [rings.current,crystals.current]){
+  for(const mesh of [rings.current,crystals.current,echoes.current]){
+   if(!mesh)continue;
    mesh.instanceMatrix.needsUpdate=true;
    if(mesh.instanceColor)mesh.instanceColor.needsUpdate=true;
   }
@@ -56,5 +86,10 @@ export function ArenaHologramPortalsV1039({audio,playing,reducedMotion,reactive,
    <octahedronGeometry args={[.22,0]}/>
    <meshBasicMaterial color="#ffffff" wireframe transparent opacity={.4} depthWrite={false} toneMapped={false}/>
   </instancedMesh>
+  {tier!=='low'&&concertCueV1068?.active&&<instancedMesh ref={echoes} args={[undefined,undefined,fixtures.length]}
+   geometry={silhouetteGeometry} frustumCulled={false}>
+   <meshBasicMaterial color="#ffffff" transparent opacity={.32} blending={AdditiveBlending}
+    depthWrite={false} depthTest={true} toneMapped={false} side={DoubleSide}/>
+  </instancedMesh>}
  </group>;
 }

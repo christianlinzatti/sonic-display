@@ -25,6 +25,9 @@ import {ArenaLaserFansV1036} from "./ArenaLaserFansV1036";
 import {ArenaMovingLedSkyV1036} from "./ArenaMovingLedSkyV1036";
 import {ArenaLowFogV1036} from "./ArenaLowFogV1036";
 import {ArenaTransformingDeckV1037} from './ArenaTransformingDeckV1037';
+import {planStageFormationV1066} from '@/lib/arena360TransformingStageV1066';
+import {planFloatingExperienceV1067} from '@/lib/arena360FloatingExperienceV1067';
+import {planHolographicConcertV1068} from '@/lib/arena360HolographicConcertV1068';
 import type {ArenaTransformationModeV1037} from '@/lib/arena360TransformationV1037';
 import {ArenaFloatingPlatformsV1038} from './ArenaFloatingPlatformsV1038';
 import type {FloatingStageModeV1038} from '@/lib/arena360FloatingStageV1038';
@@ -75,7 +78,10 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   intelligentLaserEnabledV1057=false,intelligentLaserStrengthV1057=55,
   volumetricLightingEnabledV1058=false,volumetricLightingStrengthV1058=55,
   ledWallEnabledV1059=false,ledWallStrengthV1059=55,ledWallPatternV1059='auto',
-  lightingChoreographerEnabledV1060=false,lightingChoreographerStrengthV1060=55,trackId,genre}: {
+  lightingChoreographerEnabledV1060=false,lightingChoreographerStrengthV1060=55,
+  transformingStageEnabledV1066=false,transformingStageStrengthV1066=55,
+  floatingExperienceEnabledV1067=false,floatingExperienceStrengthV1067=55,
+  holographicConcertEnabledV1068=false,holographicConcertStrengthV1068=55,trackId,genre}: {
   children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
   reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
   audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
@@ -101,6 +107,9 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   volumetricLightingEnabledV1058?:boolean;volumetricLightingStrengthV1058?:number;
   ledWallEnabledV1059?:boolean;ledWallStrengthV1059?:number;ledWallPatternV1059?:LedWallPatternV1059;
   lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
+  transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
+  floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
+  holographicConcertEnabledV1068?:boolean;holographicConcertStrengthV1068?:number;
   trackId?:string|null;genre?:string|null;
 }){
   const turntable=useRef<Group>(null);
@@ -141,6 +150,35 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     strength:ultimateConcertStrengthV1052,performanceTier:getActivePerformanceTier(),
   });
   const showCueV1040=ultimateConcertV1052.show;
+  // V1066 remains fully subordinate to the EXISTING V1037 petal renderer:
+  // no second RAF/timer, floor transformation, camera or hardware interaction.
+  const stageFormationV1066=planStageFormationV1066({
+    enabled:transformingStageEnabledV1066,stageIsArena:true,
+    playing:isPlaying,reducedMotion,showDesignerEnabled,
+    decorEnabled:transformingDeckEnabled&&showDirectorEnabled,
+    manualDeckMode:transformingDeckMode,performanceTier:getActivePerformanceTier(),
+    progressMs,durationMs,strength:transformingStageStrengthV1066,
+    show:showCueV1040,
+  });
+
+  const floatingExperienceV1067=planFloatingExperienceV1067({
+    enabled:floatingExperienceEnabledV1067,stageIsArena:true,playing:isPlaying,
+    reducedMotion,reactive,showDesignerEnabled,showDirectorEnabled,
+    floatingEnabled:floatingStageEnabled,floatMode:floatingStageMode,
+    performanceTier:getActivePerformanceTier(),progressMs,durationMs,
+    strength:floatingExperienceStrengthV1067,show:showCueV1040,
+    stageCueV1066:stageFormationV1066,
+  });
+
+  const holographicConcertV1068=planHolographicConcertV1068({
+    enabled:holographicConcertEnabledV1068,stageIsArena:true,playing:isPlaying,
+    reducedMotion,reactive,showDesignerEnabled,showDirectorEnabled,
+    hologramsEnabled,portalPattern:hologramPattern,
+    performanceTier:getActivePerformanceTier(),progressMs,durationMs,
+    strength:holographicConcertStrengthV1068,show:showCueV1040,
+    stageCueV1066:stageFormationV1066,floatCueV1067:floatingExperienceV1067,
+  });
+
   const cinematicLightingV1056=planCinematicLightingV1056({
     enabled:cinematicLightingEnabledV1056&&showDesignerEnabled&&showDirectorEnabled,
     lightsEnabled,stageIsArena:true,playing:isPlaying,reducedMotion,reactive,
@@ -367,14 +405,16 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       playing={isPlaying} reducedMotion={reducedMotion}/>
     <ArenaHologramPortalsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={hologramsEnabled&&showDirectorEnabled}
-      genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}/>
+      genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}
+      concertCueV1068={holographicConcertV1068}/>
     <ArenaLaserTunnelsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={laserArchitectureEnabled&&showDirectorEnabled&&lasersEnabled}
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}
       laserCueV1057={coordinatedLasersV1060}/>
     <ArenaFloatingPlatformsV1038 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={floatingStageEnabled} mode={plannedFloat}
-      intensity={plannedFloatStrength} section={section}/>
+      intensity={plannedFloatStrength} section={section}
+      floatingCueV1067={floatingExperienceV1067} floatingEnabledV1067={floatingExperienceEnabledV1067&&floatingStageMode==='auto'}/>
     <ArenaLightsV1032 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       enabled={lightsEnabled} dropEnabled={dropEnabled} reactive={reactive}
       lightCueV1056={coordinatedSpotsV1060}
@@ -426,7 +466,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
         })}
       </group>}
       <ArenaTransformingDeckV1037 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
-        enabled={transformingDeckEnabled} mode={plannedDeck} strength={plannedDeckStrength} section={section}/>
+        enabled={transformingDeckEnabled} mode={plannedDeck} strength={plannedDeckStrength} section={section}
+        stageCueV1066={stageFormationV1066} stageEnabledV1066={transformingStageEnabledV1066&&transformingDeckMode==='auto'}/>
       {children}
     </group>
   </group>;

@@ -31,6 +31,12 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1068 Holographic Concert FX 3.0','tests/v1068-holographic-concert-regression.cjs');
+  run('V1067 Floating Platform Experience 2.0','tests/v1067-floating-experience-regression.cjs');
+  run('V1066 Transforming Stage 3.0','tests/v1066-transforming-stage-regression.cjs');
+  run('V1065 AI Performance Director','tests/v1065-performance-director-regression.cjs');
+  run('V1064 Intelligent Stage Movement','tests/v1064-stage-movement-regression.cjs');
+  run('V1063 Ensemble Choreography 4.0','tests/v1063-ensemble-choreography-regression.cjs');
   run('V1062 Advanced Rap Performance 7.0','tests/v1062-advanced-rap-performance-regression.cjs');
   run('V1061 Natural Avatar Motion 3.0','tests/v1061-natural-avatar-motion-regression.cjs');
   run('V1060 AI Lighting Choreographer','tests/v1060-lighting-choreographer-regression.cjs');

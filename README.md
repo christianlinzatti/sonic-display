@@ -1,3 +1,17 @@
+## V1068 · Holographic Concert FX 3.0
+
+Optional world-fixed portal choreography and lightweight performer **silhouette projections**
+for the 360° arena, synced to the local concert-show timeline. Enabled from the AI Show
+Designer, initially off. V1066 stage and V1067 floating platforms can share the same
+normalized show phase. No extra dancer or singer, no laser projector, Govee control or
+remote AI call. Run `npm run verify:v1068:focused` before import.
+
+## V1063 · Ensemble Choreography 4.0
+
+Optionale lokale Ensemble-Regie für die bestehende 360°-Bühne. Sie ergänzt automatische Gruppenformationen (2–4 Avatare) um sehr kleine Fächer-, Bogen- und diagonale Versätze und einen optisch wechselnden Ensemble-Blickfokus. **Kein physischer Partner-Platztausch, keine neuen Singer-Zuordnungen oder erkannten Beats.** Die bestehende Animations-, Fußkontakt- und Kollisionsregie behält Vorrang; manuelle Shows, niedrige GPU-Stufe, Pausen und Reduced Motion deaktivieren den Zusatz. Nutzt einen vorhandenen gemeinsamen Frame-Loop; keine neue Netzwerk-/Govee-Aktion. Die Funktion muss unter **AI Show Designer → V1063 Ensemble Choreography 4.0** aktiviert werden.
+
+Qualitätsprüfungen: `npm run test:v1063`, `npm run test:v1063:types`, `npm run verify:v1063:focused`, `node scripts/v959-source-preflight.cjs`. Vollständiger Next.js-/Playwright-Build über GitHub Actions nach Import.
+
 ## V1062 · Advanced Rap Performance 7.0
 
 Die optionale **Advanced Rap Performance 7.0** erweitert bestehende, bereits verifizierte Rap-Wort-Cues. Sie verfeinert bei GLB-Avataren gestische Betonungen von Kopf, Brust und Armen mit weicher Einschwing-/Ausblendkurve; vorhandene V515-Korrekturen und Clip-/IK-Priorität bleiben erhalten. Der vorhandene V837-Lip-Sync gewinnt winzige additive Rate-Anpassungen für Kiefer, `wide` und `round` sowie minimale Augenbrauen-/Wangenakzente. **Keine** Änderung an `lipsClosed`, manuell gesetzten Visemen, morph targets, Lippen-Quellinformationen, Sängerrollen oder Fußkontakten. Nur bei beobachteten synchronisierten Wörtern, verifiziertem Slot, laufendem Deutschrap/Rap und ausreichender GPU-Qualität aktiv. Die Funktion ist im **AI Show Designer → V1062 Advanced Rap Performance 7.0** abschaltbar und standardmäßig deaktiviert. Keine neuen Ticker, Audio-Abfragen, KI-Dienste, Kameras oder Gerätebefehle.
@@ -3131,3 +3145,51 @@ Siehe `changelog/V1040-AI-SHOW-DESIGNER.md`. Der lokale, regelbasierte Showdesig
 ## V1042 – Intelligent Govee Concert Integration
 
 Der V1040-Showplan kann jetzt optional in der bestehenden Govee-LAN-Autosync-Schleife bis zu vier zugeordnete Leuchten mit dezenten Genre- und Songabschnittsfarben begleiten. Manuelle Regie, Helligkeitsobergrenzen und Vorhandensein der lokalen Bridge bleiben zwingend. Siehe `changelog/V1042-INTELLIGENT-GOVEE-CONCERT-INTEGRATION.md`.
+
+## V1064 · Intelligent Stage Movement
+
+Die optionale **Bühnen-Wege-Regie** steuert kleine, geplante Vor- und Rückbewegungen
+innerhalb der bereits vorhandenen Bühnenzonen für **automatische Gruppen mit 2–4 Avataren**.
+V1064 liest ausschließlich den verifizierten V1040-Showplan; keine zusätzliche BPM-,
+Musik- oder Fußschritt-Erkennung. Jeder Bewegungsweg kehrt nach 16 Sekunden
+in die bestehende Position zurück, ist auf **8 cm seitlich / 16 cm tief** begrenzt,
+und die Zusatzbewegung auf **14 cm pro Sekunde**. V494-Grounding, V508-Kollisionen,
+Bühnenrand und manuelle Besetzung haben Vorrang; keine Spur- oder Platztauschmanöver.
+
+**Aktivierung:** AI Show Designer → V1064 Intelligent Stage Movement
+(standardmäßig ausgeschaltet). Tests: `npm run test:v1064`,
+`npm run test:v1064:types`, `npm run verify:v1064:focused`.
+
+
+## V1065 · AI Performance Director
+
+Die optionale, **lokal und deterministisch** arbeitende Performance-Regie
+koordiniert Kamera, Rap-Gesten/Lip-Sync-Stärke, automatisch geplante
+Avatar-Choreografie, Ensemble- und Bühnenwege. Intro und Zwischenspiel
+werden bewusst ruhiger inszeniert; Strophen fokussieren bestehende Rap-
+Animationen, Hooks/Finale unterstützen die Gruppenregie. Sie verwendet
+ausschließlich den V1040-Showplan und dimmt bestehende automatische
+Effektstärken nur ab; niemals werden Leuchten, Kameras, Bewegungen oder
+Sprachphrasen erfunden oder zusätzlich aktiviert.
+
+**Aktivierung:** AI Show Designer → V1065 AI Performance Director;
+standardmäßig aus. Tests: `npm run test:v1065`,
+`npm run test:v1065:types`, `npm run verify:v1065:focused`.
+
+
+### V1066 · Transforming Stage 3.0
+
+Im **AI Show Designer** den V1040-Showplan erstellen und aktivieren, die
+360°-Arena auswählen, den bestehenden Bühnendeck-Modus auf **Automatisch**
+setzen und **V1066 Transforming Stage 3.0** einschalten. Die äußeren
+Bühnensegmente erhalten dann sanfte Iris-, Kronen-, Helix-, Fächer-, Halo-
+und Bloom-Formationen. V1066 ist standardmäßig aus; manuelle Bühnendeck-Muster
+haben Vorrang. Es bewegt niemals den Boden unter den Avataren.
+
+
+### V1067 · Floating Platform Experience 2.0
+
+Im AI Show Designer aktivierbar: Dekorative Plattformen wechseln zwischen
+Halo-, Wellen-, Treppen-, Orbit- und Finale-Formationen. Der Showplan
+(V1040) ist erforderlich, V1066 kann die Transformation zeitlich synchronisieren.
+Standardmäßig aus; kein Avatar-Transport und keine Govee-Gerätesteuerung.

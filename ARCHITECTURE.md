@@ -1,3 +1,22 @@
+## V1068 · Holographic Concert FX 3.0
+
+Die vorhandenen weltfesten V1039-Hologramm-Ringe und -Kristalle erhalten eine
+optionale Showchoreografie. Bei High/Balanced erzeugt **ein zusätzliches Instanced-Mesh**
+maximal neun einfache, virtuelle Künstler-Silhouetten; keine zusätzlichen GLB-Avatare,
+keine neuen Audio-/Netzwerk-/Govee-/Kamera-Besitzer. Sechs Showlooks basieren auf
+dem lokalen, bearbeitbaren V1040-Plan; vorhandene V1066-/V1067-Phasen können synchronisieren.
+Die Show erzeugt keine echten Song- oder Sänger-Erkennungsdaten. Bei manueller Portalwahl,
+Pause, niedriger Grafikqualität oder Reduced Motion schaltet V1068 ab.
+Aktivierung: AI Show Designer → V1068 Holographic Concert FX 3.0 (standardmäßig AUS).
+Prüfung: `npm run test:v1068`, `npm run test:v1068:types`,
+`npm run verify:v1068:focused`, `node scripts/v959-source-preflight.cjs`.
+
+## V1063 · Ensemble Choreography 4.0
+
+Optionale lokale Ensemble-Regie für die bestehende 360°-Bühne. Sie ergänzt automatische Gruppenformationen (2–4 Avatare) um sehr kleine Fächer-, Bogen- und diagonale Versätze und einen optisch wechselnden Ensemble-Blickfokus. **Kein physischer Partner-Platztausch, keine neuen Singer-Zuordnungen oder erkannten Beats.** Die bestehende Animations-, Fußkontakt- und Kollisionsregie behält Vorrang; manuelle Shows, niedrige GPU-Stufe, Pausen und Reduced Motion deaktivieren den Zusatz. Nutzt einen vorhandenen gemeinsamen Frame-Loop; keine neue Netzwerk-/Govee-Aktion. Die Funktion muss unter **AI Show Designer → V1063 Ensemble Choreography 4.0** aktiviert werden.
+
+Qualitätsprüfungen: `npm run test:v1063`, `npm run test:v1063:types`, `npm run verify:v1063:focused`, `node scripts/v959-source-preflight.cjs`. Vollständiger Next.js-/Playwright-Build über GitHub Actions nach Import.
+
 ## V1062 · Advanced Rap Performance 7.0
 
 Die optionale **Advanced Rap Performance 7.0** erweitert bestehende, bereits verifizierte Rap-Wort-Cues. Sie verfeinert bei GLB-Avataren gestische Betonungen von Kopf, Brust und Armen mit weicher Einschwing-/Ausblendkurve; vorhandene V515-Korrekturen und Clip-/IK-Priorität bleiben erhalten. Der vorhandene V837-Lip-Sync gewinnt winzige additive Rate-Anpassungen für Kiefer, `wide` und `round` sowie minimale Augenbrauen-/Wangenakzente. **Keine** Änderung an `lipsClosed`, manuell gesetzten Visemen, morph targets, Lippen-Quellinformationen, Sängerrollen oder Fußkontakten. Nur bei beobachteten synchronisierten Wörtern, verifiziertem Slot, laufendem Deutschrap/Rap und ausreichender GPU-Qualität aktiv. Die Funktion ist im **AI Show Designer → V1062 Advanced Rap Performance 7.0** abschaltbar und standardmäßig deaktiviert. Keine neuen Ticker, Audio-Abfragen, KI-Dienste, Kameras oder Gerätebefehle.
@@ -1642,7 +1661,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1062
+**Dokumentationsstand:** V1068
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -4561,3 +4580,50 @@ Der V1040-Showplan kann jetzt optional in der bestehenden Govee-LAN-Autosync-Sch
 ## V1043 – Intelligent Show Camera Director
 
 `lib/arena360ShowCameraV1043.ts` plant opt-in-Kameraakzente aus dem lokal generierten V1040-Showplan. Die vorhandenen `StageCameraDirectorV289` und `SmartStageCameraV236` bleiben alleinige Besitzer der Kameraposition. Nach manuellen Presets, Lyrics-, Gesangs-, Duett- und Timeline-Aufnahmen wird nicht eingegriffen. `Reduced Motion`, Pause, unklare Trackposition, fehlender Showplan oder nicht gewählte Arena deaktivieren die Wirkung. Die vier Vorgaben sind Totale, Orbit, Lead und Gruppenaufnahme; Kamerafahrten sind begrenzt und weich geglättet. Keine externen KI-Aufrufe, keine zweite Camera, kein eigener Timer.
+
+
+## V1064 – sichere Bühnenwege
+
+Ein reiner, deterministischer Planer in `lib/arena360StageMovementV1064.ts`
+liefert zusätzliche lokale X/Z-Wegpunkte pro V326-Bühnen-Slot. Die vorhandene
+V494-Fußbeobachtung, V508-Kollisionserkennung, automatische Gruppenbesetzung
+und eine zweite Geometrie-Prüfung müssen die Bewegung freigeben. Der bestehende
+GroupDancers-Frame-Callback begrenzt jede zusätzliche Bewegung auf 14 cm/s.
+V1063 bleibt unabhängig. Keine eigenen Animations- oder Device-Control-Loops,
+kein neuer Mesh-Draw-Call, keine tatsächlichen Slottausche.
+
+
+## V1065 – AI Performance Director
+
+`lib/arena360PerformanceDirectorV1065.ts` ist ein reiner, deterministischer
+Regiemixer mit V1040-Timeline als einziger Quelle. Die vorhandenen V1043/V1047/V1053-
+Kameras, V1041/V1054-Choreografie, V1062-Rap-Animationen und V1063/V1064-
+Ensemble-/Weganimationen behalten ihre eigenen Sicherheitsgrenzen, Besitzer
+und manuellen Vorränge. V1065 skaliert nur Stärken mit Faktoren 0..1.
+Keine zweite Echtzeit-Uhr, Mikrofon-/Spotify-Abfrage, Govee-Steuerung oder
+rekonstruierte Sänger-/Phonemzuordnung.
+
+
+## V1066 – Transforming Stage 3.0
+
+`lib/arena360TransformingStageV1066.ts` liefert deterministische, begrenzte
+Szenen-Posen für die **bestehenden** V1037-Bühnensegmente, ohne die
+Avatar-Mittelplattform oder die Kamera zu bewegen. Eingänge sind ausschließlich
+V1040-Show-Cue und beobachtete Wiedergabeposition. `ArenaTransformingDeckV1037`
+verwendet weiter seinen einzigen `useFrame`-Callback und glättet dort neue
+Petal-Offsets (maximal 6,5 cm radial, 8,5 cm vertikal, 0,045 rad Yaw).
+Automatisch nur bei aktivem Showplan, V1037-Auto-Modus und ausdrücklichem Opt-in;
+manueller Formmodus, Low-Tier und Reduced Motion haben Vorrang. Keine neuen
+Meshes, Physik, Audiosignale, Hardware- oder Govee-Befehle. Die sechs Formtypen
+(Iris, Krone, Helix, Fächer, Halo, Bloom) werden über sieben Kapitel geplant.
+
+
+## V1067 – Floating Platform Experience 2.0
+
+`lib/arena360FloatingExperienceV1067.ts` berechnet deterministische,
+begrenzte zusätzliche Positionen für die vorhandenen dekorativen V1038-Satelliten.
+`ArenaFloatingPlatformsV1038` besitzt weiterhin den einzigen `useFrame`-Callback;
+maximal sechs vorhandene Plattformen, keine weiteren Meshes oder Hardware-Befehle.
+Die V1066-Petalenphase synchronisiert die Bewegung optional. Manuelle Modi,
+Spielpause, reduzierte Bewegung, Grafikqualität und die stabile Avatar-Mittelbühne
+haben Vorrang. Es werden keine echten Sänger/Beat-Ereignisse rekonstruiert.

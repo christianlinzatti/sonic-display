@@ -1,4 +1,5 @@
 "use client";
+import type {EnsembleCueV1063} from '@/lib/arena360EnsembleChoreographyV1063';
 import {getNaturalDuetModeV664} from "./naturalDuetFeatureInteractionV664";
 // Extracted unchanged from ThreeAvatar.tsx (V492 modular refactor).
 // --- Extracted dependencies (V492 refactor) ---
@@ -156,7 +157,7 @@ export function IntelligentChoreographyTickV312({props,settings,onCue}:{props:Vi
 }
 
 /** V142: groups persist across scene changes so animator state and foot anchors survive. */
-export function FormationDancers({props, mode, choreography, performanceV1054, stageInteractionV1055}: {props: VisualizerProps; mode: DuoScene; choreography?: MultiAvatarCue | null; performanceV1054?:AvatarPerformanceCueV1054|null; stageInteractionV1055?:StageInteractionCueV1055|null}) {
+export function FormationDancers({props, mode, choreography, performanceV1054, stageInteractionV1055, ensembleV1063}: {props: VisualizerProps; mode: DuoScene; choreography?: MultiAvatarCue | null; performanceV1054?:AvatarPerformanceCueV1054|null; stageInteractionV1055?:StageInteractionCueV1055|null; ensembleV1063?:EnsembleCueV1063|null}) {
   const lead = useRef<Group>(null);
   const bodyRegistryV507=useRef(createBodyRegistryV507());
   const animatedRegistryV508=useRef(createAnimatedBodyRegistryV508());
@@ -372,19 +373,24 @@ export function FormationDancers({props, mode, choreography, performanceV1054, s
     } else {
       const leadTarget=mode === "solo" ? scene.lead : safe.lead;
       const partnerTarget=mode === "solo" ? scene.partner : safe.partner;
-      update(lead.current,[leadTarget[0],leadTarget[1],leadTarget[2]+duoOffsetV808(0)]);
-      update(partner.current,[partnerTarget[0],partnerTarget[1],partnerTarget[2]+duoOffsetV808(1)]);
+      // V1063 expands only existing side lanes; no crossing or new joint animation.
+      const v1063Active=ensembleV1063?.active===true&&!readFootLockV322().enabled&&
+        !blockingDuoV840.active&&!manualPose&&!ensemble.protectionActive;
+      update(lead.current,[leadTarget[0]+(v1063Active?ensembleV1063!.slots[0].spreadX:0),leadTarget[1],
+        leadTarget[2]+duoOffsetV808(0)+(v1063Active?ensembleV1063!.slots[0].depth:0)]);
+      update(partner.current,[partnerTarget[0]+(v1063Active?ensembleV1063!.slots[1].spreadX:0),partnerTarget[1],
+        partnerTarget[2]+duoOffsetV808(1)+(v1063Active?ensembleV1063!.slots[1].depth:0)]);
     }
     // V312: slight partner-facing invitation during call/response; manual scenes unchanged.
     const interactionStrength = smart && props.isPlaying && !props.reducedMotion ? smart.interactionStrength : 0;
     const leadInvitation = smart?.interactionMode === "exchange" && smart.role === "partner-solo" ? .2 * interactionStrength : 0;
     const partnerInvitation = smart?.interactionMode === "exchange" && smart.role === "lead-solo" ? -.2 * interactionStrength : 0;
     if (lead.current) {
-      lead.current.rotation.y = formationApproach(lead.current.rotation.y, cue.leadYaw + leadInvitation + (ensembleCueV392.current?.yaw[0]??0) + (placementV1055.active ? stageInteractionV1055?.audienceYaw??0 : 0), delta, 3.5);
+      lead.current.rotation.y = formationApproach(lead.current.rotation.y, cue.leadYaw + leadInvitation + (ensembleCueV392.current?.yaw[0]??0) + (placementV1055.active ? stageInteractionV1055?.audienceYaw??0 : 0) + (ensembleV1063?.active&&!readFootLockV322().enabled&&!manualPose&&!ensemble.active&&!blockingDuoV840.active&&!ensemble.protectionActive?ensembleV1063.slots[0].turnY:0), delta, 3.5);
       lead.current.rotation.z = formationApproach(lead.current.rotation.z, -cue.leadLean, delta, 3.5);
     }
     if (partner.current) {
-      partner.current.rotation.y = formationApproach(partner.current.rotation.y, cue.partnerYaw + partnerInvitation + (ensembleCueV392.current?.yaw[1]??0) + (placementV1055.active ? stageInteractionV1055?.audienceYaw??0 : 0), delta, 3.5);
+      partner.current.rotation.y = formationApproach(partner.current.rotation.y, cue.partnerYaw + partnerInvitation + (ensembleCueV392.current?.yaw[1]??0) + (placementV1055.active ? stageInteractionV1055?.audienceYaw??0 : 0) + (ensembleV1063?.active&&!readFootLockV322().enabled&&!manualPose&&!ensemble.active&&!blockingDuoV840.active&&!ensemble.protectionActive?ensembleV1063.slots[1].turnY:0), delta, 3.5);
       partner.current.rotation.z = formationApproach(partner.current.rotation.z, cue.partnerLean, delta, 3.5);
     }
     // V375: stage-root casting only. Manual V325 timelines, authored choreography and

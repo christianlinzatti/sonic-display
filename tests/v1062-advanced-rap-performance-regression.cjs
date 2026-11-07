@@ -88,7 +88,7 @@ for(const f of ['context/UiPreferencesContext.tsx','types/music.ts','components/
  assert(read(f).includes('arenaRapPerformanceEnabledV1062'),f);
 assert(read('context/UiPreferencesContext.tsx').includes('arenaRapPerformanceEnabledV1062:false'));
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1062');assert.equal(pkg.version,lock.version);
+assert(/^0\.1\.0-v\d+$/.test(pkg.version)&&Number(pkg.version.match(/v(\d+)$/)[1])>=1062,'V1062 supported by newer releases');assert.equal(pkg.version,lock.version);
 assert.equal(pkg.version,lock.packages[''].version);
 for(const f of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(f).includes('tests/v1062-advanced-rap-performance-regression.cjs'));
