@@ -7,10 +7,11 @@ function inspectReleaseV1082(root){
  const exists=f=>fs.existsSync(path.join(root,f));
  try{
   const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-  add('version',pkg.version==='0.1.0-v1082'&&pkg.sonicFeatureRelease==='v1082'&&pkg.sonicRoadmapRelease==='v1082');
+  const v=Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1]||0);
+  add('version',v>=1082&&pkg.sonicFeatureRelease==='v'+v&&pkg.sonicRoadmapRelease==='v'+v);
   add('lockfile',pkg.version===lock.version&&pkg.version===lock.packages?.['']?.version);
   add('node24',pkg.engines?.node==='24.x');
-  add('prebuild',pkg.scripts.prebuild.startsWith('npm run test:v1082 && npm run test:v1082:types &&'));
+  add('prebuild',pkg.scripts.prebuild.includes('npm run test:v1082 && npm run test:v1082:types &&'));
   add('focused',pkg.scripts['verify:v1082:focused']?.includes('node scripts/v1082-release-readiness.cjs'));
   add('regression',pkg.scripts['test:v1082']==='node tests/v1082-stage-architecture-regression.cjs');
   add('typecheck',pkg.scripts['test:v1082:types']==='tsc -p tests/tsconfig.v1082-core.json --noEmit');
@@ -35,7 +36,7 @@ function inspectReleaseV1082(root){
    'components/visualizer/ArenaShowDesignerPanelV1040.tsx'])
    add('ui:'+f,read(f).includes('DynamicArchitecture')||read(f).includes('dynamicArchitecture'));
   add('default-disabled',read('context/UiPreferencesContext.tsx').includes('arenaDynamicArchitectureEnabledV1082:false'));
-  add('release-reset',read('components/visualizer/ArenaShowDesignerPanelV1040.tsx').includes('arenaDynamicArchitectureEnabledV1082:false}'));
+  add('release-reset',read('components/visualizer/ArenaShowDesignerPanelV1040.tsx').includes('arenaDynamicArchitectureEnabledV1082:false,'));
   add('production-gate',read('scripts/v931-production-gate.cjs').includes('tests/v1082-stage-architecture-regression.cjs'));
   add('vercel-gate',read('scripts/vercel-production-build.cjs').includes('tests/v1082-stage-architecture-regression.cjs'));
   add('preflight',read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1082(root)'));

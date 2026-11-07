@@ -6,14 +6,16 @@ import type {AudioFeatures} from '@/types/audio';
 import {useAdaptivePerformance} from '../adaptivePerformance';
 import {createLedWallPixelsV1059,sampleLedWallPixelV1059,type LedWallCueV1059} from '@/lib/arena360LedWallV1059';
 import {acceptEpicDropBeatV1069,sampleEpicDropLedAccentV1069,type EpicDropCueV1069} from '@/lib/arena360EpicDropV1069';
+import {sampleLedWallExperienceV1083,type LedExperienceCueV1083} from '@/lib/arena360LedWallExperienceV1083';
+import {ArenaLedLyricsV1083} from './ArenaLedLyricsV1083';
 
 /** One instanced draw call, not a video texture or a wall hiding the singers.
  * An open, low-slung ring of small pixels surrounds the existing arena floor.
  * Matrix positions are static. Only colors change at 8–14 Hz.
  */
-export function ArenaLedWallV1059({audio,playing,reducedMotion,cue,progressMs,epicDropCueV1069}: {
+export function ArenaLedWallV1059({audio,playing,reducedMotion,cue,progressMs,epicDropCueV1069,experienceCueV1083}: {
  audio:AudioFeatures;playing:boolean;reducedMotion:boolean;cue:LedWallCueV1059;progressMs?:number;
- epicDropCueV1069?:EpicDropCueV1069;
+ epicDropCueV1069?:EpicDropCueV1069;experienceCueV1083?:LedExperienceCueV1083;
 }){
  const tier=useAdaptivePerformance().tier;
  const pixels=useMemo(()=>createLedWallPixelsV1059(tier),[tier]);
@@ -71,7 +73,7 @@ export function ArenaLedWallV1059({audio,playing,reducedMotion,cue,progressMs,ep
   const time=(Number.isFinite(progressMs)?Math.max(0,progressMs??0):0)/1000;
   for(let i=0;i<pixels.length;i++){
    const p=pixels[i];
-   const light=sampleLedWallPixelV1059(p,cue,audio,time);
+   const light=experienceCueV1083?.active?sampleLedWallExperienceV1083(p,experienceCueV1083,audio,time):sampleLedWallPixelV1059(p,cue,audio,time);
    tint.copy(p.column%2===0?colorA:colorB).multiplyScalar(light);
    mesh.current.setColorAt(i,tint);
   }
@@ -82,5 +84,6 @@ export function ArenaLedWallV1059({audio,playing,reducedMotion,cue,progressMs,ep
   <instancedMesh ref={mesh} name="v1059-led-wall-pixels" args={[undefined,undefined,pixels.length]} frustumCulled={false}>
    <boxGeometry args={[.24,.18,.085]}/><meshBasicMaterial color="#ffffff" toneMapped={false}/>
   </instancedMesh>
+  {experienceCueV1083?.active&&experienceCueV1083.look==='lyrics'&&<ArenaLedLyricsV1083 cue={experienceCueV1083}/>}
  </group>;
 }

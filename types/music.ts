@@ -110,6 +110,9 @@ export interface UiPreferences {
   arenaHolographicDancersStrengthV1081?:number;
   arenaDynamicArchitectureEnabledV1082?:boolean;
   arenaDynamicArchitectureStrengthV1082?:number;
+  arenaAdvancedLedEnabledV1083?:boolean;
+  arenaAdvancedLedStrengthV1083?:number;
+  arenaAdvancedLedModeV1083?:import('@/lib/arena360LedWallExperienceV1083').LedExperienceModeV1083;
   arenaEpicDropEnabledV1069?:boolean;
   arenaEpicDropStrengthV1069?:number;
   arenaUltimateFinaleEnabledV1070?:boolean;

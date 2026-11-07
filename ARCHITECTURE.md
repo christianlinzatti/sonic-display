@@ -1,3 +1,19 @@
+## V1083 · Advanced LED Wall 5.0
+
+Der reine `planLedWallExperienceV1083` erzeugt Kapitel-Looks und virtuelle
+3D-Tunnel-/Geometrie-/Drop-Muster im vorhandenen V1059-Pixelband. Es werden keine
+neuen LED-Pixel-Draw-Calls erzeugt. Ein separater optionaler und lokaler
+Canvas-Texture-Aufdruck enthält ausschließlich die aktuell gültige Zeile
+synchronisierter Lyrics (maximal 64 Unicode-Zeichen). Auf Songpausen, Seeks und
+ungültige Lyrics reagiert die Projektion mit leeren Inhalten, nicht mit Fantasietext.
+Die einzige CanvasTexture wird bei Wechsel und Unmount freigegeben.
+
+Ein manueller V1059-Look hat Vorrang. V1083 ist opt-in, benötigt V1059 und
+aktivierte Showregie; niedrige Grafikstufe, Reduced Motion und Pause schalten ab.
+Die optische Stärke bleibt durch V1059 auf maximal 0,55 begrenzt. Drop-Akzente
+benötigen einen beobachteten Drop-Abschnitt UND gemessenen Beat/Bass/Energie.
+Keine neuen Audio-/Govee-Hardwarepfade oder Timer.
+
 ## V1082 · Dynamic Stage Architecture
 
 V1082 bringt sechs dynamische **mehrstöckige Kulissenformationen** für die
@@ -1728,7 +1744,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1082
+**Dokumentationsstand:** V1083
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

@@ -1,4 +1,5 @@
 "use client";
+import {currentSyncedLedLyricV1083} from '@/lib/arena360LedWallExperienceV1083';
 import {LiveStageCanvasProbeV592} from "./LiveStageCanvasProbeV592";
 import {LiveGpuMemoryProbeV767} from "./LiveGpuMemoryProbeV767";
 // Extracted unchanged from ThreeAvatar.tsx (V492 modular refactor).
@@ -922,6 +923,12 @@ export function ThreeAvatar(props: VisualizerProps) {
         ledWallEnabledV1059={props.arenaLedWallEnabledV1059 ?? false}
         ledWallStrengthV1059={props.arenaLedWallStrengthV1059 ?? 55}
         ledWallPatternV1059={props.arenaLedWallPatternV1059 ?? "auto"}
+        advancedLedEnabledV1083={props.arenaAdvancedLedEnabledV1083 ?? false}
+        advancedLedStrengthV1083={props.arenaAdvancedLedStrengthV1083 ?? 55}
+        advancedLedModeV1083={props.arenaAdvancedLedModeV1083 ?? 'auto'}
+        // Only an active, synchronized lyric line from the owned player is projected.
+        lyricTextV1083={currentSyncedLedLyricV1083(props.lyricsScene?.lyrics,
+          props.lyricsScene?.progressMs,Boolean(props.lyricsScene?.playing&&props.isPlaying))}
         lightingChoreographerEnabledV1060={props.arenaLightingChoreographerEnabledV1060 ?? false}
         lightingChoreographerStrengthV1060={props.arenaLightingChoreographerStrengthV1060 ?? 55}
         microphoneActiveV1049={props.microphoneActiveV1049 ?? false}

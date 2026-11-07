@@ -69,9 +69,9 @@ for(const genre of ['Deutschrap','Hardtekk','Deutschrock','Pop']){
 }
 assert.equal(count,192000);assert.equal(formationsObserved.size,6);assert.equal(risks,0);
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1082');assert.equal(pkg.version,lock.version);
+assert(Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1]||0)>=1082);assert.equal(pkg.version,lock.version);
 assert.equal(pkg.version,lock.packages[''].version);
-assert(pkg.scripts.prebuild.startsWith('npm run test:v1082 && npm run test:v1082:types'));
+assert(pkg.scripts.prebuild.includes('npm run test:v1082 && npm run test:v1082:types'));
 for(const p of ['types/music.ts','components/visualizer/registry.tsx',
  'context/UiPreferencesContext.tsx','components/visualizer/VisualizerStage.tsx',
  'components/visualizer/ThreeAvatar.tsx','components/visualizer/stages/index.tsx',

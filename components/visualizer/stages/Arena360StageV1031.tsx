@@ -15,6 +15,7 @@ import {planLaserExperienceV1080} from "@/lib/arena360LaserExperienceV1080";
 import {planVolumetricLightingV1058} from '@/lib/arena360VolumetricLightingV1058';
 import {planLedWallV1059,type LedWallPatternV1059} from '@/lib/arena360LedWallV1059';
 import {ArenaLedWallV1059} from './ArenaLedWallV1059';
+import {planLedWallExperienceV1083,type LedExperienceModeV1083} from '@/lib/arena360LedWallExperienceV1083';
 import {planLightingChoreographerV1060} from '@/lib/arena360LightingChoreographerV1060';
 import {ArenaLedDomeV1033} from "./ArenaLedDomeV1033";
 import {ArenaSkyFormationV1034} from "./ArenaSkyFormationV1034";
@@ -90,6 +91,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   intelligentLaserEnabledV1057=false,intelligentLaserStrengthV1057=55,
   volumetricLightingEnabledV1058=false,volumetricLightingStrengthV1058=55,
   ledWallEnabledV1059=false,ledWallStrengthV1059=55,ledWallPatternV1059='auto',
+  advancedLedEnabledV1083=false,advancedLedStrengthV1083=55,advancedLedModeV1083='auto',lyricTextV1083='',
   lightingChoreographerEnabledV1060=false,lightingChoreographerStrengthV1060=55,
   transformingStageEnabledV1066=false,transformingStageStrengthV1066=55,
   floatingExperienceEnabledV1067=false,floatingExperienceStrengthV1067=55,
@@ -125,6 +127,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   intelligentLaserEnabledV1057?:boolean;intelligentLaserStrengthV1057?:number;
   volumetricLightingEnabledV1058?:boolean;volumetricLightingStrengthV1058?:number;
   ledWallEnabledV1059?:boolean;ledWallStrengthV1059?:number;ledWallPatternV1059?:LedWallPatternV1059;
+  advancedLedEnabledV1083?:boolean;advancedLedStrengthV1083?:number;advancedLedModeV1083?:LedExperienceModeV1083;lyricTextV1083?:string;
   lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
   transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
   floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
@@ -341,6 +344,16 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   });
   const flowLedV1071=smartFlowV1071.active&&finaleLedV1070.active?
     {...finaleLedV1070,gain:finaleLedV1070.gain*smartFlowV1071.led}:finaleLedV1070;
+  // V1083 modifies EXISTING V1059 pixel colors and optional verified lyric text only.
+  // Manual V1059 patterns, paused/reduced motion/low GPU, and unverified drops win.
+  const ledExperienceV1083=planLedWallExperienceV1083({
+    enabled:advancedLedEnabledV1083&&ledWallEnabledV1059&&showDesignerEnabled&&showDirectorEnabled,
+    stageIsArena:true,playing:isPlaying,reducedMotion,reactive,
+    performanceTier:getActivePerformanceTier(),manualPattern:ledWallPatternV1059,
+    mode:advancedLedModeV1083,progressMs,durationMs,show:showCueV1040,
+    baseCue:flowLedV1071,strength:advancedLedStrengthV1083,
+    observedSection:section,lyricText:lyricTextV1083,
+  });
   const audienceCueV1044=planArenaAudienceV1044({
     enabled:audienceDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,show:showCueV1040,
     stageIsArena:true,playing:isPlaying,reducedMotion,phoneEnabled:phoneSyncEnabled&&audienceEnabled,
@@ -505,7 +518,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       crowdEnergyCueV1075={crowdEnergyV1075}/>
     <ArenaLedDomeV1033 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={domeEnabled} reactive={reactive}/>
     <ArenaLedWallV1059 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
-      cue={flowLedV1071} progressMs={progressMs}
+      cue={flowLedV1071} progressMs={progressMs} experienceCueV1083={ledExperienceV1083}
       epicDropCueV1069={epicDropV1069}/>
     <ArenaSkyFormationV1034 audio={audio} section={section} playing={isPlaying} reducedMotion={reducedMotion}
       enabled={skyFormationEnabled} directorEnabled={showDirectorEnabled} reactive={reactive}

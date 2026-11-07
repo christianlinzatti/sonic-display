@@ -1,3 +1,12 @@
+## Neu in V1083 · Advanced LED Wall 5.0
+
+Im Arena Show Designer zuerst **V1059 LED-Wand** einschalten, dort **Auto** wählen,
+anschließend **V1083 Advanced LED Wall 5.0** aktivieren. Auswählbar sind
+3D-Tunnel, Geometrie, echte synchronisierte Lyrics und musikalisch bestätigte
+Drop-Visuals. Bei fehlenden Lyrics erscheint Geometrie. Zusätzliche Hardware
+ist dafür nicht erforderlich. Abhängig vom Audiozugriff sind Drop-Effekte
+möglicherweise nicht sichtbar. Rückfall auf V1059 ist durch Ausschalten möglich.
+
 ## V1082 · Dynamic Stage Architecture
 
 V1082 bringt sechs dynamische **mehrstöckige Kulissenformationen** für die
