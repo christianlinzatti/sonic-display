@@ -71,6 +71,10 @@ export interface UiPreferences {
   arenaAvatarPerformanceStrengthV1054?:number;
   arenaStageInteractionEnabledV1055?:boolean;
   arenaStageInteractionStrengthV1055?:number;
+  arenaCinematicLightingEnabledV1056?:boolean;
+  arenaCinematicLightingStrengthV1056?:number;
+  arenaIntelligentLaserEnabledV1057?:boolean;
+  arenaIntelligentLaserStrengthV1057?:number;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;

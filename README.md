@@ -1,3 +1,19 @@
+## V1057 · Intelligent Laser Director
+
+Die bestehende **360°-Konzertbühne** nutzt ihre vorhandenen V1036-Laserfächer und V1039-Lasertunnel für eine neue optionale Laserdramaturgie. Ein selbst erzeugter oder bearbeiteter **V1040-Showplan** lenkt über sieben Kapitel langsam die Fächer, Farbakzente und Tunnel-/Spiral-/Halo-Looks. Ein manuell ausgewähltes Lasermuster hat weiterhin Vorrang; die geplanten Szenen simulieren **keine erkannten Echtzeit-Drops**.
+
+**Aktivierung:** Display → AI Show Designer → Showplan aktivieren; V1036-Laser und V1039-Laserarchitektur einschalten; **V1057 Intelligent Laser Director** separat einschalten und Stärke zwischen 0 und 80 % wählen. Standardmäßig ausgeschaltet. Bei Pause, unplausiblen Songzeiten, niedrigem Grafikbudget, reduzierter Bewegung oder deaktivierten Effekten inaktiv. Keine zusätzlichen Shader-/Laser-Batches, Hardware-Laser, Govee-Befehle, Strobes oder externe APIs.
+
+Technische Dateien: `lib/arena360IntelligentLaserV1057.ts`, `components/visualizer/stages/ArenaLaserFansV1036.tsx`, `components/visualizer/stages/ArenaLaserTunnelsV1039.tsx`, `tests/v1057-intelligent-laser-regression.cjs`, `changelog/V1057-INTELLIGENT-LASER-DIRECTOR.md`.
+
+## V1056 · Cinematic Concert Lighting 2.0
+
+Die bestehende 360°-Bühne nutzt ihre **zwei vorhandenen V1032-Verfolger-Spots** jetzt auf Wunsch als filmische Lichtregie. Die Positionen der wirklich gerenderten Avatare werden direkt aus der Three.js-Szene ermittelt (auch während sich die Rundbühne dreht); bei nicht vorhandenen oder unsichtbaren Darstellern gelten die herkömmlichen Lichtziele. Die sieben V1040-Showkapitel steuern sanfte Farbwechsel, Duo-Fokus, Totalen und zurückhaltende Beleuchtungsakzente. Die jeweiligen Akzente sind **geplante Szenen, keine künstlich erkannten Beats oder Gesangsrollen**.
+
+**Aktivierung:** 360°-Bühne wählen, AI Show Designer und V1040-Showplan aktivieren, vorhandene V1032-Bühnenlichter einschalten; danach **V1056 Cinematic Concert Lighting 2.0** separat aktivieren und Stärke (0–80 %) wählen. V1056 ist standardmäßig deaktiviert. Pausen, reduzierte Bewegung, niedriger Grafikmodus, unzuverlässige Songzeiten, deaktivierte Lichter und ungültige Pläne schalten den Zusatz aus. Keine neuen Leuchten, Schatten, Kamera, Netzwerkverbindungen, Mikrofonnutzung oder Govee-Befehle. Die Farbe und Zielpositionen ändern sich sanft; vorhandene Qualitätsgrenzen und manuellen Einstellungen bleiben erhalten.
+
+Technische Quellen: `lib/arena360CinematicLightingV1056.ts`, `components/visualizer/stages/ArenaLightsV1032.tsx`, `tests/v1056-cinematic-lighting-regression.cjs`, `changelog/V1056-CINEMATIC-CONCERT-LIGHTING-2.md`. Verifikation: `npm run verify:v1056:focused`; GitHub Actions baut auf Node 24 zusätzlich TypeScript, Next.js und Playwright.
+
 ## V1055 · Dynamic Concert Stage & Avatar Interaction Engine
 
 Eine neue optionale Arena-Regie erweitert die automatischen **prozeduralen Duos** um

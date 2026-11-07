@@ -173,6 +173,10 @@ export interface VisualizerProps {
   arenaAvatarPerformanceStrengthV1054?:number;
   arenaStageInteractionEnabledV1055?:boolean;
   arenaStageInteractionStrengthV1055?:number;
+  arenaCinematicLightingEnabledV1056?:boolean;
+  arenaCinematicLightingStrengthV1056?:number;
+  arenaIntelligentLaserEnabledV1057?:boolean;
+  arenaIntelligentLaserStrengthV1057?:number;
   dancePostEnabledV468?: boolean;
   shaderEnvironmentV468?: import('./ProceduralShaderEnvironmentV468').ShaderEnvironmentModeV468;
   wardrobeModeV468?: import('./avatarWardrobeV468').WardrobeModeV468;

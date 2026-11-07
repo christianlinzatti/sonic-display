@@ -748,6 +748,10 @@ export function ThreeAvatar(props: VisualizerProps) {
         crowdExperienceStrengthV1051={(props.arenaCrowdExperienceStrengthV1051 ?? 55)*stageInteractionV1055.crowdGain}
         ultimateConcertEnabledV1052={props.arenaUltimateConcertEnabledV1052 ?? false}
         ultimateConcertStrengthV1052={props.arenaUltimateConcertStrengthV1052 ?? 60}
+        cinematicLightingEnabledV1056={props.arenaCinematicLightingEnabledV1056 ?? false}
+        cinematicLightingStrengthV1056={props.arenaCinematicLightingStrengthV1056 ?? 55}
+        intelligentLaserEnabledV1057={props.arenaIntelligentLaserEnabledV1057 ?? false}
+        intelligentLaserStrengthV1057={props.arenaIntelligentLaserStrengthV1057 ?? 55}
         microphoneActiveV1049={props.microphoneActiveV1049 ?? false}
         trackId={props.track?.id}
         genre={props.genre}

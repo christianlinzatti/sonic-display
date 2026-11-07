@@ -154,6 +154,47 @@ export function ArenaShowDesignerPanelV1040(){
     Bei Pause, reduzierter Bewegung oder niedrigem Grafikprofil wird die
     Zusatzregie ausgeschaltet.</small>
   </fieldset>
+  <fieldset className="arena-v1057-intelligent-laser" aria-label="V1057 Intelligent Laser Director">
+   <legend>V1057 · Intelligent Laser Director</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaIntelligentLaserEnabledV1057)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaIntelligentLaserEnabledV1057:e.target.checked})}/>
+    Laserfächer, Spiralen und Tunnel mit der geplanten Showdramaturgie synchronisieren
+   </label>
+   <label>Laserregie-Intensität: {preferences.arenaIntelligentLaserStrengthV1057??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaIntelligentLaserEnabledV1057}
+     value={preferences.arenaIntelligentLaserStrengthV1057??55}
+     onChange={e=>updatePreferences({arenaIntelligentLaserStrengthV1057:Number(e.target.value)})}/>
+   </label>
+   <small>V1057 steuert ausschließlich die bereits vorhandenen virtuellen V1036-Laserfächer
+    und V1039-Lasertunnel. Farben und langsame Schwenks folgen sieben geplanten
+    Showkapiteln; manuell gewählte Lasermuster behalten Vorrang. Die Planung ist
+    keine Echtzeit-Erkennung von Drops oder Gesangsrollen. Keine zusätzlichen
+    GPU-Objekte, physischen Laser, Blitze oder Govee-Kommandos. Bei Pause,
+    reduzierter Bewegung oder niedriger Grafikqualität bleibt V1057 inaktiv.</small>
+  </fieldset>
+  <fieldset className="arena-v1056-cinematic-lighting" aria-label="V1056 Cinematic Concert Lighting 2.0">
+   <legend>V1056 · Cinematic Concert Lighting 2.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaCinematicLightingEnabledV1056)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaCinematicLightingEnabledV1056:e.target.checked})}/>
+    Verfolger-Spots und sanfte Lichtwechsel passend zur geplanten Konzertshow
+   </label>
+   <label>Lichtregie-Intensität: {preferences.arenaCinematicLightingStrengthV1056??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaCinematicLightingEnabledV1056}
+     value={preferences.arenaCinematicLightingStrengthV1056??55}
+     onChange={e=>updatePreferences({arenaCinematicLightingStrengthV1056:Number(e.target.value)})}/>
+   </label>
+   <small>V1056 nutzt nur die zwei vorhandenen V1032-Verfolger-Spots: Eine tatsächlich
+    gerenderte Sängerposition auf der rotierenden Bühne bestimmt den Fokus, bei
+    fehlendem Avatar gelten die bisherigen Bühnenziele. Songabhängige, weiche
+    Lichtfarben und Gruppenszenen ergänzen den siebenaktigen Showplan – keine
+    Erkennung erfundener Beats und keine zusätzlichen Govee-Befehle. Lichtstärke,
+    Grafikbudget und deaktivierte Leuchten behalten Vorrang. Bei Pause, reduzierter
+    Bewegung oder niedrigem Grafikprofil ist die Zusatzregie aus.</small>
+  </fieldset>
   <fieldset className="arena-v1055-stage-interaction" aria-label="V1055 Dynamic Concert Stage & Avatar Interaction">
    <legend>V1055 · Dynamic Concert Stage & Avatar Interaction</legend>
    <label className="setting-check"><input type="checkbox"
@@ -379,7 +420,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

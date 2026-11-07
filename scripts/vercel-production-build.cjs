@@ -31,6 +31,8 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1057 Intelligent Laser Director','tests/v1057-intelligent-laser-regression.cjs');
+  run('V1056 Cinematic Concert Lighting 2.0','tests/v1056-cinematic-lighting-regression.cjs');
   run('V1055 Dynamic Concert Stage & Avatar Interaction','tests/v1055-stage-interaction-regression.cjs');
   run('V1054 Advanced Avatar Performance Intelligence','tests/v1054-avatar-performance-regression.cjs',
   'tests/v1053-cinematic-camera-regression.cjs',

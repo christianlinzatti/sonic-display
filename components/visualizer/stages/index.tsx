@@ -180,7 +180,9 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
   liveConcertEnabledV1049,liveConcertStrengthV1049,microphoneActiveV1049,
   storytellingEnabledV1050,storytellingStrengthV1050,
   crowdExperienceEnabledV1051,crowdExperienceStrengthV1051,
-  ultimateConcertEnabledV1052,ultimateConcertStrengthV1052,trackId,genre, ...props }:
+  ultimateConcertEnabledV1052,ultimateConcertStrengthV1052,
+  cinematicLightingEnabledV1056,cinematicLightingStrengthV1056,
+  intelligentLaserEnabledV1057,intelligentLaserStrengthV1057,trackId,genre, ...props }:
   Props & { theme: StageEnvironmentId; children?: React.ReactNode; rotationSpeed?: number; rotationEnabled?: boolean;
     audienceEnabled?: boolean; lightsEnabled?: boolean; dropEnabled?: boolean;
     wavesEnabled?:boolean;phoneSyncEnabled?:boolean;phoneMode?:import("@/lib/arena360ImmersionV1033").ArenaPhoneModeV1033;domeEnabled?:boolean;
@@ -204,6 +206,8 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     storytellingEnabledV1050?:boolean;storytellingStrengthV1050?:number;
     crowdExperienceEnabledV1051?:boolean;crowdExperienceStrengthV1051?:number;
     ultimateConcertEnabledV1052?:boolean;ultimateConcertStrengthV1052?:number;
+    cinematicLightingEnabledV1056?:boolean;cinematicLightingStrengthV1056?:number;
+    intelligentLaserEnabledV1057?:boolean;intelligentLaserStrengthV1057?:number;
     trackId?:string|null;genre?:string|null }) {
   if (theme === "arena360") {
     return <Arena360StageV1031 {...props} rotationSpeed={rotationSpeed} rotationEnabled={rotationEnabled}
@@ -231,6 +235,10 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       storytellingEnabledV1050={storytellingEnabledV1050} storytellingStrengthV1050={storytellingStrengthV1050}
       crowdExperienceEnabledV1051={crowdExperienceEnabledV1051} crowdExperienceStrengthV1051={crowdExperienceStrengthV1051}
       ultimateConcertEnabledV1052={ultimateConcertEnabledV1052} ultimateConcertStrengthV1052={ultimateConcertStrengthV1052}
+      cinematicLightingEnabledV1056={cinematicLightingEnabledV1056}
+      cinematicLightingStrengthV1056={cinematicLightingStrengthV1056}
+      intelligentLaserEnabledV1057={intelligentLaserEnabledV1057}
+      intelligentLaserStrengthV1057={intelligentLaserStrengthV1057}
       trackId={trackId} genre={genre}>
       {children}
     </Arena360StageV1031>;

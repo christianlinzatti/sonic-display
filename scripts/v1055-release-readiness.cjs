@@ -11,7 +11,7 @@ function inspectReleaseV1055(root){
   add('version',!!version&&Number(version[1])>=1055&&p.sonicRoadmapRelease==='v'+version[1]&&p.sonicFeatureRelease==='v'+version[1]);
   add('lockfile',p.version===l.version&&p.version===l.packages?.['']?.version);
   add('Node 24 CI',p.engines?.node==='24.x');
-  add('new tests first',pre.startsWith('npm run test:v1055 && npm run test:v1055:types && npm run test:v1054'));
+  add('new tests first',pre.includes('npm run test:v1055 && npm run test:v1055:types && npm run test:v1054'));
   add('previous focused chain retained',p.scripts['verify:v1055:focused'].includes('verify:v1054:focused'));
   for(const f of ['lib/arena360StageInteractionV1055.ts','tests/v1055-stage-interaction-regression.cjs',
    'tests/tsconfig.v1055-core.json','scripts/v1055-release-readiness.cjs',
@@ -28,7 +28,7 @@ function inspectReleaseV1055(root){
   add('production gate',read('scripts/v931-production-gate.cjs').includes('tests/v1055-stage-interaction-regression.cjs'));
   add('Vercel gate',read('scripts/vercel-production-build.cjs').includes('tests/v1055-stage-interaction-regression.cjs'));
   add('preflight release inspection',read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1055'));
-  add('documentation',read('ARCHITECTURE.md').includes('**Dokumentationsstand:** V1055'));
+  add('documentation',Number(/\*\*Dokumentationsstand:\*\* V(\d+)/.exec(read('ARCHITECTURE.md'))?.[1])>=1055);
   add('pure planner',!/(fetch\(|setInterval\(|setTimeout\(|Math\.random\(|WebSocket\(|new AnimationMixer|Date\.now\(|localStorage)/.test(read('lib/arena360StageInteractionV1055.ts')));
  }catch(error){console.error(error);add('readability',false);}
  return {checks,passed:checks.length>=20&&checks.every(c=>c.ok)};

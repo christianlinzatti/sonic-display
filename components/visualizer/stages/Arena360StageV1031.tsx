@@ -9,6 +9,8 @@ import {getActivePerformanceTier} from "../adaptivePerformance";
 import {normalizedArenaSpeedV1031, stepArenaRotationV1031} from "@/lib/arena360RotationV1031";
 import {ArenaAudienceV1032} from "./ArenaAudienceV1032";
 import {ArenaLightsV1032} from "./ArenaLightsV1032";
+import {planCinematicLightingV1056} from "@/lib/arena360CinematicLightingV1056";
+import {planIntelligentLaserV1057} from "@/lib/arena360IntelligentLaserV1057";
 import {ArenaLedDomeV1033} from "./ArenaLedDomeV1033";
 import {ArenaSkyFormationV1034} from "./ArenaSkyFormationV1034";
 import {ArenaLedColumnsV1035} from "./ArenaLedColumnsV1035";
@@ -64,7 +66,9 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   liveConcertEnabledV1049=false,liveConcertStrengthV1049=50,microphoneActiveV1049=false,
   storytellingEnabledV1050=false,storytellingStrengthV1050=55,
   crowdExperienceEnabledV1051=false,crowdExperienceStrengthV1051=55,
-  ultimateConcertEnabledV1052=false,ultimateConcertStrengthV1052=60,trackId,genre}: {
+  ultimateConcertEnabledV1052=false,ultimateConcertStrengthV1052=60,
+  cinematicLightingEnabledV1056=false,cinematicLightingStrengthV1056=55,
+  intelligentLaserEnabledV1057=false,intelligentLaserStrengthV1057=55,trackId,genre}: {
   children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
   reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
   audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
@@ -84,7 +88,10 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   liveConcertEnabledV1049?:boolean;liveConcertStrengthV1049?:number;microphoneActiveV1049?:boolean;
   storytellingEnabledV1050?:boolean;storytellingStrengthV1050?:number;
   crowdExperienceEnabledV1051?:boolean;crowdExperienceStrengthV1051?:number;
-  ultimateConcertEnabledV1052?:boolean;ultimateConcertStrengthV1052?:number;trackId?:string|null;genre?:string|null;
+  ultimateConcertEnabledV1052?:boolean;ultimateConcertStrengthV1052?:number;
+  cinematicLightingEnabledV1056?:boolean;cinematicLightingStrengthV1056?:number;
+  intelligentLaserEnabledV1057?:boolean;intelligentLaserStrengthV1057?:number;
+  trackId?:string|null;genre?:string|null;
 }){
   const turntable=useRef<Group>(null);
   const scenicTier=useRef<Group>(null);
@@ -124,6 +131,19 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     strength:ultimateConcertStrengthV1052,performanceTier:getActivePerformanceTier(),
   });
   const showCueV1040=ultimateConcertV1052.show;
+  const cinematicLightingV1056=planCinematicLightingV1056({
+    enabled:cinematicLightingEnabledV1056&&showDesignerEnabled&&showDirectorEnabled,
+    lightsEnabled,stageIsArena:true,playing:isPlaying,reducedMotion,reactive,
+    show:showCueV1040,plan:showPlan,trackId,progressMs,durationMs,
+    strength:cinematicLightingStrengthV1056,performanceTier:getActivePerformanceTier(),
+  });
+  const intelligentLaserV1057=planIntelligentLaserV1057({
+    enabled:intelligentLaserEnabledV1057&&showDesignerEnabled&&showDirectorEnabled,
+    stageIsArena:true,fanEnabled:lasersEnabled,architectureEnabled:laserArchitectureEnabled&&lasersEnabled,
+    playing:isPlaying,reducedMotion,reactive,
+    show:showCueV1040,plan:showPlan,trackId,progressMs,durationMs,
+    strength:intelligentLaserStrengthV1057,performanceTier:getActivePerformanceTier(),
+  });
   const audienceCueV1044=planArenaAudienceV1044({
     enabled:audienceDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,show:showCueV1040,
     stageIsArena:true,playing:isPlaying,reducedMotion,phoneEnabled:phoneSyncEnabled&&audienceEnabled,
@@ -280,7 +300,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       progressMs={progressMs} durationMs={durationMs} section={section} intensity={plannedIntensity}/>
     <ArenaLaserFansV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={lasersEnabled} directorEnabled={showDirectorEnabled} section={section}
-      progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045} finaleV1046={finaleV1046}/>
+      progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045} finaleV1046={finaleV1046}
+      laserCueV1057={intelligentLaserV1057}/>
     <ArenaMovingLedSkyV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={movingSkyEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}/>
@@ -297,11 +318,14 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}/>
     <ArenaLaserTunnelsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={laserArchitectureEnabled&&showDirectorEnabled&&lasersEnabled}
-      genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}/>
+      genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}
+      laserCueV1057={intelligentLaserV1057}/>
     <ArenaFloatingPlatformsV1038 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={floatingStageEnabled} mode={plannedFloat}
       intensity={plannedFloatStrength} section={section}/>
-    <ArenaLightsV1032 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={lightsEnabled} dropEnabled={dropEnabled} reactive={reactive}/>
+    <ArenaLightsV1032 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
+      enabled={lightsEnabled} dropEnabled={dropEnabled} reactive={reactive}
+      lightCueV1056={cinematicLightingV1056}/>
     {/* The turntable and the performer root share precisely the same transform. */}
     <group ref={turntable} name="v1031-rotating-platform-and-cast">
       <mesh position={[0,-1.99,0]}>
