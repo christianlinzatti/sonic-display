@@ -98,7 +98,8 @@ assert.deepEqual(JSON.parse(JSON.stringify(dance.normalizeDanceV1024({strength:2
 // Integration: one existing frame loop; downstream V839 still owns contact + IK.
 const avatar=read('components/visualizer/GltfDancerAvatarV492.tsx');
 for(const needle of ['const danceStateV1024=useRef(createDanceStateV1024());',
- 'stepDanceChoreographyV1024(danceStateV1024.current,baseDebugMotionV1024',
+ 'refineNaturalDanceV1078(baseDebugMotionV1024,',
+ 'stepDanceChoreographyV1024(danceStateV1024.current,naturalDanceV1078.motion',
  'const debugMotion = overlayNaturalMotionV1061(danceV1024.motion,naturalCueV1061);',
  'refineNaturalFootworkRigV839(naturalFootworkV839.current,debugMotion',
  'applyAvatarRigMotion(rigTargets.current, footworkV839.motion',

@@ -31,6 +31,7 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1078 Natural Dance Intelligence 4.0','tests/v1078-natural-dance-intelligence-regression.cjs');
   run('V1077 Duet Performance 3.0','tests/v1077-duet-performance-regression.cjs');
   run('V1076 Advanced Rap Gestures 8.0','tests/v1076-advanced-rap-gestures-regression.cjs');
   run('V1075 Crowd Energy Engine','tests/v1075-crowd-energy-regression.cjs');

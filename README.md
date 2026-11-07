@@ -3270,3 +3270,12 @@ bereits **manuell zugewiesener** V385/V416-Sängerrollen und tatsächlich
 synchronisierter Wörter. Sie weist keine Sänger selbst zu. Clip-/Lippen-
 und Fußsteuerung bleiben unverändert, bei Pause oder manueller Animation
 hat der Benutzer Vorrang. Tests: `npm run verify:v1077:focused`.
+
+### V1078 – Natural Dance Intelligence 4.0
+
+Optionale Tanz-Feinabstimmung für GLB-Avatare im **AI Show Designer**:
+vier musikalische Motive, sanftere Übergänge, dezente Hüft-/Schulterakzente
+und kleine vorhandene Fuß-/Gewichts-Grooves. Keine neuen Schrittanimationen.
+Für Fußbewegungen sind stabile IK-Kontakte erforderlich; manuelle Clips,
+Low-GPU, Pause und Reduced Motion sperren V1078. Tests:
+`npm run verify:v1078:focused`.

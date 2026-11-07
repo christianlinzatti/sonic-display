@@ -102,6 +102,7 @@ import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUti
 import {disposeClonedAvatarSkeletonsV654} from "./disposeClonedAvatarSkeletonsV654";
 import type { VisualizerProps } from "./registry";
 import {planNaturalMotionV1061,overlayNaturalMotionV1061} from "@/lib/naturalAvatarMotionV1061";
+import {refineNaturalDanceV1078} from "@/lib/naturalDanceIntelligenceV1078";
 import {sampleAvatarAudienceInteractionV1074,blendAvatarAudiencePoseV1074,
  ZERO_AVATAR_AUDIENCE_POSE_V1074} from '@/lib/arena360AvatarAudienceInteractionV1074';
 import { VocalRigV368 } from "./VocalRigV368";
@@ -174,7 +175,7 @@ export function SharedEmbeddedAvatarV531(props: VisualizerProps & {workloadSlot?
   return <GltfAvatar {...props} importedClips={source.animations} importedAnimationScene={source.scene} sharedMotionV531 />;
 }
 
-export function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, sharedMotionV531=false, url, assetUrl, audio, isPlaying, reducedMotion, genre, genreFusion, stagePalette, wardrobeModeV468, wardrobeColorV468, wardrobePatternV468, wardrobeGlowV468, audioMotionEnabledV468, audioMotionStrengthV468, avatarModelId, avatarScale = 1, avatarOffsetY = 0, avatarAnimationIntensity = 1, avatarRigProfile = "auto", preferredMotionUrlV440, avatarDancePreset = "auto", danceAggression = 0.5, danceVariation = 0.5, danceMotionStyle = "balanced", avatarMotionMode = "hybrid", smartDanceEnabled = false, smartDanceOverride = "", avatarClipSpeed = 1, avatarBlendEnabled = false, avatarBlendClip = "", avatarBlendWeight = 0.3, avatarBlendSpeed = 1, avatarBlendAutoEnergy = false, avatarBlendBpmSync = false, avatarBlendReferenceBpm = 120, avatarBlendSmoothing = 0.28, avatarBlendCurve = "smooth", avatarBlendMask = "full", avatarCrossfadeSeconds = 0.35, avatarArmResponse = 1, avatarLegResponse = 1, avatarFootIKEnabled = true, avatarFootIKStrength = 70, avatarFootIKContact = 50, avatarFootIKLock = 50, arenaNaturalMotionEnabledV1061=false, arenaNaturalMotionStrengthV1061=55, arenaRapPerformanceEnabledV1062=false, arenaRapPerformanceStrengthV1062=55, arenaRapGesturesEnabledV1076=false, arenaRapGesturesStrengthV1076=55, arenaDuetPerformanceEnabledV1077=false, arenaDuetPerformanceStrengthV1077=55, arenaAvatarAudienceCueV1074, stageTheme, cameraDirectorSection, cameraDirectorProgressMs, track, autonomousShowPhraseV356, showCue, lipSync: propsLipSyncV367, ensembleCountV745, workloadSlot = 0 }: VisualizerProps & { url: string; assetUrl?: string; importedClips?: AnimationClip[]; importedAnimationScene?: Group; animationUrl?: string; sharedMotionV531?:boolean; avatarRigProfile?: AvatarRigProfileId; workloadSlot?: number }) {
+export function GltfAvatar({ importedClips = [], importedAnimationScene, animationUrl, sharedMotionV531=false, url, assetUrl, audio, isPlaying, reducedMotion, genre, genreFusion, stagePalette, wardrobeModeV468, wardrobeColorV468, wardrobePatternV468, wardrobeGlowV468, audioMotionEnabledV468, audioMotionStrengthV468, avatarModelId, avatarScale = 1, avatarOffsetY = 0, avatarAnimationIntensity = 1, avatarRigProfile = "auto", preferredMotionUrlV440, avatarDancePreset = "auto", danceAggression = 0.5, danceVariation = 0.5, danceMotionStyle = "balanced", avatarMotionMode = "hybrid", smartDanceEnabled = false, smartDanceOverride = "", avatarClipSpeed = 1, avatarBlendEnabled = false, avatarBlendClip = "", avatarBlendWeight = 0.3, avatarBlendSpeed = 1, avatarBlendAutoEnergy = false, avatarBlendBpmSync = false, avatarBlendReferenceBpm = 120, avatarBlendSmoothing = 0.28, avatarBlendCurve = "smooth", avatarBlendMask = "full", avatarCrossfadeSeconds = 0.35, avatarArmResponse = 1, avatarLegResponse = 1, avatarFootIKEnabled = true, avatarFootIKStrength = 70, avatarFootIKContact = 50, avatarFootIKLock = 50, arenaNaturalMotionEnabledV1061=false, arenaNaturalMotionStrengthV1061=55, arenaRapPerformanceEnabledV1062=false, arenaRapPerformanceStrengthV1062=55, arenaRapGesturesEnabledV1076=false, arenaRapGesturesStrengthV1076=55, arenaDuetPerformanceEnabledV1077=false, arenaDuetPerformanceStrengthV1077=55, arenaNaturalDanceEnabledV1078=false, arenaNaturalDanceStrengthV1078=55, arenaAvatarAudienceCueV1074, stageTheme, cameraDirectorSection, cameraDirectorProgressMs, track, autonomousShowPhraseV356, showCue, lipSync: propsLipSyncV367, ensembleCountV745, workloadSlot = 0 }: VisualizerProps & { url: string; assetUrl?: string; importedClips?: AnimationClip[]; importedAnimationScene?: Group; animationUrl?: string; sharedMotionV531?:boolean; avatarRigProfile?: AvatarRigProfileId; workloadSlot?: number }) {
   const schedulerInstance = useId();
   useEffect(() => () => releaseAvatarFrame(schedulerInstance), [schedulerInstance]);
   useEffect(() => () => releaseScheduledInstance(schedulerInstance), [schedulerInstance]);
@@ -1156,7 +1157,27 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     // V1024: phrase variety from the existing music clock, applied to already
     // calculated upper-body overlays. V839 remains the final additive footwork
     // guardian; mixer clips, root motion, IK anchors and lips are never changed.
-    const danceV1024=stepDanceChoreographyV1024(danceStateV1024.current,baseDebugMotionV1024,{
+    // V1078: sub-step groove variation uses existing audio/IK evidence.
+    // This stays BEFORE V1024's phrase crossfade and V839's final Foot-IK guard.
+    const naturalDanceV1078=refineNaturalDanceV1078(baseDebugMotionV1024,{
+      enabled:arenaNaturalDanceEnabledV1078&&stageTheme==='arena360',
+      strength:arenaNaturalDanceStrengthV1078,trackId:track?.id,
+      seconds:cameraDirectorProgressMs===undefined?NaN:cameraDirectorProgressMs/1000,
+      bpm:audio.bpm,genre,section:showCue?.enabled?showCue.section:performance.section,
+      energy:audio.energyEnvelope??0,beat:audio.beatStrength??0,snare:audio.snare??0,
+      playing:isPlaying,reducedMotion,
+      manualPriority:hipManualPriorityV735||!!stableLibraryClip||!!activeSequence||
+        !!activeLoop||timelineEnabled||avatarBlendEnabled||!!smartDanceOverride||
+        !!clipChoiceV328||!!phraseChoiceV329||!!rapLiveEnabledV412||
+        (!!lowClipV481&&selectedClip===lowClipV481),
+      quality:getActivePerformanceTier(),qualityGain:propsLipSyncV367?.qualityDanceGainV750??1,
+      footIKEnabled:avatarFootIKEnabled,contactKnown:!!footIK.current.left&&!!footIK.current.right,
+      plantedLeft:footIK.current.left?.contact.phase==='planted',
+      plantedRight:footIK.current.right?.contact.phase==='planted',
+      slot:Math.max(0,Math.min(3,workloadSlot??0)),
+      count:Math.max(1,Math.min(4,ensembleCountV745??Math.max(workloadSlot+1,propsLipSyncV367?.ensembleCountV374??1))),
+    });
+    const danceV1024=stepDanceChoreographyV1024(danceStateV1024.current,naturalDanceV1078.motion,{
       trackId:track?.id,modelId:avatarModelId??url,
       seconds:updateDanceSongClock(danceSongClockV307.current,{trackId:track?.id,
         progressMs:cameraDirectorProgressMs,elapsed:state.clock.elapsedTime,playing:isPlaying}),

@@ -108,6 +108,6 @@ for(const forbidden of [/fetch\(/, /Math\.random\(/, /Date\.now\(/, /setTimeout
 for(const file of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(file).includes('tests/v1077-duet-performance-regression.cjs'),file);
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1077');
+assert(/^0\.1\.0-v\d+$/.test(pkg.version)&&Number(pkg.version.split('-v')[1])>=1077);
 assert.equal(lock.version,pkg.version);assert.equal(lock.packages[''].version,pkg.version);
 console.log(`PASS V1077: ${count.toLocaleString('en-US')} duet probes, verified singer casting, lead/reply/hooks, manual priority, zero role/IK/lip changes`);

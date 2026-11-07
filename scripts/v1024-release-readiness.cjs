@@ -20,7 +20,10 @@ function inspectReleaseV1024(root){
    'tests/v1024-ai-dance-choreography-regression.cjs',
    'changelog/V1024-AI-DANCE-CHOREOGRAPHY-4.md'])check('file:'+p,exists(p));
   const rig=read('components/visualizer/GltfDancerAvatarV492.tsx');
-  check('frame-integrated',rig.includes('stepDanceChoreographyV1024(danceStateV1024.current,baseDebugMotionV1024'));
+  check('frame-integrated',rig.includes('stepDanceChoreographyV1024(danceStateV1024.current,baseDebugMotionV1024')||
+    (rig.includes('stepDanceChoreographyV1024(danceStateV1024.current,naturalDanceV1078.motion')&&
+     rig.includes('refineNaturalDanceV1078(baseDebugMotionV1024,')&&
+     rig.indexOf('refineNaturalDanceV1078(baseDebugMotionV1024,')<rig.indexOf('stepDanceChoreographyV1024(')));
   check('ik-later',rig.indexOf('stepDanceChoreographyV1024(danceStateV1024.current')<rig.indexOf('updateFootGrounding({delta'));
   for(const p of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
    check('mandatory:'+p,read(p).includes('tests/v1024-ai-dance-choreography-regression.cjs'));

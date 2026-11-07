@@ -1682,7 +1682,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1077
+**Dokumentationsstand:** V1078
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -2191,7 +2191,7 @@ Neue Fußkontakte führen unmittelbar zur Reduktion additiver Fußrotationen. De
 `services/show/liveConcertComparisonV544.ts` ergänzt eine reine A/B-Projektionsanalyse auf der bereits opt-in etwa sekündlich messenden V466-WebGL-Qualitätsprobe. `components/visualizer/ConcertVisualCompareV544.tsx` ist unter dem bestehenden QA-Knopf erreichbar und speichert maximal zwei manuell aufgenommene Momentaufnahmen (A/B) im React-UI-Zustand; die Schemabilder verwenden echte normalisierte Kopf- und Lyrics-Rechtecke und zeigen die vorhandenen FPS an, **keine Pixel/Fotos und keine optische Gesichts-/Tanzprüfung**. Der Anwender markiert Fußarbeit, Gesicht/Lip-Sync und Lyrics getrennt; `createComparisonReportV544` exportiert auf Klick einen JSON-Bericht, keine Auto-Freigabe. Bildrand-/Lyrics-Nähe werden heuristisch beurteilt, nicht über Objekt-Okklusion. Original-Bühnenkamera, Motion, Beleuchtung, GLBs, FPS-Messintervall und QA-Gating bleiben unangetastet. `tests/v544-visual-quality-regression.cjs`, `tests/tsconfig.v544-core.json`. Der Next.js-Build braucht vollständig installierte Abhängigkeiten.
 
 
-> **Dokumentationsstand:** V1077 (28.10.2026)
+> **Dokumentationsstand:** V1078 (28.10.2026)
 
 ## V539 – Multi-Avatar Concert Interaction 5.0
 
@@ -3672,7 +3672,7 @@ Details: `docs/versions/V802-INTELLIGENT-CONCERT-IMPROVEMENT-ASSISTANT.md`.
 
 `components/visualizer/naturalMultiArtistStageInteractionV807.ts` berechnet ausschliesslich aus bestaetigten, songgebundenen V416/V496-Saengerrollen, vorhandenen Buehnenpositionen und Wiedergabezeit begrenzte Blicke und Gesten fuer Lead, Support, Duett, Handoff und gemeinsamen Hook. Die bestehenden 2er- und 3/4er-Avatar-Renderer verwenden die identische, reine Planungslogik ueber V144/V145-Overlays. Manuelle Animationen, Buehnenformationen, Gesichts-/Lippensynchronisation und Fuss-IK bleiben unberuehrt. V506/V508-Kollisionsschutz ist final. Keine neuen GLB-Mixer, Renderloops oder GPU-Ressourcen. Tests: `tests/v807-natural-multi-artist-stage-interaction-regression.cjs`.
 
-> **Dokumentationsstand:** V1077 (31.10.2026)
+> **Dokumentationsstand:** V1078 (31.10.2026)
 
 ## V808 Natural Performer Positioning
 
@@ -3964,7 +3964,7 @@ V844 verifies section/audio cues, schedules at most one dominant side-stage effe
 - No display/UI overlay; flash cannot be guaranteed photosensitive-safe.
 - Release requires full typecheck, Next.js build, and actual visual test.
 
-> **Dokumentationsstand:** V1077 (01.11.2026)
+> **Dokumentationsstand:** V1078 (01.11.2026)
 
 
 ## V846 - Paper Streamers
@@ -4737,3 +4737,20 @@ Gegenseitige Gesten bei expliziten Duett-Zeilen, Auftritte beim Reply-Handoff
 und leicht unterschiedliche gemeinsame Hook-Akzente bleiben in den
 bestehenden Kopf-, Brust- und Arm-Obergrenzen. Keine neuen Bone-/Mixer-/IK-
 oder Viseme-Controller, keine externe KI, kein Audio- oder Geräte-Eingriff.
+
+## V1078 – Natural Dance Intelligence 4.0
+
+`lib/naturalDanceIntelligenceV1078.ts` ergänzt eine opt-in, deterministische
+Groove-Schicht **vor** dem bestehenden V1024-Phrasen-Übergang. Vier Motive
+(Sway, Counterstep, Bounce, Release) werden in acht-Beat-Phrasen sanft
+überblendet. Nur bereits vorhandene GLB-Rigkanäle werden additiv verändert.
+
+Bei fehlender Foot-IK-Kontaktevidenz bleibt die Schicht aus. Ein oder zwei
+gepflanzte Füße sperren zusätzliche Schritt- und Gewichtsakzente; bei einem
+Stützfuß wird das Hüftschwingen gedrosselt. Die unveränderten Systeme V839,
+Grounding und IK bleiben nachgeschaltet und haben letzte Autorität.
+Es entstehen **keine** neuen Clips, künstlichen Tanzschritte, Root-Motion,
+Kontaktanker, Animationstimer, neuen 3D-Objekte, Ton- oder Govee-Befehle.
+Manuell gewählte Choreografien, Pausen, reduzierte Bewegungen und Low-Tier
+haben Vorrang. Der prozedurale Ersatzavatar erhält keine zusätzlichen
+Schrittakzente ohne verifizierte Fußkontakt-Daten.
