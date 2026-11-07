@@ -179,7 +179,14 @@ test('live integration layers V920 after V919 and before bass and group',()=>{
  assert.ok(sync.indexOf('const unboosted=genreDecision')>sync.indexOf('const sectionLook='));
  assert.ok(sync.indexOf('const bassLook=')>sync.indexOf('const unboosted=genreDecision'));
  assert.ok(sync.indexOf('const target=applyGoveeGroupBrightnessV915')>sync.indexOf('const unboosted=genreDecision'));
- assert.match(sync,/sectionSettings,genreSettings,cinematicSettings(?:,shockSettings)?(?:,neonSettings)?(?:,energySettings)?(?:,festivalSettings)?(?:,spatialSettings)?(?:,calibrationSettings)?(?:,roadmapSettings)?(?:,syncSettingsV1027)?,goveeShowEnabledV1042,goveeShowStrengthV1042,arenaShowEnabledV1040,arenaShowPlanV1040,showStageIsArenaV1042,reducedMotionV1042\]/); // V1042 explicitly extends the same effect dependency list without removing V920.
+ // New directors may extend this same useEffect: require the actual
+ // dependency entries, without freezing their adjacency or order.
+ const deps=new Set((/},\[(config,showLibrary,groups,[^\]]+)\]\);/.exec(sync)?.[1]??'').split(',').map(x=>x.trim()));
+ for(const name of ['sectionSettings','genreSettings','cinematicSettings','shockSettings','neonSettings',
+  'energySettings','festivalSettings','spatialSettings','calibrationSettings','roadmapSettings',
+  'syncSettingsV1027','goveeShowEnabledV1042','goveeShowStrengthV1042',
+  'arenaShowEnabledV1040','arenaShowPlanV1040','showStageIsArenaV1042','reducedMotionV1042'])
+  assert.ok(deps.has(name),`Govee effect must track ${name}`);
 });
 test('settings UI is mounted in existing Govee settings',()=>{
  const panel=read('components/GoveeLanPanelV909.tsx'),ui=read('components/GoveeGenreStudioV920.tsx');
