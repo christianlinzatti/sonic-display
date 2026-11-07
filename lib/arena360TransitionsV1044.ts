@@ -33,7 +33,7 @@ export function planArenaTransitionsV1044(input:{
  if(strength<=0)return OFF_ARENA_TRANSITION_V1044;
  const elapsed=bounded(input.progressMs,0,0,input.durationMs);
  const minSegmentMs=Math.min(...plan.segments.map(s=>(s.end-s.start)*input.durationMs!));
- const windowMs=bounded(Math.min(1200+strength*1600,minSegmentMs*.36),250,2500);
+ const windowMs=bounded(Math.min(1200+strength*1600,minSegmentMs*.36),1200,250,2500);
  let boundaryIndex=-1,distanceMs=Infinity,offset=0;
  for(let i=0;i<plan.segments.length-1;i++){
   const delta=elapsed-plan.segments[i].end*input.durationMs;

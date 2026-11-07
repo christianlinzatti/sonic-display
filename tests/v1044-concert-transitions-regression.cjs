@@ -20,6 +20,7 @@ assert(Math.abs(before.stageGain-after.stageGain)<1e-12);
 assert(Math.abs(before.goveeGain-after.goveeGain)<1e-12);
 const far=planArenaTransitionsV1044({...base,progressMs:1000});
 assert.equal(far.phase,'steady');assert.equal(far.stageGain,1);
+assert(far.windowMs>=250&&far.windowMs<=2500,'window must be bounded');
 for(const block of [{enabled:false},{playing:false},{reducedMotion:true},
  {stageIsArena:false},{plan:null},{progressMs:-1},{progressMs:NaN},
  {durationMs:0},{durationMs:Infinity},{strength:0}]){
