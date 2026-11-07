@@ -188,7 +188,8 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
   lightingChoreographerEnabledV1060,lightingChoreographerStrengthV1060,
   transformingStageEnabledV1066,transformingStageStrengthV1066,
   floatingExperienceEnabledV1067,floatingExperienceStrengthV1067,
-  holographicConcertEnabledV1068,holographicConcertStrengthV1068,trackId,genre, ...props }:
+  holographicConcertEnabledV1068,holographicConcertStrengthV1068,
+  epicDropEnabledV1069,epicDropStrengthV1069,trackId,genre, ...props }:
   Props & { theme: StageEnvironmentId; children?: React.ReactNode; rotationSpeed?: number; rotationEnabled?: boolean;
     audienceEnabled?: boolean; lightsEnabled?: boolean; dropEnabled?: boolean;
     wavesEnabled?:boolean;phoneSyncEnabled?:boolean;phoneMode?:import("@/lib/arena360ImmersionV1033").ArenaPhoneModeV1033;domeEnabled?:boolean;
@@ -220,6 +221,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
     floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
     holographicConcertEnabledV1068?:boolean;holographicConcertStrengthV1068?:number;
+    epicDropEnabledV1069?:boolean;epicDropStrengthV1069?:number;
     trackId?:string|null;genre?:string|null }) {
   if (theme === "arena360") {
     return <Arena360StageV1031 {...props} rotationSpeed={rotationSpeed} rotationEnabled={rotationEnabled}
@@ -247,6 +249,8 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       floatingExperienceStrengthV1067={floatingExperienceStrengthV1067}
       holographicConcertEnabledV1068={holographicConcertEnabledV1068}
       holographicConcertStrengthV1068={holographicConcertStrengthV1068}
+      epicDropEnabledV1069={epicDropEnabledV1069}
+      epicDropStrengthV1069={epicDropStrengthV1069}
       concertDirectorEnabled={concertDirectorEnabled} concertDirectorStrength={concertDirectorStrength}
       liveConcertEnabledV1049={liveConcertEnabledV1049} liveConcertStrengthV1049={liveConcertStrengthV1049}
       microphoneActiveV1049={microphoneActiveV1049}

@@ -200,6 +200,8 @@ export interface VisualizerProps {
   arenaFloatingExperienceStrengthV1067?:number;
   arenaHolographicConcertEnabledV1068?:boolean;
   arenaHolographicConcertStrengthV1068?:number;
+  arenaEpicDropEnabledV1069?:boolean;
+  arenaEpicDropStrengthV1069?:number;
   dancePostEnabledV468?: boolean;
   shaderEnvironmentV468?: import('./ProceduralShaderEnvironmentV468').ShaderEnvironmentModeV468;
   wardrobeModeV468?: import('./avatarWardrobeV468').WardrobeModeV468;

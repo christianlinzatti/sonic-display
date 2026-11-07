@@ -154,6 +154,29 @@ export function ArenaShowDesignerPanelV1040(){
     Bei Pause, reduzierter Bewegung oder niedrigem Grafikprofil wird die
     Zusatzregie ausgeschaltet.</small>
   </fieldset>
+  <fieldset className="arena-v1069-epic-drop" aria-label="V1069 Epic Drop Experience">
+   <legend>V1069 · Epic Drop Experience</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaEpicDropEnabledV1069)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaEpicDropEnabledV1069:e.target.checked})}/>
+    Bass-Schockwelle, Papierkonfetti und LED-Farbakzente bei bestätigten Drops koordinieren
+   </label>
+   <label>Drop-Choreografie: {preferences.arenaEpicDropStrengthV1069??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaEpicDropEnabledV1069}
+     value={preferences.arenaEpicDropStrengthV1069??55}
+     onChange={e=>updatePreferences({arenaEpicDropStrengthV1069:Number(e.target.value)})}/>
+   </label>
+   <small>Nur echte vom Musiksystem gemeldete Drop-Abschnitte UND starke, verifizierte
+    Beat-Flanken lösen Effekte aus. Eine geplante Hook oder ein Finale genügen niemals.
+    Verwendet ausschließlich die vorhandenen V1046-Bassringe/Konfetti, die V1059-LED-Wand
+    und die V1035-virtuelle Pyrotechnik. Max. 72 Konfettiteile pro Drop, begrenzte
+    Ringtransparenz, 2,8 s Drop-Cooldown; keine neuen Meshes, Hardware-Befehle,
+    Stroboskop- oder Vollbildblitze. LED-Akzente nur im automatischen Muster.
+    Für Schockwelle und Konfetti müssen V1046 Cinematic Finale und die Drop-Lichter
+    aktiviert sein; LED-Akzente benötigen die V1059-Wand. Manuell ausgeschaltete
+    Systeme bleiben aus. Bei Pause oder niedrigem GPU-Profil aus.</small>
+  </fieldset>
   <fieldset className="arena-v1068-holographic-concert" aria-label="V1068 Holographic Concert FX 3.0">
    <legend>V1068 · Holographic Concert FX 3.0</legend>
    <label className="setting-check"><input type="checkbox"

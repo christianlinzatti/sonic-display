@@ -1,3 +1,11 @@
+## V1069 – Epic Drop Experience
+
+Neue optionale Drop-Regie für die 360°-Bühne: existierende Basswellen,
+Konfetti, LED-Farben und virtuelle Pyrotechnik werden nur bei beobachteten
+Drop-Abschnitten und verifizierten Beat-Flanken koordiniert. Keine künstlich
+erfundenen Drops, keine Hardware-Steuerung, keine Flashes oder neuen Meshes.
+AI Show Designer → V1069 Epic Drop Experience (standardmäßig AUS).
+
 ## V1068 · Holographic Concert FX 3.0
 
 Optional world-fixed portal choreography and lightweight performer **silhouette projections**

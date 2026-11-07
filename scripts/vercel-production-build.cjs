@@ -31,6 +31,7 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1069 Epic Drop Experience','tests/v1069-epic-drop-regression.cjs');
   run('V1068 Holographic Concert FX 3.0','tests/v1068-holographic-concert-regression.cjs');
   run('V1067 Floating Platform Experience 2.0','tests/v1067-floating-experience-regression.cjs');
   run('V1066 Transforming Stage 3.0','tests/v1066-transforming-stage-regression.cjs');

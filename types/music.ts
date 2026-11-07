@@ -98,6 +98,8 @@ export interface UiPreferences {
   arenaFloatingExperienceStrengthV1067?:number;
   arenaHolographicConcertEnabledV1068?:boolean;
   arenaHolographicConcertStrengthV1068?:number;
+  arenaEpicDropEnabledV1069?:boolean;
+  arenaEpicDropStrengthV1069?:number;
   concertDetailEnabledV555?: boolean;
   concertGoboV555?: boolean;
   concertPixelWallV555?: boolean;

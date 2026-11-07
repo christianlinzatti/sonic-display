@@ -1,3 +1,11 @@
+## V1069 – Epic Drop Experience
+
+Neue optionale Drop-Regie für die 360°-Bühne: existierende Basswellen,
+Konfetti, LED-Farben und virtuelle Pyrotechnik werden nur bei beobachteten
+Drop-Abschnitten und verifizierten Beat-Flanken koordiniert. Keine künstlich
+erfundenen Drops, keine Hardware-Steuerung, keine Flashes oder neuen Meshes.
+AI Show Designer → V1069 Epic Drop Experience (standardmäßig AUS).
+
 ## V1068 · Holographic Concert FX 3.0
 
 Die vorhandenen weltfesten V1039-Hologramm-Ringe und -Kristalle erhalten eine
@@ -1661,7 +1669,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1068
+**Dokumentationsstand:** V1069
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.

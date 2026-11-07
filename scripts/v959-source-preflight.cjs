@@ -265,6 +265,11 @@ const v1066=inspectReleaseV1066(root);
 for(const c of v1066.checks)console.log(`${c.ok?'PASS':'FAIL'} V1066 ${c.id}`);
 if(!v1066.passed)process.exitCode=1;
 
+const {inspectReleaseV1069}=require('./v1069-release-readiness.cjs');
+const v1069=inspectReleaseV1069(root);
+for(const c of v1069.checks)console.log(`${c.ok?'PASS':'FAIL'} V1069 ${c.id}`);
+if(!v1069.passed)process.exitCode=1;
+
 const {inspectReleaseV1068}=require('./v1068-release-readiness.cjs');
 const v1068=inspectReleaseV1068(root);
 for(const c of v1068.checks)console.log(`${c.ok?'PASS':'FAIL'} V1068 ${c.id}`);

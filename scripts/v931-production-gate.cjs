@@ -11,6 +11,7 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1069 Epic Drop Experience','tests/v1069-epic-drop-regression.cjs'],
   ['V1068 Holographic Concert FX 3.0','tests/v1068-holographic-concert-regression.cjs'],
   ['V1067 Floating Platform Experience 2.0','tests/v1067-floating-experience-regression.cjs'],
   ['V1066 Transforming Stage 3.0','tests/v1066-transforming-stage-regression.cjs'],

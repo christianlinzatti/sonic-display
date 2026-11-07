@@ -28,6 +28,7 @@ import {ArenaTransformingDeckV1037} from './ArenaTransformingDeckV1037';
 import {planStageFormationV1066} from '@/lib/arena360TransformingStageV1066';
 import {planFloatingExperienceV1067} from '@/lib/arena360FloatingExperienceV1067';
 import {planHolographicConcertV1068} from '@/lib/arena360HolographicConcertV1068';
+import {planEpicDropV1069} from '@/lib/arena360EpicDropV1069';
 import type {ArenaTransformationModeV1037} from '@/lib/arena360TransformationV1037';
 import {ArenaFloatingPlatformsV1038} from './ArenaFloatingPlatformsV1038';
 import type {FloatingStageModeV1038} from '@/lib/arena360FloatingStageV1038';
@@ -81,7 +82,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   lightingChoreographerEnabledV1060=false,lightingChoreographerStrengthV1060=55,
   transformingStageEnabledV1066=false,transformingStageStrengthV1066=55,
   floatingExperienceEnabledV1067=false,floatingExperienceStrengthV1067=55,
-  holographicConcertEnabledV1068=false,holographicConcertStrengthV1068=55,trackId,genre}: {
+  holographicConcertEnabledV1068=false,holographicConcertStrengthV1068=55,
+  epicDropEnabledV1069=false,epicDropStrengthV1069=55,trackId,genre}: {
   children?:ReactNode;audio:AudioFeatures;isPlaying:boolean;reducedMotion:boolean;
   reactive?:boolean;rotationSpeed?:number;rotationEnabled?:boolean;
   audienceEnabled?:boolean;lightsEnabled?:boolean;dropEnabled?:boolean;
@@ -110,6 +112,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
   floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
   holographicConcertEnabledV1068?:boolean;holographicConcertStrengthV1068?:number;
+  epicDropEnabledV1069?:boolean;epicDropStrengthV1069?:number;
   trackId?:string|null;genre?:string|null;
 }){
   const turntable=useRef<Group>(null);
@@ -179,6 +182,16 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     stageCueV1066:stageFormationV1066,floatCueV1067:floatingExperienceV1067,
   });
 
+  // Authored chapters affect optical styling only. A real V287 observed `drop`
+  // plus a measured beat edge is mandatory; no planned 'hook' invents a drop.
+  const epicDropV1069=planEpicDropV1069({
+    enabled:epicDropEnabledV1069,stageIsArena:true,playing:isPlaying,
+    reducedMotion,reactive,showDesignerEnabled,showDirectorEnabled,
+    observedSection:section,show:showCueV1040,trackId,progressMs,durationMs,
+    strength:epicDropStrengthV1069,performanceTier:getActivePerformanceTier(),
+    genre:showPlan?.genre??genre,ledPattern:ledWallPatternV1059,
+    effects:{finale:cinematicFinaleEnabled&&dropEnabled,led:ledWallEnabledV1059,pyro:virtualPyroEnabled},
+  });
   const cinematicLightingV1056=planCinematicLightingV1056({
     enabled:cinematicLightingEnabledV1056&&showDesignerEnabled&&showDirectorEnabled,
     lightsEnabled,stageIsArena:true,playing:isPlaying,reducedMotion,reactive,
@@ -377,7 +390,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       audienceCueV1044={coordinatedAudienceCue} crowdCueV1051={crowdCueV1051}/>
     <ArenaLedDomeV1033 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={domeEnabled} reactive={reactive}/>
     <ArenaLedWallV1059 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
-      cue={coordinatedLedV1060} progressMs={progressMs}/>
+      cue={coordinatedLedV1060} progressMs={progressMs}
+      epicDropCueV1069={epicDropV1069}/>
     <ArenaSkyFormationV1034 audio={audio} section={section} playing={isPlaying} reducedMotion={reducedMotion}
       enabled={skyFormationEnabled} directorEnabled={showDirectorEnabled} reactive={reactive}
       showAmbience={fullSongDirectorEnabled?cueV1035.ambience:undefined}/>
@@ -386,7 +400,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       progressMs={progressMs} durationMs={durationMs} section={section} intensity={plannedIntensity}/>
     <ArenaVirtualPyroV1035 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={virtualPyroEnabled} directorEnabled={fullSongDirectorEnabled&&showDirectorEnabled}
-      progressMs={progressMs} durationMs={durationMs} section={section} intensity={plannedIntensity}/>
+      progressMs={progressMs} durationMs={durationMs} section={section} intensity={plannedIntensity}
+      epicDropCueV1069={epicDropV1069}/>
     <ArenaLaserFansV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={lasersEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045} finaleV1046={finaleV1046}
@@ -402,7 +417,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       hologramsEnabled={hologramsEnabled&&showDirectorEnabled}
       lasersEnabled={laserArchitectureEnabled&&lasersEnabled&&showDirectorEnabled}/>
     <ArenaCinematicFinaleV1046 cue={finaleV1046} audio={audio} trackId={trackId}
-      playing={isPlaying} reducedMotion={reducedMotion}/>
+      playing={isPlaying} reducedMotion={reducedMotion} progressMs={progressMs}
+      epicDropCueV1069={epicDropV1069}/>
     <ArenaHologramPortalsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={hologramsEnabled&&showDirectorEnabled}
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}

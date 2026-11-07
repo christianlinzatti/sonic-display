@@ -758,6 +758,8 @@ export function ThreeAvatar(props: VisualizerProps) {
         floatingExperienceStrengthV1067={props.arenaFloatingExperienceStrengthV1067 ?? 55}
         holographicConcertEnabledV1068={props.arenaHolographicConcertEnabledV1068 ?? false}
         holographicConcertStrengthV1068={props.arenaHolographicConcertStrengthV1068 ?? 55}
+        epicDropEnabledV1069={props.arenaEpicDropEnabledV1069 ?? false}
+        epicDropStrengthV1069={props.arenaEpicDropStrengthV1069 ?? 55}
         floatingStageEnabled={props.arenaFloatingStageEnabledV1038 ?? true}
         floatingStageMode={props.arenaFloatingStageModeV1038 ?? 'auto'}
         floatingStageIntensity={(props.arenaFloatingStageIntensityV1038 ?? 70)*stageInteractionV1055.platformGain}
