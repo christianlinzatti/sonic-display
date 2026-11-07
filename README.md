@@ -1,3 +1,7 @@
+## V1043 · Intelligent Show Camera Director
+
+Der editierbare V1040-Showplan kann nun optional und ohne externe KI die bestehende 360°-Kameraregie mit Totalen, Orbit, Lead- und Gruppenperspektiven ergänzen. Die Kamera-Option ist separat deaktiviert, bis sie unter Einstellungen → Display → 360° Arena eingeschaltet wird. Manuelle Kamerapresets, Sänger- und Lyrics-Szenen sowie `Reduced Motion` behalten Vorrang. Siehe `changelog/V1043-INTELLIGENT-SHOW-CAMERA-DIRECTOR.md`.
+
 ## V1041 · Intelligent Avatar Choreography Director
 
 Der opt-in Showplan aus V1040 steuert jetzt die bestehenden Solo-/Duo-Tanzformationen der 360°-Arena. Eigene Freigabe und Intensität in Einstellungen → Display → 360° Arena. Manuelle Bühnen-, Gruppen-, Gesangs- und GLB-Animationen behalten Vorrang. Auf niedriger Grafikstufe keine zusätzlichen Darsteller.

@@ -1353,7 +1353,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1042
+**Dokumentationsstand:** V1043
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -4268,3 +4268,7 @@ Siehe `changelog/V1040-AI-SHOW-DESIGNER.md`. Der lokale, regelbasierte Showdesig
 ## V1042 – Intelligent Govee Concert Integration
 
 Der V1040-Showplan kann jetzt optional in der bestehenden Govee-LAN-Autosync-Schleife bis zu vier zugeordnete Leuchten mit dezenten Genre- und Songabschnittsfarben begleiten. Manuelle Regie, Helligkeitsobergrenzen und Vorhandensein der lokalen Bridge bleiben zwingend. Siehe `changelog/V1042-INTELLIGENT-GOVEE-CONCERT-INTEGRATION.md`.
+
+## V1043 – Intelligent Show Camera Director
+
+`lib/arena360ShowCameraV1043.ts` plant opt-in-Kameraakzente aus dem lokal generierten V1040-Showplan. Die vorhandenen `StageCameraDirectorV289` und `SmartStageCameraV236` bleiben alleinige Besitzer der Kameraposition. Nach manuellen Presets, Lyrics-, Gesangs-, Duett- und Timeline-Aufnahmen wird nicht eingegriffen. `Reduced Motion`, Pause, unklare Trackposition, fehlender Showplan oder nicht gewählte Arena deaktivieren die Wirkung. Die vier Vorgaben sind Totale, Orbit, Lead und Gruppenaufnahme; Kamerafahrten sind begrenzt und weich geglättet. Keine externen KI-Aufrufe, keine zweite Camera, kein eigener Timer.
