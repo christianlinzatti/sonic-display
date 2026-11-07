@@ -29,6 +29,7 @@ import {ArenaTransformingDeckV1037} from './ArenaTransformingDeckV1037';
 import {planStageFormationV1066} from '@/lib/arena360TransformingStageV1066';
 import {planFloatingExperienceV1067} from '@/lib/arena360FloatingExperienceV1067';
 import {planHolographicConcertV1068} from '@/lib/arena360HolographicConcertV1068';
+import {planHolographicDancersV1081} from '@/lib/arena360HolographicDancersV1081';
 import {planEpicDropV1069} from '@/lib/arena360EpicDropV1069';
 import {planUltimateConcertFinaleV1070} from '@/lib/arena360UltimateFinaleV1070';
 import {planSmartConcertFlowV1071} from '@/lib/arena360SmartConcertFlowV1071';
@@ -91,6 +92,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   transformingStageEnabledV1066=false,transformingStageStrengthV1066=55,
   floatingExperienceEnabledV1067=false,floatingExperienceStrengthV1067=55,
   holographicConcertEnabledV1068=false,holographicConcertStrengthV1068=55,
+  holographicDancersEnabledV1081=false,holographicDancersStrengthV1081=55,
   epicDropEnabledV1069=false,epicDropStrengthV1069=55,
   ultimateFinaleEnabledV1070=false,ultimateFinaleStrengthV1070=55,
   smartConcertFlowEnabledV1071=false,smartConcertFlowStrengthV1071=55,trackId,genre}: {
@@ -124,6 +126,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
   floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
   holographicConcertEnabledV1068?:boolean;holographicConcertStrengthV1068?:number;
+  holographicDancersEnabledV1081?:boolean;holographicDancersStrengthV1081?:number;
   epicDropEnabledV1069?:boolean;epicDropStrengthV1069?:number;
   ultimateFinaleEnabledV1070?:boolean;ultimateFinaleStrengthV1070?:number;
   smartConcertFlowEnabledV1071?:boolean;smartConcertFlowStrengthV1071?:number;
@@ -299,6 +302,17 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     {...finaleFloatingV1070,power:finaleFloatingV1070.power*smartFlowV1071.floating}:finaleFloatingV1070;
   const flowHologramsV1071=smartFlowV1071.active&&finaleHologramsV1070.active?
     {...finaleHologramsV1070,power:finaleHologramsV1070.power*smartFlowV1071.holograms}:finaleHologramsV1070;
+  // V1081: lightweight dance cues for world-fixed holographic silhouettes.
+  // Neither disabled/manual V1039 portals nor unapproved V1068 channels are enabled.
+  const holographicDancersV1081=planHolographicDancersV1081({
+    enabled:holographicDancersEnabledV1081&&holographicConcertEnabledV1068,
+    stageIsArena:true,hologramsEnabled,showDesignerEnabled,showDirectorEnabled,
+    playing:isPlaying,reducedMotion,reactive,manualPattern:hologramPattern!=='auto',
+    performanceTier:getActivePerformanceTier(),progressMs,durationMs,
+    strength:holographicDancersStrengthV1081,genre:showPlan?.genre??genre,
+    energy:audio.energyEnvelope,beat:audio.beat,beatStrength:audio.beatStrength,
+    show:showCueV1040,baseHolograms:flowHologramsV1071,
+  });
   const flowLasersV1071=smartFlowV1071.active&&finaleLasersV1070.active?
     {...finaleLasersV1070,fanGain:finaleLasersV1070.fanGain*smartFlowV1071.lasers,
       beamGain:finaleLasersV1070.beamGain*smartFlowV1071.lasers}:finaleLasersV1070;
@@ -509,7 +523,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaHologramPortalsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={hologramsEnabled&&showDirectorEnabled}
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}
-      concertCueV1068={flowHologramsV1071}/>
+      concertCueV1068={flowHologramsV1071} dancerCueV1081={holographicDancersV1081}/>
     <ArenaLaserTunnelsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={laserArchitectureEnabled&&showDirectorEnabled&&lasersEnabled}
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}

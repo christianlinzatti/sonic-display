@@ -68,7 +68,7 @@ for(const unsafe of ['fetch(','setTimeout(','setInterval(','Math.random(','Date.
  'navigator.','localStorage','new SpotLight','new Camera','window.','Govee'])
  assert(!read('lib/arena360LaserExperienceV1080.ts').includes(unsafe),'pure visual-only: '+unsafe);
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert(pkg.version==='0.1.0-v1080'&&lock.version===pkg.version);
+assert(Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1]||0)>=1080&&lock.version===pkg.version&&lock.packages?.['']?.version===pkg.version);
 assert(pkg.scripts['test:v1080']&&pkg.scripts['test:v1080:types']);
 for(const file of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs',
  '.github/workflows/v965-room-wave-production.yml'])

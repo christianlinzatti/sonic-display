@@ -208,6 +208,8 @@ export interface VisualizerProps {
   arenaFloatingExperienceStrengthV1067?:number;
   arenaHolographicConcertEnabledV1068?:boolean;
   arenaHolographicConcertStrengthV1068?:number;
+  arenaHolographicDancersEnabledV1081?:boolean;
+  arenaHolographicDancersStrengthV1081?:number;
   arenaEpicDropEnabledV1069?:boolean;
   arenaEpicDropStrengthV1069?:number;
   arenaUltimateFinaleEnabledV1070?:boolean;

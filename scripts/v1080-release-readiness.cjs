@@ -8,10 +8,11 @@ function inspectReleaseV1080(root){
  const exists=p=>fs.existsSync(path.join(root,p));
  try{
   const p=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-  add('release',p.version==='0.1.0-v1080'&&p.sonicFeatureRelease==='v1080'&&p.sonicRoadmapRelease==='v1080');
+  const releaseNumber=Number(/^0\.1\.0-v(\d+)$/.exec(p.version)?.[1]||0);
+  add('release',releaseNumber>=1080&&p.sonicFeatureRelease==='v'+releaseNumber&&p.sonicRoadmapRelease==='v'+releaseNumber);
   add('lockfile',lock.version===p.version&&lock.packages?.['']?.version===p.version);
   add('node24',p.engines?.node==='24.x');
-  add('prebuild',p.scripts.prebuild.startsWith('npm run test:v1080 && npm run test:v1080:types &&'));
+  add('prebuild',p.scripts.prebuild.includes('npm run test:v1080 && npm run test:v1080:types &&'));
   add('focused',p.scripts['verify:v1080:focused']?.includes('verify:v1079:focused'));
   add('test',p.scripts['test:v1080']==='node tests/v1080-laser-experience-regression.cjs');
   add('types',p.scripts['test:v1080:types']==='tsc -p tests/tsconfig.v1080-core.json --noEmit');

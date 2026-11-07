@@ -1,3 +1,20 @@
+## V1081 · Holographic Dancers 2.0
+
+V1081 erweitert die **bestehenden** holografischen Silhouetten zu virtuellen
+Tänzerprojektionen mit sechs begrenzten Bewegungsstilen: Intro, Strophe,
+Aufbau, Hook (gespiegelte Paare), Interlude und Finale. Die Arm-Highlights
+werden als eine zusätzliche Instanced-Mesh-Gruppe gerendert (höchstens
+18 Instanzen), ohne GLB-Kopien oder zusätzliche Audio- und Frame-Controller.
+Die optische Choreografie folgt dem bereits freigegebenen V1068-Show-Cue
+sowie V1070/V1071-Fades. Beats werden nicht aus Songabschnitten erfunden;
+Akzente benötigen gemessene Signale. Bei Pause, reduzierter Bewegung,
+niedrigem GPU-Profil, manuellen Portalmustern oder inaktiven Show-Plänen
+bleibt die neue Funktion aus. Aktivierung: AI Show Designer → V1068 und V1081.
+
+Lokale Checks: `npm run test:v1081`, `npm run test:v1081:types`,
+`npm run verify:v1081:focused` und `node scripts/v959-source-preflight.cjs`.
+Production & Playwright erfordern anschließend einen GitHub-Actions-Lauf.
+
 ## V1080 · Laser Show Experience 5.0
 
 Die 360°-Bühne erhält mehrdimensionale virtuelle **Laserfächer, Lichttunnel,

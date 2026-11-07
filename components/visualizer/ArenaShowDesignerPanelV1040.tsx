@@ -321,6 +321,25 @@ export function ArenaShowDesignerPanelV1040(){
     sind keine zusätzlichen Künstler, haben keine Sängerrollen und steuern keine Geräte.
     Bei niedriger Grafikqualität, Pause oder Reduced Motion deaktiviert.</small>
   </fieldset>
+  <fieldset className="arena-v1081-holographic-dancers" aria-label="V1081 Holographic Dancers 2.0">
+   <legend>V1081 · Holographic Dancers 2.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaHolographicDancersEnabledV1081)&&Boolean(plan)}
+    disabled={!plan||!preferences.arenaHolographicConcertEnabledV1068}
+    onChange={e=>updatePreferences({arenaHolographicDancersEnabledV1081:e.target.checked})}/>
+    Holografische Tänzer mit gespiegelten Duett-Bewegungen, Groove und Finale
+   </label>
+   <label>Tanzintensität: {preferences.arenaHolographicDancersStrengthV1081??55}%
+    <input type="range" min="0" max="80" step="5"
+     disabled={!plan||!preferences.arenaHolographicDancersEnabledV1081||!preferences.arenaHolographicConcertEnabledV1068}
+     value={preferences.arenaHolographicDancersStrengthV1081??55}
+     onChange={e=>updatePreferences({arenaHolographicDancersStrengthV1081:Number(e.target.value)})}/>
+   </label>
+   <small>Aktiviere zuerst V1068. Sechs Songabschnitte steuern die Choreografie; Beat-Akzente
+    benötigen gemessene Beats. Bei Pause, Reduced Motion, manuellem Portal-Muster oder
+    niedrigem GPU-Profil bleiben die Tänzer aus. Nur virtuelle Silhouetten; keine
+    zusätzlichen Sänger, GLB-Avatare, Hardware-Laser oder Raumlicht-Befehle.</small>
+  </fieldset>
   <fieldset className="arena-v1067-floating-platforms" aria-label="V1067 Floating Platform Experience 2.0">
    <legend>V1067 · Floating Platform Experience 2.0</legend>
    <label className="setting-check"><input type="checkbox"
