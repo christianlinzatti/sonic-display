@@ -17,6 +17,9 @@ import {useCrewSettings,writeCrewSettings} from '@/components/visualizer/useSoni
 import {directVocalActingV1115,sampleVocalCueV1115,vocalPresetV1115,
  VOCAL_STYLE_LABELS_V1115,type VocalStyleV1115,type VocalShowV1115,type VocalPresetV1115}
  from '@/lib/aiVocalActingV1115';
+import {directStageTransformationV1117,stageLivePresetV1117,sampleStageCueV1117,
+ STAGE_STYLE_LABELS_V1117,type StageStyleV1117,type StageShowV1117,
+ type StageLivePresetV1117} from '@/lib/aiStageTransformationV1117';
 import {directArtistInteractionV1116,sampleInteractionCueV1116,liveArtistPresetV1116,
  INTERACTION_LABELS_V1116,type InteractionStyleV1116,type InteractionShowV1116,
  type LiveArtistPresetV1116} from '@/lib/aiArtistInteractionV1116';
@@ -83,6 +86,12 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
  const [interactionEnabled,setInteractionEnabled]=useState(false);
  const [interactionPreview,setInteractionPreview]=useState<InteractionShowV1116|null>(null);
  const [interactionCanUndo,setInteractionCanUndo]=useState(false);
+ const [stageStyle,setStageStyle]=useState<StageStyleV1117>('kinetic');
+ const [stageStrength,setStageStrength]=useState(50);
+ const [stageEnabled,setStageEnabled]=useState(false);
+ const [stagePreview,setStagePreview]=useState<StageShowV1117|null>(null);
+ const [stageCanUndo,setStageCanUndo]=useState(false);
+ const stageUndo=useRef<{before:Partial<typeof preferences>;after:StageLivePresetV1117}|null>(null);
  const interactionUndo=useRef<{before:Partial<typeof preferences>;after:LiveArtistPresetV1116}|null>(null);
  const vocalUndo=useRef<{before:Partial<typeof preferences>;after:VocalPresetV1115}|null>(null);
  const [conductorScrub,setConductorScrub]=useState(35);
@@ -175,6 +184,8 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
  const activeDanceCue=sampleDanceCueV1114(dancePreview,previewPercent);
  const activeVocalCue=sampleVocalCueV1115(vocalPreview,previewPercent);
  const activeInteractionCue=sampleInteractionCueV1116(interactionPreview,previewPercent);
+ const activeStageCue=sampleStageCueV1117(stagePreview,previewPercent);
+ const stageOptions=()=>({style:stageStyle,strength:stageStrength,intensityCap:cap});
  const canSample=audio.active&&music.isPlaying&&!preferences.reducedMotion&&!!currentTrack;
  // Tracking is strictly session-only: stop and forget measurements on a song
  // change, playback interruption, microphone loss or reduced-motion preference.
@@ -234,11 +245,11 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   setSampling(false);setReading(null);setDropReading(null);setDropCue(null);setSampleCount(0);
   setMoodExplanation('Lokale Messwerte verworfen. Es wurde nichts gespeichert oder übertragen.');
  };
- const invalidate=()=>{controller.current?.abort();requestId.current++;setBusy(false);setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setStatus('');};
- useEffect(()=>{controller.current?.abort();requestId.current++;setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setBusy(false);
+ const invalidate=()=>{setStagePreview(null);controller.current?.abort();requestId.current++;setBusy(false);setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setStatus('');};
+ useEffect(()=>{setStagePreview(null);controller.current?.abort();requestId.current++;setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setBusy(false);
   return ()=>{controller.current?.abort();requestId.current++;};
  },[signature]);
- const local=(storyOnly=false,conductorOnly=false,personalityOnly=false,performanceOnly=false,danceOnly=false,vocalOnly=false,interactionOnly=false)=>{
+ const local=(storyOnly=false,conductorOnly=false,personalityOnly=false,performanceOnly=false,danceOnly=false,vocalOnly=false,interactionOnly=false,stageOnly=false)=>{
   invalidate();
   const curated=curateCreativeRemixV1107(localAiShowRemixV1106(idea,style,cap),creativeBrief(),cap);
   if(!curated){setStatus('Regieentwurf ungültig – keine Änderungen übernommen.');return;}
@@ -256,11 +267,14 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   if((vocalOnly||interactionOnly||vocalEnabled||interactionEnabled)&&!vocal){setStatus('V1115 Vocal Acting konnte nicht sicher geplant werden. Bestehende Show unverändert.');return;}
   const interaction=withInteraction(danced.performance,danced.dance,vocal,interactionOnly);
   if((interactionOnly||interactionEnabled)&&!interaction){setStatus('V1116 Interaktion konnte nicht sicher geplant werden. Show unverändert.');return;}
-  setInteractionPreview(interaction);setVocalPreview(vocal);
-  setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,danced.staged):null);
+  const finalRemix=interaction?.remix??danced.staged;
+  const stage=stageEnabled||stageOnly?directStageTransformationV1117(base,finalRemix,stageOptions()):null;
+  if((stageEnabled||stageOnly)&&!stage){setStatus('V1117 Bühnenverwandlung konnte nicht sicher geplant werden. Show unverändert.');return;}
+  setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
+  setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,stage?.remix??finalRemix):null);
   setConductorPreview(danced.conductor);setPersonalityPreview(danced.personality);setPerformancePreview(danced.performance);setDancePreview(danced.dance);
-  setPreview(interaction?.remix??danced.staged);setBaseSignature(signature);setSource('local');
-  setStatus(interaction?'V1116: sieben Artist-Interaktionen als Vorschau. Kameraführung über vorhandene Modi; echte Partnerreaktionen nur durch separate V1079-Aktivierung bei synchronisierten Lyrics. Keine automatisch erkannten Sänger.':vocal?'V1115 Vocal Acting: sieben Szenen mit Bühnen-Vocal-Rollen als Vorschau. Die tatsächliche Lippen-/Gestik-Engine bleibt bis zur gesonderten Zustimmung unverändert. Keine Stimmen oder Phoneme erkannt.':danced.dance?'V1114: Solo, Duo, Kanon und Unisono als sichere Vorschau. Echte GLB-Tanzclips können zusätzlich in der Stage Crew mit V1114 Automatik aktiviert werden. Noch kein Gerät oder Clip geschaltet.':directed.performance?'V1113 Performance Director: sieben abgestimmte Charakter-Momente als Vorschau bereit; gemeinsam unterstützte Tanz- und Kameramodi können nach Bestätigung übernommen werden. Keine einzelnen GLB-Animationen oder Geräte gesteuert.':personalized.personality?'V1112 Avatar Personality: drei individuelle Performer-Rollen sind als Vorschau geplant; nur bestehende Kamera-/Tanzmodi werden später übernommen. Keine GLB-Clips oder Geräte geschaltet.':conductor?'V1111 Live Show Conductor: sieben koordinierte Szenen als lokale Regieprobe bereit. Keine Bühne oder Geräte geschaltet.':story?'V1109 lokaler Storybogen als Vorschau bereit. Keine KI-Anfrage, kein Gerät geschaltet und noch nichts übernommen.':
+  setPreview(stage?.remix??finalRemix);setBaseSignature(signature);setSource('local');
+  setStatus(stage?'V1117: sieben Bühnenverwandlungen als lokale Vorschau. Reale virtuelle Plattformen nur nach separater Freigabe; keine Gerätebefehle.':interaction?'V1116: sieben Artist-Interaktionen als Vorschau. Kameraführung über vorhandene Modi; echte Partnerreaktionen nur durch separate V1079-Aktivierung bei synchronisierten Lyrics. Keine automatisch erkannten Sänger.':vocal?'V1115 Vocal Acting: sieben Szenen mit Bühnen-Vocal-Rollen als Vorschau. Die tatsächliche Lippen-/Gestik-Engine bleibt bis zur gesonderten Zustimmung unverändert. Keine Stimmen oder Phoneme erkannt.':danced.dance?'V1114: Solo, Duo, Kanon und Unisono als sichere Vorschau. Echte GLB-Tanzclips können zusätzlich in der Stage Crew mit V1114 Automatik aktiviert werden. Noch kein Gerät oder Clip geschaltet.':directed.performance?'V1113 Performance Director: sieben abgestimmte Charakter-Momente als Vorschau bereit; gemeinsam unterstützte Tanz- und Kameramodi können nach Bestätigung übernommen werden. Keine einzelnen GLB-Animationen oder Geräte gesteuert.':personalized.personality?'V1112 Avatar Personality: drei individuelle Performer-Rollen sind als Vorschau geplant; nur bestehende Kamera-/Tanzmodi werden später übernommen. Keine GLB-Clips oder Geräte geschaltet.':conductor?'V1111 Live Show Conductor: sieben koordinierte Szenen als lokale Regieprobe bereit. Keine Bühne oder Geräte geschaltet.':story?'V1109 lokaler Storybogen als Vorschau bereit. Keine KI-Anfrage, kein Gerät geschaltet und noch nichts übernommen.':
    'Lokaler Remix: keine Netzwerk- oder KI-Anfrage. Noch nichts übernommen.');
  };
  const remote=async()=>{
@@ -294,10 +308,13 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
    if((vocalEnabled||interactionEnabled)&&!vocal)throw Error('V1115 Vocal Acting konnte nicht sicher geplant werden.');
    const interaction=withInteraction(danced.performance,danced.dance,vocal);
    if(interactionEnabled&&!interaction)throw Error('V1116 Artist Interaction konnte nicht sicher geplant werden.');
-   setInteractionPreview(interaction);setVocalPreview(vocal);
-   setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,danced.staged):null);
+   const finalRemix=interaction?.remix??danced.staged;
+   const stage=stageEnabled?directStageTransformationV1117(base,finalRemix,stageOptions()):null;
+   if(stageEnabled&&!stage)throw Error('V1117 Bühnenverwandlung konnte nicht sicher geplant werden.');
+   setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
+   setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,stage?.remix??finalRemix):null);
    setConductorPreview(danced.conductor);setPersonalityPreview(danced.personality);setPerformancePreview(danced.performance);setDancePreview(danced.dance);
-   setPreview(interaction?.remix??danced.staged);setSource('ai');setBaseSignature(signature);
+   setPreview(stage?.remix??finalRemix);setSource('ai');setBaseSignature(signature);
    setStatus('KI-Vorschlag bereit. Prüfe alle sieben Szenen und übernimm ihn ausdrücklich.');
   }catch(error){
    if(requestId.current===id&&!current.signal.aborted)
@@ -312,8 +329,34 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   undo.current={before:plan,after:JSON.stringify(result)};
   setCanUndo(true);
   updatePreferences({arenaShowPlanV1040:result});
-  setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);
+  setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);
   setStatus('Remix gespeichert. Die 360°-Showplan-Aktivierung bleibt unverändert – keine Geräte wurden gesteuert.');
+ };
+ const activateStageTransformation=()=>{
+  if(busy||!stagePreview||!preview||signature!==baseSignature){
+   setStatus('Bitte zuerst eine aktuelle V1117-Bühnenprobe erstellen.');return;
+  }
+  if(preferences.reducedMotion){setStatus('Bewegungsreduktion aktiv: keine Bühnenautomatik eingeschaltet.');return;}
+  if(!preferences.arenaShowDesignerEnabledV1040||!preferences.arenaConcertDirectorEnabledV1048){
+   setStatus('Bitte zuerst 360°-Show Designer und Konzertdirektor in den Bühneneinstellungen aktivieren.');return;
+  }
+  if(stageUndo.current){setStatus('Bühnenautomatik ist bereits übernommen. Vorher zuerst zurücksetzen.');return;}
+  const preset=stageLivePresetV1117(stageOptions());
+  if(!preset){setStatus('Ungültige Bühnenstärke.');return;}
+  const before=Object.fromEntries(Object.keys(preset).map(k=>
+   [k,preferences[k as keyof typeof preferences]])) as Partial<typeof preferences>;
+  updatePreferences(preset);
+  stageUndo.current={before,after:preset};setStageCanUndo(true);
+  setStatus('V1117: vorhandene virtuelle Bühnenbewegung aktiviert. Manuelle Deck-/Float-Modi, Pause, GPU-Grenze und Bewegungsreduktion haben weiterhin Vorrang. Keine Govee-Steuerung.');
+ };
+ const revertStageTransformation=()=>{
+  const saved=stageUndo.current;if(!saved)return;
+  if(!Object.entries(saved.after).every(([k,v])=>preferences[k as keyof typeof preferences]===v)){
+   stageUndo.current=null;setStageCanUndo(false);
+   setStatus('Bühneneinstellungen wurden manuell geändert; Rückgängig nicht ausgeführt.');return;
+  }
+  updatePreferences(saved.before);stageUndo.current=null;setStageCanUndo(false);
+  setStatus('Frühere Einstellungen für Bühnenbewegung wiederhergestellt.');
  };
  const activateCrewStory=()=>{
   if(!dancePreview||!preview){setStatus('Bitte zuerst eine neue V1114-Probe erstellen.');return;}
@@ -662,6 +705,38 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
     Manuelle Animationen, bestehende Sängerzuordnungen und reduzierte Bewegung
     behalten Vorrang. Keine künstliche Audio-/Gesangserkennung, keine Govee-Befehle.</small>
   </fieldset>
+  <fieldset aria-label="V1117 AI Stage Transformation" className="arena-v1117-ai-stage-transformation">
+   <legend>V1117 · AI Stage Transformation</legend>
+   <p>360°-Verwandlung mit echten vorhandenen Plattform-, Schwebebühnen- und
+    Architekturmodulen: Intro, Strophen, Aufbau, Hook, Pause und großes Finale.
+    Die Phasen sind entworfene Abschnitte, keine automatisch erkannten Drops.</p>
+   <label>Bühnenverwandlungsstil
+    <select value={stageStyle} disabled={busy}
+     onChange={e=>{setStageStyle(e.target.value as StageStyleV1117);invalidate();}}>
+     {Object.entries(STAGE_STYLE_LABELS_V1117).map(([key,value])=>
+      <option key={key} value={key}>{value}</option>)}
+    </select>
+   </label>
+   <label>Bühnenverwandlungsstärke {stageStrength}%
+    <input type="range" min="20" max="80" step="10" value={stageStrength} disabled={busy}
+     onChange={e=>{setStageStrength(Number(e.target.value));invalidate();}}/>
+   </label>
+   <label><input type="checkbox" checked={stageEnabled} disabled={busy}
+    onChange={e=>{setStageEnabled(e.target.checked);invalidate();}}/>
+    Bühnenverwandlung auch auf neue Offline-/OpenAI-Entwürfe anwenden
+   </label>
+   <button type="button" disabled={busy} onClick={()=>local(false,false,false,false,false,false,false,true)}>
+    V1117 Bühnenverwandlung jetzt proben
+   </button>
+   {stageCanUndo&&<button type="button" onClick={revertStageTransformation}>
+    Frühere Bühnenbewegung wiederherstellen
+   </button>}
+   <small>Die Probe verändert keine Live-Bühne. Nach dem Showplan-Übernehmen
+    können vorhandene virtuelle Bühneneffekte separat aktiviert werden.
+    Dafür müssen 360°-Show Designer und Konzertdirektor aktiv sein.
+    Manuelle Formationen, reduzierte Bewegung und schwache Hardware haben Vorrang.
+    Keine Govee-, Strobo- oder Pyrotechnik-Befehle.</small>
+  </fieldset>
   <label>Maximale virtuelle Showintensität: {cap}%
    <input type="range" min="30" max="85" step="5" value={cap} disabled={busy}
     onChange={e=>{setCap(Number(e.target.value));invalidate();}}/>
@@ -678,6 +753,32 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
    niemals Lyrics, Audiodaten, Tokens oder Govee-Geräteinformationen. Offline bleibt alles lokal.</small>
   {status&&<p role="status" aria-live="polite">{status}</p>}
   {preview&&<section aria-label="V1106 Show Remix Vorschau">
+   {stagePreview&&<section aria-label="V1117 Stage Transformation Partitur">
+    <h3>V1117 · 360°-Bühnenverwandlung</h3>
+    <p role="note" aria-label="V1117 Bühnenqualität">
+     {stagePreview.quality.scenes} Szenen · {stagePreview.quality.layouts} Bühnenformationen ·
+     {stagePreview.quality.floatingModes} Schwebevarianten ·
+     {stagePreview.quality.quietBreak?'bewusste Atempause':'Atempause prüfen'} ·
+     {stagePreview.quality.smoothTransitions?'weiche Übergänge':'Übergänge prüfen'}.
+    </p>
+    {activeStageCue&&<p role="status" aria-label="V1117 Aktuelle Bühnenszene">
+     Szene {activeStageCue.index+1}: {activeStageCue.chapter} · Bühne {activeStageCue.deck} ·
+     Plattformen {activeStageCue.floating} · Laserlook {activeStageCue.lasers}.
+     Dies ist eine Regieprobe ohne Live-Bühnenbewegung.
+    </p>}
+    <ol aria-label="V1117 sieben Bühnenverwandlungen">
+     {stagePreview.cues.map(c=><li key={c.index}>
+      <strong>Szene {c.index+1}: {c.chapter}</strong> · {Math.round(c.start*100)}–{Math.round(c.end*100)}% ·
+      Bühne {c.deck} · Plattformen {c.floating} · Laser {c.lasers} · {c.intensity}%.
+     </li>)}
+    </ol>
+    <button type="button" disabled={busy||preferences.reducedMotion} onClick={activateStageTransformation}>
+     V1117 vorhandene virtuelle Bühnenverwandlung aktivieren
+    </button>
+    <small>Zweiter, separater Opt-in-Schritt für bereits vorhandene V1066/V1067/V1082/V1086-Module.
+     Es werden keine neuen 3D-Modelle erzeugt; die Live-Show verwendet die gespeicherte Timeline,
+     Songposition und bestehende Leistungssperren.</small>
+   </section>}
    {interactionPreview&&<section aria-label="V1116 Artist Interaction Partitur">
     <h3>V1116 · Künstlerwechsel und Duo-Regie</h3>
     <p role="note" aria-label="V1116 Interaktionsqualität">

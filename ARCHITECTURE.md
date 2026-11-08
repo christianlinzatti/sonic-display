@@ -5086,3 +5086,13 @@ IK-Regeln, Avatare, Gerätebefehle oder Soundeffekte.
 Die V1104-Screenshot-Galerie wird um eine eigenständige, offline nutzbare Qualitätstabelle (`visual-gallery/quality.html` und `quality.json`) erweitert. Sechs neue UI-Prüfungen laufen in beiden Chromium-Projekten gegen `next start`: stabile PNG-Bilder der Startüberschrift vor/nach Reload, Settings-Viewport-/Overflow-Checks, Rückkehr des Tastaturfokus, Tastatur-Navigation, Reduced Motion und Govee-Knöpfe ohne autorisierte Geräte. Die identische Seite wird **innerhalb desselben Browserlaufs** verglichen; bewusst keine cross-platform Pixel-Golden-Files.
 
 `lib/visualPngDiffV1105.cjs` dekodiert echte PNG-Rasterdaten mit harten Größenlimits und vergleicht Farbkanäle pixelweise. `scripts/v1105-playwright-quality-report.cjs` akzeptiert Browser-Erfolg nur mit beiden Browsern, sämtlichen zwölf Prüfungen und echten Screenshots, einschließlich zweier PNG-Belege je Baseline-Vergleich. Der bestehende Browser-Runner speichert den eigenen Nachweis in `proof.json` und blockiert die Produktionsfreigabe bei fehlenden oder fehlgeschlagenen Prüfschritten. Keine zusätzlichen Hardware- oder Fremdnetz-Anfragen.
+
+### V1117 AI Stage Transformation
+
+`lib/aiStageTransformationV1117.ts` kuratiert vorhandene V1040-Bühnen-,
+Schwebebühnen- und Laser-Timeline-Cues und verändert keine Zeitgrenzen,
+Audio-Erkennung, Kamera- oder Avatar-Aktionen. Die Ausgabe wird ausschließlich
+über den expliziten V1106-Speichern-Schritt in den vorhandenen Showplan übernommen.
+Ein separater Opt-in-Dialog schaltet autorisierte V1066/V1067/V1082/V1086-
+Effekte unter ihren bestehenden Quality-/Pause-/Motion-/Manual-Gates frei.
+Keine zusätzlichen Renderpass- oder Geräteschnittstellen.

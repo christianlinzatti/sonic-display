@@ -10,7 +10,6 @@ test('V1110 Drop Radar never predicts without local opt-in microphone signal',as
  const radar=dialog.getByRole('group',{name:'V1110 AI Drop Prediction'});
  await expect(radar).toBeVisible();
  await expect(radar.getByRole('button',{name:'Drop-Dramaturgie für nächste Vorschau vormerken'})).toBeDisabled();
- // The UI must reject certainty, without requiring the older wording.
  await expect(radar).toContainText('weder einen echten Drop noch dessen Zeitpunkt sicher vorhersagen');
  await expect(radar).toContainText('Keine automatische Lichtsteuerung');
  expect(requests).toEqual([]);

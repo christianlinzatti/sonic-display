@@ -16,12 +16,10 @@ test('V1112 editable Stage Crew personalities produce a safe rehearsal, without 
  await expect(preview).toBeVisible();
  await expect(preview.getByRole('list',{name:'V1112 sieben Charakter-Szenen'}).locator('li')).toHaveCount(7);
  await expect(preview.getByRole('note',{name:'V1112 Charakter-Qualität'})).toContainText('kontrollierte Übergänge');
- // The focus follows the current rehearsal position, not a fixed artist.
- // Validate that the current scene's featured performer belongs to its
- // actual cue, regardless of where the scrubber starts on desktop or touch.
+ // The position of the rehearsal slider is not fixed to a particular performer.
  const current=await preview.getByRole('status',{name:'V1112 Aktueller Avatar-Fokus'}).innerText();
  const match=/Szene ([1-7]): (Neon Pulse|Festival Nova|Chrome Beat|Alle drei zusammen) · Kamera (\w+) · Tanz (\w+)/.exec(current);
- expect(match,'current rehearsal cue should identify the scene and artist').not.toBeNull();
+ expect(match,'current scene must identify the featured artist').not.toBeNull();
  const scene=preview.getByRole('list',{name:'V1112 sieben Charakter-Szenen'}).locator('li').nth(Number(match[1])-1);
  await expect(scene).toContainText('Szene '+match[1]);
  if(match[2]!=='Alle drei zusammen')await expect(scene).toContainText(match[2]);

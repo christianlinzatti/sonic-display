@@ -3614,3 +3614,12 @@ Die Remote-Anfrage sendet nur Genre, kurze Idee und Intensitätslimit; keine Lyr
 Songtitel, Audioanalyse, Geräte-IDs oder Zugangsdaten. Das Modell kann keine
 Hardware, Spotify oder Lampen steuern. Die neuen Szenen sind kreative Templates
 und dürfen nicht als nachgewiesene Songabschnitte oder Drops interpretiert werden.
+
+## V1117 · AI Stage Transformation
+
+Vier 360°-Verwandlungsstile planen sieben Bühnenszenen mit echten vorhandenen
+Formationen und schwebenden Plattformen. Unter Einstellungen → Bühne → 360° Arena →
+AI Show Designer → V1117 Bühnenverwandlung die lokale Vorschau starten, die
+Timeline ausdrücklich übernehmen und optional die bereits vorhandenen virtuellen
+V1066/V1067/V1082/V1086-Bühneneffekte einschalten. Keine automatischen Hardware-
+oder Govee-Befehle; manuelle Steuerung und reduzierte Bewegung haben Vorrang.
