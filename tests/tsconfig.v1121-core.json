@@ -1,0 +1,4 @@
+{
+  "compilerOptions": {"target":"ES2022","lib":["es2022"],"module":"ESNext","moduleResolution":"bundler","strict":true,"skipLibCheck":true,"noEmit":true,"rootDir":"..","types":[]},
+  "include":["../lib/aiImmersiveSceneTransitionsV1121.ts"]
+}

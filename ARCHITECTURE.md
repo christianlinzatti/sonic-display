@@ -1,3 +1,26 @@
+## V1121 · AI Immersive Scene Transitions
+
+`lib/aiImmersiveSceneTransitionsV1121.ts` berechnet sechs nebeneinander
+liegende, **nicht überlappende Überblendfenster** aus den sieben tatsächlich
+bearbeiteten V1040-Szenengrenzen. Die Fenster dauern maximal 0,65, 1,3 oder
+2,1 Sekunden (abhängig von Benutzerstärke und Szenenlänge) und verwenden
+Smoothstep-Gewichte für Bühne, Licht, Kamera und optische Hologramme.
+Die Ergebnisse sind eine **lokale Probepartitur**, keine neue Render-Pipeline
+und kein eigener Live-Show-Schnittplan. Eine eigene Probenpositionssteuerung
+zeigt das Übergangsgewicht an jeder Szenengrenze, ohne Song oder Gerät zu
+steuern. Die Song-Szenen werden **nicht** umgeschrieben. Keine verse/hook/drop
+Erkennung oder künftige Beat-Vorhersage.
+
+Der **separate Live-Opt-in** aktiviert ausschließlich bestehende, abgesicherte
+virtuelle Automatikmodule: V1071 Smart Flow, V1043/V1072 Kamera, V1056 Licht,
+V1066/1067 Bühne und V1068 Hologramme. Die tatsächlich gespielten Fades
+werden weiterhin von den jeweiligen Renderern errechnet und entsprechen
+nicht zwangsläufig exakt den sechs V1121-Probenfenstern. Der Live-Opt-in
+verweigert sich bei Reduced Motion, deaktiviertem Show Director oder
+manuellen Deck-/Float-/Hologramm-Modi. Alte Presetwerte werden nur dann
+zurückgesetzt, wenn sie seither unverändert geblieben sind. Keine Govee-,
+DMX-, Strobo-, Pyrotechnik-, Audioaufnahme- oder Cloud-Befehle.
+
 ## V1120 · AI Dynamic Lighting Conductor
 
 `lib/aiDynamicLightingConductorV1120.ts` ist ein rein lokaler, deterministischer
@@ -86,7 +109,7 @@ Im **360° AI Show Designer** kannst du jetzt die V1111-Konzertregie proben: Sie
 
 Das Drop-Radar wertet die **freiwillig gestartete lokale V1108-Mikrofonmessung** aus. Erst nach mindestens fünf Sekunden mit sauberem Signal werden ein bereits gemessener Einschlag oder ein möglicher Energieaufbau erkannt. Ein künftiger Drop-Zeitpunkt kann aus diesem Signal **nicht sicher vorhergesagt** werden. Nur nach Zustimmung kann eine Regieidee für die **nächste** V1106/V1109-Vorschau vorgemerkt werden. Die sieben Zeitgrenzen, die Intensitätsobergrenze und die manuelle Freigabe bleiben erhalten. Keine Audio-/Geräte-/Cloud-Übertragung; Tests: `npm run test:v1110`, `npm run test:v1110:types`.
 
-**Dokumentationsstand:** V1120
+**Dokumentationsstand:** V1121
 
 ## V1104 · Playwright Visual QA & Screenshot Reports
 

@@ -1,3 +1,23 @@
+## V1121 – AI Immersive Scene Transitions
+
+Im **360° AI Show Designer** stehen vier Übergangsstile zur Verfügung:
+filmisch, Festival-Wellen, sanfte Künstlerübergänge und holografische
+Raumwechsel. Die neue Probenpartitur berechnet **sechs sichere Übergänge**
+aus den sieben vorhandenen, ggf. manuell bearbeiteten Szenengrenzen.
+Mit einem zusätzlichen Probenregler lässt sich an jeder Grenze eine
+stufenlose virtuelle Überblendung von Kamera, Bühne, Hologrammen und Licht
+anzeigen. Das ist eine **Vorschau**, keine neue sekundengenaue Live-Zeitspur.
+
+Erst ein gesonderter Klick aktiviert vorhandene virtuelle V1071-, V1043-,
+V1072-, V1056- und V1066–V1068-Renderer. Deren eigene Überblendung, manuelle
+Präferenzen, Reduced Motion und GPU-Grenzen bleiben verbindlich. Der
+Showplan und alle Songzeiten bleiben bis zur gesonderten Übernahme unverändert.
+Keine neuen GLBs oder Hardwarebefehle. Rückgängig ist konfliktgeschützt.
+
+Tests: `npm run test:v1121`, `npm run test:v1121:types`,
+`tests/e2e/ai-immersive-scene-transitions-v1121.spec.cjs` in CI auf Chromium
+Desktop und Touch. Details: `changelog/V1121-AI-IMMERSIVE-SCENE-TRANSITIONS.md`.
+
 ## V1120 – AI Dynamic Lighting Conductor
 
 Im **360° AI Show Designer** stehen jetzt vier Lichtstile zur Auswahl:
