@@ -4,6 +4,7 @@ import {useLayoutEffect,useMemo,useRef} from 'react';
 import {Color,Object3D,Quaternion,Vector3,type InstancedMesh} from 'three';
 import type {AudioFeatures} from '@/types/audio';
 import {sampleMusicalDynamicsGainV1090,type MusicalDynamicsStateV1090} from '@/lib/arena360MusicalDynamicsV1090';
+import {sampleStoryArcGainV1091,type StoryArcStateV1091} from '@/lib/arena360StoryArcDirectorV1091';
 import {sampleUltimateFestivalDropV1087,type UltimateFestivalDropCueV1087,type UltimateFestivalDropStateV1087} from '@/lib/arena360UltimateFestivalDropV1087';
 import type {ArenaFinaleCueV1046} from '@/lib/arena360CinematicFinaleV1046';
 import type {IntelligentLaserCueV1057} from '@/lib/arena360IntelligentLaserV1057';
@@ -16,13 +17,14 @@ import {createArenaLasersV1036,planArenaAtmosphereV1036,sampleArenaLaserV1036} f
  * Fixed in arena coordinates: the rotating performer deck is never affected.
  */
 export function ArenaLaserFansV1036({audio,playing,reducedMotion,reactive,enabled,directorEnabled,
- section,progressMs,durationMs,intensity,peakRef,atmosphereV1045,finaleV1046,laserCueV1057,laserExperienceCueV1080,ultimateFestivalDropCueV1087,ultimateFestivalDropStateV1087,musicalDynamicsStateV1090}: {
+ section,progressMs,durationMs,intensity,peakRef,atmosphereV1045,finaleV1046,laserCueV1057,laserExperienceCueV1080,ultimateFestivalDropCueV1087,ultimateFestivalDropStateV1087,musicalDynamicsStateV1090,storyArcStateV1091}: {
  audio:AudioFeatures;playing:boolean;reducedMotion:boolean;reactive:boolean;enabled:boolean;directorEnabled:boolean;
  section?:string;progressMs?:number;durationMs?:number;intensity?:number;
  peakRef?:{readonly current:ArenaPeakStateV1036};atmosphereV1045?:ArenaAtmosphereDirectorCueV1045;finaleV1046?:ArenaFinaleCueV1046;
  laserCueV1057?:IntelligentLaserCueV1057;laserExperienceCueV1080?:LaserExperienceCueV1080;
  ultimateFestivalDropCueV1087?:UltimateFestivalDropCueV1087;ultimateFestivalDropStateV1087?:{readonly current:UltimateFestivalDropStateV1087};
  musicalDynamicsStateV1090?:{readonly current:MusicalDynamicsStateV1090};
+ storyArcStateV1091?:{readonly current:StoryArcStateV1091};
 }){
  const tier=useAdaptivePerformance().tier;
  const fixtures=useMemo(()=>createArenaLasersV1036(tier),[tier]);
@@ -79,7 +81,7 @@ export function ArenaLaserFansV1036({audio,playing,reducedMotion,reactive,enable
    dummy.quaternion.copy(quaternion);dummy.scale.set(.75,Math.max(.001,length),.75);dummy.updateMatrix();
    rays.current.setMatrixAt(i,dummy.matrix);
    rays.current.setColorAt(i,tint.copy(i%2?softBlue:softPurple).multiplyScalar(active?Math.min(.74,sample.brightness*gain*(laserCueV1057?.active?laserCueV1057.fanGain:1)*(laserExperienceCueV1080?.active?laserExperienceCueV1080.gain:1)*
-      sampleMusicalDynamicsGainV1090(musicalDynamicsStateV1090?.current)):.008));
+      sampleMusicalDynamicsGainV1090(musicalDynamicsStateV1090?.current)*sampleStoryArcGainV1091(storyArcStateV1091?.current)):.008));
   }
   rays.current.instanceMatrix.needsUpdate=true;
   if(rays.current.instanceColor)rays.current.instanceColor.needsUpdate=true;

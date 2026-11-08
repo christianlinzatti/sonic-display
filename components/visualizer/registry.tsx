@@ -231,6 +231,9 @@ export interface VisualizerProps {
   arenaMusicalDynamicsEnabledV1090?:boolean;
   arenaMusicalDynamicsStrengthV1090?:number;
   arenaMusicalDynamicsStyleV1090?:import('@/lib/arena360MusicalDynamicsV1090').MusicalDynamicsStyleV1090;
+  arenaStoryArcEnabledV1091?:boolean;
+  arenaStoryArcStrengthV1091?:number;
+  arenaStoryArcStyleV1091?:import('@/lib/arena360StoryArcDirectorV1091').StoryArcStyleV1091;
   arenaEpicDropEnabledV1069?:boolean;
   arenaEpicDropStrengthV1069?:number;
   arenaUltimateFinaleEnabledV1070?:boolean;

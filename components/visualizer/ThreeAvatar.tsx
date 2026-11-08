@@ -942,6 +942,9 @@ export function ThreeAvatar(props: VisualizerProps) {
         musicalDynamicsEnabledV1090={props.arenaMusicalDynamicsEnabledV1090 ?? false}
         musicalDynamicsStrengthV1090={props.arenaMusicalDynamicsStrengthV1090 ?? 55}
         musicalDynamicsStyleV1090={props.arenaMusicalDynamicsStyleV1090 ?? 'balanced'}
+        storyArcEnabledV1091={props.arenaStoryArcEnabledV1091 ?? false}
+        storyArcStrengthV1091={props.arenaStoryArcStrengthV1091 ?? 55}
+        storyArcStyleV1091={props.arenaStoryArcStyleV1091 ?? 'balanced'}
         // Only an active, synchronized lyric line from the owned player is projected.
         lyricTextV1083={currentSyncedLedLyricV1083(props.lyricsScene?.lyrics,
           props.lyricsScene?.progressMs,Boolean(props.lyricsScene?.playing&&props.isPlaying))}

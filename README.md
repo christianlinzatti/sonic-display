@@ -1,3 +1,7 @@
+## V1091 · Smart Concert Story Arc Director
+
+Der optionale dramaturgische Lichtbogen verbindet gemessene Energie, stabile Live-Abschnitte und die relative Songposition zu sanften LED- und Laserblenden. Songposition und automatisch geplante Abschnitte sind nur Gestaltungshinweise, niemals ein Beweis für einen Drop. Aktivierung und Modi: Arena Show Designer. Standardmäßig aus.
+
 ## V1090 · Musical Dynamics & Show Transitions
 
 V1090 ergänzt eine standardmäßig deaktivierte, songbezogene Musikdynamik für LED-Wand,

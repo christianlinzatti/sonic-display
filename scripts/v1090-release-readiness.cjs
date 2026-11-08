@@ -10,7 +10,7 @@ function inspectReleaseV1090(root){
   add('release',v>=1090&&pkg.sonicFeatureRelease==='v'+v&&pkg.sonicRoadmapRelease==='v'+v);
   add('lockfile',pkg.version===lock.version&&pkg.version===lock.packages[''].version);
   add('node24',pkg.engines.node==='24.x');
-  add('prebuild',pkg.scripts.prebuild.startsWith('npm run test:v1090 && npm run test:v1090:types &&'));
+  add('prebuild',pkg.scripts.prebuild.includes('npm run test:v1090 && npm run test:v1090:types &&'));
   add('scripts',pkg.scripts['test:v1090']==='node tests/v1090-musical-dynamics-regression.cjs'&&
    pkg.scripts['test:v1090:types']==='tsc -p tests/tsconfig.v1090-core.json --noEmit');
   for(const f of ['lib/arena360MusicalDynamicsV1090.ts','tests/v1090-musical-dynamics-regression.cjs',

@@ -608,6 +608,32 @@ export function ArenaShowDesignerPanelV1040(){
     Bei Pause, niedriger Grafikqualität, Songwechsel oder Reduced Motion inaktiv.
     Rein virtuelle FX – keine CO₂-Hardware, Pyrotechnik, Govee-Befehle oder Vollblitze.</small>
   </fieldset>
+  <fieldset className="arena-v1091-story-arc" aria-label="V1091 Smart Concert Story Arc Director">
+   <legend>V1091 · Smart Concert Story Arc Director</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaStoryArcEnabledV1091)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaStoryArcEnabledV1091:e.target.checked})}/>
+    Dramaturgische Lichtblenden passend zu Energie, Intro, Aufbau und Ausklang
+   </label>
+   <label>Szenenstil
+    <select value={preferences.arenaStoryArcStyleV1091??'balanced'}
+     disabled={!plan||!preferences.arenaStoryArcEnabledV1091}
+     onChange={e=>updatePreferences({arenaStoryArcStyleV1091:e.target.value==='cinematic'?'cinematic':e.target.value==='festival'?'festival':'balanced'})}>
+     <option value="balanced">Ausgewogen · sanfter Spannungsbogen</option>
+     <option value="cinematic">Cinematic · lange Übergänge</option>
+     <option value="festival">Festival · schnellere Akzente</option>
+    </select>
+   </label>
+   <label>Erzählintensität · {preferences.arenaStoryArcStrengthV1091??55}%
+    <input type="range" min={0} max={80} step={5} value={preferences.arenaStoryArcStrengthV1091??55}
+     disabled={!plan||!preferences.arenaStoryArcEnabledV1091}
+     onChange={e=>updatePreferences({arenaStoryArcStrengthV1091:Number(e.target.value)})}/>
+   </label>
+   <small>Eine zusätzliche dramaturgische Dimmkurve für die bestehenden LED- und Lasersysteme.
+    Audio-Messungen bestimmen Höhepunkte; Songposition und Songabschnitt dienen nur als optische
+    Gestaltungshinweise. Keine erfundenen Drops, keine Hardware-/Govee-Steuerung, keine neuen
+    Rendering-Durchläufe. Manuelle Muster gewinnen; Pause, Seek und Reduced Motion stoppen die Regie.</small>
+  </fieldset>
   <fieldset className="arena-v1090-musical-dynamics" aria-label="V1090 Musical Dynamics & Show Transitions">
    <legend>V1090 · Musical Dynamics & Show Transitions</legend>
    <label className="setting-check"><input type="checkbox"
@@ -1098,7 +1124,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false,arenaCrowdEnergyEnabledV1075:false,arenaRapGesturesEnabledV1076:false,arenaDuetPerformanceEnabledV1077:false,arenaNaturalDanceEnabledV1078:false,arenaLiveArtistEnabledV1079:false,arenaDynamicArchitectureEnabledV1082:false,arenaAdvancedLedEnabledV1083:false,arenaFestivalFxEnabledV1084:false,arenaProjectionEnabledV1085:false,arenaEpicTransformationEnabledV1086:false,arenaUltimateFestivalDropEnabledV1087:false,arenaBeatIntelligenceEnabledV1089:false,arenaMusicalDynamicsEnabledV1090:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false,arenaCrowdEnergyEnabledV1075:false,arenaRapGesturesEnabledV1076:false,arenaDuetPerformanceEnabledV1077:false,arenaNaturalDanceEnabledV1078:false,arenaLiveArtistEnabledV1079:false,arenaDynamicArchitectureEnabledV1082:false,arenaAdvancedLedEnabledV1083:false,arenaFestivalFxEnabledV1084:false,arenaProjectionEnabledV1085:false,arenaEpicTransformationEnabledV1086:false,arenaUltimateFestivalDropEnabledV1087:false,arenaBeatIntelligenceEnabledV1089:false,arenaMusicalDynamicsEnabledV1090:false,arenaStoryArcEnabledV1091:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

@@ -80,7 +80,7 @@ assert(panel.includes('arena-v1090-musical-dynamics')&&panel.includes('arenaMusi
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
 assert(/^0\.1\.0-v(\d+)$/.test(pkg.version));assert(Number(pkg.version.match(/v(\d+)$/)[1])>=1090);
 assert.equal(pkg.version,lock.version);assert.equal(pkg.version,lock.packages[''].version);
-assert(pkg.scripts.prebuild.startsWith('npm run test:v1090 && npm run test:v1090:types &&'));
+assert(pkg.scripts.prebuild.includes('npm run test:v1090 && npm run test:v1090:types &&'));
 assert(read('scripts/v931-production-gate.cjs').includes('tests/v1090-musical-dynamics-regression.cjs'));
 assert(read('scripts/vercel-production-build.cjs').includes('tests/v1090-musical-dynamics-regression.cjs'));
 console.log(`PASS V1090: ${count} finite phase/gain samples, smooth crossfades, manual priority, no fabricated beat/drop, pause/seek/track guards`);
