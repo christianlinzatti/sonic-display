@@ -1,6 +1,6 @@
 /** Only the three bundled performers. Pure clock/clip planning; no scene or audio ownership. */
 export const CREW_IDS = ['sonic-neon-pulse','sonic-festival-nova','sonic-chrome-beat'] as const;
-export type CrewMode = 'individual'|'unison'|'canon'|'spotlight';
+export type CrewMode = 'individual'|'unison'|'canon'|'spotlight'|'story';
 export type CrewSettings = { enabled:boolean; reactions:boolean; mode:CrewMode };
 export const CREW_DEFAULT: CrewSettings = Object.freeze({enabled:true,reactions:true,mode:'individual'});
 export type CrewInput = {
@@ -16,7 +16,7 @@ export type CrewPlan = {active:boolean;clip:string|null;part:'quiet'|'verse'|'ho
 export const normalizeCrewSettings = (v:unknown):CrewSettings => {
  const x=v && typeof v==='object'?v as Partial<CrewSettings>:{};
  return {enabled:typeof x.enabled==='boolean'?x.enabled:true,reactions:typeof x.reactions==='boolean'?x.reactions:true,
- mode:x.mode==='unison'||x.mode==='canon'||x.mode==='spotlight'?x.mode:'individual'};
+ mode:x.mode==='unison'||x.mode==='canon'||x.mode==='spotlight'||x.mode==='story'?x.mode:'individual'};
 };
 const clamp=(x:number,a:number,b:number)=>Math.min(b,Math.max(a,x));
 const finite=(x:unknown):x is number=>typeof x==='number'&&Number.isFinite(x);
@@ -48,14 +48,20 @@ export function stepCrew(previous:CrewState,input:CrewInput):{state:CrewState;pl
  const phrase=Math.floor((beat+1e-7)/16),count=clamp(Math.round(input.count)||1,1,4),slot=clamp(Math.round(input.slot)||0,0,count-1);
  const leader=phrase%count,model=CREW_IDS.indexOf(input.modelId as typeof CREW_IDS[number]);
  const signatures=[['Dance_NeonCircuit','Dance_LaserStep'],['Dance_FestivalFlow','Dance_DiscoStar'],['Dance_PopLock','Dance_Clockwork']];
- const ensemble=count>1 && input.settings.mode!=='individual';
+ // V1114: a single user-enabled mode switches the ACTUAL embedded GLB
+ // choreography by the observed song section. This does not detect the
+ // section itself. Manual clip/timeline/reduced-motion rules still win.
+ const effectiveMode:CrewMode=input.settings.mode==='story'
+   ?part==='quiet'?'individual':part==='verse'?'spotlight':part==='hook'?'canon':'unison'
+   :input.settings.mode;
+ const ensemble=count>1&&effectiveMode!=='individual';
  let choices:string[];
  const greet=input.settings.reactions && pos<3000 && part==='quiet' && model===1 && !ensemble;
  if(greet)choices=['Gesture_Wave','Idle_Breathe'];
  else if(part==='quiet')choices=['Idle_Breathe','Dance_Groove'];
- else if(ensemble && input.settings.mode==='canon')choices=['Dance_House','Dance_Groove'];
- else if(ensemble && input.settings.mode==='spotlight' && slot===leader)choices=[signatures[model][phrase%2],'Dance_Groove'];
- else if(ensemble && (input.settings.mode!=='spotlight'||slot!==leader))
+ else if(ensemble && effectiveMode==='canon')choices=['Dance_House','Dance_Groove'];
+ else if(ensemble && effectiveMode==='spotlight' && slot===leader)choices=[signatures[model][phrase%2],'Dance_Groove'];
+ else if(ensemble && (effectiveMode!=='spotlight'||slot!==leader))
    choices=part==='drop'?['Dance_FestivalBounce','Dance_Techno']:part==='hook'?['Dance_House','Dance_Groove']:['Dance_Groove','Dance_House'];
  else if(part==='hook')choices=[signatures[model][phrase%2],'Dance_Disco','Dance_Groove'];
  else if(part==='drop')choices=model===0?['Dance_Shuffle','Dance_Techno']:model===1?['Dance_FestivalBounce','Dance_Disco']:['Dance_Robot','Dance_Techno'];
@@ -69,11 +75,11 @@ export function stepCrew(previous:CrewState,input:CrewInput):{state:CrewState;pl
  // Switch on a bar and hold >=8 seconds. Quiet sections may settle after one bar; greetings may finish after their own clip.
  const barBoundary=Math.floor((beat+1e-7)/4)!==Math.floor((old.beat+1e-7)/4);
  const hold=old.clip==='Gesture_Wave'?3000:part==='quiet'?2000:8000;
- const roleChanged=ensemble&&input.settings.mode==='spotlight'&&!!old.key&&old.phrase!==phrase&&(slot===leader||slot===old.phrase%count);
+ const roleChanged=ensemble&&effectiveMode==='spotlight'&&!!old.key&&old.phrase!==phrase&&(slot===leader||slot===old.phrase%count);
  const keep=!!old.clip&&available.has(old.clip)&&!roleChanged&&(!barBoundary||pos-old.switched<hold-.001);
  const clip=keep?old.clip!:candidate;
  const state={key,position:pos,beat,bpm,clip,switched:clip!==old.clip?pos:old.switched,phrase};
- return {state,plan:{active:true,clip,part,beat,bpm,offset:ensemble&&input.settings.mode==='canon'?-slot*2:0,leader,
+ return {state,plan:{active:true,clip,part,beat,bpm,offset:ensemble&&effectiveMode==='canon'?-slot*2:0,leader,
  reaction:input.settings.reactions?(['nod','welcome','led'] as const)[model]:'none',reason:knownBpm?'music':'tempo-fallback'}};
 }
 /** Original clips are authored at 120 BPM. A 12s signature retains all 24 beats. */

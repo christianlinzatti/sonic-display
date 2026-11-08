@@ -29,8 +29,9 @@ export function SonicCrewControls(){
   <label><input type="checkbox" checked={settings.enabled} onChange={e=>writeCrewSettings({...settings,enabled:e.target.checked})}/> Musiksteuerung für Sonic Stage Crew</label>
   <label><input type="checkbox" checked={settings.reactions} onChange={e=>writeCrewSettings({...settings,reactions:e.target.checked})}/> Eigene Reaktionen der drei Figuren</label>
   <label>Gemeinsame Choreografie <select value={settings.mode} onChange={e=>writeCrewSettings({...settings,mode:e.target.value as CrewMode})}>
-   <option value="individual">Individuell</option><option value="unison">Gemeinsamer Tanz</option><option value="canon">Kanon · 2 Beats Versatz</option><option value="spotlight">Wechselnde Solos</option>
+   <option value="individual">Individuell</option><option value="unison">Gemeinsamer Tanz</option><option value="canon">Kanon · 2 Beats Versatz</option><option value="spotlight">Wechselnde Solos</option><option value="story">V1114 Auto-Choreografie · Abschnitte wechseln</option>
   </select></label>
+  <p>V1114 Automatik: Intro/Break = ruhig · Verse = wechselnde Solos · Hook = Kanon · Drop = Unisono. Nur bereits geladene GLB-Clips werden verwendet; bei fehlenden Clips erfolgt ein sicherer Fallback. Die Szenen stammen aus vorhandenen Abschnittssignalen, nicht aus einer erfundenen Drop-Vorhersage.</p>
   <p>Neon Pulse nickt zum Beat; Nova blickt zum Publikum und begrüßt im individuellen Intro; Chrome Beat setzt dezente LED-Akzente. Manuelle Clips, externe Bewegungen, gespeicherte Choreografien und Bewegungsreduktion haben Vorrang.</p>
   <div className="avatar-editor-actions"><button type="button" onClick={setup} disabled={!!saved}>Trio auf der Bühne einrichten</button><button type="button" onClick={undo} disabled={!saved}>Trio-Einrichtung zurücknehmen</button></div>
   {saved&&<p role="status">Trio eingerichtet. Die bisherigen Modelle und Gruppenpositionen lassen sich in diesem Fenster wiederherstellen. Vorhandene manuelle Motion-Steuerungen bleiben vorrangig.</p>}

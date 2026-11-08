@@ -1,3 +1,28 @@
+## V1116 – AI Artist Interaction (Lead-Wechsel, Dialoge und Duos)
+
+Der **V1116 AI Artist Interaction**-Bereich im AI Show Designer verbindet die bisherigen Character-, Dance- und Vocal-Regiepartituren zu sieben sichtbaren Interaktionsszenen. Vier Stile (Dialog, Duo, Rap-Battle und Festival) wechseln die Kameraführung zwischen den vorhandenen V1040-Modi. Die Regie nennt Lead-/Partnerrollen, Antwortgesten und gemeinsame Bühnenmomente, aber behauptet **keinen erkannten Gesang, physischen Blickkontakt oder neue GLB-Clips**. Die Original-Songgrenzen und die Govee- und Laserwerte bleiben bis zur expliziten Annahme unverändert.
+
+Optional kann nach einer separaten Zustimmung der vorhandene **V1079 Live Artist Interaction**-Modus aktiviert werden. Dieser visualisiert Partnerakzente ausschließlich bei echten, synchronisierten Lyrics-Lücken. Es werden keine Audiodaten gesendet und keine individuellen Kopf- oder Blickanimationen erfunden. Die Regler lassen sich konfliktgeschützt rückgängig machen. Details: `changelog/V1116-AI-ARTIST-INTERACTION.md`, `docs/V1116-RELEASE-AND-TESTS.md`.
+
+## V1115 – AI Vocal Acting & Lip-Sync Intelligence
+
+Die optionale Vocal-Regiepartitur zeigt sieben Songphasen, drei Stage-Crew-Charaktere und wechselnde Rollen für Rap, Melodie und Festival-Hybrid. Ihre Sänger-/Adlib-Rollen sind **Inszenierungsvorschläge**, keine automatische Sprechererkennung. Ein zweiter Opt-in-Schritt aktiviert begrenzte, bereits bestehende V368/V371/V372-Parameter (Lip-Sync zu vorhandenen Lyrics, Gestik, Augen/Blick, Gesichtsintensität); Rückgängig ist konfliktgesichert. Manuell gesetzte Vocal-Cues und zeitlich ausgerichtete Viseme bleiben unangetastet. Die mitgelieferten GLBs haben keine Jaw-Bones oder Mund-Morph-Targets, deshalb ist ihre echte Gesichts-Lippensynchronisation damit noch nicht möglich. Keine neuen KI-, Audio-, Mikrofon- oder Geräteberechtigungen.
+
+Siehe `changelog/V1115-AI-VOCAL-ACTING-LIP-SYNC.md` und `docs/V1115-RELEASE-AND-TESTS.md`.
+
+## V1114 – AI Dance Choreographer 4.0 (Stage Crew mit echten GLB-Clips)
+
+Der 360° AI Show Designer bietet eine lokale **Sieben-Szenen-Choreografie** für die mitgelieferten Performer Neon Pulse, Festival Nova und Chrome Beat. Vier wählbare Stile und eine Probenpartitur planen Solo, Duo, Kanon (zwei Beats Versatz), Gruppensynchronisation, Atempause und Finale. Die vorhandenen V1040-Zeitgrenzen, Intensitätsgrenzen sowie manuelle Kamera-/Tanzentscheidungen bleiben bis zur ausdrücklichen Übernahme unverändert. Die Darstellung ist eine dramaturgische Vorschau, **keine echte Echtzeit-Analyse der Musikstruktur**.
+
+Neu ist außerdem der optionale Stage-Crew-Modus **„V1114 Auto-Choreografie · Abschnitte wechseln“**. Die bereits bestehende Live-GLB-Engine schaltet bei *vorhandenem Abschnittssignal* automatisch zwischen Ruhe-Animationen (Intro/Break), Spotlight-Solos (Verse), 2-Beat-Kanon (Hook) und Unisono (Drop). Sie wählt ausschließlich Clips, die tatsächlich im geladenen GLB vorkommen, und behält Fallbacks, 8-Sekunden-Haltezeiten, Pausen-, Reduced-Motion- und manuelle Prioritätsregeln bei. In der KI-Vorschau kann der Modus **gesondert und reversibel** eingeschaltet werden; auch eine Trio-Einrichtung ist wie bisher erforderlich. Die Partitur wird nicht als individuelle Clip-zu-Clip-Timeline persistiert: tatsächliche Live-Tänze orientieren sich an den zur Laufzeit verfügbaren Abschnittssignalen und Clips. Kamera-Tracking pro Künstler und neue Rig-Motion-Captures werden nicht erfunden. Kein dauerhafter KI-Aufruf, keine neuen Geräte- oder Audio-Rechte.
+
+Tests: `npm run test:v1114`, `npm run test:v1114:types`, `node scripts/v959-source-preflight.cjs`. Desktop-/Touch-Browser-E2E: `tests/e2e/ai-dance-choreographer-v1114.spec.cjs`. Die lokalen Unit-Checks ersetzen keinen vollständigen GitHub-Actions-/Next.js-Produktionsbuild.
+
+
+## V1113 – Charakter-Performance
+
+V1113 bietet drei Regiestile und individuell lesbare Regiehinweise für die drei GLBs. Vorhandene Animationen bleiben unverändert; keine neuen Gesten-Clips wurden in GLB-Dateien eingebaut.
+
 > Die neue Musik- und Gruppensteuerung aus Paket 4 wird in [SONIC-CREW-SHOW.md](SONIC-CREW-SHOW.md) beschrieben. Dieser Leitfaden dokumentiert die weiterhin enthaltenen GLB-Modelle aus Paket 3.
 
 # Sonic Stage Crew – Charakter- und Detailpaket 3

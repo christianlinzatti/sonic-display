@@ -1,0 +1,43 @@
+'use strict';
+const {test,expect,openSettings}=require('./fixtures.cjs');
+const STORE='sonic-display-ui-preferences-v1';
+// Real Chromium Desktop + Touch against next start. No mic, cloud or devices.
+test('V1113 performance rehearsal varies all three Stage Crew characters without saving',async({page},testInfo)=>{
+ const dialog=await openSettings(page,'avatar');
+ await dialog.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const producer=dialog.getByRole('group',{name:'V1106 KI Show Remix'});
+ const group=producer.getByRole('group',{name:'V1113 AI Performance Director'});
+ await expect(group).toBeVisible();
+ await group.getByRole('combobox',{name:'Performance-Regiestil'}).selectOption('dynamic');
+ await group.getByRole('slider',{name:/Ausdruckskraft in der Charakterprobe/}).focus();
+ await page.keyboard.press('End');
+ await expect(group.getByRole('slider',{name:/Ausdruckskraft in der Charakterprobe/})).toHaveValue('80');
+ const before=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORE);
+ await group.getByRole('button',{name:'V1113 Bühnenperformance jetzt proben'}).click();
+ const score=producer.getByRole('region',{name:'V1113 Performance Director Partitur'});
+ await expect(score).toBeVisible();
+ await expect(score.getByRole('list',{name:'V1113 sieben Performance-Szenen'}).locator('li')).toHaveCount(7);
+ await expect(score.getByRole('note',{name:'V1113 Performance-Qualität'})).toContainText('kontrollierte Intensitätsübergänge');
+ await expect(score.getByRole('status',{name:'V1113 Aktuelle Performance'})).toBeVisible();
+ await expect(score.getByText(/Neon Pulse \(lead\)/).first()).toBeVisible();
+ expect(await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORE)).toEqual(before);
+ await testInfo.attach('v1113-performance-score-screenshot',{body:await score.screenshot(),contentType:'image/png'});
+});
+test('V1113 performance applies only after approval, and undo restores original show',async({page},testInfo)=>{
+ const dialog=await openSettings(page,'avatar');
+ await dialog.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const producer=dialog.getByRole('group',{name:'V1106 KI Show Remix'});
+ const group=producer.getByRole('group',{name:'V1113 AI Performance Director'});
+ await group.getByRole('combobox',{name:'Performance-Regiestil'}).selectOption('cinematic');
+ await group.getByRole('checkbox',{name:'Performance-Regie auch auf neue Offline-/OpenAI-Vorschläge anwenden'}).check();
+ const before=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORE);
+ await producer.getByRole('button',{name:'Offline-Remix ausprobieren'}).click();
+ const preview=producer.getByRole('region',{name:'V1106 Show Remix Vorschau'});
+ await expect(preview.getByRole('list',{name:'V1113 sieben Performance-Szenen'}).locator('li')).toHaveCount(7);
+ expect(await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORE)).toEqual(before);
+ await preview.getByRole('button',{name:'Diese sieben Szenen in meinen Showplan übernehmen'}).click();
+ await expect.poll(()=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040?.segments?.[2]?.camera??null,STORE)).toBe('orbit');
+ await producer.getByRole('button',{name:'Letzten Remix rückgängig machen'}).click();
+ await expect.poll(()=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORE)).toEqual(before);
+ await testInfo.attach('v1113-approved-undo-screenshot',{body:await group.screenshot(),contentType:'image/png'});
+});

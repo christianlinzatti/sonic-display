@@ -1,0 +1,44 @@
+'use strict';
+const {test,expect,openSettings}=require('./fixtures.cjs');
+const PREFS='sonic-display-ui-preferences-v1';
+// Real desktop and touch Chromium. Offline rehearsal: no microphone, OAuth or AI request.
+test('V1115 vocal rehearsal has seven safe scenes without mutating stage settings',async({page},testInfo)=>{
+ const dialog=await openSettings(page,'avatar');
+ await dialog.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const producer=dialog.getByRole('group',{name:'V1106 KI Show Remix'});
+ const director=producer.getByRole('group',{name:'V1115 AI Vocal Acting'});
+ await expect(director).toBeVisible();
+ await director.getByRole('combobox',{name:'Vocal-Auftrittsstil'}).selectOption('hybrid');
+ const before=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'{}').arenaShowPlanV1040??null,PREFS);
+ await director.getByRole('button',{name:'V1115 Vocal Acting jetzt proben'}).click();
+ const score=producer.getByRole('region',{name:'V1115 Vocal Acting Partitur'});
+ await expect(score).toBeVisible();
+ await expect(score.getByRole('list',{name:'V1115 sieben Vocal-Szenen'}).locator(':scope > li')).toHaveCount(7);
+ await expect(score.getByRole('note',{name:'V1115 Vocal-Qualität'})).toContainText('0 automatisch verifizierte Sänger');
+ await expect(score.getByRole('status',{name:'V1115 Aktuelle Vocal-Szene'})).toBeVisible();
+ await expect(score.getByText(/Neon Pulse/).first()).toBeVisible();
+ expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'{}').arenaShowPlanV1040??null,PREFS)).toEqual(before);
+ await testInfo.attach('v1115-vocal-score-screenshot',{body:await score.screenshot(),contentType:'image/png'});
+});
+test('V1115 live vocal settings require separate opt-in and safe undo',async({page},testInfo)=>{
+ const dialog=await openSettings(page,'avatar');
+ await dialog.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const producer=dialog.getByRole('group',{name:'V1106 KI Show Remix'});
+ const director=producer.getByRole('group',{name:'V1115 AI Vocal Acting'});
+ await director.getByRole('combobox',{name:'Vocal-Auftrittsstil'}).selectOption('melodic');
+ const before=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'{}'),PREFS);
+ await director.getByRole('button',{name:'V1115 Vocal Acting jetzt proben'}).click();
+ const score=producer.getByRole('region',{name:'V1115 Vocal Acting Partitur'});
+ const unchanged=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'{}'),PREFS);
+ expect(unchanged.avatarVocalStyleV368).toBe(before.avatarVocalStyleV368);
+ await score.getByRole('button',{name:'V1115 Vocal-Preset für vorhandene Lip-Sync-Engine aktivieren'}).click();
+ await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'{}').avatarVocalStyleV368,PREFS)).toBe('singing');
+ await expect(director.getByRole('button',{name:'Frühere Vocal-Regler wiederherstellen'})).toBeVisible();
+ await director.getByRole('button',{name:'Frühere Vocal-Regler wiederherstellen'}).click();
+ await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'{}').avatarVocalStyleV368??'auto',PREFS)).toBe(before.avatarVocalStyleV368??'auto');
+ const after=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'{}'),PREFS);
+ expect(after.avatarManualVocalEnabledV385).toBe(before.avatarManualVocalEnabledV385);
+ expect(after.avatarVocalAssignmentsV385).toEqual(before.avatarVocalAssignmentsV385);
+ expect(after.arenaShowPlanV1040).toEqual(before.arenaShowPlanV1040);
+ await testInfo.attach('v1115-vocal-preset-undo-screenshot',{body:await director.screenshot(),contentType:'image/png'});
+});

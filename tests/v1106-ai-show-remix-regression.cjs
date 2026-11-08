@@ -14,7 +14,8 @@ try{
  try{compiler=require.resolve('typescript/bin/tsc');}
  catch{const local=require('node:module').globalPaths.map(p=>path.join(p,'typescript/bin/tsc.js')).find(fs.existsSync);compiler=local;}
  if(!compiler)throw Error('TypeScript compiler required to verify V1106');
- const compile=spawnSync(process.execPath,[compiler,'--target','ES2022','--module','CommonJS',
+ fs.mkdirSync(path.join(temp,'type-roots'),{recursive:true});
+ const compile=spawnSync(process.execPath,[compiler,'--typeRoots',path.join(temp,'type-roots'),'--target','ES2022','--module','CommonJS',
   '--moduleResolution','node','--skipLibCheck','--strict','--outDir',temp,
   path.join(root,'lib/arena360AiShowRemixV1106.ts')],{encoding:'utf8',timeout:30000,windowsHide:true});
  assert.equal(compile.status,0,compile.stderr||compile.stdout);

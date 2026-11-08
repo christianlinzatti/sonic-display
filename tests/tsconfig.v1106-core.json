@@ -1,12 +1,17 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["es2022"],
+    "lib": [
+      "es2022"
+    ],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "types": []
   },
-  "include": ["../lib/arena360AiShowRemixV1106.ts"]
+  "include": [
+    "../lib/arena360AiShowRemixV1106.ts"
+  ]
 }

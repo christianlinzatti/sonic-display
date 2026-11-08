@@ -1,0 +1,41 @@
+'use strict';
+const {test,expect,openSettings}=require('./fixtures.cjs');
+const STORAGE='sonic-display-ui-preferences-v1';
+// Real Next.js + Playwright Chromium Desktop/Touch; no real Spotify or light devices.
+test('V1111 coordinated show rehearsal previews seven cues, supports scrubbing and leaves storage untouched',async({page},testInfo)=>{
+ const dialog=await openSettings(page,'avatar');
+ await dialog.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const producer=dialog.getByRole('group',{name:'V1106 KI Show Remix'});
+ const director=producer.getByRole('group',{name:'V1111 AI Live Show Conductor'});
+ await expect(director).toBeVisible();
+ await director.getByRole('combobox',{name:'Regiecharakter'}).selectOption('festival');
+ const before=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORAGE);
+ await director.getByRole('button',{name:'V1111 Konzertregie jetzt proben'}).click();
+ const preview=producer.getByRole('region',{name:'V1111 Konzertregie Partitur'});
+ await expect(preview).toBeVisible();
+ await expect(preview.getByRole('list',{name:'V1111 sieben koordinierte Regie-Cues'}).locator('li')).toHaveCount(7);
+ await expect(preview.getByRole('note',{name:'V1111 Regie-Qualität'})).toContainText('kontrollierte Übergänge');
+ await expect(preview.getByRole('checkbox',{name:'Laufender Spotify-Songposition folgen (nur Anzeige)'})).toBeDisabled();
+ const cue=preview.getByRole('status',{name:'V1111 Aktueller Regieimpuls'});
+ await expect(cue).toContainText('Szene 3');
+ await preview.getByRole('slider',{name:'V1111 Probeposition'}).press('End');
+ await expect(cue).toContainText('Szene 7');
+ expect(await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORAGE)).toEqual(before);
+ await testInfo.attach('v1111-conductor-rehearsal-screenshot',{body:await preview.screenshot(),contentType:'image/png'});
+});
+test('V1111 approved conductor stages only seven safe cues and supports rollback',async({page},testInfo)=>{
+ const dialog=await openSettings(page,'avatar');
+ await dialog.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const producer=dialog.getByRole('group',{name:'V1106 KI Show Remix'});
+ const director=producer.getByRole('group',{name:'V1111 AI Live Show Conductor'});
+ await director.getByRole('checkbox',{name:'Konzertregie auch auf neue Offline-/OpenAI-Entwürfe anwenden'}).check();
+ const before=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORAGE);
+ await producer.getByRole('button',{name:'Offline-Remix ausprobieren'}).click();
+ const preview=producer.getByRole('region',{name:'V1106 Show Remix Vorschau'});
+ await expect(preview.getByRole('list',{name:'V1111 sieben koordinierte Regie-Cues'}).locator('li')).toHaveCount(7);
+ await preview.getByRole('button',{name:'Diese sieben Szenen in meinen Showplan übernehmen'}).click();
+ await expect.poll(()=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040?.segments?.length??0,STORAGE)).toBe(7);
+ await producer.getByRole('button',{name:'Letzten Remix rückgängig machen'}).click();
+ await expect.poll(()=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORAGE)).toEqual(before);
+ await testInfo.attach('v1111-conductor-approved-undo-screenshot',{body:await director.screenshot(),contentType:'image/png'});
+});

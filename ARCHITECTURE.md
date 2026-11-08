@@ -1,4 +1,44 @@
-**Dokumentationsstand:** V1109
+## V1116 – AI Artist Interaction (Lead-Wechsel, Dialoge und Duos)
+
+Der **V1116 AI Artist Interaction**-Bereich im AI Show Designer verbindet die bisherigen Character-, Dance- und Vocal-Regiepartituren zu sieben sichtbaren Interaktionsszenen. Vier Stile (Dialog, Duo, Rap-Battle und Festival) wechseln die Kameraführung zwischen den vorhandenen V1040-Modi. Die Regie nennt Lead-/Partnerrollen, Antwortgesten und gemeinsame Bühnenmomente, aber behauptet **keinen erkannten Gesang, physischen Blickkontakt oder neue GLB-Clips**. Die Original-Songgrenzen und die Govee- und Laserwerte bleiben bis zur expliziten Annahme unverändert.
+
+Optional kann nach einer separaten Zustimmung der vorhandene **V1079 Live Artist Interaction**-Modus aktiviert werden. Dieser visualisiert Partnerakzente ausschließlich bei echten, synchronisierten Lyrics-Lücken. Es werden keine Audiodaten gesendet und keine individuellen Kopf- oder Blickanimationen erfunden. Die Regler lassen sich konfliktgeschützt rückgängig machen. Details: `changelog/V1116-AI-ARTIST-INTERACTION.md`, `docs/V1116-RELEASE-AND-TESTS.md`.
+
+## V1115 – AI Vocal Acting & Lip-Sync Intelligence
+
+Die optionale Vocal-Regiepartitur zeigt sieben Songphasen, drei Stage-Crew-Charaktere und wechselnde Rollen für Rap, Melodie und Festival-Hybrid. Ihre Sänger-/Adlib-Rollen sind **Inszenierungsvorschläge**, keine automatische Sprechererkennung. Ein zweiter Opt-in-Schritt aktiviert begrenzte, bereits bestehende V368/V371/V372-Parameter (Lip-Sync zu vorhandenen Lyrics, Gestik, Augen/Blick, Gesichtsintensität); Rückgängig ist konfliktgesichert. Manuell gesetzte Vocal-Cues und zeitlich ausgerichtete Viseme bleiben unangetastet. Die mitgelieferten GLBs haben keine Jaw-Bones oder Mund-Morph-Targets, deshalb ist ihre echte Gesichts-Lippensynchronisation damit noch nicht möglich. Keine neuen KI-, Audio-, Mikrofon- oder Geräteberechtigungen.
+
+Siehe `changelog/V1115-AI-VOCAL-ACTING-LIP-SYNC.md` und `docs/V1115-RELEASE-AND-TESTS.md`.
+
+## V1114 – AI Dance Choreographer 4.0 (Stage Crew mit echten GLB-Clips)
+
+Der 360° AI Show Designer bietet eine lokale **Sieben-Szenen-Choreografie** für die mitgelieferten Performer Neon Pulse, Festival Nova und Chrome Beat. Vier wählbare Stile und eine Probenpartitur planen Solo, Duo, Kanon (zwei Beats Versatz), Gruppensynchronisation, Atempause und Finale. Die vorhandenen V1040-Zeitgrenzen, Intensitätsgrenzen sowie manuelle Kamera-/Tanzentscheidungen bleiben bis zur ausdrücklichen Übernahme unverändert. Die Darstellung ist eine dramaturgische Vorschau, **keine echte Echtzeit-Analyse der Musikstruktur**.
+
+Neu ist außerdem der optionale Stage-Crew-Modus **„V1114 Auto-Choreografie · Abschnitte wechseln“**. Die bereits bestehende Live-GLB-Engine schaltet bei *vorhandenem Abschnittssignal* automatisch zwischen Ruhe-Animationen (Intro/Break), Spotlight-Solos (Verse), 2-Beat-Kanon (Hook) und Unisono (Drop). Sie wählt ausschließlich Clips, die tatsächlich im geladenen GLB vorkommen, und behält Fallbacks, 8-Sekunden-Haltezeiten, Pausen-, Reduced-Motion- und manuelle Prioritätsregeln bei. In der KI-Vorschau kann der Modus **gesondert und reversibel** eingeschaltet werden; auch eine Trio-Einrichtung ist wie bisher erforderlich. Die Partitur wird nicht als individuelle Clip-zu-Clip-Timeline persistiert: tatsächliche Live-Tänze orientieren sich an den zur Laufzeit verfügbaren Abschnittssignalen und Clips. Kamera-Tracking pro Künstler und neue Rig-Motion-Captures werden nicht erfunden. Kein dauerhafter KI-Aufruf, keine neuen Geräte- oder Audio-Rechte.
+
+Tests: `npm run test:v1114`, `npm run test:v1114:types`, `node scripts/v959-source-preflight.cjs`. Desktop-/Touch-Browser-E2E: `tests/e2e/ai-dance-choreographer-v1114.spec.cjs`. Die lokalen Unit-Checks ersetzen keinen vollständigen GitHub-Actions-/Next.js-Produktionsbuild.
+
+
+## V1113 – Performance Director im Show-Designer
+
+Die rein lokale, deterministische Bibliothek `lib/aiPerformanceDirectorV1113.ts` komponiert eine pro Avatar unterscheidbare, schrittweise Charakterpartitur über V1112 und die unveränderten V1040-Timings. Im Preview werden gefilterte, unterstützte gemeinsame `camera`-/`dance`-Cues vorgeschlagen. Kein eigener Playback-Loop, kein Gerätezugriff, keine unerlaubte Persistenz. Tests unter `tests/v1113-performance-director-regression.cjs`.
+
+## V1112 · AI Avatar Personality – individuelle Stage-Crew-Regie
+
+Neon Pulse, Festival Nova und Chrome Beat erhalten im 360°-Show-Designer **jeweils einen wählbaren Bühnencharakter**: charismatischer Frontmann, energiegeladener Hype-Artist, präziser Tänzer oder mysteriöser Performer. Die reine lokale KI-Regie plant für sieben Konzertphasen einen Rollen-/Fokuswechsel und passt **Kamera und Tanzmodus der bestehenden V1040-Timeline** dazu an. Die Vorschau zeigt die Bewegungsabsichten für jeden der drei Performer. Die Auswahl ist bewusst optional; ohne Aktivierung bleibt die V1111-Regie unverändert. Speichern erfolgt ausschließlich mit dem bestehenden Button und kann rückgängig gemacht werden.
+
+**Technische Grenze:** Die verfügbaren Tanzmodi gelten derzeit für die gesamte Bühne. Unabhängige GLB-Animationen jedes Avatars sowie echtes Kamera-Tracking einzelner Performer sind noch nicht umgesetzt. Es werden keine Audio- oder Personendaten an KI-Dienste gesendet und keine Govee-Geräte gesteuert. TypeScript und Regression: `npm run test:v1112:types`, `npm run test:v1112`. Desktop-/Touch-Browserprüfungen: `tests/e2e/ai-avatar-personality-v1112.spec.cjs`.
+
+## V1111 · AI Live Show Conductor – koordinierte Konzertregie
+
+Im **360° AI Show Designer** kannst du jetzt die V1111-Konzertregie proben: Sie harmonisiert **Kamera, Avatar-Choreografie, Bühnenform/Schwebeplattform und Laserlook** über alle sieben Szenen und stellt Kontraste, kontrollierte Übergänge sowie ein Finale sicher. Drei wählbare Stile (filmisch, Festival, ausgewogen) und optionale Perspektivüberraschungen. Die **virtuelle Probenposition** zeigt jederzeit den gerade geplanten gemeinsamen Regieimpuls; mit aktivem Spotify-Playback kann die Anzeige freiwillig der echten Songposition folgen. Der Probenregler steuert **keine** echte Bühne und keine Govee-Lichter. Erst der vorhandene „Diese sieben Szenen … übernehmen“-Button speichert den geprüften Plan; die bestehende V1040-Timeline führt diesen dann bei entsprechend aktivierter 360°-Show aus. Kein Behaupten erkannter Hooks oder Drops, keine automatische OpenAI-/Mikrofon-/Geräteabfrage. Tests: `npm run test:v1111` und `npm run test:v1111:types`.
+
+
+## V1110 · Lokales Drop-Radar & sichere Regievorschau
+
+Das Drop-Radar wertet die **freiwillig gestartete lokale V1108-Mikrofonmessung** aus. Erst nach mindestens fünf Sekunden mit sauberem Signal werden ein bereits gemessener Einschlag oder ein möglicher Energieaufbau erkannt. Ein künftiger Drop-Zeitpunkt kann aus diesem Signal **nicht sicher vorhergesagt** werden. Nur nach Zustimmung kann eine Regieidee für die **nächste** V1106/V1109-Vorschau vorgemerkt werden. Die sieben Zeitgrenzen, die Intensitätsobergrenze und die manuelle Freigabe bleiben erhalten. Keine Audio-/Geräte-/Cloud-Übertragung; Tests: `npm run test:v1110`, `npm run test:v1110:types`.
+
+**Dokumentationsstand:** V1116
 
 ## V1104 · Playwright Visual QA & Screenshot Reports
 

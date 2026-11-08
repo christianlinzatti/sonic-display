@@ -1,7 +1,19 @@
 {
   "compilerOptions": {
-    "target":"ES2022", "lib":["es2022"], "module":"ESNext", "moduleResolution":"bundler",
-    "strict":true, "skipLibCheck":true, "noEmit":true, "rootDir":".."
+    "target": "ES2022",
+    "lib": [
+      "es2022"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "rootDir": "..",
+    "types": []
   },
-  "include":["../lib/aiCreativeProducerV1107.ts","../lib/aiMusicEmotionV1108.ts"]
+  "include": [
+    "../lib/aiCreativeProducerV1107.ts",
+    "../lib/aiMusicEmotionV1108.ts"
+  ]
 }

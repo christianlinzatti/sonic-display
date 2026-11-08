@@ -14,7 +14,8 @@ try{
  try{tscScript=require.resolve('typescript/bin/tsc');}
  catch{tscScript=require('node:module').globalPaths.map(p=>path.join(p,'typescript/bin/tsc.js')).find(fs.existsSync);}
  if(!tscScript)throw Error('TypeScript compiler unavailable; install dependencies with npm ci');
- const compiler=spawnSync(process.execPath,[tscScript,'-p',path.join(root,'tests/tsconfig.v1109-core.json'),
+ fs.mkdirSync(path.join(temp,'type-roots'),{recursive:true});
+ const compiler=spawnSync(process.execPath,[tscScript,'--typeRoots',path.join(temp,'type-roots'),'-p',path.join(root,'tests/tsconfig.v1109-core.json'),
   '--noEmit','false','--module','commonjs','--moduleResolution','node','--outDir',temp],
  {cwd:root,encoding:'utf8',timeout:60000,windowsHide:true});
  assert.equal(compiler.status,0,compiler.stderr+'\n'+compiler.stdout+' '+(compiler.error?.message||''));
@@ -96,7 +97,8 @@ try{
   const api=fs.readFileSync(path.join(root,'app/api/ai/show-remix/route.ts'),'utf8');
   for(const key of ['composeConcertStoryV1109(base,remix,storyOptions())',
    'Storybogen lokal entwerfen','V1109 Storybogen Vorschau','V1109 sieben Storyphasen',
-   'setStoryPreview(story)','storyEnabled?storyFor(proposal):null',
+   'setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,danced.staged):null)',
+   'storyEnabled?storyFor(proposal):null',
    'updatePreferences({arenaShowPlanV1040:result})','Letzten Remix rückgängig machen'])
    assert(ui.includes(key),`Missing V1109 integration ${key}`);
   assert(!ui.includes('fetch(\'/api/govee/'));

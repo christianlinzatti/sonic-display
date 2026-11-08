@@ -1,0 +1,41 @@
+'use strict';
+const {test,expect,openSettings}=require('./fixtures.cjs');
+const PREFS='sonic-display-ui-preferences-v1';
+test('V1116 artist interaction rehearses seven handoffs without modifying the live show',async({page},testInfo)=>{
+ const dialog=await openSettings(page,'avatar');
+ await dialog.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const producer=dialog.getByRole('group',{name:'V1106 KI Show Remix'});
+ const controls=producer.getByRole('group',{name:'V1116 AI Artist Interaction'});
+ await expect(controls).toBeVisible();
+ await controls.getByRole('combobox',{name:'Interaktionsstil'}).selectOption('duet');
+ const before=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'{}'),PREFS);
+ await controls.getByRole('button',{name:'V1116 Künstlerinteraktionen jetzt proben'}).click();
+ const score=producer.getByRole('region',{name:'V1116 Artist Interaction Partitur'});
+ await expect(score).toBeVisible();
+ await expect(score.getByRole('list',{name:'V1116 sieben Künstlerinteraktionen'}).locator(':scope > li')).toHaveCount(7);
+ await expect(score.getByRole('note',{name:'V1116 Interaktionsqualität'})).toContainText('0 verifizierte Sänger');
+ await expect(score.getByRole('status',{name:'V1116 Aktuelle Interaktion'})).toBeVisible();
+ const after=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'{}'),PREFS);
+ expect(after.arenaShowPlanV1040).toEqual(before.arenaShowPlanV1040);
+ expect(after.arenaLiveArtistEnabledV1079).toEqual(before.arenaLiveArtistEnabledV1079);
+ await testInfo.attach('v1116-score-screenshot',{body:await score.screenshot(),contentType:'image/png'});
+});
+test('V1116 existing live artist visual requires second consent and reversible preferences',async({page},testInfo)=>{
+ const dialog=await openSettings(page,'avatar');
+ await dialog.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const producer=dialog.getByRole('group',{name:'V1106 KI Show Remix'});
+ const controls=producer.getByRole('group',{name:'V1116 AI Artist Interaction'});
+ const original=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'{}'),PREFS);
+ await controls.getByRole('button',{name:'V1116 Künstlerinteraktionen jetzt proben'}).click();
+ await producer.getByRole('region',{name:'V1116 Artist Interaction Partitur'})
+  .getByRole('button',{name:'V1116 vorhandene Live-Artist-Interaktion aktivieren'}).click();
+ await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'{}').arenaLiveArtistEnabledV1079,PREFS)).toBe(true);
+ await expect(controls.getByRole('button',{name:'Frühere Live-Interaktion wiederherstellen'})).toBeVisible();
+ await controls.getByRole('button',{name:'Frühere Live-Interaktion wiederherstellen'}).click();
+ await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'{}').arenaLiveArtistEnabledV1079??false,PREFS)).toBe(original.arenaLiveArtistEnabledV1079??false);
+ const restored=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)||'{}'),PREFS);
+ expect(restored.arenaShowPlanV1040).toEqual(original.arenaShowPlanV1040);
+ expect(restored.avatarVocalAssignmentsV385).toEqual(original.avatarVocalAssignmentsV385);
+ expect(restored.arenaLiveArtistStrengthV1079).toEqual(original.arenaLiveArtistStrengthV1079);
+ await testInfo.attach('v1116-live-consent-undo-screenshot',{body:await controls.screenshot(),contentType:'image/png'});
+});
