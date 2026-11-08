@@ -39,8 +39,9 @@ function inspectReleaseV1081(root){
   // Importer intentionally preserves .github workflows. Do not require a new workflow
   // filename or version-specific step: the updated V1080 gate and prebuild run V1081.
   const workflow=read('.github/workflows/v965-room-wave-production.yml');
-  add('ci-stable',workflow.includes('npm run test:v1080 && npm run test:v1080:types')&&
-    workflow.includes('Verify lockfile and cross-platform source names'));
+  add('ci-stable',pkg.scripts.prebuild.includes('npm run test:v1080 && npm run test:v1080:types')&&
+    workflow.includes('Verify lockfile and cross-platform source names')&&
+    workflow.includes('node scripts/v965-production-verify.cjs'));
   add('preflight',read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1081(root)'));
   add('docs',Number(/\*\*Dokumentationsstand:\*\* V(\d+)/.exec(read('ARCHITECTURE.md'))?.[1])>=1081);
  }catch(e){console.error('V1081 readiness:',e.message);add('readable',false)}

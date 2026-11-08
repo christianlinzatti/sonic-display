@@ -50,7 +50,9 @@ function inspectReleaseV1013(root){
      'Keep real Linux/Windows production runner');
    check('real-production-gates',workflow.includes('Verify lockfile and cross-platform source names')&&
      workflow.includes('node scripts/v959-source-preflight.cjs')&&
-     workflow.includes('Regressions, full TypeScript, production build and Playwright'),
+     workflow.includes('Ubuntu · full regressions, TypeScript, Next.js build, Playwright and soak')&&
+     workflow.includes("if: matrix.os == 'ubuntu-24.04'")&&
+     workflow.includes('node scripts/v965-production-verify.cjs'),
      'Do not bypass TypeScript, Next.js or Playwright');
  }
  if(gate)for(const item of REQUIRED){

@@ -72,7 +72,8 @@ for(const unsafe of ['fetch(','setTimeout(','setInterval(','Math.random(','Date.
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
 assert(Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1]||0)>=1080&&lock.version===pkg.version&&lock.packages?.['']?.version===pkg.version);
 assert(pkg.scripts['test:v1080']&&pkg.scripts['test:v1080:types']);
-for(const file of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs',
- '.github/workflows/v965-room-wave-production.yml'])
+for(const file of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(file).includes('v1080-laser-experience-regression.cjs')||read(file).includes('test:v1080'),file);
+assert(pkg.scripts.prebuild.includes('npm run test:v1080 && npm run test:v1080:types'));
+assert(read('.github/workflows/v965-room-wave-production.yml').includes('node scripts/v965-production-verify.cjs'));
 console.log(`PASS V1080 Laser Show Experience: ${samples} bounded samples, 7 chapters, measured beat gates, low-tier/manual precedence, zero new GPU batches`);
