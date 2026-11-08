@@ -132,6 +132,12 @@ export interface UiPreferences {
   arenaStoryArcEnabledV1091?:boolean;
   arenaStoryArcStrengthV1091?:number;
   arenaStoryArcStyleV1091?:import('@/lib/arena360StoryArcDirectorV1091').StoryArcStyleV1091;
+  arenaCrowdHarmonyEnabledV1092?:boolean;
+  arenaCrowdHarmonyStrengthV1092?:number;
+  arenaCrowdHarmonyStyleV1092?:import('@/lib/arena360CrowdHarmonyV1092').CrowdHarmonyStyleV1092;
+  arenaGenreShowEnabledV1093?:boolean;
+  arenaGenreShowStrengthV1093?:number;
+  arenaGenreShowModeV1093?:import('@/lib/arena360GenreShowIntelligenceV1093').GenreShowModeV1093;
   arenaEpicDropEnabledV1069?:boolean;
   arenaEpicDropStrengthV1069?:number;
   arenaUltimateFinaleEnabledV1070?:boolean;

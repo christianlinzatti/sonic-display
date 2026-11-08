@@ -1,3 +1,24 @@
+## V1093 · Genre Show Intelligence
+
+Die optionale Genre-Dramaturgie (`lib/arena360GenreShowIntelligenceV1093.ts`)
+regelt die bestehenden virtuellen LED-, Laser- und Arena-Publikumslichter
+je nach **Deutschrap, Hardtekk, Deutschrock oder Pop**. Das aktuelle Genre
+wird konservativ aus vorhandenen Metadaten erkannt oder im Arena Show Designer
+manuell gewählt. Sechs Showabschnitte (Intro, Strophe, Aufbau, Hook, Break,
+Finale) definieren reine optische Look-Hinweise, keine erfundenen Beats/Drops.
+Messbare starke Beat-Flanken können die Helligkeit lediglich bis zum ursprünglichen
+Limit erholen lassen. Alle drei Instanced-Renderer werden weiterverwendet;
+keine neuen Draw Calls, hardware commands, fullscreen flashes oder Timer.
+
+Die Funktion ist Opt-in, standardmäßig deaktiviert, und setzt ihren State bei
+Pause, Songwechsel, Seek, Low Tier oder Reduced Motion zurück. Manuelle LED-/Laser-
+und Handy-Modi bleiben vorrangig. `npm run verify:v1093:focused` und
+`node scripts/v1093-release-readiness.cjs` prüfen Implementierung und Übergaben.
+
+## V1092 · Audience & Stage Emotion Sync
+
+Der optionale Publikums-Regisseur nutzt die vorhandenen Handylichter, virtuellen Armbänder sowie Körper-/Kopf-Instanzen der 360°-Arena. In ruhigen Songpassagen werden Lichter sanft gedimmt, bei gemessenen Beats und Energieveränderungen folgen kleine, räumlich verteilte Bewegungswellen. Drei Geschwindigkeitsstile im Arena Show Designer. Opt-in und standardmäßig aus. Kein zusätzlicher Renderer, keine Govee-/Hardwaresteuerung, keine erfundenen Beats oder Drops. Manuelle Pulse-/Chase-Modi, Pause, Seek, Songwechsel, Low Tier und Reduced Motion schalten die neue Reaktion ab.
+
 ## V1091 · Smart Concert Story Arc Director
 
 `lib/arena360StoryArcDirectorV1091.ts` ist ein reiner, deterministischer, songbezogener Zustandsautomat. Er setzt sich bei Stop/Seek/Songwechsel zurück, verzichtet auf neue Timer/Netzwerk/Renderer und multipliziert ausschließlich die bestehende optische Helligkeit von V1059/V1036/V1039 über Props und useFrame. Manuelle Muster und Helligkeitsbudgets bleiben autoritativ.
@@ -27,7 +48,7 @@ Deaktivierung gelöscht. Standardmäßig ist V1089 **ausgeschaltet**, damit V108
 unverändert weiterläuft. Kein weiterer Render-Loop, Canvas-Stream oder Netzwerkzugriff. Die V1087/V1089-Einstellungen werden end-to-end über `VisualizerStage`, `VisualizerProps` und `StageEnvironment` an `Arena360StageV1031` durchgereicht; dies behebt den V1088-CI-TypeScript-Fehler V997.
 Tests: `npm run verify:v1089:focused` / `node scripts/v1089-release-readiness.cjs`.
 
-**Dokumentationsstand:** V1091
+**Dokumentationsstand:** V1093
 
 ## V1088 · Smart Song Structure Detection
 
@@ -58,7 +79,7 @@ Impuls, während manuelle Einstellungen, Reduzierte Bewegung, Low-GPU, Pause,
 Songwechsel und Seek respektiert werden. Ein geplanter Hook reicht als Trigger
 nicht aus. Kein externer Hardwarezugriff, keine Vollblitze oder neuen Partikel-Batches.
 
-**Dokumentationsstand:** V1091 (historischer Abschnitt)
+**Dokumentationsstand:** V1092 (historischer Abschnitt)
 
 ## V1086 · Epic Stage Transformation 4.0
 
@@ -79,7 +100,7 @@ strokes are drawn; balanced tier uses 16 + 12; low tier and Reduced Motion draw 
 The feature is opt-in, preserves paused/seek safety and never generates musical
 structure or triggers Govee / hardware projectors.
 
-**Dokumentationsstand:** V1091 (historischer Abschnitt)
+**Dokumentationsstand:** V1092 (historischer Abschnitt)
 
 ## V1084 · Festival Atmosphere FX
 
@@ -1845,7 +1866,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1091 (historischer Abschnitt)
+**Dokumentationsstand:** V1092 (historischer Abschnitt)
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -2354,7 +2375,7 @@ Neue Fußkontakte führen unmittelbar zur Reduktion additiver Fußrotationen. De
 `services/show/liveConcertComparisonV544.ts` ergänzt eine reine A/B-Projektionsanalyse auf der bereits opt-in etwa sekündlich messenden V466-WebGL-Qualitätsprobe. `components/visualizer/ConcertVisualCompareV544.tsx` ist unter dem bestehenden QA-Knopf erreichbar und speichert maximal zwei manuell aufgenommene Momentaufnahmen (A/B) im React-UI-Zustand; die Schemabilder verwenden echte normalisierte Kopf- und Lyrics-Rechtecke und zeigen die vorhandenen FPS an, **keine Pixel/Fotos und keine optische Gesichts-/Tanzprüfung**. Der Anwender markiert Fußarbeit, Gesicht/Lip-Sync und Lyrics getrennt; `createComparisonReportV544` exportiert auf Klick einen JSON-Bericht, keine Auto-Freigabe. Bildrand-/Lyrics-Nähe werden heuristisch beurteilt, nicht über Objekt-Okklusion. Original-Bühnenkamera, Motion, Beleuchtung, GLBs, FPS-Messintervall und QA-Gating bleiben unangetastet. `tests/v544-visual-quality-regression.cjs`, `tests/tsconfig.v544-core.json`. Der Next.js-Build braucht vollständig installierte Abhängigkeiten.
 
 
-> **Dokumentationsstand:** V1091 (historischer Abschnitt) (28.10.2026)
+> **Dokumentationsstand:** V1092 (historischer Abschnitt) (28.10.2026)
 
 ## V539 – Multi-Avatar Concert Interaction 5.0
 
@@ -3835,7 +3856,7 @@ Details: `docs/versions/V802-INTELLIGENT-CONCERT-IMPROVEMENT-ASSISTANT.md`.
 
 `components/visualizer/naturalMultiArtistStageInteractionV807.ts` berechnet ausschliesslich aus bestaetigten, songgebundenen V416/V496-Saengerrollen, vorhandenen Buehnenpositionen und Wiedergabezeit begrenzte Blicke und Gesten fuer Lead, Support, Duett, Handoff und gemeinsamen Hook. Die bestehenden 2er- und 3/4er-Avatar-Renderer verwenden die identische, reine Planungslogik ueber V144/V145-Overlays. Manuelle Animationen, Buehnenformationen, Gesichts-/Lippensynchronisation und Fuss-IK bleiben unberuehrt. V506/V508-Kollisionsschutz ist final. Keine neuen GLB-Mixer, Renderloops oder GPU-Ressourcen. Tests: `tests/v807-natural-multi-artist-stage-interaction-regression.cjs`.
 
-> **Dokumentationsstand:** V1091 (historischer Abschnitt) (31.10.2026)
+> **Dokumentationsstand:** V1092 (historischer Abschnitt) (31.10.2026)
 
 ## V808 Natural Performer Positioning
 
@@ -4127,7 +4148,7 @@ V844 verifies section/audio cues, schedules at most one dominant side-stage effe
 - No display/UI overlay; flash cannot be guaranteed photosensitive-safe.
 - Release requires full typecheck, Next.js build, and actual visual test.
 
-> **Dokumentationsstand:** V1091 (historischer Abschnitt) (01.11.2026)
+> **Dokumentationsstand:** V1092 (historischer Abschnitt) (01.11.2026)
 
 
 ## V846 - Paper Streamers

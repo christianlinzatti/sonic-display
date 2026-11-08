@@ -78,7 +78,7 @@ assert(read('context/UiPreferencesContext.tsx').includes('arenaStoryArcEnabledV1
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
 assert(Number(pkg.version.match(/-v(\d+)$/)?.[1]??0)>=1091);
 assert.equal(pkg.version,lock.version);assert.equal(pkg.version,lock.packages[''].version);
-assert(pkg.scripts.prebuild.startsWith('npm run test:v1091 && npm run test:v1091:types &&'));
+assert(pkg.scripts.prebuild.includes('npm run test:v1091 && npm run test:v1091:types &&'));
 assert(read('scripts/v931-production-gate.cjs').includes('tests/v1091-story-arc-regression.cjs'));
 assert(read('scripts/vercel-production-build.cjs').includes('tests/v1091-story-arc-regression.cjs'));
 console.log('PASS V1091: 170000 song-scoped, dim-only narrative samples; guards, scene stability, legacy renderer bridges');

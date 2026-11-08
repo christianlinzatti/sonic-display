@@ -10,7 +10,7 @@ function inspectReleaseV1091(root){
   add('metadata',version>=1091&&p.sonicRoadmapRelease==='v'+version&&p.sonicFeatureRelease==='v'+version);
   add('lockfile',p.version===l.version&&l.version===l.packages[''].version);
   add('runtime',p.engines.node==='24.x');
-  add('prebuild',p.scripts.prebuild.startsWith('npm run test:v1091 && npm run test:v1091:types &&'));
+  add('prebuild',p.scripts.prebuild.includes('npm run test:v1091 && npm run test:v1091:types &&'));
   add('scripts',p.scripts['test:v1091']==='node tests/v1091-story-arc-regression.cjs'&&
     p.scripts['test:v1091:types']==='tsc -p tests/tsconfig.v1091-core.json --noEmit');
   for(const file of ['lib/arena360StoryArcDirectorV1091.ts','tests/v1091-story-arc-regression.cjs',

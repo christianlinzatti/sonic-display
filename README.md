@@ -1,3 +1,24 @@
+## V1093 · Genre Show Intelligence
+
+Die optionale Genre-Dramaturgie (`lib/arena360GenreShowIntelligenceV1093.ts`)
+regelt die bestehenden virtuellen LED-, Laser- und Arena-Publikumslichter
+je nach **Deutschrap, Hardtekk, Deutschrock oder Pop**. Das aktuelle Genre
+wird konservativ aus vorhandenen Metadaten erkannt oder im Arena Show Designer
+manuell gewählt. Sechs Showabschnitte (Intro, Strophe, Aufbau, Hook, Break,
+Finale) definieren reine optische Look-Hinweise, keine erfundenen Beats/Drops.
+Messbare starke Beat-Flanken können die Helligkeit lediglich bis zum ursprünglichen
+Limit erholen lassen. Alle drei Instanced-Renderer werden weiterverwendet;
+keine neuen Draw Calls, hardware commands, fullscreen flashes oder Timer.
+
+Die Funktion ist Opt-in, standardmäßig deaktiviert, und setzt ihren State bei
+Pause, Songwechsel, Seek, Low Tier oder Reduced Motion zurück. Manuelle LED-/Laser-
+und Handy-Modi bleiben vorrangig. `npm run verify:v1093:focused` und
+`node scripts/v1093-release-readiness.cjs` prüfen Implementierung und Übergaben.
+
+## V1092 · Audience & Stage Emotion Sync
+
+Der optionale Publikums-Regisseur nutzt die vorhandenen Handylichter, virtuellen Armbänder sowie Körper-/Kopf-Instanzen der 360°-Arena. In ruhigen Songpassagen werden Lichter sanft gedimmt, bei gemessenen Beats und Energieveränderungen folgen kleine, räumlich verteilte Bewegungswellen. Drei Geschwindigkeitsstile im Arena Show Designer. Opt-in und standardmäßig aus. Kein zusätzlicher Renderer, keine Govee-/Hardwaresteuerung, keine erfundenen Beats oder Drops. Manuelle Pulse-/Chase-Modi, Pause, Seek, Songwechsel, Low Tier und Reduced Motion schalten die neue Reaktion ab.
+
 ## V1091 · Smart Concert Story Arc Director
 
 Der optionale dramaturgische Lichtbogen verbindet gemessene Energie, stabile Live-Abschnitte und die relative Songposition zu sanften LED- und Laserblenden. Songposition und automatisch geplante Abschnitte sind nur Gestaltungshinweise, niemals ein Beweis für einen Drop. Aktivierung und Modi: Arena Show Designer. Standardmäßig aus.

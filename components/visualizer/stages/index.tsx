@@ -193,6 +193,8 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
   beatIntelligenceEnabledV1089,beatIntelligencePrecisionV1089,
   musicalDynamicsEnabledV1090,musicalDynamicsStrengthV1090,musicalDynamicsStyleV1090,
   storyArcEnabledV1091,storyArcStrengthV1091,storyArcStyleV1091,
+  crowdHarmonyEnabledV1092,crowdHarmonyStrengthV1092,crowdHarmonyStyleV1092,
+  genreShowEnabledV1093,genreShowStrengthV1093,genreShowModeV1093,
   lightingChoreographerEnabledV1060,lightingChoreographerStrengthV1060,
   transformingStageEnabledV1066,transformingStageStrengthV1066,
   floatingExperienceEnabledV1067,floatingExperienceStrengthV1067,
@@ -238,6 +240,8 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     beatIntelligenceEnabledV1089?:boolean;beatIntelligencePrecisionV1089?:import('@/lib/beatDropIntelligenceV1089').BeatPrecisionV1089;
     musicalDynamicsEnabledV1090?:boolean;musicalDynamicsStrengthV1090?:number;musicalDynamicsStyleV1090?:import('@/lib/arena360MusicalDynamicsV1090').MusicalDynamicsStyleV1090;
     storyArcEnabledV1091?:boolean;storyArcStrengthV1091?:number;storyArcStyleV1091?:import('@/lib/arena360StoryArcDirectorV1091').StoryArcStyleV1091;
+    crowdHarmonyEnabledV1092?:boolean;crowdHarmonyStrengthV1092?:number;crowdHarmonyStyleV1092?:import('@/lib/arena360CrowdHarmonyV1092').CrowdHarmonyStyleV1092;
+    genreShowEnabledV1093?:boolean;genreShowStrengthV1093?:number;genreShowModeV1093?:import('@/lib/arena360GenreShowIntelligenceV1093').GenreShowModeV1093;
     lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
     transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
     floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
@@ -322,6 +326,12 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       storyArcEnabledV1091={storyArcEnabledV1091}
       storyArcStrengthV1091={storyArcStrengthV1091}
       storyArcStyleV1091={storyArcStyleV1091}
+      crowdHarmonyEnabledV1092={crowdHarmonyEnabledV1092}
+      crowdHarmonyStrengthV1092={crowdHarmonyStrengthV1092}
+      crowdHarmonyStyleV1092={crowdHarmonyStyleV1092}
+      genreShowEnabledV1093={genreShowEnabledV1093}
+      genreShowStrengthV1093={genreShowStrengthV1093}
+      genreShowModeV1093={genreShowModeV1093}
       lyricTextV1083={lyricTextV1083}
       lightingChoreographerEnabledV1060={lightingChoreographerEnabledV1060}
       lightingChoreographerStrengthV1060={lightingChoreographerStrengthV1060}

@@ -11,6 +11,8 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1093 Genre Show Intelligence','tests/v1093-genre-show-intelligence-regression.cjs'],
+  ['V1092 Audience & Stage Emotion Sync','tests/v1092-crowd-harmony-regression.cjs'],
   ['V1091 Smart Concert Story Arc Director','tests/v1091-story-arc-regression.cjs'],
   ['V1090 Musical Dynamics & Show Transitions','tests/v1090-musical-dynamics-regression.cjs'],
   ['V1089 Beat & Drop Intelligence 4.0','tests/v1089-beat-drop-intelligence-regression.cjs'],
