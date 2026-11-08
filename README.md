@@ -3698,3 +3698,10 @@ AI Show Designer → V1117 Bühnenverwandlung die lokale Vorschau starten, die
 Timeline ausdrücklich übernehmen und optional die bereits vorhandenen virtuellen
 V1066/V1067/V1082/V1086-Bühneneffekte einschalten. Keine automatischen Hardware-
 oder Govee-Befehle; manuelle Steuerung und reduzierte Bewegung haben Vorrang.
+
+
+### V1122 – AI Concert Atmosphere Director
+
+Unter **Einstellungen → Bühne → 360° Arena → AI Show Designer → V1122 Concert Atmosphere** findest du vier lokale Bühnenatmosphären: **Filmischer Bodennebel**, **Festival-Luft & Partikel**, **Holografische Tiefenräume** und **Ruhige Künstleratmosphäre**. Die Vorschau plant sieben Songkapitel mit Nebel, virtuellen Partikeln, Raumtiefe und einer sanften Atempause, ohne die vorhandene Show zu verändern. Die Stimmungen sind kreative Regiehinweise, keine Messwerte oder neu erkannten Songteile.
+
+Ein separater Button aktiviert auf Wunsch ausschließlich die vorhandenen 360°-Effekte V1045 (Atmosphäre), V1058 (volumetrische Beleuchtung) und V1084 (virtuelle Festivalpartikel). Bewegungsreduktion, GPU-Grenzen, pausierte Wiedergabe, manuelle Partikelmodi sowie sichere Rücknahme bleiben erhalten. **Keine** Govee-Befehle oder echten Nebelmaschinen. Lokal: `npm run test:v1122`, `npm run test:v1122:types`. Für den vollständigen Next.js-/Playwright-Produktionsnachweis nach dem Import die GitHub-Actions-Pipeline abwarten.

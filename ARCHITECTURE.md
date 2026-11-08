@@ -109,7 +109,7 @@ Im **360° AI Show Designer** kannst du jetzt die V1111-Konzertregie proben: Sie
 
 Das Drop-Radar wertet die **freiwillig gestartete lokale V1108-Mikrofonmessung** aus. Erst nach mindestens fünf Sekunden mit sauberem Signal werden ein bereits gemessener Einschlag oder ein möglicher Energieaufbau erkannt. Ein künftiger Drop-Zeitpunkt kann aus diesem Signal **nicht sicher vorhergesagt** werden. Nur nach Zustimmung kann eine Regieidee für die **nächste** V1106/V1109-Vorschau vorgemerkt werden. Die sieben Zeitgrenzen, die Intensitätsobergrenze und die manuelle Freigabe bleiben erhalten. Keine Audio-/Geräte-/Cloud-Übertragung; Tests: `npm run test:v1110`, `npm run test:v1110:types`.
 
-**Dokumentationsstand:** V1121
+**Dokumentationsstand:** V1122
 
 ## V1104 · Playwright Visual QA & Screenshot Reports
 
@@ -5167,3 +5167,12 @@ Audio-Erkennung, Kamera- oder Avatar-Aktionen. Die Ausgabe wird ausschließlich
 Ein separater Opt-in-Dialog schaltet autorisierte V1066/V1067/V1082/V1086-
 Effekte unter ihren bestehenden Quality-/Pause-/Motion-/Manual-Gates frei.
 Keine zusätzlichen Renderpass- oder Geräteschnittstellen.
+
+
+## V1122 · AI Concert Atmosphere Director
+
+- `lib/aiConcertAtmosphereDirectorV1122.ts` berechnet ausschließlich lokal sieben optische Bühnenatmosphären anhand des von Nutzerinnen und Nutzern bearbeiteten V1040-Plans. Genres, Songabschnitte und Beats werden **nicht** zusätzlich aus Audio erkannt; Szenegrenzen und Remix-Objekte bleiben unverändert.
+- Die vier Stilprofile Filmnebel, Festivalpartikel, holografische Tiefe und Künstlernähe besitzen unterschiedliche Nebel-, Partikel-, Tiefen- und Luftbewegungsstimmungen. Begrenzungen (max. 65/70/75, freie Sicht auf Lyrics) und die ruhige fünfte Szene verhindern übermäßige Dichte.
+- `components/visualizer/AiShowRemixPanelV1106.tsx` zeigt einen expliziten V1122-Entwurf in sieben Kapiteln, inklusive aktueller virtueller Atmosphäre am gewählten Probenpunkt. Erst ein **zweiter** Klick aktiviert vorhandene virtuelle `V1045`/`V1058`/`V1084`-Renderer; deren vorhandene Playback-, Qualitäts- und Bewegungsbegrenzungen bestimmen den Live-Effekt. Ein Prüfsummen-/Konfliktvergleich verhindert das automatische Zurücksetzen später geänderter Regler.
+- Kein neuer WebGL-Pass und keine zusätzliche Hardwaresteuerung: Keine Nebelmaschine, Govee-Geräte, DMX, Pyro, Stroboskop, automatische Audiospur oder Cloud-Telemetrie. Der Live-Vorschlag ist **keine** sekundengenaue Ausführung der sieben Atmosphärenwerte.
+- `tests/v1122-concert-atmosphere-regression.cjs`, `tests/tsconfig.v1122-core.json` und `tests/e2e/ai-concert-atmosphere-v1122.spec.cjs` prüfen die fachliche Planung, isolierte Typen, explizite Freigabe, Browserbedienung und den Schutz des vorhandenen Showplans.

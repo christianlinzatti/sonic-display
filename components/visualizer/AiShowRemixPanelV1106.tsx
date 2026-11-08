@@ -17,6 +17,9 @@ import {useCrewSettings,writeCrewSettings} from '@/components/visualizer/useSoni
 import {directVocalActingV1115,sampleVocalCueV1115,vocalPresetV1115,
  VOCAL_STYLE_LABELS_V1115,type VocalStyleV1115,type VocalShowV1115,type VocalPresetV1115}
  from '@/lib/aiVocalActingV1115';
+import {directConcertAtmosphereV1122,sampleConcertAtmosphereV1122,atmosphereLivePresetV1122,
+ ATMOSPHERE_LABELS_V1122,type AtmosphereStyleV1122,type AtmosphereShowV1122,
+ type AtmosphereLivePresetV1122} from '@/lib/aiConcertAtmosphereDirectorV1122';
 import {directImmersiveTransitionsV1121,sampleImmersiveTransitionV1121,transitionLivePresetV1121,
  TRANSITION_LABELS_V1121,type TransitionStyleV1121,type TransitionShowV1121,
  type TransitionLivePresetV1121} from '@/lib/aiImmersiveSceneTransitionsV1121';
@@ -103,6 +106,12 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
  const [stageEnabled,setStageEnabled]=useState(false);
  const [stagePreview,setStagePreview]=useState<StageShowV1117|null>(null);
  const [stageCanUndo,setStageCanUndo]=useState(false);
+ const [atmosphereStyle,setAtmosphereStyle]=useState<AtmosphereStyleV1122>('cinematic');
+ const [atmosphereStrength,setAtmosphereStrength]=useState(50);
+ const [atmosphereEnabled,setAtmosphereEnabled]=useState(false);
+ const [atmospherePreview,setAtmospherePreview]=useState<AtmosphereShowV1122|null>(null);
+ const [atmosphereCanUndo,setAtmosphereCanUndo]=useState(false);
+ const atmosphereUndo=useRef<{before:Partial<typeof preferences>;after:AtmosphereLivePresetV1122}|null>(null);
  const [transitionStyle,setTransitionStyle]=useState<TransitionStyleV1121>('cinematic');
  const [transitionDuration,setTransitionDuration]=useState<'short'|'balanced'|'long'>('balanced');
  const [transitionStrength,setTransitionStrength]=useState(50);
@@ -226,18 +235,20 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
  const activeCameraCue=sampleCameraCueV1119(cameraPreview,previewPercent);
  const activeLightingCue=sampleLightingCueV1120(lightingPreview,previewPercent);
  const activeTransition=sampleImmersiveTransitionV1121(transitionPreview,previewPercent);
+ const activeAtmosphere=sampleConcertAtmosphereV1122(atmospherePreview,previewPercent);
  const stageOptions=()=>({style:stageStyle,strength:stageStrength,intensityCap:cap});
  const holoOptions=()=>({style:holoStyle,strength:holoStrength,intensityCap:cap});
  const cameraOptions=()=>({style:cameraStyle,strength:cameraStrength,intensityCap:cap});
  const lightingOptions=()=>({style:lightingStyle,strength:lightingStrength,intensityCap:cap});
  const transitionOptions=()=>({style:transitionStyle,strength:transitionStrength,duration:transitionDuration,intensityCap:cap});
+ const atmosphereOptions=()=>({style:atmosphereStyle,strength:atmosphereStrength,intensityCap:cap});
  const canSample=audio.active&&music.isPlaying&&!preferences.reducedMotion&&!!currentTrack;
  // Tracking is strictly session-only: stop and forget measurements on a song
  // change, playback interruption, microphone loss or reduced-motion preference.
  useEffect(()=>{
   emotionSession.current=createMusicEmotionSessionV1108();
   setReading(null);setDropReading(null);setDropCue(null);setSampleCount(0);setSampling(false);
-  setFollowSong(false);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);setTransitionPreview(null);
+  setFollowSong(false);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);setAtmospherePreview(null);setTransitionPreview(null);
  },[currentTrack]);
  useEffect(()=>{
   // Completed readings are also invalidated if the microphone or playback stops.
@@ -290,11 +301,11 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   setSampling(false);setReading(null);setDropReading(null);setDropCue(null);setSampleCount(0);
   setMoodExplanation('Lokale Messwerte verworfen. Es wurde nichts gespeichert oder übertragen.');
  };
- const invalidate=()=>{setTransitionPreview(null);setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setBusy(false);setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setStatus('');};
- useEffect(()=>{setTransitionPreview(null);setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setBusy(false);
+ const invalidate=()=>{setAtmospherePreview(null);setTransitionPreview(null);setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setBusy(false);setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setStatus('');};
+ useEffect(()=>{setAtmospherePreview(null);setTransitionPreview(null);setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setBusy(false);
   return ()=>{controller.current?.abort();requestId.current++;};
  },[signature]);
- const local=(storyOnly=false,conductorOnly=false,personalityOnly=false,performanceOnly=false,danceOnly=false,vocalOnly=false,interactionOnly=false,stageOnly=false,holoOnly=false,cameraOnly=false,lightingOnly=false,transitionOnly=false)=>{
+ const local=(storyOnly=false,conductorOnly=false,personalityOnly=false,performanceOnly=false,danceOnly=false,vocalOnly=false,interactionOnly=false,stageOnly=false,holoOnly=false,cameraOnly=false,lightingOnly=false,transitionOnly=false,atmosphereOnly=false)=>{
   invalidate();
   const curated=curateCreativeRemixV1107(localAiShowRemixV1106(idea,style,cap),creativeBrief(),cap);
   if(!curated){setStatus('Regieentwurf ungültig – keine Änderungen übernommen.');return;}
@@ -323,11 +334,13 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   if((lightingEnabled||lightingOnly)&&!lighting){setStatus('V1120 Lichtregie konnte nicht sicher geplant werden. Show unverändert.');return;}
   const transitions=transitionEnabled||transitionOnly?directImmersiveTransitionsV1121(base,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,transitionOptions()):null;
   if((transitionEnabled||transitionOnly)&&!transitions){setStatus('V1121 Übergänge konnten nicht sicher geplant werden. Show unverändert.');return;}
-  setTransitionPreview(transitions);setLightingPreview(lighting);setCameraPreview(camera);setHoloPreview(holo);setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
+  const atmosphere=atmosphereEnabled||atmosphereOnly?directConcertAtmosphereV1122(base,transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,atmosphereOptions()):null;
+  if((atmosphereEnabled||atmosphereOnly)&&!atmosphere){setStatus('V1122 Atmosphäre konnte nicht sicher geplant werden. Show unverändert.');return;}
+  setAtmospherePreview(atmosphere);setTransitionPreview(transitions);setLightingPreview(lighting);setCameraPreview(camera);setHoloPreview(holo);setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
   setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix):null);
   setConductorPreview(danced.conductor);setPersonalityPreview(danced.personality);setPerformancePreview(danced.performance);setDancePreview(danced.dance);
-  setPreview(transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix);setBaseSignature(signature);setSource('local');
-  setStatus(transitions?'V1121: sechs sanfte Übergangsfenster geplant. Keine eigene Live-Zeitspur, keine Geräte geschaltet.':lighting?'V1120: sieben virtuelle Lichtphasen als lokale Vorschau. Noch kein Lichtmodul und kein Govee-Gerät geschaltet.':camera?'V1119: sieben geplante Kameraszenen als lokale Vorschau, mit sanften vorhandenen V1072-Fahrten. Keine Kamera oder Geräte geschaltet.':holo?'V1118: sieben holografische Regieszenen als lokale optische Vorschau; echte 3D-Projektion nur nach separater Freigabe, keine Hardware.':stage?'V1117: sieben Bühnenverwandlungen als lokale Vorschau. Reale virtuelle Plattformen nur nach separater Freigabe; keine Gerätebefehle.':interaction?'V1116: sieben Artist-Interaktionen als Vorschau. Kameraführung über vorhandene Modi; echte Partnerreaktionen nur durch separate V1079-Aktivierung bei synchronisierten Lyrics. Keine automatisch erkannten Sänger.':vocal?'V1115 Vocal Acting: sieben Szenen mit Bühnen-Vocal-Rollen als Vorschau. Die tatsächliche Lippen-/Gestik-Engine bleibt bis zur gesonderten Zustimmung unverändert. Keine Stimmen oder Phoneme erkannt.':danced.dance?'V1114: Solo, Duo, Kanon und Unisono als sichere Vorschau. Echte GLB-Tanzclips können zusätzlich in der Stage Crew mit V1114 Automatik aktiviert werden. Noch kein Gerät oder Clip geschaltet.':directed.performance?'V1113 Performance Director: sieben abgestimmte Charakter-Momente als Vorschau bereit; gemeinsam unterstützte Tanz- und Kameramodi können nach Bestätigung übernommen werden. Keine einzelnen GLB-Animationen oder Geräte gesteuert.':personalized.personality?'V1112 Avatar Personality: drei individuelle Performer-Rollen sind als Vorschau geplant; nur bestehende Kamera-/Tanzmodi werden später übernommen. Keine GLB-Clips oder Geräte geschaltet.':conductor?'V1111 Live Show Conductor: sieben koordinierte Szenen als lokale Regieprobe bereit. Keine Bühne oder Geräte geschaltet.':story?'V1109 lokaler Storybogen als Vorschau bereit. Keine KI-Anfrage, kein Gerät geschaltet und noch nichts übernommen.':
+  setPreview(atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix);setBaseSignature(signature);setSource('local');
+  setStatus(atmosphere?'V1122: sieben sichere Atmosphärenstimmungen als lokale Vorschau. Keine Nebelmaschine oder Geräte geschaltet.':transitions?'V1121: sechs sanfte Übergangsfenster geplant. Keine eigene Live-Zeitspur, keine Geräte geschaltet.':lighting?'V1120: sieben virtuelle Lichtphasen als lokale Vorschau. Noch kein Lichtmodul und kein Govee-Gerät geschaltet.':camera?'V1119: sieben geplante Kameraszenen als lokale Vorschau, mit sanften vorhandenen V1072-Fahrten. Keine Kamera oder Geräte geschaltet.':holo?'V1118: sieben holografische Regieszenen als lokale optische Vorschau; echte 3D-Projektion nur nach separater Freigabe, keine Hardware.':stage?'V1117: sieben Bühnenverwandlungen als lokale Vorschau. Reale virtuelle Plattformen nur nach separater Freigabe; keine Gerätebefehle.':interaction?'V1116: sieben Artist-Interaktionen als Vorschau. Kameraführung über vorhandene Modi; echte Partnerreaktionen nur durch separate V1079-Aktivierung bei synchronisierten Lyrics. Keine automatisch erkannten Sänger.':vocal?'V1115 Vocal Acting: sieben Szenen mit Bühnen-Vocal-Rollen als Vorschau. Die tatsächliche Lippen-/Gestik-Engine bleibt bis zur gesonderten Zustimmung unverändert. Keine Stimmen oder Phoneme erkannt.':danced.dance?'V1114: Solo, Duo, Kanon und Unisono als sichere Vorschau. Echte GLB-Tanzclips können zusätzlich in der Stage Crew mit V1114 Automatik aktiviert werden. Noch kein Gerät oder Clip geschaltet.':directed.performance?'V1113 Performance Director: sieben abgestimmte Charakter-Momente als Vorschau bereit; gemeinsam unterstützte Tanz- und Kameramodi können nach Bestätigung übernommen werden. Keine einzelnen GLB-Animationen oder Geräte gesteuert.':personalized.personality?'V1112 Avatar Personality: drei individuelle Performer-Rollen sind als Vorschau geplant; nur bestehende Kamera-/Tanzmodi werden später übernommen. Keine GLB-Clips oder Geräte geschaltet.':conductor?'V1111 Live Show Conductor: sieben koordinierte Szenen als lokale Regieprobe bereit. Keine Bühne oder Geräte geschaltet.':story?'V1109 lokaler Storybogen als Vorschau bereit. Keine KI-Anfrage, kein Gerät geschaltet und noch nichts übernommen.':
    'Lokaler Remix: keine Netzwerk- oder KI-Anfrage. Noch nichts übernommen.');
  };
  const remote=async()=>{
@@ -372,10 +385,12 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
    if(lightingEnabled&&!lighting)throw Error('V1120 Lichtregie konnte nicht sicher geplant werden.');
    const transitions=transitionEnabled?directImmersiveTransitionsV1121(base,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,transitionOptions()):null;
    if(transitionEnabled&&!transitions)throw Error('V1121 Übergänge konnten nicht sicher geplant werden.');
-   setTransitionPreview(transitions);setLightingPreview(lighting);setCameraPreview(camera);setHoloPreview(holo);setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
+   const atmosphere=atmosphereEnabled?directConcertAtmosphereV1122(base,transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,atmosphereOptions()):null;
+   if(atmosphereEnabled&&!atmosphere)throw Error('V1122 Atmosphäre konnte nicht sicher geplant werden.');
+   setAtmospherePreview(atmosphere);setTransitionPreview(transitions);setLightingPreview(lighting);setCameraPreview(camera);setHoloPreview(holo);setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
    setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix):null);
    setConductorPreview(danced.conductor);setPersonalityPreview(danced.personality);setPerformancePreview(danced.performance);setDancePreview(danced.dance);
-   setPreview(transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix);setSource('ai');setBaseSignature(signature);
+   setPreview(atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix);setSource('ai');setBaseSignature(signature);
    setStatus('KI-Vorschlag bereit. Prüfe alle sieben Szenen und übernimm ihn ausdrücklich.');
   }catch(error){
    if(requestId.current===id&&!current.signal.aborted)
@@ -390,8 +405,37 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   undo.current={before:plan,after:JSON.stringify(result)};
   setCanUndo(true);
   updatePreferences({arenaShowPlanV1040:result});
-  setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);setTransitionPreview(null);
+  setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);setAtmospherePreview(null);setTransitionPreview(null);
   setStatus('Remix gespeichert. Die 360°-Showplan-Aktivierung bleibt unverändert – keine Geräte wurden gesteuert.');
+ };
+ const activateConcertAtmosphere=()=>{
+  if(busy||!atmospherePreview||!preview||signature!==baseSignature){
+   setStatus('Bitte zuerst eine aktuelle V1122-Atmosphärenprobe erstellen.');return;
+  }
+  if(preferences.reducedMotion){setStatus('Bewegungsreduktion aktiv: kein neues Atmosphärenpreset.');return;}
+  if(!preferences.arenaShowDesignerEnabledV1040||!preferences.arenaConcertDirectorEnabledV1048||
+   !preferences.arenaLightsEnabledV1032){
+   setStatus('V1122 benötigt 360°-Show Designer, Konzertdirektor und virtuelle Bühnenlichter.');return;
+  }
+  if((preferences.arenaFestivalFxModeV1084??'auto')!=='auto'){
+   setStatus('Manuelle Festival-Partikelmodi haben Vorrang. Bitte zuerst auf Auto umstellen.');return;
+  }
+  if(atmosphereUndo.current){setStatus('V1122-Atmosphärenpreset bereits aktiv. Bitte erst zurücksetzen.');return;}
+  const preset=atmosphereLivePresetV1122(atmosphereOptions());
+  if(!preset){setStatus('V1122: ungültige Atmosphäre-Intensität.');return;}
+  const before=Object.fromEntries(Object.keys(preset).map(k=>
+   [k,preferences[k as keyof typeof preferences]])) as Partial<typeof preferences>;
+  updatePreferences(preset);atmosphereUndo.current={before,after:preset};setAtmosphereCanUndo(true);
+  setStatus('V1122: vorhandene virtuelle V1045-/V1058-/V1084-Atmosphäre aktiviert. Songzeit, Bewegungsreduktion, GPU-Limits und manuelle Partikelmodi bleiben maßgebend. Keine realen Nebelmaschinen oder Hardware.');
+ };
+ const revertConcertAtmosphere=()=>{
+  const saved=atmosphereUndo.current;if(!saved)return;
+  if(!Object.entries(saved.after).every(([k,v])=>preferences[k as keyof typeof preferences]===v)){
+   atmosphereUndo.current=null;setAtmosphereCanUndo(false);
+   setStatus('V1122 Atmosphäre wurde inzwischen manuell geändert; automatisches Rückgängig abgebrochen.');return;
+  }
+  updatePreferences(saved.before);atmosphereUndo.current=null;setAtmosphereCanUndo(false);
+  setStatus('Vorherige virtuelle Atmosphäre wiederhergestellt.');
  };
  const activateImmersiveTransitions=()=>{
   if(busy||!transitionPreview||!preview||signature!==baseSignature){
@@ -882,6 +926,36 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
     Manuelle Animationen, bestehende Sängerzuordnungen und reduzierte Bewegung
     behalten Vorrang. Keine künstliche Audio-/Gesangserkennung, keine Govee-Befehle.</small>
   </fieldset>
+  <fieldset aria-label="V1122 AI Concert Atmosphere Director" className="arena-v1122-concert-atmosphere">
+   <legend>V1122 · AI Concert Atmosphere Director</legend>
+   <p>Virtuelle Nebelschleier, Raumtiefe und bestehende Partikeleffekte über sieben
+    Konzertkapitel. Die Szene enthält geplante Stimmungen, keine gemessene Nebeldichte
+    oder automatisch erkannte Drops. Alle Song-Zeitmarken bleiben erhalten.</p>
+   <label>Atmosphärenstil
+    <select value={atmosphereStyle} disabled={busy}
+     onChange={e=>{setAtmosphereStyle(e.target.value as AtmosphereStyleV1122);invalidate();}}>
+     {Object.entries(ATMOSPHERE_LABELS_V1122).map(([key,label])=><option key={key} value={key}>{label}</option>)}
+    </select>
+   </label>
+   <label>Virtuelle Atmosphäre-Stärke {atmosphereStrength}%
+    <input type="range" min="20" max="80" step="10" value={atmosphereStrength} disabled={busy}
+     onChange={e=>{setAtmosphereStrength(Number(e.target.value));invalidate();}}/>
+   </label>
+   <label><input type="checkbox" checked={atmosphereEnabled} disabled={busy}
+    onChange={e=>{setAtmosphereEnabled(e.target.checked);invalidate();}}/>
+    Atmosphärenregie auf neue Offline-/OpenAI-Entwürfe anwenden
+   </label>
+   <button type="button" disabled={busy}
+    onClick={()=>local(false,false,false,false,false,false,false,false,false,false,false,false,true)}>
+    V1122 Atmosphäre jetzt proben
+   </button>
+   {atmosphereCanUndo&&<button type="button" onClick={revertConcertAtmosphere}>
+    Frühere Atmosphäre-Einstellungen wiederherstellen
+   </button>}
+   <small>Die Probe steuert weder Govee noch eine echte Nebelmaschine. Live werden nach
+    separatem Klick ausschließlich die vorhandenen V1045-/V1058-/V1084-Renderer aktiviert.
+    Manuelle Partikelmodi, Lyrics-Lesbarkeit, GPU-Grenzen und reduzierte Bewegung behalten Vorrang.</small>
+  </fieldset>
   <fieldset aria-label="V1121 AI Immersive Scene Transitions" className="arena-v1121-immersive-transitions">
    <legend>V1121 · AI Immersive Scene Transitions</legend>
    <p>Sechs lokale, sanft berechnete Szenenübergänge: Kamera, Bühnenarchitektur,
@@ -1058,6 +1132,33 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
    niemals Lyrics, Audiodaten, Tokens oder Govee-Geräteinformationen. Offline bleibt alles lokal.</small>
   {status&&<p role="status" aria-live="polite">{status}</p>}
   {preview&&<section aria-label="V1106 Show Remix Vorschau">
+   {atmospherePreview&&<section aria-label="V1122 Concert Atmosphere Partitur">
+    <h3>V1122 · Virtuelle Konzertatmosphäre</h3>
+    <p role="note" aria-label="V1122 Atmosphärenqualität">
+     {atmospherePreview.quality.scenes} Atmosphärenszenen ·
+     {atmospherePreview.quality.quietBreak?'ruhige Atempause':'Atempause prüfen'} ·
+     {atmospherePreview.quality.lyricsReadable?'Lyrics-Sicht geschützt':'Sicht prüfen'}.
+    </p>
+    {activeAtmosphere&&<p role="status" aria-label="V1122 Aktuelle Atmosphäre">
+     Szene {activeAtmosphere.cue.index+1}: {activeAtmosphere.cue.chapter} ·
+     Nebel {activeAtmosphere.fog}% · Partikel {activeAtmosphere.particles}% ·
+     Raumtiefe {activeAtmosphere.depth}% · Luftbewegung {activeAtmosphere.airflow}%.
+     Dies ist eine virtuelle Regieprobe, keine Echtzeitmessung.
+    </p>}
+    <ol aria-label="V1122 sieben Atmosphärenszenen">
+     {atmospherePreview.cues.map(c=><li key={c.index}>
+      <strong>Szene {c.index+1}: {c.chapter}</strong> · {Math.round(c.start*100)}–{Math.round(c.end*100)}% ·
+      Look {c.look}, Nebel {c.fog}%, Partikel {c.particles}%, Tiefe {c.depth}% ·
+      Lyrics-Sicht mindestens {c.lyricsClearance}%.
+     </li>)}
+    </ol>
+    <button type="button" disabled={busy||preferences.reducedMotion} onClick={activateConcertAtmosphere}>
+     V1122 vorhandene virtuelle Atmosphäre aktivieren
+    </button>
+    <small>Diese sieben Stimmungen sind kein sekundengenauer Partikel-Automationsplan.
+     Die Live-Effekte folgen der vorhandenen V1045-/V1058-/V1084-Engine und deren eigenen
+     Schutzregeln. Keine Hardware, Cloud-Abfrage oder Audioaufzeichnung.</small>
+   </section>}
    {transitionPreview&&<section aria-label="V1121 Immersive Scene Transitions Partitur">
     <h3>V1121 · Sechs fließende Konzert-Übergänge</h3>
     <p role="note" aria-label="V1121 Übergangsqualität">
