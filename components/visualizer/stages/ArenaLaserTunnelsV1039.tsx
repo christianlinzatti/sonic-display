@@ -3,6 +3,7 @@ import {useFrame} from '@react-three/fiber';
 import {useMemo,useRef} from 'react';
 import {Color,Object3D,Quaternion,Vector3,type InstancedMesh} from 'three';
 import type {AudioFeatures} from '@/types/audio';
+import {sampleUltimateFestivalDropV1087,type UltimateFestivalDropCueV1087,type UltimateFestivalDropStateV1087} from '@/lib/arena360UltimateFestivalDropV1087';
 import type {IntelligentLaserCueV1057} from '@/lib/arena360IntelligentLaserV1057';
 import {sampleLaserEndpointV1080,type LaserExperienceCueV1080} from '@/lib/arena360LaserExperienceV1080';
 import {useAdaptivePerformance} from '../adaptivePerformance';
@@ -12,10 +13,11 @@ import {createLaserArchitectureV1039,planArenaHolographyV1039,sampleLaserArchite
  * Uses existing stage audio/section; NO hardware output, flashes or extra lights.
  */
 export function ArenaLaserTunnelsV1039({audio,playing,reducedMotion,reactive,enabled=true,
- genre,section,pattern='auto',strength=65,laserCueV1057,laserExperienceCueV1080}:{audio:AudioFeatures;playing:boolean;reducedMotion:boolean;
+ genre,section,pattern='auto',strength=65,laserCueV1057,laserExperienceCueV1080,ultimateFestivalDropCueV1087,ultimateFestivalDropStateV1087}:{audio:AudioFeatures;playing:boolean;reducedMotion:boolean;
  reactive:boolean;enabled?:boolean;genre?:string|null;section?:string;
  pattern?:HologramPatternV1039;strength?:number;laserCueV1057?:IntelligentLaserCueV1057;
- laserExperienceCueV1080?:LaserExperienceCueV1080}){
+ laserExperienceCueV1080?:LaserExperienceCueV1080;
+ ultimateFestivalDropCueV1087?:UltimateFestivalDropCueV1087;ultimateFestivalDropStateV1087?:{readonly current:UltimateFestivalDropStateV1087}}){
  const {tier}=useAdaptivePerformance();
  const fixtures=useMemo(()=>createLaserArchitectureV1039(tier),[tier]);
  const rays=useRef<InstancedMesh>(null),dummy=useMemo(()=>new Object3D(),[]);
@@ -48,6 +50,11 @@ export function ArenaLaserTunnelsV1039({audio,playing,reducedMotion,reactive,ena
    start.set(ray.origin.x,ray.origin.y,ray.origin.z);end.set(ray.end.x,ray.end.y,ray.end.z);
    if(laserExperienceCueV1080?.active)sampleLaserEndpointV1080(
     laserExperienceCueV1080,i,fixtures.length,time.current,'architecture',end);
+   if(ultimateFestivalDropCueV1087?.channels.laser&&ultimateFestivalDropStateV1087){
+    const pulse=sampleUltimateFestivalDropV1087(ultimateFestivalDropCueV1087,ultimateFestivalDropStateV1087.current).laser;
+    end.x=Math.max(-4.4,Math.min(4.4,end.x*(1+.045*pulse)));
+    end.z=Math.max(-4.4,Math.min(4.4,end.z*(1+.045*pulse)));
+   }
    difference.subVectors(end,start);
    const length=Math.max(.01,difference.length());
    orientation.setFromUnitVectors(up,difference.normalize());

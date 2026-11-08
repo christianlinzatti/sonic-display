@@ -21,6 +21,8 @@ import {ArenaFestivalAtmosphereV1084} from './ArenaFestivalAtmosphereV1084';
 import {planProjectionMappingV1085,type ProjectionModeV1085} from '@/lib/arena360ProjectionMappingV1085';
 import {planEpicStageTransformationV1086,coordinateEpicStageTransformationV1086,type EpicStageModeV1086} from '@/lib/arena360EpicStageTransformationV1086';
 import {ArenaProjectionMappingV1085} from './ArenaProjectionMappingV1085';
+import {planUltimateFestivalDropV1087,stepUltimateFestivalDropV1087,INITIAL_ULTIMATE_FESTIVAL_DROP_V1087} from '@/lib/arena360UltimateFestivalDropV1087';
+import {ArenaUltimateFestivalDropV1087} from './ArenaUltimateFestivalDropV1087';
 import {planLightingChoreographerV1060} from '@/lib/arena360LightingChoreographerV1060';
 import {ArenaLedDomeV1033} from "./ArenaLedDomeV1033";
 import {ArenaSkyFormationV1034} from "./ArenaSkyFormationV1034";
@@ -100,6 +102,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   festivalFxEnabledV1084=false,festivalFxStrengthV1084=55,festivalFxModeV1084='auto',
   projectionEnabledV1085=false,projectionStrengthV1085=55,projectionModeV1085='auto',
   epicTransformationEnabledV1086=false,epicTransformationStrengthV1086=55,epicTransformationModeV1086='auto',
+  ultimateFestivalDropEnabledV1087=false,ultimateFestivalDropStrengthV1087=55,
   lightingChoreographerEnabledV1060=false,lightingChoreographerStrengthV1060=55,
   transformingStageEnabledV1066=false,transformingStageStrengthV1066=55,
   floatingExperienceEnabledV1067=false,floatingExperienceStrengthV1067=55,
@@ -139,6 +142,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   festivalFxEnabledV1084?:boolean;festivalFxStrengthV1084?:number;festivalFxModeV1084?:FestivalModeV1084;
   projectionEnabledV1085?:boolean;projectionStrengthV1085?:number;projectionModeV1085?:ProjectionModeV1085;
   epicTransformationEnabledV1086?:boolean;epicTransformationStrengthV1086?:number;epicTransformationModeV1086?:EpicStageModeV1086;
+  ultimateFestivalDropEnabledV1087?:boolean;ultimateFestivalDropStrengthV1087?:number;
   lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
   transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
   floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
@@ -154,6 +158,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   const scenicTier=useRef<Group>(null);
   const scenicState=useRef({...INITIAL_ARENA_LIFT_V1034});
   const sharedPeak=useRef({...INITIAL_ARENA_PEAK_V1036});
+  const ultimateFestivalDropStateV1087=useRef({...INITIAL_ULTIMATE_FESTIVAL_DROP_V1087});
   const glow=useRef<Group>(null);
   const leds=useRef<InstancedMesh>(null);
   const dummy=useMemo(()=>new Object3D(),[]);
@@ -405,6 +410,18 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     architecture:dynamicArchitectureV1082,laser:laserExperienceV1080,
     led:ledExperienceV1083,holograms:flowHologramsV1071,projection:projectionCueV1085,
   });
+  // V1087: one measured beat-edge envelope shared by all existing virtual FX.
+  // Authored hooks alone cannot fire; manual patterns and individual OFF switches win.
+  const ultimateFestivalDropCueV1087=planUltimateFestivalDropV1087({
+    enabled:ultimateFestivalDropEnabledV1087,stageIsArena:true,playing:isPlaying,
+    reducedMotion,reactive,showDesignerEnabled,showDirectorEnabled,
+    performanceTier:getActivePerformanceTier(),observedSection:section,
+    show:showCueV1040,progressMs,durationMs,strength:ultimateFestivalDropStrengthV1087,
+    channels:{shockwave:dropEnabled,
+      laser:lasersEnabled&&hologramPattern==='auto',
+      led:ledWallEnabledV1059&&flowLedV1071.active&&ledWallPatternV1059==='auto',
+      confetti:festivalCueV1084.active&&festivalCueV1084.confetti>.02},
+  });
   const audienceCueV1044=planArenaAudienceV1044({
     enabled:audienceDirectorEnabled&&showDesignerEnabled&&showDirectorEnabled,show:showCueV1040,
     stageIsArena:true,playing:isPlaying,reducedMotion,phoneEnabled:phoneSyncEnabled&&audienceEnabled,
@@ -493,6 +510,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   },[dummy,blue,pink]);
 
   useFrame((_,delta)=>{
+    ultimateFestivalDropStateV1087.current=stepUltimateFestivalDropV1087(
+      ultimateFestivalDropStateV1087.current,delta,ultimateFestivalDropCueV1087,audio,progressMs,trackId);
     sharedPeak.current=stepArenaPeakV1036(sharedPeak.current,delta,{
       enabled:arenaPeaksEnabled&&showDirectorEnabled&&fullSongDirectorEnabled,
       playing:isPlaying,reducedMotion,reactive,section,beat:audio.beat,
@@ -570,7 +589,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaLedDomeV1033 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} enabled={domeEnabled} reactive={reactive}/>
     <ArenaLedWallV1059 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       cue={flowLedV1071} progressMs={progressMs} experienceCueV1083={epicTransformedV1086.led}
-      epicDropCueV1069={epicDropV1069}/>
+      epicDropCueV1069={epicDropV1069} ultimateFestivalDropCueV1087={ultimateFestivalDropCueV1087}
+      ultimateFestivalDropStateV1087={ultimateFestivalDropStateV1087}/>
     <ArenaSkyFormationV1034 audio={audio} section={section} playing={isPlaying} reducedMotion={reducedMotion}
       enabled={skyFormationEnabled} directorEnabled={showDirectorEnabled} reactive={reactive}
       showAmbience={fullSongDirectorEnabled?cueV1035.ambience:undefined}/>
@@ -584,7 +604,9 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaLaserFansV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={lasersEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045} finaleV1046={finaleV1046}
-      laserCueV1057={flowLasersV1071} laserExperienceCueV1080={epicTransformedV1086.laser}/>
+      laserCueV1057={flowLasersV1071} laserExperienceCueV1080={epicTransformedV1086.laser}
+      ultimateFestivalDropCueV1087={ultimateFestivalDropCueV1087}
+      ultimateFestivalDropStateV1087={ultimateFestivalDropStateV1087}/>
     <ArenaMovingLedSkyV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={movingSkyEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}/>
@@ -592,7 +614,10 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       enabled={groundFogEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}
       volumetricCueV1058={volumetricLightingEnabledV1058?coordinatedVolumeV1060:undefined} festivalCueV1084={festivalCueV1084}/>
-    {festivalCueV1084.active && <ArenaFestivalAtmosphereV1084 cue={festivalCueV1084} audio={audio} progressMs={progressMs}/>}
+    {festivalCueV1084.active && <ArenaFestivalAtmosphereV1084 cue={festivalCueV1084} audio={audio} progressMs={progressMs}
+      ultimateFestivalDropCueV1087={ultimateFestivalDropCueV1087}
+      ultimateFestivalDropStateV1087={ultimateFestivalDropStateV1087}/>}
+    <ArenaUltimateFestivalDropV1087 cue={ultimateFestivalDropCueV1087} stateRef={ultimateFestivalDropStateV1087}/>
     <ArenaImmersiveExperienceV1047 cue={immersiveV1047}
       hologramsEnabled={hologramsEnabled&&showDirectorEnabled}
       lasersEnabled={laserArchitectureEnabled&&lasersEnabled&&showDirectorEnabled}/>
@@ -606,7 +631,9 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaLaserTunnelsV1039 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       reactive={reactive} enabled={laserArchitectureEnabled&&showDirectorEnabled&&lasersEnabled}
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}
-      laserCueV1057={flowLasersV1071} laserExperienceCueV1080={epicTransformedV1086.laser}/>
+      laserCueV1057={flowLasersV1071} laserExperienceCueV1080={epicTransformedV1086.laser}
+      ultimateFestivalDropCueV1087={ultimateFestivalDropCueV1087}
+      ultimateFestivalDropStateV1087={ultimateFestivalDropStateV1087}/>
     {dynamicArchitectureEnabledV1082 && <ArenaDynamicArchitectureV1082 enabled={dynamicArchitectureEnabledV1082}
       playing={isPlaying} reducedMotion={reducedMotion} cue={epicTransformedV1086.architecture}/>}
     {projectionCueV1085.active&&projectionCueV1085.scenery&&

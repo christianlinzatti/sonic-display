@@ -1,3 +1,34 @@
+## V1088 · Smart Song Structure Detection
+
+**Song Understanding / Live FX Deck:** Die neue V1088-Anzeige unterscheidet zwischen
+wirklich bestätigten Abschnitten aus der V604/V763-Song-Timeline (Strophe, Hook,
+Aufbau, Drop, Break) und lediglich **vorläufigen** Aufbau-/Break-Hypothesen aus
+der gemessenen V896-Live-Energie. Die Beobachtungen müssen mindestens drei
+Sekunden zusammenhängend, positionsrichtig und songbezogen sein. Spotify-
+Metadaten oder ein lauter Bass allein können damit **keine Hooks, Drops oder
+Abschnittsgrenzen bestätigen**. Ein visueller Positionshinweis für Songanfang
+und Songende ist ausdrücklich keine Strukturdiagnose.
+
+**Stabilität:** Pause, Seek, Titelwechsel, ungültige Werte und unterbrochene
+Messreihen setzen die Kandidaten zurück. Gleiche Wiedergabeposition zählt nicht
+als neue Beobachtung. Es gibt keine zusätzlichen Audio-Streams, API-Abfragen,
+Speicherung, 3D-Effekte, Lichtblitze oder Hardware-Kommandos. Der bestehende
+Show Director behält die Autorität für Effekt- und Drop-Signale. Das Modul ist
+bereits für spätere V1089/V1090-Auswertungen typisiert, greift aber nicht in
+die Bühnensignale ein. Tests: `npm run verify:v1088:focused` und
+`node scripts/v1088-release-readiness.cjs`.
+
+## V1087 · Ultimate Festival Drop
+
+Mit einem gültigen Showplan im **Arena Show Designer** V1087 aktivieren. Gemessene
+Drops synchronisieren eine dezente virtuelle Schockwelle mit bereits aktivierten
+Lasern, LED-Wand und V1084-Konfetti. Mindestens zwei dieser Effektsysteme müssen
+eingeschaltet sein. 3,6 Sekunden Trigger-Sperre und separate Performance-Guards.
+Keine physischen Gerätebefehle, keine zusätzliche Konfetti-Partikelgruppe.
+
+Tests: `npm run test:v1087`, `npm run test:v1087:types`,
+`node scripts/v1087-release-readiness.cjs`.
+
 ## V1086 · Epic Stage Transformation 4.0
 
 Im Arena Show Designer lassen sich eine gemeinsame optische Bühnenregie, Intensität und die Modi Automatisch, Cinematic, Festival oder Minimal aktivieren. Die Regie koordiniert ausschließlich separat aktivierte Systeme, respektiert die manuelle Musterauswahl und dimmt innerhalb der vorhandenen Grenzen.
@@ -2140,7 +2171,7 @@ Neue Fußkontakte führen unmittelbar zur Reduktion additiver Fußrotationen. De
 `services/show/liveConcertComparisonV544.ts` ergänzt eine reine A/B-Projektionsanalyse auf der bereits opt-in etwa sekündlich messenden V466-WebGL-Qualitätsprobe. `components/visualizer/ConcertVisualCompareV544.tsx` ist unter dem bestehenden QA-Knopf erreichbar und speichert maximal zwei manuell aufgenommene Momentaufnahmen (A/B) im React-UI-Zustand; die Schemabilder verwenden echte normalisierte Kopf- und Lyrics-Rechtecke und zeigen die vorhandenen FPS an, **keine Pixel/Fotos und keine optische Gesichts-/Tanzprüfung**. Der Anwender markiert Fußarbeit, Gesicht/Lip-Sync und Lyrics getrennt; `createComparisonReportV544` exportiert auf Klick einen JSON-Bericht, keine Auto-Freigabe. Bildrand-/Lyrics-Nähe werden heuristisch beurteilt, nicht über Objekt-Okklusion. Original-Bühnenkamera, Motion, Beleuchtung, GLBs, FPS-Messintervall und QA-Gating bleiben unangetastet. `tests/v544-visual-quality-regression.cjs`, `tests/tsconfig.v544-core.json`. Der Next.js-Build braucht vollständig installierte Abhängigkeiten.
 
 
-> **Dokumentationsstand:** V643 (27.10.2026)
+> **Dokumentationsstand:** V1088 (27.10.2026)
 
 ## V539 – Multi-Avatar Concert Interaction 5.0
 

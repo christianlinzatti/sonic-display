@@ -3,6 +3,7 @@ import {useFrame} from '@react-three/fiber';
 import {useLayoutEffect,useMemo,useRef} from 'react';
 import {Color,Object3D,type InstancedMesh} from 'three';
 import type {AudioFeatures} from '@/types/audio';
+import {sampleUltimateFestivalDropV1087,type UltimateFestivalDropCueV1087,type UltimateFestivalDropStateV1087} from '@/lib/arena360UltimateFestivalDropV1087';
 import {useAdaptivePerformance} from '../adaptivePerformance';
 import {createLedWallPixelsV1059,sampleLedWallPixelV1059,type LedWallCueV1059} from '@/lib/arena360LedWallV1059';
 import {acceptEpicDropBeatV1069,sampleEpicDropLedAccentV1069,type EpicDropCueV1069} from '@/lib/arena360EpicDropV1069';
@@ -13,9 +14,10 @@ import {ArenaLedLyricsV1083} from './ArenaLedLyricsV1083';
  * An open, low-slung ring of small pixels surrounds the existing arena floor.
  * Matrix positions are static. Only colors change at 8–14 Hz.
  */
-export function ArenaLedWallV1059({audio,playing,reducedMotion,cue,progressMs,epicDropCueV1069,experienceCueV1083}: {
+export function ArenaLedWallV1059({audio,playing,reducedMotion,cue,progressMs,epicDropCueV1069,experienceCueV1083,ultimateFestivalDropCueV1087,ultimateFestivalDropStateV1087}: {
  audio:AudioFeatures;playing:boolean;reducedMotion:boolean;cue:LedWallCueV1059;progressMs?:number;
  epicDropCueV1069?:EpicDropCueV1069;experienceCueV1083?:LedExperienceCueV1083;
+ ultimateFestivalDropCueV1087?:UltimateFestivalDropCueV1087;ultimateFestivalDropStateV1087?:{readonly current:UltimateFestivalDropStateV1087};
 }){
  const tier=useAdaptivePerformance().tier;
  const pixels=useMemo(()=>createLedWallPixelsV1059(tier),[tier]);
@@ -71,10 +73,20 @@ export function ArenaLedWallV1059({audio,playing,reducedMotion,cue,progressMs,ep
   if(afterA>beforeA&&afterA>0)colorA.multiplyScalar(beforeA/afterA);
   if(afterB>beforeB&&afterB>0)colorB.multiplyScalar(beforeB/afterB);
   const time=(Number.isFinite(progressMs)?Math.max(0,progressMs??0):0)/1000;
+  const sharedDrop=ultimateFestivalDropCueV1087&&ultimateFestivalDropStateV1087?
+   sampleUltimateFestivalDropV1087(ultimateFestivalDropCueV1087,ultimateFestivalDropStateV1087.current).led:0;
   for(let i=0;i<pixels.length;i++){
    const p=pixels[i];
    const light=experienceCueV1083?.active?sampleLedWallExperienceV1083(p,experienceCueV1083,audio,time):sampleLedWallPixelV1059(p,cue,audio,time);
    tint.copy(p.column%2===0?colorA:colorB).multiplyScalar(light);
+   if(sharedDrop>.001){
+    const before=luminance(tint);
+    // A travelling hue shift, not an extra bright flash; clamp luminance to original.
+    const phase=Math.sin(p.angle*3+time*2.2);
+    tint.lerp(accentColor,sharedDrop*(.35+.25*phase));
+    const after=luminance(tint);
+    if(after>before&&after>0)tint.multiplyScalar(before/after);
+   }
    mesh.current.setColorAt(i,tint);
   }
   if(mesh.current.instanceColor)mesh.current.instanceColor.needsUpdate=true;

@@ -3,6 +3,7 @@ import {useFrame} from '@react-three/fiber';
 import {useLayoutEffect,useMemo,useRef} from 'react';
 import {Color,Object3D,Quaternion,Vector3,type InstancedMesh} from 'three';
 import type {AudioFeatures} from '@/types/audio';
+import {sampleUltimateFestivalDropV1087,type UltimateFestivalDropCueV1087,type UltimateFestivalDropStateV1087} from '@/lib/arena360UltimateFestivalDropV1087';
 import type {ArenaFinaleCueV1046} from '@/lib/arena360CinematicFinaleV1046';
 import type {IntelligentLaserCueV1057} from '@/lib/arena360IntelligentLaserV1057';
 import {sampleLaserEndpointV1080,type LaserExperienceCueV1080} from '@/lib/arena360LaserExperienceV1080';
@@ -14,11 +15,12 @@ import {createArenaLasersV1036,planArenaAtmosphereV1036,sampleArenaLaserV1036} f
  * Fixed in arena coordinates: the rotating performer deck is never affected.
  */
 export function ArenaLaserFansV1036({audio,playing,reducedMotion,reactive,enabled,directorEnabled,
- section,progressMs,durationMs,intensity,peakRef,atmosphereV1045,finaleV1046,laserCueV1057,laserExperienceCueV1080}: {
+ section,progressMs,durationMs,intensity,peakRef,atmosphereV1045,finaleV1046,laserCueV1057,laserExperienceCueV1080,ultimateFestivalDropCueV1087,ultimateFestivalDropStateV1087}: {
  audio:AudioFeatures;playing:boolean;reducedMotion:boolean;reactive:boolean;enabled:boolean;directorEnabled:boolean;
  section?:string;progressMs?:number;durationMs?:number;intensity?:number;
  peakRef?:{readonly current:ArenaPeakStateV1036};atmosphereV1045?:ArenaAtmosphereDirectorCueV1045;finaleV1046?:ArenaFinaleCueV1046;
  laserCueV1057?:IntelligentLaserCueV1057;laserExperienceCueV1080?:LaserExperienceCueV1080;
+ ultimateFestivalDropCueV1087?:UltimateFestivalDropCueV1087;ultimateFestivalDropStateV1087?:{readonly current:UltimateFestivalDropStateV1087};
 }){
  const tier=useAdaptivePerformance().tier;
  const fixtures=useMemo(()=>createArenaLasersV1036(tier),[tier]);
@@ -62,6 +64,13 @@ export function ArenaLaserFansV1036({audio,playing,reducedMotion,reactive,enable
     Math.max(-4.4,Math.min(4.4,x*sin+z*cos)));
    if(laserExperienceCueV1080?.active)sampleLaserEndpointV1080(
     laserExperienceCueV1080,i,fixtures.length,clock.current,'fan',end);
+   // Shared V1087 beat wave opens existing fan geometry; never increases beam brightness.
+   if(ultimateFestivalDropCueV1087?.channels.laser&&ultimateFestivalDropStateV1087){
+    const pulse=sampleUltimateFestivalDropV1087(ultimateFestivalDropCueV1087,ultimateFestivalDropStateV1087.current).laser;
+    const spread=1+.065*pulse;
+    end.x=Math.max(-4.4,Math.min(4.4,end.x*spread));
+    end.z=Math.max(-4.4,Math.min(4.4,end.z*spread));
+   }
    direction.subVectors(end,start);const length=direction.length();
    quaternion.setFromUnitVectors(up,direction.normalize());
    dummy.position.copy(start).add(end).multiplyScalar(.5);

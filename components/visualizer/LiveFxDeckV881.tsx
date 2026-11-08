@@ -65,6 +65,7 @@ import {normalizeLivePlanV998,resolveLiveChangesV998,
  type LivePlanV998,type LiveSnapshotV998} from '@/lib/liveConcertAssistantV998';
 import {SongIntelligencePanelV983} from './SongIntelligencePanelV983';
 import {SongUnderstandingPanelV1018} from './SongUnderstandingPanelV1018';
+import {SongStructurePanelV1088} from './SongStructurePanelV1088';
 import {PredictiveConcertPanelV1019} from './PredictiveConcertPanelV1019';
 import {ConcertStorytellingPanelV1020} from './ConcertStorytellingPanelV1020';
 import {GenreIntelligencePanelV1021} from './GenreIntelligencePanelV1021';
@@ -920,6 +921,8 @@ export function LiveFxDeckV881({trackId,title,artist,durationMs,progressMs,genre
      canApply={Boolean(trackId)&&playing&&!motionOff&&settings.enabled&&settings.auto&&
       storageReady&&atmosphereReady&&genreStageReadyV894&&cameraReadyV992&&controlsVisible}/>
     <SongUnderstandingPanelV1018 trackId={trackId} durationMs={durationMs}
+     positionMs={progressMs} playing={playing} genre={genre}/>
+    <SongStructurePanelV1088 key={`v1088-${trackId}`} trackId={trackId} durationMs={durationMs}
      positionMs={progressMs} playing={playing} genre={genre}/>
     <PredictiveConcertPanelV1019 trackId={trackId} durationMs={durationMs}
      positionMs={progressMs} playing={playing} genre={genre}
