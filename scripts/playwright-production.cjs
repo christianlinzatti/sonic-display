@@ -60,7 +60,8 @@ function runProductionTests({ existingBuildSince } = {}) {
       run('Install Chromium and system dependencies', 'node_modules/@playwright/test/cli.js',
         process.platform === 'linux' ? ['install', '--with-deps', 'chromium'] : ['install', 'chromium'], 10 * 60 * 1000);
     }
-    run('Playwright against next start', 'node_modules/@playwright/test/cli.js', ['test', '--config=config/playwright.production.cjs'], 10 * 60 * 1000);
+    // The 90 mandatory desktop/touch browser cases can exceed ten minutes; preserve real failures and screenshots.
+    run('Playwright against next start', 'node_modules/@playwright/test/cli.js', ['test', '--config=config/playwright.production.cjs'], 30 * 60 * 1000);
     results = JSON.parse(fs.readFileSync(path.join(directory, 'results.json'), 'utf8'));
     if (results.stats.expected < 1 || results.stats.unexpected !== 0 || results.stats.skipped !== 0 || results.stats.flaky !== 0)
       throw Error('No complete passing Playwright suite');

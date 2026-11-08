@@ -27,7 +27,7 @@ function formatActionTitlesV1016(root,apply=false){
   else if(filename==='project-archive-import.yml')
    runName=`Sonic Display · \${{ inputs.archive || '${release}' }} · Projekt-ZIP-Import`;
   else if(filename==='v965-deployment-smoke.yml')
-   runName=`Sonic Display · ${release} · Deployment reachability · \${{ github.event.deployment_status.state || github.event_name }}`;
+   runName=`Sonic Display · ${release} · Deployment reachability · manuell`;
   else runName=`Sonic Display · ${release} · ${name.replace(/^Sonic Display\s*[·–-]?\s*/,'')}`;
   // One top-level run-name only; leave all other YAML bytes exactly as-is.
   const without=original.replace(/^run-name:[^\n]*(?:\n|$)/gm,'');

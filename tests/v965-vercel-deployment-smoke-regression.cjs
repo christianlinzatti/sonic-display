@@ -47,7 +47,8 @@ const response=(status=200,type='text/html; charset=utf-8',html='<!doctype html>
  const login=await smokeV965(valid,async()=>response(200,'text/html','<html><head><title>Login – Vercel</title></head><body>Sign in</body></html>'),{automationBypassSecret:secret});
  assert.equal(login.reason,'NOT_SONIC_DISPLAY_HTML');
  const config=fs.readFileSync(path.join(root,'.github/workflows/v965-deployment-smoke.yml'),'utf8');
- assert(config.includes('deployment_status:'));assert(config.includes('workflow_dispatch:'));
+ assert(!/^\s*deployment_status:/m.test(config),'Vercel failure events must not spawn skipped Actions runs');
+ assert(config.includes('workflow_dispatch:'));assert(config.includes('inputs.deployment_url'));
  assert(config.includes('VERCEL_DEPLOYMENT_URL:'));
  assert(config.includes('node scripts/check-vercel-deployment-v965.cjs'));
  assert(config.includes('ubuntu-24.04'));

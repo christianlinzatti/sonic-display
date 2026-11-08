@@ -44,7 +44,8 @@ for (const [name, workflow] of Object.entries(workflows)) {
     assert.deepEqual(Object.keys(workflow.on), ['workflow_dispatch'], `${name} must remain available manually`);
 }
 assert.ok(workflows['production-quality-v405.yml'].on.schedule, 'Preserve historical scheduled regression');
-assert.ok(workflows['v965-deployment-smoke.yml'].on.deployment_status !== undefined, 'Preserve deployment reachability check');
+assert.deepEqual(Object.keys(workflows['v965-deployment-smoke.yml'].on), ['workflow_dispatch'], 'Deployments should be checked manually without creating failure event noise');
+assert.ok(workflows['v965-deployment-smoke.yml'].jobs['deployed-site-smoke'].env.VERCEL_DEPLOYMENT_URL.includes('inputs.deployment_url'));
 const commands = production.jobs['v965-production'].steps.map(x => x.run || '').join('\n');
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json')));
 for (const match of commands.matchAll(/npm run ([a-z0-9:_-]+)/g)) assert.ok(pkg.scripts[match[1]], `Missing script ${match[1]}`);

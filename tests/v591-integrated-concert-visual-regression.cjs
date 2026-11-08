@@ -103,6 +103,8 @@ check('scripts integrate release and prior V590 remains intact',()=>{
  for(const key of ['test:v591','test:v591:types','test:smoke:v591','verify:v591','benchmark:v591:concert'])assert(pkg.scripts[key]);
  assert(pkg.scripts['test:smoke:v591'].includes('test:v590'));
  assert(pkg.scripts['benchmark:v590:visual'].includes('v590-real-concert'));
- assert(require('./helpers/release-coverage-v651.cjs').isInReleaseGate('test:smoke:v656'));
+ // The V656 smoke chain remains reachable from V657, not from the modern prebuild gate.
+ assert(pkg.scripts['test:smoke:v656']);
+ assert(require('./helpers/release-coverage-v651.cjs').isInReleaseGate('test:smoke:v656', 'test:smoke:v657'));
 });
 console.log(`PASS V591: ${groups} test groups, 15,000 concert composition cases, honest missing-GLB blockade`);
