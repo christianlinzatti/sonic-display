@@ -86,7 +86,13 @@ const sender=read('components/GoveeMusicSyncV909.tsx');
 assert(sender.includes('const syncDecisionV1027=planGoveeSyncV1027({'));
 assert(sender.includes('const syncedLookV1027=applyGoveeSyncV1027(voiceLookV970,previous,syncDecisionV1027,'));
 assert(sender.indexOf('const syncedLookV1027=')<sender.indexOf('applyGoveeShowV1042(syncedLookV1027,previous,'));
-assert(sender.indexOf('applyGoveeShowV1042(syncedLookV1027,previous,')<sender.indexOf('governConcertLookV961(previous,showLookV1042,'));
+assert(sender.indexOf('applyGoveeShowV1042(syncedLookV1027,previous,') <
+ (sender.includes('governConcertLookV961(previous,showLookV1042,')?
+ sender.indexOf('governConcertLookV961(previous,showLookV1042,'):
+ sender.indexOf('applyGoveeRoomV1096(showLookV1042,previous,')));
+assert(sender.includes('governConcertLookV961(previous,showLookV1042,')||
+ (sender.includes('applyGoveeRoomV1096(showLookV1042,previous,')&&
+ sender.includes('governConcertLookV961(previous,roomLookV1096,')));
 assert.equal((sender.match(/goveeBridgeRequestV909\(config,'\/command','POST',\{ip,action:'look',value:finalLook\}\)/g)||[]).length,1);
 assert(sender.includes('visualAdvanceV1027(syncSettingsV1027,ip,visualAdvance)'));
 assert(sender.includes('savedShowActive:Boolean(show),authoredStageActive:stage?.source===\'authored\''));

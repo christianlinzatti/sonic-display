@@ -1,3 +1,40 @@
+## V1097 · Govee Spatial Light Waves
+
+Pure planner `lib/goveeSpatialWavesV1097.ts` erzeugt zonenversetzte Farb-Mischfaktoren auf Basis bestätigter V318-Phasen und *aktiver* V1096-Entscheidungen. Die vorhandene `applyGoveeRoomV1096`-Funktion und der V961-Governor begrenzen weiterhin Farbänderungen und Helligkeit. `components/GoveeMusicSyncV909.tsx` nutzt seinen einzigen bereits autorisierten LAN-Tick; keine zusätzlichen Timer/Netzwerkkommandos oder neuen Berechtigungen. `components/GoveeSpatialWavesStudioV1097.tsx` zeigt die Opt-in-Regler und eine rein simulierte Vorschau. V1096 bleibt Voraussetzung; manuelle/gespeicherte Shows, Sprache, Gruppenmodus und Recovery haben Vorrang.
+
+**Dokumentationsstand:** V1097
+
+## V1096 · Govee Room Lighting 5.0
+
+Opt-in room color harmonisation for up to four separately mapped Govee fixtures, based only on verified V318 song phases and conservative virtual-stage tint. A new pure planner (`lib/goveeRoomLightingV1096.ts`) feeds the existing `components/GoveeMusicSyncV909.tsx` LAN loop. Explicit settings live in `GoveeRoomLightingStudioV1096`; it never enables LAN, devices, or microphone. The send cadence, master/group brightness caps, V961 governor, manual presets, authored stages, V987 atmosphere, voice cues, V1027 and V1042 precedence remain unchanged. No added timers, UDP calls, RGBIC segments, power or flash actions.
+
+**Dokumentationsstand:** V1096
+
+## V1095 · Live Show Learning
+
+V1095 ergänzt den bestehenden V1040-Show-Designer um ein bewusstes, **lokales Feedback-System**.
+`lib/arena360LiveShowLearningV1095.ts` validiert und begrenzt gespeicherte
+Showstil-Abstimmungen auf 24 Einträge; nur Genre sowie sieben abstrakte
+Licht-/Laser-/Plattformmotive werden gespeichert. Titel, Prompts, Songtexte,
+Track-IDs und Hörverlauf sind nicht Teil des Feedback-Schemas.
+
+`components/visualizer/LiveShowLearningPanelV1095.tsx` speichert erst nach
+explizitem **Gefällt / Weniger**-Klick in einer versionierten localStorage-
+Sammlung und erlaubt vollständiges Löschen. Neue Varianten sind ausschließlich
+Vorschläge. Die Bühne bekommt eine Variation erst nach **Vorschlag übernehmen**
+über den bereits vorhandenen V1040-Showplan. V1094-Zeitgrenzen, Kamera- und
+Choreografie-Cues bleiben unverändert; manuelle Regie und effektbezogene
+Schalter behalten Vorrang. Lokales Lernen beansprucht keine automatische
+Erfolgsmessung und verwendet kein Netzwerk, keine neue Audioanalyse, keine
+Govee- oder Stroboskop-/Pyro-Befehle.
+
+Prüfungen: `npm run test:v1095`, `npm run test:v1095:types`,
+`node scripts/v1095-release-readiness.cjs`.
+
+## V1094 · Concert Timeline Studio 3.0
+
+Bearbeitbare Zeitgrenzen für die sieben vorhandenen Arena-Show-Szenen samt visueller Timeline, unabhängiger Vorschau und sicherem Zurücksetzen. Keine neuen Effektsysteme oder Hardwarezugriffe; die 360°-Bühne liest den gespeicherten V1040-Plan direkt.
+
 ## V1093 · Genre Show Intelligence
 
 Die optionale Genre-Dramaturgie (`lib/arena360GenreShowIntelligenceV1093.ts`)
@@ -48,7 +85,7 @@ Deaktivierung gelöscht. Standardmäßig ist V1089 **ausgeschaltet**, damit V108
 unverändert weiterläuft. Kein weiterer Render-Loop, Canvas-Stream oder Netzwerkzugriff. Die V1087/V1089-Einstellungen werden end-to-end über `VisualizerStage`, `VisualizerProps` und `StageEnvironment` an `Arena360StageV1031` durchgereicht; dies behebt den V1088-CI-TypeScript-Fehler V997.
 Tests: `npm run verify:v1089:focused` / `node scripts/v1089-release-readiness.cjs`.
 
-**Dokumentationsstand:** V1093
+**Dokumentationsstand:** V1096
 
 ## V1088 · Smart Song Structure Detection
 

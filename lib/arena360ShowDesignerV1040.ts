@@ -72,7 +72,13 @@ export function normalizeArenaShowPlanV1040(input:unknown):ArenaShowPlanV1040|nu
  for(let i=0;i<LAYOUT.length;i++){
   const s=raw.segments[i];if(!s||typeof s!=='object')return null;
   const l=LAYOUT[i];
-  if(s.id!==`act-${i+1}`||s.scene!==l.scene||s.start!==l.start||s.end!==l.end||
+  // V1094: user-authored scene boundaries are permitted, but never gaps, overlaps,
+  // backwards time, non-finite numbers or zero-length segments.
+  const startOk=typeof s.start==='number'&&Number.isFinite(s.start)&&s.start>=0;
+  const endOk=typeof s.end==='number'&&Number.isFinite(s.end)&&s.end<=1;
+  if(s.id!==`act-${i+1}`||s.scene!==l.scene||!startOk||!endOk||
+   s.end-s.start<.02-1e-8||(i===0?s.start!==0:s.start!==segments[i-1].end)||
+   (i===LAYOUT.length-1&&s.end!==1)||
    !isOneOf(s.deck,DECKS)||!isOneOf(s.floating,FLOATS)||!isOneOf(s.lasers,LASERS)||
    !isOneOf(s.camera,CAMERAS)||!isOneOf(s.dance,DANCES)||
    typeof s.intensity!=='number'||!Number.isFinite(s.intensity)||s.intensity<0||s.intensity>100)return null;

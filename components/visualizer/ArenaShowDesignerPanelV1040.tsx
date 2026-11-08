@@ -2,6 +2,8 @@
 /** V1040 · Editable, offline-first concert template. Nothing is sent to an API. */
 import {useState} from 'react';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
+import {ConcertTimelineStudioV1094} from './ConcertTimelineStudioV1094';
+import {LiveShowLearningPanelV1095} from './LiveShowLearningPanelV1095';
 import {editArenaShowSegmentV1040,generateArenaShowPlanV1040,normalizeArenaShowPlanV1040,
  type ArenaShowDeckV1040,type ArenaShowFloatV1040,type ArenaShowLaserV1040,
  type ArenaShowCameraV1040,type ArenaShowDanceV1040} from '@/lib/arena360ShowDesignerV1040';
@@ -1154,6 +1156,8 @@ export function ArenaShowDesignerPanelV1040(){
    </label>
    <small>Die vorhandene Kamera bleibt verantwortlich. Nur bei aktiviertem Showplan und laufendem Titel; manuelle Presets, Lyrics-, Sänger-, Rap-, Duett- und Timeline-Kameras sowie Reduced Motion haben Vorrang. Keine harten Schnitte und keine zusätzlichen Kameras.</small>
   </fieldset>
+  <ConcertTimelineStudioV1094/>
+  <LiveShowLearningPanelV1095/>
   {status&&<small role="status">{status}</small>}
   {plan&&<>
    <p><strong>{plan.title}</strong> · {plan.genre} · Vorschau {minsec(plan.durationMs)} · sieben Szenen</p>

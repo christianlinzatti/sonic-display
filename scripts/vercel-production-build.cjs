@@ -31,6 +31,10 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1097 Govee Spatial Light Waves','tests/v1097-govee-spatial-waves-regression.cjs');
+  run('V1096 Govee Room Lighting 5.0','tests/v1096-govee-room-lighting-regression.cjs');
+  run('V1095 Live Show Learning','tests/v1095-live-show-learning-regression.cjs');
+  run('V1094 Concert Timeline Studio 3.0','tests/v1094-concert-timeline-studio-regression.cjs');
   run('V1093 Genre Show Intelligence','tests/v1093-genre-show-intelligence-regression.cjs');
   run('V1092 Audience & Stage Emotion Sync','tests/v1092-crowd-harmony-regression.cjs');
   run('V1091 Smart Concert Story Arc Director','tests/v1091-story-arc-regression.cjs');

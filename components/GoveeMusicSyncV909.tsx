@@ -7,6 +7,8 @@ import {directArenaShowV1048} from '@/lib/arena360ConcertDirectorV1048';
 import {directLiveConcertV1049} from '@/lib/arena360LiveConcertIntelligenceV1049';
 import {directAdaptiveStoryV1050} from '@/lib/arena360AdaptiveStorytellingV1050';
 import {planGoveeShowV1042,applyGoveeShowV1042} from '@/lib/goveeShowSyncV1042';
+import {GOVEE_ROOM_EVENT_V1096,GOVEE_ROOM_KEY_V1096,loadGoveeRoomV1096,planGoveeRoomV1096,applyGoveeRoomV1096} from '@/lib/goveeRoomLightingV1096';
+import {GOVEE_WAVES_EVENT_V1097,GOVEE_WAVES_KEY_V1097,loadGoveeWavesV1097,planGoveeSpatialWaveV1097,applyGoveeSpatialWaveV1097} from '@/lib/goveeSpatialWavesV1097';
 import {useAudioAnalysis} from '@/context/AudioAnalysisContext';
 import {GOVEE_CONFIG_EVENT_V909,GOVEE_CONFIG_KEY_V909,loadGoveeConfigV909,goveeBridgeRequestV909,planGoveeLookV909,
  type GoveeConfigV909,type GoveeLookV909,type GoveeDeviceV909} from '@/lib/goveeLanV909';
@@ -83,6 +85,8 @@ export function GoveeMusicSyncV909(){
  const [spatialSettings,setSpatialSettings]=useState<GoveeSpatialSettingsV926>(loadGoveeSpatialV926);
  const [calibrationSettings,setCalibrationSettings]=useState<GoveeRoomCalibrationV927>(loadGoveeCalibrationV927);
  const [syncSettingsV1027,setSyncSettingsV1027]=useState<GoveeSyncSettingsV1027>(loadGoveeSyncV1027);
+ const [roomSettingsV1096,setRoomSettingsV1096]=useState(loadGoveeRoomV1096);
+ const [waveSettingsV1097,setWaveSettingsV1097]=useState(loadGoveeWavesV1097);
  const [roadmapSettings,setRoadmapSettings]=useState<ConcertSettingsV958>(loadConcertRoadmapV958);
  const stageCueV921=useRef<GoveeStageCueV921|null>(null);
  const roomAtmosphereV987=useRef<RoomAtmosphereSessionV987|null>(null);
@@ -249,6 +253,20 @@ export function GoveeMusicSyncV909(){
   const storage=(event:StorageEvent)=>{if(!event.key||event.key===GOVEE_FESTIVAL_KEY_V925)refresh();};
   refresh();window.addEventListener(GOVEE_FESTIVAL_EVENT_V925,refresh);window.addEventListener('storage',storage);
   return()=>{window.removeEventListener(GOVEE_FESTIVAL_EVENT_V925,refresh);window.removeEventListener('storage',storage);};
+ },[]);
+ // V1096 preferences are local and cross-tab; all overlay work uses the existing LAN tick.
+ useEffect(()=>{
+  const refresh=()=>setRoomSettingsV1096(loadGoveeRoomV1096());
+  const storage=(e:StorageEvent)=>{if(!e.key||e.key===GOVEE_ROOM_KEY_V1096)refresh();};
+  refresh();window.addEventListener(GOVEE_ROOM_EVENT_V1096,refresh);window.addEventListener('storage',storage);
+  return()=>{window.removeEventListener(GOVEE_ROOM_EVENT_V1096,refresh);window.removeEventListener('storage',storage);};
+ },[]);
+ // V1097: settings changes share the existing authorised V909 device loop.
+ useEffect(()=>{
+  const refresh=()=>setWaveSettingsV1097(loadGoveeWavesV1097());
+  const storage=(e:StorageEvent)=>{if(!e.key||e.key===GOVEE_WAVES_KEY_V1097)refresh();};
+  refresh();window.addEventListener(GOVEE_WAVES_EVENT_V1097,refresh);window.addEventListener('storage',storage);
+  return()=>{window.removeEventListener(GOVEE_WAVES_EVENT_V1097,refresh);window.removeEventListener('storage',storage);};
  },[]);
  // V1027 is an explicit opt-in layer inside the existing sender. No extra LAN timer.
  useEffect(()=>{
@@ -612,7 +630,29 @@ export function GoveeMusicSyncV909(){
        roomAtmosphereActive:roomDecisionV987.active,higherPrioritySyncActive:syncDecisionV1027.active});
       const showLookV1042=applyGoveeShowV1042(syncedLookV1027,previous,authoredDecisionV1042,
        Math.min(config.masterBrightness,festivalDeliveredLook.brightness));
-      const finalLook=governConcertLookV961(previous,showLookV1042,{
+      // V1096: gentle room color harmonisation is the LAST optional overlay before
+      // the existing V961 governor. Never bypass a saved/manual show, V1027,
+      // V1042 or any device/fixture brightness ceiling. No new device request.
+      let roomDecisionV1096=planGoveeRoomV1096({settings:roomSettingsV1096,
+       syncSettings:syncSettingsV1027,ip,selectedIps:config.selectedIps,
+       phase:verifiedPhaseV1027,genre:String(state.genre??''),show:authoredGoveeShowV1042,
+       bridgeEnabled:config.enabled,autoSync:config.autoSync,directorEnabled:config.directorEnabledV911,
+       playing:state.isPlaying,visible:!document.hidden,stageIsArena:showStageIsArenaV1042,
+       reducedMotion:reducedMotionV1042||Boolean(stage?.reducedMotion)||
+        Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches),
+       savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
+       groupUnisonActive:group?.mode==='unison',recovering:recoveringDevices.has(ip),
+       roomAtmosphereActive:roomDecisionV987.active,
+       higherPrioritySyncActive:syncDecisionV1027.active||authoredDecisionV1042.active,
+       voiceActive:Boolean(alexaGoveeCueV970.current&&loadAlexaGoveeConsentV970().enabled),
+       microphoneActive:state.microphoneActive,sampleAgeMs:now-state.observedAt,
+       beatObserved:state.metrics.beat,beatStrength:state.metrics.beatStrength});
+      const waveDecisionV1097=planGoveeSpatialWaveV1097({settings:waveSettingsV1097,
+       base:roomDecisionV1096,phase:verifiedPhaseV1027});
+      roomDecisionV1096=applyGoveeSpatialWaveV1097(roomDecisionV1096,waveDecisionV1097);
+      const roomLookV1096=applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,
+       Math.min(config.masterBrightness,festivalDeliveredLook.brightness,showLookV1042.brightness));
+      const finalLook=governConcertLookV961(previous,roomLookV1096,{
        enabled:roadmapSettings.enabled&&roadmapSettings.hardwareSync&&roadmapSettings.lightGovernorV961,
        playing:state.isPlaying,verified:Boolean(roadmapScene?.verified),
        savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
@@ -640,6 +680,6 @@ export function GoveeMusicSyncV909(){
    :bassSettings.enabled||shockSettings.enabled?window.setInterval(()=>void tick(),900)
    :neonBassEnabled?window.setInterval(()=>void tick(),900):window.setInterval(()=>void tick(),1700);
   return()=>{cancelled=true;window.clearInterval(interval);window.clearInterval(sampler);};
- },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings,syncSettingsV1027,goveeShowEnabledV1042,goveeShowStrengthV1042,concertDirectorEnabledV1048,concertDirectorStrengthV1048,liveConcertEnabledV1049,liveConcertStrengthV1049,arenaShowEnabledV1040,arenaShowPlanV1040,showStageIsArenaV1042,reducedMotionV1042]);
+ },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings,syncSettingsV1027,roomSettingsV1096,goveeShowEnabledV1042,goveeShowStrengthV1042,concertDirectorEnabledV1048,concertDirectorStrengthV1048,liveConcertEnabledV1049,liveConcertStrengthV1049,arenaShowEnabledV1040,arenaShowPlanV1040,showStageIsArenaV1042,reducedMotionV1042]);
  return null;
 }

@@ -23,7 +23,9 @@ function inspectReleaseV1027(root){
   check('existing-single-lan-loop',sender.includes('const syncDecisionV1027=planGoveeSyncV1027({')&&
    sender.includes('const syncedLookV1027=applyGoveeSyncV1027(voiceLookV970,previous,syncDecisionV1027,')&&
    sender.includes('applyGoveeShowV1042(syncedLookV1027,previous,')&&
-   sender.includes('governConcertLookV961(previous,showLookV1042,'));
+   (sender.includes('governConcertLookV961(previous,showLookV1042,')||
+    (sender.includes('applyGoveeRoomV1096(showLookV1042,previous,')&&
+     sender.includes('governConcertLookV961(previous,roomLookV1096,'))));
   check('settings-ui',read('components/GoveeLanPanelV909.tsx').includes('<GoveeConcertSyncStudioV1027 config={config} devices={devices} onConfig={update}/>'));
   check('no-extra-lan-command',(sender.match(/goveeBridgeRequestV909\(config,'\/command','POST',\{ip,action:'look',value:finalLook\}\)/g)||[]).length===1);
   check('v931-gate',read('scripts/v931-production-gate.cjs').includes('tests/v1027-govee-concert-sync-regression.cjs'));

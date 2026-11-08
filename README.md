@@ -1,3 +1,30 @@
+## V1097 · Govee Spatial Light Waves
+
+Bis zu vier Govee-LAN-Zonen erhalten eine weiche, räumlich wandernde Farbwelle. Drei Stile (rundum, gespiegelt, gemeinsam pulsierend), Vorschau ohne Hardwarebefehle, Stärke 0–60 %. Voraussetzung sind ausdrücklich aktivierte V1096-Raumbeleuchtung, V909-LAN-Synchronisierung und bestätigte V318-Songabschnitte. Das neue Signal verändert nur die bereits begrenzte V1096-Farbmischung, überschreitet keine Helligkeit und nutzt den einzigen V909-LAN-Sendetakt. Manuelle und höher priorisierte Quellen bleiben vorrangig. Standardmäßig ausgeschaltet.
+
+Prüfen: `npm run test:v1097`, `npm run test:v1097:types`, `node scripts/v1097-release-readiness.cjs`.
+
+## V1096 · Govee Room Lighting 5.0
+
+Vier-Zonen-Raumlichtharmonie als freiwilliger Zusatz im vorhandenen Govee-LAN-Panel. Zuordnung aus V1027, separate Opt-in-Freigabe, drei Stile (Ausgewogen/Cinematic/Festival), Farbvorschau ohne Hardwarebefehle. Nur bestätigte V318-Musikphasen; manuelle Shows und höher priorisierte Steuerungen haben Vorrang. Kein neuer Netzwerk-Timer und niemals automatische Power- oder Blitzbefehle. `npm run test:v1096`, `npm run test:v1096:types` und `npm run verify:v1096:focused` prüfen das Release.
+
+## V1095 – Live Show Learning
+
+Im Arena Show Designer können vorhandene Showpläne ausdrücklich bewertet
+(„Stil merken“ / „Weniger davon“) und **abwechslungsreiche Vorschläge**
+angefordert werden. Nur Genre und abstrakte Szenenmuster landen lokal im
+Browser (max. 24 Feedback-Einträge und sechs zuletzt gezeigte Kombinationen);
+kein Songtitel, Prompt, Songtext, Künstler oder Verlauf wird dabei gespeichert.
+Ein Vorschlag wird **nicht automatisch** auf die Bühne übernommen. Ein
+Löschen-Knopf entfernt die gelernten Stile. Die Kamera-/Tanz-Cues und alle
+Timeline-Grenzen bleiben auch nach ausdrücklicher Übernahme unverändert.
+
+Checks: `npm run test:v1095 && npm run test:v1095:types`.
+
+## V1094 · Concert Timeline Studio 3.0
+
+Bearbeitbare Zeitgrenzen für die sieben vorhandenen Arena-Show-Szenen samt visueller Timeline, unabhängiger Vorschau und sicherem Zurücksetzen. Keine neuen Effektsysteme oder Hardwarezugriffe; die 360°-Bühne liest den gespeicherten V1040-Plan direkt.
+
 ## V1093 · Genre Show Intelligence
 
 Die optionale Genre-Dramaturgie (`lib/arena360GenreShowIntelligenceV1093.ts`)

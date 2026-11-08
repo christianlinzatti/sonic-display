@@ -101,9 +101,9 @@ const panel=read('components/visualizer/ArenaShowDesignerPanelV1040.tsx');
 assert(panel.includes('arena-v1093-genre-show'));
 assert(panel.includes('arenaGenreShowEnabledV1093:false'));
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1093');assert.equal(pkg.version,lock.version);
+assert(Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1]||0)>=1093,'V1093 regression remains valid in later releases');assert.equal(pkg.version,lock.version);
 assert.equal(pkg.version,lock.packages[''].version);
-assert(pkg.scripts.prebuild.startsWith('npm run test:v1093 && npm run test:v1093:types &&'));
+assert(pkg.scripts.prebuild.includes('npm run test:v1093 && npm run test:v1093:types &&')); 
 for(const file of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(file).includes('tests/v1093-genre-show-intelligence-regression.cjs'));
 assert(read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1093(root)'));

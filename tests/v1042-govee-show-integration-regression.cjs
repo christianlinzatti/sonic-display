@@ -52,7 +52,11 @@ const govee=read('components/GoveeMusicSyncV909.tsx');
 for(const term of ['sampleArenaShowPlanV1040','planGoveeShowV1042','applyGoveeShowV1042',
  'syncDecisionV1027.active','roomDecisionV987.active','recoveringDevices.has(ip)',
  'goveeBridgeRequestV909','Math.min(config.masterBrightness,festivalDeliveredLook.brightness)',
- 'governConcertLookV961(previous,showLookV1042'])assert(govee.includes(term),'existing LAN integration: '+term);
+] )assert(govee.includes(term),'existing LAN integration: '+term);
+assert(govee.includes('governConcertLookV961(previous,showLookV1042,')||
+ (govee.includes('applyGoveeRoomV1096(showLookV1042,previous,')&&
+ govee.includes('governConcertLookV961(previous,roomLookV1096,')),
+ 'existing V1042 look must still reach the final V961 safety governor');
 assert.equal((govee.match(/goveeBridgeRequestV909\(config,'\/command'/g)||[]).length,1,
  'V1042 never introduces a second LAN send');
 for(const term of ['goveeShowSyncEnabledV1042:false','goveeShowSyncStrengthV1042:45'])
