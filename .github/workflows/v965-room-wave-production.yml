@@ -100,6 +100,10 @@ jobs:
       - name: Windows · full TypeScript without duplicated regression chain
         if: matrix.os == 'windows-latest'
         run: node node_modules/typescript/bin/tsc --noEmit --pretty false
+      - name: Windows · record clean build start for artifact freshness proof
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: echo "SONIC_WINDOWS_BUILD_STARTED_MS=$(node -p 'Date.now()')" >> "$GITHUB_ENV"
       - name: Windows · Next.js production build without npm prebuild rerun
         if: matrix.os == 'windows-latest'
         env:
@@ -107,7 +111,13 @@ jobs:
           SONIC_LOW_MEMORY_BUILD: '1'
         run: node node_modules/next/dist/bin/next build
       - name: Verify emitted production artifacts
-        run: node scripts/check-next-build-v964.cjs
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            node scripts/check-next-build-v964.cjs "$SONIC_WINDOWS_BUILD_STARTED_MS"
+          else
+            node scripts/check-next-build-v964.cjs
+          fi
       - name: Publish every recorded test result in the job summary
         if: ${{ always() && matrix.os == 'ubuntu-24.04' }}
         env:
