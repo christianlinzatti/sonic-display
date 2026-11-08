@@ -189,6 +189,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
   festivalFxEnabledV1084,festivalFxStrengthV1084,festivalFxModeV1084,
   projectionEnabledV1085,projectionStrengthV1085,projectionModeV1085,
   epicTransformationEnabledV1086,epicTransformationStrengthV1086,epicTransformationModeV1086,
+  ultimateFestivalDropEnabledV1087,ultimateFestivalDropStrengthV1087,
   lightingChoreographerEnabledV1060,lightingChoreographerStrengthV1060,
   transformingStageEnabledV1066,transformingStageStrengthV1066,
   floatingExperienceEnabledV1067,floatingExperienceStrengthV1067,
@@ -230,6 +231,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     festivalFxEnabledV1084?:boolean;festivalFxStrengthV1084?:number;festivalFxModeV1084?:import('@/lib/arena360FestivalAtmosphereV1084').FestivalModeV1084;
     projectionEnabledV1085?:boolean;projectionStrengthV1085?:number;projectionModeV1085?:import('@/lib/arena360ProjectionMappingV1085').ProjectionModeV1085;
     epicTransformationEnabledV1086?:boolean;epicTransformationStrengthV1086?:number;epicTransformationModeV1086?:import('@/lib/arena360EpicStageTransformationV1086').EpicStageModeV1086;
+    ultimateFestivalDropEnabledV1087?:boolean;ultimateFestivalDropStrengthV1087?:number;
     lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
     transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
     floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
@@ -304,6 +306,8 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       epicTransformationEnabledV1086={epicTransformationEnabledV1086}
       epicTransformationStrengthV1086={epicTransformationStrengthV1086}
       epicTransformationModeV1086={epicTransformationModeV1086}
+      ultimateFestivalDropEnabledV1087={ultimateFestivalDropEnabledV1087}
+      ultimateFestivalDropStrengthV1087={ultimateFestivalDropStrengthV1087}
       lyricTextV1083={lyricTextV1083}
       lightingChoreographerEnabledV1060={lightingChoreographerEnabledV1060}
       lightingChoreographerStrengthV1060={lightingChoreographerStrengthV1060}

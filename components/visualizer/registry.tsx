@@ -224,6 +224,8 @@ export interface VisualizerProps {
   arenaEpicTransformationEnabledV1086?:boolean;
   arenaEpicTransformationStrengthV1086?:number;
   arenaEpicTransformationModeV1086?:import('@/lib/arena360EpicStageTransformationV1086').EpicStageModeV1086;
+  arenaUltimateFestivalDropEnabledV1087?:boolean;
+  arenaUltimateFestivalDropStrengthV1087?:number;
   arenaEpicDropEnabledV1069?:boolean;
   arenaEpicDropStrengthV1069?:number;
   arenaUltimateFinaleEnabledV1070?:boolean;
