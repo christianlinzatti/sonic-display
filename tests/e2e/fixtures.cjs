@@ -31,7 +31,12 @@ async function openSettings(page, section) {
   await page.getByRole('button', { name: '⚙ Settings', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Sonic Display Einstellungen' });
   await expect(dialog).toBeVisible();
-  if (section) await dialog.locator(`[data-v571-tab="${section}"]`).click();
+  if (section) {
+    const tab = dialog.locator(`[data-v571-tab="${section}"]`);
+    await expect(tab).toBeVisible();
+    await tab.click();
+    await expect(tab).toHaveAttribute("aria-current", "page");
+  }
   return dialog;
 }
 module.exports = { test, expect, openSettings };
