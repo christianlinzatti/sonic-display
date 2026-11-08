@@ -12,6 +12,9 @@ import {useGltfBlendPlaybackV492} from "./useGltfBlendPlaybackV492";
 import {useGltfMotionPresetDirectorV493} from "./useGltfMotionPresetDirectorV493";
 import {preparePortraitMaterialsV560} from "./applyGlbPortraitMaterialsV560";
 import {GlbMaterialQualityV560} from "./GlbMaterialQualityV560";
+import {useCrewSettings,useCrewDirector} from "./useSonicCrew";
+import {crewClipTime} from "./sonicCrewDirector";
+import {prepareCrewReaction,applyCrewReaction} from "./sonicCrewReaction";
 import {useEmbeddedMotionDirectorV530} from "./useEmbeddedMotionDirectorV530";
 import {useGenreAwareMotionDirectorV536} from "./useGenreAwareMotionDirectorV536";
 import {genreCrossfadeSecondsV536,type GenreMotionCandidateV536} from "./genreAwareMotionDirectorV536";
@@ -180,6 +183,8 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   useEffect(() => () => releaseAvatarFrame(schedulerInstance), [schedulerInstance]);
   useEffect(() => () => releaseScheduledInstance(schedulerInstance), [schedulerInstance]);
   const {preferences: groovePreferences} = useUiPreferences();
+  const crewSettings = useCrewSettings();
+  const crewClock = useRef({key:"",position:-1,elapsed:0});
   const preferencesRap=useRef(groovePreferences.rapGroove??DEFAULT_RAP_GROOVE);
   preferencesRap.current=groovePreferences.rapGroove??DEFAULT_RAP_GROOVE;
   const partnerLook = usePartnerLook();
@@ -710,6 +715,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     directorLastCheck.current = -100;
     if (!smartDanceEnabled) setActiveSequence(getActiveChoreography(url, animationUrl ?? ""));
   }, [smartDanceEnabled, smartDanceOverride, url, animationUrl]);
+  const crewReaction = useMemo(()=>prepareCrewReaction(model),[model]);
   const {footIK, updateFootGrounding}=useGltfFootContactV492(root, model, rigTargets, avatarRigProfile);
   useEffect(() => { applyMotionPresetForGenre(genre); }, [genre]);
   const mapping = animationMapping[propsGenreKey(genre)];
@@ -724,6 +730,15 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     beatFlowData.current = advanceBeatFlow(beatFlow.current, audio, delta, genre, isPlaying, reducedMotion);
     const avatarRoot = root.current;
     if (!avatarRoot) return;
+    if (crew.plan.active && selectedClip === crew.plan.clip) {
+      if (crewClock.current.key !== crew.state.key || crewClock.current.position !== crew.state.position) crewClock.current={key:crew.state.key,position:crew.state.position,elapsed:state.clock.elapsedTime};
+      const action = selectedClip ? actions[selectedClip] : undefined;
+      if (action) {
+        action.time=crewClipTime(crew.plan,action.getClip().duration,(state.clock.elapsedTime-crewClock.current.elapsed)*1000);
+        groupMixerV328.update(0);
+      }
+    }
+
     intelligence.current = updateDanceIntelligence(intelligence.current, audio, state.clock.elapsedTime);
     const intelligenceMultipliers = getDanceIntelligenceMultipliers(intelligence.current);
     musicalStructure.current = updateMusicalStructure(musicalStructure.current, audio, state.clock.elapsedTime, isPlaying, reducedMotion);
@@ -1261,6 +1276,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     if(rigV1074.leftArm)rigV1074.leftArm.rotation.z+=nextV1074.leftLift-beforeV1074.leftLift;
     if(rigV1074.rightArm)rigV1074.rightArm.rotation.z-=nextV1074.rightLift-beforeV1074.rightLift;
     lastAudiencePoseV1074.current=nextV1074;
+    applyCrewReaction(crewReaction,crew.plan,crew.plan.beat+Math.min(1,Math.max(0,state.clock.elapsedTime-crewClock.current.elapsed))*crew.plan.bpm/60,audio.energyEnvelope??.35);
     applyGltfVocalPerformanceV492({propsLipSyncV367,trackId:track?.id??"",audio,genre,showCue,reducedMotion,isPlaying,
       workloadSlot,avatarMotionMode,stableLibraryClip,partnerGesture,partnerLook,partnerHand,
       groovePreferences,rapLiveEnabledV412,rapLiveFrameV412,rapLyricsFrameV414,preferencesRap,
@@ -1320,6 +1336,19 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     !!lowClipV481||!!clipChoiceV328||!!phraseChoiceV329||!!autoMotionV356||
     !!groupClockV328?.settings.enabled||!!groupPhraseV329?.settings.enabled||
     rapLiveEnabledV412||!!rapLiveCandidateV412;
+  const crew = useCrewDirector({
+    modelId:avatarModelId??'',clips:embeddedCandidatesV530,trackId:track?.id,
+    progressMs:cameraDirectorProgressMs??propsLipSyncV367?.progressMs,
+    section:showCue?.enabled?showCue.section:cameraDirectorSection,
+    genre,energy:audio.energyEnvelope,bpm:audio.bpm,slot:workloadSlot,
+    count:ensembleCountV745??propsLipSyncV367?.ensembleCountV374??1,
+    playing:isPlaying,reducedMotion,settings:crewSettings,
+    manualPriority:avatarMotionMode!=='hybrid'||Math.abs(avatarClipSpeed-1)>.001||!!animationUrl||sharedMotionV531||!!activeSequence||
+      !!activeLoop||timelineEnabled||avatarBlendEnabled||!!stableLibraryClip||!!smartDanceOverride||
+      !!lowClipV481||!!clipChoiceV328||!!phraseChoiceV329||!!groupClockV328?.settings.enabled||
+      !!groupPhraseV329?.settings.enabled||!!rapLiveEnabledV412||!!rapLiveCandidateV412||
+      !!evolutionMotion||!!adaptiveMotion||!!preferredMotionUrlV440,
+  });
   const embeddedMotionV530=useEmbeddedMotionDirectorV530({
     clips:embeddedCandidatesV530,modelKey:`${url}|${assetUrl??url}|${sharedMotionV531?"shared":"embedded"}`,trackId:track?.id,
     progressMs:cameraDirectorProgressMs??propsLipSyncV367?.progressMs,
@@ -1366,7 +1395,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   });
   // Keep V481/V328/V329/V356 and every manually authored action above V530.
   // The existing V492 transition pipeline performs the real pose-matched crossfade.
-  const selectedClip=lowClipV481 && actions[lowClipV481] && isPlaying&&!reducedMotion ? lowClipV481 : clipChoiceV328 && actions[clipChoiceV328] ? clipChoiceV328 : phraseChoiceV329 && actions[phraseChoiceV329]?phraseChoiceV329:autoMotionV356 && actions[autoMotionV356]?autoMotionV356:genreMotionV536 && actions[genreMotionV536]?genreMotionV536:embeddedMotionV530 && actions[embeddedMotionV530]?embeddedMotionV530:selectedClipLegacy;
+  const selectedClip=lowClipV481 && actions[lowClipV481] && isPlaying&&!reducedMotion ? lowClipV481 : clipChoiceV328 && actions[clipChoiceV328] ? clipChoiceV328 : phraseChoiceV329 && actions[phraseChoiceV329]?phraseChoiceV329:crew.plan.active && crew.plan.clip && actions[crew.plan.clip]?crew.plan.clip:autoMotionV356 && actions[autoMotionV356]?autoMotionV356:genreMotionV536 && actions[genreMotionV536]?genreMotionV536:embeddedMotionV530 && actions[embeddedMotionV530]?embeddedMotionV530:selectedClipLegacy;
   // V492: a saved combination activates only when its original *base* is
   // already the chosen live clip. Never hijack a manual selection / timeline.
   const liveBlendV492=preparedBlendsV492.find(p=>p.baseName===selectedClip)??null;
@@ -1389,7 +1418,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     activeSequence,rapLiveEnabledV412,timelineEnabled,timeline,avatarBlendEnabled,avatarBlendClip,
     maskedOverlay,liveTransition,stableLibraryClip,sequenceCrossfade,lowClipV481,smartDanceOverride,
     avatarMotionMode,activeLoop,autoUpperGestureV490,activeLiveBlendV492,
-    avatarCrossfadeSeconds:genreMotionV536===selectedClip?Math.max(avatarCrossfadeSeconds,genreCrossfadeSecondsV536({section:showCue?.enabled?showCue.section:cameraDirectorSection,energy:audio.energyEnvelope})):embeddedMotionV530===selectedClip?Math.max(.55,avatarCrossfadeSeconds):avatarCrossfadeSeconds,
+    avatarCrossfadeSeconds:crew.plan.active && crew.plan.clip===selectedClip?Math.max(.55,avatarCrossfadeSeconds):genreMotionV536===selectedClip?Math.max(avatarCrossfadeSeconds,genreCrossfadeSecondsV536({section:showCue?.enabled?showCue.section:cameraDirectorSection,energy:audio.energyEnvelope})):embeddedMotionV530===selectedClip?Math.max(.55,avatarCrossfadeSeconds):avatarCrossfadeSeconds,
     footIK,beatFlowData,musicSectionV565:showCue?.enabled?showCue.section:cameraDirectorSection,
     trackIdV614:track?.id,progressMsV614:cameraDirectorProgressMs??propsLipSyncV367?.progressMs,
     energyV614:audio.energyEnvelope,

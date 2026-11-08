@@ -6,7 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const source = fs.readFileSync(path.join(__dirname, '../scripts/playwright-production.cjs'), 'utf8');
 let count = 0;
-function fixture({ artifactPassed = true, spawnStatus = 0, stats = { expected: 12, unexpected: 0, skipped: 0, flaky: 0 }, screenshotCount = 4 } = {}) {
+function fixture({ artifactPassed = true, spawnStatus = 0, stats = { expected: 12, unexpected: 0, skipped: 0, flaky: 0 }, screenshotCount = 4, visualQualityPassed = true } = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sonic-playwright-'));
   fs.mkdirSync(path.join(root, '.next'), { recursive: true });
   fs.writeFileSync(path.join(root, '.next/BUILD_ID'), 'fixture-build-123');
@@ -20,6 +20,7 @@ function fixture({ artifactPassed = true, spawnStatus = 0, stats = { expected: 1
     require(name) {
       if (name === './check-next-build-v964.cjs') return { inspectBuild: () => ({ passed: artifactPassed, issues: artifactPassed ? [] : ['BUILD_ID stale'] }) };
       if (name === './v1104-playwright-visual-report.cjs') return { buildVisualReport: () => ({ screenshotCount, projects: screenshotCount ? ['chromium-desktop', 'chromium-touch'] : [] }) };
+      if (name === './v1105-playwright-quality-report.cjs') return { writeQualityReportV1105: () => ({ passed: visualQualityPassed, passedChecks: visualQualityPassed ? 15 : 11, expectedChecks: 15, verifiedBrowserCases: visualQualityPassed ? 12 : 8 }) };
       if (name === 'node:child_process') return { spawnSync(_exe, args) {
         calls.push(args);
         fs.writeFileSync(path.join(root, 'reports/playwright-production/results.json'), JSON.stringify({ stats }));
@@ -48,6 +49,9 @@ for (const stats of [{ expected: 0, unexpected: 0, skipped: 0, flaky: 0 }, { exp
 }
 check('passing-looking tests without screenshots must fail closed', { screenshotCount: 0 }, proof => {
   assert.equal(proof.passed, false); assert.match(proof.error, /Missing desktop\/touch screenshot evidence/);
+});
+check('missing V1105 accessibility or screenshot evidence blocks green Playwright status', { visualQualityPassed: false }, proof => {
+  assert.equal(proof.passed, false); assert.match(proof.error, /V1105 visual quality evidence missing/);
 });
 check('passing suite records build and artifact evidence without rebuilding', {}, (proof, f) => {
   assert.equal(fs.existsSync(path.join(f.root, 'public/avatars/sonic-playwright-reference.glb')), false);

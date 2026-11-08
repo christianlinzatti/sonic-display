@@ -11,9 +11,10 @@ import { withPrivateGltfV769 } from "./privateGltfLifecycleV769";
 import { retargetHumanoidClips, readRetargetCalibration, RETARGET_EVENT } from "./avatarAnimationRetarget";
 import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUtils.js";
 import {disposeClonedAvatarSkeletonsV654} from "./disposeClonedAvatarSkeletonsV654";
-import { AnimationMixer, AnimationClip, LoopOnce, LoopRepeat, type Group } from "three";
+import { AnimationMixer, AnimationClip, LoopRepeat, type Group } from "three";
 import {GLB_BLEND_PRESET_LIMIT_V492,readBlendPresetsV492,writeBlendPresetsV492,mergeBlendPresetsV492,parseBlendPresetsV492,serializeBlendPresetsV492,scopedBlendPresetsV492,type GlbBlendPresetV492,type BlendGenreV492} from "./glbBlendPresetsV492";
 import { previewBlendRegionsV491, resolvePreviewBlendV491, previewBlendWeightV491, isPreviewBlendTrackV491, type PreviewBlendPlanV491 } from "./glbMotionBlendPreviewV491";
+import { PreviewClipPlayer } from "./previewClipPlayer";
 import {readFootLockV322} from "./intelligentFootLockV322";
 import { createFootIKState, initializeFootIK, updateFootIK } from "./avatarFootIK";
 import { collectAvatarRigNodes } from "./avatarRigController";
@@ -109,11 +110,15 @@ function GltfPreview({ url, animationUrl, sharedMotionUrlV531, timeline, blendV4
   useOwnedAvatarResourcesV1009(model);
   useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(model);},[model]);
   const mixer = useMemo(() => new AnimationMixer(model), [model]);
+  const clipPlayer = useMemo(() => new PreviewClipPlayer(mixer, model), [mixer, model]);
+  const transitionPreferences = useRef({ playing: timeline.playing, reduced: preferences.reducedMotion, seconds: preferences.avatarCrossfadeSeconds, blending: !!blendV491?.enabled });
+  transitionPreferences.current = { playing: timeline.playing, reduced: preferences.reducedMotion, seconds: preferences.avatarCrossfadeSeconds, blending: !!blendV491?.enabled };
   const [externalClips, setExternalClips] = useState<AnimationClip[]>([]);
   const [calibrationVersion, setCalibrationVersion] = useState(0);
   useEffect(() => { const update = () => setCalibrationVersion(v=>v+1); window.addEventListener(RETARGET_EVENT, update); window.addEventListener("storage", update); return () => {window.removeEventListener(RETARGET_EVENT, update); window.removeEventListener("storage", update);}; }, []);
   const externalRequest = useRef(0);
   const clock = useRef(0);
+  const boundPreviewClip = useRef<string | null>(null);
   const selectedAction = useRef<ReturnType<AnimationMixer["clipAction"]> | null>(null);
   const onPositionRef = useRef(onPosition);
   onPositionRef.current = onPosition;
@@ -155,19 +160,16 @@ function GltfPreview({ url, animationUrl, sharedMotionUrlV531, timeline, blendV4
   const overlayWeightV491 = blendClipV491 ? previewBlendWeightV491(blendV491?.weight ?? 0) : 0;
 
   useEffect(() => {
-    mixer.stopAllAction();
-    selectedAction.current = null;
-    overlayActionV491.current = null;
     if (!selected) return;
-    const action = mixer.clipAction(selected.clip);
-    action.reset(); action.setLoop(LoopOnce, 1); action.clampWhenFinished = true;
-    action.play(); // The clock is driven explicitly by mixer.setTime (also when scrubbing).
-    selectedAction.current = action;
-    clock.current = Math.max(0, Math.min(selected.clip.duration, timeline.start));
-    mixer.setTime(clock.current);
-    return () => { action.stop(); selectedAction.current = null; };
-    // Only rebind when selected clip changes, not on every timeline edit.
-  }, [mixer, selected?.id, selected?.clip]);
+    const options = transitionPreferences.current;
+    const initialTime = boundPreviewClip.current === null && !options.playing ? timeline.cursor : timeline.start;
+    clock.current = Math.max(0, Math.min(selected.clip.duration, initialTime));
+    boundPreviewClip.current = selected.id;
+    // Paused scrubbing, reduced motion and explicit overlay mixing stay immediate.
+    const fade = options.playing && !options.reduced && !options.blending
+      ? Math.max(.15, Math.min(1.5, options.seconds ?? .35)) : 0;
+    selectedAction.current = clipPlayer.select(selected.clip, clock.current, fade);
+  }, [clipPlayer, selected?.id, selected?.clip]);
   useEffect(() => {
     const old = overlayActionV491.current;
     if (old) { old.stop(); overlayActionV491.current = null; }
@@ -176,7 +178,8 @@ function GltfPreview({ url, animationUrl, sharedMotionUrlV531, timeline, blendV4
     overlay.reset(); overlay.setLoop(LoopRepeat, Infinity);
     overlay.setEffectiveWeight(overlayWeightV491); overlay.play();
     overlayActionV491.current = overlay;
-    mixer.setTime(clock.current);
+    overlay.time = clock.current % Math.max(.01, blendClipV491.duration);
+    mixer.update(0);
     return () => { overlay.stop(); if (overlayActionV491.current === overlay) overlayActionV491.current = null; };
   }, [mixer, blendClipV491, selected?.id]);
   useEffect(() => {
@@ -184,19 +187,12 @@ function GltfPreview({ url, animationUrl, sharedMotionUrlV531, timeline, blendV4
   }, [overlayWeightV491]);
   const seekRequest = useRef(timeline.cursor);
   useEffect(() => {
-    if (Math.abs(timeline.cursor - seekRequest.current) > 0.035) {
+    if (!timeline.playing && Math.abs(timeline.cursor - seekRequest.current) > 0.0005) {
       clock.current = Math.max(0, Math.min(selected?.clip.duration ?? 0, timeline.cursor));
-      if (selectedAction.current && clock.current < (selected?.clip.duration ?? 0)) {
-        // LoopOnce + clampWhenFinished leaves an Action paused at the final pose.
-        // Reset the action's loop counter before seeking to a previous frame.
-        selectedAction.current.reset().play();
-        selectedAction.current.paused = false;
-        selectedAction.current.enabled = true;
-      }
-      mixer.setTime(clock.current);
+      clipPlayer.seek(clock.current);
     }
     seekRequest.current = timeline.cursor;
-  }, [timeline.cursor, mixer, selected?.clip.duration]);
+  }, [timeline.cursor, timeline.playing, clipPlayer, selected?.clip.duration]);
   const lastReport = useRef(0);
   useFrame((state, delta) => {
     if (!root.current || !selected || !selectedAction.current) return;
@@ -206,8 +202,13 @@ function GltfPreview({ url, animationUrl, sharedMotionUrlV531, timeline, blendV4
     if (timeline.playing && !preferences.reducedMotion) {
       clock.current += Math.min(delta, 0.1) * timeline.speed;
       if (clock.current >= end) clock.current = start + ((clock.current - start) % (end - start));
-      mixer.setTime(clock.current);
     }
+    if (overlayActionV491.current) {
+      const overlay = overlayActionV491.current;
+      overlay.enabled = true; overlay.paused = false;
+      overlay.time = clock.current % Math.max(.01, overlay.getClip().duration);
+    }
+    clipPlayer.update(clock.current, preferences.reducedMotion ? 1.5 : timeline.playing ? Math.min(delta, .1) : 0);
     updateFootIK(ik.current, root.current, delta, timeline.playing && footIK && compatible && (preferences.avatarFootIKEnabled ?? true),
       (preferences.avatarFootIKStrength ?? 70) / 100,
       (preferences.avatarFootIKContact ?? 50) / 100,
@@ -217,7 +218,7 @@ function GltfPreview({ url, animationUrl, sharedMotionUrlV531, timeline, blendV4
       onPositionRef.current(clock.current);
     }
   });
-  useEffect(() => () => { mixer.stopAllAction(); mixer.uncacheRoot(model); }, [mixer,model]);
+  useEffect(() => () => { clipPlayer.dispose(); mixer.stopAllAction(); mixer.uncacheRoot(model); }, [clipPlayer,mixer,model]);
   return <group ref={root}><primitive object={model}/></group>;
 }
 
@@ -484,6 +485,7 @@ export function AvatarPreview3D({ modelUrl, preferences, studio = false, animati
   const activeBlendV491 = canBlendV491 ? blendV491 : {...blendV491,enabled:false};
   const [autoRotate, setAutoRotate] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const [detailView, setDetailView] = useState<"full" | "portrait" | "upper">("full");
   const [beatEnabled, setBeatEnabled] = useState(false);
   const [bpm, setBpm] = useState(150);
   const [style, setStyle] = useState<BeatStyle>("hardstyle");
@@ -499,9 +501,13 @@ export function AvatarPreview3D({ modelUrl, preferences, studio = false, animati
   };
   const chooseStyle = (next: BeatStyle) => { setStyle(next); setBpm(beatStyles[next].bpm); setBeatCount(0); };
   const intensity = preferences.reducedMotion ? 0 : preferences.avatarAnimationIntensity;
+  const view = compareIK ? "full" : detailView;
+  const focusY = view === "full" ? 0 : (view === "portrait" ? .73 : -.04) * preferences.avatarScale + preferences.avatarOffsetY;
+  const distance = view === "full" ? 4.2 : (view === "portrait" ? .95 : 1.65) * Math.max(.7, preferences.avatarScale);
+  const cameraPosition: [number, number, number] = [0, focusY + (view === "full" ? .15 : 0), distance];
   return <div className="avatar-preview-interactive">
     <div className="avatar-preview-canvas" role="img" aria-label="Interaktive 3D-Vorschau des Avatars; mit Maus oder Touch drehen und zoomen">
-      <ModelPreviewBoundaryV733 key={`${modelUrl}:${animationUrl}`} onRetry={()=>{if(modelUrl)useGLTF.clear(modelUrl);if(animationUrl)useGLTF.clear(animationUrl);}}><Canvas key={resetKey} camera={{ position: [0, 0.15, 4.2], fov: 38 }} dpr={[1, 1.5]} gl={{ powerPreference: "low-power" }}>
+      <ModelPreviewBoundaryV733 key={`${modelUrl}:${animationUrl}`} onRetry={()=>{if(modelUrl)useGLTF.clear(modelUrl);if(animationUrl)useGLTF.clear(animationUrl);}}><Canvas key={`${resetKey}:${view}`} camera={{ position: cameraPosition, fov: 38 }} dpr={[1, 1.5]} gl={{ powerPreference: "low-power" }}>
         <ambientLight intensity={1.7}/><directionalLight position={[3, 4, 5]} intensity={2.2}/>
         <group scale={preferences.avatarScale} position={[0, preferences.avatarOffsetY, 0]}>
           {studio && compareIK && modelUrl ? <>
@@ -519,18 +525,21 @@ export function AvatarPreview3D({ modelUrl, preferences, studio = false, animati
             {modelUrl ? <Suspense fallback={<ProceduralModel/>}><GltfPreview url={modelUrl} animationUrl={animationUrl} sharedMotionUrlV531={sharedMotionUrlV531} timeline={timeline} blendV491={activeBlendV491} onClips={handleClips} onPosition={handlePosition} footIK={previewIK} preferences={preferences}/></Suspense> : <ProceduralModel/>}
           </PreviewMotion>}
         </group>
-        <OrbitControls enablePan={false} enableZoom minDistance={1.8} maxDistance={8} autoRotate={autoRotate && !playing} autoRotateSpeed={1.2}/>
+        <OrbitControls target={[0, focusY, 0]} enablePan={false} enableZoom minDistance={view === "full" ? 1.8 : .5} maxDistance={8} autoRotate={autoRotate && !playing} autoRotateSpeed={1.2}/>
       </Canvas></ModelPreviewBoundaryV733>
     </div>
     <div className="avatar-preview-toolbar">
       <button type="button" onClick={() => { if (!playing) onPreviewPlaybackV532?.(); setPlaying(value => !value); }} disabled={preferences.reducedMotion || !readyForSelectedV532} aria-pressed={playing}>{playing ? "⏸ Tanz pausieren" : "▶ Tanz testen"}</button>
       {studio && <>
+        <label>Detailansicht <select aria-label="Avatar-Detailansicht" value={view} disabled={compareIK} onChange={e => { setDetailView(e.target.value as typeof detailView); setPlaying(false); }}>
+          <option value="full">Ganze Figur</option><option value="portrait">Gesicht</option><option value="upper">Oberkörper &amp; Hände</option>
+        </select></label>
         <label><input type="checkbox" checked={previewIK} disabled={!modelUrl || compareIK} onChange={e => setPreviewIK(e.target.checked)}/> Foot IK</label>
         <label><input type="checkbox" checked={compareIK} disabled={!modelUrl} onChange={e => setCompareIK(e.target.checked)}/> Vorher/Nachher</label>
       </>}
       <label>Tempo <select value={speed} onChange={e => setSpeed(Number(e.target.value))} aria-label="Vorschau-Tempo"><option value={0.25}>0,25× Zeitlupe</option><option value={0.5}>0,5×</option><option value={1}>1×</option><option value={1.5}>1,5×</option><option value={2}>2×</option></select></label>
       <button type="button" aria-pressed={autoRotate} onClick={() => setAutoRotate(value => !value)}>{autoRotate ? "Rotation aus" : "Auto-Rotation"}</button>
-      <button type="button" onClick={() => setResetKey(value => value + 1)}>Ansicht zurücksetzen</button>
+      <button type="button" onClick={() => { setDetailView("full"); setResetKey(value => value + 1); }}>Ansicht zurücksetzen</button>
     </div>
     {studio && <fieldset className="avatar-timeline-editor avatar-motion-blend-preview-v491" aria-label="GLB Motion Preview & Blending Studio V491">
       <legend>GLB Motion Preview & Blending Studio · V491</legend>
@@ -590,7 +599,7 @@ export function AvatarPreview3D({ modelUrl, preferences, studio = false, animati
       </fieldset>
     </fieldset>}
     {studio && <fieldset className="avatar-timeline-editor"><legend>Animation Timeline · V93</legend>
-      <p>Wähle einen eingebetteten oder importierten Clip, positioniere die Abspielmarke und lege eine Loop-Spanne fest. Die GLB-Dateien bleiben unverändert.</p>
+      <p>Wähle einen eingebetteten oder importierten Clip, positioniere die Abspielmarke und lege eine Loop-Spanne fest. Beim Abspielen wechseln Clips mit einem weichen Übergang aus der aktuellen Pose. Die GLB-Dateien bleiben unverändert.</p>
       <label>Animation <select value={clipId} disabled={!clips.length} onChange={event => setClipId(event.target.value)}>
         {!clips.length && <option value="">Keine Animation vorhanden</option>}
         {clips.map(clip => <option key={clip.id} value={clip.id}>{clip.label} ({clip.duration.toFixed(1)} s)</option>)}

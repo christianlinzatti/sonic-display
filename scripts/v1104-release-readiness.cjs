@@ -12,7 +12,7 @@ function inspectReleaseV1104(root){
   add('node24',pkg.engines.node==='24.x');
   add('test',pkg.scripts['test:v1104']==='node tests/v1104-playwright-visual-regression.cjs');
   add('types',pkg.scripts['test:v1104:types']==='tsc -p tests/tsconfig.v1104-core.json --noEmit');
-  add('prebuild',pkg.scripts.prebuild.startsWith('npm run test:v1104 && npm run test:v1104:types'));
+  add('prebuild',pkg.scripts.prebuild.includes('npm run test:v1104 && npm run test:v1104:types'));
   for(const f of ['scripts/v1104-playwright-visual-report.cjs','tests/v1104-playwright-visual-regression.cjs',
    'tests/e2e/visual-quality-v1104.spec.cjs','tests/tsconfig.v1104-core.json','scripts/v1104-release-readiness.cjs',
    'changelog/V1104-PLAYWRIGHT-VISUAL-QA-SCREENSHOTS.md'])add('file:'+f,exists(f));

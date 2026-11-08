@@ -1,0 +1,176 @@
+[
+  {
+    "file": "chrome-beat.glb",
+    "motionVersion": 3,
+    "bytes": 2307324,
+    "sha256": "a3bf30a4d8846551b903d3d3dff1e494855d250cb90925df77a7d93a3cbb13e3",
+    "triangles": 14232,
+    "joints": 47,
+    "clips": [
+      {
+        "name": "Dance_Groove",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Techno",
+        "seconds": 2
+      },
+      {
+        "name": "Idle_Breathe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_House",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HipHop",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Disco",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Shuffle",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Robot",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FestivalBounce",
+        "seconds": 2
+      },
+      {
+        "name": "Gesture_Wave",
+        "seconds": 3
+      },
+      {
+        "name": "Dance_PopLock",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_Clockwork",
+        "seconds": 16
+      }
+    ]
+  },
+  {
+    "file": "festival-nova.glb",
+    "motionVersion": 3,
+    "bytes": 2119660,
+    "sha256": "78ab5b7c132fa3808fc6608ef62d405da5bf600848d50d4c175687b957154eb7",
+    "triangles": 14048,
+    "joints": 45,
+    "clips": [
+      {
+        "name": "Dance_Groove",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Techno",
+        "seconds": 2
+      },
+      {
+        "name": "Idle_Breathe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_House",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HipHop",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Disco",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Shuffle",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Robot",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FestivalBounce",
+        "seconds": 2
+      },
+      {
+        "name": "Gesture_Wave",
+        "seconds": 3
+      },
+      {
+        "name": "Dance_FestivalFlow",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_DiscoStar",
+        "seconds": 12
+      }
+    ]
+  },
+  {
+    "file": "neon-pulse.glb",
+    "motionVersion": 3,
+    "bytes": 2076316,
+    "sha256": "0e3b11413da9f1ec06df921d5cb0a3e84eba98a16fbd9502a89e4650b3d684ae",
+    "triangles": 13060,
+    "joints": 44,
+    "clips": [
+      {
+        "name": "Dance_Groove",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Techno",
+        "seconds": 2
+      },
+      {
+        "name": "Idle_Breathe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_House",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HipHop",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Disco",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Shuffle",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Robot",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FestivalBounce",
+        "seconds": 2
+      },
+      {
+        "name": "Gesture_Wave",
+        "seconds": 3
+      },
+      {
+        "name": "Dance_NeonCircuit",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_LaserStep",
+        "seconds": 12
+      }
+    ]
+  }
+]

@@ -1,4 +1,4 @@
-**Dokumentationsstand:** V1104
+**Dokumentationsstand:** V1105
 
 ## V1104 · Playwright Visual QA & Screenshot Reports
 
@@ -5039,3 +5039,10 @@ Cue** in bereits existierenden Frames und Instanzen verwendet. Die bestehende
 V1074-Blen­ding-Schicht glättet Ein-/Austritte. Manuelle Clips, Vocal-Casting,
 Pause, Low-GPU und Reduced Motion sperren die neue Regie. Keine neuen Mixer,
 IK-Regeln, Avatare, Gerätebefehle oder Soundeffekte.
+
+
+## V1105 – Playwright Visual Regression & Accessibility
+
+Die V1104-Screenshot-Galerie wird um eine eigenständige, offline nutzbare Qualitätstabelle (`visual-gallery/quality.html` und `quality.json`) erweitert. Sechs neue UI-Prüfungen laufen in beiden Chromium-Projekten gegen `next start`: stabile PNG-Bilder der Startüberschrift vor/nach Reload, Settings-Viewport-/Overflow-Checks, Rückkehr des Tastaturfokus, Tastatur-Navigation, Reduced Motion und Govee-Knöpfe ohne autorisierte Geräte. Die identische Seite wird **innerhalb desselben Browserlaufs** verglichen; bewusst keine cross-platform Pixel-Golden-Files.
+
+`lib/visualPngDiffV1105.cjs` dekodiert echte PNG-Rasterdaten mit harten Größenlimits und vergleicht Farbkanäle pixelweise. `scripts/v1105-playwright-quality-report.cjs` akzeptiert Browser-Erfolg nur mit beiden Browsern, sämtlichen zwölf Prüfungen und echten Screenshots, einschließlich zweier PNG-Belege je Baseline-Vergleich. Der bestehende Browser-Runner speichert den eigenen Nachweis in `proof.json` und blockiert die Produktionsfreigabe bei fehlenden oder fehlgeschlagenen Prüfschritten. Keine zusätzlichen Hardware- oder Fremdnetz-Anfragen.
