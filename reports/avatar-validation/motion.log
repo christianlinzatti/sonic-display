@@ -1,0 +1,7 @@
+chrome-beat.glb: 12 clips / 240 contact samples each; max stance drift 0.014 mm; level soles, IK recognition, smooth/rapid transitions and cleanup PASS
+festival-nova.glb: 12 clips / 240 contact samples each; max stance drift 0.014 mm; level soles, IK recognition, smooth/rapid transitions and cleanup PASS
+neon-pulse.glb: 12 clips / 240 contact samples each; max stance drift 0.014 mm; level soles, IK recognition, smooth/rapid transitions and cleanup PASS
+All three performers have different choreography, including the common Groove clip.
+Standard knee aliases and rejection of opposite-side/unrelated chains PASS
+Real glTF CUBICSPLINE rotation snapshot and transition PASS
+Interrupted transitions with disjoint animated channels PASS

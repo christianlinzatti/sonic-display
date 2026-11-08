@@ -1,0 +1,10 @@
+unison @ 80 BPM: 40s / 2400 actual GLB mixer frames; coordinated clips, finite feet and correct clock phases PASS
+canon @ 80 BPM: 40s / 2400 actual GLB mixer frames; coordinated clips, finite feet and correct clock phases PASS
+spotlight @ 80 BPM: 40s / 2400 actual GLB mixer frames; coordinated clips, finite feet and correct clock phases PASS
+unison @ 120 BPM: 40s / 2400 actual GLB mixer frames; coordinated clips, finite feet and correct clock phases PASS
+canon @ 120 BPM: 40s / 2400 actual GLB mixer frames; coordinated clips, finite feet and correct clock phases PASS
+spotlight @ 120 BPM: 40s / 2400 actual GLB mixer frames; coordinated clips, finite feet and correct clock phases PASS
+unison @ 180 BPM: 40s / 2400 actual GLB mixer frames; coordinated clips, finite feet and correct clock phases PASS
+canon @ 180 BPM: 40s / 2400 actual GLB mixer frames; coordinated clips, finite feet and correct clock phases PASS
+spotlight @ 180 BPM: 40s / 2400 actual GLB mixer frames; coordinated clips, finite feet and correct clock phases PASS
+Manual priority, reduced motion, missing clocks/clips, track changes, seeks, anti-jitter, tempo continuity and reaction cleanup PASS

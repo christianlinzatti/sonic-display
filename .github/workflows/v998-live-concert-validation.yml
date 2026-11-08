@@ -1,5 +1,5 @@
 name: V998 Live AI Concert Assistant production validation
-run-name: Sonic Display · V1044 · V998 Live AI Concert Assistant production validation
+run-name: Sonic Display · V1105 · V998 Live AI Concert Assistant production validation
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:

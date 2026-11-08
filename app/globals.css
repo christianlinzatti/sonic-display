@@ -90,6 +90,7 @@
 /* V62: interactive WebGL avatar preview */
 .settings-avatar-preview{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:12px}
 .avatar-preview-interactive{width:100%;min-width:0;display:flex;flex-direction:column;gap:10px}
+.avatar-preview-canvas>div{height:100%;width:100%}
 .avatar-preview-canvas{height:300px;width:100%;border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at 50% 50%,#354064,#090d19 75%);border:1px solid #ffffff29;touch-action:none}
 .avatar-preview-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .avatar-preview-toolbar button,.avatar-preview-toolbar select{background:#222d40;color:#f1f5ff;border:1px solid #ffffff35;border-radius:9px;padding:8px 10px;font:inherit;cursor:pointer}

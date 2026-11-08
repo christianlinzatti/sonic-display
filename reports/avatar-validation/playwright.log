@@ -1,0 +1,36 @@
+[2m[WebServer] [22m(node:11415) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[2m[WebServer] [22m(Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 16 tests using 1 worker
+
+(node:11429) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:11429) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium-desktop] › tests/e2e/sonic-crew-show.spec.cjs:4:1 › crew preferences persist and trio setup restores previous models and grouping (14.2s)
+  ✓   2 [chromium-desktop] › tests/e2e/sonic-crew-show.spec.cjs:28:1 › three real GLBs rehearse unison, canon and solo roles; pause and reduced motion work (23.1s)
+  ✓   3 [chromium-desktop] › tests/e2e/sonic-stage-avatars.spec.cjs:9:1 › stage crew catalog serves local models and original previews once each (711ms)
+  ✓   4 [chromium-desktop] › tests/e2e/sonic-stage-avatars.spec.cjs:24:26 › Neon Pulse: gallery, all clips, visible animation and saved selection (40.0s)
+  ✓   5 [chromium-desktop] › tests/e2e/sonic-stage-avatars.spec.cjs:24:26 › Festival Nova: gallery, all clips, visible animation and saved selection (40.6s)
+  ✓   6 [chromium-desktop] › tests/e2e/sonic-stage-avatars.spec.cjs:24:26 › Chrome Beat: gallery, all clips, visible animation and saved selection (41.9s)
+  ✓   7 [chromium-desktop] › tests/e2e/sonic-stage-avatars.spec.cjs:75:1 › playing signature changes and rapid switches keep the studio running; fine scrubbing stays exact (15.7s)
+  ✓   8 [chromium-desktop] › tests/e2e/sonic-stage-avatars.spec.cjs:101:1 › reduced-motion preferences keep clip changes paused (7.2s)
+(node:11872) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:11872) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   9 [chromium-touch] › tests/e2e/sonic-crew-show.spec.cjs:4:1 › crew preferences persist and trio setup restores previous models and grouping (16.1s)
+  ✓  10 [chromium-touch] › tests/e2e/sonic-crew-show.spec.cjs:28:1 › three real GLBs rehearse unison, canon and solo roles; pause and reduced motion work (27.3s)
+  ✓  11 [chromium-touch] › tests/e2e/sonic-stage-avatars.spec.cjs:9:1 › stage crew catalog serves local models and original previews once each (774ms)
+  ✓  12 [chromium-touch] › tests/e2e/sonic-stage-avatars.spec.cjs:24:26 › Neon Pulse: gallery, all clips, visible animation and saved selection (50.0s)
+  ✓  13 [chromium-touch] › tests/e2e/sonic-stage-avatars.spec.cjs:24:26 › Festival Nova: gallery, all clips, visible animation and saved selection (51.6s)
+  ✓  14 [chromium-touch] › tests/e2e/sonic-stage-avatars.spec.cjs:24:26 › Chrome Beat: gallery, all clips, visible animation and saved selection (49.5s)
+  ✓  15 [chromium-touch] › tests/e2e/sonic-stage-avatars.spec.cjs:75:1 › playing signature changes and rapid switches keep the studio running; fine scrubbing stays exact (17.0s)
+  ✓  16 [chromium-touch] › tests/e2e/sonic-stage-avatars.spec.cjs:101:1 › reduced-motion preferences keep clip changes paused (8.8s)
+
+  16 passed (6.8m)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report reports/playwright-avatars/html[39m
+[36m[39m

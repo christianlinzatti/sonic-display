@@ -1,5 +1,5 @@
 name: V1017 Intelligent Cache Manager
-run-name: Sonic Display · V1044 · V1017 Intelligent Cache Manager
+run-name: Sonic Display · V1105 · V1017 Intelligent Cache Manager
 on:
   workflow_dispatch:
 permissions:

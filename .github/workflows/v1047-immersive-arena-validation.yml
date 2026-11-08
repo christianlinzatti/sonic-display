@@ -1,5 +1,5 @@
 name: V1047 Immersive Arena Experience 3.0 validation
-run-name: Sonic Display · V1055 · V1047 Immersive Arena Experience 3.0 validation
+run-name: Sonic Display · V1105 · V1047 Immersive Arena Experience 3.0 validation
 on:
   workflow_dispatch:
 permissions:

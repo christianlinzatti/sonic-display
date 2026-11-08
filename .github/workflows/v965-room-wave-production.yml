@@ -1,6 +1,6 @@
 # Keep the filename stable: older ZIP importers already dispatch this entry point.
 name: Sonic Display · Production & Playwright
-run-name: Sonic Display · ${{ inputs.release || 'V1044' }} · Production & Playwright · ${{ github.event_name }}
+run-name: Sonic Display · ${{ inputs.release || 'V1105' }} · Production & Playwright · ${{ github.event_name }}
 on:
   push:
     branches: [master]
@@ -86,6 +86,40 @@ jobs:
         run: npm run verify:v1004:focused
       - name: V1080 Laser Show Experience (regression and isolated type checks)
         run: npm run test:v1080 && npm run test:v1080:types
+      - name: V1105 Playwright Visual Regression & Accessibility (regression and isolated type checks)
+        run: npm run test:v1105 && npm run test:v1105:types
+      - name: V1104 Playwright Visual QA & Screenshot Reports (regression and isolated type checks)
+        run: npm run test:v1104 && npm run test:v1104:types
+      - name: V1103 Production Stability & Automated Release (regression and isolated type checks)
+        run: npm run test:v1103 && npm run test:v1103:types
+      - name: V1102 Govee Scene Zone Choreographer (regression and isolated type checks)
+        run: npm run test:v1102 && npm run test:v1102:types
+      - name: V1101 Govee Scene Transition Smoother (regression and isolated type checks)
+        run: npm run test:v1101 && npm run test:v1101:types
+      - name: V1100 Govee Room Zone Mixer (regression and isolated type checks)
+        run: npm run test:v1100 && npm run test:v1100:types
+      - name: V1099 Govee Live Beat Accent (regression and isolated type checks)
+        run: npm run test:v1099 && npm run test:v1099:types
+      - name: V1098 Govee Immersive Color Journey (regression and isolated type checks)
+        run: npm run test:v1098 && npm run test:v1098:types
+      - name: V1097 Govee Spatial Light Waves (regression and isolated type checks)
+        run: npm run test:v1097 && npm run test:v1097:types
+      - name: V1096 Govee Room Lighting 5.0 (regression and isolated type checks)
+        run: npm run test:v1096 && npm run test:v1096:types
+      - name: V1095 Live Show Learning (regression and isolated type checks)
+        run: npm run test:v1095 && npm run test:v1095:types
+      - name: V1094 Concert Timeline Studio 3.0 (regression and isolated type checks)
+        run: npm run test:v1094 && npm run test:v1094:types
+      - name: V1093 Genre Show Intelligence (regression and isolated type checks)
+        run: npm run test:v1093 && npm run test:v1093:types
+      - name: V1092 Audience & Stage Emotion Sync (regression and isolated type checks)
+        run: npm run test:v1092 && npm run test:v1092:types
+      - name: V1091 Smart Concert Story Arc Director (regression and isolated type checks)
+        run: npm run test:v1091 && npm run test:v1091:types
+      - name: V1090 Musical Dynamics & Show Transitions (regression and isolated type checks)
+        run: npm run test:v1090 && npm run test:v1090:types
+      - name: V1089 Beat & Drop Intelligence 4.0 (regression and isolated type checks)
+        run: npm run test:v1089 && npm run test:v1089:types
       - name: Active imported release (regression and isolated type checks)
         shell: bash
         run: |

@@ -1,5 +1,5 @@
 name: V1010 Central Network Coordination
-run-name: Sonic Display · V1044 · V1010 Central Network Coordination
+run-name: Sonic Display · V1105 · V1010 Central Network Coordination
 on:
   workflow_dispatch:
 permissions:

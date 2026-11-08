@@ -1,3 +1,11 @@
+> **Sonic Stage Crew – Paket 4:** Musikgesteuerte Clip-Auswahl, eigene Reaktionen, gemeinsamer Tanz, Kanon und wechselnde Solos mit einer 3D-Show-Simulation. Anleitung: [SONIC-CREW-SHOW.md](SONIC-CREW-SHOW.md).
+
+## V1105 – Playwright Visual Regression & Accessibility (08.11.2026)
+
+Playwright legt in Desktop- und Touch-Chromium je sechs neue UI-Prüfungen mit echten Bildern ab: PNG-Vergleich der Startüberschrift vor/nach Reload, responsive Settings-Bounds, Tastaturfokus/Navigation, Reduced Motion und Govee-Sicherheit ohne Hardware. Kleine Anti-Aliasing-Unterschiede innerhalb desselben Browserlaufs werden toleriert; es gibt **keine** plattformübergreifend fest verdrahteten Pixel-Golden-Files.
+
+Nach dem GitHub-Produktionslauf im Artefakt `playwright-production/visual-gallery/quality.html` die 15 Kontrollnachweise und unter `index.html` die Bilder ansehen. Fehlen ein Browser, ein Screenshot, ein bestandener Test oder ein Vorher-/Nachher-Bild, bleibt der Lauf **nicht freigegeben**. Alle Berichte bleiben bei Fehlern verfügbar. Die echten Screenshots werden nur durch den Browser-Test erzeugt.
+
 ## V1104 · Playwright Visual QA und Screenshot-Berichte
 
 Erfolgreiche UI-Tests erzeugen jetzt echte Screenshots im Playwright-HTML-Bericht und in der separaten Offline-Galerie `reports/playwright-production/visual-gallery/index.html`. Sieben zusätzliche E2E-Szenarien werden auf Chromium Desktop und Touch geprüft. Fehlende Bildnachweise verhindern ein vollständiges Produktions-PASS. In GitHub Actions das Produktions-Artefakt herunterladen und den Bildbericht lokal öffnen. Einzelheiten: `changelog/V1104-PLAYWRIGHT-VISUAL-QA-SCREENSHOTS.md`.

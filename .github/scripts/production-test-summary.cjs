@@ -13,7 +13,7 @@ function summary(root){
  '',`- Regression, type and build checks: ${rows.filter(x=>x.ok).length}/${rows.length}${gate?'':' — report missing; stage not reached'}`,
  `- Playwright: ${stats?.expected??0} passed, ${stats?.unexpected??0} failed, ${stats?.skipped??0} skipped, ${stats?.flaky??0} flaky${browser?'':' — report missing; stage not reached'}`,
  `- Playwright screenshots: ${browser?.visual?.screenshotCount??0} · Desktop/Touch ${browser?.visual?.projects?.join(' + ')||'not available'} · ${browser?.visual?.screenshotCount ? 'open visual-gallery/index.html in the downloaded production artifact' : 'no visual evidence; see Playwright logs'}`,
- `- V1105 Visual Quality: ${browser?.visualQuality?.passed===true?'PASS':'NOT VERIFIED'} · ${browser?.visualQuality?.passedChecks??0}/${browser?.visualQuality?.expectedChecks??0} checks · visual-gallery/quality.html`,
+ `- V1105 Visual Quality: ${browser?.visualQuality?.passed===true?'PASS': 'NOT VERIFIED'} · ${browser?.visualQuality?.passedChecks??0}/${browser?.visualQuality?.expectedChecks??0} checks · visual-gallery/quality.html`,
  `- Resource soak: ${soak?(soak.passed?'PASS':'FAIL'):'not run'}${soak?.minutes?` (${soak.minutes} minute run)`:''}`,
  '', 'The full suite belongs to this workflow. Deployment reachability runs separately and does not certify the test suite.',
  '', 'Additional feature regression steps above are independent mandatory checks; an earlier failed step can prevent the build/browser stages from running.',

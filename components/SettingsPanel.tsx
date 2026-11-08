@@ -45,6 +45,7 @@ import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useUiPreferences } from "@/context/UiPreferencesContext";
 import { useAudioAnalysis } from "@/context/AudioAnalysisContext";
+import { SonicCrewControls } from "./visualizer/SonicCrewControls";
 import { avatarModels, getAvatarModel } from "@/components/visualizer/avatarModels";
 import type { AvatarModel } from "@/components/visualizer/avatarModels";
 const AvatarEditor = dynamic(() => import("@/components/visualizer/AvatarEditor").then(module => module.AvatarEditor), { ssr: false });
@@ -326,6 +327,7 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
         <AvatarPreview3D modelUrl={currentAvatar.url} sharedMotionUrlV531={currentAvatar.sharedMotionUrl} preferences={preferences} />
         <div><span className="settings-eyebrow">AKTIVER AVATAR</span><h3>{currentAvatar.label}</h3><p>{currentAvatar.description}</p><span className="settings-preview-meta">Rig: {preferences.avatarRigProfile} · Dance: {preferences.avatarDancePreset}</span></div>
       </div>
+      <SonicCrewControls />
       <fieldset className="avatar-library"><legend>Avatar-Bibliothek</legend>
         <div className="fbx-import">
           <strong>FBX automatisch nach GLB konvertieren</strong>

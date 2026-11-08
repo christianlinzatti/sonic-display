@@ -31,6 +31,7 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1105 Playwright Visual Regression & Accessibility','tests/v1105-playwright-accessibility-regression.cjs');
   run('V1104 Playwright Visual QA & Screenshot Reports','tests/v1104-playwright-visual-regression.cjs');
   run('V1103 Production Stability & Automated Release','tests/v1103-production-release-regression.cjs');
   run('V1102 Govee Scene Zone Choreographer','tests/v1102-govee-scene-zone-regression.cjs');

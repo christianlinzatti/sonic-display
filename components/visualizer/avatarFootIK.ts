@@ -43,12 +43,16 @@ function isAncestor(parent: Object3D, descendant: Object3D) {
 
 function findKnee(hip: Object3D, ankle: Object3D, side: "left" | "right") {
   const candidates: Object3D[] = [];
+  // Mixamo/glTF commonly calls the lower leg LeftLeg/RightLeg. Require the
+  // exact standard name and an intervening ancestor; never accept an UpLeg.
+  const isKnee = (name: string) => /knee|shin|calf|lower.?leg/i.test(name) ||
+    /^(?:mixamorig)?(?:left|right)leg$/i.test(name.replace(/[^a-z]/gi, ''));
   hip.traverse(node => {
     if (node === hip || node === ankle || !isAncestor(node, ankle)) return;
-    if (/knee|shin|calf|lower.?leg/i.test(node.name)) candidates.push(node);
+    if (isKnee(node.name)) candidates.push(node);
   });
   // Use only an actual intervening knee node (never infer from another leg).
-  return candidates.find(node => /knee|lower.?leg|shin|calf/i.test(node.name) &&
+  return candidates.find(node => isKnee(node.name) &&
     !(side === "left" && /right/i.test(node.name)) &&
     !(side === "right" && /left/i.test(node.name))) ?? null;
 }

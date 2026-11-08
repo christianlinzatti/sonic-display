@@ -1,5 +1,5 @@
 name: V1043 Intelligent Show Camera Director manual validation
-run-name: Sonic Display · V1044 · V1043 Intelligent Show Camera Director manual validation
+run-name: Sonic Display · V1105 · V1043 Intelligent Show Camera Director manual validation
 # Optional manual integration check. v965 is the authoritative automatic production matrix.
 on:
   workflow_dispatch:

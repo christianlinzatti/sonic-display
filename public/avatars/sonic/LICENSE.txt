@@ -1,0 +1,8 @@
+Sonic Stage Crew — original meshes, materials, rigs, animation clips and rendered previews.
+Created for this Sonic Display project, 2026-11-08.
+
+To the extent possible under law, the authors dedicate these assets to the public
+under CC0 1.0 Universal: https://creativecommons.org/publicdomain/zero/1.0/
+You may use, modify and redistribute these assets, including commercially,
+without attribution. No downloaded third-party meshes, textures or animations
+are included in this collection.
