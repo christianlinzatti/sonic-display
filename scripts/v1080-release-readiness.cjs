@@ -34,7 +34,8 @@ function inspectReleaseV1080(root){
   add('panel',read('components/visualizer/ArenaShowDesignerPanelV1040.tsx').includes('V1080 Laser Show Experience 5.0'));
   add('production',read('scripts/v931-production-gate.cjs').includes('tests/v1080-laser-experience-regression.cjs'));
   add('vercel',read('scripts/vercel-production-build.cjs').includes('tests/v1080-laser-experience-regression.cjs'));
-  add('ci',read('.github/workflows/v965-room-wave-production.yml').includes('npm run test:v1080 && npm run test:v1080:types'));
+  add('ci',p.scripts.prebuild.includes('npm run test:v1080 && npm run test:v1080:types')&&
+    read('.github/workflows/v965-room-wave-production.yml').includes('node scripts/v965-production-verify.cjs'));
   add('preflight',read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1080(root)'));
  }catch(e){console.error('V1080 readiness:',e.message);add('readable',false);}
  return {passed:checks.length>=20&&checks.every(c=>c.ok),checks};
