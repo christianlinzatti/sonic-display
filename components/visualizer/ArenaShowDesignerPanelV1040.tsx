@@ -608,6 +608,56 @@ export function ArenaShowDesignerPanelV1040(){
     Bei Pause, niedriger Grafikqualität, Songwechsel oder Reduced Motion inaktiv.
     Rein virtuelle FX – keine CO₂-Hardware, Pyrotechnik, Govee-Befehle oder Vollblitze.</small>
   </fieldset>
+  <fieldset className="arena-v1090-musical-dynamics" aria-label="V1090 Musical Dynamics & Show Transitions">
+   <legend>V1090 · Musical Dynamics & Show Transitions</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaMusicalDynamicsEnabledV1090)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaMusicalDynamicsEnabledV1090:e.target.checked})}/>
+    Sanfte Licht-Übergänge zwischen ruhigen und energiegeladenen Momenten
+   </label>
+   <label>Übergangsstil
+    <select value={preferences.arenaMusicalDynamicsStyleV1090??'balanced'}
+     disabled={!plan||!preferences.arenaMusicalDynamicsEnabledV1090}
+     onChange={e=>updatePreferences({arenaMusicalDynamicsStyleV1090:e.target.value==='cinematic'?'cinematic':e.target.value==='festival'?'festival':'balanced'})}>
+     <option value="balanced">Ausgewogen · natürliche Übergänge</option>
+     <option value="cinematic">Cinematic · langsamere Lichtblenden</option>
+     <option value="festival">Festival · schnellere Akzentanstiege</option>
+    </select>
+   </label>
+   <label>Übergangsstärke · {preferences.arenaMusicalDynamicsStrengthV1090??55}%
+    <input type="range" min={0} max={80} step={5} value={preferences.arenaMusicalDynamicsStrengthV1090??55}
+     disabled={!plan||!preferences.arenaMusicalDynamicsEnabledV1090}
+     onChange={e=>updatePreferences({arenaMusicalDynamicsStrengthV1090:Number(e.target.value)})}/>
+   </label>
+   <small>Verbindet die vorhandene LED-Wand und automatische Laserformationen mit weichen,
+    gemessenen Energiekurven. Es werden ausschließlich bestehende Lichter gedimmt und
+    wieder bis zu ihrer bisherigen Helligkeit hochgefahren; keine Vollblitze oder
+    zusätzlichen Renderdurchläufe. Manuelle Muster bleiben unverändert. Keine
+    erfundenen Drops, neuen Mikrofone oder Govee-Hardwarebefehle. Bei Pause, Seek,
+    Reduced Motion oder geringer Grafikqualität aus.</small>
+  </fieldset>
+  <fieldset className="arena-v1089-beat-intelligence" aria-label="V1089 Beat & Drop Intelligence 4.0">
+   <legend>V1089 · Beat & Drop Intelligence 4.0</legend>
+   <label className="setting-check"><input type="checkbox"
+    checked={Boolean(preferences.arenaBeatIntelligenceEnabledV1089)&&Boolean(plan)} disabled={!plan}
+    onChange={e=>updatePreferences({arenaBeatIntelligenceEnabledV1089:e.target.checked})}/>
+    Präzise Beat-Akzente vor dem V1087 Festival-Drop prüfen
+   </label>
+   <label>Beat-Filter
+    <select value={preferences.arenaBeatIntelligencePrecisionV1089??'balanced'}
+     disabled={!plan||!preferences.arenaBeatIntelligenceEnabledV1089}
+     onChange={e=>updatePreferences({arenaBeatIntelligencePrecisionV1089:e.target.value==='strict'?'strict':'balanced'})}>
+     <option value="balanced">Ausgewogen · mehr musikalische Akzente</option>
+     <option value="strict">Präzise · nur besonders klare Attacken</option>
+    </select>
+   </label>
+   <small>Verwendet gemessene Beat-Stärke, Bass, Attack und Energieanstieg. Unterdrückt
+    gehaltene Beats, schwache Signale und zu schnelle Wiederholungen. Nur aktiv,
+    wenn V1087 separat eingeschaltet ist und ein echter Drop beobachtet wird.
+    Keine neue Songstruktur, keine erfundenen Drops, keine zusätzlichen Mikrofone,
+    KI-Cloud-Aufrufe oder Govee-/Hardware-Befehle. Reset bei Pause, Seek und Titelwechsel.
+    Bei deaktivierter Option bleibt das ursprüngliche V1087-Verhalten erhalten.</small>
+  </fieldset>
   <fieldset className="arena-v1086-epic-stage-transformation" aria-label="V1086 Epic Stage Transformation 4.0">
    <legend>V1086 · Epic Stage Transformation 4.0</legend>
    <label className="setting-check"><input type="checkbox"
@@ -1048,7 +1098,7 @@ export function ArenaShowDesignerPanelV1040(){
     </li>)}
    </ol>
    <button type="button" onClick={()=>{
-    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false,arenaCrowdEnergyEnabledV1075:false,arenaRapGesturesEnabledV1076:false,arenaDuetPerformanceEnabledV1077:false,arenaNaturalDanceEnabledV1078:false,arenaLiveArtistEnabledV1079:false,arenaDynamicArchitectureEnabledV1082:false,arenaAdvancedLedEnabledV1083:false,arenaFestivalFxEnabledV1084:false,arenaProjectionEnabledV1085:false,arenaEpicTransformationEnabledV1086:false,arenaUltimateFestivalDropEnabledV1087:false});
+    updatePreferences({arenaShowDesignerEnabledV1040:false,arenaShowPlanV1040:undefined,goveeShowSyncEnabledV1042:false,arenaAudienceDirectorEnabledV1044:false,arenaAtmosphereDirectorEnabledV1045:false,arenaFinaleEnabledV1046:false,arenaImmersiveEnabledV1047:false,arenaConcertDirectorEnabledV1048:false,arenaLiveConcertEnabledV1049:false,arenaStorytellingEnabledV1050:false,arenaCrowdExperienceEnabledV1051:false,arenaUltimateConcertEnabledV1052:false,arenaCinematicCameraEnabledV1053:false,arenaAvatarPerformanceEnabledV1054:false,arenaStageInteractionEnabledV1055:false,arenaCinematicLightingEnabledV1056:false,arenaIntelligentLaserEnabledV1057:false,arenaVolumetricLightingEnabledV1058:false,arenaLedWallEnabledV1059:false,arenaLightingChoreographerEnabledV1060:false,arenaNaturalMotionEnabledV1061:false,arenaRapPerformanceEnabledV1062:false,arenaEnsembleEnabledV1063:false,arenaStageMovementEnabledV1064:false,arenaPerformanceDirectorEnabledV1065:false,arenaTransformingStageEnabledV1066:false,arenaFloatingExperienceEnabledV1067:false,arenaCameraDirectorEnabledV1072:false,arenaAudienceExperienceEnabledV1073:false,arenaAvatarAudienceEnabledV1074:false,arenaCrowdEnergyEnabledV1075:false,arenaRapGesturesEnabledV1076:false,arenaDuetPerformanceEnabledV1077:false,arenaNaturalDanceEnabledV1078:false,arenaLiveArtistEnabledV1079:false,arenaDynamicArchitectureEnabledV1082:false,arenaAdvancedLedEnabledV1083:false,arenaFestivalFxEnabledV1084:false,arenaProjectionEnabledV1085:false,arenaEpicTransformationEnabledV1086:false,arenaUltimateFestivalDropEnabledV1087:false,arenaBeatIntelligenceEnabledV1089:false,arenaMusicalDynamicsEnabledV1090:false});
     setStatus('Showplan entfernt; vorherige Bühnen-Einstellungen gelten wieder.');
    }}>Showplan entfernen</button>
   </>}

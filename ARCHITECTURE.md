@@ -1,3 +1,30 @@
+## V1090 · Musical Dynamics & Show Transitions
+
+V1090 ergänzt eine standardmäßig deaktivierte, songbezogene Musikdynamik für LED-Wand,
+Laserfächer und Lasertunnel. Eine deterministische Frame-Kurve dimmt die bestehenden
+virtuellen Lichtquellen in ruhigen Passagen und fährt sie bei gemessenen Akzenten
+fließend höchstens bis zur alten Helligkeit hoch. Drei Stile im Arena Show Designer,
+manuelle Muster haben Vorrang. Kein zusätzlicher Renderpass, keine Hardware-Steuerung,
+keine erfundenen Drops. Umfangreiche Regressionen und Release-Kontrollen enthalten.
+
+## V1089 · Beat & Drop Intelligence 4.0
+
+Der opt-in V1089-Beat-Filter `lib/beatDropIntelligenceV1089.ts` qualifiziert bereits
+**gemessene** Beat-Flanken vor dem gemeinsamen V1087-Festival-Drop. Verwendet werden
+normalisierte Beat-Stärke, Bass, Attack, Energieanstieg und ggf. ein vorhandener
+Kick-Akzent. Die auswählbaren Filter **Ausgewogen** und **Präzise** begrenzen
+Fehltrigger und Wiederholungen (220/320 ms). Ein vorhandener V1087-Cue ist
+weiterhin notwendig, einschließlich separat beobachteten Drops, mindestens zwei
+aktiver Visuals sowie Qualitäts-, Pause- und Manual-Guards. Kein Beat, kein
+musikalischer Abschnitt und kein Hardware-Kommando wird künstlich erzeugt.
+
+Der Beat-Zustand wird bei Titelwechsel, Seek, Pause, ungültigem Signal oder
+Deaktivierung gelöscht. Standardmäßig ist V1089 **ausgeschaltet**, damit V1087
+unverändert weiterläuft. Kein weiterer Render-Loop, Canvas-Stream oder Netzwerkzugriff. Die V1087/V1089-Einstellungen werden end-to-end über `VisualizerStage`, `VisualizerProps` und `StageEnvironment` an `Arena360StageV1031` durchgereicht; dies behebt den V1088-CI-TypeScript-Fehler V997.
+Tests: `npm run verify:v1089:focused` / `node scripts/v1089-release-readiness.cjs`.
+
+**Dokumentationsstand:** V1090
+
 ## V1088 · Smart Song Structure Detection
 
 **Song Understanding / Live FX Deck:** Die neue V1088-Anzeige unterscheidet zwischen
@@ -27,7 +54,7 @@ Impuls, während manuelle Einstellungen, Reduzierte Bewegung, Low-GPU, Pause,
 Songwechsel und Seek respektiert werden. Ein geplanter Hook reicht als Trigger
 nicht aus. Kein externer Hardwarezugriff, keine Vollblitze oder neuen Partikel-Batches.
 
-**Dokumentationsstand:** V1088
+**Dokumentationsstand:** V1090 (historischer Abschnitt)
 
 ## V1086 · Epic Stage Transformation 4.0
 
@@ -48,7 +75,7 @@ strokes are drawn; balanced tier uses 16 + 12; low tier and Reduced Motion draw 
 The feature is opt-in, preserves paused/seek safety and never generates musical
 structure or triggers Govee / hardware projectors.
 
-**Dokumentationsstand:** V1088
+**Dokumentationsstand:** V1090 (historischer Abschnitt)
 
 ## V1084 · Festival Atmosphere FX
 
@@ -1814,7 +1841,7 @@ Client-only Route `/acceptance` mit `ConcertAcceptanceDashboardPanelV697.tsx`, s
 - 30/90/365 Tage oder Gesamtarchiv für Rankings/Wochentage; 12 Kalendermonate sowie separate Trends der jüngsten zwei 30-Tage-Fenster. Keine Hörminuten behaupten.
 - Tests: `tests/v711-lastfm-intelligence-regression.cjs`, `tests/tsconfig.v711-core.json`, `tests/tsconfig.v711-ui.json`. Release-Prüfstatus: `docs/versions/V711-VERIFICATION.md`.
 
-**Dokumentationsstand:** V1088
+**Dokumentationsstand:** V1090 (historischer Abschnitt)
 
 ### V837 - Advanced Deutschrap Lip-Sync 7.0
 - Verified timed lyric words and explicitly authorized lead/feature singers provide bounded response-rate cues only.
@@ -2323,7 +2350,7 @@ Neue Fußkontakte führen unmittelbar zur Reduktion additiver Fußrotationen. De
 `services/show/liveConcertComparisonV544.ts` ergänzt eine reine A/B-Projektionsanalyse auf der bereits opt-in etwa sekündlich messenden V466-WebGL-Qualitätsprobe. `components/visualizer/ConcertVisualCompareV544.tsx` ist unter dem bestehenden QA-Knopf erreichbar und speichert maximal zwei manuell aufgenommene Momentaufnahmen (A/B) im React-UI-Zustand; die Schemabilder verwenden echte normalisierte Kopf- und Lyrics-Rechtecke und zeigen die vorhandenen FPS an, **keine Pixel/Fotos und keine optische Gesichts-/Tanzprüfung**. Der Anwender markiert Fußarbeit, Gesicht/Lip-Sync und Lyrics getrennt; `createComparisonReportV544` exportiert auf Klick einen JSON-Bericht, keine Auto-Freigabe. Bildrand-/Lyrics-Nähe werden heuristisch beurteilt, nicht über Objekt-Okklusion. Original-Bühnenkamera, Motion, Beleuchtung, GLBs, FPS-Messintervall und QA-Gating bleiben unangetastet. `tests/v544-visual-quality-regression.cjs`, `tests/tsconfig.v544-core.json`. Der Next.js-Build braucht vollständig installierte Abhängigkeiten.
 
 
-> **Dokumentationsstand:** V1088 (28.10.2026)
+> **Dokumentationsstand:** V1090 (historischer Abschnitt) (28.10.2026)
 
 ## V539 – Multi-Avatar Concert Interaction 5.0
 
@@ -3804,7 +3831,7 @@ Details: `docs/versions/V802-INTELLIGENT-CONCERT-IMPROVEMENT-ASSISTANT.md`.
 
 `components/visualizer/naturalMultiArtistStageInteractionV807.ts` berechnet ausschliesslich aus bestaetigten, songgebundenen V416/V496-Saengerrollen, vorhandenen Buehnenpositionen und Wiedergabezeit begrenzte Blicke und Gesten fuer Lead, Support, Duett, Handoff und gemeinsamen Hook. Die bestehenden 2er- und 3/4er-Avatar-Renderer verwenden die identische, reine Planungslogik ueber V144/V145-Overlays. Manuelle Animationen, Buehnenformationen, Gesichts-/Lippensynchronisation und Fuss-IK bleiben unberuehrt. V506/V508-Kollisionsschutz ist final. Keine neuen GLB-Mixer, Renderloops oder GPU-Ressourcen. Tests: `tests/v807-natural-multi-artist-stage-interaction-regression.cjs`.
 
-> **Dokumentationsstand:** V1088 (31.10.2026)
+> **Dokumentationsstand:** V1090 (historischer Abschnitt) (31.10.2026)
 
 ## V808 Natural Performer Positioning
 
@@ -4096,7 +4123,7 @@ V844 verifies section/audio cues, schedules at most one dominant side-stage effe
 - No display/UI overlay; flash cannot be guaranteed photosensitive-safe.
 - Release requires full typecheck, Next.js build, and actual visual test.
 
-> **Dokumentationsstand:** V1088 (01.11.2026)
+> **Dokumentationsstand:** V1090 (historischer Abschnitt) (01.11.2026)
 
 
 ## V846 - Paper Streamers

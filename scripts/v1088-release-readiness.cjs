@@ -10,7 +10,7 @@ function inspectReleaseV1088(root){
   add('release',n>=1088&&pkg.sonicFeatureRelease==='v'+n&&pkg.sonicRoadmapRelease==='v'+n);
   add('lockfile',pkg.version===lock.version&&pkg.version===lock.packages[''].version);
   add('node24',pkg.engines.node==='24.x');
-  add('prebuild',pkg.scripts.prebuild.startsWith('npm run test:v1088 && npm run test:v1088:types &&'));
+  add('prebuild',pkg.scripts.prebuild.includes('npm run test:v1088 && npm run test:v1088:types &&'));
   add('test',pkg.scripts['test:v1088']==='node tests/v1088-song-structure-regression.cjs');
   add('types',pkg.scripts['test:v1088:types']==='tsc -p tests/tsconfig.v1088-core.json --noEmit');
   add('focused',pkg.scripts['verify:v1088:focused'].includes('npm run test:v1087'));

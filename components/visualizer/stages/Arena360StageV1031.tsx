@@ -23,6 +23,8 @@ import {planEpicStageTransformationV1086,coordinateEpicStageTransformationV1086,
 import {ArenaProjectionMappingV1085} from './ArenaProjectionMappingV1085';
 import {planUltimateFestivalDropV1087,stepUltimateFestivalDropV1087,INITIAL_ULTIMATE_FESTIVAL_DROP_V1087} from '@/lib/arena360UltimateFestivalDropV1087';
 import {ArenaUltimateFestivalDropV1087} from './ArenaUltimateFestivalDropV1087';
+import {stepBeatDropIntelligenceV1089,INITIAL_BEAT_STATE_V1089,type BeatPrecisionV1089} from '@/lib/beatDropIntelligenceV1089';
+import {stepMusicalDynamicsV1090,INITIAL_MUSICAL_DYNAMICS_V1090,type MusicalDynamicsStyleV1090} from '@/lib/arena360MusicalDynamicsV1090';
 import {planLightingChoreographerV1060} from '@/lib/arena360LightingChoreographerV1060';
 import {ArenaLedDomeV1033} from "./ArenaLedDomeV1033";
 import {ArenaSkyFormationV1034} from "./ArenaSkyFormationV1034";
@@ -103,6 +105,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   projectionEnabledV1085=false,projectionStrengthV1085=55,projectionModeV1085='auto',
   epicTransformationEnabledV1086=false,epicTransformationStrengthV1086=55,epicTransformationModeV1086='auto',
   ultimateFestivalDropEnabledV1087=false,ultimateFestivalDropStrengthV1087=55,
+  beatIntelligenceEnabledV1089=false,beatIntelligencePrecisionV1089='balanced',
+  musicalDynamicsEnabledV1090=false,musicalDynamicsStrengthV1090=55,musicalDynamicsStyleV1090='balanced',
   lightingChoreographerEnabledV1060=false,lightingChoreographerStrengthV1060=55,
   transformingStageEnabledV1066=false,transformingStageStrengthV1066=55,
   floatingExperienceEnabledV1067=false,floatingExperienceStrengthV1067=55,
@@ -143,6 +147,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   projectionEnabledV1085?:boolean;projectionStrengthV1085?:number;projectionModeV1085?:ProjectionModeV1085;
   epicTransformationEnabledV1086?:boolean;epicTransformationStrengthV1086?:number;epicTransformationModeV1086?:EpicStageModeV1086;
   ultimateFestivalDropEnabledV1087?:boolean;ultimateFestivalDropStrengthV1087?:number;
+  beatIntelligenceEnabledV1089?:boolean;beatIntelligencePrecisionV1089?:BeatPrecisionV1089;
+  musicalDynamicsEnabledV1090?:boolean;musicalDynamicsStrengthV1090?:number;musicalDynamicsStyleV1090?:MusicalDynamicsStyleV1090;
   lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
   transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
   floatingExperienceEnabledV1067?:boolean;floatingExperienceStrengthV1067?:number;
@@ -159,6 +165,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   const scenicState=useRef({...INITIAL_ARENA_LIFT_V1034});
   const sharedPeak=useRef({...INITIAL_ARENA_PEAK_V1036});
   const ultimateFestivalDropStateV1087=useRef({...INITIAL_ULTIMATE_FESTIVAL_DROP_V1087});
+  const beatIntelligenceStateV1089=useRef({...INITIAL_BEAT_STATE_V1089});
+  const musicalDynamicsStateV1090=useRef({...INITIAL_MUSICAL_DYNAMICS_V1090});
   const glow=useRef<Group>(null);
   const leds=useRef<InstancedMesh>(null);
   const dummy=useMemo(()=>new Object3D(),[]);
@@ -510,8 +518,28 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   },[dummy,blue,pink]);
 
   useFrame((_,delta)=>{
+    // V1090: one shared song-scoped optical envelope, read by existing renderers.
+    // Manual light patterns remain untouched; low tier and Reduced Motion fail open
+    // to the original *visuals* (gain=1), never to extra brightness.
+    musicalDynamicsStateV1090.current=stepMusicalDynamicsV1090(musicalDynamicsStateV1090.current,{
+      enabled:musicalDynamicsEnabledV1090&&showDesignerEnabled&&showDirectorEnabled&&
+        ((ledWallEnabledV1059&&ledWallPatternV1059==='auto'&&advancedLedModeV1083==='auto')||
+         (lasersEnabled&&hologramPattern==='auto')),
+      playing:isPlaying,reducedMotion,reactive,performanceTier:getActivePerformanceTier(),
+      trackId,progressMs,deltaSeconds:delta,strength:musicalDynamicsStrengthV1090,
+      style:musicalDynamicsStyleV1090,observedSection:section,audio,
+    }).state;
+    // V1089 only QUALIFIES actual microphone beat edges; V1087 still requires
+    // a separately observed `drop`, armed show plan and enabled manual channels.
+    const measuredBeatV1089=stepBeatDropIntelligenceV1089(beatIntelligenceStateV1089.current,{
+      enabled:beatIntelligenceEnabledV1089,playing:isPlaying,reducedMotion,reactive,
+      precision:beatIntelligencePrecisionV1089,trackId,progressMs,deltaSeconds:delta,audio,
+    });
+    beatIntelligenceStateV1089.current=measuredBeatV1089.state;
+    const qualifiedAudioV1089=beatIntelligenceEnabledV1089
+      ? {...audio,beat:measuredBeatV1089.qualifiedBeat}:audio;
     ultimateFestivalDropStateV1087.current=stepUltimateFestivalDropV1087(
-      ultimateFestivalDropStateV1087.current,delta,ultimateFestivalDropCueV1087,audio,progressMs,trackId);
+      ultimateFestivalDropStateV1087.current,delta,ultimateFestivalDropCueV1087,qualifiedAudioV1089,progressMs,trackId);
     sharedPeak.current=stepArenaPeakV1036(sharedPeak.current,delta,{
       enabled:arenaPeaksEnabled&&showDirectorEnabled&&fullSongDirectorEnabled,
       playing:isPlaying,reducedMotion,reactive,section,beat:audio.beat,
@@ -590,7 +618,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
     <ArenaLedWallV1059 audio={audio} playing={isPlaying} reducedMotion={reducedMotion}
       cue={flowLedV1071} progressMs={progressMs} experienceCueV1083={epicTransformedV1086.led}
       epicDropCueV1069={epicDropV1069} ultimateFestivalDropCueV1087={ultimateFestivalDropCueV1087}
-      ultimateFestivalDropStateV1087={ultimateFestivalDropStateV1087}/>
+      ultimateFestivalDropStateV1087={ultimateFestivalDropStateV1087}
+      musicalDynamicsStateV1090={ledWallPatternV1059==='auto'&&advancedLedModeV1083==='auto'?musicalDynamicsStateV1090:undefined}/>
     <ArenaSkyFormationV1034 audio={audio} section={section} playing={isPlaying} reducedMotion={reducedMotion}
       enabled={skyFormationEnabled} directorEnabled={showDirectorEnabled} reactive={reactive}
       showAmbience={fullSongDirectorEnabled?cueV1035.ambience:undefined}/>
@@ -606,7 +635,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045} finaleV1046={finaleV1046}
       laserCueV1057={flowLasersV1071} laserExperienceCueV1080={epicTransformedV1086.laser}
       ultimateFestivalDropCueV1087={ultimateFestivalDropCueV1087}
-      ultimateFestivalDropStateV1087={ultimateFestivalDropStateV1087}/>
+      ultimateFestivalDropStateV1087={ultimateFestivalDropStateV1087}
+      musicalDynamicsStateV1090={hologramPattern==='auto'?musicalDynamicsStateV1090:undefined}/>
     <ArenaMovingLedSkyV1036 audio={audio} playing={isPlaying} reducedMotion={reducedMotion} reactive={reactive}
       enabled={movingSkyEnabled} directorEnabled={showDirectorEnabled} section={section}
       progressMs={progressMs} durationMs={durationMs} intensity={plannedIntensity} peakRef={sharedPeak} atmosphereV1045={atmosphereV1045}/>
@@ -633,7 +663,8 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       genre={plannedGenre} section={section} pattern={plannedLasers} strength={plannedHoloStrength}
       laserCueV1057={flowLasersV1071} laserExperienceCueV1080={epicTransformedV1086.laser}
       ultimateFestivalDropCueV1087={ultimateFestivalDropCueV1087}
-      ultimateFestivalDropStateV1087={ultimateFestivalDropStateV1087}/>
+      ultimateFestivalDropStateV1087={ultimateFestivalDropStateV1087}
+      musicalDynamicsStateV1090={hologramPattern==='auto'?musicalDynamicsStateV1090:undefined}/>
     {dynamicArchitectureEnabledV1082 && <ArenaDynamicArchitectureV1082 enabled={dynamicArchitectureEnabledV1082}
       playing={isPlaying} reducedMotion={reducedMotion} cue={epicTransformedV1086.architecture}/>}
     {projectionCueV1085.active&&projectionCueV1085.scenery&&

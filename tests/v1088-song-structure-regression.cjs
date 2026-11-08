@@ -83,9 +83,9 @@ for(let n=0;n<220000;n++){
  assert(!history||Number.isFinite(history.positionMs));samples++;
 }
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1088');assert.equal(pkg.version,lock.version);
+assert(Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1]||0)>=1088);assert.equal(pkg.version,lock.version);
 assert.equal(pkg.version,lock.packages[''].version);
-assert(pkg.scripts.prebuild.startsWith('npm run test:v1088 && npm run test:v1088:types &&'));
+assert(pkg.scripts.prebuild.includes('npm run test:v1088 && npm run test:v1088:types &&'));
 const panel=read('components/visualizer/SongStructurePanelV1088.tsx');
 const deck=read('components/visualizer/LiveFxDeckV881.tsx');
 assert(deck.includes('<SongStructurePanelV1088 key={`v1088-${trackId}`'));assert(panel.includes('advanceSongStructureV1088('));

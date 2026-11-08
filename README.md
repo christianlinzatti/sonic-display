@@ -1,3 +1,21 @@
+## V1090 · Musical Dynamics & Show Transitions
+
+V1090 ergänzt eine standardmäßig deaktivierte, songbezogene Musikdynamik für LED-Wand,
+Laserfächer und Lasertunnel. Eine deterministische Frame-Kurve dimmt die bestehenden
+virtuellen Lichtquellen in ruhigen Passagen und fährt sie bei gemessenen Akzenten
+fließend höchstens bis zur alten Helligkeit hoch. Drei Stile im Arena Show Designer,
+manuelle Muster haben Vorrang. Kein zusätzlicher Renderpass, keine Hardware-Steuerung,
+keine erfundenen Drops. Umfangreiche Regressionen und Release-Kontrollen enthalten.
+
+### V1089 – Beat & Drop Intelligence 4.0
+
+Der optionale **Beat-Filter** im Arena Show Designer ergänzt V1087 um
+qualifizierte Beat-Flanken (Stärke/Bass/Attack/Energieanstieg) mit zwei
+Empfindlichkeitsstufen. Er verhindert gehaltene und zu schnelle Akzente;
+beobachteter Drop und alle bestehenden Schutz- und Manual-Regeln bleiben Pflicht.
+Das Feature verändert keine Govee-Steuerung oder Songstruktur und ist zunächst aus.
+`npm run verify:v1089:focused` prüft den neuen Analyzer und V1080–V1088.
+
 ## V1088 · Smart Song Structure Detection
 
 **Song Understanding / Live FX Deck:** Die neue V1088-Anzeige unterscheidet zwischen

@@ -3,6 +3,7 @@ import {useFrame} from '@react-three/fiber';
 import {useMemo,useRef} from 'react';
 import {Color,Object3D,Quaternion,Vector3,type InstancedMesh} from 'three';
 import type {AudioFeatures} from '@/types/audio';
+import {sampleMusicalDynamicsGainV1090,type MusicalDynamicsStateV1090} from '@/lib/arena360MusicalDynamicsV1090';
 import {sampleUltimateFestivalDropV1087,type UltimateFestivalDropCueV1087,type UltimateFestivalDropStateV1087} from '@/lib/arena360UltimateFestivalDropV1087';
 import type {IntelligentLaserCueV1057} from '@/lib/arena360IntelligentLaserV1057';
 import {sampleLaserEndpointV1080,type LaserExperienceCueV1080} from '@/lib/arena360LaserExperienceV1080';
@@ -13,11 +14,12 @@ import {createLaserArchitectureV1039,planArenaHolographyV1039,sampleLaserArchite
  * Uses existing stage audio/section; NO hardware output, flashes or extra lights.
  */
 export function ArenaLaserTunnelsV1039({audio,playing,reducedMotion,reactive,enabled=true,
- genre,section,pattern='auto',strength=65,laserCueV1057,laserExperienceCueV1080,ultimateFestivalDropCueV1087,ultimateFestivalDropStateV1087}:{audio:AudioFeatures;playing:boolean;reducedMotion:boolean;
+ genre,section,pattern='auto',strength=65,laserCueV1057,laserExperienceCueV1080,ultimateFestivalDropCueV1087,ultimateFestivalDropStateV1087,musicalDynamicsStateV1090}:{audio:AudioFeatures;playing:boolean;reducedMotion:boolean;
  reactive:boolean;enabled?:boolean;genre?:string|null;section?:string;
  pattern?:HologramPatternV1039;strength?:number;laserCueV1057?:IntelligentLaserCueV1057;
  laserExperienceCueV1080?:LaserExperienceCueV1080;
- ultimateFestivalDropCueV1087?:UltimateFestivalDropCueV1087;ultimateFestivalDropStateV1087?:{readonly current:UltimateFestivalDropStateV1087}}){
+ ultimateFestivalDropCueV1087?:UltimateFestivalDropCueV1087;ultimateFestivalDropStateV1087?:{readonly current:UltimateFestivalDropStateV1087};
+ musicalDynamicsStateV1090?:{readonly current:MusicalDynamicsStateV1090};}){
  const {tier}=useAdaptivePerformance();
  const fixtures=useMemo(()=>createLaserArchitectureV1039(tier),[tier]);
  const rays=useRef<InstancedMesh>(null),dummy=useMemo(()=>new Object3D(),[]);
@@ -61,7 +63,8 @@ export function ArenaLaserTunnelsV1039({audio,playing,reducedMotion,reactive,ena
    dummy.position.copy(start).add(end).multiplyScalar(.5);
    dummy.quaternion.copy(orientation);dummy.scale.set(1,length,1);dummy.updateMatrix();
    rays.current.setMatrixAt(i,dummy.matrix);
-   rays.current.setColorAt(i,tint.copy(palette[i%2]).multiplyScalar(ray.light*(authored?.beamGain??1)*(laserExperienceCueV1080?.active?laserExperienceCueV1080.gain:1)));
+   rays.current.setColorAt(i,tint.copy(palette[i%2]).multiplyScalar(ray.light*(authored?.beamGain??1)*(laserExperienceCueV1080?.active?laserExperienceCueV1080.gain:1)*
+     sampleMusicalDynamicsGainV1090(musicalDynamicsStateV1090?.current)));
   }
   rays.current.instanceMatrix.needsUpdate=true;
   if(rays.current.instanceColor)rays.current.instanceColor.needsUpdate=true;

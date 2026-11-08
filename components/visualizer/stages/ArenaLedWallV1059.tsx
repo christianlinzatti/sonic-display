@@ -3,6 +3,7 @@ import {useFrame} from '@react-three/fiber';
 import {useLayoutEffect,useMemo,useRef} from 'react';
 import {Color,Object3D,type InstancedMesh} from 'three';
 import type {AudioFeatures} from '@/types/audio';
+import {sampleMusicalDynamicsGainV1090,type MusicalDynamicsStateV1090} from '@/lib/arena360MusicalDynamicsV1090';
 import {sampleUltimateFestivalDropV1087,type UltimateFestivalDropCueV1087,type UltimateFestivalDropStateV1087} from '@/lib/arena360UltimateFestivalDropV1087';
 import {useAdaptivePerformance} from '../adaptivePerformance';
 import {createLedWallPixelsV1059,sampleLedWallPixelV1059,type LedWallCueV1059} from '@/lib/arena360LedWallV1059';
@@ -14,10 +15,11 @@ import {ArenaLedLyricsV1083} from './ArenaLedLyricsV1083';
  * An open, low-slung ring of small pixels surrounds the existing arena floor.
  * Matrix positions are static. Only colors change at 8–14 Hz.
  */
-export function ArenaLedWallV1059({audio,playing,reducedMotion,cue,progressMs,epicDropCueV1069,experienceCueV1083,ultimateFestivalDropCueV1087,ultimateFestivalDropStateV1087}: {
+export function ArenaLedWallV1059({audio,playing,reducedMotion,cue,progressMs,epicDropCueV1069,experienceCueV1083,ultimateFestivalDropCueV1087,ultimateFestivalDropStateV1087,musicalDynamicsStateV1090}: {
  audio:AudioFeatures;playing:boolean;reducedMotion:boolean;cue:LedWallCueV1059;progressMs?:number;
  epicDropCueV1069?:EpicDropCueV1069;experienceCueV1083?:LedExperienceCueV1083;
  ultimateFestivalDropCueV1087?:UltimateFestivalDropCueV1087;ultimateFestivalDropStateV1087?:{readonly current:UltimateFestivalDropStateV1087};
+ musicalDynamicsStateV1090?:{readonly current:MusicalDynamicsStateV1090};
 }){
  const tier=useAdaptivePerformance().tier;
  const pixels=useMemo(()=>createLedWallPixelsV1059(tier),[tier]);
@@ -87,6 +89,8 @@ export function ArenaLedWallV1059({audio,playing,reducedMotion,cue,progressMs,ep
     const after=luminance(tint);
     if(after>before&&after>0)tint.multiplyScalar(before/after);
    }
+   // V1090: multiplicative, bounded optical crossfade; NEVER boost a pixel.
+   tint.multiplyScalar(sampleMusicalDynamicsGainV1090(musicalDynamicsStateV1090?.current));
    mesh.current.setColorAt(i,tint);
   }
   if(mesh.current.instanceColor)mesh.current.instanceColor.needsUpdate=true;

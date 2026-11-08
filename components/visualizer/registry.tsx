@@ -226,6 +226,11 @@ export interface VisualizerProps {
   arenaEpicTransformationModeV1086?:import('@/lib/arena360EpicStageTransformationV1086').EpicStageModeV1086;
   arenaUltimateFestivalDropEnabledV1087?:boolean;
   arenaUltimateFestivalDropStrengthV1087?:number;
+  arenaBeatIntelligenceEnabledV1089?:boolean;
+  arenaBeatIntelligencePrecisionV1089?:import('@/lib/beatDropIntelligenceV1089').BeatPrecisionV1089;
+  arenaMusicalDynamicsEnabledV1090?:boolean;
+  arenaMusicalDynamicsStrengthV1090?:number;
+  arenaMusicalDynamicsStyleV1090?:import('@/lib/arena360MusicalDynamicsV1090').MusicalDynamicsStyleV1090;
   arenaEpicDropEnabledV1069?:boolean;
   arenaEpicDropStrengthV1069?:number;
   arenaUltimateFinaleEnabledV1070?:boolean;

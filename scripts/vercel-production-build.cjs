@@ -31,6 +31,8 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1090 Musical Dynamics & Show Transitions','tests/v1090-musical-dynamics-regression.cjs');
+  run('V1089 Beat & Drop Intelligence 4.0','tests/v1089-beat-drop-intelligence-regression.cjs');
   run('V1088 Smart Song Structure Detection','tests/v1088-song-structure-regression.cjs');
   run('V1087 Ultimate Festival Drop','tests/v1087-ultimate-festival-drop-regression.cjs');
   run('V1086 Epic Stage Transformation','tests/v1086-epic-stage-transformation-regression.cjs');
