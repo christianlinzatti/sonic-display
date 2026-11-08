@@ -61,13 +61,13 @@ test('V1105 visual: settings categories are operable without a mouse', async ({p
   await expect(display).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(display).toHaveAttribute('aria-current','page');
-  await expect(dialog.getByLabel('Visualizer',{exact:true})).toBeVisible();
+  await expect(dialog.getByRole('combobox',{name:'Visualizer',exact:true})).toBeVisible();
 });
 
 test('V1105 visual: reduced motion preference keeps readable UI usable', async ({page}) => {
   await page.emulateMedia({reducedMotion:'reduce'});
   const dialog=await openSettings(page,'display');
-  await expect(dialog.getByLabel('Visualizer',{exact:true})).toBeVisible();
+  await expect(dialog.getByRole('combobox',{name:'Visualizer',exact:true})).toBeVisible();
   expect(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true);
   await expect(dialog.locator('[data-v571-tab="display"]')).toHaveAttribute('aria-current','page');
 });

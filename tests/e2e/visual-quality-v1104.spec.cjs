@@ -5,19 +5,19 @@ const PREFS = 'sonic-display-ui-preferences-v1';
 // These tests run against `next start` on BOTH desktop Chromium and touch Chromium.
 test('V1104 visual: display modes save and restore across a real reload', async ({ page }, testInfo) => {
   let dialog = await openSettings(page, 'display');
-  const select = dialog.getByLabel('Visualizer', { exact: true });
+  const select = dialog.getByRole('combobox', { name: 'Visualizer', exact: true });
   await expect(select).toBeVisible();
   await select.selectOption('wave');
   await select.selectOption('particles');
   await expect.poll(() => page.evaluate(k => JSON.parse(localStorage.getItem(k))?.visualizerMode, PREFS)).toBe('particles');
   await testInfo.attach('v1104-display-settings', { body: await page.screenshot({type:'jpeg',quality:75,fullPage:true}), contentType:'image/jpeg' });
   dialog = await openSettings(page, 'display');
-  await expect(dialog.getByLabel('Visualizer', { exact: true })).toHaveValue('particles');
+  await expect(dialog.getByRole('combobox', { name: 'Visualizer', exact: true })).toHaveValue('particles');
 });
 
 test('V1104 visual: 360 arena settings and show designer become accessible', async ({ page }, testInfo) => {
   const dialog = await openSettings(page, 'avatar');
-  const theme = dialog.getByLabel('Bühnenstil', { exact: true });
+  const theme = dialog.getByRole('combobox', { name: 'Bühnenstil', exact: true });
   await expect(theme).toBeVisible();
   await theme.selectOption('arena360');
   await expect(dialog.locator('.arena360-settings-v1031')).toBeVisible();

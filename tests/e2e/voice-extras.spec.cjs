@@ -18,9 +18,23 @@ test('local voice lyrics controls hide immersive lyrics too and survive reload',
 });
 test('voice avatar cycling uses installed models and calm mode is reversible',async({page})=>{
  const panel=await tools(page);await panel.getByText('Anzeige lokal ausprobieren',{exact:true}).click();
- await panel.getByRole('button',{name:'Avatar wechseln',exact:true}).click();
- await expect.poll(async()=>(await prefs(page)).avatarModelId).toBe('local:sonic-playwright-reference.glb');
- await panel.getByRole('button',{name:'Avatar wechseln',exact:true}).click();await expect.poll(async()=>(await prefs(page)).avatarModelId).toBe('procedural');
+ // Use the live catalog: built-in Stage Crew models now precede user-installed GLBs.
+ const response=await page.request.get('/api/avatars');expect(response.ok()).toBe(true);
+ const catalog=await response.json();
+ const entries=[...(Array.isArray(catalog.defaults)?catalog.defaults:[]),...(Array.isArray(catalog.models)?catalog.models:[])];
+ const models=Array.from(new Map(entries.filter(model=>model&&typeof model.id==='string'&&typeof model.label==='string'&&
+   (model.id==='procedural'||(typeof model.url==='string'&&model.url.length>0))).map(model=>[model.id,model])).values());
+ expect(models.some(model=>model.id==='sonic-neon-pulse')).toBe(true);
+ expect(models.some(model=>model.id==='local:sonic-playwright-reference.glb')).toBe(true);
+ const initial=(await prefs(page)).avatarModelId;
+ const startIndex=models.findIndex(model=>model.id===initial);
+ expect(startIndex).toBeGreaterThanOrEqual(0);
+ for(let step=1;step<=models.length;step++){
+  const expected=models[(startIndex+step)%models.length].id;
+  await panel.getByRole('button',{name:'Avatar wechseln',exact:true}).click();
+  await expect.poll(async()=>(await prefs(page)).avatarModelId).toBe(expected);
+ }
+ await expect.poll(async()=>(await prefs(page)).avatarModelId).toBe(initial);
  await panel.getByRole('button',{name:'Ruhige Darstellung',exact:true}).click();await expect.poll(async()=>(await prefs(page)).reducedMotion).toBe(true);
  await panel.getByRole('button',{name:'Normale Darstellung',exact:true}).click();await expect.poll(async()=>(await prefs(page)).reducedMotion).toBe(false);
 });
