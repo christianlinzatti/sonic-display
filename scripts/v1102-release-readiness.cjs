@@ -12,7 +12,7 @@ function inspectReleaseV1102(root){
   add('node24',pkg.engines.node==='24.x');
   add('script',pkg.scripts['test:v1102']==='node tests/v1102-govee-scene-zone-regression.cjs');
   add('types',pkg.scripts['test:v1102:types']==='tsc -p tests/tsconfig.v1102-core.json --noEmit');
-  add('prebuild',pkg.scripts.prebuild.startsWith('npm run test:v1102 && npm run test:v1102:types'));
+  add('prebuild',pkg.scripts.prebuild.includes('npm run test:v1102 && npm run test:v1102:types'));
   for(const p of ['lib/goveeSceneZoneChoreographerV1102.ts','components/GoveeSceneZoneStudioV1102.tsx',
    'tests/v1102-govee-scene-zone-regression.cjs','tests/tsconfig.v1102-core.json',
    'scripts/v1102-release-readiness.cjs','changelog/V1102-GOVEE-SCENE-ZONE-CHOREOGRAPHER.md'])add('file:'+p,exists(p));

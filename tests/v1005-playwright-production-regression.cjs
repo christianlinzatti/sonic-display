@@ -6,7 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const source = fs.readFileSync(path.join(__dirname, '../scripts/playwright-production.cjs'), 'utf8');
 let count = 0;
-function fixture({ artifactPassed = true, spawnStatus = 0, stats = { expected: 12, unexpected: 0, skipped: 0, flaky: 0 } } = {}) {
+function fixture({ artifactPassed = true, spawnStatus = 0, stats = { expected: 12, unexpected: 0, skipped: 0, flaky: 0 }, screenshotCount = 4 } = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sonic-playwright-'));
   fs.mkdirSync(path.join(root, '.next'), { recursive: true });
   fs.writeFileSync(path.join(root, '.next/BUILD_ID'), 'fixture-build-123');
@@ -19,6 +19,7 @@ function fixture({ artifactPassed = true, spawnStatus = 0, stats = { expected: 1
     __dirname: path.join(root, 'scripts'), module, process: fakeProcess, console: { log() {} },
     require(name) {
       if (name === './check-next-build-v964.cjs') return { inspectBuild: () => ({ passed: artifactPassed, issues: artifactPassed ? [] : ['BUILD_ID stale'] }) };
+      if (name === './v1104-playwright-visual-report.cjs') return { buildVisualReport: () => ({ screenshotCount, projects: screenshotCount ? ['chromium-desktop', 'chromium-touch'] : [] }) };
       if (name === 'node:child_process') return { spawnSync(_exe, args) {
         calls.push(args);
         fs.writeFileSync(path.join(root, 'reports/playwright-production/results.json'), JSON.stringify({ stats }));
@@ -45,6 +46,9 @@ check('nonzero Playwright exit fails gate despite passing-looking report', { spa
 for (const stats of [{ expected: 0, unexpected: 0, skipped: 0, flaky: 0 }, { expected: 11, unexpected: 0, skipped: 1, flaky: 0 }, { expected: 11, unexpected: 1, skipped: 0, flaky: 0 }]) {
   check('empty, skipped or failed suite cannot pass: ' + JSON.stringify(stats), { stats }, proof => assert.equal(proof.passed, false));
 }
+check('passing-looking tests without screenshots must fail closed', { screenshotCount: 0 }, proof => {
+  assert.equal(proof.passed, false); assert.match(proof.error, /Missing desktop\/touch screenshot evidence/);
+});
 check('passing suite records build and artifact evidence without rebuilding', {}, (proof, f) => {
   assert.equal(fs.existsSync(path.join(f.root, 'public/avatars/sonic-playwright-reference.glb')), false);
   assert.equal(proof.passed, true); assert.equal(proof.buildId, 'fixture-build-123'); assert.equal(f.calls.length, 1);

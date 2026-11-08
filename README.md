@@ -1,3 +1,7 @@
+## V1104 · Playwright Visual QA und Screenshot-Berichte
+
+Erfolgreiche UI-Tests erzeugen jetzt echte Screenshots im Playwright-HTML-Bericht und in der separaten Offline-Galerie `reports/playwright-production/visual-gallery/index.html`. Sieben zusätzliche E2E-Szenarien werden auf Chromium Desktop und Touch geprüft. Fehlende Bildnachweise verhindern ein vollständiges Produktions-PASS. In GitHub Actions das Produktions-Artefakt herunterladen und den Bildbericht lokal öffnen. Einzelheiten: `changelog/V1104-PLAYWRIGHT-VISUAL-QA-SCREENSHOTS.md`.
+
 ## V1102 – Govee Scene Zone Choreographer
 
 Opt-in automatische **Raumlicht-Zonen-Choreografie** für die bereits autorisierten vier Govee-Leuchten. Deutschrap-/Hardtekk-/Deutschrock- oder Pop-Songabschnitte werden nur nach gültiger **V318-Bestätigung** kreativ zwischen Bühnenwand, Rhythmus, Neon und Ambiente gewichtet. Ausgewogen, Cinematic und Festival; Stärke und Szenen-Vorschau im Govee-Panel. Nur gedimmte V1096-Farbanteile, kein automatisches Anschalten und keine erfundenen Beats/Drops; V1100 Handgewichtung, V1096-/V961-Limits sowie der einzelne V909 LAN-Sendeweg bleiben verbindlich.

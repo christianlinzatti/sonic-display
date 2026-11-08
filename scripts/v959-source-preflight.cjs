@@ -443,3 +443,13 @@ const {inspectReleaseV1102}=require('./v1102-release-readiness.cjs');
 const v1102=inspectReleaseV1102(root);
 for(const c of v1102.checks)console.log(`${c.ok?'PASS':'FAIL'} V1102 ${c.id}`);
 if(!v1102.passed)process.exitCode=1;
+
+const {inspectReleaseV1103}=require('./v1103-release-readiness.cjs');
+const v1103=inspectReleaseV1103(root);
+for(const c of v1103.checks)console.log(`${c.ok?'PASS':'FAIL'} V1103 ${c.id}`);
+if(!v1103.passed)process.exitCode=1;
+
+const {inspectReleaseV1104}=require('./v1104-release-readiness.cjs');
+const v1104=inspectReleaseV1104(root);
+for(const c of v1104.checks)console.log(`${c.ok?'PASS':'FAIL'} V1104 ${c.id}`);
+if(!v1104.passed)process.exitCode=1;

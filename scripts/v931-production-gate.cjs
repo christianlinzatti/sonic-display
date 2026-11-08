@@ -11,6 +11,8 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1104 Playwright Visual QA & Screenshot Reports','tests/v1104-playwright-visual-regression.cjs'],
+  ['V1103 Production Stability & Automated Release','tests/v1103-production-release-regression.cjs'],
   ['V1102 Govee Scene Zone Choreographer','tests/v1102-govee-scene-zone-regression.cjs'],
   ['V1101 Govee Scene Transition Smoother','tests/v1101-govee-scene-transition-regression.cjs'],
   ['V1100 Govee Room Zone Mixer','tests/v1100-govee-room-zone-mixer-regression.cjs'],

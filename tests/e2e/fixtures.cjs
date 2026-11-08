@@ -17,6 +17,14 @@ const test = base.extend({
     expect(errors, 'No runtime errors, missing chunks or external requests').toEqual([]);
   }, { auto: true }],
 });
+// V1104: Attach a real screenshot of every visited local UI after each test.
+// API-only tests never navigate, so they do not create misleading blank images.
+test.afterEach(async ({ page }, testInfo) => {
+  if (page.isClosed() || !/^http:\/\/127\.0\.0\.1:3215(?:\/|$)/.test(page.url())) return;
+  const body = await page.screenshot({ type: 'jpeg', quality: 72, fullPage: true,
+    animations: 'disabled', timeout: 15000 });
+  await testInfo.attach('v1104-ui-screenshot', { body, contentType: 'image/jpeg' });
+});
 async function openSettings(page, section) {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'SONIC DISPLAY', exact: true })).toBeVisible();

@@ -111,7 +111,7 @@ assert(read('components/GoveeLanPanelV909.tsx').includes('<GoveeSceneZoneStudioV
 const ui=read('components/GoveeSceneZoneStudioV1102.tsx');
 assert(ui.includes('Reine Vorschau')&&!ui.includes('goveeBridgeRequestV909('));
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1102');assert.equal(lock.version,pkg.version);assert.equal(lock.packages[''].version,pkg.version);
+assert(/^0\.1\.0-v\d+$/.test(pkg.version)&&Number(pkg.version.split('-v')[1])>=1102);assert.equal(lock.version,pkg.version);assert.equal(lock.packages[''].version,pkg.version);
 for(const f of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(f).includes('tests/v1102-govee-scene-zone-regression.cjs'));
 assert(read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1102(root)'));

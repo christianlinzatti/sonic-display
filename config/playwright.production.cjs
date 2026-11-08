@@ -13,6 +13,7 @@ module.exports = defineConfig({
   reporter: [
     ['list'],
     ['json', { outputFile: path.join(root, 'reports/playwright-production/results.json') }],
+    ['junit', { outputFile: path.join(root, 'reports/playwright-production/junit.xml') }],
     ['html', { outputFolder: path.join(root, 'reports/playwright-production/html'), open: 'never' }],
   ],
   use: {
@@ -20,7 +21,7 @@ module.exports = defineConfig({
     serviceWorkers: 'block',
     reducedMotion: 'no-preference',
     trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
+    screenshot: 'only-on-failure', // Passing UI screenshots are attached by fixtures.cjs (V1104).
     launchOptions: { ...(executablePath ? { executablePath } : {}), args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] },
   },
   projects: [

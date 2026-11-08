@@ -1,3 +1,9 @@
+**Dokumentationsstand:** V1104
+
+## V1104 · Playwright Visual QA & Screenshot Reports
+
+Browser-Fixture `tests/e2e/fixtures.cjs` erfasst echte Screenshots auf Desktop- und Touch-Chromium. `scripts/v1104-playwright-visual-report.cjs` erstellt aus aktuellen JSON-Anhängen eine selbstständige Offline-Galerie, wobei unzulässige Pfade und HTML-Injektionen ausgeschlossen werden. Der produktive Browser-Runner verlangt Screenshots beider Browserprojekte; fehlende oder unvollständige Evidenz verweigert die Freigabe. `reports/playwright-production/` wird weiterhin im vorhandenen Windows-/Ubuntu-Workflow als Artefakt gesichert. Keine Verbindung mit echten Govee-Leuchten oder Spotify-Konten.
+
 ## V1102 – Govee Scene Zone Choreographer
 
 `lib/goveeSceneZoneChoreographerV1102.ts` ist reiner, fail-closed Modifikator. Es verarbeitet ausschließlich einen gültigen V1096-Raum-Cue, das explizite V1102-Opt-in und den passenden bestätigten V318-Phasencue. Die vier fixen Zonenprofile dimmen die bestehenden Farbanteile: Verse ambientbetont, Build bühnenbetont, Hook/Drop rhythmus- und neonbetont und Break atmosphärisch. Die aktuelle, verifizierte Phasenposition blendet vom bekannten vorherigen Profil zum aktuellen, ohne Songereignisse zu erfinden.
