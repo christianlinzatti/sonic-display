@@ -17,6 +17,15 @@ import {useCrewSettings,writeCrewSettings} from '@/components/visualizer/useSoni
 import {directVocalActingV1115,sampleVocalCueV1115,vocalPresetV1115,
  VOCAL_STYLE_LABELS_V1115,type VocalStyleV1115,type VocalShowV1115,type VocalPresetV1115}
  from '@/lib/aiVocalActingV1115';
+import {directDynamicLightingV1120,lightingLivePresetV1120,sampleLightingCueV1120,
+ LIGHTING_LABELS_V1120,type LightingStyleV1120,type LightingShowV1120,
+ type LightingLivePresetV1120} from '@/lib/aiDynamicLightingConductorV1120';
+import {directCinematicCameraV1119,cameraLivePresetV1119,sampleCameraCueV1119,
+ CAMERA_STYLE_LABELS_V1119,type CameraStyleV1119,type CameraShowV1119,
+ type CameraLivePresetV1119} from '@/lib/aiCinematicCameraDirectorV1119';
+import {directHolographicShowV1118,hologramLivePresetV1118,sampleHologramCueV1118,
+ HOLOGRAM_STYLE_LABELS_V1118,type HologramStyleV1118,type HologramShowV1118,
+ type HologramLivePresetV1118} from '@/lib/aiHolographicStageDirectorV1118';
 import {directStageTransformationV1117,stageLivePresetV1117,sampleStageCueV1117,
  STAGE_STYLE_LABELS_V1117,type StageStyleV1117,type StageShowV1117,
  type StageLivePresetV1117} from '@/lib/aiStageTransformationV1117';
@@ -91,6 +100,24 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
  const [stageEnabled,setStageEnabled]=useState(false);
  const [stagePreview,setStagePreview]=useState<StageShowV1117|null>(null);
  const [stageCanUndo,setStageCanUndo]=useState(false);
+ const [lightingStyle,setLightingStyle]=useState<LightingStyleV1120>('cinematic');
+ const [lightingStrength,setLightingStrength]=useState(50);
+ const [lightingEnabled,setLightingEnabled]=useState(false);
+ const [lightingPreview,setLightingPreview]=useState<LightingShowV1120|null>(null);
+ const [lightingCanUndo,setLightingCanUndo]=useState(false);
+ const lightingUndo=useRef<{before:Partial<typeof preferences>;after:LightingLivePresetV1120}|null>(null);
+ const [cameraStyle,setCameraStyle]=useState<CameraStyleV1119>('cinematic');
+ const [cameraStrength,setCameraStrength]=useState(50);
+ const [cameraEnabled,setCameraEnabled]=useState(false);
+ const [cameraPreview,setCameraPreview]=useState<CameraShowV1119|null>(null);
+ const [cameraCanUndo,setCameraCanUndo]=useState(false);
+ const cameraUndo=useRef<{before:Partial<typeof preferences>;after:CameraLivePresetV1119}|null>(null);
+ const [holoStyle,setHoloStyle]=useState<HologramStyleV1118>('spectral');
+ const [holoStrength,setHoloStrength]=useState(50);
+ const [holoEnabled,setHoloEnabled]=useState(false);
+ const [holoPreview,setHoloPreview]=useState<HologramShowV1118|null>(null);
+ const [holoCanUndo,setHoloCanUndo]=useState(false);
+ const holoUndo=useRef<{before:Partial<typeof preferences>;after:HologramLivePresetV1118}|null>(null);
  const stageUndo=useRef<{before:Partial<typeof preferences>;after:StageLivePresetV1117}|null>(null);
  const interactionUndo=useRef<{before:Partial<typeof preferences>;after:LiveArtistPresetV1116}|null>(null);
  const vocalUndo=useRef<{before:Partial<typeof preferences>;after:VocalPresetV1115}|null>(null);
@@ -185,14 +212,20 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
  const activeVocalCue=sampleVocalCueV1115(vocalPreview,previewPercent);
  const activeInteractionCue=sampleInteractionCueV1116(interactionPreview,previewPercent);
  const activeStageCue=sampleStageCueV1117(stagePreview,previewPercent);
+ const activeHoloCue=sampleHologramCueV1118(holoPreview,previewPercent);
+ const activeCameraCue=sampleCameraCueV1119(cameraPreview,previewPercent);
+ const activeLightingCue=sampleLightingCueV1120(lightingPreview,previewPercent);
  const stageOptions=()=>({style:stageStyle,strength:stageStrength,intensityCap:cap});
+ const holoOptions=()=>({style:holoStyle,strength:holoStrength,intensityCap:cap});
+ const cameraOptions=()=>({style:cameraStyle,strength:cameraStrength,intensityCap:cap});
+ const lightingOptions=()=>({style:lightingStyle,strength:lightingStrength,intensityCap:cap});
  const canSample=audio.active&&music.isPlaying&&!preferences.reducedMotion&&!!currentTrack;
  // Tracking is strictly session-only: stop and forget measurements on a song
  // change, playback interruption, microphone loss or reduced-motion preference.
  useEffect(()=>{
   emotionSession.current=createMusicEmotionSessionV1108();
   setReading(null);setDropReading(null);setDropCue(null);setSampleCount(0);setSampling(false);
-  setFollowSong(false);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);
+  setFollowSong(false);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);
  },[currentTrack]);
  useEffect(()=>{
   // Completed readings are also invalidated if the microphone or playback stops.
@@ -245,11 +278,11 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   setSampling(false);setReading(null);setDropReading(null);setDropCue(null);setSampleCount(0);
   setMoodExplanation('Lokale Messwerte verworfen. Es wurde nichts gespeichert oder übertragen.');
  };
- const invalidate=()=>{setStagePreview(null);controller.current?.abort();requestId.current++;setBusy(false);setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setStatus('');};
- useEffect(()=>{setStagePreview(null);controller.current?.abort();requestId.current++;setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setBusy(false);
+ const invalidate=()=>{setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setBusy(false);setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setStatus('');};
+ useEffect(()=>{setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setBusy(false);
   return ()=>{controller.current?.abort();requestId.current++;};
  },[signature]);
- const local=(storyOnly=false,conductorOnly=false,personalityOnly=false,performanceOnly=false,danceOnly=false,vocalOnly=false,interactionOnly=false,stageOnly=false)=>{
+ const local=(storyOnly=false,conductorOnly=false,personalityOnly=false,performanceOnly=false,danceOnly=false,vocalOnly=false,interactionOnly=false,stageOnly=false,holoOnly=false,cameraOnly=false,lightingOnly=false)=>{
   invalidate();
   const curated=curateCreativeRemixV1107(localAiShowRemixV1106(idea,style,cap),creativeBrief(),cap);
   if(!curated){setStatus('Regieentwurf ungültig – keine Änderungen übernommen.');return;}
@@ -270,11 +303,17 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   const finalRemix=interaction?.remix??danced.staged;
   const stage=stageEnabled||stageOnly?directStageTransformationV1117(base,finalRemix,stageOptions()):null;
   if((stageEnabled||stageOnly)&&!stage){setStatus('V1117 Bühnenverwandlung konnte nicht sicher geplant werden. Show unverändert.');return;}
-  setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
-  setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,stage?.remix??finalRemix):null);
+  const holo=holoEnabled||holoOnly?directHolographicShowV1118(base,stage?.remix??finalRemix,holoOptions()):null;
+  if((holoEnabled||holoOnly)&&!holo){setStatus('V1118 Hologramm-Regie konnte nicht sicher geplant werden. Show unverändert.');return;}
+  const camera=cameraEnabled||cameraOnly?directCinematicCameraV1119(base,holo?.remix??stage?.remix??finalRemix,cameraOptions()):null;
+  if((cameraEnabled||cameraOnly)&&!camera){setStatus('V1119 Kameraregie konnte nicht sicher geplant werden. Show unverändert.');return;}
+  const lighting=lightingEnabled||lightingOnly?directDynamicLightingV1120(base,camera?.remix??holo?.remix??stage?.remix??finalRemix,lightingOptions()):null;
+  if((lightingEnabled||lightingOnly)&&!lighting){setStatus('V1120 Lichtregie konnte nicht sicher geplant werden. Show unverändert.');return;}
+  setLightingPreview(lighting);setCameraPreview(camera);setHoloPreview(holo);setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
+  setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix):null);
   setConductorPreview(danced.conductor);setPersonalityPreview(danced.personality);setPerformancePreview(danced.performance);setDancePreview(danced.dance);
-  setPreview(stage?.remix??finalRemix);setBaseSignature(signature);setSource('local');
-  setStatus(stage?'V1117: sieben Bühnenverwandlungen als lokale Vorschau. Reale virtuelle Plattformen nur nach separater Freigabe; keine Gerätebefehle.':interaction?'V1116: sieben Artist-Interaktionen als Vorschau. Kameraführung über vorhandene Modi; echte Partnerreaktionen nur durch separate V1079-Aktivierung bei synchronisierten Lyrics. Keine automatisch erkannten Sänger.':vocal?'V1115 Vocal Acting: sieben Szenen mit Bühnen-Vocal-Rollen als Vorschau. Die tatsächliche Lippen-/Gestik-Engine bleibt bis zur gesonderten Zustimmung unverändert. Keine Stimmen oder Phoneme erkannt.':danced.dance?'V1114: Solo, Duo, Kanon und Unisono als sichere Vorschau. Echte GLB-Tanzclips können zusätzlich in der Stage Crew mit V1114 Automatik aktiviert werden. Noch kein Gerät oder Clip geschaltet.':directed.performance?'V1113 Performance Director: sieben abgestimmte Charakter-Momente als Vorschau bereit; gemeinsam unterstützte Tanz- und Kameramodi können nach Bestätigung übernommen werden. Keine einzelnen GLB-Animationen oder Geräte gesteuert.':personalized.personality?'V1112 Avatar Personality: drei individuelle Performer-Rollen sind als Vorschau geplant; nur bestehende Kamera-/Tanzmodi werden später übernommen. Keine GLB-Clips oder Geräte geschaltet.':conductor?'V1111 Live Show Conductor: sieben koordinierte Szenen als lokale Regieprobe bereit. Keine Bühne oder Geräte geschaltet.':story?'V1109 lokaler Storybogen als Vorschau bereit. Keine KI-Anfrage, kein Gerät geschaltet und noch nichts übernommen.':
+  setPreview(lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix);setBaseSignature(signature);setSource('local');
+  setStatus(lighting?'V1120: sieben virtuelle Lichtphasen als lokale Vorschau. Noch kein Lichtmodul und kein Govee-Gerät geschaltet.':camera?'V1119: sieben geplante Kameraszenen als lokale Vorschau, mit sanften vorhandenen V1072-Fahrten. Keine Kamera oder Geräte geschaltet.':holo?'V1118: sieben holografische Regieszenen als lokale optische Vorschau; echte 3D-Projektion nur nach separater Freigabe, keine Hardware.':stage?'V1117: sieben Bühnenverwandlungen als lokale Vorschau. Reale virtuelle Plattformen nur nach separater Freigabe; keine Gerätebefehle.':interaction?'V1116: sieben Artist-Interaktionen als Vorschau. Kameraführung über vorhandene Modi; echte Partnerreaktionen nur durch separate V1079-Aktivierung bei synchronisierten Lyrics. Keine automatisch erkannten Sänger.':vocal?'V1115 Vocal Acting: sieben Szenen mit Bühnen-Vocal-Rollen als Vorschau. Die tatsächliche Lippen-/Gestik-Engine bleibt bis zur gesonderten Zustimmung unverändert. Keine Stimmen oder Phoneme erkannt.':danced.dance?'V1114: Solo, Duo, Kanon und Unisono als sichere Vorschau. Echte GLB-Tanzclips können zusätzlich in der Stage Crew mit V1114 Automatik aktiviert werden. Noch kein Gerät oder Clip geschaltet.':directed.performance?'V1113 Performance Director: sieben abgestimmte Charakter-Momente als Vorschau bereit; gemeinsam unterstützte Tanz- und Kameramodi können nach Bestätigung übernommen werden. Keine einzelnen GLB-Animationen oder Geräte gesteuert.':personalized.personality?'V1112 Avatar Personality: drei individuelle Performer-Rollen sind als Vorschau geplant; nur bestehende Kamera-/Tanzmodi werden später übernommen. Keine GLB-Clips oder Geräte geschaltet.':conductor?'V1111 Live Show Conductor: sieben koordinierte Szenen als lokale Regieprobe bereit. Keine Bühne oder Geräte geschaltet.':story?'V1109 lokaler Storybogen als Vorschau bereit. Keine KI-Anfrage, kein Gerät geschaltet und noch nichts übernommen.':
    'Lokaler Remix: keine Netzwerk- oder KI-Anfrage. Noch nichts übernommen.');
  };
  const remote=async()=>{
@@ -311,10 +350,16 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
    const finalRemix=interaction?.remix??danced.staged;
    const stage=stageEnabled?directStageTransformationV1117(base,finalRemix,stageOptions()):null;
    if(stageEnabled&&!stage)throw Error('V1117 Bühnenverwandlung konnte nicht sicher geplant werden.');
-   setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
-   setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,stage?.remix??finalRemix):null);
+   const holo=holoEnabled?directHolographicShowV1118(base,stage?.remix??finalRemix,holoOptions()):null;
+   if(holoEnabled&&!holo)throw Error('V1118 Hologramm-Planung konnte nicht sicher durchgeführt werden.');
+   const camera=cameraEnabled?directCinematicCameraV1119(base,holo?.remix??stage?.remix??finalRemix,cameraOptions()):null;
+   if(cameraEnabled&&!camera)throw Error('V1119 Kameraregie konnte nicht sicher durchgeführt werden.');
+   const lighting=lightingEnabled?directDynamicLightingV1120(base,camera?.remix??holo?.remix??stage?.remix??finalRemix,lightingOptions()):null;
+   if(lightingEnabled&&!lighting)throw Error('V1120 Lichtregie konnte nicht sicher geplant werden.');
+   setLightingPreview(lighting);setCameraPreview(camera);setHoloPreview(holo);setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
+   setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix):null);
    setConductorPreview(danced.conductor);setPersonalityPreview(danced.personality);setPerformancePreview(danced.performance);setDancePreview(danced.dance);
-   setPreview(stage?.remix??finalRemix);setSource('ai');setBaseSignature(signature);
+   setPreview(lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix);setSource('ai');setBaseSignature(signature);
    setStatus('KI-Vorschlag bereit. Prüfe alle sieben Szenen und übernimm ihn ausdrücklich.');
   }catch(error){
    if(requestId.current===id&&!current.signal.aborted)
@@ -329,8 +374,93 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   undo.current={before:plan,after:JSON.stringify(result)};
   setCanUndo(true);
   updatePreferences({arenaShowPlanV1040:result});
-  setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);
+  setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);
   setStatus('Remix gespeichert. Die 360°-Showplan-Aktivierung bleibt unverändert – keine Geräte wurden gesteuert.');
+ };
+ const activateDynamicLighting=()=>{
+  if(busy||!lightingPreview||!preview||signature!==baseSignature){
+   setStatus('Bitte zuerst eine aktuelle V1120-Lichtprobe erstellen.');return;
+  }
+  if(preferences.reducedMotion){setStatus('Bewegungsreduktion aktiv: keine neue Lichtautomatik aktiviert.');return;}
+  if(!preferences.arenaShowDesignerEnabledV1040||!preferences.arenaConcertDirectorEnabledV1048||
+   !preferences.arenaLightsEnabledV1032){
+   setStatus('V1120 benötigt den 360°-Show Designer, Konzertdirektor und aktivierte virtuelle Bühnenlichter.');return;
+  }
+  if(lightingUndo.current){setStatus('V1120 Lichtpreset bereits aktiv. Bitte zuerst zurücksetzen.');return;}
+  const preset=lightingLivePresetV1120(lightingOptions());
+  if(!preset){setStatus('V1120: ungültiges virtuelles Lichtlimit.');return;}
+  // Do not overwrite authored lighting timeline, LED pattern, Govee, strobe or
+  // stored scene times. Enable only existing guarded virtual render layers.
+  const before=Object.fromEntries(Object.keys(preset).map(key=>
+   [key,preferences[key as keyof typeof preferences]])) as Partial<typeof preferences>;
+  updatePreferences(preset);lightingUndo.current={before,after:preset};setLightingCanUndo(true);
+  setStatus('V1120: vorhandene V1056/V1058/V1059/V1060-Lichtmodule aktiviert. Gespeicherte Licht-Timeline und manuelle Muster bleiben maßgebend. Keine Govee- oder Gerätebefehle.');
+ };
+ const revertDynamicLighting=()=>{
+  const saved=lightingUndo.current;if(!saved)return;
+  if(!Object.entries(saved.after).every(([key,value])=>preferences[key as keyof typeof preferences]===value)){
+   lightingUndo.current=null;setLightingCanUndo(false);
+   setStatus('V1120 Licht-Einstellungen wurden inzwischen manuell geändert; Rückgängig abgebrochen.');return;
+  }
+  updatePreferences(saved.before);lightingUndo.current=null;setLightingCanUndo(false);
+  setStatus('Vorherige virtuelle Licht-Einstellungen wiederhergestellt.');
+ };
+ const activateCinematicCamera=()=>{
+  if(busy||!cameraPreview||!preview||signature!==baseSignature){
+   setStatus('Bitte zuerst eine aktuelle V1119-Kameraprobe erstellen.');return;
+  }
+  if(preferences.reducedMotion){setStatus('Bewegungsreduktion aktiv: keine automatische Kamerafahrt eingeschaltet.');return;}
+  if(!preferences.arenaShowDesignerEnabledV1040||!preferences.arenaConcertDirectorEnabledV1048||!preferences.arenaCameraEnabledV1032){
+   setStatus('V1119 benötigt den aktiven 360°-Show Designer, Konzertdirektor und die freigegebene 360°-Kamera.');return;
+  }
+  if(cameraUndo.current){setStatus('V1119-Kamerapreset ist bereits aktiv. Bitte vorher rückgängig machen.');return;}
+  const preset=cameraLivePresetV1119(cameraOptions());
+  if(!preset){setStatus('V1119: ungültiges Kamera-Intensitätslimit.');return;}
+  const before=Object.fromEntries(Object.keys(preset).map(key=>
+   [key,preferences[key as keyof typeof preferences]])) as Partial<typeof preferences>;
+  updatePreferences(preset);cameraUndo.current={before,after:preset};setCameraCanUndo(true);
+  setStatus('V1119: bestehende V1043-/V1053-/V1072-Kamerafahrten aktiviert. Manuelle Kamera, Lyrics, Songzeit, Pause und Reduced Motion bleiben maßgebend. Keine Hardware.');
+ };
+ const revertCinematicCamera=()=>{
+  const saved=cameraUndo.current;if(!saved)return;
+  if(!Object.entries(saved.after).every(([key,value])=>preferences[key as keyof typeof preferences]===value)){
+   cameraUndo.current=null;setCameraCanUndo(false);
+   setStatus('V1119 Kamera-Einstellungen wurden inzwischen manuell geändert; Rückgängig abgebrochen.');return;
+  }
+  updatePreferences(saved.before);cameraUndo.current=null;setCameraCanUndo(false);
+  setStatus('Vorherige Kamera-Einstellungen wiederhergestellt.');
+ };
+ const activateHolographicStage=()=>{
+  if(busy||!holoPreview||!preview||signature!==baseSignature){
+   setStatus('Bitte zuerst eine aktuelle V1118-Hologramm-Probe erstellen.');return;
+  }
+  if(preferences.reducedMotion){setStatus('Bewegungsreduktion aktiv: kein Hologramm-Preset übernommen.');return;}
+  if(!preferences.arenaShowDesignerEnabledV1040||!preferences.arenaConcertDirectorEnabledV1048){
+   setStatus('V1118 benötigt den aktivierten 360°-Show Designer und Konzertdirektor.');return;
+  }
+  if((preferences.arenaHologramPatternV1039??'auto')!=='auto'){
+   setStatus('Manueller Hologramm-Modus hat Vorrang: für V1118 zuerst den Hologramm-Modus auf Auto umstellen.');return;
+  }
+  const existingProjection=preferences.arenaProjectionModeV1085??'auto';
+  const preset=hologramLivePresetV1118(holoOptions());
+  if(!preset){setStatus('Ungültige Hologramm-Intensität.');return;}
+  if(existingProjection!=='auto'&&existingProjection!==preset.arenaProjectionModeV1085){
+   setStatus('Manueller Projektionsmodus hat Vorrang: für V1118 zuerst den Projektionsmodus auf Auto setzen.');return;
+  }
+  if(holoUndo.current){setStatus('V1118-Hologramm-Preset ist bereits aktiviert. Vorher rückgängig machen.');return;}
+  const before=Object.fromEntries(Object.keys(preset).map(k=>
+   [k,preferences[k as keyof typeof preferences]])) as Partial<typeof preferences>;
+  updatePreferences(preset);holoUndo.current={before,after:preset};setHoloCanUndo(true);
+  setStatus('V1118: vorhandene Hologramm-/Silhouetten- und Projektionsmodule aktiviert. Pause, niedrige GPU-Stufe, Bewegungsreduktion, Songzeit und manuelle Muster bleiben maßgebend. Keine realen Geräte.');
+ };
+ const revertHolographicStage=()=>{
+  const saved=holoUndo.current;if(!saved)return;
+  if(!Object.entries(saved.after).every(([k,v])=>preferences[k as keyof typeof preferences]===v)){
+   holoUndo.current=null;setHoloCanUndo(false);
+   setStatus('Hologramm-Einstellungen wurden inzwischen manuell geändert; Rückgängig abgebrochen.');return;
+  }
+  updatePreferences(saved.before);holoUndo.current=null;setHoloCanUndo(false);
+  setStatus('Frühere Hologramm- und Projektionswerte wiederhergestellt.');
  };
  const activateStageTransformation=()=>{
   if(busy||!stagePreview||!preview||signature!==baseSignature){
@@ -705,6 +835,97 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
     Manuelle Animationen, bestehende Sängerzuordnungen und reduzierte Bewegung
     behalten Vorrang. Keine künstliche Audio-/Gesangserkennung, keine Govee-Befehle.</small>
   </fieldset>
+  <fieldset aria-label="V1120 AI Dynamic Lighting Conductor" className="arena-v1120-dynamic-lighting">
+   <legend>V1120 · AI Dynamic Lighting Conductor</legend>
+   <p>Vier Lichtdramaturgien für die vorhandenen virtuellen 360°-Lichtsysteme,
+    abgestimmt auf Kamera, Hologramme, Künstlerfokus und Atempause. Die Lichtfarben
+    sind geplante Stimmungen, keine gespeicherten Farbwechsel der V1040-Timeline.</p>
+   <label>Virtueller Licht-Regiestil
+    <select value={lightingStyle} disabled={busy}
+     onChange={e=>{setLightingStyle(e.target.value as LightingStyleV1120);invalidate();}}>
+     {Object.entries(LIGHTING_LABELS_V1120).map(([key,label])=>
+      <option key={key} value={key}>{label}</option>)}
+    </select>
+   </label>
+   <label>Virtuelle Lichtstärke {lightingStrength}%
+    <input type="range" min="20" max="80" step="10" value={lightingStrength} disabled={busy}
+     onChange={e=>{setLightingStrength(Number(e.target.value));invalidate();}}/>
+   </label>
+   <label><input type="checkbox" checked={lightingEnabled} disabled={busy}
+    onChange={e=>{setLightingEnabled(e.target.checked);invalidate();}}/>
+    Lichtregie auch auf neue Offline-/OpenAI-Entwürfe anwenden
+   </label>
+   <button type="button" disabled={busy} onClick={()=>local(false,false,false,false,false,false,false,false,false,false,true)}>
+    V1120 Lichtshow jetzt proben
+   </button>
+   {lightingCanUndo&&<button type="button" onClick={revertDynamicLighting}>
+    Frühere Licht-Einstellungen wiederherstellen
+   </button>}
+   <small>Die Regieprobe ist lokal und steuert keine Lampen. Ein gesonderter Klick
+    aktiviert nur V1056/V1058/V1059/V1060. Manuelle Licht-Timelines, Pausen,
+    reduzierte Bewegung, Lyrics-Kontrast und GPU-Grenzen behalten Vorrang.
+    Keine Govee-, DMX-, Strobo- oder Pyrotechnik-Befehle.</small>
+  </fieldset>
+  <fieldset aria-label="V1119 AI Cinematic Camera Director" className="arena-v1119-cinematic-camera">
+   <legend>V1119 · AI Cinematic Camera Director 4.0</legend>
+   <p>Vier filmische Kamerastile für die vorhandene 360°-Bühne: weiche Orbit- und Dollyfahrten,
+    Künstlernähe und breite Ensemblebilder bei Hologramm-Momenten.
+    Keine automatische Sänger-, Songstruktur- oder Drop-Erkennung.</p>
+   <label>Kamera-Regiestil
+    <select value={cameraStyle} disabled={busy}
+     onChange={e=>{setCameraStyle(e.target.value as CameraStyleV1119);invalidate();}}>
+     {Object.entries(CAMERA_STYLE_LABELS_V1119).map(([key,label])=>
+      <option key={key} value={key}>{label}</option>)}
+    </select>
+   </label>
+   <label>Virtuelle Kamerafahrt-Stärke {cameraStrength}%
+    <input type="range" min="20" max="80" step="10" value={cameraStrength} disabled={busy}
+     onChange={e=>{setCameraStrength(Number(e.target.value));invalidate();}}/>
+   </label>
+   <label><input type="checkbox" checked={cameraEnabled} disabled={busy}
+    onChange={e=>{setCameraEnabled(e.target.checked);invalidate();}}/>
+    Kamera-Regie auch in neue Offline-/OpenAI-Entwürfe aufnehmen
+   </label>
+   <button type="button" disabled={busy} onClick={()=>local(false,false,false,false,false,false,false,false,false,true)}>
+    V1119 Kamerafahrt jetzt proben
+   </button>
+   {cameraCanUndo&&<button type="button" onClick={revertCinematicCamera}>
+    Frühere Kamera-Einstellungen wiederherstellen
+   </button>}
+   <small>Eine lokale, unverbindliche Partitur. Ein separater Klick aktiviert nur die vorhandenen
+    V1043-, V1053- und V1072-Kameramodule. Manuell festgelegte Kameras, Lyrics,
+    reduzierte Bewegung, schwache GPU und eine pausierte Wiedergabe behalten Vorrang.</small>
+  </fieldset>
+  <fieldset aria-label="V1118 AI Holographic Stage Director" className="arena-v1118-holographic-director">
+   <legend>V1118 · AI Holographic Stage Director</legend>
+   <p>Inszeniert vorhandene virtuelle Hologramm-Ringe, optische Tänzer-Silhouetten und
+    Projektionen auf Bühnenflächen. Sieben geplante Songkapitel: kein echter
+    Künstler-Klon, keine neue GLB-Datei, keine erkannten Drops und kein Hardware-Projektor.</p>
+   <label>Hologramm-Regiestil
+    <select value={holoStyle} disabled={busy}
+     onChange={e=>{setHoloStyle(e.target.value as HologramStyleV1118);invalidate();}}>
+     {Object.entries(HOLOGRAM_STYLE_LABELS_V1118).map(([key,label])=>
+      <option key={key} value={key}>{label}</option>)}
+    </select>
+   </label>
+   <label>Virtuelle Hologramm-Intensität {holoStrength}%
+    <input type="range" min="20" max="80" step="10" value={holoStrength} disabled={busy}
+     onChange={e=>{setHoloStrength(Number(e.target.value));invalidate();}}/>
+   </label>
+   <label><input type="checkbox" checked={holoEnabled} disabled={busy}
+    onChange={e=>{setHoloEnabled(e.target.checked);invalidate();}}/>
+    Hologramm-Regie auch auf neue Offline-/OpenAI-Entwürfe anwenden
+   </label>
+   <button type="button" disabled={busy} onClick={()=>local(false,false,false,false,false,false,false,false,true)}>
+    V1118 Hologramm-Show jetzt proben
+   </button>
+   {holoCanUndo&&<button type="button" onClick={revertHolographicStage}>
+    Frühere Hologramm-Einstellungen wiederherstellen
+   </button>}
+   <small>Die Probe ist rein lokal. Ein zusätzlicher Klick aktiviert ausschließlich vorhandene
+    V1039-/V1068-/V1081-/V1085-Rendermodule. Automatik, Songposition, manuelle Muster,
+    reduzierte Bewegung und GPU-Qualitätsgrenzen behalten Vorrang. Keine Govee-Geräte oder Kameras.</small>
+  </fieldset>
   <fieldset aria-label="V1117 AI Stage Transformation" className="arena-v1117-ai-stage-transformation">
    <legend>V1117 · AI Stage Transformation</legend>
    <p>360°-Verwandlung mit echten vorhandenen Plattform-, Schwebebühnen- und
@@ -753,6 +974,82 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
    niemals Lyrics, Audiodaten, Tokens oder Govee-Geräteinformationen. Offline bleibt alles lokal.</small>
   {status&&<p role="status" aria-live="polite">{status}</p>}
   {preview&&<section aria-label="V1106 Show Remix Vorschau">
+   {lightingPreview&&<section aria-label="V1120 Dynamic Lighting Partitur">
+    <h3>V1120 · Koordinierte virtuelle Lichtregie</h3>
+    <p role="note" aria-label="V1120 Licht-Qualität">
+     {lightingPreview.quality.scenes} Lichtszenen · {lightingPreview.quality.lightLooks} Lichtlooks ·
+     {lightingPreview.quality.quietBreak?'ruhige Atempause':'Lichtpause prüfen'} ·
+     {lightingPreview.quality.fadeSafe?'begrenzte Übergänge':'Übergänge prüfen'}.
+    </p>
+    {activeLightingCue&&<p role="status" aria-label="V1120 Aktueller Lichtfokus">
+     Szene {activeLightingCue.index+1}: {activeLightingCue.chapter} ·
+     {activeLightingCue.colorMood} · Lichtenergie {activeLightingCue.virtualBrightness}%.
+     Dies ist eine virtuelle Lichtprobe, keine Lichtmessung oder Gerätesteuerung.
+    </p>}
+    <ol aria-label="V1120 sieben Lichtszenen">
+     {lightingPreview.cues.map(c=><li key={c.index}>
+      <strong>Szene {c.index+1}: {c.chapter}</strong> · {Math.round(c.start*100)}–{Math.round(c.end*100)}% ·
+      Lichtlook {c.look}, Stimmung {c.colorMood}, {c.virtualBrightness}% ·
+      Kamera {c.camera}, Laserlook {c.lasers}.
+     </li>)}
+    </ol>
+    <button type="button" disabled={busy||preferences.reducedMotion} onClick={activateDynamicLighting}>
+     V1120 vorhandene virtuelle Lichtregie aktivieren
+    </button>
+    <small>Die Vorschau verwendet die Zeitmarken des Showplans; weder echte Verse/Drops
+     noch exakte Lichtfarben werden erkannt. Separate Bestätigung schaltet nur
+     die vorhandenen virtuellen Lichtmodule ein. Keine Govee- oder Gerätebefehle.</small>
+   </section>}
+   {cameraPreview&&<section aria-label="V1119 Cinematic Camera Partitur">
+    <h3>V1119 · Filmische 360°-Kameraregie</h3>
+    <p role="note" aria-label="V1119 Kamera-Qualität">
+     {cameraPreview.quality.scenes} Kameraszenen · {cameraPreview.quality.cameraLooks} Perspektiven ·
+     {cameraPreview.quality.quietBreak?'ruhige Atempause':'Pause prüfen'} ·
+     {cameraPreview.quality.smoothExistingCamera?'weiche vorhandene Übergänge':'Übergänge prüfen'}.
+    </p>
+    {activeCameraCue&&<p role="status" aria-label="V1119 Aktueller Kamerafokus">
+     Szene {activeCameraCue.index+1}: {activeCameraCue.chapter} · Kamera {activeCameraCue.camera}.
+     Dies ist nur eine Kameraprobe, kein Live-Schwenk und keine Sängererkennung.
+    </p>}
+    <ol aria-label="V1119 sieben Kameraszenen">
+     {cameraPreview.cues.map(c=><li key={c.index}>
+      <strong>Szene {c.index+1}: {c.chapter}</strong> · {Math.round(c.start*100)}–{Math.round(c.end*100)}% ·
+      Kamera {c.camera} · Fokus {c.focus} · sanfte V1072-Überblendung.
+     </li>)}
+    </ol>
+    <button type="button" disabled={busy||preferences.reducedMotion} onClick={activateCinematicCamera}>
+     V1119 vorhandene filmische Kamerafahrten aktivieren
+    </button>
+    <small>Freigabe separat zur Showplan-Übernahme. Bewegungen laufen nur in vorhandenen
+     automatischen Kameras und werden durch manuelle Regie, Pausen und Motion-Schutz gesperrt.
+     Die Partitur ist geplant und kein sekundenexakt reproduzierter V1072-Kamera-Cut-Track.</small>
+   </section>}
+   {holoPreview&&<section aria-label="V1118 Holographic Stage Partitur">
+    <h3>V1118 · Optisches Hologramm-Konzert</h3>
+    <p role="note" aria-label="V1118 Hologramm-Qualität">
+     {holoPreview.quality.scenes} Szenen · {holoPreview.quality.looks} Hologramm-Phasen ·
+     Projektion {holoPreview.quality.projectedPattern} ·
+     {holoPreview.quality.quietBreak?'Atempause mit reduziertem Licht':'Atempause prüfen'} ·
+     {holoPreview.quality.safeTransitions?'sanfte Übergänge':'Übergänge prüfen'}.
+    </p>
+    {activeHoloCue&&<p role="status" aria-label="V1118 Aktueller Hologramm-Fokus">
+     Szene {activeHoloCue.index+1}: {activeHoloCue.chapter} ·
+     Hologrammlook {activeHoloCue.look} · optische Choreografie {activeHoloCue.opticalDancers} ·
+     Projektion {activeHoloCue.projection}. Nur Regieprobe, keine Live-Geräte.
+    </p>}
+    <ol aria-label="V1118 sieben holografische Szenen">
+     {holoPreview.cues.map(c=><li key={c.index}>
+      <strong>Szene {c.index+1}: {c.chapter}</strong> · {Math.round(c.start*100)}–{Math.round(c.end*100)}% ·
+      Look {c.look} · Lichtfigur {c.opticalDancers} · Projektion {c.projection} · Laserlook {c.lasers}.
+     </li>)}
+    </ol>
+    <button type="button" disabled={busy||preferences.reducedMotion} onClick={activateHolographicStage}>
+     V1118 vorhandene virtuelle Hologramm-Show aktivieren
+    </button>
+    <small>Separate Zustimmung für die bisherigen optischen Render-Effekte. Der Stil verändert
+     das Projektionsmuster, während bestehende V1068/V1081-Effekte weiterhin den
+     Songabschnitten folgen. Keine echte Künstlerprojektion oder zusätzlicher Avatar.</small>
+   </section>}
    {stagePreview&&<section aria-label="V1117 Stage Transformation Partitur">
     <h3>V1117 · 360°-Bühnenverwandlung</h3>
     <p role="note" aria-label="V1117 Bühnenqualität">

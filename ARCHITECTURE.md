@@ -1,3 +1,51 @@
+## V1120 · AI Dynamic Lighting Conductor
+
+`lib/aiDynamicLightingConductorV1120.ts` ist ein rein lokaler, deterministischer
+Licht-Dramaturgieplaner mit vier Stilen und sieben geplanten Konzertphasen.
+Die V1040-Show-Timeline unterstützt bisher `lasers`, aber **keine**
+sekunden- oder szenengenauen Lichtfarben oder DMX-Universen. Entsprechend
+können die geplanten Farb- und Helligkeitsstimmungen nur als ehrliche
+**Vorschau** angezeigt werden. Bei ausdrücklicher Showplan-Übernahme werden
+nur existierende, validierte Laserlooks geändert; alle Zeitgrenzen, Kameras,
+Avatare, Bühnenplattformen, Tanzmodi und Intensitäten bleiben erhalten.
+
+Ein **zweiter getrennter Opt-in** schaltet ausschließlich die vorhandenen
+virtuellen Render-Bausteine V1056 (Cinematic Lighting), V1058 (Volumetric),
+V1059 (LED Wall) und V1060 (Lighting Choreographer) mit begrenzter Stärke ein.
+Die tatsächlichen Lichteffekte folgen weiterhin deren eigenen Playback-,
+Manual-Timeline-, GPU-, Pause-, Lyrics- und Reduced-Motion-Regeln; es wird
+**keine sekundengenaue Partitur abgespielt**. Der zurücksetzbare Preset-Schritt
+schützt seit der Aktivierung manuell veränderte Einstellungen vor Überschreiben.
+Keine automatische OpenAI-Anfrage, keine Audioaufnahme, kein physisches Govee,
+DMX, Strobo, Pyro oder Mikrofon wird ausgelöst.
+
+## V1119 · AI Cinematic Camera Director 4.0
+
+`lib/aiCinematicCameraDirectorV1119.ts` erzeugt eine lokale, siebenphasige
+Kamera-Partitur aus den vorhandenen V1040-Kameramodi (wide, orbit, lead, group).
+Sie kann nur das `camera`-Feld einer ausdrücklich zur Speicherung freigegebenen
+V1106-Show-Vorschau anpassen; alle manuell angepassten Abschnittsgrenzen,
+Tanz-, Bühnen-, Hologramm- und Intensitätswerte bleiben unverändert. Sie
+beansprucht keine Künstleridentität, keinen echten Drop und kein Audio-Timing.
+
+Ein gesonderter, rückgängig machbarer Opt-in aktiviert die bestehenden V1043-
+Showkameras, V1053-Cinematic-Offsets und V1072-Konzertkameras. Die bereits
+vorhandene V1072-Regie glättet Fahrten mit zeitbasierten Überblendungen und
+hält Einstellungen unter manueller Kamera, Lyrics, Wiedergabe, GPU- und
+Reduced-Motion-Grenzen. Die neue Partitur ist ein Konzept, kein eigener
+sekundengenauer 3D-Kamerapfad oder permanenter Live-Cut-Automat. Keine
+neuen Renderpässe, GLBs, Govee-Gerätebefehle oder Cloud-Abfragen.
+
+## V1118 · Holographic Stage Director
+
+`lib/aiHolographicStageDirectorV1118.ts` erzeugt ausschließlich sichere V1040-
+Szenen-Laserlooks und eine erklärende optische Partitur aus festen, vorhandenen
+V1068-/V1081-/V1085-Mustern. Keine neuen Renderobjekte, keine Kopien von Avataren.
+Die UI erweitert die bestehende V1106-V1117-Vorschaukette; ein zusätzlicher
+Live-Preset aktiviert V1039/V1068/V1081/V1085 nur nach Opt-in und blockiert bei
+manuellen Hologramm-/Projektionsmodi, Reduced Motion oder fehlendem Show Director.
+Die Prüfung bleibt in den vorhandenen GPU-/Songzeit-/Optik-Gates der Renderer.
+
 ## V1116 – AI Artist Interaction (Lead-Wechsel, Dialoge und Duos)
 
 Der **V1116 AI Artist Interaction**-Bereich im AI Show Designer verbindet die bisherigen Character-, Dance- und Vocal-Regiepartituren zu sieben sichtbaren Interaktionsszenen. Vier Stile (Dialog, Duo, Rap-Battle und Festival) wechseln die Kameraführung zwischen den vorhandenen V1040-Modi. Die Regie nennt Lead-/Partnerrollen, Antwortgesten und gemeinsame Bühnenmomente, aber behauptet **keinen erkannten Gesang, physischen Blickkontakt oder neue GLB-Clips**. Die Original-Songgrenzen und die Govee- und Laserwerte bleiben bis zur expliziten Annahme unverändert.
@@ -38,7 +86,7 @@ Im **360° AI Show Designer** kannst du jetzt die V1111-Konzertregie proben: Sie
 
 Das Drop-Radar wertet die **freiwillig gestartete lokale V1108-Mikrofonmessung** aus. Erst nach mindestens fünf Sekunden mit sauberem Signal werden ein bereits gemessener Einschlag oder ein möglicher Energieaufbau erkannt. Ein künftiger Drop-Zeitpunkt kann aus diesem Signal **nicht sicher vorhergesagt** werden. Nur nach Zustimmung kann eine Regieidee für die **nächste** V1106/V1109-Vorschau vorgemerkt werden. Die sieben Zeitgrenzen, die Intensitätsobergrenze und die manuelle Freigabe bleiben erhalten. Keine Audio-/Geräte-/Cloud-Übertragung; Tests: `npm run test:v1110`, `npm run test:v1110:types`.
 
-**Dokumentationsstand:** V1117
+**Dokumentationsstand:** V1120
 
 ## V1104 · Playwright Visual QA & Screenshot Reports
 

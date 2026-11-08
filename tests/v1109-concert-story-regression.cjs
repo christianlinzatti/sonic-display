@@ -97,7 +97,7 @@ try{
   const api=fs.readFileSync(path.join(root,'app/api/ai/show-remix/route.ts'),'utf8');
   for(const key of ['composeConcertStoryV1109(base,remix,storyOptions())',
    'Storybogen lokal entwerfen','V1109 Storybogen Vorschau','V1109 sieben Storyphasen',
-   'setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,stage?.remix??finalRemix):null)',
+   'setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix):null)',
    'storyEnabled?storyFor(proposal):null',
    'updatePreferences({arenaShowPlanV1040:result})','Letzten Remix rückgängig machen'])
    assert(ui.includes(key),`Missing V1109 integration ${key}`);

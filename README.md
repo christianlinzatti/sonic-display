@@ -1,3 +1,58 @@
+## V1120 – AI Dynamic Lighting Conductor
+
+Im **360° AI Show Designer** stehen jetzt vier Lichtstile zur Auswahl:
+Filmischer Lichtbogen, Festival-Lichtarchitektur, Künstlerporträt mit
+Lyrics-Kontrast und Holografischer Lichtkosmos. Eine lokale Partitur zeigt
+für sieben Szenen geplanten Lichtcharakter, Energie, vorhandenen Laserlook,
+Kamerafokus und eine bewusste ruhigere Atempause.
+
+Bis zur ausdrücklichen Übernahme bleibt der Showplan unverändert.
+Die bestehende V1040-Timeline speichert **nur den Laserlook**, nicht
+per-Phase-Farbwerte. Eine weitere separate Bestätigung aktiviert nur
+vorhandene **virtuelle** V1056-/V1058-/V1059-/V1060-Lichtmodule.
+Manuelle Lichteinstellungen, Lyrics, Reduced Motion, Pause und GPU bleiben
+maßgebend. Kein Govee-, DMX-, Strobo- oder Pyrotechnik-Befehl.
+
+Tests: `npm run test:v1120`, `npm run test:v1120:types` und
+`tests/e2e/ai-dynamic-lighting-v1120.spec.cjs` auf Desktop/Touch in CI.
+Siehe `changelog/V1120-AI-DYNAMIC-LIGHTING-CONDUCTOR.md`.
+
+## V1119 – AI Cinematic Camera Director 4.0
+
+Der **360° AI Show Designer** enthält jetzt vier Kameraregien: Filmische
+360°-Kamerafahrt, Festival-Arena, Künstlernah & Lyrics-freundlich sowie
+Holografische Raumreise. Eine lokale Partitur zeigt sieben vorbereitete
+Kameramomente und eine ruhige Atempause. Sie kann nur den vorhandenen
+Kameramodus der V1040-Timeline ändern – ohne Songgrenzen, Bühne, Hologramme,
+Tanz oder Intensität anzutasten. Vor dem Speichern ist alles nur Vorschau.
+
+Mit einem **zweiten ausdrücklichen Klick** lassen sich die vorhandenen
+V1043/V1053/V1072-Kamerafahrten einschalten. Deren bestehende Übergänge
+bleiben begrenzt, Lyrics und manueller Kamerafokus haben Vorrang; Pausen,
+Reduced Motion und ungeeignete GPU-Stufen sperren die Effekte. Kein neues
+Kamerarig, keine Sängererkennung und keine Gerätebefehle. Die Regiepartitur
+wird nicht als sekundengenauer Live-Schnittplan behauptet.
+
+Tests: `npm run test:v1119`, `npm run test:v1119:types` und
+`tests/e2e/ai-cinematic-camera-v1119.spec.cjs` (Desktop/Touch bei CI).
+Siehe `changelog/V1119-AI-CINEMATIC-CAMERA-DIRECTOR.md`.
+
+## V1118 – AI Holographic Stage Director
+
+Im **Einstellungen → Bühne → 360° Arena → AI Show Designer** stehen jetzt vier
+Hologramm-Regiestile zur Wahl: Spektrales Lichttheater, Holografische Spiegelwelt,
+Optisches Künstlerduett und Kosmischer Lichttunnel. Die lokale Sieben-Szenen-Partitur
+verwendet nur vorhandene V1039/V1068/V1081/V1085-Optikeffekte und schlägt vorhandene
+Laserlooks für die bestätigte V1040-Timeline vor. Originale Zeitmarken, Kamera, Tanz,
+Bühne und Intensität bleiben erhalten. Ein zweiter Opt-in-Schritt aktiviert die
+wirklich vorhandenen virtuellen Module mit einem begrenzten Projektionsmodus.
+Manuelle Muster, GPU-Sperren, Pausen und reduzierte Bewegung werden respektiert;
+keine Hologramm-Künstlerklone, Hardware-Projektoren oder Govee-Befehle.
+
+Tests: `npm run test:v1118`, `npm run test:v1118:types`,
+`tests/e2e/ai-holographic-stage-v1118.spec.cjs`.
+Siehe `changelog/V1118-AI-HOLOGRAPHIC-STAGE-DIRECTOR.md`.
+
 ## V1116 – AI Artist Interaction (Lead-Wechsel, Dialoge und Duos)
 
 Der **V1116 AI Artist Interaction**-Bereich im AI Show Designer verbindet die bisherigen Character-, Dance- und Vocal-Regiepartituren zu sieben sichtbaren Interaktionsszenen. Vier Stile (Dialog, Duo, Rap-Battle und Festival) wechseln die Kameraführung zwischen den vorhandenen V1040-Modi. Die Regie nennt Lead-/Partnerrollen, Antwortgesten und gemeinsame Bühnenmomente, aber behauptet **keinen erkannten Gesang, physischen Blickkontakt oder neue GLB-Clips**. Die Original-Songgrenzen und die Govee- und Laserwerte bleiben bis zur expliziten Annahme unverändert.
