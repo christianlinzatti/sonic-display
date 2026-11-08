@@ -123,7 +123,8 @@ test('only existing V909 sender performs I/O; no independent driver is created',
  assert(sender.includes('planRoomAtmosphereV987(roomAtmosphereV987.current'));
  assert(sender.includes('applyRoomAtmosphereV987(recoveryLookV961,previous,roomDecisionV987'));
  assert(sender.includes("goveeBridgeRequestV909(config,'/command','POST'"));
- assert(sender.indexOf('applyRoomAtmosphereV987(recoveryLookV961')<sender.indexOf('governConcertLookV961(previous,showLookV1042'));
+ assert(sender.indexOf('applyRoomAtmosphereV987(recoveryLookV961')<sender.indexOf('governConcertLookV961(previous,roomLookV1096,'),
+  'V987 overlay must reach the existing final V961 governor after V1042/V1096 room overlays');
 });
 test('UI requires a second explicit click and allows immediate revocation',()=>{
  const ui=read('components/visualizer/AtmosphereDesignerV986.tsx');
