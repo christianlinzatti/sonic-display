@@ -88,6 +88,35 @@ check('new full ZIP safely updates an already-organized version document', () =>
     fs.writeFileSync(src, revised);
     moveChecked(src, dest, { allowVersionUpdate: true, archiveRoot: temp });
     assert.equal(fs.readFileSync(archive, 'utf8'), old);
+    // A newer full ZIP intentionally updates these two Stage Crew guides.
+    // Preserve their previous revisions by content hash, never silently lose them.
+    for (const [name,relative] of [
+      ['AVATAR-UPDATE.md','docs/features/avatars/AVATAR-UPDATE.md'],
+      ['SONIC-CREW-SHOW.md','docs/features/application/SONIC-CREW-SHOW.md'],
+    ]) {
+      const from = path.join(temp,name),to = path.join(temp,relative);
+      const original = 'old guide: '+name, newer = 'new V1116 guide: '+name;
+      fs.mkdirSync(path.dirname(to),{recursive:true});
+      fs.writeFileSync(from,newer);fs.writeFileSync(to,original);
+      moveChecked(from,to,{allowVersionUpdate:true,archiveRoot:temp});
+      assert.equal(fs.readFileSync(to,'utf8'),newer);
+      assert.equal(fs.existsSync(from),false);
+      const digest=crypto.createHash('sha256').update(original).digest('hex');
+      const previous=path.join(temp,'artifacts/historical/document-revisions',name+'.'+digest+'.bak');
+      assert.equal(fs.readFileSync(previous,'utf8'),original);
+      // Reimporting unchanged content must remain idempotent.
+      fs.writeFileSync(from,newer);
+      moveChecked(from,to,{allowVersionUpdate:true,archiveRoot:temp});
+      assert.equal(fs.readFileSync(to,'utf8'),newer);
+      assert.equal(fs.readFileSync(previous,'utf8'),original);
+      // Never authorize a similarly named guide in an arbitrary directory.
+      const wrong=path.join(temp,'docs/features/stage',name);
+      fs.mkdirSync(path.dirname(wrong),{recursive:true});
+      fs.writeFileSync(from,'untrusted guide');fs.writeFileSync(wrong,'important stage guide');
+      assert.throws(()=>moveChecked(from,wrong,{allowVersionUpdate:true,archiveRoot:temp}),/Conflicting documents/);
+      assert.equal(fs.readFileSync(wrong,'utf8'),'important stage guide');
+      fs.unlinkSync(from);
+    }
     const unsafe = path.join(temp, 'README.md');
     const unsafeDest = path.join(temp, 'docs', 'versions', 'README.md');
     fs.writeFileSync(unsafe, 'untrusted replacement');

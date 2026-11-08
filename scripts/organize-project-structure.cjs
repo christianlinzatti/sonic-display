@@ -33,10 +33,20 @@ function moveChecked(src, target, options = {}) {
     if (fileHash(src) !== previousHash) {
       const sourceName = path.basename(src);
       const canonical = path.join(archiveRoot, 'docs', 'versions', sourceName);
+      // Complete release ZIPs also carry updated Stage Crew guides in the root.
+      // Only these TWO canonical guide paths may be updated: archive the old
+      // contents first, and keep all other document collisions fail-closed.
+      const supportedGuideTargets = new Map([
+        ['AVATAR-UPDATE.md', 'docs/features/avatars/AVATAR-UPDATE.md'],
+        ['SONIC-CREW-SHOW.md', 'docs/features/application/SONIC-CREW-SHOW.md'],
+      ]);
+      const versionedDocument = /^V[1-9][0-9]*[._-].+\.md$/i.test(sourceName) &&
+        path.resolve(target) === path.resolve(canonical);
+      const sharedGuide = supportedGuideTargets.has(sourceName) &&
+        path.resolve(target) === path.join(archiveRoot, ...supportedGuideTargets.get(sourceName).split('/'));
       const allowed = options.allowVersionUpdate === true &&
-        /^V[1-9][0-9]*[._-].+\.md$/i.test(sourceName) &&
-        path.resolve(target) === path.resolve(canonical) &&
-        path.resolve(src) === path.resolve(path.join(archiveRoot, sourceName));
+        path.resolve(src) === path.resolve(path.join(archiveRoot, sourceName)) &&
+        (versionedDocument || sharedGuide);
       if (!allowed) {
         throw new Error(`Conflicting documents: ${slash(path.relative(root, src))} => ${slash(path.relative(root, target))}`);
       }
