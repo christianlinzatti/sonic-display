@@ -54,7 +54,7 @@ jobs:
         run: node scripts/production-workflow-metadata.cjs
   v965-production:
     needs: release
-    name: ${{ needs.release.outputs.release }} · Production & Playwright · ${{ matrix.os }}
+    name: ${{ needs.release.outputs.release }} · ${{ matrix.os == 'windows-latest' && 'Windows smoke (TypeScript + build)' || 'Full production + Playwright' }} · ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 95
     strategy:
@@ -84,8 +84,8 @@ jobs:
         run: node tests/v971-integration-setup-regression.cjs
       - name: Release reliability regressions
         run: npm run verify:v1004:focused
-      - name: V1080 Laser Show Experience (regression and isolated type checks)
-        run: npm run test:v1080 && npm run test:v1080:types
+      # Full historical regression coverage is already enforced by the inherited
+      # Linux production gate. Avoid duplicating dozens of costly suites.
       - name: Active imported release (regression and isolated type checks)
         shell: bash
         run: |
@@ -94,61 +94,33 @@ jobs:
           if [[ ! "$version" =~ ^[0-9]+$ ]]; then echo 'Invalid release version'; exit 1; fi
           npm run "test:v${version}"
           npm run "test:v${version}:types"
-      - name: V1003 Auto Improvement Director (regression and isolated type checks)
-        run: npm run test:v1003 && npm run test:v1003:types
-      - name: V1002 Concert Quality Assurance (regression and isolated type checks)
-        run: npm run test:v1002 && npm run test:v1002:api && npm run test:v1002:types
-      - name: V1001 Interactive Concert Control (regression and isolated type checks)
-        run: npm run test:v1001 && npm run test:v1001:types
-      - name: V1000 Immersive Concert Director (regression and isolated type checks)
-        run: npm run test:v1000 && npm run test:v1000:types
-      - name: V999 Intelligent Performance Governor (regression and isolated type checks)
-        run: npm run test:v999 && npm run test:v999:types
-      - name: V997 Continuous Concert Flow (regression and isolated type checks)
-        run: npm run test:v997 && npm run test:v997:types
-      - name: V996 Virtual Crowd Experience (regression and isolated type checks)
-        run: npm run test:v996 && npm run test:v996:types
-      - name: V995 Duet & Ensemble 3.0 (regression and isolated type checks)
-        run: npm run test:v995 && npm run test:v995:types
-      - name: V994 Vocal Performance Intelligence (regression and isolated type checks)
-        run: npm run test:v994 && npm run test:v994:types
-      - name: V993 AI Choreography Director (regression and isolated type checks)
-        run: npm run test:v993 && npm run test:v993:types
-      - name: V992 Cinematic Camera Director (regression and isolated type checks)
-        run: npm run test:v992 && npm run test:v992:types
-      - name: V991 Bass Impact Physics (regression and isolated type checks)
-        run: npm run test:v991 && npm run test:v991:types
-      - name: V987 Govee Immersive Sync 2.0 (regression and isolated type checks)
-        run: npm run test:v987 && npm run test:v987:types
-      - name: V986 AI Atmosphere Designer (regression and isolated type checks)
-        run: npm run test:v986 && npm run test:v986:types
-      - name: V985 Predictive Show Timeline (regression and isolated type checks)
-        run: npm run test:v985 && npm run test:v985:types
-      - name: V984 AI Concert Story Director (regression and isolated type checks)
-        run: npm run test:v984 && npm run test:v984:types
-      - name: V983 AI Song Intelligence (regression and isolated type checks)
-        run: npm run test:v983 && npm run test:v983:types
-      - name: V982 Immersive AI Show (regression and isolated type checks)
-        run: npm run test:v982 && npm run test:v982:types
-      - name: V998 Live AI Concert Assistant (regression and isolated type checks)
-        run: npm run test:v998 && npm run test:v998:types
-      - name: V990 Living LED Wall 3.0 (regression and isolated type checks)
-        run: npm run test:v990 && npm run test:v990:types
-      - name: V989 Volumetric Atmosphere 2.0 (regression and isolated type checks)
-        run: npm run test:v989 && npm run test:v989:types
-      - name: V988 Holographic Stage Portal (regression and isolated type checks)
-        run: npm run test:v988 && npm run test:v988:types
-      - name: Regressions, full TypeScript, production build and Playwright
+      - name: Ubuntu · full regressions, TypeScript, Next.js build, Playwright and soak
+        if: matrix.os == 'ubuntu-24.04'
         run: node scripts/v965-production-verify.cjs
+      - name: Windows · full TypeScript without duplicated regression chain
+        if: matrix.os == 'windows-latest'
+        run: node node_modules/typescript/bin/tsc --noEmit --pretty false
+      - name: Windows · Next.js production build without npm prebuild rerun
+        if: matrix.os == 'windows-latest'
+        env:
+          NODE_ENV: production
+          SONIC_LOW_MEMORY_BUILD: '1'
+        run: node node_modules/next/dist/bin/next build
       - name: Verify emitted production artifacts
         run: node scripts/check-next-build-v964.cjs
       - name: Publish every recorded test result in the job summary
-        if: always()
+        if: ${{ always() && matrix.os == 'ubuntu-24.04' }}
         env:
           SONIC_TEST_REVISION: ${{ needs.release.outputs.revision }}
         run: node .github/scripts/production-test-summary.cjs
+      - name: Explain Windows smoke scope in summary
+        if: ${{ always() && matrix.os == 'windows-latest' }}
+        shell: bash
+        run: |
+          echo '### Windows TypeScript + Next.js production smoke' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The complete historical regressions, Playwright desktop/touch screenshots and resource soak run on Ubuntu and remain mandatory.' >> "$GITHUB_STEP_SUMMARY"
       - name: Save production and browser evidence, including failures
-        if: always()
+        if: ${{ always() && matrix.os == 'ubuntu-24.04' }}
         uses: actions/upload-artifact@v6
         with:
           name: sonic-${{ needs.release.outputs.release }}-${{ matrix.os }}-production

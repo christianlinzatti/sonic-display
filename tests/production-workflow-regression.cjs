@@ -31,11 +31,11 @@ assert.ok(dispatch.run.includes('git rev-parse HEAD'));
 assert.ok(dispatch.run.includes('-f "release=V$VERSION"'));
 assert.ok(dispatch.run.includes('-f "revision=$IMPORTED_REVISION"'));
 const upload = production.jobs['v965-production'].steps.find(x => x.uses === 'actions/upload-artifact@v6');
-assert.equal(upload.if, 'always()');
+assert.equal(upload.if, "${{ always() && matrix.os == 'ubuntu-24.04' }}");
 assert.ok(upload.with.path.includes('reports/playwright-production/'));
 assert.ok(upload.with.path.includes('reports/playwright-soak/'));
 const summary=production.jobs['v965-production'].steps.find(x=>(x.run||'').includes('production-test-summary.cjs'));
-assert.equal(summary.if,'always()');
+assert.equal(summary.if,"${{ always() && matrix.os == 'ubuntu-24.04' }}");
 assert.ok(upload.with.name.includes('needs.release.outputs.release'));
 const allowedAutomatic = new Set(['v965-room-wave-production.yml', 'project-archive-import.yml', 'organize-version-docs.yml']);
 for (const [name, workflow] of Object.entries(workflows)) {
@@ -49,8 +49,14 @@ assert.ok(workflows['v965-deployment-smoke.yml'].jobs['deployed-site-smoke'].env
 const commands = production.jobs['v965-production'].steps.map(x => x.run || '').join('\n');
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json')));
 for (const match of commands.matchAll(/npm run ([a-z0-9:_-]+)/g)) assert.ok(pkg.scripts[match[1]], `Missing script ${match[1]}`);
+// Full Linux production certification executes the mandatory prebuild chain.
+// Avoid a second copy of these historic TypeScript regressions in the workflow.
 for (const version of [982,983,984,985,986,987,988,989,990,991,992,993,994,995,996,997,998,999,1000,1001,1002,1003])
-  assert.ok(commands.includes(`npm run test:v${version}`), `Recent feature regression V${version} removed`);
+  assert.ok(pkg.scripts.prebuild.includes('npm run test:v'+version), 'Inherited regression V'+version+' removed');
+assert.ok(commands.includes('node node_modules/typescript/bin/tsc --noEmit'));
+assert.ok(commands.includes('node node_modules/next/dist/bin/next build'));
+assert.equal(production.jobs['v965-production'].steps.find(x=>(x.run||'').includes('node scripts/v965-production-verify.cjs')).if, "matrix.os == 'ubuntu-24.04'");
+assert.equal(production.jobs['v965-production'].steps.find(x=>(x.run||'').includes('node node_modules/next/dist/bin/next build')).if, "matrix.os == 'windows-latest'");
 assert.ok(commands.includes('node scripts/v965-production-verify.cjs'));
 const revision = 'a'.repeat(40);
 for (const version of [1005,1006,1100]) {
