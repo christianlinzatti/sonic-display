@@ -105,6 +105,23 @@ class ArchiveImportTest(unittest.TestCase):
         self.assertFalse(archive.exists())
         self.assertEqual(json.loads((self.root / 'package.json').read_text())['sonicRoadmapRelease'], 'v1037')
 
+    def test_browser_duplicate_suffix_imports_safely(self):
+        name = 'SonicDisplay-V1101-Govee-Scene-Transition-Smoother (1).zip'
+        self.assertEqual(mod.checked_name(f'releases/{name}'), (name, 1101))
+        self.assertEqual(mod.checked_name('SonicDisplay-V1101 (12).zip'), ('SonicDisplay-V1101 (12).zip', 1101))
+        archive = self.build(num=1101, name=name)
+        before, head = 'a' * 40, 'b' * 40
+        with patch.object(mod.subprocess, 'check_output', return_value=f'releases/{name}\n'):
+            self.assertEqual(mod.select_archive(self.root, '', before, head), name)
+        mod.import_archive(self.root, name)
+        self.assertFalse(archive.exists())
+        self.assertEqual(json.loads((self.root / 'package.json').read_text())['sonicRoadmapRelease'], 'v1101')
+        for unsafe in ('SonicDisplay-V1101-foo (0).zip', 'SonicDisplay-V1101-foo (10000).zip',
+                       'SonicDisplay-V1101-foo (1) (2).zip', 'SonicDisplay-V1101-foo(1).zip',
+                       'SonicDisplay-V1101-foo (1)/evil.zip'):
+            with self.assertRaises(ValueError):
+                mod.checked_name(unsafe)
+
     def test_long_filename_near_filesystem_limit(self):
         prefix = 'SonicDisplay-V1037-'
         name = prefix + ('A' * (255 - len(prefix) - len('.zip'))) + '.zip'

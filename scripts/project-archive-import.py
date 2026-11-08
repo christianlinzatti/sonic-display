@@ -17,11 +17,12 @@ import sys
 from pathlib import Path, PurePosixPath
 from zipfile import BadZipFile, ZipFile
 
+# Allow bounded browser duplicate suffixes such as ` (1)` before .zip only.
 # Optional descriptive suffixes support real release ZIP names, including the
 # long archives produced by Sonic Display. Versions must stay at the front and
 # filenames must remain single, safe path components on common filesystems.
 ARCHIVE_NAME = re.compile(
-    r"SonicDisplay-V([1-9][0-9]*)(?:-[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)?\.zip\Z"
+    r"SonicDisplay-V([1-9][0-9]*)(?:-[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)?(?: \([1-9][0-9]{0,3}\))?\.zip\Z"
 )
 MAX_ARCHIVE_NAME_BYTES = 255
 REQUIRED = {
