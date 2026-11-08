@@ -54,8 +54,7 @@ const titles=formatActionTitlesV1016(root,false);
 // ZIP import intentionally protects workflow YAML; 29 files are installed on GitHub.
 // Require all installed Action titles to match, not ZIP-only historical workflows.
 assert(titles.total>=25);
-// Only active user-facing workflows must be current immediately. Legacy manual-only titles
-// can be refreshed on the next archive import without failing production CI.
+// Active workflow titles must be current; manually launched historical titles may stay old.
 for(const file of ['v965-room-wave-production.yml','v965-deployment-smoke.yml','project-archive-import.yml'])
  assert(!titles.mismatched.includes(file),`Stale active workflow title: ${file}`);
 for(const file of ['v965-room-wave-production.yml','v965-deployment-smoke.yml','project-archive-import.yml']){

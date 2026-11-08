@@ -4,6 +4,7 @@ import {useState} from 'react';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
 import {ConcertTimelineStudioV1094} from './ConcertTimelineStudioV1094';
 import {LiveShowLearningPanelV1095} from './LiveShowLearningPanelV1095';
+import {AiShowRemixPanelV1106} from './AiShowRemixPanelV1106';
 import {editArenaShowSegmentV1040,generateArenaShowPlanV1040,normalizeArenaShowPlanV1040,
  type ArenaShowDeckV1040,type ArenaShowFloatV1040,type ArenaShowLaserV1040,
  type ArenaShowCameraV1040,type ArenaShowDanceV1040} from '@/lib/arena360ShowDesignerV1040';
@@ -49,6 +50,7 @@ export function ArenaShowDesignerPanelV1040(){
    const next=generateArenaShowPlanV1040({prompt,genre,durationMs:seconds*1000,title:name});
    updatePreferences({arenaShowPlanV1040:next});setStatus('Showplan erstellt. Aktiviere ihn ausdrücklich, um die Bühne zu steuern.');
   }}>Showplan erzeugen</button>
+  <AiShowRemixPanelV1106 plan={plan} prompt={prompt} genre={genre} title={name} durationMs={seconds*1000}/>
   <label className="setting-check"><input type="checkbox"
    checked={Boolean(preferences.arenaShowDesignerEnabledV1040)&&Boolean(plan)} disabled={!plan}
    onChange={e=>updatePreferences({arenaShowDesignerEnabledV1040:e.target.checked})}/>

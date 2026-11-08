@@ -3512,3 +3512,23 @@ Instrumentalerkennung. Vorhandene V1074-Avatar- und Zuschauerinstanzen
 werden weiterverwendet; Partner-Blicke sind visuell angedeutet. Manuelle
 Animationen, Vocal-Casting, Low-GPU und Reduced Motion bleiben vorrangig.
 Tests: `npm run verify:v1079:focused`.
+
+### V1106 – KI Creative Producer / 360° Show Remix
+
+Im Bereich **Einstellungen → Avatare/Bühne → 360° Show Designer** gibt es nun
+**„KI Creative Producer – Show Remix“**. Ein Gestaltungswunsch wird entweder
+auf ausdrücklichen Klick über die bestehende serverseitige OpenAI-Konfiguration
+(`OPENAI_API_KEY`, `OPENAI_MODEL`) oder ohne Netzwerk über einen als solchen
+gekennzeichneten lokalen Regieentwurf in sieben Szenen umgesetzt. Die Vorschau
+enthält Kamera, Bühnengeometrie, schwebende Plattform, Laserlook, Tanzaufbau,
+Intensität und eine Kurzbegründung pro Szene. Erst **„In meinen Showplan
+übernehmen“** speichert die neue Choreografie; die bestehenden Zeitgrenzen,
+manuellen Aktivierungsschalter, Lyrics- und Bewegungsreduktionsregeln behalten
+Vorrang. Die vorige Fassung kann rückgängig gemacht werden, solange zwischenzeitlich
+keine weitere Bearbeitung stattfand. Ohne Spotify-Anmeldung oder serverseitigen
+API-Schlüssel ist die Remote-Anfrage nicht verfügbar, der Offline-Remix aber schon.
+
+Die Remote-Anfrage sendet nur Genre, kurze Idee und Intensitätslimit; keine Lyrics,
+Songtitel, Audioanalyse, Geräte-IDs oder Zugangsdaten. Das Modell kann keine
+Hardware, Spotify oder Lampen steuern. Die neuen Szenen sind kreative Templates
+und dürfen nicht als nachgewiesene Songabschnitte oder Drops interpretiert werden.

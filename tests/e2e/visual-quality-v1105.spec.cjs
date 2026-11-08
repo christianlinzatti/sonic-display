@@ -1,8 +1,7 @@
 'use strict';
 const { test, expect, openSettings } = require('./fixtures.cjs');
 const {comparePngV1105} = require('../../lib/visualPngDiffV1105.cjs');
-// Attach a fresh screenshot to every audited scenario. Fixture afterEach
-// screenshots are not serialized into the JSON report by this Playwright version.
+// Each quality scenario attaches a fresh PNG in its JSON reporter entry.
 async function attachAuditScreenshot(page,testInfo,scenario){
   const png=await page.screenshot({type:'png',animations:'disabled',fullPage:false,timeout:15000});
   await testInfo.attach('v1105-'+scenario+'-screenshot',{body:png,contentType:'image/png'});

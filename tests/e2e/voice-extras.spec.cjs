@@ -18,7 +18,8 @@ test('local voice lyrics controls hide immersive lyrics too and survive reload',
 });
 test('voice avatar cycling uses installed models and calm mode is reversible',async({page})=>{
  const panel=await tools(page);await panel.getByText('Anzeige lokal ausprobieren',{exact:true}).click();
- // Use the live catalog: built-in Stage Crew models now precede user-installed GLBs.
+ // The API catalog is authoritative: built-in Stage Crew characters are now ahead
+ // of user-installed GLBs, so a hard-coded two-avatar order is no longer valid.
  const response=await page.request.get('/api/avatars');expect(response.ok()).toBe(true);
  const catalog=await response.json();
  const entries=[...(Array.isArray(catalog.defaults)?catalog.defaults:[]),...(Array.isArray(catalog.models)?catalog.models:[])];
