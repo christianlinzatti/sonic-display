@@ -14,6 +14,8 @@ const documented = document.match(/\*\*Dokumentationsstand:\*\* V(\d+)(?:\.\d+)?
 const released = pkg.version.match(/-v(\d+)/);
 assert(documented && released, 'Architecture/release version must be stated explicitly');
 assert.equal(documented[1], released[1], 'ARCHITECTURE.md has not been updated for the package release');
+assert.equal(pkg.sonicRoadmapRelease, `v${released[1]}`, 'Roadmap release must match package version');
+assert.equal(pkg.sonicFeatureRelease, `v${released[1]}`, 'Feature release must match package version');
 for (const section of [
  'System auf einen Blick', 'Einstiegspunkte, Provider und Datenfluss',
  'Serverseitige Integration und Sicherheit', 'Visualisierung und Bühnenarchitektur',
