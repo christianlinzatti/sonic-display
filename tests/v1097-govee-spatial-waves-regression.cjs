@@ -106,7 +106,7 @@ assert(ui.includes('saveGoveeWavesV1097(safe)')&&ui.includes('Reine Vorschau'));
 assert(!ui.includes('goveeBridgeRequestV909('));
 assert(read('components/GoveeLanPanelV909.tsx').includes('<GoveeSpatialWavesStudioV1097 config={config} devices={devices}/>'));
 const pkg=JSON.parse(read('package.json')),lock=JSON.parse(read('package-lock.json'));
-assert.equal(pkg.version,'0.1.0-v1097');assert.equal(lock.version,pkg.version);
+assert(Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1]||0)>=1097);assert.equal(lock.version,pkg.version);
 assert.equal(lock.packages[''].version,pkg.version);
 for(const p of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(p).includes('tests/v1097-govee-spatial-waves-regression.cjs'));

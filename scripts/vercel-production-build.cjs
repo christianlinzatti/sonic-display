@@ -31,6 +31,11 @@ function report(passed,error){
     env:process.env.VERCEL_ENV||'local-production',passed,tests:results,playwright:browser,error},null,2)+'\n');
 }
 try {
+  run('V1102 Govee Scene Zone Choreographer','tests/v1102-govee-scene-zone-regression.cjs');
+  run('V1101 Govee Scene Transition Smoother','tests/v1101-govee-scene-transition-regression.cjs');
+  run('V1100 Govee Room Zone Mixer','tests/v1100-govee-room-zone-mixer-regression.cjs');
+  run('V1099 Govee Live Beat Accent','tests/v1099-govee-live-beat-accent-regression.cjs');
+  run('V1098 Govee Immersive Color Journey','tests/v1098-govee-color-journey-regression.cjs');
   run('V1097 Govee Spatial Light Waves','tests/v1097-govee-spatial-waves-regression.cjs');
   run('V1096 Govee Room Lighting 5.0','tests/v1096-govee-room-lighting-regression.cjs');
   run('V1095 Live Show Learning','tests/v1095-live-show-learning-regression.cjs');

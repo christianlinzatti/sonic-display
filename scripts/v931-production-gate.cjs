@@ -11,6 +11,11 @@ const { parallelism, runParallelTests } = require('../lib/v959ParallelTests.cjs'
 const root = path.resolve(__dirname, '..');
 const reportFile = path.join(root, 'reports', 'v931-production-gate.json');
 const regressions = [
+  ['V1102 Govee Scene Zone Choreographer','tests/v1102-govee-scene-zone-regression.cjs'],
+  ['V1101 Govee Scene Transition Smoother','tests/v1101-govee-scene-transition-regression.cjs'],
+  ['V1100 Govee Room Zone Mixer','tests/v1100-govee-room-zone-mixer-regression.cjs'],
+  ['V1099 Govee Live Beat Accent','tests/v1099-govee-live-beat-accent-regression.cjs'],
+  ['V1098 Govee Immersive Color Journey','tests/v1098-govee-color-journey-regression.cjs'],
   ['V1097 Govee Spatial Light Waves','tests/v1097-govee-spatial-waves-regression.cjs'],
   ['V1096 Govee Room Lighting 5.0','tests/v1096-govee-room-lighting-regression.cjs'],
   ['V1095 Live Show Learning','tests/v1095-live-show-learning-regression.cjs'],

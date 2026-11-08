@@ -1,3 +1,32 @@
+## V1102 – Govee Scene Zone Choreographer
+
+Opt-in automatische **Raumlicht-Zonen-Choreografie** für die bereits autorisierten vier Govee-Leuchten. Deutschrap-/Hardtekk-/Deutschrock- oder Pop-Songabschnitte werden nur nach gültiger **V318-Bestätigung** kreativ zwischen Bühnenwand, Rhythmus, Neon und Ambiente gewichtet. Ausgewogen, Cinematic und Festival; Stärke und Szenen-Vorschau im Govee-Panel. Nur gedimmte V1096-Farbanteile, kein automatisches Anschalten und keine erfundenen Beats/Drops; V1100 Handgewichtung, V1096-/V961-Limits sowie der einzelne V909 LAN-Sendeweg bleiben verbindlich.
+
+Tests: `npm run test:v1102`, `npm run test:v1102:types`, `npm run verify:v1102:focused`.
+
+## V1101 – Govee Scene Transition Smoother
+
+Sanfte, opt-in Einblendung der zusätzlichen Govee-Raumlichtfarben zu Beginn **bestätigter V318-Songabschnitte**. Drei zeitlich unterschiedliche Styles (Sanft, Cinematic, Festival), Stärke 0–80 Prozent sowie eine gerätefreie Vorschau direkt im Govee-Panel. Die Funktion nutzt ausschließlich den vorhandenen V909-Sendetakt und V1096/V961-Sicherheitsweg und dimmt den zusätzlichen Farbanteil; manuelle Shows und alle höheren Freigaben haben Vorrang. Unbestätigte Abschnitte, Pausen oder verbotene Cues lösen nichts aus. Tests: `npm run test:v1101`, `npm run test:v1101:types` und `npm run verify:v1101:focused`.
+
+## V1100 – Govee Room Zone Mixer
+
+Vier getrennte, ausschließlich reduzierende Zonen-Regler für die bestehende V1096-Raumbeleuchtung: Bühnenwand, Bass/Rhythmus, Neon und Ambiente. Opt-in, drei Voreinstellungen und Hardware-freie Vorschau. V1096, V1097, V1098 und V1099 bleiben unverändert und der V961-Governor, die V909-LAN-Grenzen und manuelle Freigaben bleiben abschließend wirksam.
+
+## V1099 – Govee Live Beat Accent
+
+Aktivierbare, sanft abklingende Govee-Farbakzente für bis zu vier Raumlicht-Zonen.
+Nur **tatsächlich beobachtete frische Mikrofon-Beats** bei bestätigten Hooks/Drops;
+keine erfundenen Musikabschnitte. Stile: Sanft/Dynamisch; hardwarefreie Vorschau.
+Die bestehende V1096/V1097/V1098-Regie, der V961-Governor und der einzelne V909-Sender
+bleiben maßgeblich; manuelle und höher priorisierte Shows sperren V1099.
+`npm run verify:v1099:focused` prüft die neue Version und ihre direkten Vorgänger.
+
+## V1098 · Govee Immersive Color Journey
+
+Die neue Govee-Farbdramaturgie gestaltet innerhalb bestätigter V318-Musikphasen einen sanften Farbverlauf über bis zu vier Zonen: kühl in der Strophe, spannungsvoll im Aufbau, warm in Hook und Drop. Einstellungen (Ausgewogen, Cinematic, Festival; Stärke 0–60 %) und eine rein lokale Vorschau findest du im Govee-Panel. V1096 muss aktiv sein; V1097-Wellen können parallel laufen. Alle bestehenden manuellen Vorränge, LAN-Sendewege, Helligkeitsgrenzen und der V961-Governor bleiben erhalten. Standardmäßig ist V1098 aus.
+
+Tests: `npm run test:v1098`, `npm run test:v1098:types` und `npm run verify:v1098:focused`.
+
 ## V1097 · Govee Spatial Light Waves
 
 Bis zu vier Govee-LAN-Zonen erhalten eine weiche, räumlich wandernde Farbwelle. Drei Stile (rundum, gespiegelt, gemeinsam pulsierend), Vorschau ohne Hardwarebefehle, Stärke 0–60 %. Voraussetzung sind ausdrücklich aktivierte V1096-Raumbeleuchtung, V909-LAN-Synchronisierung und bestätigte V318-Songabschnitte. Das neue Signal verändert nur die bereits begrenzte V1096-Farbmischung, überschreitet keine Helligkeit und nutzt den einzigen V909-LAN-Sendetakt. Manuelle und höher priorisierte Quellen bleiben vorrangig. Standardmäßig ausgeschaltet.

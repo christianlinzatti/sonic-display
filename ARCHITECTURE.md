@@ -1,8 +1,49 @@
+## V1102 – Govee Scene Zone Choreographer
+
+`lib/goveeSceneZoneChoreographerV1102.ts` ist reiner, fail-closed Modifikator. Es verarbeitet ausschließlich einen gültigen V1096-Raum-Cue, das explizite V1102-Opt-in und den passenden bestätigten V318-Phasencue. Die vier fixen Zonenprofile dimmen die bestehenden Farbanteile: Verse ambientbetont, Build bühnenbetont, Hook/Drop rhythmus- und neonbetont und Break atmosphärisch. Die aktuelle, verifizierte Phasenposition blendet vom bekannten vorherigen Profil zum aktuellen, ohne Songereignisse zu erfinden.
+
+Autorisierter Pfad: V1096 → V1097 → V1098 → V1099 → V1100 manuell → V1101 Einblendung → **V1102 szenische Zonen-Gewichtung** → V1096 RGB-Rate/Helligkeit → V961 Governor → V909 ein einzelner LAN-Sender. UI-Vorschau erzeugt keinerlei Hardwarebefehle; kein zusätzlicher Timer, kein Zustandsmonitoring oder externe Speicherung.
+
+## V1101 – Govee Scene Transition Smoother
+
+`lib/goveeSceneTransitionV1101.ts` ist ein reiner, zustandsfreier, zeitquellenfreier und fail-closed Übergangsplaner. Aus der **bereits bestätigten V318-Phasenposition** berechnet er eine monotone Ease-In-Absenkung des vorhandenen V1096-Cues. Er erfindet keine Drop-Zeiten und besitzt weder einen eigenen Timer noch eine Geräte-Sendefunktion. Position im autorisierten Pfad: V1096 → V1097 → V1098 → V1099 → V1100 → **V1101** → `applyGoveeRoomV1096` (RGB-Slew-/Helligkeitslimit) → V961 (Governor) → V909 (einziger LAN-Sender). Opt-in, lokale Speicherung, UI-Vorschau ohne Hardware. Bei fehlender Freigabe ist die Entscheidung inaktiv und die alte Ausgabe bleibt unverändert.
+
+**Dokumentationsstand:** V1102
+
+## V1100 – Govee Room Zone Mixer
+
+`lib/goveeRoomZoneMixerV1100.ts` stellt einen reinen, deterministischen, fail-closed Zonenregler bereit. Er verändert ausschließlich den Mix und reduziert optional die Helligkeit eines vorher gültigen V1096-Cues. Die autorisierte Verarbeitung bleibt V1099 → V1100 → V1096-Grenzprüfung → V961-Governor → V909-LAN-Sender. Es gibt weder einen zweiten Netzwerk-Timer noch erzwungene Geräteaktionen. Das Govee-Panel besitzt lokale, separat gespeicherte Regler und eine Preview ohne Befehle.
+
+**Dokumentationsstand:** V1100
+
+## V1099 · Govee Live Beat Accent
+
+**Dokumentationsstand:** V1099
+
+Das opt-in Modul `lib/goveeLiveBeatAccentV1099.ts` moduliert ausschließlich den vorhandenen,
+autorisierten V1096-Raumlicht-Cue nach V1097-Welle und V1098-Farbdramaturgie.
+Nur bestätigte V318-Hook/Drop-Phasen mit frischem Mikrofon-Beatsignal (≤600 ms,
+Stärke ≥0,78) erlauben einen kurzen, über die vier Zonen abgestuften Farbakzent.
+Farbe: maximal ±12/255 pro Kanal; Mix und Helligkeit werden **nie erhöht**.
+Danach gelten unverändert `applyGoveeRoomV1096` (12/255 Slew/Cap),
+`governConcertLookV961` und der einzige autorisierte V909-LAN-Sendetakt.
+
+Die Einstellungen befinden sich im Govee-Panel (`GoveeBeatAccentStudioV1099`)
+mit hardwarefreier Vorschau; standardmäßig inaktiv, lokale/cross-tab Speicherung.
+Keine neuen Netzwerk-Timer, Geräte-Power-Kommandos oder automatisch erfundenen Drops.
+Regression und isolierter TypeScript-Check: `npm run test:v1099` und `npm run test:v1099:types`.
+
+## V1098 · Govee Immersive Color Journey
+
+Reiner Mood-Planner `lib/goveeColorJourneyV1098.ts`: auf bereits aktiven V1096- und optional V1097-Farb-Cues wird die RGB-Zielfarbe pro Kanal maximal um 24/255 gedreht; Mischung und Helligkeit werden nur abgeschwächt. Verifizierte V318-Phasen, Zuordnung einer von vier Zonen und vorhandene Opt-in-Einstellungen sind Pflicht. Implementiert in `components/GoveeMusicSyncV909.tsx` unmittelbar vor `applyGoveeRoomV1096` und dem bestehenden V961-Governor. Im Panel `components/GoveeColorJourneyStudioV1098.tsx` erfolgen ausdrückliche Freigabe, Stilwahl und rein lokale Simulation. Kein neuer LAN-Sender, Timer, Mikrofon oder Energiedetektor. Die V1097-Wellen-Einstellungen stehen jetzt auch in der bestehenden Effect-Dependency-Liste, sodass Änderungen tatsächlich im laufenden Sendetakt ankommen.
+
+**Dokumentationsstand:** V1098
+
 ## V1097 · Govee Spatial Light Waves
 
 Pure planner `lib/goveeSpatialWavesV1097.ts` erzeugt zonenversetzte Farb-Mischfaktoren auf Basis bestätigter V318-Phasen und *aktiver* V1096-Entscheidungen. Die vorhandene `applyGoveeRoomV1096`-Funktion und der V961-Governor begrenzen weiterhin Farbänderungen und Helligkeit. `components/GoveeMusicSyncV909.tsx` nutzt seinen einzigen bereits autorisierten LAN-Tick; keine zusätzlichen Timer/Netzwerkkommandos oder neuen Berechtigungen. `components/GoveeSpatialWavesStudioV1097.tsx` zeigt die Opt-in-Regler und eine rein simulierte Vorschau. V1096 bleibt Voraussetzung; manuelle/gespeicherte Shows, Sprache, Gruppenmodus und Recovery haben Vorrang.
 
-**Dokumentationsstand:** V1097
+**Dokumentationsstand:** V1098
 
 ## V1096 · Govee Room Lighting 5.0
 

@@ -13,7 +13,7 @@ function inspectReleaseV1097(root){
   add('node24',pkg.engines.node==='24.x');
   add('regression',pkg.scripts['test:v1097']==='node tests/v1097-govee-spatial-waves-regression.cjs');
   add('types',pkg.scripts['test:v1097:types']==='tsc -p tests/tsconfig.v1097-core.json --noEmit');
-  add('prebuild',pkg.scripts.prebuild.startsWith('npm run test:v1097 && npm run test:v1097:types &&'));
+  add('prebuild',pkg.scripts.prebuild.includes('npm run test:v1097 && npm run test:v1097:types &&'));
   for(const f of ['lib/goveeSpatialWavesV1097.ts','components/GoveeSpatialWavesStudioV1097.tsx',
    'tests/v1097-govee-spatial-waves-regression.cjs','tests/tsconfig.v1097-core.json',
    'scripts/v1097-release-readiness.cjs','changelog/V1097-GOVEE-SPATIAL-LIGHT-WAVES.md'])add('file:'+f,exists(f));

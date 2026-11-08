@@ -9,6 +9,11 @@ import {directAdaptiveStoryV1050} from '@/lib/arena360AdaptiveStorytellingV1050'
 import {planGoveeShowV1042,applyGoveeShowV1042} from '@/lib/goveeShowSyncV1042';
 import {GOVEE_ROOM_EVENT_V1096,GOVEE_ROOM_KEY_V1096,loadGoveeRoomV1096,planGoveeRoomV1096,applyGoveeRoomV1096} from '@/lib/goveeRoomLightingV1096';
 import {GOVEE_WAVES_EVENT_V1097,GOVEE_WAVES_KEY_V1097,loadGoveeWavesV1097,planGoveeSpatialWaveV1097,applyGoveeSpatialWaveV1097} from '@/lib/goveeSpatialWavesV1097';
+import {GOVEE_JOURNEY_EVENT_V1098,GOVEE_JOURNEY_KEY_V1098,loadGoveeJourneyV1098,planGoveeColorJourneyV1098,applyGoveeColorJourneyV1098} from '@/lib/goveeColorJourneyV1098';
+import {GOVEE_BEAT_ACCENT_KEY_V1099,GOVEE_BEAT_ACCENT_EVENT_V1099,loadGoveeBeatAccentV1099,planGoveeBeatAccentV1099,applyGoveeBeatAccentV1099} from '@/lib/goveeLiveBeatAccentV1099';
+import {GOVEE_ZONE_MIXER_KEY_V1100,GOVEE_ZONE_MIXER_EVENT_V1100,loadGoveeZoneMixerV1100,planGoveeZoneMixV1100,applyGoveeZoneMixV1100} from '@/lib/goveeRoomZoneMixerV1100';
+import {GOVEE_TRANSITION_KEY_V1101,GOVEE_TRANSITION_EVENT_V1101,loadGoveeTransitionV1101,planGoveeSceneTransitionV1101,applyGoveeSceneTransitionV1101} from '@/lib/goveeSceneTransitionV1101';
+import {GOVEE_CHOREOGRAPHER_KEY_V1102,GOVEE_CHOREOGRAPHER_EVENT_V1102,loadGoveeChoreographerV1102,planGoveeSceneZoneV1102,applyGoveeSceneZoneV1102} from '@/lib/goveeSceneZoneChoreographerV1102';
 import {useAudioAnalysis} from '@/context/AudioAnalysisContext';
 import {GOVEE_CONFIG_EVENT_V909,GOVEE_CONFIG_KEY_V909,loadGoveeConfigV909,goveeBridgeRequestV909,planGoveeLookV909,
  type GoveeConfigV909,type GoveeLookV909,type GoveeDeviceV909} from '@/lib/goveeLanV909';
@@ -87,6 +92,11 @@ export function GoveeMusicSyncV909(){
  const [syncSettingsV1027,setSyncSettingsV1027]=useState<GoveeSyncSettingsV1027>(loadGoveeSyncV1027);
  const [roomSettingsV1096,setRoomSettingsV1096]=useState(loadGoveeRoomV1096);
  const [waveSettingsV1097,setWaveSettingsV1097]=useState(loadGoveeWavesV1097);
+ const [journeySettingsV1098,setJourneySettingsV1098]=useState(loadGoveeJourneyV1098);
+ const [beatAccentSettingsV1099,setBeatAccentSettingsV1099]=useState(loadGoveeBeatAccentV1099);
+ const [zoneMixerSettingsV1100,setZoneMixerSettingsV1100]=useState(loadGoveeZoneMixerV1100);
+ const [transitionSettingsV1101,setTransitionSettingsV1101]=useState(loadGoveeTransitionV1101);
+ const [choreographerSettingsV1102,setChoreographerSettingsV1102]=useState(loadGoveeChoreographerV1102);
  const [roadmapSettings,setRoadmapSettings]=useState<ConcertSettingsV958>(loadConcertRoadmapV958);
  const stageCueV921=useRef<GoveeStageCueV921|null>(null);
  const roomAtmosphereV987=useRef<RoomAtmosphereSessionV987|null>(null);
@@ -268,12 +278,47 @@ export function GoveeMusicSyncV909(){
   refresh();window.addEventListener(GOVEE_WAVES_EVENT_V1097,refresh);window.addEventListener('storage',storage);
   return()=>{window.removeEventListener(GOVEE_WAVES_EVENT_V1097,refresh);window.removeEventListener('storage',storage);};
  },[]);
+ // V1098: listen for local/cross-tab changes; uses the SAME V909 device loop.
+ useEffect(()=>{
+  const refresh=()=>setJourneySettingsV1098(loadGoveeJourneyV1098());
+  const storage=(e:StorageEvent)=>{if(!e.key||e.key===GOVEE_JOURNEY_KEY_V1098)refresh();};
+  refresh();window.addEventListener(GOVEE_JOURNEY_EVENT_V1098,refresh);window.addEventListener('storage',storage);
+  return()=>{window.removeEventListener(GOVEE_JOURNEY_EVENT_V1098,refresh);window.removeEventListener('storage',storage);};
+ },[]);
+ // V1099: local/cross-tab setting changes use the existing V909 send loop.
+ useEffect(()=>{
+  const refresh=()=>setBeatAccentSettingsV1099(loadGoveeBeatAccentV1099());
+  const storage=(e:StorageEvent)=>{if(!e.key||e.key===GOVEE_BEAT_ACCENT_KEY_V1099)refresh();};
+  refresh();window.addEventListener(GOVEE_BEAT_ACCENT_EVENT_V1099,refresh);window.addEventListener('storage',storage);
+  return()=>{window.removeEventListener(GOVEE_BEAT_ACCENT_EVENT_V1099,refresh);window.removeEventListener('storage',storage);};
+ },[]);
  // V1027 is an explicit opt-in layer inside the existing sender. No extra LAN timer.
  useEffect(()=>{
   const refresh=()=>setSyncSettingsV1027(loadGoveeSyncV1027());
   const storage=(e:StorageEvent)=>{if(!e.key||e.key===GOVEE_SYNC_KEY_V1027)refresh();};
   refresh();window.addEventListener(GOVEE_SYNC_EVENT_V1027,refresh);window.addEventListener('storage',storage);
   return()=>{window.removeEventListener(GOVEE_SYNC_EVENT_V1027,refresh);window.removeEventListener('storage',storage);};
+ },[]);
+ // V1100: only refresh stored per-zone weights, never add a LAN polling loop.
+ useEffect(()=>{
+  const refresh=()=>setZoneMixerSettingsV1100(loadGoveeZoneMixerV1100());
+  const storage=(e:StorageEvent)=>{if(!e.key||e.key===GOVEE_ZONE_MIXER_KEY_V1100)refresh();};
+  refresh();window.addEventListener(GOVEE_ZONE_MIXER_EVENT_V1100,refresh);window.addEventListener('storage',storage);
+  return()=>{window.removeEventListener(GOVEE_ZONE_MIXER_EVENT_V1100,refresh);window.removeEventListener('storage',storage);};
+ },[]);
+ // V1101: settings refresh on the same authorized sender, with cleanup.
+ useEffect(()=>{
+  const refresh=()=>setTransitionSettingsV1101(loadGoveeTransitionV1101());
+  const storage=(e:StorageEvent)=>{if(!e.key||e.key===GOVEE_TRANSITION_KEY_V1101)refresh();};
+  refresh();window.addEventListener(GOVEE_TRANSITION_EVENT_V1101,refresh);window.addEventListener('storage',storage);
+  return()=>{window.removeEventListener(GOVEE_TRANSITION_EVENT_V1101,refresh);window.removeEventListener('storage',storage);};
+ },[]);
+ // V1102: the same existing LAN dispatch sees opt-in zone choreographer changes.
+ useEffect(()=>{
+  const refresh=()=>setChoreographerSettingsV1102(loadGoveeChoreographerV1102());
+  const storage=(e:StorageEvent)=>{if(!e.key||e.key===GOVEE_CHOREOGRAPHER_KEY_V1102)refresh();};
+  refresh();window.addEventListener(GOVEE_CHOREOGRAPHER_EVENT_V1102,refresh);window.addEventListener('storage',storage);
+  return()=>{window.removeEventListener(GOVEE_CHOREOGRAPHER_EVENT_V1102,refresh);window.removeEventListener('storage',storage);};
  },[]);
  // Never use section cues imported for a different track; refresh immediately on V318 imports.
  useEffect(()=>{
@@ -650,6 +695,29 @@ export function GoveeMusicSyncV909(){
       const waveDecisionV1097=planGoveeSpatialWaveV1097({settings:waveSettingsV1097,
        base:roomDecisionV1096,phase:verifiedPhaseV1027});
       roomDecisionV1096=applyGoveeSpatialWaveV1097(roomDecisionV1096,waveDecisionV1097);
+      const journeyDecisionV1098=planGoveeColorJourneyV1098({settings:journeySettingsV1098,
+       base:roomDecisionV1096,phase:verifiedPhaseV1027});
+      roomDecisionV1096=applyGoveeColorJourneyV1098(roomDecisionV1096,journeyDecisionV1098);
+      // V1099: strictly observed, fresh microphone beat within a verified hook/drop.
+      // The existing V1096 colour slew, brightness cap, V961 governor and LAN sender remain authoritative.
+      const beatAccentDecisionV1099=planGoveeBeatAccentV1099({settings:beatAccentSettingsV1099,
+       base:roomDecisionV1096,phase:verifiedPhaseV1027,microphoneActive:state.microphoneActive,
+       beatObserved:state.metrics.beat===true,beatStrength:state.metrics.beatStrength??0,
+       sampleAgeMs:now-state.observedAt});
+      roomDecisionV1096=applyGoveeBeatAccentV1099(roomDecisionV1096,beatAccentDecisionV1099);
+      // V1100: per-zone attenuation only after the authorized V1099 accent.
+      // Existing V1096 slew, V961 global governor and V909 LAN sender remain final.
+      const zoneMixDecisionV1100=planGoveeZoneMixV1100({settings:zoneMixerSettingsV1100,
+       base:roomDecisionV1096,phase:verifiedPhaseV1027});
+      roomDecisionV1096=applyGoveeZoneMixV1100(roomDecisionV1096,zoneMixDecisionV1100);
+      // V1101: section-entry attenuation (never a new beat or network command).
+      const transitionDecisionV1101=planGoveeSceneTransitionV1101({settings:transitionSettingsV1101,
+       base:roomDecisionV1096,phase:verifiedPhaseV1027});
+      roomDecisionV1096=applyGoveeSceneTransitionV1101(roomDecisionV1096,transitionDecisionV1101);
+      // V1102: verified scene focus dim-only after V1100 manual weights and V1101 entry fade.
+      const sceneZoneDecisionV1102=planGoveeSceneZoneV1102({settings:choreographerSettingsV1102,
+       base:roomDecisionV1096,phase:verifiedPhaseV1027});
+      roomDecisionV1096=applyGoveeSceneZoneV1102(roomDecisionV1096,sceneZoneDecisionV1102);
       const roomLookV1096=applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,
        Math.min(config.masterBrightness,festivalDeliveredLook.brightness,showLookV1042.brightness));
       const finalLook=governConcertLookV961(previous,roomLookV1096,{
@@ -680,6 +748,6 @@ export function GoveeMusicSyncV909(){
    :bassSettings.enabled||shockSettings.enabled?window.setInterval(()=>void tick(),900)
    :neonBassEnabled?window.setInterval(()=>void tick(),900):window.setInterval(()=>void tick(),1700);
   return()=>{cancelled=true;window.clearInterval(interval);window.clearInterval(sampler);};
- },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings,syncSettingsV1027,roomSettingsV1096,goveeShowEnabledV1042,goveeShowStrengthV1042,concertDirectorEnabledV1048,concertDirectorStrengthV1048,liveConcertEnabledV1049,liveConcertStrengthV1049,arenaShowEnabledV1040,arenaShowPlanV1040,showStageIsArenaV1042,reducedMotionV1042]);
+ },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings,syncSettingsV1027,roomSettingsV1096,waveSettingsV1097,journeySettingsV1098,beatAccentSettingsV1099,zoneMixerSettingsV1100,transitionSettingsV1101,choreographerSettingsV1102,goveeShowEnabledV1042,goveeShowStrengthV1042,concertDirectorEnabledV1048,concertDirectorStrengthV1048,liveConcertEnabledV1049,liveConcertStrengthV1049,arenaShowEnabledV1040,arenaShowPlanV1040,showStageIsArenaV1042,reducedMotionV1042]);
  return null;
 }

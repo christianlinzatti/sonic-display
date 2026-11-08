@@ -418,3 +418,28 @@ const {inspectReleaseV1097}=require('./v1097-release-readiness.cjs');
 const v1097=inspectReleaseV1097(root);
 for(const c of v1097.checks)console.log(`${c.ok?'PASS':'FAIL'} V1097 ${c.id}`);
 if(!v1097.passed)process.exitCode=1;
+
+const {inspectReleaseV1098}=require('./v1098-release-readiness.cjs');
+const v1098=inspectReleaseV1098(root);
+for(const c of v1098.checks)console.log(`${c.ok?'PASS':'FAIL'} V1098 ${c.id}`);
+if(!v1098.passed)process.exitCode=1;
+
+const {inspectReleaseV1099}=require('./v1099-release-readiness.cjs');
+const v1099=inspectReleaseV1099(root);
+for(const c of v1099.checks)console.log(`${c.ok?'PASS':'FAIL'} V1099 ${c.id}`);
+if(!v1099.passed)process.exitCode=1;
+
+const {inspectReleaseV1100}=require('./v1100-release-readiness.cjs');
+const v1100=inspectReleaseV1100(root);
+for(const c of v1100.checks)console.log(`${c.ok?'PASS':'FAIL'} V1100 ${c.id}`);
+if(!v1100.passed)process.exitCode=1;
+
+const {inspectReleaseV1101}=require('./v1101-release-readiness.cjs');
+const v1101=inspectReleaseV1101(root);
+for(const c of v1101.checks)console.log(`${c.ok?'PASS':'FAIL'} V1101 ${c.id}`);
+if(!v1101.passed)process.exitCode=1;
+
+const {inspectReleaseV1102}=require('./v1102-release-readiness.cjs');
+const v1102=inspectReleaseV1102(root);
+for(const c of v1102.checks)console.log(`${c.ok?'PASS':'FAIL'} V1102 ${c.id}`);
+if(!v1102.passed)process.exitCode=1;

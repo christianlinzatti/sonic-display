@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "module": "CommonJS", "moduleResolution": "node",
+    "noEmit": true, "strict": true, "skipLibCheck": true, "types": []
+  },
+  "files": ["../lib/goveeLiveBeatAccentV1099.ts"]
+}

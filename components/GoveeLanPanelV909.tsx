@@ -21,6 +21,11 @@ import {GoveeRoomCalibrationStudioV927} from '@/components/GoveeRoomCalibrationS
 import {GoveeConcertSyncStudioV1027} from '@/components/GoveeConcertSyncStudioV1027';
 import {GoveeRoomLightingStudioV1096} from '@/components/GoveeRoomLightingStudioV1096';
 import {GoveeSpatialWavesStudioV1097} from '@/components/GoveeSpatialWavesStudioV1097';
+import {GoveeColorJourneyStudioV1098} from '@/components/GoveeColorJourneyStudioV1098';
+import {GoveeBeatAccentStudioV1099} from '@/components/GoveeBeatAccentStudioV1099';
+import {GoveeRoomZoneMixerStudioV1100} from '@/components/GoveeRoomZoneMixerStudioV1100';
+import {GoveeSceneTransitionStudioV1101} from '@/components/GoveeSceneTransitionStudioV1101';
+import {GoveeSceneZoneStudioV1102} from '@/components/GoveeSceneZoneStudioV1102';
 import {GoveeRoomPerformanceDashboardV928} from '@/components/GoveeRoomPerformanceDashboardV928';
 import {IntegrationSetupWizardV971} from '@/components/IntegrationSetupWizardV971';
 import {ConcertRoadmapStudioV958} from '@/components/ConcertRoadmapStudioV958';
@@ -204,6 +209,11 @@ export function GoveeLanPanelV909(){
   <GoveeConcertSyncStudioV1027 config={config} devices={devices} onConfig={update}/>
   <GoveeRoomLightingStudioV1096 config={config} devices={devices}/>
   <GoveeSpatialWavesStudioV1097 config={config} devices={devices}/>
+  <GoveeColorJourneyStudioV1098 config={config} devices={devices}/>
+  <GoveeBeatAccentStudioV1099 config={config} devices={devices}/>
+  <GoveeRoomZoneMixerStudioV1100 config={config} devices={devices}/>
+  <GoveeSceneTransitionStudioV1101 config={config} devices={devices}/>
+  <GoveeSceneZoneStudioV1102 config={config} devices={devices}/>
   <GoveeLightShowEditorV912 config={config} devices={devices} genre={String(genre??'')} onConfig={update}/>
   <h3 id="govee-v909-auto">Automatische Konzert-Beleuchtung</h3>
   <label className="setting-check"><input type="checkbox" checked={config.enabled} onChange={e=>update({enabled:e.target.checked})}/> Govee-Lichtintegration aktivieren</label>
