@@ -1,3 +1,21 @@
+## V1123 – AI Concert Energy Director
+
+Im **Einstellungen → Bühne → 360° Arena → AI Show Designer** kannst du einen
+gemeinsamen Energieverlauf für fünf virtuelle Regiekanäle erstellen:
+**Kamera, Choreografie, Bühne, Licht und Atmosphäre**. Vier dramaturgische
+Stile koordinieren sieben Songphasen und eine bewusste Ruhephase. Die bestehende
+V1040-Timeline speichert nur erlaubte Felder und bewahrt alle manuellen
+Songgrenzen. Erst die separate Bestätigung übernimmt den Showplan; danach
+ist eine **zweite Zustimmung** für die vorhandene Live-Engine notwendig.
+
+Eine optionale, **lokal und kurz gemessene** V1108-Energie kann bei hoher
+Messqualität höchstens vier Punkte beisteuern. Keine Gesamt-Songanalyse,
+keine erkannten Drops, kein Cloud-Upload von Rohmessungen oder Hardware-Steuerung.
+Manuelle Regie und reduzierte Bewegung haben Vorrang, Undo ist konfliktgesichert.
+
+Tests: `npm run test:v1123`, `npm run test:v1123:types` und
+`tests/e2e/ai-concert-energy-v1123.spec.cjs` für Desktop/Touch in GitHub Actions.
+
 ## V1121 – AI Immersive Scene Transitions
 
 Im **360° AI Show Designer** stehen vier Übergangsstile zur Verfügung:

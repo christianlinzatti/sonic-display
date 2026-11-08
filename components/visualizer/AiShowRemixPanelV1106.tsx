@@ -17,6 +17,9 @@ import {useCrewSettings,writeCrewSettings} from '@/components/visualizer/useSoni
 import {directVocalActingV1115,sampleVocalCueV1115,vocalPresetV1115,
  VOCAL_STYLE_LABELS_V1115,type VocalStyleV1115,type VocalShowV1115,type VocalPresetV1115}
  from '@/lib/aiVocalActingV1115';
+import {directConcertEnergyV1123,sampleConcertEnergyV1123,energyLivePresetV1123,
+ ENERGY_LABELS_V1123,type EnergyStyleV1123,type EnergyShowV1123,
+ type EnergyLivePresetV1123} from '@/lib/aiConcertEnergyDirectorV1123';
 import {directConcertAtmosphereV1122,sampleConcertAtmosphereV1122,atmosphereLivePresetV1122,
  ATMOSPHERE_LABELS_V1122,type AtmosphereStyleV1122,type AtmosphereShowV1122,
  type AtmosphereLivePresetV1122} from '@/lib/aiConcertAtmosphereDirectorV1122';
@@ -106,6 +109,13 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
  const [stageEnabled,setStageEnabled]=useState(false);
  const [stagePreview,setStagePreview]=useState<StageShowV1117|null>(null);
  const [stageCanUndo,setStageCanUndo]=useState(false);
+ const [energyStyle,setEnergyStyle]=useState<EnergyStyleV1123>('balanced');
+ const [energyStrength,setEnergyStrength]=useState(50);
+ const [energyEnabled,setEnergyEnabled]=useState(false);
+ const [energyUseMeasurement,setEnergyUseMeasurement]=useState(false);
+ const [energyPreview,setEnergyPreview]=useState<EnergyShowV1123|null>(null);
+ const [energyCanUndo,setEnergyCanUndo]=useState(false);
+ const energyUndo=useRef<{before:Partial<typeof preferences>;after:EnergyLivePresetV1123}|null>(null);
  const [atmosphereStyle,setAtmosphereStyle]=useState<AtmosphereStyleV1122>('cinematic');
  const [atmosphereStrength,setAtmosphereStrength]=useState(50);
  const [atmosphereEnabled,setAtmosphereEnabled]=useState(false);
@@ -236,19 +246,22 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
  const activeLightingCue=sampleLightingCueV1120(lightingPreview,previewPercent);
  const activeTransition=sampleImmersiveTransitionV1121(transitionPreview,previewPercent);
  const activeAtmosphere=sampleConcertAtmosphereV1122(atmospherePreview,previewPercent);
+ const activeEnergy=sampleConcertEnergyV1123(energyPreview,previewPercent);
  const stageOptions=()=>({style:stageStyle,strength:stageStrength,intensityCap:cap});
  const holoOptions=()=>({style:holoStyle,strength:holoStrength,intensityCap:cap});
  const cameraOptions=()=>({style:cameraStyle,strength:cameraStrength,intensityCap:cap});
  const lightingOptions=()=>({style:lightingStyle,strength:lightingStrength,intensityCap:cap});
  const transitionOptions=()=>({style:transitionStyle,strength:transitionStrength,duration:transitionDuration,intensityCap:cap});
  const atmosphereOptions=()=>({style:atmosphereStyle,strength:atmosphereStrength,intensityCap:cap});
+ const energyOptions=()=>({style:energyStyle,strength:energyStrength,intensityCap:cap});
+ const energyObservation=()=>energyUseMeasurement&&!sampling&&canSample&&reading?.ready?reading:null;
  const canSample=audio.active&&music.isPlaying&&!preferences.reducedMotion&&!!currentTrack;
  // Tracking is strictly session-only: stop and forget measurements on a song
  // change, playback interruption, microphone loss or reduced-motion preference.
  useEffect(()=>{
   emotionSession.current=createMusicEmotionSessionV1108();
   setReading(null);setDropReading(null);setDropCue(null);setSampleCount(0);setSampling(false);
-  setFollowSong(false);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);setAtmospherePreview(null);setTransitionPreview(null);
+  setFollowSong(false);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);setEnergyPreview(null);setAtmospherePreview(null);setTransitionPreview(null);
  },[currentTrack]);
  useEffect(()=>{
   // Completed readings are also invalidated if the microphone or playback stops.
@@ -301,11 +314,11 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   setSampling(false);setReading(null);setDropReading(null);setDropCue(null);setSampleCount(0);
   setMoodExplanation('Lokale Messwerte verworfen. Es wurde nichts gespeichert oder übertragen.');
  };
- const invalidate=()=>{setAtmospherePreview(null);setTransitionPreview(null);setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setBusy(false);setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setStatus('');};
- useEffect(()=>{setAtmospherePreview(null);setTransitionPreview(null);setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setBusy(false);
+ const invalidate=()=>{setEnergyPreview(null);setAtmospherePreview(null);setTransitionPreview(null);setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setBusy(false);setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setStatus('');};
+ useEffect(()=>{setEnergyPreview(null);setAtmospherePreview(null);setTransitionPreview(null);setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setBusy(false);
   return ()=>{controller.current?.abort();requestId.current++;};
  },[signature]);
- const local=(storyOnly=false,conductorOnly=false,personalityOnly=false,performanceOnly=false,danceOnly=false,vocalOnly=false,interactionOnly=false,stageOnly=false,holoOnly=false,cameraOnly=false,lightingOnly=false,transitionOnly=false,atmosphereOnly=false)=>{
+ const local=(storyOnly=false,conductorOnly=false,personalityOnly=false,performanceOnly=false,danceOnly=false,vocalOnly=false,interactionOnly=false,stageOnly=false,holoOnly=false,cameraOnly=false,lightingOnly=false,transitionOnly=false,atmosphereOnly=false,energyOnly=false)=>{
   invalidate();
   const curated=curateCreativeRemixV1107(localAiShowRemixV1106(idea,style,cap),creativeBrief(),cap);
   if(!curated){setStatus('Regieentwurf ungültig – keine Änderungen übernommen.');return;}
@@ -336,11 +349,13 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   if((transitionEnabled||transitionOnly)&&!transitions){setStatus('V1121 Übergänge konnten nicht sicher geplant werden. Show unverändert.');return;}
   const atmosphere=atmosphereEnabled||atmosphereOnly?directConcertAtmosphereV1122(base,transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,atmosphereOptions()):null;
   if((atmosphereEnabled||atmosphereOnly)&&!atmosphere){setStatus('V1122 Atmosphäre konnte nicht sicher geplant werden. Show unverändert.');return;}
-  setAtmospherePreview(atmosphere);setTransitionPreview(transitions);setLightingPreview(lighting);setCameraPreview(camera);setHoloPreview(holo);setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
+  const energy=energyEnabled||energyOnly?directConcertEnergyV1123(base,atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,energyOptions(),energyObservation()):null;
+  if((energyEnabled||energyOnly)&&!energy){setStatus('V1123 Energie konnte nicht sicher geplant werden. Show unverändert.');return;}
+  setEnergyPreview(energy);setAtmospherePreview(atmosphere);setTransitionPreview(transitions);setLightingPreview(lighting);setCameraPreview(camera);setHoloPreview(holo);setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
   setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix):null);
   setConductorPreview(danced.conductor);setPersonalityPreview(danced.personality);setPerformancePreview(danced.performance);setDancePreview(danced.dance);
-  setPreview(atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix);setBaseSignature(signature);setSource('local');
-  setStatus(atmosphere?'V1122: sieben sichere Atmosphärenstimmungen als lokale Vorschau. Keine Nebelmaschine oder Geräte geschaltet.':transitions?'V1121: sechs sanfte Übergangsfenster geplant. Keine eigene Live-Zeitspur, keine Geräte geschaltet.':lighting?'V1120: sieben virtuelle Lichtphasen als lokale Vorschau. Noch kein Lichtmodul und kein Govee-Gerät geschaltet.':camera?'V1119: sieben geplante Kameraszenen als lokale Vorschau, mit sanften vorhandenen V1072-Fahrten. Keine Kamera oder Geräte geschaltet.':holo?'V1118: sieben holografische Regieszenen als lokale optische Vorschau; echte 3D-Projektion nur nach separater Freigabe, keine Hardware.':stage?'V1117: sieben Bühnenverwandlungen als lokale Vorschau. Reale virtuelle Plattformen nur nach separater Freigabe; keine Gerätebefehle.':interaction?'V1116: sieben Artist-Interaktionen als Vorschau. Kameraführung über vorhandene Modi; echte Partnerreaktionen nur durch separate V1079-Aktivierung bei synchronisierten Lyrics. Keine automatisch erkannten Sänger.':vocal?'V1115 Vocal Acting: sieben Szenen mit Bühnen-Vocal-Rollen als Vorschau. Die tatsächliche Lippen-/Gestik-Engine bleibt bis zur gesonderten Zustimmung unverändert. Keine Stimmen oder Phoneme erkannt.':danced.dance?'V1114: Solo, Duo, Kanon und Unisono als sichere Vorschau. Echte GLB-Tanzclips können zusätzlich in der Stage Crew mit V1114 Automatik aktiviert werden. Noch kein Gerät oder Clip geschaltet.':directed.performance?'V1113 Performance Director: sieben abgestimmte Charakter-Momente als Vorschau bereit; gemeinsam unterstützte Tanz- und Kameramodi können nach Bestätigung übernommen werden. Keine einzelnen GLB-Animationen oder Geräte gesteuert.':personalized.personality?'V1112 Avatar Personality: drei individuelle Performer-Rollen sind als Vorschau geplant; nur bestehende Kamera-/Tanzmodi werden später übernommen. Keine GLB-Clips oder Geräte geschaltet.':conductor?'V1111 Live Show Conductor: sieben koordinierte Szenen als lokale Regieprobe bereit. Keine Bühne oder Geräte geschaltet.':story?'V1109 lokaler Storybogen als Vorschau bereit. Keine KI-Anfrage, kein Gerät geschaltet und noch nichts übernommen.':
+  setPreview(energy?.remix??atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix);setBaseSignature(signature);setSource('local');
+  setStatus(energy?'V1123: fünf virtuelle Showkanäle mit gemeinsamem Energiebogen geplant. Keine Geräte aktiviert.':atmosphere?'V1122: sieben sichere Atmosphärenstimmungen als lokale Vorschau. Keine Nebelmaschine oder Geräte geschaltet.':transitions?'V1121: sechs sanfte Übergangsfenster geplant. Keine eigene Live-Zeitspur, keine Geräte geschaltet.':lighting?'V1120: sieben virtuelle Lichtphasen als lokale Vorschau. Noch kein Lichtmodul und kein Govee-Gerät geschaltet.':camera?'V1119: sieben geplante Kameraszenen als lokale Vorschau, mit sanften vorhandenen V1072-Fahrten. Keine Kamera oder Geräte geschaltet.':holo?'V1118: sieben holografische Regieszenen als lokale optische Vorschau; echte 3D-Projektion nur nach separater Freigabe, keine Hardware.':stage?'V1117: sieben Bühnenverwandlungen als lokale Vorschau. Reale virtuelle Plattformen nur nach separater Freigabe; keine Gerätebefehle.':interaction?'V1116: sieben Artist-Interaktionen als Vorschau. Kameraführung über vorhandene Modi; echte Partnerreaktionen nur durch separate V1079-Aktivierung bei synchronisierten Lyrics. Keine automatisch erkannten Sänger.':vocal?'V1115 Vocal Acting: sieben Szenen mit Bühnen-Vocal-Rollen als Vorschau. Die tatsächliche Lippen-/Gestik-Engine bleibt bis zur gesonderten Zustimmung unverändert. Keine Stimmen oder Phoneme erkannt.':danced.dance?'V1114: Solo, Duo, Kanon und Unisono als sichere Vorschau. Echte GLB-Tanzclips können zusätzlich in der Stage Crew mit V1114 Automatik aktiviert werden. Noch kein Gerät oder Clip geschaltet.':directed.performance?'V1113 Performance Director: sieben abgestimmte Charakter-Momente als Vorschau bereit; gemeinsam unterstützte Tanz- und Kameramodi können nach Bestätigung übernommen werden. Keine einzelnen GLB-Animationen oder Geräte gesteuert.':personalized.personality?'V1112 Avatar Personality: drei individuelle Performer-Rollen sind als Vorschau geplant; nur bestehende Kamera-/Tanzmodi werden später übernommen. Keine GLB-Clips oder Geräte geschaltet.':conductor?'V1111 Live Show Conductor: sieben koordinierte Szenen als lokale Regieprobe bereit. Keine Bühne oder Geräte geschaltet.':story?'V1109 lokaler Storybogen als Vorschau bereit. Keine KI-Anfrage, kein Gerät geschaltet und noch nichts übernommen.':
    'Lokaler Remix: keine Netzwerk- oder KI-Anfrage. Noch nichts übernommen.');
  };
  const remote=async()=>{
@@ -387,10 +402,12 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
    if(transitionEnabled&&!transitions)throw Error('V1121 Übergänge konnten nicht sicher geplant werden.');
    const atmosphere=atmosphereEnabled?directConcertAtmosphereV1122(base,transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,atmosphereOptions()):null;
    if(atmosphereEnabled&&!atmosphere)throw Error('V1122 Atmosphäre konnte nicht sicher geplant werden.');
-   setAtmospherePreview(atmosphere);setTransitionPreview(transitions);setLightingPreview(lighting);setCameraPreview(camera);setHoloPreview(holo);setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
+   const energy=energyEnabled?directConcertEnergyV1123(base,atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,energyOptions(),energyObservation()):null;
+   if(energyEnabled&&!energy)throw Error('V1123 Energie konnte nicht sicher geplant werden.');
+   setEnergyPreview(energy);setAtmospherePreview(atmosphere);setTransitionPreview(transitions);setLightingPreview(lighting);setCameraPreview(camera);setHoloPreview(holo);setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
    setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix):null);
    setConductorPreview(danced.conductor);setPersonalityPreview(danced.personality);setPerformancePreview(danced.performance);setDancePreview(danced.dance);
-   setPreview(atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix);setSource('ai');setBaseSignature(signature);
+   setPreview(energy?.remix??atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix);setSource('ai');setBaseSignature(signature);
    setStatus('KI-Vorschlag bereit. Prüfe alle sieben Szenen und übernimm ihn ausdrücklich.');
   }catch(error){
    if(requestId.current===id&&!current.signal.aborted)
@@ -405,8 +422,42 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   undo.current={before:plan,after:JSON.stringify(result)};
   setCanUndo(true);
   updatePreferences({arenaShowPlanV1040:result});
-  setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);setAtmospherePreview(null);setTransitionPreview(null);
+  setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);setEnergyPreview(null);setAtmospherePreview(null);setTransitionPreview(null);
   setStatus('Remix gespeichert. Die 360°-Showplan-Aktivierung bleibt unverändert – keine Geräte wurden gesteuert.');
+ };
+ const activateConcertEnergy=()=>{
+  if(busy||!energyPreview||!preview||signature!==baseSignature){
+   setStatus('Bitte zuerst eine aktuelle V1123-Energieprobe erstellen.');return;
+  }
+  if(preferences.reducedMotion){setStatus('Bewegungsreduktion aktiv: keine neue Energieautomatik.');return;}
+  if(!preferences.arenaShowDesignerEnabledV1040||!preferences.arenaConcertDirectorEnabledV1048||
+   !preferences.arenaLightsEnabledV1032||!preferences.arenaCameraEnabledV1032){
+   setStatus('V1123 benötigt Show Designer, Konzertdirektor, virtuelle Kamera und Bühnenlichter.');return;
+  }
+  if((preferences.arenaChoreographyFormationV1041??'auto')!=='auto'||
+   (preferences.arenaTransformingDeckModeV1037??'auto')!=='auto'||
+   (preferences.arenaFloatingStageModeV1038??'auto')!=='auto'){
+   setStatus('V1123 respektiert manuelle Tanz-, Deck- und Plattformformationen. Bitte für Automatik auf Auto umstellen.');return;
+  }
+  if(energyUndo.current||stageUndo.current||cameraUndo.current||lightingUndo.current||
+   atmosphereUndo.current||transitionUndo.current){
+   setStatus('Eine andere virtuelle Regie ist noch als manuell rücknehmbares Preset aktiv. Zuerst diese Einstellungen zurücksetzen.');return;
+  }
+  const preset=energyLivePresetV1123(energyOptions());
+  if(!preset){setStatus('Ungültige V1123 Energiegrenze.');return;}
+  const before=Object.fromEntries(Object.keys(preset).map(k=>
+   [k,preferences[k as keyof typeof preferences]])) as Partial<typeof preferences>;
+  updatePreferences(preset);energyUndo.current={before,after:preset};setEnergyCanUndo(true);
+  setStatus('V1123: vorhandene Konzertflow-, Tanz-, Kamera-, Bühnen-, Licht- und Atmosphärenmodule aktiviert. Deren eigene Live-Regeln bleiben maßgebend. Keine Govee-/Gerätebefehle.');
+ };
+ const revertConcertEnergy=()=>{
+  const saved=energyUndo.current;if(!saved)return;
+  if(!Object.entries(saved.after).every(([k,v])=>preferences[k as keyof typeof preferences]===v)){
+   energyUndo.current=null;setEnergyCanUndo(false);
+   setStatus('V1123 Energieeinstellungen wurden inzwischen manuell verändert; Rückgängig abgebrochen.');return;
+  }
+  updatePreferences(saved.before);energyUndo.current=null;setEnergyCanUndo(false);
+  setStatus('Vorherige virtuelle Energieeinstellungen wiederhergestellt.');
  };
  const activateConcertAtmosphere=()=>{
   if(busy||!atmospherePreview||!preview||signature!==baseSignature){
@@ -926,6 +977,44 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
     Manuelle Animationen, bestehende Sängerzuordnungen und reduzierte Bewegung
     behalten Vorrang. Keine künstliche Audio-/Gesangserkennung, keine Govee-Befehle.</small>
   </fieldset>
+  <fieldset aria-label="V1123 AI Concert Energy Director" className="arena-v1123-concert-energy">
+   <legend>V1123 · AI Concert Energy Director</legend>
+   <p>Eine gemeinsame Energie-Partitur koordiniert Kamera, Tanz, Bühnenformation,
+    Licht und Atmosphäre über sieben geplante Songabschnitte. Das ist keine
+    automatische vollständige Songanalyse und keine Vorhersage echter Drops.</p>
+   <label>Energiedramaturgie
+    <select value={energyStyle} disabled={busy}
+     onChange={e=>{setEnergyStyle(e.target.value as EnergyStyleV1123);invalidate();}}>
+     {Object.entries(ENERGY_LABELS_V1123).map(([key,label])=><option key={key} value={key}>{label}</option>)}
+    </select>
+   </label>
+   <label>Showenergie {energyStrength}%
+    <input type="range" min="20" max="80" step="10" value={energyStrength} disabled={busy}
+     onChange={e=>{setEnergyStrength(Number(e.target.value));invalidate();}}/>
+   </label>
+   <label><input type="checkbox" checked={energyEnabled} disabled={busy}
+    onChange={e=>{setEnergyEnabled(e.target.checked);invalidate();}}/>
+    Energiedramaturgie auf neue Offline-/OpenAI-Entwürfe anwenden
+   </label>
+   <label><input type="checkbox" checked={energyUseMeasurement} disabled={busy}
+    onChange={e=>{setEnergyUseMeasurement(e.target.checked);invalidate();}}/>
+    Freiwillige lokale V1108-Energiemessung vorsichtig berücksichtigen
+   </label>
+   <small>{energyUseMeasurement?(reading?.ready&&reading.confidence>=.58&&canSample&&!sampling?
+    `Lokales Signal ausreichend (${Math.round(reading.confidence*100)}% Messsicherheit). Höchstens vier Energiepunkte Anpassung.`:
+    'Noch keine ausreichende laufende Songmessung. Ohne sie verwendet V1123 ausschließlich die geplanten Szenen.'):
+    'Nur die vorhandene Konzertdramaturgie. Keine Mikrofonpflicht.'}</small>
+   <button type="button" disabled={busy}
+    onClick={()=>local(false,false,false,false,false,false,false,false,false,false,false,false,false,true)}>
+    V1123 Konzertenergie jetzt proben
+   </button>
+   {energyCanUndo&&<button type="button" onClick={revertConcertEnergy}>
+    Frühere Konzertenergie-Einstellungen wiederherstellen
+   </button>}
+   <small>Erst nach gesonderter Zustimmung werden bestehende virtuelle Regiemodule
+    aktiviert. Manuelle Szenen, GPU-/Bewegungsgrenzen und Hardware bleiben unangetastet.
+    Lokale Messungen werden nicht an OpenAI gesendet oder gespeichert.</small>
+  </fieldset>
   <fieldset aria-label="V1122 AI Concert Atmosphere Director" className="arena-v1122-concert-atmosphere">
    <legend>V1122 · AI Concert Atmosphere Director</legend>
    <p>Virtuelle Nebelschleier, Raumtiefe und bestehende Partikeleffekte über sieben
@@ -1132,6 +1221,39 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
    niemals Lyrics, Audiodaten, Tokens oder Govee-Geräteinformationen. Offline bleibt alles lokal.</small>
   {status&&<p role="status" aria-live="polite">{status}</p>}
   {preview&&<section aria-label="V1106 Show Remix Vorschau">
+   {energyPreview&&<section aria-label="V1123 Concert Energy Partitur">
+    <h3>V1123 · Gemeinsamer Show-Energiebogen</h3>
+    <p role="note" aria-label="V1123 Energiequalität">
+     {energyPreview.quality.scenes} Szenen · fünf koordinierte Regiekanäle ·
+     {energyPreview.quality.quietBreak?'ruhige Atempause':'Atempause prüfen'} ·
+     {energyPreview.measurementUsed?'kurze lokale Messung als kleine Korrektur':
+      'rein geplante Dramaturgie – keine Songabschnitte erkannt'}.
+    </p>
+    {activeEnergy&&<p role="status" aria-label="V1123 Aktuelle Konzertenergie">
+     Szene {activeEnergy.cue.index+1}: {activeEnergy.cue.chapter} ·
+     Energie {activeEnergy.energy}% · Kamera {activeEnergy.channels.camera}% ·
+     Tanz {activeEnergy.channels.dance}% · Bühne {activeEnergy.channels.stage}% ·
+     Licht {activeEnergy.channels.lighting}% · Atmosphäre {activeEnergy.channels.atmosphere}%.
+     Dies ist die Regieprobe, keine aktuelle Lautstärkemessung.
+    </p>}
+    <ol aria-label="V1123 sieben Energieszenen">
+     {energyPreview.cues.map(c=><li key={c.index}>
+      <strong>Szene {c.index+1}: {c.chapter}</strong> · {Math.round(c.start*100)}–{Math.round(c.end*100)}% ·
+      Energie {c.energy}% · Kamera {c.camera}, Tanz {c.dance}, Deck {c.deck},
+      Plattform {c.floating}, Laser {c.lasers}.
+      <div role="img" aria-label={`V1123 Energie Szene ${c.index+1}: ${c.energy} von ${cap}`} style={{height:6,background:'rgba(130,155,185,.2)',borderRadius:4,maxWidth:240}}>
+       <div style={{height:'100%',width:`${Math.round(100*c.energy/Math.max(1,cap))}%`,background:'linear-gradient(90deg,#35b7df,#cb67f7)',borderRadius:4}}/>
+      </div>
+     </li>)}
+    </ol>
+    <button type="button" disabled={busy||preferences.reducedMotion} onClick={activateConcertEnergy}>
+     V1123 vorhandene virtuelle Konzertregie aktivieren
+    </button>
+    <small>Fünf Planungskanäle teilen ein Energie-Budget. V1040 übernimmt nur nach
+     deiner Bestätigung die vorhandenen Timeline-Felder; die Live-Renderer steuern
+     sich weiterhin über echte Musiksignale und eigene Schutzregeln.
+     Keine direkten Govee-, Strobe- oder Pyrotechnikbefehle.</small>
+   </section>}
    {atmospherePreview&&<section aria-label="V1122 Concert Atmosphere Partitur">
     <h3>V1122 · Virtuelle Konzertatmosphäre</h3>
     <p role="note" aria-label="V1122 Atmosphärenqualität">

@@ -1,3 +1,32 @@
+## V1123 · AI Concert Energy Director
+
+`lib/aiConcertEnergyDirectorV1123.ts` integriert sieben validierte V1040-Szenen
+zu einem **gemeinsamen Energiebogen für Kamera, Avatar-Choreografie,
+Bühnenformation, virtuelle Beleuchtung und virtuelle Atmosphäre**. Vier Stile
+(Ausgewogen, Deutschrap, Festival/Hardtekk, Filmisch) erlauben kontrollierte
+Höhepunkte und eine ruhige Atempause. Die V1106-Preview bekommt nur bereits
+zulässige Felder (`camera`, `dance`, `deck`, `floating`, `lasers`, `intensity`).
+Manuell editierte Start-/Endmarken und IDs bleiben vollständig erhalten.
+Maximale Sprünge zwischen Szenen bleiben auf 45 Intensitätspunkte begrenzt.
+
+Ein **freiwilliger lokaler V1108-Messwert** darf die Preview pro Szene um höchstens
+vier Energiepunkte beeinflussen, sofern ausreichend lang, plausibel und mit
+mindestens 58 % Messsicherheit geprüft. Dies ist **keine Analyse der
+vollständigen Song-Energie**, keine automatische Verse/Hook/Drop-Erkennung und
+keine Echtzeit-Steuerung fünf neuer Kanäle. Die Regieplanung und die tatsächliche
+Musik-Reaktivität der vorhandenen virtuellen V1071-/V1041-/V1043-/V1066-/V1060-/
+V1045-Renderer bleiben bewusst getrennt.
+
+Erst eine gesonderte Bestätigung aktiviert diese bestehenden Laufzeitmodule;
+Reduced Motion, manuelle Tanz-/Deck-/Plattformmodi, GPU-/Pause-Regeln sowie
+aktive Presets mit Rückgängig-Priorität bleiben geschützt. Das konfliktgeschützte
+Undo setzt nie inzwischen manuell veränderte Werte zurück. Kein Govee, DMX,
+Strobo, Pyrotechnik, Audio-Rohdaten-Upload oder neue Netzwerk-Anfrage.
+
+Tests: `tests/v1123-concert-energy-regression.cjs`,
+`tests/tsconfig.v1123-core.json`,
+`tests/e2e/ai-concert-energy-v1123.spec.cjs` (Desktop + Touch).
+
 ## V1121 · AI Immersive Scene Transitions
 
 `lib/aiImmersiveSceneTransitionsV1121.ts` berechnet sechs nebeneinander
@@ -109,7 +138,7 @@ Im **360° AI Show Designer** kannst du jetzt die V1111-Konzertregie proben: Sie
 
 Das Drop-Radar wertet die **freiwillig gestartete lokale V1108-Mikrofonmessung** aus. Erst nach mindestens fünf Sekunden mit sauberem Signal werden ein bereits gemessener Einschlag oder ein möglicher Energieaufbau erkannt. Ein künftiger Drop-Zeitpunkt kann aus diesem Signal **nicht sicher vorhergesagt** werden. Nur nach Zustimmung kann eine Regieidee für die **nächste** V1106/V1109-Vorschau vorgemerkt werden. Die sieben Zeitgrenzen, die Intensitätsobergrenze und die manuelle Freigabe bleiben erhalten. Keine Audio-/Geräte-/Cloud-Übertragung; Tests: `npm run test:v1110`, `npm run test:v1110:types`.
 
-**Dokumentationsstand:** V1122
+**Dokumentationsstand:** V1123
 
 ## V1104 · Playwright Visual QA & Screenshot Reports
 
