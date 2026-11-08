@@ -11,7 +11,7 @@ function inspectReleaseV1105(root){
     add('node24',pkg.engines.node==='24.x');
     add('new-regression',pkg.scripts['test:v1105']==='node tests/v1105-playwright-accessibility-regression.cjs');
     add('new-types',pkg.scripts['test:v1105:types']==='tsc -p tests/tsconfig.v1105-core.json --noEmit');
-    add('prebuild',pkg.scripts.prebuild.startsWith('npm run test:v1105 && npm run test:v1105:types && npm run test:v1104'));
+    add('prebuild',pkg.scripts.prebuild.includes('npm run test:v1105 && npm run test:v1105:types && npm run test:v1104'));
     for(const f of ['lib/visualPngDiffV1105.cjs','lib/visualViewportAuditV1105.ts',
       'scripts/v1105-playwright-quality-report.cjs','tests/e2e/visual-quality-v1105.spec.cjs',
       'tests/v1105-playwright-accessibility-regression.cjs','tests/tsconfig.v1105-core.json',

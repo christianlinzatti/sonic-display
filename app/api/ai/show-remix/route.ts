@@ -4,6 +4,7 @@ import {createHash} from 'node:crypto';
 import {getValidSession,ReauthRequiredError} from '@/lib/spotify';
 import {setSessionCookie} from '@/lib/session';
 import {normalizeAiShowRemixV1106,normalizeRemixRequestV1106} from '@/lib/arena360AiShowRemixV1106';
+import {DEFAULT_CREATIVE_BRIEF_V1107,normalizeCreativeBriefV1107,curateCreativeRemixV1107} from '@/lib/aiCreativeProducerV1107';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const HEADERS={'Cache-Control':'private, no-store'};
@@ -28,7 +29,9 @@ Kameraperspektiven und Tanzrollen. Intensitäten müssen ganzzahlig zwischen 0 u
 im Auftrag angegebenen intensityCap liegen, benachbarte Akte dürfen maximal 45
 Punkte auseinanderliegen. Denke in Kontrasten: ruhiges Intro, Spannungsaufbau,
 kräftiger Hook, bewusste Atempause und überraschendes Finale. Kreative Abwechslung
-ist wichtiger als durchgehend volle Helligkeit. Kamerafokus auf Lead beim Verse,
+ist wichtiger als durchgehend volle Helligkeit. Berücksichtige die im Auftrag angegebene creativeDirection (Stil, Kontraste, Überraschungsgrad,
+optional ausgewählter Stimmungshinweis) ausschließlich innerhalb der Sicherheitsgrenzen.
+Kamerafokus auf Lead beim Verse,
 Gruppe im Hook; schütze lesbare Lyrics und vermeide hektisches Dauerblinken.
 Kurze, spezifische Notiz pro Akt auf Deutsch. Keine Songs oder echten Drops behaupten;
 das sind TEMPLATES, keine Analyse. Keine Code- oder Gerätebefehle, keine echten
@@ -65,7 +68,12 @@ export async function POST(request:Request){
  try{const input=await request.text();if(input.length>1500)throw Error('too long');body=JSON.parse(input);}
  catch{return NextResponse.json({error:'Ungültiges JSON.'},{status:400,headers:HEADERS});}
  const opts=normalizeRemixRequestV1106(body);
- if(!opts)return NextResponse.json({error:'Ungültiger kreativer Wunsch.'},{status:400,headers:HEADERS});
+ const brief=normalizeCreativeBriefV1107((body&&typeof body==='object'&&!Array.isArray(body)
+  ?(body as Record<string,unknown>).brief:undefined)??DEFAULT_CREATIVE_BRIEF_V1107);
+ // Reject malformed explicitly supplied direction settings; old V1106 callers remain valid.
+ const hasBrief=!!body&&typeof body==='object'&&!Array.isArray(body)&&'brief' in body;
+ if(!opts||(hasBrief&&!normalizeCreativeBriefV1107((body as Record<string,unknown>).brief)))
+  return NextResponse.json({error:'Ungültiger kreativer Wunsch oder Regieparameter.'},{status:400,headers:HEADERS});
  if(!allow(createHash('sha256').update(session.session.accessToken).digest('hex'),Date.now()))
   return NextResponse.json({error:'Zu viele Anfragen. Bitte später erneut probieren.'},{status:429,headers:HEADERS});
  try{
@@ -74,7 +82,7 @@ export async function POST(request:Request){
    headers:{Authorization:`Bearer ${key}`,'Content-Type':'application/json'},
    body:JSON.stringify({model:process.env.OPENAI_MODEL||'gpt-4.1-mini',store:false,
     max_output_tokens:1700,instructions:INSTRUCTIONS,
-    input:[{role:'user',content:JSON.stringify(opts)}],
+    input:[{role:'user',content:JSON.stringify({...opts,creativeDirection:brief})}],
     text:{format:{type:'json_schema',name:'sonic_show_remix_v1106',strict:true,schema:SCHEMA}}})
   });
   if(!response.ok)throw Error('Upstream unavailable');
@@ -86,7 +94,9 @@ export async function POST(request:Request){
   if(!text||text.length>16000)throw Error('Missing output');
   const proposal=normalizeAiShowRemixV1106(JSON.parse(text));
   if(!proposal||proposal.acts.some(a=>a.intensity>opts.intensityCap))throw Error('Invalid AI output');
-  const result=NextResponse.json({remix:proposal,source:'ai'},{headers:HEADERS});
+  const curated=curateCreativeRemixV1107(proposal,brief,opts.intensityCap);
+  if(!curated)throw Error('Invalid creative direction');
+  const result=NextResponse.json({remix:curated,source:'ai',directorVersion:1107},{headers:HEADERS});
   if(session.refreshed)setSessionCookie(result,session.session);
   return result;
  }catch{

@@ -1,3 +1,45 @@
+## V1109 – AI Concert Story Engine (Sieben-Akt-Storybogen)
+
+In **Einstellungen → Bühne → 360° Arena → AI Show Designer → V1109 Concert Story Engine**
+zwischen vier Storybögen auswählen: **Crescendo**, **zwei Wellen**, **Mystery/Enthüllung** oder
+**Festivalhymne**. Die Spannungsverteilung beeinflusst die Intensitätskurve, ohne die zuvor
+manuell gesetzten Zeitgrenzen zu verändern. **Storybogen lokal entwerfen** zeigt direkt
+sieben zusammenhängende Phasen mit Energie, Kamera, Bühnenregie und prozentualem Songabschnitt.
+Optional kann dieser Storybogen auch auf die bisherigen Offline-/OpenAI-Remix-Vorschläge angewendet
+werden. Die Übernahme erfolgt weiterhin **ausschließlich nach ausdrücklicher Bestätigung**;
+der bisherige Remix ist rückgängig zu machen. V1109 löst weder Mikrofonaufnahme noch
+OpenAI-Aufruf oder Govee-/Stroboskopbefehle aus.
+
+**Wichtig:** Songphasen sind dramaturgische Templates, keine automatisch erkannten
+Hooks, Verse, Drops oder tatsächlichen Gefühle. Beibehalten werden die sieben
+V1040-Timeline-Grenzen, alle bisherigen Sicherheitsgrenzen und Reduced Motion.
+Tests: `npm run test:v1109`, `npm run test:v1109:types`; die Browserfälle liegen
+unter `tests/e2e/ai-concert-story-v1109.spec.cjs`.
+
+## V1108 – Music Emotion Intelligence (lokale Mehrsekunden-Analyse)
+
+In **Einstellungen → Bühne → 360° Arena → AI Show Designer** die neue **Musik-Energie & Dramaturgie** öffnen.
+Mit aktivem Mikrofon und laufender Spotify-Wiedergabe ausdrücklich **Lokale Musikanalyse starten**, einige Sekunden
+beobachten, **Analyse beenden** und optional **Regievorschlag bewusst übernehmen** auswählen. V1108 wertet
+mehrere Messpunkte über maximal 20 Sekunden aus, zeigt Energieverlauf, Impulsklarheit und Messsicherheit
+und schlägt einen der vorhandenen Regiestile samt Intensitätskontrasten vor. Erst ein weiterer Klick erzeugt
+einen neuen KI- oder Offline-Showplan; bestehende Showpläne und Govee-Lichter bleiben unverändert.
+
+**Grenze:** rein heuristische Audioenergie, keine echte Emotionen-/Songteil-/Drop-Erkennung.
+Keine Aufnahmen, kein Roh-Audio-Upload, keine Persistenz; bei Songwechsel, Mikrofonverlust, Pausieren und
+Bewegungsreduktion wird die laufende Messung verworfen. `npm run test:v1108` und
+`npm run test:v1108:types` prüfen die Grenzen. Ausführliche Hinweise: `changelog/V1108-MUSIC-EMOTION-INTELLIGENCE.md`.
+
+## V1107 – KI Creative Producer 2.0 (neuer Show-Designer)
+
+Im **360°-Bühnenstil → AI Show Designer → KI Show Remix** gibt es jetzt vier Regiestile, Regler für Kontraste und kreative Überraschungen sowie eine quantitative Vorschau der virtuellen Kamera-/Bühnenvarianten. OpenAI wird nur nach bewusstem Klick gefragt; ein lokaler 7-Akte-Entwurf bleibt ohne API-Key verfügbar. Der Live-Showplan ändert sich ausschließlich durch **„Diese sieben Szenen ... übernehmen“**, mit Undo.
+
+Als **V1108-Grundlage** kann optional der aktuelle lokale Mikrofon-Messwert als unverbindlicher Energie-/Stimmungshinweis übernommen werden. Es werden keine Mikrofondaten an OpenAI übertragen. Das ist weder eine echte Audioemotions- noch eine Songabschnittserkennung.
+
+Neu: `changelog/V1107-AI-CREATIVE-PRODUCER-2.md`, `changelog/V1108-MUSIC-EMOTION-FOUNDATION.md`; Tests: `npm run test:v1107`, `npm run test:v1108`. Die aktuelle Projektversion steht in `package.json` (V1109).
+
+---
+
 > **Sonic Stage Crew – Paket 4:** Musikgesteuerte Clip-Auswahl, eigene Reaktionen, gemeinsamer Tanz, Kanon und wechselnde Solos mit einer 3D-Show-Simulation. Anleitung: [SONIC-CREW-SHOW.md](docs/features/application/SONIC-CREW-SHOW.md).
 
 ## V1105 – Playwright Visual Regression & Accessibility (08.11.2026)

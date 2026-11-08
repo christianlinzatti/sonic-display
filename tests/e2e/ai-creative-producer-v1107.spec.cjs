@@ -1,0 +1,32 @@
+'use strict';
+const {test,expect,openSettings}=require('./fixtures.cjs');
+const STORAGE='sonic-display-ui-preferences-v1';
+test('V1107 creative direction is editable, previewed and safely reversible on the real 360 stage',async({page},testInfo)=>{
+ const settings=await openSettings(page,'avatar');
+ await settings.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const producer=settings.getByRole('group',{name:'V1106 KI Show Remix'});
+ const controls=producer.getByRole('group',{name:'V1107 KI Regiefeinschliff'});
+ await expect(controls).toBeVisible();
+ await controls.getByRole('combobox',{name:'Regiestil'}).selectOption('festival');
+ await controls.getByRole('combobox',{name:'Musikalischer Stimmungshinweis (optional)'}).selectOption('euphoric');
+ const before=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORAGE);
+ await producer.getByRole('button',{name:'Offline-Remix ausprobieren'}).click();
+ const preview=producer.locator('[aria-label="V1106 Show Remix Vorschau"]');
+ await expect(preview.locator('li')).toHaveCount(7);
+ await expect(preview.getByRole('note',{name:'V1107 Regie-Qualitätsvorschau'})).toContainText('Kameraperspektiven');
+ await testInfo.attach('v1107-festival-creative-preview-screenshot',{body:await preview.screenshot(),contentType:'image/png'});
+ expect(await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORAGE)).toEqual(before);
+ await preview.getByRole('button',{name:'Diese sieben Szenen in meinen Showplan übernehmen'}).click();
+ await expect.poll(()=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040?.segments?.length??0,STORAGE)).toBe(7);
+ await producer.getByRole('button',{name:'Letzten Remix rückgängig machen'}).click();
+ await expect.poll(()=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORAGE)).toEqual(before);
+});
+test('V1108 measured-mood control remains disabled without live microphone permission',async({page},testInfo)=>{
+ const settings=await openSettings(page,'avatar');
+ await settings.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const controls=settings.getByRole('group',{name:'V1107 KI Regiefeinschliff'});
+ await expect(controls.getByRole('button',{name:'Lokale Musikanalyse starten'})).toBeDisabled();
+ await expect(controls.getByRole('button',{name:'Regievorschlag bewusst übernehmen'})).toBeDisabled();
+ await expect(controls.getByRole('group',{name:'V1108 Music Emotion Intelligence'})).toContainText('Keine Audioaufzeichnung');
+ await testInfo.attach('v1108-opt-in-microphone-off-screenshot',{body:await controls.screenshot(),contentType:'image/png'});
+});
