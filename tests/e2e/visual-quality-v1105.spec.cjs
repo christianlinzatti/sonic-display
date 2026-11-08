@@ -1,6 +1,12 @@
 'use strict';
 const { test, expect, openSettings } = require('./fixtures.cjs');
 const {comparePngV1105} = require('../../lib/visualPngDiffV1105.cjs');
+// Attach a fresh screenshot to every audited scenario. Fixture afterEach
+// screenshots are not serialized into the JSON report by this Playwright version.
+async function attachAuditScreenshot(page,testInfo,scenario){
+  const png=await page.screenshot({type:'png',animations:'disabled',fullPage:false,timeout:15000});
+  await testInfo.attach('v1105-'+scenario+'-screenshot',{body:png,contentType:'image/png'});
+}
 
 // Executed in BOTH Chromium Desktop and Chromium Touch against the built Next.js server.
 // No external accounts, Spotify OAuth, LEDs or changes to real Govee devices.
@@ -43,7 +49,7 @@ test('V1105 visual: settings dialog stays inside viewport on desktop and touch',
   await testInfo.attach('v1105-responsive-screenshot',{body:await page.screenshot({type:'png',animations:'disabled',fullPage:false}),contentType:'image/png'});
 });
 
-test('V1105 visual: keyboard can close settings and focus returns safely', async ({page}) => {
+test('V1105 visual: keyboard can close settings and focus returns safely', async ({page},testInfo) => {
   const dialog=await openSettings(page);
   await expect(dialog.getByRole('searchbox',{name:'Einstellungen suchen'})).toBeFocused();
   await page.keyboard.press('Escape');
@@ -52,9 +58,10 @@ test('V1105 visual: keyboard can close settings and focus returns safely', async
   await expect(trigger).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(dialog).toBeVisible();
+  await attachAuditScreenshot(page,testInfo,'keyboard-focus');
 });
 
-test('V1105 visual: settings categories are operable without a mouse', async ({page}) => {
+test('V1105 visual: settings categories are operable without a mouse', async ({page},testInfo) => {
   const dialog=await openSettings(page);
   const display=dialog.locator('[data-v571-tab="display"]');
   await display.focus();
@@ -62,19 +69,22 @@ test('V1105 visual: settings categories are operable without a mouse', async ({p
   await page.keyboard.press('Enter');
   await expect(display).toHaveAttribute('aria-current','page');
   await expect(dialog.getByRole('combobox',{name:'Visualizer',exact:true})).toBeVisible();
+  await attachAuditScreenshot(page,testInfo,'keyboard-categories');
 });
 
-test('V1105 visual: reduced motion preference keeps readable UI usable', async ({page}) => {
+test('V1105 visual: reduced motion preference keeps readable UI usable', async ({page},testInfo) => {
   await page.emulateMedia({reducedMotion:'reduce'});
   const dialog=await openSettings(page,'display');
   await expect(dialog.getByRole('combobox',{name:'Visualizer',exact:true})).toBeVisible();
   expect(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true);
   await expect(dialog.locator('[data-v571-tab="display"]')).toHaveAttribute('aria-current','page');
+  await attachAuditScreenshot(page,testInfo,'reduced-motion');
 });
 
-test('V1105 visual: unauthenticated Govee commands remain unavailable', async ({page}) => {
+test('V1105 visual: unauthenticated Govee commands remain unavailable', async ({page},testInfo) => {
   const dialog=await openSettings(page,'govee');
   for(const name of ['Lichter EIN','Lichter AUS','Farbe senden'])
     await expect(dialog.getByRole('button',{name,exact:true})).toBeDisabled();
   await expect(dialog.getByText('Govee LAN · lokale Konzertbeleuchtung')).toBeVisible();
+  await attachAuditScreenshot(page,testInfo,'unauthenticated-govee');
 });
