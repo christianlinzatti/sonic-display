@@ -1,3 +1,37 @@
+## V1134 – Songdramaturgie und Crew-Dialog
+
+Die adaptive Show sammelt vor wiederkehrenden Refrains Spannung, wechselt Solisten und Duellpartner und setzt gemeinsame Höhepunkte. Bei schnellen Lyrics werden Crew, automatische Kamera und Bühnenlicht zurückgenommen. Eine Pause bewahrt die Tanzphase; neue Tempoangaben werden weiterhin geglättet.
+
+Fehlerhafte Lyrics-Zeitmarken werden am Dateneingang geprüft. Fehlende Texte blockieren die Show nicht. Neue Stress-Mocks prüfen Tempoänderungen, Pausen, Seeks und kaputte Zeiten; Spotify und Lyrics bleiben in Browsertests vollständig gemockt.
+
+**Bedienung:** Settings → Avatar → Intelligente Show aktivieren. **Prüfen:** `npm run test:v1134`; Produktionsbuild und anschließend `npm run test:v1134:browser`. Anleitung, Architektur und Grenzen: [V1134-Dokumentation](docs/versions/V1134-SONGREGIE-CREW.md). Die Regie bleibt lokal und regelbasiert. Die ZIP enthält keine Playwright-Testberichte.
+
+## V1133 – Ganzkörper-Tanz und Lyrics-Bühne
+
+Sechs neue Ganzkörper-Phasen für **alle elf Avatare** erweitern die tatsächliche Beinarbeit, Kniekompression, Gewichtsverlagerung und kontrollierte Drehung. Insgesamt stehen jetzt **306 eingebettete Animationen** bereit. Roboter, fließende Tänzerin und Frontmann wählen unterschiedliche Körperstile; Crew-Antworten und Tanzduelle bleiben Teil der lokalen Regie.
+
+Synchronisierte Refrains werden groß inszeniert und passende Inhaltswörter nach echten Wortzeitmarken hervorgehoben. Schnelle Passagen erhalten eine ruhigere, vollständig umbrechende Leseansicht. Kamera und Bühnenlicht berücksichtigen diese Text-Priorität. Ohne Wortzeitmarken werden keine Wortzeiten erfunden.
+
+**Ausprobieren:** Settings → Avatar → Intelligente Show aktivieren; für Lyrics Cinematic, Kinetic oder Neon wählen. **Herkunft:** Die neuen Bewegungen sind prozedural erstellt, keine Motion-Capture-Aufnahmen.
+
+Ausführliche Anleitung, Grenzen und Testbefehle: [V1133-Dokumentation](docs/versions/V1133-GANZKOERPER-LYRICS.md). Weitere Versionsanleitungen liegen ebenfalls unter `docs/versions/`. Das Projekt-ZIP enthält Testquellen, aber keine generierten Playwright-Testberichte.
+
+## V1132 – Expressive Performance
+
+Elf individuelle Ausdrucksprofile, gespeicherte Ausdrucksstärke, genreabhängige Phrasenfolgen und kontinuierliche Phasenkorrektur für gemeinsame Tänze. Anleitung und Prüfungen: [LIESMICH-V1132.md](docs/versions/LIESMICH-V1132.md).
+
+## V1131 – Concert Story & Crew
+
+Gemeinsame Song-Dramaturgie für Tanz, Kamera, Licht und Lyrics; steigende Refrains, Crew-Dialoge, Tanzduelle und vier neue gebackene Fußarbeits-Clips für alle elf Figuren. Anleitung und Prüfungen: [LIESMICH-V1131.md](docs/versions/LIESMICH-V1131.md).
+
+## V1130 – Intelligent Headliner Show
+
+Vier weitere Original-GLB-Avatare (insgesamt elf), je 22 Headliner-Clips, lokale Genre-/Energie-Bewertung mit Bewegungs-Gedächtnis, lyricsabhängige Dramaturgie und zusätzliche Live-Show-Inszenierung. Vollständige Spotify-/Lyrics-Browser-Mocks für reproduzierbare Tests. Anleitung: [LIESMICH-V1130.md](docs/versions/LIESMICH-V1130.md).
+
+## V1129 – Encore Music Performance
+
+Vier neue echte GLB-Avatare mit jeweils 18 Animationen, Genre-Move-Variation über musikalische Phrasen und zusätzliche genreabhängige Lyrics-Einblendungen in DOM und 3D. Die lokale Musikregie nutzt vorhandene Songdaten ohne externen KI-Dienst. Anleitung und Grenzen: [LIESMICH-V1129.md](docs/versions/LIESMICH-V1129.md). Prüfung: `npm run test:v1129` und `npm run typecheck`.
+
 ## V1128 – Adaptive Concert Performance 2.0
 
 Die **automatische Renderqualität** berücksichtigt nun die vorhandenen gemessenen
@@ -185,7 +219,7 @@ Neu: `changelog/V1107-AI-CREATIVE-PRODUCER-2.md`, `changelog/V1108-MUSIC-EMOTION
 
 ---
 
-> **Sonic Stage Crew – Paket 4:** Musikgesteuerte Clip-Auswahl, eigene Reaktionen, gemeinsamer Tanz, Kanon und wechselnde Solos mit einer 3D-Show-Simulation. Anleitung: [SONIC-CREW-SHOW.md](docs/features/application/SONIC-CREW-SHOW.md).
+> **Sonic Stage Crew – Paket 4:** Musikgesteuerte Clip-Auswahl, eigene Reaktionen, gemeinsamer Tanz, Kanon und wechselnde Solos mit einer 3D-Show-Simulation. Anleitung: [SONIC-CREW-SHOW.md](SONIC-CREW-SHOW.md).
 
 ## V1105 – Playwright Visual Regression & Accessibility (08.11.2026)
 

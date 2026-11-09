@@ -1,3 +1,55 @@
+## V1134 – Gemeinsamer Score für Song, Crew und Text
+
+**Aktueller Dokumentationsstand: V1134.** Bedienung, Stress-Tests und Grenzen: [docs/versions/V1134-SONGREGIE-CREW.md](docs/versions/V1134-SONGREGIE-CREW.md).
+
+`lib/concertScoreV1134.ts` erweitert die V1131-Story um Auftakt, Refrain-Vorschau, Lesepassagen, Rollenrotation und begrenzte Lichtakzente. Das bestehende `useConcertStoryV1131` liefert diesen erweiterten Score an Kamera, Bühne, Lyrics und Probenbeleuchtung. Der Live-Regieindikator und `sonicCrewDirector` verwenden dieselbe reine Planung. Rollen und Phrasen sind aus festen Songzeitblöcken rekonstruierbar und springen nicht bei BPM-Updates. Die tatsächlich abgespielte Tanzuhr integriert weiterhin geglättete BPM und weiche Phasenkorrekturen.
+
+`composeScoreCameraV1134` ergänzt die letzte automatische Komposition vor der bestehenden Glättung. Lesepassagen und Pausen halten eine gespeicherte Kamerapose einschließlich Blickziel. Manuelle, gespeicherte und Timeline-Kameras sowie Reduced Motion bleiben vorrangig. Virtuelle Licht- und Strahlengains berücksichtigen denselben Score; Blackout und manuelle Beleuchtung bleiben geschützt. Es gibt keine zusätzlichen Renderloops, Netzwerkanfragen oder Hardwarebefehle.
+
+`lib/lyricTimingV1134.ts` validiert den Lyrics-Provider-Payload im Client-Adapter vor der Nutzung. Geprüft werden Zeilenstart, Sortierung, Duplikate, Überlappung, Songdauer und Wortzeiten. Bei beschädigten Wortdaten wird die ganze Wortzeitliste einer Zeile entfernt; lesbarer Text bleibt erhalten. Ungültige Zeilenenden werden auf ein begrenztes Lesefenster beschränkt. Formal plausible, inhaltlich falsch versetzte Zeiten bleiben eine bekannte Grenze.
+
+Die Pause lässt den letzten gültigen Crew-State erhalten; ein Trackwechsel oder Seek löst beim nächsten aktiven Plan weiterhin einen Reset aus. Tänze verwenden ausschließlich geladene Clips. Gegenseitige Partnerblicke und relative Antwortphasen ergänzen die vorhandenen geglätteten Persönlichkeits-Overlays.
+
+Tests: `tests/v1134-concert-score.cjs`, `tests/fixtures/concertStressV1134.cjs` und `tests/e2e/concert-score-v1134.spec.cjs`. Die bestehenden Regressionsprüfungen bleiben enthalten; die Fußarbeits-Variantenprüfung zählt zusätzlich die tatsächlich eingesetzten Ganzkörper-Schritte. Der Persönlichkeitstest prüft die energischen Folgen gezielt in der Strophe nach dem ruhigen Auftakt. Archivierung schließt weiterhin sämtliche generierten Playwright-Berichte und Testergebnisordner aus.
+
+## V1133 – Ganzkörper- und Text-Prioritäts-Pipeline
+
+**Historischer Dokumentationsstand: V1133.** Ausführliche Bedienung und Herkunft: [docs/versions/V1133-GANZKOERPER-LYRICS.md](docs/versions/V1133-GANZKOERPER-LYRICS.md).
+
+### Bewegung und Persönlichkeiten
+
+`scripts/sonic_stage_motion.py` erzeugt sechs zusätzliche zyklische Ganzkörper-Clips pro Figur. Beckenposition und -rotation werden vor der analytischen Zweiknochen-IK berechnet; die Zielpunkte der Standfüße bleiben unverändert. Der jeweils schwingende Fuß erhält einen stilabhängigen Seiten-/Diagonal-/Vorwärtsweg. Pivot-/Drehphrasen dürfen um die senkrechte Achse drehen, die Sohlen dürfen dabei nicht kippen. `scripts/generate-sonic-avatars.py -- --ensemble` exportiert alle elf GLBs und aktualisiert Dateigrößen/Hashes im Manifest. Die neue Bibliothek umfasst 306 Clips (22/28/32 pro ursprünglicher/Encore/Headliner-Figur). Es werden keine Motion-Capture- oder Fremd-Lizenzansprüche erhoben.
+
+`lib/fullBodyPerformanceV1133.ts` wählt vorhandene Ganzkörper-Clips nach Figur, Genre und gemeinsamem Song-Cue. Die Auswahl ist eine zusätzliche Stufe im bestehenden `sonicCrewDirector.ts`; Ruhe, Aufbau, dichte Lyrics, Antwortgruppen, manuelle Priorität und Verfügbarkeit bleiben berücksichtigt. Gemeinsame Höhepunkte verwenden eine kompatible gemeinsame Bewegung. Die kleinen geglätteten Ausdrucks-Overlays aus V1132 bleiben unabhängig von den gebackenen Bein-/Beckenbewegungen.
+
+### Lyrics, Kamera und Effekte
+
+`lib/lyricSpotlightV1133.ts` ist ein reiner Planner. Aus bestehenden synchronisierten Zeilen berechnet er die Lesedichte und die Darstellungsart `verse`, `anthem` oder `rap`. Wortcursor und Schlüsselwort setzen tatsächliche Wortzeitmarken voraus; ohne diese bleiben ihre Indizes bei -1. Wiederkehrende Zeilen liefern weiterhin nur einen Refrain-Hinweis, keine Audioanalyse.
+
+`KineticLyrics.tsx` verwendet die Richtung für Textlayout und semantische Wortmarker. Das CSS hält priorisierte Lyrics im sichtbaren Bereich oberhalb des Players; auf breiten Ansichten teilen sich Bühne und Text den Raum. `Lyrics3DScene.tsx` bevorzugt bei hoher Dichte eine vollständige Zeile und reduziert zusätzliche Textbewegung. Die beiden bestehenden Kameratreiber erweitern ihre vorhandenen Schutzbedingungen um die Text-Priorität. `DynamicStage.tsx` dimmt zusätzliche automatische Licht-/Strahlintensität, ohne manuelle Lichtsteuerung zu ersetzen. Es gibt keinen zusätzlichen Kamera- oder Render-Schreiber.
+
+### Verifikation und Ausgabe
+
+`tests/v1133-body-kinematics.mjs` prüft an realen Rigs sechs unterschiedliche Becken-/Fußtrajektorien, mindestens 7,5 cm seitliche Gewichtsverlagerung, sichtbare Kniekompression, Beckenrotation und feste Standfüße. Bestehende Skin-/Loop-/Bodenkontaktprüfungen bleiben aktiv. `tests/v1133-lyrics-body-policy.cjs` prüft tatsächliche Wortzeiten, Rap-Dichte, Figurenstile und Kameraschutz. Die neuen Browser-Tests verwenden die vorhandenen Spotify-/Lyrics-Mocks sowie einen kontrollierten schnellen Testtext.
+
+Das ZIP enthält Quellcode und Testkonfigurationen. Generierte Reports, Playwright-Testberichte, Traces, Screenshots/Videos und Playwright-bezogene Testergebnis-Artefakte werden bei der Archivierung ausgeschlossen. Detaillierte Versionsdokumentation befindet sich unter `docs/versions/`; README und ARCHITECTURE bleiben im Projektstamm.
+
+## V1132 – Expressive Performance
+
+Elf individuelle Ausdrucksprofile, gespeicherte Ausdrucksstärke, genreabhängige Phrasenfolgen und kontinuierliche Phasenkorrektur für gemeinsame Tänze. Anleitung und Prüfungen: [LIESMICH-V1132.md](docs/versions/LIESMICH-V1132.md).
+
+## V1131 – Concert Story & Crew
+
+Gemeinsame Song-Dramaturgie für Tanz, Kamera, Licht und Lyrics; steigende Refrains, Crew-Dialoge, Tanzduelle und vier neue gebackene Fußarbeits-Clips für alle elf Figuren. Anleitung und Prüfungen: [LIESMICH-V1131.md](docs/versions/LIESMICH-V1131.md).
+
+## V1130 – Intelligent Headliner Show
+
+Vier weitere Original-GLB-Avatare (insgesamt elf), je 22 Headliner-Clips, lokale Genre-/Energie-Bewertung mit Bewegungs-Gedächtnis, lyricsabhängige Dramaturgie und zusätzliche Live-Show-Inszenierung. Vollständige Spotify-/Lyrics-Browser-Mocks für reproduzierbare Tests. Anleitung: [LIESMICH-V1130.md](docs/versions/LIESMICH-V1130.md).
+
+## V1129 – Encore Music Performance
+
+Vier neue echte GLB-Avatare mit jeweils 18 Animationen, Genre-Move-Variation über musikalische Phrasen und zusätzliche genreabhängige Lyrics-Einblendungen in DOM und 3D. Die lokale Musikregie nutzt vorhandene Songdaten ohne externen KI-Dienst. Anleitung und Grenzen: [LIESMICH-V1129.md](docs/versions/LIESMICH-V1129.md). Prüfung: `npm run test:v1129` und `npm run typecheck`.
+
 ## V1128 · Adaptive Concert Performance 2.0
 
 `lib/adaptiveConcertPerformanceV1128.ts` reduziert auf Basis der **bereits gemessenen**

@@ -1,4 +1,7 @@
 "use client";
+import {lyricSpotlightV1133} from '@/lib/lyricSpotlightV1133';
+import {composeScoreCameraV1134,newScoreCameraV1134} from '@/lib/concertScoreV1134';
+import {useConcertStoryV1131} from './useConcertStoryV1131';
 import {composeArenaShowCameraV1043,type ArenaShowCameraCueV1043} from "@/lib/arena360ShowCameraV1043";
 import {composeArenaImmersiveCameraV1047,type ArenaImmersiveCameraCueV1047} from "@/lib/arena360ImmersiveArenaV1047";
 import {composeArenaCinematicCameraV1053,type ConcertCameraCueV1053} from "@/lib/arena360CinematicCameraV1053";
@@ -21,6 +24,9 @@ import {advanceStageDirector,createStageDirectorState} from "./smartStageDirecto
 /** Moves only the active scene camera; no new render passes or per-frame React state. */
 export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,composition,genreCue,timelineCue,lipSync,arena360=false,arenaCameraEnabled=true,arenaCameraMode="arc",arenaFlyoverEnabled=true,arenaSectionCameraEnabled=true,arenaShowCameraCueV1043,arenaImmersiveCameraCueV1047,arenaCinematicCameraCueV1053,concertCameraCueV1072,section="verse"}:{
  arena360?:boolean;arenaCameraEnabled?:boolean;arenaCameraMode?:ArenaCameraModeV1032;arenaFlyoverEnabled?:boolean;arenaSectionCameraEnabled?:boolean;arenaShowCameraCueV1043?:ArenaShowCameraCueV1043;arenaImmersiveCameraCueV1047?:ArenaImmersiveCameraCueV1047;arenaCinematicCameraCueV1053?:ConcertCameraCueV1053;concertCameraCueV1072?:CameraCueV1072;section?:string;audio:AudioFeatures;genre?:string|null;playing:boolean;reducedMotion:boolean;duo:boolean;composition?:SmartStageCueV351;genreCue?:GenreVisualCueV352;timelineCue?:ShowTimelineCueV354;lipSync?:VisualizerProps["lipSync"]}){
+ const scoreCameraV1134=useRef(newScoreCameraV1134());
+ const lyricPriorityV1133=lyricSpotlightV1133(lipSync?.lyrics,lipSync?.progressMs??0).protectCamera;
+ const storyV1131=useConcertStoryV1131({durationMs:lipSync?.storyDurationMsV1131,progressMs:lipSync?.progressMs??0,lyrics:lipSync?.lyrics,genre,bpm:audio.bpm,energy:audio.energyEnvelope,count:lipSync?.cameraCastCountV377??(duo?2:1),section:lipSync?.lyrics?.synced?undefined:section});
  const director=useRef(createStageDirectorState());
  const arenaFlyoverV1033=useRef({...INITIAL_ARENA_FLYOVER_V1033});
  const focusV369=useRef(0);
@@ -31,7 +37,7 @@ export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,comp
  useFrame(({camera,clock,scene},delta)=>{
   if(!initial.current||initial.current.camera!==camera){initial.current={camera:camera as PerspectiveCamera,x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:(camera as PerspectiveCamera).fov};director.current=createStageDirectorState();}
   const base=initial.current;const cue=advanceStageDirector(director.current,audio,delta,genre,playing,reducedMotion);
-  const cameraMotion=genreCue?.active?genreCue.cameraMotion:1;
+  const cameraMotion=(genreCue?.active?genreCue.cameraMotion:1)*(storyV1131?.motionGain??1);
   const sway=cue.camera*(duo?.16:.11)*cameraMotion;
   const targetX=base.x+Math.sin(clock.elapsedTime*.45)*sway;
   const targetY=base.y+cue.camera*.065;
@@ -49,10 +55,10 @@ export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,comp
   const vocalCamera=composeVocalCameraV369({...timelineCamera,y:targetY,targetY:0},focusV369.current,{duo,intensity:lipSync?.cameraStrengthV369??55,headY:faceV369.current.value,lyricsProtected:composition?.protectLyrics??false});
   const safe=composeArenaCameraV1032(guardAutomaticCameraV351(vocalCamera,composition),{
     enabled:arena360&&arenaCameraEnabled,playing,reducedMotion,automatic:true,
-    protectedShot:!!timelineCue?.active||focusV369.current>.01||!!composition?.protectLyrics,
+    protectedShot:lyricPriorityV1133||!!timelineCue?.active||focusV369.current>.01||!!composition?.protectLyrics,
     seconds:clock.elapsedTime,mode:arenaCameraMode,
   });
-  const protectedShotV1033=!!timelineCue?.active||focusV369.current>.01||!!composition?.protectLyrics;
+  const protectedShotV1033=lyricPriorityV1133||!!timelineCue?.active||focusV369.current>.01||!!composition?.protectLyrics;
   const flyoverAllowedV1033=arena360&&arenaCameraEnabled&&arenaFlyoverEnabled&&playing&&!reducedMotion&&!protectedShotV1033;
   arenaFlyoverV1033.current=stepArenaFlyoverV1033(arenaFlyoverV1033.current,delta,{
     enabled:flyoverAllowedV1033,playing,reducedMotion,protectedShot:protectedShotV1033,
@@ -66,7 +72,8 @@ export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,comp
   const safeV1043=composeArenaShowCameraV1043(safeV1034,arenaShowCameraCueV1043,protectedShotV1033);
   const safeV1047=composeArenaImmersiveCameraV1047(safeV1043,arenaImmersiveCameraCueV1047,protectedShotV1033);
   const safeV1053=composeArenaCinematicCameraV1053(safeV1047,arenaCinematicCameraCueV1053,protectedShotV1033);
-  const safeV1072=composeConcertCameraDirectorV1072(safeV1053,concertCameraCueV1072,protectedShotV1033);
+  const priorV1131=composeConcertCameraDirectorV1072(safeV1053,concertCameraCueV1072,protectedShotV1033);
+  const safeV1072=composeScoreCameraV1134(priorV1131,storyV1131,scoreCameraV1134.current,{playing,reducedMotion,protectedShot:!!timelineCue?.active||focusV369.current>.01},{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:(camera as PerspectiveCamera).fov,targetY:lookV369.current} as typeof priorV1131);
   const t=1-Math.exp(-Math.min(Math.max(delta,0),.1)*3);
   camera.position.x+=(safeV1072.x-camera.position.x)*t;
   camera.position.y+=(safeV1072.y-camera.position.y)*t;

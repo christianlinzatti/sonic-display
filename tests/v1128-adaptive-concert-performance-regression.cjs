@@ -93,8 +93,8 @@ try{
  });
  check('release metadata, main documentation, CI and browser coverage are present',()=>{
   const pkg=require(path.join(root,'package.json'));
-  assert.equal(pkg.version,'0.1.0-v1128');assert.equal(pkg.sonicFeatureRelease,'v1128');
-  assert.equal(pkg.sonicRoadmapRelease,'v1128');assert(pkg.scripts.prebuild.startsWith('npm run test:v1128 && npm run test:v1128:types'));
+  assert.match(pkg.version,/^0\.1\.0-v\d+$/);assert(Number(pkg.sonicFeatureRelease.slice(1))>=1128);
+  assert(Number(pkg.sonicRoadmapRelease.slice(1))>=1128);assert(pkg.scripts.prebuild.startsWith('npm run test:v1128 && npm run test:v1128:types'));
   assert(fs.existsSync(path.join(root,'tests/e2e/adaptive-concert-performance-v1128.spec.cjs')));
   assert(fs.readFileSync(path.join(root,'ARCHITECTURE.md'),'utf8').includes('**Dokumentationsstand:** V1128'));
  });

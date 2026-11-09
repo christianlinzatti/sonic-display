@@ -44,15 +44,13 @@ for (const [name, workflow] of Object.entries(workflows)) {
     assert.deepEqual(Object.keys(workflow.on), ['workflow_dispatch'], `${name} must remain available manually`);
 }
 assert.ok(workflows['production-quality-v405.yml'].on.schedule, 'Preserve historical scheduled regression');
-assert.deepEqual(Object.keys(workflows['v965-deployment-smoke.yml'].on), ['workflow_dispatch'], 'Deployments should be checked manually without creating failure event noise');
+assert.deepEqual(Object.keys(workflows['v965-deployment-smoke.yml'].on), ['workflow_dispatch']);
 assert.ok(workflows['v965-deployment-smoke.yml'].jobs['deployed-site-smoke'].env.VERCEL_DEPLOYMENT_URL.includes('inputs.deployment_url'));
 const commands = production.jobs['v965-production'].steps.map(x => x.run || '').join('\n');
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json')));
 for (const match of commands.matchAll(/npm run ([a-z0-9:_-]+)/g)) assert.ok(pkg.scripts[match[1]], `Missing script ${match[1]}`);
-// Full Linux production certification executes the mandatory prebuild chain.
-// Avoid a second copy of these historic TypeScript regressions in the workflow.
 for (const version of [982,983,984,985,986,987,988,989,990,991,992,993,994,995,996,997,998,999,1000,1001,1002,1003])
-  assert.ok(pkg.scripts.prebuild.includes('npm run test:v'+version), 'Inherited regression V'+version+' removed');
+  assert.ok(pkg.scripts.prebuild.includes('npm run test:v'+version),'Inherited regression V'+version+' removed');
 assert.ok(commands.includes('node node_modules/typescript/bin/tsc --noEmit'));
 assert.ok(commands.includes('node node_modules/next/dist/bin/next build'));
 assert.equal(production.jobs['v965-production'].steps.find(x=>(x.run||'').includes('node scripts/v965-production-verify.cjs')).if, "matrix.os == 'ubuntu-24.04'");

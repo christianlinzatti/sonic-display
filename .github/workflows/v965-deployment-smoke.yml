@@ -1,5 +1,5 @@
 name: Sonic Display · Deployment reachability
-run-name: Sonic Display · V1105 · Deployment reachability · manuell
+run-name: Sonic Display · V1128 · Deployment reachability · manuell
 # Run only on demand: failed Vercel deployment_status events create noisy skipped runs.
 on:
   workflow_dispatch:

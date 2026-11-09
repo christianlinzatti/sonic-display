@@ -17,7 +17,8 @@ import sys
 from pathlib import Path, PurePosixPath
 from zipfile import BadZipFile, ZipFile
 
-# Allow bounded browser duplicate suffixes such as ` (1)` before .zip only.
+# Browser-uploaded duplicate filenames may add ` (1)` immediately before .zip.
+# Permit only a bounded decimal counter (not arbitrary spaces or punctuation).
 # Optional descriptive suffixes support real release ZIP names, including the
 # long archives produced by Sonic Display. Versions must stay at the front and
 # filenames must remain single, safe path components on common filesystems.
@@ -122,8 +123,8 @@ def checked_name(value):
         raise ValueError("Release ZIP filename exceeds the 255-byte filesystem limit")
     match = ARCHIVE_NAME.fullmatch(name)
     if not match or name != Path(name).name:
-        raise ValueError("Expected releases/SonicDisplay-V969[-description].zip "
-                         "(letters, digits, dots, hyphens or underscores in description)")
+        raise ValueError("Expected releases/SonicDisplay-V969[-description][ (1)].zip "
+                         "(safe description and optional browser duplicate counter)")
     return name, int(match.group(1))
 
 

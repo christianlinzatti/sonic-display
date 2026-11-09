@@ -2,12 +2,12 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { AnimationMixer, Vector3, LoopOnce, Box3 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-const files = ['neon-pulse', 'festival-nova', 'chrome-beat'];
+const files = ['neon-pulse', 'festival-nova', 'chrome-beat','ember-rock','luna-flow','sol-groove','velvet-jazz','atlas-prism','aurora-synth','rio-carnival','quantum-bass'];
 const common = ['Dance_Groove','Dance_Techno','Idle_Breathe','Dance_House','Dance_HipHop','Dance_Disco','Dance_Shuffle','Dance_Robot','Dance_FestivalBounce','Gesture_Wave'];
 const manifest = JSON.parse(readFileSync(new URL('../public/avatars/sonic/manifest.json', import.meta.url)));
 for (const file of files) {
   const expected = manifest.find(asset => asset.file === `${file}.glb`).clips.map(clip => clip.name);
-  assert.equal(expected.length,12);
+  assert.equal(expected.length,files.indexOf(file)<3?22:files.indexOf(file)<7?28:32);
   assert.deepEqual(expected.slice(0,10),common);
   const bytes = readFileSync(new URL(`../public/avatars/sonic/${file}.glb`, import.meta.url));
   assert.equal(bytes.toString('ascii', 0, 4), 'glTF');
@@ -49,5 +49,5 @@ for (const file of files) {
     assert.ok(end.every((x,i) => Math.abs(x-start[i]) < .001), `${clip.name} must loop without a pose jump`);
   }
   assert.equal(new Set(signatures).size, expected.length, 'Clips must produce different poses');
-  console.log(`${file}: skin, 12 distinct animated clips, finite vertices and seamless loops PASS (${bytes.length} bytes)`);
+  console.log(`${file}: skin, ${expected.length} distinct animated clips, finite vertices and seamless loops PASS (${bytes.length} bytes)`);
 }

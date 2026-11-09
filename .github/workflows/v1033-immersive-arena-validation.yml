@@ -1,5 +1,5 @@
 name: V1033 Immersive Arena Show manual verification
-run-name: Sonic Display · V1044 · V1033 Immersive Arena Show manual verification
+run-name: Sonic Display · V1128 · V1033 Immersive Arena Show manual verification
 # Manual version-specific diagnostics; v965 is the authoritative production matrix.
 on:
   workflow_dispatch:

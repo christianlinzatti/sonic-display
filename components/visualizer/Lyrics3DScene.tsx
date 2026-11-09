@@ -1,4 +1,7 @@
 "use client";
+import {lyricSpotlightV1133} from '@/lib/lyricSpotlightV1133';
+import {useConcertStoryV1131} from './useConcertStoryV1131';
+import {lyricEntranceV1129} from '@/lib/musicPerformanceV1129';
 import {planLyricsPerformanceV748,lyricWordAccentV748} from "./lyricsPerformanceStudioV748";
 import type {SmartStageCueV351} from "@/services/stageContent/smartStageCompositionV351";
 import { Text } from "@react-three/drei";
@@ -62,6 +65,8 @@ const WordText = memo(function WordText({ text, size, color, opacity, outline, o
 
 /** Real GPU text meshes sharing the avatar scene. Quality follows existing adaptive controller. */
 export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { scene: Scene; audio: AudioFeatures; reducedMotion: boolean; composition?:SmartStageCueV351 }) {
+  const spotlightV1133=lyricSpotlightV1133(scene.lyrics,scene.progressMs);
+  const storyV1131=useConcertStoryV1131({durationMs:scene.storyDurationMsV1131,progressMs:scene.progressMs,lyrics:scene.lyrics,genre:scene.genreV382});
   const root = useRef<Group>(null);
   const { tier } = useAdaptivePerformance();
   const lines = scene.lyrics.lines;
@@ -138,10 +143,10 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
   const baseSize = .135 * clamp(scene.fontScale / 100, .6, 1.8);
   useFrame(({ clock }, dt) => {
     if (!root.current) return;
-    const beat = scene.playing && !reducedMotion ? clamp(audio.beatStrength ?? 0) : 0;
-    const bass = scene.playing && !reducedMotion ? clamp(audio.bass ?? 0) : 0;
+    const beat = scene.playing && !reducedMotion && spotlightV1133.mode!=='rap' ? clamp(audio.beatStrength ?? 0) : 0;
+    const bass = scene.playing && !reducedMotion && spotlightV1133.mode!=='rap' ? clamp(audio.bass ?? 0) : 0;
     const motionFactor = tier === "high" ? 1 : tier === "balanced" ? .55 : 0;
-    const targetY = (reducedMotion ? 0 : Math.sin(clock.elapsedTime * .75) * .035 * intensity * motionFactor) + beat * .018 * intensity * motionFactor;
+    const targetY = (reducedMotion||spotlightV1133.mode==='rap' ? 0 : Math.sin(clock.elapsedTime * .75) * .035 * intensity * motionFactor) + beat * .018 * intensity * motionFactor;
     root.current.position.y += (targetY - root.current.position.y) * Math.min(1, dt * 6);
     root.current.rotation.y += (((right ? -.13 : .13) * depth + (reducedMotion ? 0 : bass * .045 * intensity * motionFactor)) - root.current.rotation.y) * Math.min(1, dt * 5);
   });
@@ -152,10 +157,13 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
       <planeGeometry args={[activeCaptionV501?.cast===4 ? 2.42 : 2.7, tier === "low" ? .53 : 1.16]} />
       <meshBasicMaterial color="#091022" transparent opacity={clamp(Math.max(activeCaptionV549?.plateOpacity??activeCaptionV541?.backdropOpacity??activeCaptionV525?.plateOpacity??activeCaptionV501?.plateOpacity??.74,activeCaptionV477?.backdropOpacity??.72,activeStageLyricV634.plateOpacity,stageLyricCinemaV688.plateOpacity,studioV748.plateOpacity,.64+plateStrengthV378*.25)+concertAccentV502*.32+lyricsDirectionV528.plateBoost)} depthWrite={false} depthTest={false} />
     </mesh>
-    {visible.map(i => {
+    {visible.filter(i=>spotlightV1133.mode!=='rap'||i===scene.activeIndex).map(i => {
       const line = lines[i];
       const current = i === scene.activeIndex;
       const end = line.endMs && line.endMs > line.startMs ? line.endMs : lines[i + 1]?.startMs ?? line.startMs + 3400;
+      const entranceV1129=lyricEntranceV1129({genre:scene.genreV382,
+        elapsedMs:scene.progressMs-line.startMs,durationMs:end-line.startMs,
+        playing:scene.playing&&scene.lyrics.synced&&current,reducedMotion,highQuality:tier==='high'&&spotlightV1133.mode!=='rap'});
       const ratio = scene.lyrics.synced ? clamp((scene.progressMs - line.startMs) / Math.max(200, end - line.startMs)) : 0;
       // Word-timed records take precedence; otherwise spread the line duration across words.
       const tokens = line.words?.length ? line.words.map(w => w.text) : line.text.match(/\S+/g) ?? [line.text || "♪"];
@@ -201,18 +209,18 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
         existing3DWidth:visualV525.max3DWidth,
         intensity,
       });
-      const size = (readabilityV578.mode==='very-dense'?.91:1) * baseSize * (current ? 1.18 : .88) * visualV461.fontScale * visualV477.fontScale * visualV501.fontScale * visualV525.readingBoost * visualV541.readingScale * visualV549.readingScale * (current?lyricsDirectionV528.readingBoost:1);
+      const size = (current&&spotlightV1133.mode==='rap'?Math.max(.7,Math.min(1,180/Math.max(1,line.text.length))):1) * (readabilityV578.mode==='very-dense'?.91:1) * baseSize * (current ? 1.18 : .88) * visualV461.fontScale * visualV477.fontScale * visualV501.fontScale * visualV525.readingBoost * visualV541.readingScale * visualV549.readingScale * (current?lyricsDirectionV528.readingBoost:1);
       // A full line costs one GPU text mesh. Limit glyph/mesh pressure on slower devices
       // without truncating lyrics. High quality keeps per-word karaoke on normal lines.
       const wordLimit = visualV549.max3DWordMeshes;
-      const useWordMeshes = current && visualV461.allowWordMeshes && visualV477.allowWordMeshes &&
+      const useWordMeshes = spotlightV1133.mode!=='rap' && current && visualV461.allowWordMeshes && visualV477.allowWordMeshes &&
         tokens.length <= wordLimit;
       const positions = useWordMeshes ? layoutWords(tokens, size,
         Math.min(lyricPolishV634.max3DWidth,stageLyricCinemaV688.max3DWidth,studioV748.max3DWidth)) : [];
       const shouldHighlight = scene.wordHighlight && visualV477.timingMode === "verified-word" && current;
-      return <group key={`${i}-${line.startMs}`} position={[x, y + (current ? -visualV501.lineOffsetPx * .001 : 0), z]}>
+      return <group key={`${i}-${line.startMs}`} position={[x+entranceV1129.x, y+entranceV1129.y + (current&&spotlightV1133.mode!=='rap' ? -visualV501.lineOffsetPx * .001 : 0), z+entranceV1129.z]} scale={spotlightV1133.mode==='rap'?1:entranceV1129.scale*(current&&scene.playing&&!reducedMotion?(storyV1131?.lyricGain??1):1)*(current?spotlightV1133.lineScale:1)}>
         {!useWordMeshes && <WordText text={line.text || "♪"} size={size} color={current ? from : "#8b93ad"}
-          opacity={current ? visualV501.reveal : visualV477.focusOpacity} maxWidth={Math.min(visualV477.max3DWidth,Math.min(lyricPolishV634.max3DWidth,stageLyricCinemaV688.max3DWidth,studioV748.max3DWidth))} outline={tier === "low" ? 0 : current ? .002+plateStrengthV378*.002+concertAccentV502*.006 : 0} outlineColor={to} />}
+          opacity={current ? visualV501.reveal*entranceV1129.opacity : visualV477.focusOpacity} maxWidth={Math.min(visualV477.max3DWidth,Math.min(lyricPolishV634.max3DWidth,stageLyricCinemaV688.max3DWidth,studioV748.max3DWidth))} outline={tier === "low" ? 0 : current ? .002+plateStrengthV378*.002+concertAccentV502*.006 : 0} outlineColor={to} />}
         {positions.map((token, wi) => {
           const timed = line.words?.[wi];
           const next = line.words?.[wi + 1];
@@ -247,10 +255,11 @@ export function Lyrics3DScene({ scene, audio, reducedMotion, composition }: { sc
           const baseScaleV748=1+(tier=== "high"&&!reducedMotion?studioAccentV748*.035*(studioV748.wordGlow/.065):0);
           const scale=cueV382&&tier==="high" ? 1+wordAccentV567.scale+(cueV382.scale-1)*visualV461.motionScale*visualV526.wordMotionGain*lyricsDirectionV528.motionGain*visualV549.wordMotionGain + accentV501*.02
             : current && lit && !reducedMotion && tier === "high" && !kineticStyleV382 ? 1 + progress * .075 * intensity * visualV526.wordMotionGain*lyricsDirectionV528.motionGain + accentV501*.02 : 1;
-          const color=cueV382?blendKineticColorV382(from,to,wordProgress):(lit ? to : current ? from : "#8b93ad");
+          const heroV1133=current&&wi===spotlightV1133.currentWord&&wi===spotlightV1133.keyWord&&spotlightV1133.mode==='anthem';
+          const color=heroV1133?to:cueV382?blendKineticColorV382(from,to,wordProgress):(lit ? to : current ? from : "#8b93ad");
           return <group key={`${wi}-${token.text}`} position={[token.x, token.y, 0]} scale={scale*baseScaleV748}>
             <WordText text={token.text} size={size} color={color}
-              opacity={current ? visualV501.reveal : visualV477.focusOpacity} outline={tier === "low" ? 0 : current ? .003 + plateStrengthV378*.002 + clamp(scene.glow / 100) * (lit ? .012 : .004) * (tier === "balanced" ? .5 : 1) + (cueV382?.glow??0)*.008*visualV549.wordMotionGain + wordAccentV567.outline + wordAccentV634*.035*lyricPolishV634.wordGlow/.115 +
+              opacity={current ? visualV501.reveal*entranceV1129.opacity : visualV477.focusOpacity} outline={tier === "low" ? 0 : current ? .003 + plateStrengthV378*.002 + clamp(scene.glow / 100) * (lit ? .012 : .004) * (tier === "balanced" ? .5 : 1) + (cueV382?.glow??0)*.008*visualV549.wordMotionGain + wordAccentV567.outline + wordAccentV634*.035*lyricPolishV634.wordGlow/.115 +
                 (current&&timed?cinematicLyricWordAccentV688({
                   line,nextLineStart:lines[i+1]?.startMs,wordIndex:wi,
                   progressMs:scene.progressMs,playing:scene.playing,reducedMotion,

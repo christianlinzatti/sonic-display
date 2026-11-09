@@ -1,5 +1,5 @@
 name: V1040 AI Show Designer manual validation
-run-name: Sonic Display · V1044 · V1040 AI Show Designer manual validation
+run-name: Sonic Display · V1128 · V1040 AI Show Designer manual validation
 # Manual diagnostic workflow; the v965 production matrix is the only automatic CI workflow.
 on:
   workflow_dispatch:

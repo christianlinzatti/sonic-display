@@ -5,7 +5,7 @@ test('crew preferences persist and trio setup restores previous models and group
  test.setTimeout(120000);
  let box=panel(await openSettings(page,'avatar'));
  await box.getByLabel('Musiksteuerung für Sonic Stage Crew',{exact:true}).uncheck();
- await box.getByLabel('Eigene Reaktionen der drei Figuren',{exact:true}).uncheck();
+ await box.getByLabel('Eigene Reaktionen der Figuren',{exact:true}).uncheck();
  await box.getByRole('combobox',{name:'Gemeinsame Choreografie',exact:true}).selectOption('canon');
  box=panel(await openSettings(page,'avatar'));
  await expect(box.getByLabel('Musiksteuerung für Sonic Stage Crew',{exact:true})).not.toBeChecked();
@@ -20,7 +20,7 @@ test('crew preferences persist and trio setup restores previous models and group
  await box.getByRole('button',{name:'Trio-Einrichtung zurücknehmen',exact:true}).click();
  await expect.poll(()=>page.evaluate(key=>JSON.parse(localStorage.getItem(key)).avatarModelId,PREFS)).toBe(before.avatarModelId);
  await expect(box.getByLabel('Musiksteuerung für Sonic Stage Crew',{exact:true})).not.toBeChecked();
- await expect(box.getByLabel('Eigene Reaktionen der drei Figuren',{exact:true})).not.toBeChecked();
+ await expect(box.getByLabel('Eigene Reaktionen der Figuren',{exact:true})).not.toBeChecked();
  await expect(box.getByRole('combobox',{name:'Gemeinsame Choreografie',exact:true})).toHaveValue('canon');
  expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).enabled,GROUP)).toBe(false);
  expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).visualizerMode,PREFS)).toBe(before.visualizerMode);

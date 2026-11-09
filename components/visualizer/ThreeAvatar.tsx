@@ -842,7 +842,7 @@ export function ThreeAvatar(props: VisualizerProps) {
         strength={(props.danceFxStrength??60)*compositionV354.fxGain*stabilityGainV355}
         drop={props.cameraDirectorSection==='drop' || props.showCue?.section==='drop'}/>
       <DanceFX audio={props.audio} isPlaying={props.isPlaying} reducedMotion={props.reducedMotion} settings={{ tint:visualFxCueV355.active?visualFxCueV355.color:undefined, enabled: props.danceFxEnabled || (piConcertEffectsV479.automaticFx && props.showCue?.fxEnabled), strength: (props.showCue?.fxEnabled ? Math.max(props.danceFxEnabled ? (props.danceFxStrength ?? 0) : 0,Math.round(props.showCue.fxGain*85)) : (props.danceFxStrength ?? 0)) * compositionV354.fxGain * fxScaleV354 * stabilityGainV355, shockwaves: props.danceFxShockwaves || (props.showCue?.fxGain ?? 0) > .7, footprints: props.danceFxFootprints, trails: props.danceFxTrails }} />
-      {props.lyricsScene && <Suspense fallback={null}><Lyrics3DScene scene={props.lyricsScene} audio={props.audio} reducedMotion={props.reducedMotion} composition={compositionV497} /></Suspense>}
+      {props.lyricsScene && <Suspense fallback={null}><Lyrics3DScene scene={{...props.lyricsScene,storyDurationMsV1131:props.track?.durationMs}} audio={props.audio} reducedMotion={props.reducedMotion} composition={compositionV497} /></Suspense>}
       <StageEnvironment theme={directedThemeV352} audio={props.audio} isPlaying={props.isPlaying}
         reducedMotion={props.reducedMotion} reactive={props.stageReactive ?? true}
         rotationSpeed={props.stageRotationSpeedV1031 ?? 90}

@@ -1,5 +1,5 @@
 name: V1031 Rotating 360 Arena validation
-run-name: Sonic Display · V1044 · V1031 Rotating 360 Arena validation
+run-name: Sonic Display · V1128 · V1031 Rotating 360 Arena validation
 # Manual version-specific diagnostics; v965 is the authoritative production matrix.
 on:
   workflow_dispatch:

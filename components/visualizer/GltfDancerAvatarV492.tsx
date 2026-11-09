@@ -1,4 +1,5 @@
 "use client";
+import {lyricDensityV1130,lyricSectionV1130} from '@/lib/showIntelligenceV1130';
 import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
 import {planMotionPlaybackV659,keepCurrentMotionWhileLoadingV659} from "./motionPlaybackWindowV659";
@@ -1276,7 +1277,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     if(rigV1074.leftArm)rigV1074.leftArm.rotation.z+=nextV1074.leftLift-beforeV1074.leftLift;
     if(rigV1074.rightArm)rigV1074.rightArm.rotation.z-=nextV1074.rightLift-beforeV1074.rightLift;
     lastAudiencePoseV1074.current=nextV1074;
-    applyCrewReaction(crewReaction,crew.plan,crew.plan.beat+Math.min(1,Math.max(0,state.clock.elapsedTime-crewClock.current.elapsed))*crew.plan.bpm/60,audio.energyEnvelope??.35);
+    applyCrewReaction(crewReaction,crew.plan,crew.plan.beat+Math.min(1,Math.max(0,state.clock.elapsedTime-crewClock.current.elapsed))*crew.plan.bpm/60,audio.energyEnvelope??.35,delta);
     applyGltfVocalPerformanceV492({propsLipSyncV367,trackId:track?.id??"",audio,genre,showCue,reducedMotion,isPlaying,
       workloadSlot,avatarMotionMode,stableLibraryClip,partnerGesture,partnerLook,partnerHand,
       groovePreferences,rapLiveEnabledV412,rapLiveFrameV412,rapLyricsFrameV414,preferencesRap,
@@ -1339,10 +1340,11 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   const crew = useCrewDirector({
     modelId:avatarModelId??'',clips:embeddedCandidatesV530,trackId:track?.id,
     progressMs:cameraDirectorProgressMs??propsLipSyncV367?.progressMs,
-    section:showCue?.enabled?showCue.section:cameraDirectorSection,
+    section:(showCue?.enabled?showCue.section:cameraDirectorSection)??lyricSectionV1130(propsLipSyncV367?.lyrics,cameraDirectorProgressMs??propsLipSyncV367?.progressMs??0),
     genre,energy:audio.energyEnvelope,bpm:audio.bpm,slot:workloadSlot,
     count:ensembleCountV745??propsLipSyncV367?.ensembleCountV374??1,
-    playing:isPlaying,reducedMotion,settings:crewSettings,
+    playing:isPlaying,reducedMotion,settings:crewSettings,durationMs:track?.durationMs,lyrics:propsLipSyncV367?.lyrics,
+    lyricDensity:lyricDensityV1130(propsLipSyncV367?.lyrics,cameraDirectorProgressMs??propsLipSyncV367?.progressMs??0),
     manualPriority:avatarMotionMode!=='hybrid'||Math.abs(avatarClipSpeed-1)>.001||!!animationUrl||sharedMotionV531||!!activeSequence||
       !!activeLoop||timelineEnabled||avatarBlendEnabled||!!stableLibraryClip||!!smartDanceOverride||
       !!lowClipV481||!!clipChoiceV328||!!phraseChoiceV329||!!groupClockV328?.settings.enabled||

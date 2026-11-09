@@ -1,4 +1,7 @@
 "use client";
+import {lyricSpotlightV1133} from '@/lib/lyricSpotlightV1133';
+import {composeScoreCameraV1134,newScoreCameraV1134} from '@/lib/concertScoreV1134';
+import {useConcertStoryV1131} from './useConcertStoryV1131';
 
 import {composeConcertSceneCameraV528} from "./cinematicConcertCoordinationV528";
 import {composeArenaShowCameraV1043,type ArenaShowCameraCueV1043} from "@/lib/arena360ShowCameraV1043";
@@ -90,6 +93,9 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
   arena360?:boolean;arenaCameraEnabled?:boolean;arenaCameraMode?:ArenaCameraModeV1032;arenaFlyoverEnabled?:boolean;arenaSectionCameraEnabled?:boolean;arenaShowCameraCueV1043?:ArenaShowCameraCueV1043;arenaImmersiveCameraCueV1047?:ArenaImmersiveCameraCueV1047;arenaCinematicCameraCueV1053?:ConcertCameraCueV1053;concertCameraCueV1072?:CameraCueV1072;audio?:AudioFeatures;
   section: StageSection; progressMs: number; intensity: number; playing: boolean; reducedMotion: boolean; duo: boolean; showCue?: ShowCue; concertShowCueV387?:ConcertShowCueV387; concertShowCameraV387?:boolean;festivalShowCueV394?:FestivalShowCueV394;festivalShowCameraV394?:boolean; composition?:SmartStageCueV351; genreCue?:GenreVisualCueV352; timelineCue?:ShowTimelineCueV354; lipSync?:VisualizerProps["lipSync"];genre?:string|null;cinematicCueV497?:CinematicConcertCueV497;cameraNarrativeV605?:{plan:NarrativePlanV604;cue:NarrativeCueV604;manualCamera:boolean};concertFlowV654?:ConcertFlowCueV654;transitionV791?:SceneTransitionCueV791;choreographyV792?:CameraChoreographyCueV792;vocalSpotlightV797?:MultiVocalSpotlightCueV797;vocalDuetV838?:VocalDuetPlanV838;
 }) {
+ const scoreCameraV1134=useRef(newScoreCameraV1134());
+ const lyricPriorityV1133=lyricSpotlightV1133(lipSync?.lyrics,lipSync?.progressMs??progressMs).protectCamera;
+  const storyV1131=useConcertStoryV1131({durationMs:lipSync?.storyDurationMsV1131,progressMs,lyrics:lipSync?.lyrics,genre,bpm:audio?.bpm,energy:audio?.energyEnvelope,count:lipSync?.cameraCastCountV377??(duo?2:1),section:lipSync?.lyrics?.synced?undefined:section});
   const camera = useThree(state => state.camera as PerspectiveCamera);
   const liveEditPose = useRef<CameraPose|null>(null);
   useEffect(()=>{
@@ -1016,14 +1022,14 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
     // timeline, authored, lyrics, vocal/duet or concert-specific shots.
     const arenaFramedV1032=composeArenaCameraV1032(stageFramed,{
       enabled:arena360&&arenaCameraEnabled,playing,reducedMotion,automatic:automaticShot,
-      protectedShot:!!(editingPose||userHasPreset||manual!=="auto"||timelineCue?.active||authoredCueV400||
+      protectedShot:lyricPriorityV1133||!!(editingPose||userHasPreset||manual!=="auto"||timelineCue?.active||authoredCueV400||
         cameraNarrativeV605?.manualCamera||lipSync?.cameraManualStagePriorityV377||
         shotV377.active||visualPlanV397.active||vocalPlanV401.active||lyricsPlanV378.active||
         liveCueV400||cutToCameraCueV400),
       seconds:progressMs/1000,mode:arenaCameraMode,
     });
     // V1033 is a temporary, non-owning composition into the existing director.
-    const flyoverProtectedV1033=!!(editingPose||userHasPreset||manual!=="auto"||timelineCue?.active||authoredCueV400||
+    const flyoverProtectedV1033=lyricPriorityV1133||!!(editingPose||userHasPreset||manual!=="auto"||timelineCue?.active||authoredCueV400||
       cameraNarrativeV605?.manualCamera||lipSync?.cameraManualStagePriorityV377||shotV377.active||
       visualPlanV397.active||vocalPlanV401.active||lyricsPlanV378.active||liveCueV400||cutToCameraCueV400);
     const flyoverAllowedV1033=arena360&&arenaCameraEnabled&&arenaFlyoverEnabled&&automaticShot&&
@@ -1044,8 +1050,9 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
     // V1053 never replaces a saved, vocalist, authored or manual camera shot.
     const arenaFramedV1053=composeArenaCinematicCameraV1053(
       arenaFramedV1047,arenaCinematicCameraCueV1053,flyoverProtectedV1033||!automaticShot);
-    const arenaFramedV1072=composeConcertCameraDirectorV1072(
+    const priorV1131=composeConcertCameraDirectorV1072(
       arenaFramedV1053,concertCameraCueV1072,flyoverProtectedV1033||!automaticShot);
+    const arenaFramedV1072=composeScoreCameraV1134(priorV1131,storyV1131,scoreCameraV1134.current,{playing,reducedMotion,protectedShot:!!(editingPose||userHasPreset||manual!=="auto"||timelineCue?.active||authoredCueV400||cameraNarrativeV605?.manualCamera||lipSync?.cameraManualStagePriorityV377||liveCueV400||cutToCameraCueV400)||!automaticShot},{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:camera.fov,targetX:target.current.x,targetY:target.current.y,targetZ:target.current.z} as typeof priorV1131);
     camera.position.x += (arenaFramedV1072.x-camera.position.x)*alpha;
     camera.position.y += (arenaFramedV1072.y-camera.position.y)*alpha;
     camera.position.z += (arenaFramedV1072.z-camera.position.z)*alpha;

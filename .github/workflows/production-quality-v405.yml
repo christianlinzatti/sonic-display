@@ -1,5 +1,5 @@
 name: Sonic Display historical regression suite
-run-name: Sonic Display · V1105 · historical regression suite
+run-name: Sonic Display · V1128 · historical regression suite
 on:
   workflow_dispatch:
   schedule:

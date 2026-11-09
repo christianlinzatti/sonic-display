@@ -1,5 +1,5 @@
 name: Vercel Production Parity (Node 24 / React 19)
-run-name: Sonic Display · V1044 · Vercel Production Parity (Node 24 / React 19)
+run-name: Sonic Display · V1128 · Vercel Production Parity (Node 24 / React 19)
 # Historical checks remain available on demand; automatic production CI is centralized.
 on:
   workflow_dispatch:

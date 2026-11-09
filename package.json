@@ -1,6 +1,6 @@
 {
   "name": "sonic-display",
-  "version": "0.1.0-v1128",
+  "version": "0.1.0-v1134",
   "private": true,
   "scripts": {
     "test:vercel:parity": "node tests/vercel-production-parity-regression.cjs",
@@ -2408,7 +2408,18 @@
     "test:v1127": "node tests/v1127-crowd-frame-performance-regression.cjs",
     "test:v1127:types": "tsc -p tests/tsconfig.v1127-core.json --noEmit",
     "test:v1128": "node tests/v1128-adaptive-concert-performance-regression.cjs",
-    "test:v1128:types": "tsc -p tests/tsconfig.v1128-core.json --noEmit"
+    "test:v1128:types": "tsc -p tests/tsconfig.v1128-core.json --noEmit",
+    "test:v1129": "node tests/v1129-music-performance.cjs && node tests/sonic-stage-avatars.mjs && node tests/sonic-stage-motion.mjs && node tests/sonic-crew-director.mjs",
+    "test:v1130": "node tests/v1130-show-intelligence.cjs && node tests/v1129-music-performance.cjs && node tests/sonic-stage-avatars.mjs && node tests/sonic-stage-motion.mjs && node tests/sonic-crew-director.mjs",
+    "test:v1130:browser": "playwright test --config=config/playwright.production.cjs tests/e2e/intelligent-concert-v1130.spec.cjs --project=chromium-desktop",
+    "test:v1131": "node tests/v1131-concert-story.cjs && node tests/v1130-show-intelligence.cjs && node tests/v1129-music-performance.cjs && node tests/sonic-stage-avatars.mjs && node tests/sonic-stage-motion.mjs && node tests/sonic-crew-director.mjs && node tests/v1131-crew-body.mjs",
+    "test:v1131:browser": "playwright test --config=config/playwright.production.cjs tests/e2e/concert-story-v1131.spec.cjs tests/e2e/intelligent-concert-v1130.spec.cjs --project=chromium-desktop",
+    "test:v1132": "npm run test:v1131 && node tests/v1132-performance-personality.cjs && node tests/v1132-personality-rigs.mjs",
+    "test:v1132:browser": "playwright test --config=config/playwright.production.cjs tests/e2e/performer-personality-v1132.spec.cjs tests/e2e/concert-story-v1131.spec.cjs tests/e2e/intelligent-concert-v1130.spec.cjs --project=chromium-desktop",
+    "test:v1133": "npm run test:v1132 && node tests/v1133-lyrics-body-policy.cjs && node tests/v1133-body-kinematics.mjs",
+    "test:v1133:browser": "playwright test --config=config/playwright.production.cjs tests/e2e/whole-body-lyrics-v1133.spec.cjs tests/e2e/performer-personality-v1132.spec.cjs tests/e2e/concert-story-v1131.spec.cjs tests/e2e/intelligent-concert-v1130.spec.cjs --project=chromium-desktop",
+    "test:v1134": "npm run test:v1133 && node tests/v1134-concert-score.cjs",
+    "test:v1134:browser": "playwright test --config=config/playwright.production.cjs tests/e2e/concert-score-v1134.spec.cjs tests/e2e/whole-body-lyrics-v1133.spec.cjs tests/e2e/performer-personality-v1132.spec.cjs tests/e2e/concert-story-v1131.spec.cjs tests/e2e/intelligent-concert-v1130.spec.cjs --project=chromium-desktop"
   },
   "engines": {
     "node": "24.x"
@@ -2437,8 +2448,8 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v1128",
-  "sonicFeatureRelease": "v1128",
+  "sonicRoadmapRelease": "v1134",
+  "sonicFeatureRelease": "v1134",
   "overrides": {
     "postcss": "^8.5.32",
     "@vercel/cli-config": {

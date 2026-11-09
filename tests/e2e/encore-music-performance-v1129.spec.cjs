@@ -1,0 +1,27 @@
+const {test,expect,openSettings}=require('./fixtures.cjs');
+test.use({actionTimeout:15000});
+test('Encore cast plays real genre clips, changes poses, pauses and restores stage settings',async({page},testInfo)=>{
+ test.setTimeout(180000);
+ const dialog=await openSettings(page,'avatar');
+ const box=dialog.getByRole('group',{name:'Sonic Stage Crew – Musik und gemeinsame Show',exact:true});
+ await expect(box.getByLabel('Figur 1').locator('option')).toHaveCount(11);
+ for(const [slot,id] of ['sonic-ember-rock','sonic-luna-flow','sonic-velvet-jazz'].entries())await box.getByLabel(`Figur ${slot+1}`).selectOption(id);
+ await box.getByRole('button',{name:'Show-Simulation öffnen',exact:true}).click();
+ await box.getByLabel('Simuliertes Genre').selectOption('jazz');
+ const canvas=box.locator('canvas');await canvas.scrollIntoViewIfNeeded();
+ await box.getByRole('button',{name:'Show-Simulation starten',exact:true}).click();
+ const rows=box.getByRole('list',{name:'Wiedergegebene Show-Clips'}).getByRole('listitem');
+ await expect(rows).toHaveCount(3);
+ await expect.poll(async()=>(await rows.allTextContents()).every(s=>s.includes('Dance_JazzSwing'))).toBe(true);
+ const before=await canvas.screenshot();
+ const position=box.getByLabel('Simulierte Position');await position.focus();await position.press('Home');await position.press('ArrowRight');await position.press('ArrowRight');
+ await expect.poll(async()=>!(await canvas.screenshot()).equals(before)).toBe(true);
+ await testInfo.attach('encore-jazz-crew',{body:await canvas.screenshot(),contentType:'image/png'});
+ await box.getByRole('button',{name:'Show-Simulation pausieren',exact:true}).click();
+ await expect.poll(async()=>(await rows.allTextContents()).every(s=>s.includes('Pausiert'))).toBe(true);
+ const previous=await page.evaluate(()=>JSON.parse(localStorage.getItem('sonic-display-ui-preferences-v1')));
+ await box.getByRole('button',{name:'Trio auf der Bühne einrichten',exact:true}).click();
+ await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('sonic-multi-avatar-stage-v326')).modelIds.slice(0,3))).toEqual(['sonic-ember-rock','sonic-luna-flow','sonic-velvet-jazz']);
+ await box.getByRole('button',{name:'Trio-Einrichtung zurücknehmen',exact:true}).click();
+ await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('sonic-display-ui-preferences-v1')).avatarModelId)).toBe(previous.avatarModelId);
+});

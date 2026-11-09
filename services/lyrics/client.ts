@@ -1,3 +1,4 @@
+import {normalizeLyricTimingV1134} from '@/lib/lyricTimingV1134';
 import {networkJsonV1010} from '@/lib/networkJsonV1010';
 import type { Lyrics, Track } from "@/types/music";
 
@@ -9,5 +10,5 @@ export async function fetchLyrics(track: Track, signal?: AbortSignal): Promise<L
   const response=await networkJsonV1010(`/api/lyrics?${params}`,{cache:'no-store',signal},
     {provider:'lyrics',priority:'lyrics',ttlMs:300000,staleMs:1800000,timeoutMs:20000,retry:1,cachePayload:data=>data!==null});
   if(!response.ok)throw new Error(`Lyrics-Anfrage fehlgeschlagen (${response.status})`);
-  return response.json() as Promise<Lyrics | null>;
+  return normalizeLyricTimingV1134(await response.json(),track.durationMs);
 }

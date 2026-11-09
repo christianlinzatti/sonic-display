@@ -1,9 +1,285 @@
 [
   {
+    "file": "atlas-prism.glb",
+    "motionVersion": 3,
+    "bytes": 4720404,
+    "sha256": "507fb1d024c9ddc3f40bf507a38132c2abbdb9d837b340a5c0d68ebdd8c7b861",
+    "triangles": 14772,
+    "joints": 47,
+    "clips": [
+      {
+        "name": "Dance_Groove",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Techno",
+        "seconds": 2
+      },
+      {
+        "name": "Idle_Breathe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_House",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HipHop",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Disco",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Shuffle",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Robot",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FestivalBounce",
+        "seconds": 2
+      },
+      {
+        "name": "Gesture_Wave",
+        "seconds": 3
+      },
+      {
+        "name": "Dance_PopLock",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_Clockwork",
+        "seconds": 16
+      },
+      {
+        "name": "Dance_RockDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LatinSway",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzSwing",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LiquidWave",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_AfroPulse",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Waltz",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PowerHit",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Ripple",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Turnout",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Stomp",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_SideGlide",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_DiagonalStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HeelToe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PivotStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_RobotGroove",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FluidArc",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FrontmanDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzRebound",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_CrossStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_TurnPhrase",
+        "seconds": 4
+      }
+    ]
+  },
+  {
+    "file": "aurora-synth.glb",
+    "motionVersion": 3,
+    "bytes": 4436560,
+    "sha256": "8922d955fb527cd2465dcc50f2803db104a497b4d63c9f8d3f160f7cbe7f2a0f",
+    "triangles": 15832,
+    "joints": 45,
+    "clips": [
+      {
+        "name": "Dance_Groove",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Techno",
+        "seconds": 2
+      },
+      {
+        "name": "Idle_Breathe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_House",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HipHop",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Disco",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Shuffle",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Robot",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FestivalBounce",
+        "seconds": 2
+      },
+      {
+        "name": "Gesture_Wave",
+        "seconds": 3
+      },
+      {
+        "name": "Dance_FestivalFlow",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_DiscoStar",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_RockDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LatinSway",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzSwing",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LiquidWave",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_AfroPulse",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Waltz",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PowerHit",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Ripple",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Turnout",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Stomp",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_SideGlide",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_DiagonalStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HeelToe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PivotStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_RobotGroove",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FluidArc",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FrontmanDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzRebound",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_CrossStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_TurnPhrase",
+        "seconds": 4
+      }
+    ]
+  },
+  {
     "file": "chrome-beat.glb",
     "motionVersion": 3,
-    "bytes": 2307324,
-    "sha256": "a3bf30a4d8846551b903d3d3dff1e494855d250cb90925df77a7d93a3cbb13e3",
+    "bytes": 3500208,
+    "sha256": "c9f7f86f7c66290ba5df84310991d332d556e0334ce909cbc5b70951005c5250",
     "triangles": 14232,
     "joints": 47,
     "clips": [
@@ -54,14 +330,176 @@
       {
         "name": "Dance_Clockwork",
         "seconds": 16
+      },
+      {
+        "name": "Dance_SideGlide",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_DiagonalStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HeelToe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PivotStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_RobotGroove",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FluidArc",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FrontmanDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzRebound",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_CrossStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_TurnPhrase",
+        "seconds": 4
+      }
+    ]
+  },
+  {
+    "file": "ember-rock.glb",
+    "motionVersion": 3,
+    "bytes": 3916148,
+    "sha256": "95a5887a74d63b5b4f6aaef93659121c7d0c13438c0f11d3f6c1c0f084eb2da6",
+    "triangles": 14048,
+    "joints": 44,
+    "clips": [
+      {
+        "name": "Dance_Groove",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Techno",
+        "seconds": 2
+      },
+      {
+        "name": "Idle_Breathe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_House",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HipHop",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Disco",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Shuffle",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Robot",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FestivalBounce",
+        "seconds": 2
+      },
+      {
+        "name": "Gesture_Wave",
+        "seconds": 3
+      },
+      {
+        "name": "Dance_NeonCircuit",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_LaserStep",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_RockDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LatinSway",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzSwing",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LiquidWave",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_AfroPulse",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Waltz",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_SideGlide",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_DiagonalStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HeelToe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PivotStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_RobotGroove",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FluidArc",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FrontmanDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzRebound",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_CrossStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_TurnPhrase",
+        "seconds": 4
       }
     ]
   },
   {
     "file": "festival-nova.glb",
     "motionVersion": 3,
-    "bytes": 2119660,
-    "sha256": "78ab5b7c132fa3808fc6608ef62d405da5bf600848d50d4c175687b957154eb7",
+    "bytes": 3240212,
+    "sha256": "36df7bdd0eb6c83a123991a548ca3d9d97f7c913ba30f430895f72425d60e724",
     "triangles": 14048,
     "joints": 45,
     "clips": [
@@ -112,14 +550,176 @@
       {
         "name": "Dance_DiscoStar",
         "seconds": 12
+      },
+      {
+        "name": "Dance_SideGlide",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_DiagonalStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HeelToe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PivotStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_RobotGroove",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FluidArc",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FrontmanDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzRebound",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_CrossStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_TurnPhrase",
+        "seconds": 4
+      }
+    ]
+  },
+  {
+    "file": "luna-flow.glb",
+    "motionVersion": 3,
+    "bytes": 3944708,
+    "sha256": "a338cb26a0182c7e40a7f18712b1929802936505178a6f127e9d29433b9da473",
+    "triangles": 14820,
+    "joints": 45,
+    "clips": [
+      {
+        "name": "Dance_Groove",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Techno",
+        "seconds": 2
+      },
+      {
+        "name": "Idle_Breathe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_House",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HipHop",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Disco",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Shuffle",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Robot",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FestivalBounce",
+        "seconds": 2
+      },
+      {
+        "name": "Gesture_Wave",
+        "seconds": 3
+      },
+      {
+        "name": "Dance_FestivalFlow",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_DiscoStar",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_RockDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LatinSway",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzSwing",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LiquidWave",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_AfroPulse",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Waltz",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_SideGlide",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_DiagonalStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HeelToe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PivotStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_RobotGroove",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FluidArc",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FrontmanDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzRebound",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_CrossStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_TurnPhrase",
+        "seconds": 4
       }
     ]
   },
   {
     "file": "neon-pulse.glb",
     "motionVersion": 3,
-    "bytes": 2076316,
-    "sha256": "0e3b11413da9f1ec06df921d5cb0a3e84eba98a16fbd9502a89e4650b3d684ae",
+    "bytes": 3199008,
+    "sha256": "105f1615a0d03c4ae6aa37b6e06ab8b45c4894641514ec943dece0d944009c2b",
     "triangles": 13060,
     "joints": 44,
     "clips": [
@@ -170,6 +770,566 @@
       {
         "name": "Dance_LaserStep",
         "seconds": 12
+      },
+      {
+        "name": "Dance_SideGlide",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_DiagonalStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HeelToe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PivotStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_RobotGroove",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FluidArc",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FrontmanDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzRebound",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_CrossStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_TurnPhrase",
+        "seconds": 4
+      }
+    ]
+  },
+  {
+    "file": "quantum-bass.glb",
+    "motionVersion": 3,
+    "bytes": 4720196,
+    "sha256": "e7bdad9a8a70a28bfc4e815911d6ecfd892ef68db1f95fcb14004a306fa55666",
+    "triangles": 14780,
+    "joints": 47,
+    "clips": [
+      {
+        "name": "Dance_Groove",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Techno",
+        "seconds": 2
+      },
+      {
+        "name": "Idle_Breathe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_House",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HipHop",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Disco",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Shuffle",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Robot",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FestivalBounce",
+        "seconds": 2
+      },
+      {
+        "name": "Gesture_Wave",
+        "seconds": 3
+      },
+      {
+        "name": "Dance_PopLock",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_Clockwork",
+        "seconds": 16
+      },
+      {
+        "name": "Dance_RockDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LatinSway",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzSwing",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LiquidWave",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_AfroPulse",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Waltz",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PowerHit",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Ripple",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Turnout",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Stomp",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_SideGlide",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_DiagonalStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HeelToe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PivotStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_RobotGroove",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FluidArc",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FrontmanDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzRebound",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_CrossStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_TurnPhrase",
+        "seconds": 4
+      }
+    ]
+  },
+  {
+    "file": "rio-carnival.glb",
+    "motionVersion": 3,
+    "bytes": 4414068,
+    "sha256": "1a8b403ecb7e0cca3b9f20a14c8f8f07bf50a501dd594427710a230b30259dde",
+    "triangles": 15252,
+    "joints": 45,
+    "clips": [
+      {
+        "name": "Dance_Groove",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Techno",
+        "seconds": 2
+      },
+      {
+        "name": "Idle_Breathe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_House",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HipHop",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Disco",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Shuffle",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Robot",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FestivalBounce",
+        "seconds": 2
+      },
+      {
+        "name": "Gesture_Wave",
+        "seconds": 3
+      },
+      {
+        "name": "Dance_FestivalFlow",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_DiscoStar",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_RockDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LatinSway",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzSwing",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LiquidWave",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_AfroPulse",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Waltz",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PowerHit",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Ripple",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Turnout",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Stomp",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_SideGlide",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_DiagonalStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HeelToe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PivotStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_RobotGroove",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FluidArc",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FrontmanDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzRebound",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_CrossStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_TurnPhrase",
+        "seconds": 4
+      }
+    ]
+  },
+  {
+    "file": "sol-groove.glb",
+    "motionVersion": 3,
+    "bytes": 3935496,
+    "sha256": "c8475ba1dceafadfda9530e0db22ef31c330a050cc9172fe1c3150e283d2f7ac",
+    "triangles": 14596,
+    "joints": 45,
+    "clips": [
+      {
+        "name": "Dance_Groove",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Techno",
+        "seconds": 2
+      },
+      {
+        "name": "Idle_Breathe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_House",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HipHop",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Disco",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Shuffle",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Robot",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FestivalBounce",
+        "seconds": 2
+      },
+      {
+        "name": "Gesture_Wave",
+        "seconds": 3
+      },
+      {
+        "name": "Dance_FestivalFlow",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_DiscoStar",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_RockDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LatinSway",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzSwing",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LiquidWave",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_AfroPulse",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Waltz",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_SideGlide",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_DiagonalStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HeelToe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PivotStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_RobotGroove",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FluidArc",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FrontmanDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzRebound",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_CrossStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_TurnPhrase",
+        "seconds": 4
+      }
+    ]
+  },
+  {
+    "file": "velvet-jazz.glb",
+    "motionVersion": 3,
+    "bytes": 3897548,
+    "sha256": "a15a3c7dd5809c62e67dfdac484dc71d39969c861d647dc10bdc6664f70e27ac",
+    "triangles": 13608,
+    "joints": 44,
+    "clips": [
+      {
+        "name": "Dance_Groove",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Techno",
+        "seconds": 2
+      },
+      {
+        "name": "Idle_Breathe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_House",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HipHop",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Disco",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Shuffle",
+        "seconds": 2
+      },
+      {
+        "name": "Dance_Robot",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FestivalBounce",
+        "seconds": 2
+      },
+      {
+        "name": "Gesture_Wave",
+        "seconds": 3
+      },
+      {
+        "name": "Dance_NeonCircuit",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_LaserStep",
+        "seconds": 12
+      },
+      {
+        "name": "Dance_RockDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LatinSway",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzSwing",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_LiquidWave",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_AfroPulse",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_Waltz",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_SideGlide",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_DiagonalStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_HeelToe",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_PivotStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_RobotGroove",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FluidArc",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_FrontmanDrive",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_JazzRebound",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_CrossStep",
+        "seconds": 4
+      },
+      {
+        "name": "Dance_TurnPhrase",
+        "seconds": 4
       }
     ]
   }

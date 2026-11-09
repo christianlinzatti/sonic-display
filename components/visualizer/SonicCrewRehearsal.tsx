@@ -1,4 +1,8 @@
 'use client';
+import {useConcertStoryV1131} from './useConcertStoryV1131';
+import type {Lyrics} from '@/types/playbackCore';
+import {useThree} from '@react-three/fiber';
+import {useState} from 'react';
 import {Suspense,useEffect,useMemo,useRef} from 'react';
 import {Canvas,useFrame} from '@react-three/fiber';
 import {OrbitControls,useGLTF} from '@react-three/drei';
@@ -9,14 +13,14 @@ import {usePreviewGltfCacheV654} from './usePreviewGltfCacheV654';
 import {disposeClonedAvatarSkeletonsV654} from './disposeClonedAvatarSkeletonsV654';
 import {ModelPreviewBoundaryV733} from './ModelPreviewBoundaryV733';
 import {PreviewClipPlayer} from './previewClipPlayer';
-import {CREW_IDS,newCrewState,stepCrew,crewClipTime,type CrewSettings} from './sonicCrewDirector';
+import {newCrewState,stepCrew,crewClipTime,type CrewSettings} from './sonicCrewDirector';
 import {prepareCrewReaction,applyCrewReaction} from './sonicCrewReaction';
-export type CrewScenario={section:string;genre:string;energy:number;bpm:number};
-export type CrewReading={slot:number;clip:string;time:number;leader:boolean};
-const slugs=['neon-pulse','festival-nova','chrome-beat'];
-function Clock({clock,playing}:{clock:{current:number};playing:boolean}){useFrame((_,dt)=>{if(playing)clock.current=Math.min(120,clock.current+Math.min(dt,.1));});return null;}
-function Performer({slot,clock,playing,settings,scenario,onReading}:{slot:number;clock:{current:number};playing:boolean;settings:CrewSettings;scenario:CrewScenario;onReading:(reading:CrewReading)=>void}){
- const url=`/avatars/sonic/${slugs[slot]}.glb`,{scene,animations}=useGLTF(url);
+export type CrewScenario={section:string;genre:string;energy:number;bpm:number;lyrics?:Lyrics|null;durationMs?:number;trackId?:string};
+export type CrewReading={slot:number;clip:string;time:number;leader:boolean;role?:string;chapter?:string;persona?:string;sequence?:string;bodyStyle?:string};
+import {getAvatarModel} from './avatarModels';
+function Clock({clock,playing,maxSeconds}:{clock:{current:number};playing:boolean;maxSeconds:number}){useFrame((_,dt)=>{if(playing)clock.current=Math.min(maxSeconds,clock.current+Math.min(dt,.1));});return null;}
+function Performer({slot,modelId,clock,playing,settings,scenario,onReading}:{slot:number;modelId:string;clock:{current:number};playing:boolean;settings:CrewSettings;scenario:CrewScenario;onReading:(reading:CrewReading)=>void}){
+ const url=getAvatarModel(modelId).url!,{scene,animations}=useGLTF(url);
  usePreviewGltfCacheV654(url);
  const model=useMemo(()=>clone(scene),[scene]);useOwnedAvatarResourcesV1009(model);
  const mixer=useMemo(()=>new AnimationMixer(model),[model]);
@@ -25,24 +29,30 @@ function Performer({slot,clock,playing,settings,scenario,onReading}:{slot:number
  const state=useRef(newCrewState()),selected=useRef(''),time=useRef(0),lastReport=useRef(-1);
  useEffect(()=>()=>{player.dispose();mixer.stopAllAction();mixer.uncacheRoot(model);disposeClonedAvatarSkeletonsV654(model);},[player,mixer,model]);
  useFrame((frame,dt)=>{
-  const next=stepCrew(state.current,{...scenario,modelId:CREW_IDS[slot],clips:animations,trackId:'sonic-crew-rehearsal',progressMs:clock.current*1000,slot,count:3,playing,reducedMotion:false,manualPriority:false,settings});
+  const next=stepCrew(state.current,{...scenario,section:scenario.section==='auto'?undefined:scenario.section,modelId,clips:animations,trackId:scenario.trackId??'sonic-crew-rehearsal',progressMs:clock.current*1000,slot,count:3,playing,reducedMotion:false,manualPriority:false,settings});
   state.current=next.state;
   if(next.plan.active){
    const clip=animations.find(c=>c.name===next.plan.clip);
    if(clip){if(selected.current!==clip.name){player.select(clip,0,.55);selected.current=clip.name;}time.current=crewClipTime(next.plan,clip.duration);}
   }
   player.update(time.current,playing?Math.min(dt,.1):0);
-  applyCrewReaction(reaction,next.plan,next.plan.beat,scenario.energy);
-  if(frame.clock.elapsedTime-lastReport.current>.35){lastReport.current=frame.clock.elapsedTime;onReading({slot,clip:next.plan.active?selected.current:'Pausiert',time:time.current,leader:next.plan.leader===slot});}
+  applyCrewReaction(reaction,next.plan,next.plan.beat,scenario.energy,dt);
+  if(frame.clock.elapsedTime-lastReport.current>.35){lastReport.current=frame.clock.elapsedTime;onReading({slot,clip:next.plan.active?selected.current:'Pausiert',time:time.current,leader:next.plan.leader===slot,role:next.plan.interaction?.role,chapter:next.plan.story?.chapter,persona:next.plan.persona?.label,sequence:next.plan.sequence?.label,bodyStyle:next.plan.bodyStyle});}
  });
  return <group position={[(slot-1)*1.4,0,0]}><primitive object={model}/></group>;
 }
-export default function SonicCrewRehearsal(props:{clock:{current:number};playing:boolean;settings:CrewSettings;scenario:CrewScenario;onReading:(reading:CrewReading)=>void}){
- return <ModelPreviewBoundaryV733 onRetry={()=>slugs.forEach(slug=>useGLTF.clear(`/avatars/sonic/${slug}.glb`))}><div style={{height:320,border:'1px solid #ffffff33',borderRadius:12,overflow:'hidden'}} role="img" aria-label="Simulierte Sonic-Crew-Show mit drei echten GLB-Modellen">
+function RehearsalLightsV1131({clock,scenario,playing}:{clock:{current:number};scenario:CrewScenario;playing:boolean}){
+ const [position,setPosition]=useState(clock.current),last=useRef(-1);
+ useFrame(({clock:frameClock})=>{if(frameClock.elapsedTime-last.current>.35){last.current=frameClock.elapsedTime;setPosition(clock.current);}});
+ const story=useConcertStoryV1131({...scenario,section:scenario.section==='auto'?undefined:scenario.section,progressMs:position*1000,count:3});
+ return <><ambientLight intensity={1.3}/><directionalLight color={story?.palette??'#ffffff'} position={[3,5,4]} intensity={playing?(story?.lightGain??1)*2:2}/></>;
+}
+export default function SonicCrewRehearsal(props:{modelIds:string[];clock:{current:number};playing:boolean;settings:CrewSettings;scenario:CrewScenario;onReading:(reading:CrewReading)=>void}){
+ return <ModelPreviewBoundaryV733 onRetry={()=>props.modelIds.forEach(id=>{const url=getAvatarModel(id).url;if(url)useGLTF.clear(url);})}><div style={{height:320,border:'1px solid #ffffff33',borderRadius:12,overflow:'hidden'}} role="img" aria-label="Simulierte Sonic-Crew-Show mit drei echten GLB-Modellen">
   <Canvas camera={{position:[0,.2,6.2],fov:40}} dpr={[1,1.3]}>
-   <ambientLight intensity={1.5}/><directionalLight position={[3,5,4]} intensity={2}/>
-   <Clock clock={props.clock} playing={props.playing}/>
-   <Suspense fallback={null}>{CREW_IDS.map((id,slot)=><Performer key={id} slot={slot} {...props}/>)}</Suspense>
+   <RehearsalLightsV1131 clock={props.clock} scenario={props.scenario} playing={props.playing}/>
+   <Clock clock={props.clock} playing={props.playing} maxSeconds={Math.max(120,Math.min(3600,(props.scenario.durationMs??120000)/1000))}/>
+   <Suspense fallback={null}>{props.modelIds.slice(0,3).map((id,slot)=><Performer key={`${slot}-${id}`} modelId={id} slot={slot} {...props}/>)}</Suspense>
    <OrbitControls target={[0,0,0]} enablePan={false} minDistance={3.8} maxDistance={10}/>
   </Canvas>
  </div></ModelPreviewBoundaryV733>;

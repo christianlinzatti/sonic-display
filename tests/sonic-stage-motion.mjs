@@ -39,7 +39,7 @@ for (const asset of manifest) {
     for (let n=0;n<240;n++) {
       const time=clip.duration*n/240, phase=time/clip.duration*Math.PI*2*(clip.duration>=8 ? clip.duration/4 : 1);
       mixer.setTime(time); root.updateMatrixWorld(true);
-      const stationary=/Idle|Gesture|Robot|FestivalBounce|PopLock|Clockwork/.test(clip.name);
+      const stationary=/^(Idle_Breathe|Gesture_Wave|Dance_Robot|Dance_FestivalBounce|Dance_PopLock|Dance_Clockwork)$/.test(clip.name);
       for(let i=0;i<2;i++) {
         const p=ankles[i].getWorldPosition(new Vector3());
         const q=ankles[i].getWorldQuaternion(new Quaternion());
@@ -49,7 +49,10 @@ for (const asset of manifest) {
         assert.ok(sole.y>=probe.floor-.0015, 'Actual skinned soles must never penetrate the floor');
         assert.ok(h>-.0015 && h<.09, `${asset.file}/${clip.name}: no penetration or excessive lift (${h})`);
         maxRotation=Math.max(maxRotation,q.angleTo(initialRotation[i]));
-        assert.ok(q.angleTo(initialRotation[i])<.004,'Soles must stay level');
+        if((clip.name==='Dance_PivotStep'||clip.name==='Dance_TurnPhrase')){
+          const relative=q.clone().multiply(initialRotation[i].clone().invert());
+          assert.ok(new Vector3(0,1,0).applyQuaternion(relative).distanceTo(new Vector3(0,1,0))<.004,'Pivot yaw must not tilt the sole');
+        }else assert.ok(q.angleTo(initialRotation[i])<.004,'Soles must stay level');
         const planted=stationary || (i===0 ? Math.sin(phase)<=0 : Math.sin(phase)>=0);
         if(planted) {
           const drift=p.distanceTo(stance[i]);maxDrift=Math.max(maxDrift,drift);
@@ -80,10 +83,10 @@ for (const asset of manifest) {
   player.dispose();assert.equal(mixer.stats.actions.inUse,0);
   mixer.stopAllAction();mixer.clipAction(gltf.animations[0]).reset().setEffectiveWeight(1).play();mixer.setTime(.43);root.updateMatrixWorld(true);
   poses.push(root.getObjectByName('RightHand').getWorldPosition(new Vector3()));
-  console.log(`${asset.file}: 12 clips / 240 contact samples each; max stance drift ${(maxDrift*1000).toFixed(3)} mm; level soles, IK recognition, smooth/rapid transitions and cleanup PASS`);
+  console.log(`${asset.file}: ${gltf.animations.length} clips / 240 contact samples each; max stance drift ${(maxDrift*1000).toFixed(3)} mm; level soles, IK recognition, smooth/rapid transitions and cleanup PASS`);
 }
 for(let i=0;i<poses.length;i++)for(let j=i+1;j<poses.length;j++)assert.ok(poses[i].distanceTo(poses[j])>.015,'Shared dances must have individual performer phrasing');
-console.log('All three performers have different choreography, including the common Groove clip.');
+console.log('All eleven performers have different choreography, including the common Groove clip.');
 
 // Exact conventional knee aliases work, unrelated or opposite-side nodes do not.
 for(const kneeName of ['LeftLeg','mixamorig:LeftLeg','mixamorigLeftLeg','LeftLowerLeg','LeftKnee']) {

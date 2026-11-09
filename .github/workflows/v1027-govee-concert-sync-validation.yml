@@ -1,5 +1,5 @@
 name: V1027 Govee Concert Sync 3.0 validation
-run-name: Sonic Display · V1044 · V1027 Govee Concert Sync 3.0 validation
+run-name: Sonic Display · V1128 · V1027 Govee Concert Sync 3.0 validation
 # Optional diagnostics. Full Linux/Windows production workflow is the source of truth.
 on:
   workflow_dispatch:

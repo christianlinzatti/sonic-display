@@ -1,5 +1,5 @@
 name: V1014 Network Diagnostics 2.0
-run-name: Sonic Display · V1044 · V1014 Network Diagnostics 2.0
+run-name: Sonic Display · V1128 · V1014 Network Diagnostics 2.0
 on:
   workflow_dispatch:
 permissions:

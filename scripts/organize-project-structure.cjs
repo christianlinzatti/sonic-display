@@ -33,9 +33,9 @@ function moveChecked(src, target, options = {}) {
     if (fileHash(src) !== previousHash) {
       const sourceName = path.basename(src);
       const canonical = path.join(archiveRoot, 'docs', 'versions', sourceName);
-      // Complete release ZIPs also carry updated Stage Crew guides in the root.
-      // Only these TWO canonical guide paths may be updated: archive the old
-      // contents first, and keep all other document collisions fail-closed.
+      // V1116: full ZIPs can refresh exactly two Stage Crew guides. Archive
+      // previous contents by SHA-256 before replacing either canonical guide.
+      // Unknown paths (including setup guides) remain fail-closed.
       const supportedGuideTargets = new Map([
         ['AVATAR-UPDATE.md', 'docs/features/avatars/AVATAR-UPDATE.md'],
         ['SONIC-CREW-SHOW.md', 'docs/features/application/SONIC-CREW-SHOW.md'],

@@ -1,4 +1,6 @@
 "use client";
+import {lyricSpotlightV1133} from '@/lib/lyricSpotlightV1133';
+import {useConcertStoryV1131} from './useConcertStoryV1131';
 import type {SmartStageCueV351} from "@/services/stageContent/smartStageCompositionV351";
 import { useFrame } from "@react-three/fiber";
 import {planConcertStageV882,readConcertStageSyncV882,OFF_CONCERT_STAGE_V882,
@@ -225,6 +227,8 @@ function followPerformerLightV557(scene:Scene,slot:number|null,home:Vector3,
 export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotion, reactive = true, strength = 60, genre, musicPalette, showCue, composition, glowGainV353=1, timelineGainV354=1, cinematicCueV497, concertLipSyncV386, concertShowCueV387, concertShowLightingV387=true,concertShowAtmosphereV387=true,festivalShowCueV394,festivalShowLightingV394=true,festivalShowAtmosphereV394=true,festivalShowLasersV394=false,lyricsProtectedV542=false,groupCountV542=1,vocalFocusV542=false,performerLightingV557,cameraNarrativeV605,cameraSectionV608,performanceLightingV749,concertFxV810,lyricsV813,lyricsVisibleV813=false,scenicLightingV762,cinematicCueV761,manualLightingV763=false,transitionV791,transitionV849,epicPeakV794,stageEvolutionV795,vocalSpotlightV797,liveShowV827=false }: {
   theme?: StageTheme; audio: AudioFeatures; isPlaying: boolean; reducedMotion: boolean; reactive?: boolean; strength?: number; genre?: string | null; musicPalette?: { primary: string; secondary: string; glow: string }; showCue?: ShowCue; composition?:SmartStageCueV351;glowGainV353?:number; timelineGainV354?:number;cinematicCueV497?:VocalConcertHandoffV498;concertLipSyncV386?:VisualizerProps["lipSync"];concertShowCueV387?:ConcertShowCueV387;concertShowLightingV387?:boolean;concertShowAtmosphereV387?:boolean;festivalShowCueV394?:FestivalShowCueV394;festivalShowLightingV394?:boolean;festivalShowAtmosphereV394?:boolean;festivalShowLasersV394?:boolean;lyricsProtectedV542?:boolean;groupCountV542?:number;vocalFocusV542?:boolean;performerLightingV557?:{settings:ConcertDetailSettingsV555;cue:ConcertDetailsCueV555;scene?:import("./cinematicConcertCoordinationV528").ConcertSceneV528|null;progressMs?:number};cameraNarrativeV605?:{plan:NarrativePlanV604;cue:NarrativeCueV604;manualCamera:boolean};cameraSectionV608?:StageSection;performanceLightingV749?:PerformanceLightingSettingsV749;concertFxV810?:ConcertFxSettingsV810;lyricsV813?:Lyrics|null;lyricsVisibleV813?:boolean;scenicLightingV762?:DynamicStageLightingSettingsV762;cinematicCueV761?:CinematicCueV761;manualLightingV763?:boolean;transitionV791?:SceneTransitionCueV791;transitionV849?:CoordinatedConcertTransitionV849;epicPeakV794?:EpicPeakCueV794;stageEvolutionV795?:StageEvolutionCueV795;vocalSpotlightV797?:MultiVocalSpotlightCueV797;liveShowV827?:boolean;
 }) {
+  const lyricPriorityV1133=lyricSpotlightV1133(lyricsV813??concertLipSyncV386?.lyrics,concertLipSyncV386?.progressMs??performerLightingV557?.progressMs??0);
+  const storyV1131=useConcertStoryV1131({durationMs:concertLipSyncV386?.storyDurationMsV1131,progressMs:concertLipSyncV386?.progressMs??performerLightingV557?.progressMs??0,lyrics:lyricsV813??concertLipSyncV386?.lyrics,genre,bpm:audio.bpm,energy:audio.energyEnvelope,count:groupCountV542,section:lyricsV813?.synced?undefined:cameraSectionV608});
   const palette = palettes[theme];
   const liveStageV882=useRef<ConcertStageCueV882>({...OFF_CONCERT_STAGE_V882});
   const livePyroV891=useRef<PyroCueV891>({...PYRO_OFF_V891});
@@ -1864,8 +1868,10 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       authored:authoredLightsV386,
       blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,
       playing:isPlaying&&reactive,reducedMotion,lowTier:tier==="low"});
-    const showGain = festivalLightV387 * lightAccentV386.gain * (reactive && isPlaying && !reducedMotion ? (showCue?.lightGain ?? 1) : 1) * (composition?.lightGain ?? 1) * (reducedMotion||timelineCue.blackout>0?1:timelineGainV354);
-    const showBeam = festivalBeamV387 * lightAccentV386.beamGain * (reactive && isPlaying && !reducedMotion ? (showCue?.beamGain ?? 1) : 1) * (composition?.beamGain ?? 1) * (reducedMotion||timelineCue.blackout>0?1:timelineGainV354);
+    const storyGainV1131=storyV1131&&isPlaying&&!reducedMotion&&reactive&&!manualLightingV763&&!authoredLightsV386&&timelineCue.blackout<=0&&timelineCue.strobe<=0?storyV1131.lightGain:1;
+    const scoreBeamV1134=storyV1131&&isPlaying&&!reducedMotion&&reactive&&!manualLightingV763&&!authoredLightsV386&&timelineCue.blackout<=0&&timelineCue.strobe<=0?storyV1131.beamGain:1;
+    const showGain = (reactive&&isPlaying&&!reducedMotion&&!manualLightingV763&&!authoredLightsV386?lyricPriorityV1133.effectGain:1) * storyGainV1131 * festivalLightV387 * lightAccentV386.gain * (reactive && isPlaying && !reducedMotion ? (showCue?.lightGain ?? 1) : 1) * (composition?.lightGain ?? 1) * (reducedMotion||timelineCue.blackout>0?1:timelineGainV354);
+    const showBeam = scoreBeamV1134 * (reactive&&isPlaying&&!reducedMotion&&!manualLightingV763&&!authoredLightsV386?lyricPriorityV1133.effectGain:1) * festivalBeamV387 * lightAccentV386.beamGain * (reactive && isPlaying && !reducedMotion ? (showCue?.beamGain ?? 1) : 1) * (composition?.beamGain ?? 1) * (reducedMotion||timelineCue.blackout>0?1:timelineGainV354);
     // Face floor is limited to un-authored active scenes and never defeats a manual blackout.
     const performerPlanV557=planPerformerLightingV557({
       cue:performerLightingV557?.cue,settings:performerLightingV557?.settings,

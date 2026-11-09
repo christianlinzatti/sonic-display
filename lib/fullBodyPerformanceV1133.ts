@@ -1,0 +1,21 @@
+import type {StoryCueV1131} from './concertStoryV1131';
+import {musicFamilyV1129} from './musicPerformanceV1129';
+export const FULL_BODY_CLIPS_V1133=['Dance_RobotGroove','Dance_FluidArc','Dance_FrontmanDrive','Dance_JazzRebound','Dance_CrossStep','Dance_TurnPhrase'] as const;
+const STYLES:Record<string,string>={Dance_RobotGroove:'Präzision & Stopps',Dance_FluidArc:'Fließende Gewichtswechsel',Dance_FrontmanDrive:'Kraftvolle Kniearbeit',Dance_JazzRebound:'Swing & Federung',Dance_CrossStep:'Diagonale Schritte',Dance_TurnPhrase:'Drehphrase'};
+export const bodyStyleV1133=(clip:string|null)=>clip?STYLES[clip]:undefined;
+const PERSONAL:Record<string,string>={
+ 'sonic-neon-pulse':'Dance_CrossStep','sonic-festival-nova':'Dance_FrontmanDrive','sonic-chrome-beat':'Dance_RobotGroove',
+ 'sonic-ember-rock':'Dance_FrontmanDrive','sonic-luna-flow':'Dance_FluidArc','sonic-sol-groove':'Dance_CrossStep',
+ 'sonic-velvet-jazz':'Dance_JazzRebound','sonic-atlas-prism':'Dance_RobotGroove','sonic-aurora-synth':'Dance_FluidArc',
+ 'sonic-rio-carnival':'Dance_CrossStep','sonic-quantum-bass':'Dance_RobotGroove',
+};
+/** Whole-body choices from actual available clips; keep quiet/dense passages and shared canon intact. */
+export function fullBodyClipV1133(input:{modelId:string;genre?:string|null;cue:StoryCueV1131;count:number;available:ReadonlySet<string>;fallback:string|null}):string|null{
+ const {cue}=input;
+ if(cue.act==='breathe'||cue.act==='build'||cue.lyricDensity>.7||input.count>1&&cue.interaction==='answer')return input.fallback;
+ const family=musicFamilyV1129(input.genre),shared=input.count>1&&cue.interaction==='unison';
+ const selected=cue.phrase%4===3?'Dance_TurnPhrase':shared?
+ (family==='ambient'||family==='classical'?'Dance_FluidArc':family==='jazz'?'Dance_JazzRebound':family==='hard'||family==='rock'?'Dance_FrontmanDrive':family==='electronic'?'Dance_RobotGroove':'Dance_CrossStep'):
+ PERSONAL[input.modelId]??'Dance_CrossStep';
+ return input.available.has(selected)?selected:input.fallback;
+}
