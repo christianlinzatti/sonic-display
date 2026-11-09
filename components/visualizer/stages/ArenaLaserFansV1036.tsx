@@ -12,6 +12,8 @@ import type {IntelligentLaserCueV1057} from '@/lib/arena360IntelligentLaserV1057
 import {sampleLaserEndpointV1080,type LaserExperienceCueV1080} from '@/lib/arena360LaserExperienceV1080';
 import type {ArenaAtmosphereDirectorCueV1045} from '@/lib/arena360AtmosphereDirectorV1045';
 import {useAdaptivePerformance} from '../adaptivePerformance';
+import {getConcertFxBudgetV1128} from '../concertFxBudgetStoreV1128';
+import {concertFxFactorsV1128} from '@/lib/adaptiveConcertPerformanceV1128';
 import type {ArenaPeakStateV1036} from '@/lib/arena360AtmosphereV1036';
 import {createArenaLasersV1036,planArenaAtmosphereV1036,sampleArenaLaserV1036} from '@/lib/arena360AtmosphereV1036';
 /** All rays are translucent, bounded mesh geometry, not physical lasers or HDR flashes.
@@ -46,7 +48,7 @@ export function ArenaLaserFansV1036({audio,playing,reducedMotion,reactive,enable
   if(active)clock.current+=dt*(atmosphereV1045?.active?atmosphereV1045.drift:1);
   if(!active&&!wasActive.current)return;
   budget.current+=dt;
-  if(active&&budget.current<(tier==='low'?.14:.065))return;
+  if(active&&budget.current<(tier==='low'?.14:.065)*concertFxFactorsV1128(getConcertFxBudgetV1128().level).laserTick)return;
   budget.current=0;wasActive.current=active;
   const cue=planArenaAtmosphereV1036({enabled:directorEnabled,playing,reducedMotion,reactive,
     section,progressMs,durationMs,energy:audio.energyEnvelope,intensity,peak:peakRef?.current.energy});

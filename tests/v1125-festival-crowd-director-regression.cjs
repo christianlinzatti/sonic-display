@@ -120,9 +120,9 @@ try{
  check('actual fixed-instance renderer applies spatial sample to phones, bands, arms and body',()=>{
   const filename='components/visualizer/stages/ArenaAudienceV1032.tsx';
   const ui=fs.readFileSync(path.join(root,filename),'utf8');
-  for(const fragment of ['planFestivalCrowdLiveV1125({','sampleFestivalCrowdSectorV1125(festivalCrowdV1125',
+  for(const fragment of ['planFestivalCrowdLiveV1125({','compileFestivalCrowdFrameV1127(festivalCrowdCueV1127',
    '*spatialV1125.light','spatialV1125.arms+reaction.arms','const rise=spatialV1125.rise+',
-   'sampleFestivalCrowdSectorV1125(festivalCrowdV1125,angle,t).light'])assert(ui.includes(fragment),fragment);
+   'readFestivalCrowdSectorV1127(spatialFrameV1127,phoneSectorsV1127[i]).light'])assert(ui.includes(fragment),fragment);
   assert(!ui.includes('new InstancedMesh')); // existing useMemo fixed count only
   for(const stage of ['components/visualizer/VisualizerStage.tsx','components/visualizer/ThreeAvatar.tsx',
    'components/visualizer/stages/index.tsx','components/visualizer/stages/Arena360StageV1031.tsx'])

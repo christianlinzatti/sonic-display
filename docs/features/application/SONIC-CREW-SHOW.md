@@ -1,3 +1,15 @@
+## V1128 – Adaptive Concert Performance 2.0
+
+Die **automatische Renderqualität** berücksichtigt nun die vorhandenen gemessenen
+FPS-/P95-Werte auch für vier dekorative 360°-Bühnenmodule: Crowd, LED-Wand,
+Bodennebel und Laserschwenks. Drei belastete Messfenster drosseln die optionalen
+Effekt-Updates, sieben stabile erlauben eine vorsichtige Erholung; die Stufe bleibt
+mindestens acht Sekunden erhalten. Die Statusanzeige steht in den
+3D-Performance-Einstellungen. Manuelle Qualitätswahl, Pausen, Übergänge,
+Reduced Motion, Lyrics, Avatare und Govee bleiben geschützt.
+Keine neuen 3D-Meshes, Berechtigung, Timer oder Netzwerkabfragen.
+Tests: `npm run test:v1128` und `npm run test:v1128:types`.
+
 ## V1116 – AI Artist Interaction (Lead-Wechsel, Dialoge und Duos)
 
 Der **V1116 AI Artist Interaction**-Bereich im AI Show Designer verbindet die bisherigen Character-, Dance- und Vocal-Regiepartituren zu sieben sichtbaren Interaktionsszenen. Vier Stile (Dialog, Duo, Rap-Battle und Festival) wechseln die Kameraführung zwischen den vorhandenen V1040-Modi. Die Regie nennt Lead-/Partnerrollen, Antwortgesten und gemeinsame Bühnenmomente, aber behauptet **keinen erkannten Gesang, physischen Blickkontakt oder neue GLB-Clips**. Die Original-Songgrenzen und die Govee- und Laserwerte bleiben bis zur expliziten Annahme unverändert.

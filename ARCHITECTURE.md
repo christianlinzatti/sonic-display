@@ -1,3 +1,47 @@
+## V1128 · Adaptive Concert Performance 2.0
+
+`lib/adaptiveConcertPerformanceV1128.ts` reduziert auf Basis der **bereits gemessenen**
+R3F-FPS-/P95-Fenster in `components/visualizer/adaptivePerformance.tsx` nur optionale
+Effekt-Aktualisierungsfrequenzen. Nach drei belasteten Fenstern wird die Qualitätsstufe
+schrittweise gesenkt, nach sieben stabilen Fenstern schrittweise wieder erhöht; acht
+Sekunden Haltezeit verhindern Hin-und-Her. Pausen, verborgene Tabs, manuelle Qualität,
+Szenenübergänge und fehlerhafte Messungen lösen keine Drosselung aus.
+
+Die bestehende Hardware-, DPR-, Geräte-, V640- und V999-Steuerung bleibt autonom;
+V1128 wirkt nur auf Render-Ticks der **vorhandenen** `ArenaAudienceV1032`,
+`ArenaLedWallV1059`, `ArenaLowFogV1036` und `ArenaLaserFansV1036`, sowie auf
+die begrenzte Nebeltransparenz. `components/visualizer/concertFxBudgetStoreV1128.ts`
+veröffentlicht das Ergebnis ohne eigene Timer oder pro Frame auslösende React-Rerenders.
+Weder Musik-Timeline, Govee, Stroboskop, Lyrics, Avatare, Kamerafahrten noch persönliche
+Einstellungen werden verändert.
+
+Kontrollen: `tests/v1128-adaptive-concert-performance-regression.cjs`,
+`tests/tsconfig.v1128-core.json`, `tests/e2e/adaptive-concert-performance-v1128.spec.cjs`.
+
+## V1127 · Crowd Frame Performance & Production Stability
+
+`lib/arena360CrowdFrameBudgetV1127.ts` reduziert den CPU-Aufwand des **vorhandenen**
+instanzierten 360°-Publikums: Die acht räumlichen Sektorsamples werden pro
+vorhandenem gedrosseltem Crowd-Tick **einmal** berechnet und von Körpern, Armen,
+Handys und Armbändern geteilt. Die Zuordnung der festen Zuschauer zu Sektoren
+wird ausschließlich bei Änderungen der Crowd-Mitglieder bzw. Performance-Stufe
+neu erstellt. Die V1125-Eight-Sector-Partitur wird über `useMemo` an tatsächliche
+Show-, Playback- und Qualitätsparameter gekoppelt, nicht in jedem Renderframe
+neu erzeugt. Sektorgleichheit zum V1125-Sampler ist über Tests nachgewiesen.
+
+Es entstehen **keine zusätzlichen Meshes, Crowd-Instanzen, Animationstimer,
+Netzwerkzugriffe oder Hardware-Befehle**. Reaktive Musikbewegung, dramaturgische
+Fades, manuelle Telefonlichtmodi, Reduced Motion, Pause und Low-Tier bleiben
+unverändert. Die CPU-Arbeit sinkt strukturell; ein garantierter FPS-Zuwachs
+wird **nicht** behauptet, da er von Hardware und der restlichen Szene abhängt.
+
+Changelog: `changelog/V1127-CROWD-FRAME-PERFORMANCE.md`.
+Regressionen: `tests/v1127-crowd-frame-performance-regression.cjs`,
+`tests/tsconfig.v1127-core.json`,
+`tests/e2e/crowd-frame-performance-v1127.spec.cjs` für Desktop und Touch.
+Der Produktionsbuild bleibt unter der bestehenden GitHub-Node-24-Pipeline
+pflichtig. Versions- und Lockfile-Metadaten sind konsistent.
+
 ## V1126 · AI Festival Show Master
 
 `lib/aiFestivalShowMasterV1126.ts` koordiniert neun vorhandene virtuelle Regiemodule
@@ -210,7 +254,7 @@ Im **360° AI Show Designer** kannst du jetzt die V1111-Konzertregie proben: Sie
 
 Das Drop-Radar wertet die **freiwillig gestartete lokale V1108-Mikrofonmessung** aus. Erst nach mindestens fünf Sekunden mit sauberem Signal werden ein bereits gemessener Einschlag oder ein möglicher Energieaufbau erkannt. Ein künftiger Drop-Zeitpunkt kann aus diesem Signal **nicht sicher vorhergesagt** werden. Nur nach Zustimmung kann eine Regieidee für die **nächste** V1106/V1109-Vorschau vorgemerkt werden. Die sieben Zeitgrenzen, die Intensitätsobergrenze und die manuelle Freigabe bleiben erhalten. Keine Audio-/Geräte-/Cloud-Übertragung; Tests: `npm run test:v1110`, `npm run test:v1110:types`.
 
-**Dokumentationsstand:** V1126
+**Dokumentationsstand:** V1128
 
 ## V1104 · Playwright Visual QA & Screenshot Reports
 

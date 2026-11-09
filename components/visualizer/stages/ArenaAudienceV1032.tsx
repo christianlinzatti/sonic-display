@@ -4,6 +4,8 @@ import {useLayoutEffect,useMemo,useRef} from "react";
 import {Color,Object3D,type Group,type InstancedMesh,type MeshBasicMaterial} from "three";
 import type {AudioFeatures} from "@/types/audio";
 import {useAdaptivePerformance} from "../adaptivePerformance";
+import {getConcertFxBudgetV1128} from '../concertFxBudgetStoreV1128';
+import {concertFxFactorsV1128} from '@/lib/adaptiveConcertPerformanceV1128';
 import {createArenaAudienceV1032} from "@/lib/arena360ExperienceV1032";
 import {planArenaTimelineV1035,sampleArenaCrowdHookV1035} from "@/lib/arena360DirectorV1035";
 import {sampleArenaAudienceV1044,type ArenaAudienceCueV1044} from "@/lib/arena360AudienceDirectorV1044";
@@ -11,8 +13,8 @@ import {sampleCrowdExperienceV1051,type CrowdCueV1051} from "@/lib/arena360Crowd
 import {sampleAudienceExperienceV1073,type AudienceCueV1073} from "@/lib/arena360AudienceExperienceV1073";
 import {sampleAvatarAudienceInteractionV1074,type AvatarAudienceCueV1074} from "@/lib/arena360AvatarAudienceInteractionV1074";
 import {sampleCrowdEnergyV1075,type CrowdEnergyCueV1075} from "@/lib/arena360CrowdEnergyV1075";
-import {planFestivalCrowdLiveV1125,sampleFestivalCrowdSectorV1125,
-  type FestivalCrowdStyleV1125} from '@/lib/aiFestivalCrowdDirectorV1125';
+import {planFestivalCrowdLiveV1125,type FestivalCrowdStyleV1125} from '@/lib/aiFestivalCrowdDirectorV1125';
+import {festivalCrowdSectorLookupV1127,compileFestivalCrowdFrameV1127,readFestivalCrowdSectorV1127} from '@/lib/arena360CrowdFrameBudgetV1127';
 import type {ArenaShowCueV1040} from '@/lib/arena360ShowDesignerV1040';
 import {stepCrowdHarmonyV1092,sampleCrowdHarmonyV1092,INITIAL_CROWD_HARMONY_V1092,
   type CrowdHarmonyStyleV1092} from '@/lib/arena360CrowdHarmonyV1092';
@@ -53,6 +55,10 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
   const phoneMembers=useMemo(()=>members.filter((_,i)=>i%5===0),[members]);
   // Only a small subset receives arms; both sides use a single instanced draw call.
   const cheeringMembers=useMemo(()=>members.filter((_,i)=>i%3===0),[members]);
+  // Stage-fixed sector lookups are derived only when the adaptive crowd changes.
+  const memberSectorsV1127=useMemo(()=>festivalCrowdSectorLookupV1127(members),[members]);
+  const phoneSectorsV1127=useMemo(()=>festivalCrowdSectorLookupV1127(phoneMembers),[phoneMembers]);
+  const cheeringSectorsV1127=useMemo(()=>festivalCrowdSectorLookupV1127(cheeringMembers),[cheeringMembers]);
   const arms=useRef<InstancedMesh>(null);
   const audienceActiveV1073=Boolean(enabled&&audienceCueV1073?.active&&phoneSyncEnabled&&tier!=='low');
   const interactionActiveV1074=Boolean(enabled&&avatarAudienceCueV1074?.active&&tier!=='low');
@@ -62,6 +68,17 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
   const braceletTintV1073=useMemo(()=>new Color(),[]);
   const clock=useRef(0),budget=useRef(0),lastWaveAnimation=useRef(false),lastPhoneAnimation=useRef(false);
   const wave=useRef({...INITIAL_ARENA_WAVE_V1033});  const crowdHarmonyV1092=useRef({...INITIAL_CROWD_HARMONY_V1092});
+  // A full eight-sector plan no longer allocates on every 60 Hz useFrame call.
+  // Primitive cue dependencies keep authored fades/scene changes live without
+  // relying on mutable object identity (or changing the user's selected modes).
+  const festivalCrowdCueV1127=useMemo(()=>planFestivalCrowdLiveV1125({
+    enabled:festivalCrowdEnabledV1125,playing,reducedMotion,reactive,
+    audienceEnabled:enabled,phoneSyncEnabled,phoneMode,performanceTier:tier,
+    show:festivalCrowdShowV1125,style:festivalCrowdStyleV1125,strength:festivalCrowdStrengthV1125,
+  }),[festivalCrowdEnabledV1125,playing,reducedMotion,reactive,enabled,phoneSyncEnabled,
+    phoneMode,tier,festivalCrowdShowV1125?.active,festivalCrowdShowV1125?.segmentIndex,
+    festivalCrowdShowV1125?.intensity,festivalCrowdShowV1125?.fade,
+    festivalCrowdStyleV1125,festivalCrowdStrengthV1125]);
 
   useLayoutEffect(()=>{
     for(let i=0;i<count;i++){
@@ -128,10 +145,7 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
     }
     const dt=Number.isFinite(delta)?Math.max(0,Math.min(.1,delta)):0;
     const active=playing&&!reducedMotion&&reactive;
-    const festivalCrowdV1125=planFestivalCrowdLiveV1125({enabled:festivalCrowdEnabledV1125,
-      playing,reducedMotion,reactive,audienceEnabled:enabled,phoneSyncEnabled,phoneMode,
-      performanceTier:tier,show:festivalCrowdShowV1125,style:festivalCrowdStyleV1125,
-      strength:festivalCrowdStrengthV1125});
+
     const harmonyV1092=stepCrowdHarmonyV1092(crowdHarmonyV1092.current,{
       enabled:enabled&&crowdHarmonyEnabledV1092,playing,reducedMotion,reactive,
       phoneSyncEnabled,phoneMode,performanceTier:tier,trackId:trackIdV1092,
@@ -158,9 +172,11 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
     const audienceOrchestra=animatePhones&&audienceCueV1044?.active===true;
     if(!animateWave&&!animatePhones&&!lastWaveAnimation.current&&!lastPhoneAnimation.current)return;
     budget.current+=dt;
-    if(budget.current<(tier==='low' ? .12 : .066)&&active)return;
+    if(budget.current<(tier==='low' ? .12 : .066)*concertFxFactorsV1128(getConcertFxBudgetV1128().level).crowdTick&&active)return;
     budget.current=0;
     const t=clock.current;
+    // Compute eight spatial samples once per capped crowd tick, not per instance.
+    const spatialFrameV1127=compileFestivalCrowdFrameV1127(festivalCrowdCueV1127,t);
     // V1074 samples one shared reply per capped crowd tick, rather than once
     // for every audience instance. No new renderer or audio clock.
     const replyV1074=interactionActiveV1074?
@@ -179,7 +195,7 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
         const sway=(animateWave ? .023*Math.sin(t*1.9+i*.47)*(.28+.72*bass) : 0)+(energyV1075?.sway??0);
         const hookRise=hookCueEnabled?sampleArenaCrowdHookV1035(hookCue,Math.atan2(m.z,m.x),t):0;
         const crowdStory= harmonyV1092.active?sampleCrowdHarmonyV1092(harmonyV1092.state,Math.atan2(m.z,m.x)):null;
-        const spatialV1125=sampleFestivalCrowdSectorV1125(festivalCrowdV1125,Math.atan2(m.z,m.x),t);
+        const spatialV1125=readFestivalCrowdSectorV1127(spatialFrameV1127,memberSectorsV1127[i]);
         const rise=spatialV1125.rise+crest*.20+hookRise+(reaction?.rise??0)*.24+(v1073?.lift??0)+(energyV1075?.rise??0)+(crowdStory?.rise??0);
         dummy.position.set(m.x+sway,m.y+m.height*.43+rise,m.z);
         dummy.rotation.set(0,Math.atan2(-m.x,-m.z),0);
@@ -201,7 +217,7 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
         const energyV1075=energyActiveV1075?
           sampleCrowdEnergyV1075(crowdEnergyCueV1075,Math.atan2(m.z,m.x),t,
             audio.beat?audio.beatStrength:0,bass):null;
-        const spatialV1125=sampleFestivalCrowdSectorV1125(festivalCrowdV1125,Math.atan2(m.z,m.x),t);
+        const spatialV1125=readFestivalCrowdSectorV1127(spatialFrameV1127,cheeringSectorsV1127[i]);
         const gestureArms=Math.min(.8,spatialV1125.arms+reaction.arms+(v1073?.arms??0)+
           (replyV1074?.audienceArms??0)+(energyV1075?.arms??0));
         for(let side=0;side<2;side++){
@@ -234,7 +250,7 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
         if(audienceOrchestra)tint.lerp(sceneTint,Math.min(.55,audienceCueV1044!.gain*.65));
         const harmonyLight=harmonyV1092.active?sampleCrowdHarmonyV1092(harmonyV1092.state,angle).phoneGain:1;
         const genreLight=phoneMode==='wave'&&phoneSyncEnabled?sampleGenreShowGainV1093(genreShowStateV1093?.current,'crowd'):1;
-        const spatialV1125=sampleFestivalCrowdSectorV1125(festivalCrowdV1125,angle,t);
+        const spatialV1125=readFestivalCrowdSectorV1127(spatialFrameV1127,phoneSectorsV1127[i]);
         phones.current?.setColorAt(i,tint.multiplyScalar(Math.min(1,light*(1+.20*hookCue.crowdEnergy))*(energyV1075?.light??1)*harmonyLight*genreLight*spatialV1125.light));
         const hookRise=hookCueEnabled?sampleArenaCrowdHookV1035(hookCue,angle,t):0;
         dummy.position.set(m.x+.17,m.y+m.height*(m.armRaised?1.39:1.12)+crest*.20+hookRise,m.z);
@@ -253,7 +269,7 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
           const sample=sampleAudienceExperienceV1073(audienceCueV1073,angle,t,audio.beat?audio.beatStrength:0);
           braceletTintV1073.setRGB(color[0],color[1],color[2]);
           const harmonyBand=harmonyV1092.active?sampleCrowdHarmonyV1092(harmonyV1092.state,angle).phoneGain:1;
-          band.setColorAt(i,braceletTintV1073.multiplyScalar(sample.light*harmonyBand*sampleFestivalCrowdSectorV1125(festivalCrowdV1125,angle,t).light*(phoneMode==='wave'&&phoneSyncEnabled?sampleGenreShowGainV1093(genreShowStateV1093?.current,'crowd'):1)));
+          band.setColorAt(i,braceletTintV1073.multiplyScalar(sample.light*harmonyBand*readFestivalCrowdSectorV1127(spatialFrameV1127,phoneSectorsV1127[i]).light*(phoneMode==='wave'&&phoneSyncEnabled?sampleGenreShowGainV1093(genreShowStateV1093?.current,'crowd'):1)));
           dummy.position.set(m.x-.16,m.y+m.height*(.96+sample.arms*.28)+sample.lift,m.z);
           dummy.rotation.set(0,Math.atan2(-m.x,-m.z),0);
           dummy.scale.set(.065,.065,.065);dummy.updateMatrix();band.setMatrixAt(i,dummy.matrix);

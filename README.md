@@ -1,3 +1,15 @@
+## V1128 – Adaptive Concert Performance 2.0
+
+Die **automatische Renderqualität** berücksichtigt nun die vorhandenen gemessenen
+FPS-/P95-Werte auch für vier dekorative 360°-Bühnenmodule: Crowd, LED-Wand,
+Bodennebel und Laserschwenks. Drei belastete Messfenster drosseln die optionalen
+Effekt-Updates, sieben stabile erlauben eine vorsichtige Erholung; die Stufe bleibt
+mindestens acht Sekunden erhalten. Die Statusanzeige steht in den
+3D-Performance-Einstellungen. Manuelle Qualitätswahl, Pausen, Übergänge,
+Reduced Motion, Lyrics, Avatare und Govee bleiben geschützt.
+Keine neuen 3D-Meshes, Berechtigung, Timer oder Netzwerkabfragen.
+Tests: `npm run test:v1128` und `npm run test:v1128:types`.
+
 ## V1123 – AI Concert Energy Director
 
 Im **Einstellungen → Bühne → 360° Arena → AI Show Designer** kannst du einen
@@ -3773,3 +3785,20 @@ Stroboskop oder physisches Gerät; jederzeit ist ein konfliktgeschütztes
 Rückgängig möglich. Opt-in für kommende Offline-/OpenAI-Remixes ist getrennt.
 
 Prüfen mit `npm run test:v1126` und `npm run test:v1126:types`.
+
+
+### V1127 – Crowd Frame Performance & Stability
+
+V1127 verbessert die **vorhandene** 360°-Arena ohne neue Grafikeffekte oder
+zusätzliche Crowd-Instanzen: Die V1125-Acht-Sektoren-Partitur wird bei Änderungen
+von Show-/Qualitätseinstellungen aktualisiert, nicht 60-mal pro Sekunde
+unnötig berechnet. Die acht räumlichen Bewegungs- und Lichtsamples werden
+nur auf dem bereits gedrosselten Crowd-Tick ermittelt und pro Zuschauerbereich
+wiederverwendet. Alle vorherigen Festival-Show-Master-, Musik-, Kamera-,
+Govee- und Avatar-Funktionen bleiben erhalten.
+
+Manuelle Einstellungen, Pausenzustand, reduzierte Bewegung und der
+Low-GPU-Modus schalten die Zusatzregie weiterhin ab. V1127 liefert keine
+FPS-Garantie ohne Hardwaremessung. Lokal: `npm run test:v1127` und
+`npm run test:v1127:types`; vollständige Freigabe über GitHub Actions
+(Windows/Ubuntu/Next.js/Playwright) nach ZIP-Import.

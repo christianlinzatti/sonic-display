@@ -8,6 +8,8 @@ import {sampleStoryArcGainV1091,type StoryArcStateV1091} from '@/lib/arena360Sto
 import {sampleGenreShowGainV1093,type GenreShowStateV1093} from '@/lib/arena360GenreShowIntelligenceV1093';
 import {sampleUltimateFestivalDropV1087,type UltimateFestivalDropCueV1087,type UltimateFestivalDropStateV1087} from '@/lib/arena360UltimateFestivalDropV1087';
 import {useAdaptivePerformance} from '../adaptivePerformance';
+import {getConcertFxBudgetV1128} from '../concertFxBudgetStoreV1128';
+import {concertFxFactorsV1128} from '@/lib/adaptiveConcertPerformanceV1128';
 import {createLedWallPixelsV1059,sampleLedWallPixelV1059,type LedWallCueV1059} from '@/lib/arena360LedWallV1059';
 import {acceptEpicDropBeatV1069,sampleEpicDropLedAccentV1069,type EpicDropCueV1069} from '@/lib/arena360EpicDropV1069';
 import {sampleLedWallExperienceV1083,type LedExperienceCueV1083} from '@/lib/arena360LedWallExperienceV1083';
@@ -63,7 +65,7 @@ export function ArenaLedWallV1059({audio,playing,reducedMotion,cue,progressMs,ep
   }else accentAge.current+=dt;
   beatHeld.current=beat;
   timer.current+=dt;
-  if(timer.current<(tier==='high'?.07:.12))return;
+  if(timer.current<(tier==='high'?.07:.12)*concertFxFactorsV1128(getConcertFxBudgetV1128().level).ledTick)return;
   timer.current=0;
   colorA.set(cue.colorA);colorB.set(cue.colorB);
   // A warm hue accent, never a brightness increase or fullscreen flash.

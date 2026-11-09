@@ -20,6 +20,8 @@ import {initialVisualBudgetV640,stepVisualBudgetV640,measuredPressureV640,setVis
 import { useAudioWorkerTelemetry } from "./audioWorkerTelemetry";
 import { recordQualityDecision } from "./qualityDecisionHistoryV255";
 import {sampleConcertGovernorV999,resetConcertGovernorV999} from "./concertPerformanceGovernorStoreV999";
+import {initialConcertFxBudgetV1128,stepConcertFxBudgetV1128} from '@/lib/adaptiveConcertPerformanceV1128';
+import {publishConcertFxBudgetV1128,useConcertFxBudgetV1128} from './concertFxBudgetStoreV1128';
 
 type QualityMode = "auto" | "high" | "balanced" | "low";
 type QualityState = { mode: QualityMode; tier: "high" | "balanced" | "low"; dpr: number; reason: string };
@@ -71,6 +73,7 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
   const decision = useRef(initialPerformanceDecision());
   const renderBudget = useRef(initialRenderBudget());
   const visualBudgetV640 = useRef(initialVisualBudgetV640());
+  const concertFxV1128 = useRef(initialConcertFxBudgetV1128());
   const tier = useRef<QualityState["tier"]>("high");
   const deviceDpr = useRef(1);
   const deviceFingerprint = useRef("");
@@ -98,9 +101,17 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
   }, []);
   useEffect(() => {
     resetConcertGovernorV999(); // Revoke visual discounts on a manual-mode switch.
+    concertFxV1128.current=initialConcertFxBudgetV1128();
+    publishConcertFxBudgetV1128(concertFxV1128.current);
   },[mode]);
   useEffect(() => {
-    const clearFrameWindow=()=>{diagnostic.current={elapsed:0,frames:0,slow:0,frameSeconds:0,durations:[]};if(document.hidden)resetConcertGovernorV999();};
+    const clearFrameWindow=()=>{
+      diagnostic.current={elapsed:0,frames:0,slow:0,frameSeconds:0,durations:[]};
+      if(document.hidden){
+        resetConcertGovernorV999();concertFxV1128.current=initialConcertFxBudgetV1128();
+        publishConcertFxBudgetV1128(concertFxV1128.current);
+      }
+    };
     document.addEventListener("visibilitychange",clearFrameWindow);
     const resetPi=()=>{if(document.hidden)samplePiConcertV479({at:Date.now(),fps:NaN,p95FrameMs:NaN,avatarCount,playing,visible:false});};
     document.addEventListener("visibilitychange",resetPi);
@@ -137,6 +148,8 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
     setDpr(dpr);
     update({...current,dpr,reason:studioPlanV835.limited?studioPlanV835.reason:dpr<requestedDprV602?"V602 Pi concert quality budget":dpr<stableDpr?displayBudgetV388.reason:dpr<baseline?"V355 long-session render guard":current.reason});
   }, [mode,setDpr,stabilityCapV355,stabilityDeviceV355,stabilitySettingsV355.enabled,displayBudgetV388.dprCap,displayBudgetV388.enabled,displayDeviceV388.pixelRatio,piBudgetV602.level,piBudgetV602.enabled,avatarCount,displaySettingsV835.profile,displaySettingsV835.adaptive,displaySettingsV835.targetFps]);
+  useEffect(()=>{if(!playing){concertFxV1128.current=initialConcertFxBudgetV1128();
+    publishConcertFxBudgetV1128(concertFxV1128.current);}},[playing]);
   useFrame((_state, delta) => {
     // V218: one sample window feeds both diagnostics and the adaptive DPR policy.
     // Exclude long suspended-tab frames so returning to the page cannot force low quality.
@@ -185,6 +198,14 @@ export function AdaptivePerformanceController({avatarCount=1,playing=true}:{avat
     // hidden or scene-transition frame cannot be counted as performance evidence.
     // Manual modes always bypass automatic decorative throttling.
     const transitioningV640=isPiQualityTransitionV463(nowV518);
+    // V1128: consume the same measured, visible R3F frame window, with
+    // independent hysteresis and no timers/extra sampling or persistence.
+    concertFxV1128.current=stepConcertFxBudgetV1128(concertFxV1128.current,{
+      fps,p95Ms:p95FrameMs,slowRatio,elapsed,samples:sorted.length,
+      playing,visible:true,transitioning:transitioningV640,auto:mode==='auto',
+      targetFps:displaySettingsV835.targetFps,
+    });
+    publishConcertFxBudgetV1128(concertFxV1128.current);
     // V999: reuses this measured R3F window. No extra RAF or synthetic FPS.
     sampleConcertGovernorV999({fps,p95FrameMs,slowRatio,elapsed,drawCalls:info.render.calls,
       triangles:info.render.triangles,avatarCount,playing,visible:true,
@@ -280,6 +301,7 @@ export function AdaptivePerformanceSettings() {
   const { mode, tier, dpr, reason } = useAdaptivePerformance();
   const audio = useAudioWorkerTelemetry();
   const decorationV640=getVisualLevelV640();
+  const concertFxV1128=useConcertFxBudgetV1128();
   return <div className="settings-field">
     <label htmlFor="performance-mode">3D render quality</label>
     <select id="performance-mode" value={mode} onChange={event => setPerformanceMode(event.target.value as QualityMode)}>
@@ -292,6 +314,12 @@ export function AdaptivePerformanceSettings() {
     <p className="settings-note">V254: Automatic quality calibrates against the real scene and remembers a device-specific cap for up to 14 days. Manual modes bypass the cap. <button type="button" onClick={() => { clearDeviceRenderCalibration(); window.location.reload(); }}>Recalibrate device</button></p>
     <p className="settings-note">Active: {tier} · pixel ratio {dpr.toFixed(2)} · {reason}. Auto lowers resolution after sustained slow frames and raises it only after a longer stable period. This does not change dance timing or microphone analysis.</p>
     <p className="settings-note">V640: Optional stage decoration {decorationV640}. Reduces LED/Gobo/Haze and nonessential beams before legacy DPR downshift, using measured FPS/P95 and draw-call/triangle proxies. Manual quality bypasses this guard; lip-sync, lyrics, dance and camera clocks stay intact.</p>
+    <p role="status" aria-label="V1128 adaptive concert FX status" className="settings-note">
+      V1128 Adaptive Concert Performance: {concertFxV1128.level} · {concertFxV1128.reason}.
+      Reduziert ausschließlich die Aktualisierungsfrequenz optionaler Crowd-, LED-, Nebel- und Laser-Effekte
+      anhand gemessener FPS/P95; manueller Qualitätsmodus bleibt unverändert. Kein Eingriff in Lyrics,
+      Tanz-/Kamera-Zeit oder Govee-Hardware.
+    </p>
     <DisplayPerformanceStudioV835 />
     <p className="settings-note">V552: invisible light shafts/haze do not consume transparent GPU draw calls; inactive dance effects stop updating their mesh pool. Existing Pi concert presets and measured FPS/P95/P99 still control adaptive quality. No changes to lyric, lip-sync, camera or dance timing.</p>
   </div>;

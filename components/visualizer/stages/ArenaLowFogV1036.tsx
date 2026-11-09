@@ -7,6 +7,8 @@ import type {VolumetricLightCueV1058} from '@/lib/arena360VolumetricLightingV105
 import type {AudioFeatures} from '@/types/audio';
 import type {FestivalCueV1084} from '@/lib/arena360FestivalAtmosphereV1084';
 import {useAdaptivePerformance} from '../adaptivePerformance';
+import {getConcertFxBudgetV1128} from '../concertFxBudgetStoreV1128';
+import {concertFxFactorsV1128} from '@/lib/adaptiveConcertPerformanceV1128';
 import type {ArenaPeakStateV1036} from '@/lib/arena360AtmosphereV1036';
 import {createArenaFogBanksV1036,planArenaAtmosphereV1036,sampleArenaFogV1036} from '@/lib/arena360AtmosphereV1036';
 /** Fake, texture-free ground haze with a soft radial alpha shader.
@@ -40,7 +42,7 @@ export function ArenaLowFogV1036({audio,playing,reducedMotion,reactive,enabled,d
   if(active)clock.current+=dt*(atmosphereV1045?.active?atmosphereV1045.drift:1);
   if(!active&&!wasActive.current)return;
   budget.current+=dt;
-  if(active&&budget.current<(tier==='low'?.17:.09))return;
+  if(active&&budget.current<(tier==='low'?.17:.09)*concertFxFactorsV1128(getConcertFxBudgetV1128().level).fogTick)return;
   budget.current=0;wasActive.current=active;
   const cue=planArenaAtmosphereV1036({enabled:directorEnabled,playing,reducedMotion,reactive,
    section,progressMs,durationMs,energy:audio.energyEnvelope,intensity,peak:peakRef?.current.energy});
@@ -54,8 +56,9 @@ export function ArenaLowFogV1036({audio,playing,reducedMotion,reactive,enabled,d
   material.current.uniforms.uTint.value.lerp(targetTint,blend);
   plumeMaterial.current.uniforms.uTint.value.lerp(targetTint,blend);
   material.current.uniforms.uTime.value=clock.current;
-  const floorOpacity=active?Math.min(.16,cue.fog*.2*gain):0;
-  const plumeOpacity=active?Math.min(.095,cue.fog*.12*gain):0;
+  const fogSafetyV1128=concertFxFactorsV1128(getConcertFxBudgetV1128().level).fogOpacity;
+  const floorOpacity=active?Math.min(.16,cue.fog*.2*gain)*fogSafetyV1128:0;
+  const plumeOpacity=active?Math.min(.095,cue.fog*.12*gain)*fogSafetyV1128:0;
   material.current.uniforms.uOpacity.value=active?
    material.current.uniforms.uOpacity.value+(floorOpacity-material.current.uniforms.uOpacity.value)*blend:0;
   plumeMaterial.current.uniforms.uTime.value=clock.current;
