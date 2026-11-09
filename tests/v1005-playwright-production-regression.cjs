@@ -70,6 +70,7 @@ for (const [github, browserPassed] of [[true, true], [true, false], [false, fals
       __dirname: path.join(root, 'scripts'), process: fakeProcess, console: { log() {}, error() {} },
       require(name) {
         if (name === 'node:child_process') return { spawnSync: () => ({ status: 0 }) };
+        if (name === './version-action-titles-v1016.cjs') return { formatActionTitlesV1016: () => ({ release: 'V1136', total: 29, changed: 0 }) };
         if (name === './playwright-production.cjs') return { runProductionTests(options) {
           browserCalls++; assert.ok(options.existingBuildSince > 0); return { passed: browserPassed };
         } };
