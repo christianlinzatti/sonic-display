@@ -53,6 +53,19 @@ export function AlexaConcertControlV967(){
    window.removeEventListener(ALEXA_GOVEE_CONSENT_EVENT_V970,refresh);
    window.removeEventListener('storage',storage);};
  },[]);
+ useEffect(()=>{
+  const synchronize=()=>{
+   try{
+    const saved=JSON.parse(localStorage.getItem(ALEXA_LOCAL_ENABLED_KEY_V967)||'null') as {enabled?:boolean;since?:number}|null;
+    const allowed=saved?.enabled===true&&Number.isSafeInteger(saved.since)&&
+     typeof saved.since==='number'&&saved.since>0&&saved.since<=Date.now();
+    setEnabled(allowed);setEnabledSince(allowed?saved!.since!:0);
+   }catch{setEnabled(false);setEnabledSince(0);}
+  };
+  window.addEventListener('storage',synchronize);
+  window.addEventListener('sonic-display:alexa-local-status-v971',synchronize);
+  return()=>{window.removeEventListener('storage',synchronize);window.removeEventListener('sonic-display:alexa-local-status-v971',synchronize);};
+ },[]);
  const toggle=(next:boolean)=>{
   const since=next?Date.now():0;
   try{localStorage.setItem(ALEXA_LOCAL_ENABLED_KEY_V967,JSON.stringify({enabled:next,since}));}

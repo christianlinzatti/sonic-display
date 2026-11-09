@@ -21,6 +21,6 @@ export async function completeVoiceV1008(id:string,token:string,result:VoiceResu
  await redis('SET',prefix+'last-result',id,'EX',120);return true;
 }
 export async function voiceResultV1008(id:string):Promise<unknown>{
- const key=id==='latest'?await redis('GET',prefix+'last-request'):id;
+ const key=id==='latest'?(await redis('GET',prefix+'last-result')??await redis('GET',prefix+'last-request')):id;
  if(typeof key!=='string')return null;const raw=await redis('GET',prefix+'result:'+key);return typeof raw==='string'?JSON.parse(raw):null;
 }

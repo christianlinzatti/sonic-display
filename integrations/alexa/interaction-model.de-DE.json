@@ -182,6 +182,15 @@
           ]
         },
         {
+          "name": "AllCommandsIntent",
+          "samples": [
+            "welche befehle gibt es",
+            "zeige alle sprachbefehle",
+            "hilfe für sprachbefehle",
+            "was kannst du alles steuern"
+          ]
+        },
+        {
           "name": "StatusIntent",
           "samples": [
             "wie ist der Status",

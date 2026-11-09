@@ -35,6 +35,9 @@ function request(body,origin='https://sonic-display.test'){return new Request(or
  assert.equal((await browser.POST(request({phase:'complete',id,token,result}))).status,409);
  r=await voice.POST(signed({read:id}));assert.equal((await r.json()).result.text,result.text);
  r=await voice.POST(signed({read:'latest'}));assert.equal((await r.json()).result.text,result.text);
+ // A newer pending command must not hide the last completed Alexa result.
+ r=await voice.POST(signed({command:'lyrics-off'}));assert.equal(r.status,200);
+ r=await voice.POST(signed({read:'latest'}));assert.equal((await r.json()).result.text,result.text);
  const health=load('app/api/alexa/status/route.ts',{
   '@/lib/spotify':{getValidSession:async()=>authenticated?{session:{accessToken:'unit-token',scopes:'user-follow-read user-follow-modify'},refreshed:false}:null,refreshSession:async()=>{throw Error('Probe rejected');},ReauthRequiredError:class extends Error{}},
   '@/lib/session':{setSessionCookie(){},clearSessionCookie(){}},'next/server':{NextResponse:{json:(data,options)=>Object.assign(Response.json(data,options),{cookies:{set(){}}})}},

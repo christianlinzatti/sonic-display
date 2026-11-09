@@ -82,6 +82,7 @@ const StageContentPluginSettingsV330 = dynamic(() => import("@/components/visual
 const StagePresetLibraryV286 = dynamic(() => import("@/components/visualizer/StagePresetLibraryV286").then(m => m.StagePresetLibraryV286), { ssr: false });
 const RuntimePerformancePanelV285 = dynamic(() => import("@/components/RuntimePerformancePanelV285").then(m => m.RuntimePerformancePanelV285), { ssr: false });
 const AvatarFrameProfilerPanel = dynamic(() => import("@/components/AvatarFrameProfilerPanel").then(m => m.AvatarFrameProfilerPanel), { ssr:false });
+const AlexaSettingsV1137 = dynamic(() => import("./AlexaSettingsV1137").then(m => m.AlexaSettingsV1137), {ssr:false});
 const GoveeLanPanelV909 = dynamic(() => import("@/components/GoveeLanPanelV909").then(m => m.GoveeLanPanelV909), {ssr:false});
 const ServiceStatusDashboardV667 = dynamic(() => import("@/components/ServiceStatusDashboardV667").then(m => m.ServiceStatusDashboardV667), {ssr:false});
 const LongRunStabilitySettingsV355 = dynamic(() => import("@/components/visualizer/LongRunStabilityV355").then(m => m.LongRunStabilitySettingsV355), { ssr:false });
@@ -244,6 +245,7 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
     { id: "display", label: "Anzeige", hint: "Visualizer Lyrics Motion Bildschirm" },
     { id: "avatar", label: "Avatar & Tanz", hint: "Avatar GLTF Vorschau Scale Rig Dance Preset Intensität Aggression Variation Motion Studio" },
     { id: "audio", label: "Mikrofon & Beat", hint: "Audio BPM Mikrofon Sensitivity Calibration Cooldown Sync Offset" },
+    { id: "alexa", label: "Alexa", hint: "Alexa Sprachsteuerung Hilfe Befehle Voice Künstler Spotify Govee Skill Echo" },
     { id: "govee", label: "Govee LAN", hint: "Govee Lichter WLAN LAN Geräte Licht Bühne Farben Beleuchtung Bridge" },
     { id: "diagnostics", label: "Diagnose", hint: "Debug FPS Performance Beat Rhythm" },
   ] as const;
@@ -252,7 +254,7 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
   const [facialStudioOpen,setFacialStudioOpen]=useState(false);
   const [vocalSyncInspectorOpenV373,setVocalSyncInspectorOpenV373]=useState(false);
   const [rapEditorOpenV408,setRapEditorOpenV408]=useState(false);
-  const [tab, setTab] = useState<"dashboard" | "display" | "avatar" | "audio" | "govee" | "diagnostics">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "display" | "avatar" | "audio" | "govee" | "alexa" | "diagnostics">("dashboard");
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); };
@@ -316,6 +318,7 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
       <div className="settings-content">
       {tab === "dashboard" && <ServiceStatusDashboardV667 onNavigate={setTab} />}
       {tab === "govee" && <GoveeLanPanelV909 />}
+      {tab === "alexa" && <AlexaSettingsV1137 />}
       {tab === "diagnostics" && <fieldset><legend>V826–V827 · Live-Konzertqualität</legend><ConcertQualityDashboardV826 enabled={preferences.concertFxV810?.qualityDashboardV826!==false}/><ConcertBenchmarkPanelV827 enabled={preferences.concertFxV810?.qualityDashboardV826!==false}/></fieldset>}
       {tab === "display" && <>
       <label>Visualizer<select value={preferences.visualizerMode} onChange={e => updatePreferences({ visualizerMode: e.target.value as typeof preferences.visualizerMode })}>
