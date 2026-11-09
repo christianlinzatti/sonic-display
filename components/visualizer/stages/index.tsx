@@ -194,6 +194,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
   musicalDynamicsEnabledV1090,musicalDynamicsStrengthV1090,musicalDynamicsStyleV1090,
   storyArcEnabledV1091,storyArcStrengthV1091,storyArcStyleV1091,
   crowdHarmonyEnabledV1092,crowdHarmonyStrengthV1092,crowdHarmonyStyleV1092,
+  festivalCrowdEnabledV1125,festivalCrowdStrengthV1125,festivalCrowdStyleV1125,
   genreShowEnabledV1093,genreShowStrengthV1093,genreShowModeV1093,
   lightingChoreographerEnabledV1060,lightingChoreographerStrengthV1060,
   transformingStageEnabledV1066,transformingStageStrengthV1066,
@@ -241,6 +242,7 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
     musicalDynamicsEnabledV1090?:boolean;musicalDynamicsStrengthV1090?:number;musicalDynamicsStyleV1090?:import('@/lib/arena360MusicalDynamicsV1090').MusicalDynamicsStyleV1090;
     storyArcEnabledV1091?:boolean;storyArcStrengthV1091?:number;storyArcStyleV1091?:import('@/lib/arena360StoryArcDirectorV1091').StoryArcStyleV1091;
     crowdHarmonyEnabledV1092?:boolean;crowdHarmonyStrengthV1092?:number;crowdHarmonyStyleV1092?:import('@/lib/arena360CrowdHarmonyV1092').CrowdHarmonyStyleV1092;
+    festivalCrowdEnabledV1125?:boolean;festivalCrowdStrengthV1125?:number;festivalCrowdStyleV1125?:import('@/lib/aiFestivalCrowdDirectorV1125').FestivalCrowdStyleV1125;
     genreShowEnabledV1093?:boolean;genreShowStrengthV1093?:number;genreShowModeV1093?:import('@/lib/arena360GenreShowIntelligenceV1093').GenreShowModeV1093;
     lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
     transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
@@ -329,6 +331,9 @@ export function StageEnvironment({ theme, children, rotationSpeed, rotationEnabl
       crowdHarmonyEnabledV1092={crowdHarmonyEnabledV1092}
       crowdHarmonyStrengthV1092={crowdHarmonyStrengthV1092}
       crowdHarmonyStyleV1092={crowdHarmonyStyleV1092}
+      festivalCrowdEnabledV1125={festivalCrowdEnabledV1125}
+      festivalCrowdStrengthV1125={festivalCrowdStrengthV1125}
+      festivalCrowdStyleV1125={festivalCrowdStyleV1125}
       genreShowEnabledV1093={genreShowEnabledV1093}
       genreShowStrengthV1093={genreShowStrengthV1093}
       genreShowModeV1093={genreShowModeV1093}

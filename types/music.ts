@@ -135,6 +135,9 @@ export interface UiPreferences {
   arenaCrowdHarmonyEnabledV1092?:boolean;
   arenaCrowdHarmonyStrengthV1092?:number;
   arenaCrowdHarmonyStyleV1092?:import('@/lib/arena360CrowdHarmonyV1092').CrowdHarmonyStyleV1092;
+  arenaFestivalCrowdEnabledV1125?:boolean;
+  arenaFestivalCrowdStrengthV1125?:number;
+  arenaFestivalCrowdStyleV1125?:import('@/lib/aiFestivalCrowdDirectorV1125').FestivalCrowdStyleV1125;
   arenaGenreShowEnabledV1093?:boolean;
   arenaGenreShowStrengthV1093?:number;
   arenaGenreShowModeV1093?:import('@/lib/arena360GenreShowIntelligenceV1093').GenreShowModeV1093;

@@ -1,0 +1,35 @@
+'use strict';
+const {test,expect,openSettings}=require('./fixtures.cjs');
+const STORE='sonic-display-ui-preferences-v1';
+test('V1125 spatial crowd preview has eight sectors and seven scenes without saving or AI',async({page},info)=>{
+ const requests=[];page.on('request',r=>{if(r.url().includes('/api/ai/show-remix'))requests.push(r.url());});
+ const dialog=await openSettings(page,'avatar');
+ await dialog.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const root=dialog.getByRole('group',{name:'V1106 KI Show Remix'});
+ const group=root.getByRole('group',{name:'V1125 AI Festival Crowd Director 2.0'});
+ await expect(group).toBeVisible();
+ await group.getByRole('combobox',{name:'Räumliche Publikumsformation'}).selectOption('duet');
+ const before=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORE);
+ await group.getByRole('button',{name:'V1125 Acht-Sektoren-Festival jetzt proben'}).click();
+ const preview=root.getByRole('region',{name:'V1125 Festival Crowd Director Partitur'});
+ await expect(preview).toBeVisible();
+ await expect(preview.getByRole('list',{name:'V1125 sieben Festival-Szenen'}).locator('li')).toHaveCount(7);
+ await expect(preview.getByRole('note',{name:'V1125 Festival-Qualität'})).toContainText('8 feste Crowd-Sektoren');
+ await expect(preview.getByRole('status',{name:'V1125 Aktueller Künstlerfokus'})).toContainText('keine automatisch erkannten Sänger');
+ expect(await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORE)).toEqual(before);
+ expect(requests).toEqual([]);
+ await info.attach('v1125-spatial-crowd-preview',{body:await preview.screenshot(),contentType:'image/png'});
+});
+test('V1125 refuses activation if main show director or phone sync is not enabled',async({page})=>{
+ const dialog=await openSettings(page,'avatar');
+ await dialog.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const root=dialog.getByRole('group',{name:'V1106 KI Show Remix'});
+ const group=root.getByRole('group',{name:'V1125 AI Festival Crowd Director 2.0'});
+ await group.getByRole('button',{name:'V1125 Acht-Sektoren-Festival jetzt proben'}).click();
+ const preview=root.getByRole('region',{name:'V1125 Festival Crowd Director Partitur'});
+ const before=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaFestivalCrowdEnabledV1125??false,STORE);
+ await preview.getByRole('button',{name:'V1125 virtuelle Acht-Sektoren-Regie aktivieren'}).click();
+ await expect(root.getByRole('status').filter({hasText:'V1125 benötigt Show Designer'})).toBeVisible();
+ const after=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaFestivalCrowdEnabledV1125??false,STORE);
+ expect(after).toBe(before);
+});

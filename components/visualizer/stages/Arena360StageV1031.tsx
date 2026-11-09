@@ -26,6 +26,7 @@ import {ArenaUltimateFestivalDropV1087} from './ArenaUltimateFestivalDropV1087';
 import {stepBeatDropIntelligenceV1089,INITIAL_BEAT_STATE_V1089,type BeatPrecisionV1089} from '@/lib/beatDropIntelligenceV1089';
 import {stepMusicalDynamicsV1090,INITIAL_MUSICAL_DYNAMICS_V1090,type MusicalDynamicsStyleV1090} from '@/lib/arena360MusicalDynamicsV1090';
 import {stepStoryArcV1091,INITIAL_STORY_ARC_V1091,type StoryArcStyleV1091} from '@/lib/arena360StoryArcDirectorV1091';
+import type {FestivalCrowdStyleV1125} from '@/lib/aiFestivalCrowdDirectorV1125';
 import type {CrowdHarmonyStyleV1092} from '@/lib/arena360CrowdHarmonyV1092';
 import {stepGenreShowV1093,INITIAL_GENRE_SHOW_V1093,type GenreShowModeV1093} from '@/lib/arena360GenreShowIntelligenceV1093';
 import {planLightingChoreographerV1060} from '@/lib/arena360LightingChoreographerV1060';
@@ -112,6 +113,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   musicalDynamicsEnabledV1090=false,musicalDynamicsStrengthV1090=55,musicalDynamicsStyleV1090='balanced',
   storyArcEnabledV1091=false,storyArcStrengthV1091=55,storyArcStyleV1091='balanced',
   crowdHarmonyEnabledV1092=false,crowdHarmonyStrengthV1092=55,crowdHarmonyStyleV1092='balanced',
+  festivalCrowdEnabledV1125=false,festivalCrowdStrengthV1125=45,festivalCrowdStyleV1125='ripple',
   genreShowEnabledV1093=false,genreShowStrengthV1093=55,genreShowModeV1093='auto',
   lightingChoreographerEnabledV1060=false,lightingChoreographerStrengthV1060=55,
   transformingStageEnabledV1066=false,transformingStageStrengthV1066=55,
@@ -156,6 +158,7 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
   beatIntelligenceEnabledV1089?:boolean;beatIntelligencePrecisionV1089?:BeatPrecisionV1089;
   musicalDynamicsEnabledV1090?:boolean;musicalDynamicsStrengthV1090?:number;musicalDynamicsStyleV1090?:MusicalDynamicsStyleV1090;
   storyArcEnabledV1091?:boolean;storyArcStrengthV1091?:number;storyArcStyleV1091?:StoryArcStyleV1091;  crowdHarmonyEnabledV1092?:boolean;crowdHarmonyStrengthV1092?:number;crowdHarmonyStyleV1092?:CrowdHarmonyStyleV1092;
+  festivalCrowdEnabledV1125?:boolean;festivalCrowdStrengthV1125?:number;festivalCrowdStyleV1125?:FestivalCrowdStyleV1125;
   genreShowEnabledV1093?:boolean;genreShowStrengthV1093?:number;genreShowModeV1093?:GenreShowModeV1093;
   lightingChoreographerEnabledV1060?:boolean;lightingChoreographerStrengthV1060?:number;
   transformingStageEnabledV1066?:boolean;transformingStageStrengthV1066?:number;
@@ -648,6 +651,10 @@ export function Arena360StageV1031({children,audio,isPlaying,reducedMotion,react
       crowdHarmonyEnabledV1092={crowdHarmonyEnabledV1092&&showDesignerEnabled&&showDirectorEnabled}
       crowdHarmonyStrengthV1092={crowdHarmonyStrengthV1092}
       crowdHarmonyStyleV1092={crowdHarmonyStyleV1092}
+      festivalCrowdEnabledV1125={festivalCrowdEnabledV1125&&showDesignerEnabled&&concertDirectorEnabled}
+      festivalCrowdStrengthV1125={festivalCrowdStrengthV1125}
+      festivalCrowdStyleV1125={festivalCrowdStyleV1125}
+      festivalCrowdShowV1125={authoredShowCueV1040}
       trackIdV1092={trackId}
       genreShowStateV1093={phoneSyncEnabled&&phoneMode==='wave'?genreShowStateV1093:undefined}
       storyArcStateV1091={storyArcEnabledV1091?storyArcStateV1091:undefined}/>

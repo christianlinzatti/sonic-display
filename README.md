@@ -3739,3 +3739,20 @@ Reduced Motion, Pause und GPU-Grenzen behalten Vorrang. Keine zusätzlichen
 Crowd-Instanzen, keine Govee-Hardwarebefehle. Lokal prüfen mit
 `npm run test:v1124` und `npm run test:v1124:types`; die vollständige CI
 unter Node 24 mit Playwright bleibt nach dem Import erforderlich.
+
+### V1125 – AI Festival Crowd Director 2.0
+
+Im **AI Show Designer → V1125 Festival Crowd Director 2.0** gibt es
+vier Raumregie-Stile: Ringwelle, Künstlerfokus, Duett/Gegenchor und
+Acht-Sektoren-Festival. Die lokale Vorschau zeigt für sieben Songphasen
+die acht Sektorintensitäten und drei **geplante** Stage-Crew-Fokusrollen.
+Das ist keine Erkennung realer Sänger, Beats, Hooks oder Publikumsgeräusche.
+Nach **separatem Live-Klick** wird ein echter optischer Sektor-Overlay im
+vorhandenen V1032-Instanzrenderer sowie die vorhandene V1073-/V1074-Regie
+aktiviert. Es werden keine neuen Crowd-Objekte, Stroboskope, Stimmen,
+Lautsprecher oder Govee-/Hardwarebefehle erzeugt. Manuelle Handylichtmodi,
+Reduced Motion, Pausenzustand und Low-GPU schützen die Wiedergabe.
+V1125 ist mit der bestehenden V1124-Publikumsvorschau kombinierbar.
+Prüfen mit `npm run test:v1125` und `npm run test:v1125:types`.
+Die vollständige Freigabe erfolgt nach GitHub-Import über Ubuntu/Windows
+Build, TypeScript und Playwright Desktop/Touch.

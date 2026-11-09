@@ -948,6 +948,9 @@ export function ThreeAvatar(props: VisualizerProps) {
         crowdHarmonyEnabledV1092={props.arenaCrowdHarmonyEnabledV1092 ?? false}
         crowdHarmonyStrengthV1092={props.arenaCrowdHarmonyStrengthV1092 ?? 55}
         crowdHarmonyStyleV1092={props.arenaCrowdHarmonyStyleV1092 ?? 'balanced'}
+        festivalCrowdEnabledV1125={props.arenaFestivalCrowdEnabledV1125 ?? false}
+        festivalCrowdStrengthV1125={props.arenaFestivalCrowdStrengthV1125 ?? 45}
+        festivalCrowdStyleV1125={props.arenaFestivalCrowdStyleV1125 ?? 'ripple'}
         genreShowEnabledV1093={props.arenaGenreShowEnabledV1093 ?? false}
         genreShowStrengthV1093={props.arenaGenreShowStrengthV1093 ?? 55}
         genreShowModeV1093={props.arenaGenreShowModeV1093 ?? 'auto'}

@@ -119,3 +119,10 @@ Neue Publikumswellen nutzen vorhandene V1032-Instanzen und Crowd-Renderer.
 Die Stage-Crew-Modelle und ihre Animationsclips erhalten keine neuen Bones,
 Morph-Targets oder Jubelgeräusche. Reduzierte Bewegung und GPU-Grenzen
 bleiben verbindlich.
+
+## V1125 – Stage-Crew-Fokus ohne neue Bones
+
+Neon Pulse, Festival Nova und Chrome Beat erhalten symbolische Fokuspositionen
+für die acht Sektoren des virtuellen Publikums. Keine neuen GLB-/FBX-Clips,
+Bones oder Morph-Targets. Die echten V1074-Avatarantworten bleiben optional;
+keine automatisch erkannte Sängerzuordnung.

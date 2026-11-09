@@ -136,3 +136,12 @@ und Jubelgesten stammen aus bestehenden Crowd-Modulen. Die Stage-Crew-GLB-Clips,
 Sängerzuordnung und manuelle Choreografien bleiben unverändert. Ohne ausdrückliche
 Bestätigung bleibt es bei einer reinen Vorschau; es entstehen keine Stimmen
 oder echten Geräteaktionen.
+
+## V1125 – Festival Crowd Director 2.0
+
+Die virtuelle Crowd kann um die drei Stage-Crew-Künstlerfokusse in acht
+räumlich unterschiedlichen Sektoren leuchten und dezent reagieren. Die
+Künstlernamen stehen für geplante Inszenierung und nicht für erkannte
+Stimmen oder belegte Rollen. Keine Änderung an Avatarrigs, Tanzclips,
+Kamerazeiten oder Showplangrenzen. Echte Stage-Crew-/Publikumsreaktionen
+bleiben an die vorhandenen V1074-Grenzen gebunden.

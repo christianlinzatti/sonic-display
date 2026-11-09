@@ -1,0 +1,4 @@
+{
+ "compilerOptions":{"target":"ES2022","lib":["es2022"],"module":"ESNext","moduleResolution":"bundler","strict":true,"skipLibCheck":true,"noEmit":true,"rootDir":"..","types":[]},
+ "include":["../lib/aiFestivalCrowdDirectorV1125.ts","../lib/aiAudienceEnergySyncV1124.ts","../lib/arena360AudienceExperienceV1073.ts","../lib/arena360AvatarAudienceInteractionV1074.ts"]
+}

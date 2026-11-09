@@ -1,3 +1,32 @@
+## V1125 · AI Festival Crowd Director 2.0
+
+`lib/aiFestivalCrowdDirectorV1125.ts` plant sieben lokale Szenen mit je acht
+räumlichen Crowd-Sektoren. Die drei wechselnden Bühnenfokusse (Neon Pulse,
+Festival Nova, Chrome Beat) sind **symbolische Regierollen**, keine automatisch
+erkannten Sänger. Vier Formationsstile erzeugen verschiedene Winkelverteilungen.
+Sektorwerte bleiben auf höchstens 65 begrenzt; die Atempause ist leiser.
+Die V1040-Szenengrenzen und bestehende Remix-Einträge werden nicht verändert.
+Ein gültiger V1124-Publikumsentwurf kann optional mit derselben Timeline
+gekoppelt werden; fremde oder veraltete Partituren werden abgelehnt.
+
+Nach separater Zustimmung aktiviert V1125 im tatsächlichen festen V1032-
+Instanzrenderer acht sanft modulierte Helligkeitszonen für bereits vorhandene
+Handy-/Armbandlichter sowie kleine bestehende Körper- und Armbewegungen.
+Der Weg `VisualizerStage` → `ThreeAvatar` → `stages/index` →
+`Arena360StageV1031` → `ArenaAudienceV1032` transportiert die drei neuen
+Opt-in-Präferenzen. Der räumliche Cue wird nur einmal pro bereits vorhandenem
+maximal 15-Hz-Crowd-Tick vorbereitet; `sampleFestivalCrowdSectorV1125` verteilt
+ihn ohne zusätzlichen Renderer, Crowd-Instanz, Frame-Hook oder Netzwerkverkehr.
+Pause, deaktivierter Showplan, Reduced Motion, Low-GPU, manuelle Handylicht-
+modi und fehlende Freigabe schalten die räumliche Ebene ab. Ein Undo verändert
+nichts, wenn die betroffenen Einstellungen inzwischen manuell überschrieben
+wurden. V1073 Lichtbänder und V1074 Avatar-/Publikums-Interaktion werden nur
+über ein weiteres Benutzer-Opt-in aktiviert, ohne Audio- oder Hardwarebefehle.
+
+Prüfungen: `tests/v1125-festival-crowd-director-regression.cjs`,
+`tests/tsconfig.v1125-core.json`,
+`tests/e2e/ai-festival-crowd-v1125.spec.cjs` (Desktop/Touch).
+
 ## V1124 · AI Audience Energy Sync
 
 `lib/aiAudienceEnergySyncV1124.ts` berechnet sieben rein lokale, durch die
@@ -158,7 +187,7 @@ Im **360° AI Show Designer** kannst du jetzt die V1111-Konzertregie proben: Sie
 
 Das Drop-Radar wertet die **freiwillig gestartete lokale V1108-Mikrofonmessung** aus. Erst nach mindestens fünf Sekunden mit sauberem Signal werden ein bereits gemessener Einschlag oder ein möglicher Energieaufbau erkannt. Ein künftiger Drop-Zeitpunkt kann aus diesem Signal **nicht sicher vorhergesagt** werden. Nur nach Zustimmung kann eine Regieidee für die **nächste** V1106/V1109-Vorschau vorgemerkt werden. Die sieben Zeitgrenzen, die Intensitätsobergrenze und die manuelle Freigabe bleiben erhalten. Keine Audio-/Geräte-/Cloud-Übertragung; Tests: `npm run test:v1110`, `npm run test:v1110:types`.
 
-**Dokumentationsstand:** V1124
+**Dokumentationsstand:** V1125
 
 ## V1104 · Playwright Visual QA & Screenshot Reports
 

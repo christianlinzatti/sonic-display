@@ -11,6 +11,9 @@ import {sampleCrowdExperienceV1051,type CrowdCueV1051} from "@/lib/arena360Crowd
 import {sampleAudienceExperienceV1073,type AudienceCueV1073} from "@/lib/arena360AudienceExperienceV1073";
 import {sampleAvatarAudienceInteractionV1074,type AvatarAudienceCueV1074} from "@/lib/arena360AvatarAudienceInteractionV1074";
 import {sampleCrowdEnergyV1075,type CrowdEnergyCueV1075} from "@/lib/arena360CrowdEnergyV1075";
+import {planFestivalCrowdLiveV1125,sampleFestivalCrowdSectorV1125,
+  type FestivalCrowdStyleV1125} from '@/lib/aiFestivalCrowdDirectorV1125';
+import type {ArenaShowCueV1040} from '@/lib/arena360ShowDesignerV1040';
 import {stepCrowdHarmonyV1092,sampleCrowdHarmonyV1092,INITIAL_CROWD_HARMONY_V1092,
   type CrowdHarmonyStyleV1092} from '@/lib/arena360CrowdHarmonyV1092';
 import type {StoryArcStateV1091} from '@/lib/arena360StoryArcDirectorV1091';
@@ -26,13 +29,15 @@ const PHONE_COLORS=['#7af4ff','#ef73ff','#faf1a9'];
  */
 export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,reactive=true,
   wavesEnabled=true,phoneSyncEnabled=true,phoneMode='wave',hookCueEnabled=true,
-  progressMs=0,durationMs=0,fullSongDirectorEnabled=true,showIntensity=65,section='verse',audienceCueV1044,crowdCueV1051,audienceCueV1073,avatarAudienceCueV1074,crowdEnergyCueV1075,crowdHarmonyEnabledV1092=false,crowdHarmonyStrengthV1092=55,crowdHarmonyStyleV1092='balanced',trackIdV1092,storyArcStateV1091,genreShowStateV1093}:{
+  progressMs=0,durationMs=0,fullSongDirectorEnabled=true,showIntensity=65,section='verse',audienceCueV1044,crowdCueV1051,audienceCueV1073,avatarAudienceCueV1074,crowdEnergyCueV1075,crowdHarmonyEnabledV1092=false,crowdHarmonyStrengthV1092=55,crowdHarmonyStyleV1092='balanced',festivalCrowdEnabledV1125=false,festivalCrowdStrengthV1125=45,festivalCrowdStyleV1125='ripple',festivalCrowdShowV1125,trackIdV1092,storyArcStateV1091,genreShowStateV1093}:{
   audio:AudioFeatures;playing:boolean;reducedMotion:boolean;enabled?:boolean;reactive?:boolean;
   wavesEnabled?:boolean;phoneSyncEnabled?:boolean;phoneMode?:ArenaPhoneModeV1033;
   hookCueEnabled?:boolean;progressMs?:number;durationMs?:number;
   fullSongDirectorEnabled?:boolean;showIntensity?:number;section?:string;audienceCueV1044?:ArenaAudienceCueV1044;crowdCueV1051?:CrowdCueV1051;audienceCueV1073?:AudienceCueV1073;avatarAudienceCueV1074?:AvatarAudienceCueV1074;crowdEnergyCueV1075?:CrowdEnergyCueV1075;
   crowdHarmonyEnabledV1092?:boolean;crowdHarmonyStrengthV1092?:number;
-  crowdHarmonyStyleV1092?:CrowdHarmonyStyleV1092;trackIdV1092?:string|null;
+  crowdHarmonyStyleV1092?:CrowdHarmonyStyleV1092;
+  festivalCrowdEnabledV1125?:boolean;festivalCrowdStrengthV1125?:number;festivalCrowdStyleV1125?:FestivalCrowdStyleV1125;festivalCrowdShowV1125?:ArenaShowCueV1040;
+  trackIdV1092?:string|null;
   storyArcStateV1091?:Readonly<{current:StoryArcStateV1091}>;
   genreShowStateV1093?:Readonly<{current:GenreShowStateV1093}>;
 }){
@@ -123,6 +128,10 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
     }
     const dt=Number.isFinite(delta)?Math.max(0,Math.min(.1,delta)):0;
     const active=playing&&!reducedMotion&&reactive;
+    const festivalCrowdV1125=planFestivalCrowdLiveV1125({enabled:festivalCrowdEnabledV1125,
+      playing,reducedMotion,reactive,audienceEnabled:enabled,phoneSyncEnabled,phoneMode,
+      performanceTier:tier,show:festivalCrowdShowV1125,style:festivalCrowdStyleV1125,
+      strength:festivalCrowdStrengthV1125});
     const harmonyV1092=stepCrowdHarmonyV1092(crowdHarmonyV1092.current,{
       enabled:enabled&&crowdHarmonyEnabledV1092,playing,reducedMotion,reactive,
       phoneSyncEnabled,phoneMode,performanceTier:tier,trackId:trackIdV1092,
@@ -170,13 +179,14 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
         const sway=(animateWave ? .023*Math.sin(t*1.9+i*.47)*(.28+.72*bass) : 0)+(energyV1075?.sway??0);
         const hookRise=hookCueEnabled?sampleArenaCrowdHookV1035(hookCue,Math.atan2(m.z,m.x),t):0;
         const crowdStory= harmonyV1092.active?sampleCrowdHarmonyV1092(harmonyV1092.state,Math.atan2(m.z,m.x)):null;
-        const rise=crest*.20+hookRise+(reaction?.rise??0)*.24+(v1073?.lift??0)+(energyV1075?.rise??0)+(crowdStory?.rise??0);
+        const spatialV1125=sampleFestivalCrowdSectorV1125(festivalCrowdV1125,Math.atan2(m.z,m.x),t);
+        const rise=spatialV1125.rise+crest*.20+hookRise+(reaction?.rise??0)*.24+(v1073?.lift??0)+(energyV1075?.rise??0)+(crowdStory?.rise??0);
         dummy.position.set(m.x+sway,m.y+m.height*.43+rise,m.z);
         dummy.rotation.set(0,Math.atan2(-m.x,-m.z),0);
         dummy.scale.set(.20,m.height*.75,.12);
         dummy.updateMatrix();bodies.current?.setMatrixAt(i,dummy.matrix);
         dummy.position.set(m.x+sway,m.y+m.height*.89+rise,m.z);
-        dummy.rotation.set(0,0,(v1073?.faceStage??0)*.12*Math.sin(t*.42+i*.5)+(replyV1074?.audienceHead??0)+(energyV1075?.head??0)+(crowdStory?.head??0));dummy.scale.set(.102,.107,.103);
+        dummy.rotation.set(0,0,(v1073?.faceStage??0)*.12*Math.sin(t*.42+i*.5)+(replyV1074?.audienceHead??0)+(energyV1075?.head??0)+(crowdStory?.head??0)+spatialV1125.head);dummy.scale.set(.102,.107,.103);
         dummy.updateMatrix();heads.current?.setMatrixAt(i,dummy.matrix);
       }
       if(bodies.current)bodies.current.instanceMatrix.needsUpdate=true;
@@ -191,7 +201,8 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
         const energyV1075=energyActiveV1075?
           sampleCrowdEnergyV1075(crowdEnergyCueV1075,Math.atan2(m.z,m.x),t,
             audio.beat?audio.beatStrength:0,bass):null;
-        const gestureArms=Math.min(.8,reaction.arms+(v1073?.arms??0)+
+        const spatialV1125=sampleFestivalCrowdSectorV1125(festivalCrowdV1125,Math.atan2(m.z,m.x),t);
+        const gestureArms=Math.min(.8,spatialV1125.arms+reaction.arms+(v1073?.arms??0)+
           (replyV1074?.audienceArms??0)+(energyV1075?.arms??0));
         for(let side=0;side<2;side++){
           const sign=side===0?-1:1;
@@ -223,7 +234,8 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
         if(audienceOrchestra)tint.lerp(sceneTint,Math.min(.55,audienceCueV1044!.gain*.65));
         const harmonyLight=harmonyV1092.active?sampleCrowdHarmonyV1092(harmonyV1092.state,angle).phoneGain:1;
         const genreLight=phoneMode==='wave'&&phoneSyncEnabled?sampleGenreShowGainV1093(genreShowStateV1093?.current,'crowd'):1;
-        phones.current?.setColorAt(i,tint.multiplyScalar(Math.min(1,light*(1+.20*hookCue.crowdEnergy))*(energyV1075?.light??1)*harmonyLight*genreLight));
+        const spatialV1125=sampleFestivalCrowdSectorV1125(festivalCrowdV1125,angle,t);
+        phones.current?.setColorAt(i,tint.multiplyScalar(Math.min(1,light*(1+.20*hookCue.crowdEnergy))*(energyV1075?.light??1)*harmonyLight*genreLight*spatialV1125.light));
         const hookRise=hookCueEnabled?sampleArenaCrowdHookV1035(hookCue,angle,t):0;
         dummy.position.set(m.x+.17,m.y+m.height*(m.armRaised?1.39:1.12)+crest*.20+hookRise,m.z);
         dummy.rotation.set(0,Math.atan2(-m.x,-m.z),0);
@@ -241,7 +253,7 @@ export function ArenaAudienceV1032({audio,playing,reducedMotion,enabled=true,rea
           const sample=sampleAudienceExperienceV1073(audienceCueV1073,angle,t,audio.beat?audio.beatStrength:0);
           braceletTintV1073.setRGB(color[0],color[1],color[2]);
           const harmonyBand=harmonyV1092.active?sampleCrowdHarmonyV1092(harmonyV1092.state,angle).phoneGain:1;
-          band.setColorAt(i,braceletTintV1073.multiplyScalar(sample.light*harmonyBand*(phoneMode==='wave'&&phoneSyncEnabled?sampleGenreShowGainV1093(genreShowStateV1093?.current,'crowd'):1)));
+          band.setColorAt(i,braceletTintV1073.multiplyScalar(sample.light*harmonyBand*sampleFestivalCrowdSectorV1125(festivalCrowdV1125,angle,t).light*(phoneMode==='wave'&&phoneSyncEnabled?sampleGenreShowGainV1093(genreShowStateV1093?.current,'crowd'):1)));
           dummy.position.set(m.x-.16,m.y+m.height*(.96+sample.arms*.28)+sample.lift,m.z);
           dummy.rotation.set(0,Math.atan2(-m.x,-m.z),0);
           dummy.scale.set(.065,.065,.065);dummy.updateMatrix();band.setMatrixAt(i,dummy.matrix);
