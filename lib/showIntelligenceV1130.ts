@@ -1,3 +1,4 @@
+import {activeConcertLyric,concertLyricSection} from './concertLyricTimeline';
 import {genreClipsV1129,musicFamilyV1129} from './musicPerformanceV1129';
 import type {Lyrics} from '../types/playbackCore';
 export const HEADLINERS_V1130=[
@@ -13,9 +14,9 @@ export type ShowCueV1130={act:ShowActV1130;label:string;mode:'individual'|'spotl
 /** Timed lyrics provide a vocal-density cue, never audio energy or singer identification. */
 export function lyricDensityV1130(lyrics:Lyrics|null|undefined,progressMs:number):number{
  if(!lyrics?.synced||!Number.isFinite(progressMs))return 0;
- const line=lyrics.lines.find((l,i)=>progressMs>=l.startMs&&progressMs<(l.endMs??lyrics.lines[i+1]?.startMs??l.startMs+4000));
- if(!line)return 0;
- const index=lyrics.lines.indexOf(line),end=line.endMs??lyrics.lines[index+1]?.startMs??line.startMs+4000;
+ const index=activeConcertLyric(lyrics,progressMs);
+ if(index<0)return 0;
+ const line=lyrics.lines[index],end=line.endMs??Math.min(lyrics.lines[index+1]?.startMs??Infinity,line.startMs+4000);
  return clamp((line.text.match(/\S+/g)?.length??0)/Math.max(1,(end-line.startMs)/1000)/4);
 }
 export function showCueV1130(input:{section?:string|null;energy?:number|null;bpm?:number|null;
@@ -72,10 +73,5 @@ export function intelligentClipV1130(input:{clips:readonly string[];genre?:strin
 }
 /** Conservative lyric structure heuristic, explicitly separate from audio analysis. */
 export function lyricSectionV1130(lyrics:Lyrics|null|undefined,progressMs:number):string|null{
- if(!lyrics?.synced||!Number.isFinite(progressMs))return null;
- const index=lyrics.lines.findIndex((l,i)=>progressMs>=l.startMs&&progressMs<(l.endMs??lyrics.lines[i+1]?.startMs??l.startMs+4000));
- if(index<0)return 'quiet';
- const line=lyrics.lines[index],normalized=line.text.toLocaleLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
- if(normalized.length>8&&lyrics.lines.filter(l=>l.text.toLocaleLowerCase().replace(/[^\p{L}\p{N}]/gu,'')===normalized).length>1)return 'hook';
- return 'verse';
+ return concertLyricSection(lyrics,progressMs);
 }

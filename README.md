@@ -1,3 +1,11 @@
+## V1136 – Update: Weicher Refrain-Aufbau
+
+Die Crew bereitet den kommenden Refrain-Solisten bereits im Aufbau vor. Licht,
+Bewegung und automatische Kamerakomposition steigen weich an. Eine gemeinsame
+Lyrics-Zeitleiste reduziert wiederholte Arbeit bei langen Songs und erkennt
+Textlücken eindeutig. Details, Grenzen und Tests:
+[Refrain-Aufbau](docs/versions/V1136-REFRAIN-AUFBAU.md).
+
 ## V1136 – Saubere Positionswechsel und erweiterte Tests
 
 Die pausierte Crew-Probe zeigt beim Verschieben des Positionsreglers direkt die tatsächliche Zielpose. Seek und Trackwechsel beenden alte Vorschau-Übergänge; normale Clipwechsel bleiben weich. Die ruhige Rap-Kamera verwirft ihren bisherigen Leseanker bei einer neuen Quelle oder einem deutlichen Positionssprung und ordnet die Aufnahme neu ein.

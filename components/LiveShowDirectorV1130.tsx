@@ -18,7 +18,7 @@ export function LiveShowDirectorV1130({progressMs}:{progressMs:number}){
   section:lyricSectionV1130(lyrics,progressMs),lyricDensity:lyricDensityV1130(lyrics,progressMs)});
  const motion=isPlaying&&!preferences.reducedMotion;
  return <aside className={`show-v1130 show-v1130-${cue.act} ${motion?'show-v1130-moving':''}`}
-  aria-label="Intelligente Show-Regie" data-show-staging={cue.staging} data-show-leader={cue.leader} data-show-accent={cue.accent.toFixed(3)} data-show-act={cue.act} data-show-chapter={cue.chorusVisit} data-show-interaction={cue.interaction}
+  aria-label="Intelligente Show-Regie" data-show-staging={cue.staging} data-show-build={cue.anticipationProgress.toFixed(3)} data-show-leader={cue.leader} data-show-accent={cue.accent.toFixed(3)} data-show-act={cue.act} data-show-chapter={cue.chorusVisit} data-show-interaction={cue.interaction}
   style={{'--show-color':cue.palette,'--show-gain':cue.intensity,'--show-light':cue.lightGain} as CSSProperties}>
   <div className="show-v1130-halo" aria-hidden="true"/>
   <div className="show-v1130-status"><span aria-hidden="true">✦</span> {cue.chapter}

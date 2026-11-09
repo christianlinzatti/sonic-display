@@ -1,3 +1,4 @@
+import {concertRefrainVisit} from './concertLyricTimeline';
 import type {PlaybackSampleV1136} from './showContinuityV1136';
 import type {Lyrics} from '../types/playbackCore';
 import {showCueV1130,lyricDensityV1130,lyricSectionV1130,type ShowCueV1130} from './showIntelligenceV1130';
@@ -7,20 +8,9 @@ export type StoryInputV1131={progressMs:number;trackId?:string|null;playback?:Pl
  section?:string|null;energy?:number|null;lyrics?:Lyrics|null;lyricDensity?:number;count?:number};
 export type StoryCueV1131=ShowCueV1130 & {chorusVisit:number;chapter:string;interaction:InteractionV1131;
  leader:number;partner:number;cameraScale:number;cameraSide:number;lightGain:number;lyricGain:number;};
-const normalize=(s:string)=>s.toLocaleLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
-/** Repeated lyric blocks supply structure, not measured beats or audio-section predictions. */
+/** Repeated lyric blocks supply structure, not measured beats or audio predictions. */
 export function chorusVisitsV1131(lyrics:Lyrics|null|undefined,progressMs:number):number{
- if(!lyrics?.synced||!Number.isFinite(progressMs))return 0;
- const counts=new Map<string,number>();
- for(const line of lyrics.lines){const key=normalize(line.text);if(key.length>8)counts.set(key,(counts.get(key)??0)+1);}
- let visits=0,last=-Infinity;
- for(const line of lyrics.lines){
-  if(line.startMs>progressMs)break;
-  if((counts.get(normalize(line.text))??0)<2)continue;
-  if(line.startMs-last>12000)visits++;
-  last=line.startMs;
- }
- return visits;
+ return concertRefrainVisit(lyrics,progressMs);
 }
 /** A single deterministic score shared by dance, body language, camera, light and lyrics. */
 export function concertStoryV1131(input:StoryInputV1131):StoryCueV1131{

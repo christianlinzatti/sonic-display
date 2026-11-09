@@ -1,3 +1,11 @@
+## V1136 – Update: Weicher Refrain-Aufbau
+
+Die Crew bereitet den kommenden Refrain-Solisten bereits im Aufbau vor. Licht,
+Bewegung und automatische Kamerakomposition steigen weich an. Eine gemeinsame
+Lyrics-Zeitleiste reduziert wiederholte Arbeit bei langen Songs und erkennt
+Textlücken eindeutig. Details, Grenzen und Tests:
+[Refrain-Aufbau](docs/versions/V1136-REFRAIN-AUFBAU.md).
+
 ## V1136 – Quellengebundene Kameraanker und explizite Vorschau-Seeks
 
 **Aktueller Dokumentationsstand: V1136.** Details: [V1136-SHOW-KONTINUITAET.md](docs/versions/V1136-SHOW-KONTINUITAET.md).

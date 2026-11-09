@@ -60,7 +60,7 @@ function runProductionTests({ existingBuildSince } = {}) {
       run('Install Chromium and system dependencies', 'node_modules/@playwright/test/cli.js',
         process.platform === 'linux' ? ['install', '--with-deps', 'chromium'] : ['install', 'chromium'], 10 * 60 * 1000);
     }
-    // The full desktop/touch suite now includes 218 cases. Allow the serial
+    // The full desktop/touch suite exceeds 200 cases. Allow the serial
     // browser run enough time while retaining per-test limits and all evidence.
     run('Playwright against next start', 'node_modules/@playwright/test/cli.js', ['test', '--config=config/playwright.production.cjs'], 45 * 60 * 1000);
     results = JSON.parse(fs.readFileSync(path.join(directory, 'results.json'), 'utf8'));
