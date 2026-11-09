@@ -4,6 +4,7 @@ import {useEffect,useRef,useState} from 'react';
 import {useMusic} from '@/context/MusicContext';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
 import {ALEXA_LOCAL_ENABLED_KEY_V967} from '@/lib/alexaConcertV967';
+import {planConcertSceneV1147,type ConcertSceneV1147} from '@/lib/alexaConcertScenesV1147';
 import {ALEXA_FULL_CONCERT_EVENT_V1145,loadFullConcertConsentV1145,isFullConcertVoiceCommandV1145,executeAlexaFullConcertV1145} from '@/lib/alexaFullConcertV1145';
 import {ALEXA_GOVEE_RECEIVER_EVENT_V1139,readAlexaGoveeReceiverTokenV1139,alexaGoveeReceiverHeadersV1139} from '@/lib/alexaGoveeReceiverClientV1139';
 import {executeAlexaGoveePowerV1141} from '@/lib/goveePowerRoutingV1141';
@@ -53,7 +54,7 @@ export function AlexaVoiceControlV1008(){
      const claim=await post({id:message.id,phase:'claim'});if(!claim.ok)continue;
      const {token}=await claim.json();let result:VoiceResultV1008;
      try{
-      const category=isArtistVoiceV1008(message.command)?'artist':isGoveePowerCommandV1138(message.command)?'power':isGoveeMusicVoiceCommandV1143(message.command)?'sync':isGoveeVoiceLookCommandV1146(message.command)?'look':isFullConcertVoiceCommandV1145(message.command)?'show':'display';
+      const category=isArtistVoiceV1008(message.command)?'artist':isGoveePowerCommandV1138(message.command)?'power':isGoveeMusicVoiceCommandV1143(message.command)?'sync':isGoveeVoiceLookCommandV1146(message.command)?'look':(isFullConcertVoiceCommandV1145(message.command)||message.command.startsWith('concert-scene-'))?'show':'display';
       const consent=p[category];const since=Math.max(p.general.since,consent.since);
       const allowed=()=>{const latest=permissions();return visible()&&latest.general.enabled&&latest.general.since===p.general.since&&latest[category].enabled&&latest[category].since===consent.since;};
       if(message.command==='connection-status'){
@@ -65,6 +66,15 @@ export function AlexaVoiceControlV1008(){
       else if(category==='artist')result=await executeArtistVoiceV1008(message,{since,now:Date.now,allowed,fetcher:fetch,signal:abort.signal,undo:undo.current,saveUndo,notify});
       else if(category==='sync')result=executeAlexaGoveeMusicSyncV1143(message,{since,now:Date.now,allowed,signal:abort.signal});
       else if(category==='look')result=await executeAlexaGoveeVoiceLookV1146(message,{since,now:Date.now,allowed,signal:abort.signal});
+      else if(category==='show'&&message.command.startsWith('concert-scene-')){
+       if(!connected||!isPlaying||!track?.id)throw Error('Bitte zuerst Spotify-Musik abspielen.');
+       if(!allowed())throw Error('Konzertfreigabe widerrufen.');
+       const scene=message.command.slice('concert-scene-'.length) as ConcertSceneV1147;
+       const plan=planConcertSceneV1147({scene,genre:'other',showConsent:p.show.enabled,
+        goveeConsent:p.show.includeGovee&&p.look.enabled,musicSyncConsent:p.sync.enabled,
+        reducedMotion:current.current.reducedMotion,masterBrightness:50});
+       result={kind:'complete',text:'Konzertszene '+plan.scene+' vorbereitet. Dies ist eine sichere Vorschau; Bühne und Govee bleiben unverändert.'};
+      }
       else if(category==='show')result=executeAlexaFullConcertV1145(message,{since,now:Date.now,allowed,signal:abort.signal,preferences:current.current,updatePreferences,connected,playing:isPlaying,trackId:track?.id});
       else if(category==='power')result=message.goveeTarget?
        await executeAlexaGoveePowerV1141(message,{since,now:Date.now,allowed,signal:abort.signal}):
