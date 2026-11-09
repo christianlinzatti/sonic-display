@@ -3,6 +3,7 @@
  */
 import {loadGoveeConfigV909,saveGoveeConfigV909} from './goveeLanV909';
 import {canExecuteGoveePowerV1138,isGoveePowerCommandV1138} from './goveePowerV1138';
+import {isGoveeVoiceLookCommandV1146} from './goveeVoiceLookV1146';
 import type {VoiceMessageV1008,VoiceResultV1008} from './alexaVoiceV1008';
 export const GOVEE_SYNC_CONSENT_KEY_V1143='sonic-display:alexa-govee-sync-v1143';
 export const GOVEE_SYNC_CONSENT_EVENT_V1143='sonic-display:alexa-govee-sync-changed-v1143';
@@ -11,7 +12,7 @@ export type GoveeMusicVoiceCommandV1143='govee-sync-start'|'govee-sync-pause';
 export const isGoveeMusicVoiceCommandV1143=(v:unknown):v is GoveeMusicVoiceCommandV1143=>
  v==='govee-sync-start'||v==='govee-sync-pause';
 export const isGoveeOnlyVoiceCommandV1143=(v:unknown):boolean=>
- isGoveePowerCommandV1138(v)||isGoveeMusicVoiceCommandV1143(v);
+ isGoveePowerCommandV1138(v)||isGoveeMusicVoiceCommandV1143(v)||isGoveeVoiceLookCommandV1146(v);
 export function loadGoveeSyncConsentV1143():GoveeSyncConsentV1143{
  if(typeof window==='undefined')return {enabled:false,since:0};
  try{const raw:unknown=JSON.parse(localStorage.getItem(GOVEE_SYNC_CONSENT_KEY_V1143)||'null');
