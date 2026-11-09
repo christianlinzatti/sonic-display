@@ -8,6 +8,10 @@ const path=require('node:path');
 const fs=require('node:fs');
 const {spawnSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..');
+// V1016: CI/Vercel builds run historical versioned-action assertions before
+// the later source-preflight. Normalize titles in this ephemeral checkout first;
+// only run-name metadata changes, never triggers, permissions or workflow steps.
+require('./version-action-titles-v1016.cjs').formatActionTitlesV1016(root,true);
 const proof=path.join(root,'reports','vercel-production-proof.json');
 const startedAt=new Date().toISOString();
 const results=[];
