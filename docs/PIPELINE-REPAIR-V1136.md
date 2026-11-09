@@ -16,3 +16,7 @@ mit diesen beiden Befehlen beginnt. Die Versionsnummer wird aus
 Die Vorprüfung synchronisiert Workflow-Anzeigenamen ausschließlich im
 CI-Checkout. Diese Normalisierung muss vor den historischen Regressionen
 laufen; sie ersetzt keine Tests und verändert keine freigegebenen Workflows.
+
+Der maschinenlesbare Dokumentationsstand in `ARCHITECTURE.md` ist ebenfalls
+auf V1136 aktualisiert; die Architekturprüfung verifiziert weiterhin sämtliche
+Quellreferenzen und erforderlichen Abschnitte.
