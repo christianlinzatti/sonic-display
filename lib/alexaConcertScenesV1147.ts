@@ -35,3 +35,16 @@ export function planConcertSceneV1147(input:{
   goveeAllowed:input.goveeConsent&&input.musicSyncConsent
  };
 }
+
+/** Maps an authenticated scene request to existing reversible V1145 show controls.
+ * Only the concert-show-start transition is requested here; no direct hardware writes.
+ * Scene colors remain previews until the visual director supports owned scene overrides.
+ */
+export function activateConcertSceneV1147(
+ input:Parameters<typeof planConcertSceneV1147>[0],
+ startShow:()=>string
+):{plan:ConcertScenePlanV1147;message:string}{
+ const plan=planConcertSceneV1147(input);
+ const started=startShow();
+ return {plan,message:started+' Konzertphase '+plan.scene+' ausgewählt; Lichtfarben sind weiterhin nur Vorschau.'};
+}
