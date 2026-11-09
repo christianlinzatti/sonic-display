@@ -15,7 +15,7 @@ const GROUPS:{title:string;permission:string;intents:readonly string[]}[]=[
  {title:'Smart Concert Presets',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['RapPresetIntent','HardtekkPresetIntent','RockPresetIntent','CinemaPresetIntent','AutoPresetIntent']},
  {title:'Bühnenbereiche und Lichtfarben',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['StageZoneIntent','BackdropZoneIntent','AudienceZoneIntent','AllZonesIntent','WarmMoodIntent','CoolMoodIntent','NeonMoodIntent','AutoMoodIntent']},
  {title:'Virtuelle Bühneneffekte',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['VirtualFxOnIntent','VirtualFxOffIntent','BeamsEffectIntent','FogEffectIntent','ConfettiEffectIntent','StreamersEffectIntent','AutoEffectIntent','EffectsOffIntent']},
- {title:'Govee-Raumlicht',permission:'Für Lichtfarben: separate Govee-Freigabe und Musik-Sync. Für echtes Ein/Aus: eigene Alexa-Power-Freigabe, LAN-Bridge und ausgewählte Lampen',intents:['GoveeArenaIntent','GoveeFestivalIntent','GoveeClubIntent','GoveeCalmIntent','GoveeDimIntent','GoveeAutoIntent','GoveePowerOnIntent','GoveePowerOffIntent']},
+ {title:'Govee-Raumlicht',permission:'Für Lichtfarben: separate Govee-Freigabe und Musik-Sync. Für echtes Ein/Aus: eigene Alexa-Power-Freigabe, LAN-Bridge und ausgewählte Lampen',intents:['GoveeArenaIntent','GoveeFestivalIntent','GoveeClubIntent','GoveeCalmIntent','GoveeDimIntent','GoveeAutoIntent','GoveePowerOnIntent','GoveePowerOffIntent','GoveeFixtureOnIntent','GoveeFixtureOffIntent','GoveeGroupOnIntent','GoveeGroupOffIntent']},
  {title:'Spotify-Künstler',permission:'Zusätzliche Künstlerfreigabe und Spotify-Follow-Berechtigung',intents:['LikeArtistIntent','UnlikeArtistIntent','FollowAllArtistsIntent','ArtistStatusIntent','UndoArtistIntent','FollowPrimaryArtistIntent','UnfollowPrimaryArtistIntent','SelectFirstArtistIntent','SelectSecondArtistIntent','SelectThirdArtistIntent','SelectArtistIntent']},
  {title:'Anzeige und Avatar',permission:'Zusätzliche Anzeigefreigabe',intents:['LyricsOnIntent','LyricsOffIntent','NextAvatarIntent','CalmDisplayIntent','NormalDisplayIntent']},
  {title:'Status und Hilfe',permission:'Alexa-Empfang; Hilfe, Abbrechen und Stopp funktionieren auch ohne Displayverbindung',intents:['StatusIntent','LastVoiceResultIntent','AllCommandsIntent','AMAZON.HelpIntent','AMAZON.CancelIntent','AMAZON.StopIntent']}
@@ -52,7 +52,8 @@ export function AlexaCommandHelpV1137(){
    </section>:null;
   })}
   {!matching.length&&<p role="status">Kein Sprachbefehl passt zur Suche.</p>}
-  <p className="settings-note">Die Alexa-Antwort „gesendet“ bestätigt nur die Annahme durch die Bridge. Die Umsetzung erfolgt erst auf einem geöffneten, freigegebenen Display. Spotify-Playback wird nicht per Alexa gesteuert. Ein/Aus der ausgewählten Govee-Lampen erfordert eine zusätzliche Freigabe.</p>
+  <p className="settings-note">Einzelgeräte: „Schalte Govee Lampe 1 ein“ (Reihenfolge der ausgewählten Lampen). Gruppen: „Schalte Govee Bühne aus“, „Schalte Govee Ambient ein“. Gruppen verwenden gespeicherte Lichtrollen aus dem Gruppenstudio oder die Gerätezuteilung; nur ausgewählte Lampen werden geschaltet.</p>
+  <p className="settings-note">Die Alexa-Antwort „gesendet" bestätigt nur die Annahme durch die Bridge. Die Umsetzung erfolgt erst auf einem geöffneten, freigegebenen Display. Spotify-Playback wird nicht per Alexa gesteuert. Ein/Aus der ausgewählten Govee-Lampen erfordert eine zusätzliche Freigabe.</p>
  </details>;
 }
 

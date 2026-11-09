@@ -1,7 +1,7 @@
 'use strict';
 const {createHmac,randomUUID}=require('node:crypto');
 const COMMANDS={LikeArtistIntent:'artist-follow',UnlikeArtistIntent:'artist-unfollow',FollowAllArtistsIntent:'artist-follow-all',ArtistStatusIntent:'artist-status',UndoArtistIntent:'artist-undo',
- FollowPrimaryArtistIntent:'artist-follow-primary',UnfollowPrimaryArtistIntent:'artist-unfollow-primary',LyricsOnIntent:'lyrics-on',LyricsOffIntent:'lyrics-off',NextAvatarIntent:'avatar-next',CalmDisplayIntent:'display-calm',NormalDisplayIntent:'display-normal',GoveePowerOnIntent:'govee-power-on',GoveePowerOffIntent:'govee-power-off',StatusIntent:'connection-status'};
+ FollowPrimaryArtistIntent:'artist-follow-primary',UnfollowPrimaryArtistIntent:'artist-unfollow-primary',LyricsOnIntent:'lyrics-on',LyricsOffIntent:'lyrics-off',NextAvatarIntent:'avatar-next',CalmDisplayIntent:'display-calm',NormalDisplayIntent:'display-normal',GoveePowerOnIntent:'govee-power-on',GoveePowerOffIntent:'govee-power-off',GoveeFixtureOnIntent:'govee-power-on',GoveeFixtureOffIntent:'govee-power-off',GoveeGroupOnIntent:'govee-power-on',GoveeGroupOffIntent:'govee-power-off',StatusIntent:'connection-status'};
 const CHOICES={SelectFirstArtistIntent:1,SelectSecondArtistIntent:2,SelectThirdArtistIntent:3};
 const id=v=>typeof v==='string'&&/^[a-zA-Z0-9]{10,32}$/.test(v);
 function validSelection(v){return v?.kind==='selection'&&['artist-follow','artist-unfollow','artist-status'].includes(v.action)&&id(v.trackId)&&Array.isArray(v.choices)&&v.choices.length>=2&&v.choices.length<=10&&v.choices.every(c=>id(c?.id)&&typeof c.name==='string'&&c.name.length<=120)&&typeof v.text==='string'&&v.text.length<=1200;}
@@ -20,7 +20,20 @@ async function runVoiceV1008(event,{origin,secret,fetcher=fetch,clock=Date.now,s
  };
  try{
   if(intent==='LastVoiceResultIntent'){const data=await send({read:'latest'});return data.result?output(data.result):output({kind:'error',text:'Noch kein Ergebnis verfügbar. Prüfe, ob dein Display sichtbar geöffnet und mit Spotify verbunden ist.'});}
-  let command=COMMANDS[intent],target;
+  let command=COMMANDS[intent],target,goveeTarget;
+  if(['GoveeFixtureOnIntent','GoveeFixtureOffIntent'].includes(intent)){
+   const value=String(event?.request?.intent?.slots?.FixtureNumber?.value||'');
+   const number=Number(value);
+   if(!/^[1-4]$/.test(value)||!Number.isSafeInteger(number))return output({kind:'error',text:'Bitte eine Govee-Lampe von eins bis vier angeben.'});
+   goveeTarget={fixtureNumber:number};
+  }
+  if(['GoveeGroupOnIntent','GoveeGroupOffIntent'].includes(intent)){
+   const value=String(event?.request?.intent?.slots?.GoveeZone?.value||'').trim().toLocaleLowerCase('de-DE');
+   const groups={bühne:'wall',buehne:'wall',bühnenlicht:'wall',wand:'wall',ambient:'ambient',hintergrund:'ambient',neon:'neon',rhythmus:'rhythm',rhythm:'rhythm',bass:'rhythm'};
+   const groupRole=groups[value];
+   if(!groupRole)return output({kind:'error',text:'Diese Lichtgruppe kenne ich nicht. Nutze Bühne, Ambient, Neon oder Rhythmus.'});
+   goveeTarget={groupRole};
+  }
   if(intent==='SelectArtistIntent'||CHOICES[intent]){
    let selection=event?.session?.attributes?.voiceArtistSelection;
    if(!validSelection(selection))selection=(await send({read:'latest'})).result;
@@ -31,7 +44,7 @@ async function runVoiceV1008(event,{origin,secret,fetcher=fetch,clock=Date.now,s
    command=selection.action;target={artistId:selection.choices[number-1].id,trackId:selection.trackId};
   }
   if(!command)return null;
-  const queued=await send({command,...(target?{target}:{})});
+  const queued=await send({command,...(target?{target}:{}),...(goveeTarget?{goveeTarget}:{})});
   if(queued.queued!==true)return output({kind:'error',text:'Sonic Display hat die Anfrage nicht angenommen.'});
   if(typeof queued.id!=='string')return output(null);
   for(let tries=0;tries<12&&clock()<deadline-100;tries++){

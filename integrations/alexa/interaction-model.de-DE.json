@@ -260,6 +260,62 @@
           ]
         },
         {
+          "name": "GoveeFixtureOnIntent",
+          "slots": [
+            {
+              "name": "FixtureNumber",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "schalte govee lampe {FixtureNumber} ein",
+            "govee licht {FixtureNumber} einschalten",
+            "mache govee lampe {FixtureNumber} an"
+          ]
+        },
+        {
+          "name": "GoveeFixtureOffIntent",
+          "slots": [
+            {
+              "name": "FixtureNumber",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "schalte govee lampe {FixtureNumber} aus",
+            "govee licht {FixtureNumber} ausschalten",
+            "mache govee lampe {FixtureNumber} aus"
+          ]
+        },
+        {
+          "name": "GoveeGroupOnIntent",
+          "slots": [
+            {
+              "name": "GoveeZone",
+              "type": "GoveeZoneV1141"
+            }
+          ],
+          "samples": [
+            "schalte govee {GoveeZone} ein",
+            "aktiviere govee {GoveeZone}",
+            "mach govee {GoveeZone} an"
+          ]
+        },
+        {
+          "name": "GoveeGroupOffIntent",
+          "slots": [
+            {
+              "name": "GoveeZone",
+              "type": "GoveeZoneV1141"
+            }
+          ],
+          "samples": [
+            "schalte govee {GoveeZone} aus",
+            "deaktiviere govee {GoveeZone}",
+            "mach govee {GoveeZone} aus"
+          ]
+        },
+        {
           "name": "GoveePowerOnIntent",
           "samples": [
             "schalte die govee lichter ein",
@@ -503,7 +559,44 @@
           ]
         }
       ],
-      "types": []
+      "types": [
+        {
+          "name": "GoveeZoneV1141",
+          "values": [
+            {
+              "name": {
+                "value": "Bühne",
+                "synonyms": [
+                  "Bühnenlicht",
+                  "Wand"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Ambient",
+                "synonyms": [
+                  "Hintergrund"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Neon"
+              }
+            },
+            {
+              "name": {
+                "value": "Rhythmus",
+                "synonyms": [
+                  "Bass",
+                  "Rhythm"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   }
 }

@@ -1,10 +1,11 @@
 import {backgroundJsonV1009} from './backgroundJsonV1009';
 import {validArtistId} from './artist-follow-v359';
+import {validGoveeVoiceTargetV1141,type GoveeVoiceTargetV1141} from './goveeVoiceTargetV1141';
 import type {UiPreferences} from '@/types/music';
 export const VOICE_COMMANDS_V1008=['artist-follow','artist-follow-all','artist-unfollow','artist-status','artist-undo','artist-follow-primary','artist-unfollow-primary','lyrics-on','lyrics-off','avatar-next','display-calm','display-normal','connection-status','govee-power-on','govee-power-off'] as const;
 export type VoiceCommandV1008=typeof VOICE_COMMANDS_V1008[number];
 export type VoiceTargetV1008={artistId:string;trackId:string};
-export type VoiceMessageV1008={id:string;command:VoiceCommandV1008;createdAt:number;target?:VoiceTargetV1008};
+export type VoiceMessageV1008={id:string;command:VoiceCommandV1008;createdAt:number;target?:VoiceTargetV1008;goveeTarget?:GoveeVoiceTargetV1141};
 export type VoiceChoiceV1008={id:string;name:string};
 export type VoiceResultV1008={kind:'complete'|'error'|'selection';text:string;choices?:VoiceChoiceV1008[];trackId?:string;action?:'artist-follow'|'artist-unfollow'|'artist-status'};
 export type VoiceUndoV1008={owner:string;artistId:string;artistName:string;before:boolean;after:boolean;at:number;batch?:Array<{artistId:string;artistName:string;before:boolean;after:boolean}>};
@@ -16,7 +17,7 @@ export const isArtistVoiceV1008=(v:VoiceCommandV1008)=>v.startsWith('artist-');
 export function validTargetV1008(v:unknown):v is VoiceTargetV1008 {const x=v as VoiceTargetV1008|null;return !!x&&validArtistId(x.artistId)&&validArtistId(x.trackId);}
 export function freshVoiceV1008(v:unknown,since:number,now:number):v is VoiceMessageV1008 {
  const x=v as VoiceMessageV1008|null;
- return !!x&&voiceIdV1008(x.id)&&isVoiceCommandV1008(x.command)&&Number.isSafeInteger(x.createdAt)&&since>0&&since<=now&&x.createdAt>=since&&x.createdAt<=now&&now-x.createdAt<=30000&&(!x.target||validTargetV1008(x.target));
+ return !!x&&voiceIdV1008(x.id)&&isVoiceCommandV1008(x.command)&&Number.isSafeInteger(x.createdAt)&&since>0&&since<=now&&x.createdAt>=since&&x.createdAt<=now&&now-x.createdAt<=30000&&(!x.target||validTargetV1008(x.target))&&(!x.goveeTarget||(['govee-power-on','govee-power-off'].includes(x.command)&&validGoveeVoiceTargetV1141(x.goveeTarget)));
 }
 export function validVoiceResultV1008(v:unknown):v is VoiceResultV1008 {
  const x=v as VoiceResultV1008|null;

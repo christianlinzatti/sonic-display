@@ -5,6 +5,7 @@ import {useMusic} from '@/context/MusicContext';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
 import {ALEXA_LOCAL_ENABLED_KEY_V967} from '@/lib/alexaConcertV967';
 import {ALEXA_GOVEE_RECEIVER_EVENT_V1139,readAlexaGoveeReceiverTokenV1139,alexaGoveeReceiverHeadersV1139} from '@/lib/alexaGoveeReceiverClientV1139';
+import {executeAlexaGoveePowerV1141} from '@/lib/goveePowerRoutingV1141';
 import {GOVEE_POWER_CONSENT_EVENT_V1138,loadGoveePowerConsentV1138,isGoveePowerCommandV1138,executeAlexaGoveePowerV1138} from '@/lib/goveePowerV1138';
 import {ALEXA_ARTIST_KEY_V1007,ALEXA_ARTIST_EVENT_V1007,parseArtistVoiceConsentV1007} from '@/lib/alexaArtistV1007';
 import {VOICE_DISPLAY_KEY_V1008,VOICE_SETTINGS_EVENT_V1008,freshVoiceV1008,isArtistVoiceV1008,
@@ -56,7 +57,9 @@ export function AlexaVoiceControlV1008(){
       }
       else if(!consent.enabled||!freshVoiceV1008(message,since,Date.now()))throw Error(category==='artist'?'Bitte zuerst die Künstlersteuerung auf diesem Display freigeben.':category==='power'?'Bitte zuerst Alexa Govee Ein/Aus separat freigeben.':'Bitte zuerst die Anzeigesteuerung auf diesem Display freigeben.');
       else if(category==='artist')result=await executeArtistVoiceV1008(message,{since,now:Date.now,allowed,fetcher:fetch,signal:abort.signal,undo:undo.current,saveUndo,notify});
-      else if(category==='power')result=await executeAlexaGoveePowerV1138(message,{since,now:Date.now,allowed,signal:abort.signal});
+      else if(category==='power')result=message.goveeTarget?
+       await executeAlexaGoveePowerV1141(message,{since,now:Date.now,allowed,signal:abort.signal}):
+       await executeAlexaGoveePowerV1138(message,{since,now:Date.now,allowed,signal:abort.signal});
       else result=await executeDisplayVoiceV1008(message.command,{current:current.current.avatarModelId,fetcher:fetch,update:updatePreferences,allowed,signal:abort.signal});
      }catch(error){result={kind:'error',text:error instanceof Error?error.message.slice(0,1000):'Sprachbefehl konnte nicht ausgeführt werden.'};}
      if(disposed||abort.signal.aborted)return;

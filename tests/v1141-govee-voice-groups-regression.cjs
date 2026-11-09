@@ -1,0 +1,28 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const ts=require('./typescript-loader.cjs');
+const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+const source=ts.transpileModule(read('lib/goveeVoiceTargetV1141.ts'),{fileName:'lib/goveeVoiceTargetV1141.ts',compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;
+const moduleResult={exports:{}};
+vm.runInNewContext(source,{module:moduleResult,exports:moduleResult.exports,Number,Object});
+const {validGoveeVoiceTargetV1141:valid,resolveGoveeVoiceIpsV1141:resolve}=moduleResult.exports;
+const selected=['192.168.1.10','192.168.1.11','192.168.1.12','192.168.1.13'];
+const roles={'192.168.1.10':'wall','192.168.1.11':'ambient','192.168.1.12':'rhythm','192.168.1.13':'neon'};
+for(const value of [{fixtureNumber:0},{fixtureNumber:5},{fixtureNumber:'2'},{groupRole:'other'},{groupRole:'wall',ip:'8.8.8.8'},{ip:'192.168.1.10'},null,[]])assert(!valid(value),JSON.stringify(value));
+for(let n=1;n<=4;n++)assert(valid({fixtureNumber:n}));
+assert(valid({groupRole:'wall'}));
+const groups={enabled:false,groups:[]};
+assert.deepEqual(JSON.parse(JSON.stringify(resolve({fixtureNumber:2},selected,roles,groups))),['192.168.1.11']);
+assert.deepEqual(JSON.parse(JSON.stringify(resolve({groupRole:'ambient'},selected,roles,groups))),['192.168.1.11']);
+assert.deepEqual(JSON.parse(JSON.stringify(resolve({groupRole:'wall'},selected,roles,{enabled:true,groups:[{role:'wall',members:['8.8.8.8','192.168.1.12']}]}))),['192.168.1.12']);
+assert.equal(resolve({fixtureNumber:4},selected.slice(0,2),roles,groups).length,0);
+const lambda=require('../integrations/alexa/voice-v1008.cjs');
+const names=['GoveeFixtureOnIntent','GoveeFixtureOffIntent','GoveeGroupOnIntent','GoveeGroupOffIntent'];
+const model=require('../integrations/alexa/interaction-model.de-DE.json').interactionModel.languageModel;
+for(const name of names){assert(lambda.COMMANDS[name]);assert(model.intents.some(v=>v.name===name&&v.slots.length===1));}
+for(const marker of ['goveeTarget','validGoveeVoiceTargetV1141','isGoveePowerCommandV1138'])assert(read('app/api/alexa/voice/route.ts').includes(marker));
+assert(read('app/api/alexa/govee-pending/route.ts').includes('isGoveePowerCommandV1138'));
+assert(read('app/api/alexa/govee-result/route.ts').includes('Not a Govee command'));
+assert(read('components/AlexaVoiceControlV1008.tsx').includes('executeAlexaGoveePowerV1141'));
+assert(read('components/AlexaSettingsV1137.tsx').includes("'GoveeGroupOnIntent'"));
+console.log('PASS V1141 bounded fixture/group targets, deny unselected LAN IPs, slot model, signed voice relay and opt-in routing');

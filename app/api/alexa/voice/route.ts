@@ -1,6 +1,8 @@
 import {createHmac,timingSafeEqual,randomUUID} from 'node:crypto';
 import {alexaRelayConfiguredV967,claimAlexaNonceV967} from '@/lib/alexaRedisV967';
 import {isVoiceCommandV1008,validTargetV1008,voiceIdV1008} from '@/lib/alexaVoiceV1008';
+import {isGoveePowerCommandV1138} from '@/lib/goveePowerV1138';
+import {validGoveeVoiceTargetV1141} from '@/lib/goveeVoiceTargetV1141';
 import {enqueueVoiceV1008,voiceResultV1008} from '@/lib/alexaVoiceStoreV1008';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const json=(v:object,status=200)=>Response.json(v,{status,headers:{'Cache-Control':'no-store'}});
@@ -16,11 +18,12 @@ export async function POST(request:Request){
  let v;try{v=JSON.parse(raw);}catch{return json({error:'Invalid JSON'},400);}
  if(!v||typeof v!=='object'||Array.isArray(v))return json({error:'Invalid command'},400);
  if(v.read!==undefined&&!(voiceIdV1008(v.read)||v.read==='latest'))return json({error:'Invalid request ID'},400);
- if(v.read===undefined&&(!isVoiceCommandV1008(v.command)||(v.target!==undefined&&(!validTargetV1008(v.target)||!['artist-follow','artist-unfollow','artist-status'].includes(v.command)))))return json({error:'Invalid command'},400);
+ if(v.read===undefined&&(!isVoiceCommandV1008(v.command)||(v.target!==undefined&&(!validTargetV1008(v.target)||!['artist-follow','artist-unfollow','artist-status'].includes(v.command)))||
+   (v.goveeTarget!==undefined&&(!isGoveePowerCommandV1138(v.command)||!validGoveeVoiceTargetV1141(v.goveeTarget)||v.target!==undefined))))return json({error:'Invalid command'},400);
  try{
   if(!await claimAlexaNonceV967(nonce))return json({error:'Duplicate request'},409);
   if(v.read!==undefined)return json({result:await voiceResultV1008(v.read)});
-  const message={id:randomUUID(),command:v.command,createdAt:Date.now(),...(v.target?{target:v.target}:{})};
+  const message={id:randomUUID(),command:v.command,createdAt:Date.now(),...(v.target?{target:v.target}:{}),...(v.goveeTarget?{goveeTarget:v.goveeTarget}:{})};
   await enqueueVoiceV1008(message);return json({queued:true,id:message.id});
  }catch{return json({error:'Relay unavailable'},503);}
 }
