@@ -1,6 +1,6 @@
 ## V1134 – Gemeinsamer Score für Song, Crew und Text
 
-**Aktueller Dokumentationsstand: V1134.** Bedienung, Stress-Tests und Grenzen: [docs/versions/V1134-SONGREGIE-CREW.md](docs/versions/V1134-SONGREGIE-CREW.md).
+**Aktueller Dokumentationsstand: V1134.** Bedienung, Stress-Tests und Grenzen: [V1134-SONGREGIE-CREW.md](docs/versions/V1134-SONGREGIE-CREW.md).
 
 `lib/concertScoreV1134.ts` erweitert die V1131-Story um Auftakt, Refrain-Vorschau, Lesepassagen, Rollenrotation und begrenzte Lichtakzente. Das bestehende `useConcertStoryV1131` liefert diesen erweiterten Score an Kamera, Bühne, Lyrics und Probenbeleuchtung. Der Live-Regieindikator und `sonicCrewDirector` verwenden dieselbe reine Planung. Rollen und Phrasen sind aus festen Songzeitblöcken rekonstruierbar und springen nicht bei BPM-Updates. Die tatsächlich abgespielte Tanzuhr integriert weiterhin geglättete BPM und weiche Phasenkorrekturen.
 
@@ -14,7 +14,7 @@ Tests: `tests/v1134-concert-score.cjs`, `tests/fixtures/concertStressV1134.cjs` 
 
 ## V1133 – Ganzkörper- und Text-Prioritäts-Pipeline
 
-**Historischer Dokumentationsstand: V1133.** Ausführliche Bedienung und Herkunft: [docs/versions/V1133-GANZKOERPER-LYRICS.md](docs/versions/V1133-GANZKOERPER-LYRICS.md).
+**Historischer Dokumentationsstand: V1133.** Ausführliche Bedienung und Herkunft: [V1133-GANZKOERPER-LYRICS.md](docs/versions/V1133-GANZKOERPER-LYRICS.md).
 
 ### Bewegung und Persönlichkeiten
 
