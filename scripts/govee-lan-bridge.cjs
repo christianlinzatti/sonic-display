@@ -57,7 +57,7 @@ socket.on('message',(raw,peer)=>{
     devices.set(result.ip,{...old,...result,lastSeen:Date.now(),manual:false});
   } else if(result.type==='devStatus'&&devices.has(result.ip)){
     const old=devices.get(result.ip);
-    devices.set(result.ip,{...old,status:{on:result.on??null,brightness:result.brightness??null,color:result.color??null},lastSeen:Date.now()});
+    devices.set(result.ip,{...old,status:{on:result.on??null,brightness:result.brightness??null,color:result.color??null},statusAt:Date.now(),lastSeen:Date.now()});
   }
 });
 socket.bind(REPLY_PORT,'0.0.0.0',()=>{
@@ -124,9 +124,12 @@ const server=http.createServer(async(req,res)=>{
     if(req.method==='POST'&&url.pathname==='/status') {
       const {ip}=await body(req);
       if(!isPrivateIPv4(ip)||!devices.has(ip))return respond(res,404,{error:'Gerät nicht registriert.'});
+      const requestedAt=Date.now();
       await send(status(),ip,COMMAND_PORT);
-      await pause(350);
-      return respond(res,200,{device:withPresence(devices.get(ip))});
+      await pause(450);
+      const device=devices.get(ip);
+      // Only count a status packet that arrived AFTER this explicit query.
+      return respond(res,200,{device:withPresence(device),fresh:Boolean(device.statusAt&&device.statusAt>=requestedAt&&isOnline(device))});
     }
     if(req.method==='POST'&&url.pathname==='/command') {
       const payload=await body(req);const {ip,action,value}=payload;

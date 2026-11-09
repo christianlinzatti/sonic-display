@@ -8,6 +8,7 @@ import {ALEXA_GOVEE_CONSENT_EVENT_V970,ALEXA_GOVEE_RESET_EVENT_V970,loadAlexaGov
 import model from '../integrations/alexa/interaction-model.de-DE.json';
 import {ALEXA_GOVEE_RECEIVER_EVENT_V1139,readAlexaGoveeReceiverTokenV1139,saveAlexaGoveeReceiverTokenV1139} from '@/lib/alexaGoveeReceiverClientV1139';
 import {GoveePowerQuickControlsV1138,GoveePowerPermissionV1138} from './GoveePowerControlsV1138';
+import {GoveeLightDashboardV1142} from './GoveeLightDashboardV1142';
 
 const LOCAL_EVENT='sonic-display:alexa-local-status-v971';
 const GROUPS:{title:string;permission:string;intents:readonly string[]}[]=[
@@ -112,6 +113,7 @@ export function AlexaSettingsV1137(){
    <small role="status">{receiverSaved?'Token lokal hinterlegt':'Kein Token hinterlegt'} · Spotify-Zugriff bleibt unverändert.</small>
   </details>
   <GoveePowerQuickControlsV1138/>
+  <details><summary>Govee-Lichtzentrale · Status, Einzelgeräte und Favoriten</summary><GoveeLightDashboardV1142/></details>
   {notice&&<p role="status">{notice}</p>}
   <AlexaCommandHelpV1137/>
   <p className="settings-note">Einmalige Einrichtung: <a href="https://github.com/christianlinzatti/sonic-display/blob/master/docs/versions/V967-ALEXA-ANBINDUNG.md" target="_blank" rel="noopener noreferrer">Alexa-Skill, Lambda und Bridge konfigurieren</a>.</p>

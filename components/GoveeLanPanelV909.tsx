@@ -28,6 +28,7 @@ import {GoveeSceneTransitionStudioV1101} from '@/components/GoveeSceneTransition
 import {GoveeSceneZoneStudioV1102} from '@/components/GoveeSceneZoneStudioV1102';
 import {GoveeRoomPerformanceDashboardV928} from '@/components/GoveeRoomPerformanceDashboardV928';
 import {IntegrationSetupWizardV971} from '@/components/IntegrationSetupWizardV971';
+import {GoveeLightDashboardV1142} from '@/components/GoveeLightDashboardV1142';
 import {ConcertRoadmapStudioV958} from '@/components/ConcertRoadmapStudioV958';
 import {recoveryDelayV930} from '@/lib/ultimateConcertRoadmapV958';
 type DeviceList={devices:GoveeDeviceV909[]};
@@ -156,6 +157,7 @@ export function GoveeLanPanelV909(){
    <label>Farbe<input type="color" value={rgbHex(color)} onChange={e=>setColor(e.target.value)}/></label>
    <label>Helligkeit ({config.masterBrightness} %)<input type="range" min={1} max={100} value={config.masterBrightness} onChange={e=>update({masterBrightness:Number(e.target.value)})}/></label>
   </div>
+  <GoveeLightDashboardV1142/>
   <div className="govee-v909-actions"><button type="button" disabled={busy||!config.selectedIps.length} onClick={()=>void operation(()=>action('color',hexColor(color)))}>Farbe senden</button>
   <button type="button" disabled={busy||!config.selectedIps.length} onClick={()=>void operation(()=>action('brightness',config.masterBrightness))}>Helligkeit senden</button></div>
   <label>Farbtemperatur ({kelvin} K)<input type="range" min={2000} max={9000} step={100} value={kelvin} onChange={e=>setKelvin(Number(e.target.value))}/></label>

@@ -7,6 +7,7 @@ import type {TouchReadabilityV648} from "./touchDisplayPolicyV648";
 import type {UiPreferences} from "@/types/music";
 import {ConcertPresetManagerV650} from "./ConcertPresetManagerV650";
 import {GoveePowerQuickControlsV1138} from './GoveePowerControlsV1138';
+import {GoveeLightDashboardV1142} from './GoveeLightDashboardV1142';
 import {sanitizeConcertPatchV650,type ConcertPresetV650} from "./concertPresetsV650";
 import type {SmartPresetAutomationUiV651} from "./useSmartPresetAutomationV651";
 
@@ -97,6 +98,7 @@ export function ConcertControlCenterV649({onClose,onActivity,view,setView,readab
       <h3>Licht und Effekte</h3><p>Die vorhandenen 3D-Lichter und Bühnendetails einstellen – ohne neue Lichtobjekte.</p>
       <h4>Govee LAN · Schnelleinstellungen</h4>
       <GoveePowerQuickControlsV1138 compact onActivity={onActivity}/>
+      <GoveeLightDashboardV1142 onActivity={onActivity}/>
       {range("Bühnenlicht","stageLightStrength",preferences.stageLightStrength)}
       {toggle("Bühnendetails","concertDetailEnabledV555",preferences.concertDetailEnabledV555??true)}
       {range("Detail-Intensität","concertDetailStrengthV555",preferences.concertDetailStrengthV555??45)}
