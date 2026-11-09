@@ -12,6 +12,7 @@ import {GoveeLightDashboardV1142} from './GoveeLightDashboardV1142';
 import {GoveeMusicVoiceControlsV1143} from './GoveeMusicVoiceControlsV1143';
 import {GoveeVoiceLookControlsV1146} from './GoveeVoiceLookControlsV1146';
 import {FullConcertVoiceControlsV1145} from './FullConcertVoiceControlsV1145';
+import {AlexaConcertScenePreviewV1147} from './AlexaConcertScenePreviewV1147';
 
 const LOCAL_EVENT='sonic-display:alexa-local-status-v971';
 const GROUPS:{title:string;permission:string;intents:readonly string[]}[]=[
@@ -99,6 +100,7 @@ export function AlexaSettingsV1137(){
    <small>Standardmäßig aus. Die Berechtigungen für Spotify-Künstler, Anzeige und Govee werden zusätzlich und getrennt erteilt.</small>
   </fieldset>
   <FullConcertVoiceControlsV1145/>
+  <AlexaConcertScenePreviewV1147/>
   <AlexaArtistPermissionV1007/>
   <AlexaToolsV1008/>
   <fieldset><legend>Govee-Raumlicht per Alexa</legend>
