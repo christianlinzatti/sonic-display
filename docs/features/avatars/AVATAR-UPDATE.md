@@ -112,3 +112,10 @@ kann `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium` gesetzt werden;
 alternativ vorher `npx playwright install chromium` ausführen.
 Prüfbericht: `reports/avatar-validation/VERIFICATION.md`.
 Browserbericht mit Bildern: `reports/playwright-avatars/html/index.html`.
+
+## V1124 – Crowd-Regie ohne Änderungen am Avatar-Rig
+
+Neue Publikumswellen nutzen vorhandene V1032-Instanzen und Crowd-Renderer.
+Die Stage-Crew-Modelle und ihre Animationsclips erhalten keine neuen Bones,
+Morph-Targets oder Jubelgeräusche. Reduzierte Bewegung und GPU-Grenzen
+bleiben verbindlich.

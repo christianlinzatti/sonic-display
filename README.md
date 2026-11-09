@@ -3723,3 +3723,19 @@ oder Govee-Befehle; manuelle Steuerung und reduzierte Bewegung haben Vorrang.
 Unter **Einstellungen → Bühne → 360° Arena → AI Show Designer → V1122 Concert Atmosphere** findest du vier lokale Bühnenatmosphären: **Filmischer Bodennebel**, **Festival-Luft & Partikel**, **Holografische Tiefenräume** und **Ruhige Künstleratmosphäre**. Die Vorschau plant sieben Songkapitel mit Nebel, virtuellen Partikeln, Raumtiefe und einer sanften Atempause, ohne die vorhandene Show zu verändern. Die Stimmungen sind kreative Regiehinweise, keine Messwerte oder neu erkannten Songteile.
 
 Ein separater Button aktiviert auf Wunsch ausschließlich die vorhandenen 360°-Effekte V1045 (Atmosphäre), V1058 (volumetrische Beleuchtung) und V1084 (virtuelle Festivalpartikel). Bewegungsreduktion, GPU-Grenzen, pausierte Wiedergabe, manuelle Partikelmodi sowie sichere Rücknahme bleiben erhalten. **Keine** Govee-Befehle oder echten Nebelmaschinen. Lokal: `npm run test:v1122`, `npm run test:v1122:types`. Für den vollständigen Next.js-/Playwright-Produktionsnachweis nach dem Import die GitHub-Actions-Pipeline abwarten.
+
+### V1124 – AI Audience Energy Sync
+
+Unter **Einstellungen → Bühne → 360° Arena → AI Show Designer → V1124
+AI Audience Energy Sync** gibt es vier Stilrichtungen (Publikumswelle,
+Festival-Lichtermeer, Deutschrap-Call-and-Response und filmische Lichtatmosphäre).
+Die lokale Vorschau plant sieben Crowd-Szenen: Smartphone-Licht, virtuelle
+Lichtbänder, Arme, Jubel**gesten** und Bühnenaufmerksamkeit. Das ist eine
+planende visuelle Partitur, keine echte Publikumsreaktion, keine Audioausgabe
+und keine automatische Erkennung eines Hooks. Optional wird der V1123-Energiebogen
+verwendet. Erst ein **separater Live-Aktivierungsklick** schaltet die vorhandenen
+V1044-/V1073-/V1075-/V1092-Crowd-Renderer ein. Manuelle Telefonlichtmodi,
+Reduced Motion, Pause und GPU-Grenzen behalten Vorrang. Keine zusätzlichen
+Crowd-Instanzen, keine Govee-Hardwarebefehle. Lokal prüfen mit
+`npm run test:v1124` und `npm run test:v1124:types`; die vollständige CI
+unter Node 24 mit Playwright bleibt nach dem Import erforderlich.

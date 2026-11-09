@@ -1,3 +1,23 @@
+## V1124 · AI Audience Energy Sync
+
+`lib/aiAudienceEnergySyncV1124.ts` berechnet sieben rein lokale, durch die
+V1040-Timeline begrenzte Publikumsbilder. Auf Wunsch verwendet die Vorschau den
+bereits geprüften V1123-Energieverlauf; sonst die Intensität des vorhandenen
+Show-Remixes. Die fünf **Planungskanäle** (Smartphone-Lichter, virtuelle
+Lichtbänder, Arme, Jubelgesten und Bühnenaufmerksamkeit) sind keine Messwerte
+und erzeugen weder Geräusche noch neue Publikumsinstanzen.
+
+Nur nach einem zweiten Benutzerklick werden vorhandene V1044-/V1073-/V1075-/
+V1092-Effekte aktiviert, mit maximal 55 % Preset-Stärke. Pause, niedrige
+GPU-Leistung, Reduced Motion und manuelle Smartphone-Modi behalten Vorrang;
+konfliktgeschütztes Undo stellt keine nachträglich bearbeiteten Werte zurück.
+Dies ist keine sekundengenaue Crowd-Automation, kein echter Beat-/Hook-Nachweis
+und keine Steuerung realer Mobiltelefone, Govee-Lichter oder Lautsprecher.
+
+Prüfungen: `tests/v1124-audience-energy-sync-regression.cjs`,
+`tests/tsconfig.v1124-core.json`,
+`tests/e2e/ai-audience-energy-v1124.spec.cjs` (Desktop/Touch).
+
 ## V1123 · AI Concert Energy Director
 
 `lib/aiConcertEnergyDirectorV1123.ts` integriert sieben validierte V1040-Szenen
@@ -138,7 +158,7 @@ Im **360° AI Show Designer** kannst du jetzt die V1111-Konzertregie proben: Sie
 
 Das Drop-Radar wertet die **freiwillig gestartete lokale V1108-Mikrofonmessung** aus. Erst nach mindestens fünf Sekunden mit sauberem Signal werden ein bereits gemessener Einschlag oder ein möglicher Energieaufbau erkannt. Ein künftiger Drop-Zeitpunkt kann aus diesem Signal **nicht sicher vorhergesagt** werden. Nur nach Zustimmung kann eine Regieidee für die **nächste** V1106/V1109-Vorschau vorgemerkt werden. Die sieben Zeitgrenzen, die Intensitätsobergrenze und die manuelle Freigabe bleiben erhalten. Keine Audio-/Geräte-/Cloud-Übertragung; Tests: `npm run test:v1110`, `npm run test:v1110:types`.
 
-**Dokumentationsstand:** V1123
+**Dokumentationsstand:** V1124
 
 ## V1104 · Playwright Visual QA & Screenshot Reports
 

@@ -127,3 +127,12 @@ Die Browser-Tests starten den Produktionsserver selbst auf Port 3215.
 Prüfbericht: `reports/avatar-validation/VERIFICATION.md`.
 Browserbericht mit Screenshots: `reports/playwright-avatars/html/index.html`.
 Der Modell- und Blender-Leitfaden bleibt in `AVATAR-UPDATE.md` erhalten.
+
+## V1124 – Virtuelles Publikum synchronisieren
+
+Im AI Show Designer schlägt die V1124-Regie sieben Crowd-Phasen entlang der
+Showtimeline vor. Optische Armbewegungen, virtuelle Handy-/Lichtbandwellen
+und Jubelgesten stammen aus bestehenden Crowd-Modulen. Die Stage-Crew-GLB-Clips,
+Sängerzuordnung und manuelle Choreografien bleiben unverändert. Ohne ausdrückliche
+Bestätigung bleibt es bei einer reinen Vorschau; es entstehen keine Stimmen
+oder echten Geräteaktionen.

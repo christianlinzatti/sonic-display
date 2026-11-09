@@ -1,0 +1,4 @@
+{
+ "compilerOptions":{"target":"ES2022","lib":["es2022"],"module":"ESNext","moduleResolution":"bundler","strict":true,"skipLibCheck":true,"noEmit":true,"rootDir":"..","types":[]},
+ "include":["../lib/aiAudienceEnergySyncV1124.ts","../lib/aiConcertEnergyDirectorV1123.ts","../lib/arena360AudienceDirectorV1044.ts","../lib/arena360AudienceExperienceV1073.ts"]
+}
