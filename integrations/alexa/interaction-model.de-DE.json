@@ -626,6 +626,33 @@
             "künstler nummer {ArtistNumber}",
             "ich wähle nummer {ArtistNumber}"
           ]
+        },
+        {
+          "name": "ConcertSceneCalmIntent",
+          "samples": [
+            "starte ruhige Konzertszene",
+            "schalte auf ruhige Konzertphase",
+            "mache die Konzertshow ruhig",
+            "aktiviere ruhige Szene"
+          ]
+        },
+        {
+          "name": "ConcertSceneIntenseIntent",
+          "samples": [
+            "starte intensive Konzertszene",
+            "schalte auf intensive Konzertphase",
+            "mache die Konzertshow intensiv",
+            "aktiviere intensive Szene"
+          ]
+        },
+        {
+          "name": "ConcertSceneFinaleIntent",
+          "samples": [
+            "starte Konzertfinale",
+            "aktiviere die Finalszene",
+            "starte die finale Konzertphase",
+            "schalte auf Konzertfinale"
+          ]
         }
       ],
       "types": [
