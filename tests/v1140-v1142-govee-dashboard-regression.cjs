@@ -15,7 +15,7 @@ const bridge=read('scripts/govee-lan-bridge.cjs');
 assert(bridge.includes('const requestedAt=Date.now()')&&bridge.includes('device.statusAt>=requestedAt'),'status must be newer than request');
 assert(bridge.includes('statusAt:Date.now()'),'only actual LAN reply can update statusAt');
 const ui=read('components/GoveeLightDashboardV1142.tsx');
-for(const marker of ['readGoveeStatusV1140','sendTargetedGoveePowerV1141','sendGoveePowerV1138','Status prüfen','Hardtekk','Entspannen','Nacht','Konzert','Musik-Sync','masterBrightness'])assert(ui.includes(marker),marker);
+for(const marker of ['readGoveeStatusWithRetryV1144','sendTargetedGoveePowerV1141','sendGoveePowerV1138','Status prüfen','Hardtekk','Entspannen','Nacht','Konzert','Musik-Sync','masterBrightness'])assert(ui.includes(marker),marker);
 assert(!ui.includes('setInterval('),'dashboard must not poll in background');
 for(const path of ['components/AlexaSettingsV1137.tsx','components/ConcertControlCenterV649.tsx','components/GoveeLanPanelV909.tsx'])assert(read(path).includes('GoveeLightDashboardV1142'),path);
 assert(read('scripts/vercel-production-build.cjs').includes('v1140-v1142-govee-dashboard-regression.cjs'));
