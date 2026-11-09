@@ -17,6 +17,9 @@ import {useCrewSettings,writeCrewSettings} from '@/components/visualizer/useSoni
 import {directVocalActingV1115,sampleVocalCueV1115,vocalPresetV1115,
  VOCAL_STYLE_LABELS_V1115,type VocalStyleV1115,type VocalShowV1115,type VocalPresetV1115}
  from '@/lib/aiVocalActingV1115';
+import {directFestivalShowMasterV1126,masterDirectorOptionsV1126,sampleFestivalShowMasterV1126,
+ festivalShowMasterLivePresetV1126,MASTER_LABELS_V1126,
+ type MasterStyleV1126,type MasterShowV1126} from '@/lib/aiFestivalShowMasterV1126';
 import {directFestivalCrowdV1125,sampleFestivalCrowdV1125,festivalCrowdLivePresetV1125,
  FESTIVAL_CROWD_LABELS_V1125,type FestivalCrowdStyleV1125,
  type FestivalCrowdShowV1125,type FestivalCrowdLivePresetV1125} from '@/lib/aiFestivalCrowdDirectorV1125';
@@ -115,6 +118,12 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
  const [stageEnabled,setStageEnabled]=useState(false);
  const [stagePreview,setStagePreview]=useState<StageShowV1117|null>(null);
  const [stageCanUndo,setStageCanUndo]=useState(false);
+ const [masterStyle,setMasterStyle]=useState<MasterStyleV1126>('cinematic');
+ const [masterStrength,setMasterStrength]=useState(50);
+ const [masterEnabled,setMasterEnabled]=useState(false);
+ const [masterPreview,setMasterPreview]=useState<MasterShowV1126|null>(null);
+ const [masterCanUndo,setMasterCanUndo]=useState(false);
+ const masterUndo=useRef<{before:Partial<typeof preferences>;after:Record<string,boolean|number|string>}|null>(null);
  const [festivalStyle,setFestivalStyle]=useState<FestivalCrowdStyleV1125>('ripple');
  const [festivalStrength,setFestivalStrength]=useState(50);
  const [festivalEnabled,setFestivalEnabled]=useState(false);
@@ -267,6 +276,8 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
  const activeEnergy=sampleConcertEnergyV1123(energyPreview,previewPercent);
  const activeAudience=sampleAudienceEnergySyncV1124(audiencePreview,previewPercent);
  const activeFestival=sampleFestivalCrowdV1125(festivalPreview,previewPercent);
+ const activeMaster=sampleFestivalShowMasterV1126(masterPreview,previewPercent);
+ const masterOptions=()=>({style:masterStyle,strength:masterStrength,intensityCap:cap});
  const stageOptions=()=>({style:stageStyle,strength:stageStrength,intensityCap:cap});
  const holoOptions=()=>({style:holoStyle,strength:holoStrength,intensityCap:cap});
  const cameraOptions=()=>({style:cameraStyle,strength:cameraStrength,intensityCap:cap});
@@ -283,7 +294,7 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
  useEffect(()=>{
   emotionSession.current=createMusicEmotionSessionV1108();
   setReading(null);setDropReading(null);setDropCue(null);setSampleCount(0);setSampling(false);
-  setFollowSong(false);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);setEnergyPreview(null);setAudiencePreview(null);setFestivalPreview(null);setAtmospherePreview(null);setTransitionPreview(null);
+  setFollowSong(false);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);setEnergyPreview(null);setAudiencePreview(null);setFestivalPreview(null);setMasterPreview(null);setAtmospherePreview(null);setTransitionPreview(null);
  },[currentTrack]);
  useEffect(()=>{
   // Completed readings are also invalidated if the microphone or playback stops.
@@ -336,11 +347,14 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   setSampling(false);setReading(null);setDropReading(null);setDropCue(null);setSampleCount(0);
   setMoodExplanation('Lokale Messwerte verworfen. Es wurde nichts gespeichert oder übertragen.');
  };
- const invalidate=()=>{setEnergyPreview(null);setAudiencePreview(null);setFestivalPreview(null);setAtmospherePreview(null);setTransitionPreview(null);setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setBusy(false);setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setStatus('');};
- useEffect(()=>{setEnergyPreview(null);setAudiencePreview(null);setFestivalPreview(null);setAtmospherePreview(null);setTransitionPreview(null);setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setBusy(false);
+ const invalidate=()=>{setMasterPreview(null);setEnergyPreview(null);setAudiencePreview(null);setFestivalPreview(null);setAtmospherePreview(null);setTransitionPreview(null);setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setBusy(false);setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setStatus('');};
+ useEffect(()=>{setEnergyPreview(null);setAudiencePreview(null);setFestivalPreview(null);setMasterPreview(null);setAtmospherePreview(null);setTransitionPreview(null);setLightingPreview(null);setCameraPreview(null);setHoloPreview(null);setStagePreview(null);controller.current?.abort();requestId.current++;setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setSource(null);setBusy(false);
   return ()=>{controller.current?.abort();requestId.current++;};
  },[signature]);
- const local=(storyOnly=false,conductorOnly=false,personalityOnly=false,performanceOnly=false,danceOnly=false,vocalOnly=false,interactionOnly=false,stageOnly=false,holoOnly=false,cameraOnly=false,lightingOnly=false,transitionOnly=false,atmosphereOnly=false,energyOnly=false,audienceOnly=false,festivalOnly=false)=>{
+ const local=(storyOnly=false,conductorOnly=false,personalityOnly=false,performanceOnly=false,danceOnly=false,vocalOnly=false,interactionOnly=false,stageOnly=false,holoOnly=false,cameraOnly=false,lightingOnly=false,transitionOnly=false,atmosphereOnly=false,energyOnly=false,audienceOnly=false,festivalOnly=false,masterOnly=false)=>{
+  const masterOn=masterOnly||masterEnabled;
+  const master=masterOn?masterDirectorOptionsV1126(masterOptions()):null;
+  if(masterOn&&!master){setStatus('V1126: ungültige Master-Regieparameter.');return;}
   invalidate();
   const curated=curateCreativeRemixV1107(localAiShowRemixV1106(idea,style,cap),creativeBrief(),cap);
   if(!curated){setStatus('Regieentwurf ungültig – keine Änderungen übernommen.');return;}
@@ -359,32 +373,39 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   const interaction=withInteraction(danced.performance,danced.dance,vocal,interactionOnly);
   if((interactionOnly||interactionEnabled)&&!interaction){setStatus('V1116 Interaktion konnte nicht sicher geplant werden. Show unverändert.');return;}
   const finalRemix=interaction?.remix??danced.staged;
-  const stage=stageEnabled||stageOnly?directStageTransformationV1117(base,finalRemix,stageOptions()):null;
-  if((stageEnabled||stageOnly)&&!stage){setStatus('V1117 Bühnenverwandlung konnte nicht sicher geplant werden. Show unverändert.');return;}
-  const holo=holoEnabled||holoOnly?directHolographicShowV1118(base,stage?.remix??finalRemix,holoOptions()):null;
-  if((holoEnabled||holoOnly)&&!holo){setStatus('V1118 Hologramm-Regie konnte nicht sicher geplant werden. Show unverändert.');return;}
-  const camera=cameraEnabled||cameraOnly?directCinematicCameraV1119(base,holo?.remix??stage?.remix??finalRemix,cameraOptions()):null;
-  if((cameraEnabled||cameraOnly)&&!camera){setStatus('V1119 Kameraregie konnte nicht sicher geplant werden. Show unverändert.');return;}
-  const lighting=lightingEnabled||lightingOnly?directDynamicLightingV1120(base,camera?.remix??holo?.remix??stage?.remix??finalRemix,lightingOptions()):null;
-  if((lightingEnabled||lightingOnly)&&!lighting){setStatus('V1120 Lichtregie konnte nicht sicher geplant werden. Show unverändert.');return;}
-  const transitions=transitionEnabled||transitionOnly?directImmersiveTransitionsV1121(base,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,transitionOptions()):null;
-  if((transitionEnabled||transitionOnly)&&!transitions){setStatus('V1121 Übergänge konnten nicht sicher geplant werden. Show unverändert.');return;}
-  const atmosphere=atmosphereEnabled||atmosphereOnly?directConcertAtmosphereV1122(base,transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,atmosphereOptions()):null;
-  if((atmosphereEnabled||atmosphereOnly)&&!atmosphere){setStatus('V1122 Atmosphäre konnte nicht sicher geplant werden. Show unverändert.');return;}
-  const energy=energyEnabled||energyOnly?directConcertEnergyV1123(base,atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,energyOptions(),energyObservation()):null;
-  if((energyEnabled||energyOnly)&&!energy){setStatus('V1123 Energie konnte nicht sicher geplant werden. Show unverändert.');return;}
-  const audience=audienceEnabled||audienceOnly?directAudienceEnergySyncV1124(base,energy?.remix??atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,audienceOptions(),energy):null;
-  if((audienceEnabled||audienceOnly)&&!audience){setStatus('V1124 Publikum konnte nicht sicher geplant werden. Show unverändert.');return;}
-  const festival=festivalEnabled||festivalOnly?directFestivalCrowdV1125(base,audience?.remix??energy?.remix??atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,festivalOptions(),audience):null;
-  if((festivalEnabled||festivalOnly)&&!festival){setStatus('V1125 Acht-Sektoren-Regie konnte nicht sicher geplant werden. Show unverändert.');return;}
+  const stage=stageEnabled||stageOnly||masterOn?directStageTransformationV1117(base,finalRemix,(master?.stage??stageOptions())):null;
+  if((stageEnabled||stageOnly||masterOn)&&!stage){setStatus('V1117 Bühnenverwandlung konnte nicht sicher geplant werden. Show unverändert.');return;}
+  const holo=holoEnabled||holoOnly||masterOn?directHolographicShowV1118(base,stage?.remix??finalRemix,(master?.holo??holoOptions())):null;
+  if((holoEnabled||holoOnly||masterOn)&&!holo){setStatus('V1118 Hologramm-Regie konnte nicht sicher geplant werden. Show unverändert.');return;}
+  const camera=cameraEnabled||cameraOnly||masterOn?directCinematicCameraV1119(base,holo?.remix??stage?.remix??finalRemix,(master?.camera??cameraOptions())):null;
+  if((cameraEnabled||cameraOnly||masterOn)&&!camera){setStatus('V1119 Kameraregie konnte nicht sicher geplant werden. Show unverändert.');return;}
+  const lighting=lightingEnabled||lightingOnly||masterOn?directDynamicLightingV1120(base,camera?.remix??holo?.remix??stage?.remix??finalRemix,(master?.lighting??lightingOptions())):null;
+  if((lightingEnabled||lightingOnly||masterOn)&&!lighting){setStatus('V1120 Lichtregie konnte nicht sicher geplant werden. Show unverändert.');return;}
+  const transitions=transitionEnabled||transitionOnly||masterOn?directImmersiveTransitionsV1121(base,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,(master?.transition??transitionOptions())):null;
+  if((transitionEnabled||transitionOnly||masterOn)&&!transitions){setStatus('V1121 Übergänge konnten nicht sicher geplant werden. Show unverändert.');return;}
+  const atmosphere=atmosphereEnabled||atmosphereOnly||masterOn?directConcertAtmosphereV1122(base,transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,(master?.atmosphere??atmosphereOptions())):null;
+  if((atmosphereEnabled||atmosphereOnly||masterOn)&&!atmosphere){setStatus('V1122 Atmosphäre konnte nicht sicher geplant werden. Show unverändert.');return;}
+  const energy=energyEnabled||energyOnly||masterOn?directConcertEnergyV1123(base,atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,(master?.energy??energyOptions()),energyObservation()):null;
+  if((energyEnabled||energyOnly||masterOn)&&!energy){setStatus('V1123 Energie konnte nicht sicher geplant werden. Show unverändert.');return;}
+  const audience=audienceEnabled||audienceOnly||masterOn?directAudienceEnergySyncV1124(base,energy?.remix??atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,(master?.audience??audienceOptions()),energy):null;
+  if((audienceEnabled||audienceOnly||masterOn)&&!audience){setStatus('V1124 Publikum konnte nicht sicher geplant werden. Show unverändert.');return;}
+  const festival=festivalEnabled||festivalOnly||masterOn?directFestivalCrowdV1125(base,audience?.remix??energy?.remix??atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,(master?.festival??festivalOptions()),audience):null;
+  if((festivalEnabled||festivalOnly||masterOn)&&!festival){setStatus('V1125 Acht-Sektoren-Regie konnte nicht sicher geplant werden. Show unverändert.');return;}
+  const mastered=masterOn?directFestivalShowMasterV1126(base,festival?.remix??finalRemix,masterOptions(),
+   {stage:stage!,holo:holo!,camera:camera!,lighting:lighting!,transition:transitions!,
+    atmosphere:atmosphere!,energy:energy!,audience:audience!,festival:festival!}):null;
+  if(masterOn&&!mastered){setStatus('V1126: Regieszenen nicht synchron. Nichts übernommen.');return;}
+  setMasterPreview(mastered);
   setFestivalPreview(festival);setAudiencePreview(audience);setEnergyPreview(energy);setAtmospherePreview(atmosphere);setTransitionPreview(transitions);setLightingPreview(lighting);setCameraPreview(camera);setHoloPreview(holo);setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
   setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix):null);
   setConductorPreview(danced.conductor);setPersonalityPreview(danced.personality);setPerformancePreview(danced.performance);setDancePreview(danced.dance);
   setPreview(festival?.remix??audience?.remix??energy?.remix??atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix);setBaseSignature(signature);setSource('local');
-  setStatus(festival?'V1125: Acht räumliche Publikumssektoren und drei geplante Künstlerfokusse als Vorschau. Keine echten Sänger erkannt und keine Geräte aktiviert.':audience?'V1124: sieben Publikumswellen in der Vorschau. Keine Lichter, Audios oder Geräte aktiviert.':energy?'V1123: fünf virtuelle Showkanäle mit gemeinsamem Energiebogen geplant. Keine Geräte aktiviert.':atmosphere?'V1122: sieben sichere Atmosphärenstimmungen als lokale Vorschau. Keine Nebelmaschine oder Geräte geschaltet.':transitions?'V1121: sechs sanfte Übergangsfenster geplant. Keine eigene Live-Zeitspur, keine Geräte geschaltet.':lighting?'V1120: sieben virtuelle Lichtphasen als lokale Vorschau. Noch kein Lichtmodul und kein Govee-Gerät geschaltet.':camera?'V1119: sieben geplante Kameraszenen als lokale Vorschau, mit sanften vorhandenen V1072-Fahrten. Keine Kamera oder Geräte geschaltet.':holo?'V1118: sieben holografische Regieszenen als lokale optische Vorschau; echte 3D-Projektion nur nach separater Freigabe, keine Hardware.':stage?'V1117: sieben Bühnenverwandlungen als lokale Vorschau. Reale virtuelle Plattformen nur nach separater Freigabe; keine Gerätebefehle.':interaction?'V1116: sieben Artist-Interaktionen als Vorschau. Kameraführung über vorhandene Modi; echte Partnerreaktionen nur durch separate V1079-Aktivierung bei synchronisierten Lyrics. Keine automatisch erkannten Sänger.':vocal?'V1115 Vocal Acting: sieben Szenen mit Bühnen-Vocal-Rollen als Vorschau. Die tatsächliche Lippen-/Gestik-Engine bleibt bis zur gesonderten Zustimmung unverändert. Keine Stimmen oder Phoneme erkannt.':danced.dance?'V1114: Solo, Duo, Kanon und Unisono als sichere Vorschau. Echte GLB-Tanzclips können zusätzlich in der Stage Crew mit V1114 Automatik aktiviert werden. Noch kein Gerät oder Clip geschaltet.':directed.performance?'V1113 Performance Director: sieben abgestimmte Charakter-Momente als Vorschau bereit; gemeinsam unterstützte Tanz- und Kameramodi können nach Bestätigung übernommen werden. Keine einzelnen GLB-Animationen oder Geräte gesteuert.':personalized.personality?'V1112 Avatar Personality: drei individuelle Performer-Rollen sind als Vorschau geplant; nur bestehende Kamera-/Tanzmodi werden später übernommen. Keine GLB-Clips oder Geräte geschaltet.':conductor?'V1111 Live Show Conductor: sieben koordinierte Szenen als lokale Regieprobe bereit. Keine Bühne oder Geräte geschaltet.':story?'V1109 lokaler Storybogen als Vorschau bereit. Keine KI-Anfrage, kein Gerät geschaltet und noch nichts übernommen.':
+  setStatus(mastered?'V1126: neun Regiemodule über dieselben sieben Songphasen abgestimmt. Alle Effekte bleiben Vorschau, bis du sie separat freigibst.':festival?'V1125: Acht räumliche Publikumssektoren und drei geplante Künstlerfokusse als Vorschau. Keine echten Sänger erkannt und keine Geräte aktiviert.':audience?'V1124: sieben Publikumswellen in der Vorschau. Keine Lichter, Audios oder Geräte aktiviert.':energy?'V1123: fünf virtuelle Showkanäle mit gemeinsamem Energiebogen geplant. Keine Geräte aktiviert.':atmosphere?'V1122: sieben sichere Atmosphärenstimmungen als lokale Vorschau. Keine Nebelmaschine oder Geräte geschaltet.':transitions?'V1121: sechs sanfte Übergangsfenster geplant. Keine eigene Live-Zeitspur, keine Geräte geschaltet.':lighting?'V1120: sieben virtuelle Lichtphasen als lokale Vorschau. Noch kein Lichtmodul und kein Govee-Gerät geschaltet.':camera?'V1119: sieben geplante Kameraszenen als lokale Vorschau, mit sanften vorhandenen V1072-Fahrten. Keine Kamera oder Geräte geschaltet.':holo?'V1118: sieben holografische Regieszenen als lokale optische Vorschau; echte 3D-Projektion nur nach separater Freigabe, keine Hardware.':stage?'V1117: sieben Bühnenverwandlungen als lokale Vorschau. Reale virtuelle Plattformen nur nach separater Freigabe; keine Gerätebefehle.':interaction?'V1116: sieben Artist-Interaktionen als Vorschau. Kameraführung über vorhandene Modi; echte Partnerreaktionen nur durch separate V1079-Aktivierung bei synchronisierten Lyrics. Keine automatisch erkannten Sänger.':vocal?'V1115 Vocal Acting: sieben Szenen mit Bühnen-Vocal-Rollen als Vorschau. Die tatsächliche Lippen-/Gestik-Engine bleibt bis zur gesonderten Zustimmung unverändert. Keine Stimmen oder Phoneme erkannt.':danced.dance?'V1114: Solo, Duo, Kanon und Unisono als sichere Vorschau. Echte GLB-Tanzclips können zusätzlich in der Stage Crew mit V1114 Automatik aktiviert werden. Noch kein Gerät oder Clip geschaltet.':directed.performance?'V1113 Performance Director: sieben abgestimmte Charakter-Momente als Vorschau bereit; gemeinsam unterstützte Tanz- und Kameramodi können nach Bestätigung übernommen werden. Keine einzelnen GLB-Animationen oder Geräte gesteuert.':personalized.personality?'V1112 Avatar Personality: drei individuelle Performer-Rollen sind als Vorschau geplant; nur bestehende Kamera-/Tanzmodi werden später übernommen. Keine GLB-Clips oder Geräte geschaltet.':conductor?'V1111 Live Show Conductor: sieben koordinierte Szenen als lokale Regieprobe bereit. Keine Bühne oder Geräte geschaltet.':story?'V1109 lokaler Storybogen als Vorschau bereit. Keine KI-Anfrage, kein Gerät geschaltet und noch nichts übernommen.':
    'Lokaler Remix: keine Netzwerk- oder KI-Anfrage. Noch nichts übernommen.');
  };
  const remote=async()=>{
+  const master=masterEnabled?masterDirectorOptionsV1126(masterOptions()):null;
+  if(masterEnabled&&!master){setStatus('V1126: ungültige Master-Regieparameter.');return;}
   if(idea.trim().length<4||idea.length>400){setStatus('Bitte 4 bis 400 Zeichen eingeben.');return;}
   invalidate();
   const id=requestId.current;
@@ -416,24 +437,29 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
    const interaction=withInteraction(danced.performance,danced.dance,vocal);
    if(interactionEnabled&&!interaction)throw Error('V1116 Artist Interaction konnte nicht sicher geplant werden.');
    const finalRemix=interaction?.remix??danced.staged;
-   const stage=stageEnabled?directStageTransformationV1117(base,finalRemix,stageOptions()):null;
-   if(stageEnabled&&!stage)throw Error('V1117 Bühnenverwandlung konnte nicht sicher geplant werden.');
-   const holo=holoEnabled?directHolographicShowV1118(base,stage?.remix??finalRemix,holoOptions()):null;
-   if(holoEnabled&&!holo)throw Error('V1118 Hologramm-Planung konnte nicht sicher durchgeführt werden.');
-   const camera=cameraEnabled?directCinematicCameraV1119(base,holo?.remix??stage?.remix??finalRemix,cameraOptions()):null;
-   if(cameraEnabled&&!camera)throw Error('V1119 Kameraregie konnte nicht sicher durchgeführt werden.');
-   const lighting=lightingEnabled?directDynamicLightingV1120(base,camera?.remix??holo?.remix??stage?.remix??finalRemix,lightingOptions()):null;
-   if(lightingEnabled&&!lighting)throw Error('V1120 Lichtregie konnte nicht sicher geplant werden.');
-   const transitions=transitionEnabled?directImmersiveTransitionsV1121(base,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,transitionOptions()):null;
-   if(transitionEnabled&&!transitions)throw Error('V1121 Übergänge konnten nicht sicher geplant werden.');
-   const atmosphere=atmosphereEnabled?directConcertAtmosphereV1122(base,transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,atmosphereOptions()):null;
-   if(atmosphereEnabled&&!atmosphere)throw Error('V1122 Atmosphäre konnte nicht sicher geplant werden.');
-   const energy=energyEnabled?directConcertEnergyV1123(base,atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,energyOptions(),energyObservation()):null;
-   if(energyEnabled&&!energy)throw Error('V1123 Energie konnte nicht sicher geplant werden.');
-   const audience=audienceEnabled?directAudienceEnergySyncV1124(base,energy?.remix??atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,audienceOptions(),energy):null;
-   if(audienceEnabled&&!audience)throw Error('V1124 Publikumsregie konnte nicht sicher geplant werden.');
-   const festival=festivalEnabled?directFestivalCrowdV1125(base,audience?.remix??energy?.remix??atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,festivalOptions(),audience):null;
-   if(festivalEnabled&&!festival)throw Error('V1125 Festival-Publikum konnte nicht sicher geplant werden.');
+   const stage=stageEnabled||masterEnabled?directStageTransformationV1117(base,finalRemix,(master?.stage??stageOptions())):null;
+   if((stageEnabled||masterEnabled)&&!stage)throw Error('V1117 Bühnenverwandlung konnte nicht sicher geplant werden.');
+   const holo=holoEnabled||masterEnabled?directHolographicShowV1118(base,stage?.remix??finalRemix,(master?.holo??holoOptions())):null;
+   if((holoEnabled||masterEnabled)&&!holo)throw Error('V1118 Hologramm-Planung konnte nicht sicher durchgeführt werden.');
+   const camera=cameraEnabled||masterEnabled?directCinematicCameraV1119(base,holo?.remix??stage?.remix??finalRemix,(master?.camera??cameraOptions())):null;
+   if((cameraEnabled||masterEnabled)&&!camera)throw Error('V1119 Kameraregie konnte nicht sicher durchgeführt werden.');
+   const lighting=lightingEnabled||masterEnabled?directDynamicLightingV1120(base,camera?.remix??holo?.remix??stage?.remix??finalRemix,(master?.lighting??lightingOptions())):null;
+   if((lightingEnabled||masterEnabled)&&!lighting)throw Error('V1120 Lichtregie konnte nicht sicher geplant werden.');
+   const transitions=transitionEnabled||masterEnabled?directImmersiveTransitionsV1121(base,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,(master?.transition??transitionOptions())):null;
+   if((transitionEnabled||masterEnabled)&&!transitions)throw Error('V1121 Übergänge konnten nicht sicher geplant werden.');
+   const atmosphere=atmosphereEnabled||masterEnabled?directConcertAtmosphereV1122(base,transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,(master?.atmosphere??atmosphereOptions())):null;
+   if((atmosphereEnabled||masterEnabled)&&!atmosphere)throw Error('V1122 Atmosphäre konnte nicht sicher geplant werden.');
+   const energy=energyEnabled||masterEnabled?directConcertEnergyV1123(base,atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,(master?.energy??energyOptions()),energyObservation()):null;
+   if((energyEnabled||masterEnabled)&&!energy)throw Error('V1123 Energie konnte nicht sicher geplant werden.');
+   const audience=audienceEnabled||masterEnabled?directAudienceEnergySyncV1124(base,energy?.remix??atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,(master?.audience??audienceOptions()),energy):null;
+   if((audienceEnabled||masterEnabled)&&!audience)throw Error('V1124 Publikumsregie konnte nicht sicher geplant werden.');
+   const festival=festivalEnabled||masterEnabled?directFestivalCrowdV1125(base,audience?.remix??energy?.remix??atmosphere?.remix??transitions?.remix??lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix,(master?.festival??festivalOptions()),audience):null;
+   if((festivalEnabled||masterEnabled)&&!festival)throw Error('V1125 Festival-Publikum konnte nicht sicher geplant werden.');
+   const mastered=masterEnabled?directFestivalShowMasterV1126(base,festival?.remix??finalRemix,masterOptions(),
+    {stage:stage!,holo:holo!,camera:camera!,lighting:lighting!,transition:transitions!,
+     atmosphere:atmosphere!,energy:energy!,audience:audience!,festival:festival!}):null;
+   if(masterEnabled&&!mastered)throw Error('V1126: Kameras, Lichter, Bühne und Publikum sind nicht synchron.');
+   setMasterPreview(mastered);
    setFestivalPreview(festival);setAudiencePreview(audience);setEnergyPreview(energy);setAtmospherePreview(atmosphere);setTransitionPreview(transitions);setLightingPreview(lighting);setCameraPreview(camera);setHoloPreview(holo);setStagePreview(stage);setInteractionPreview(interaction);setVocalPreview(vocal);
    setStoryPreview(stagedStory?syncDropStoryV1110(stagedStory,lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix):null);
    setConductorPreview(danced.conductor);setPersonalityPreview(danced.personality);setPerformancePreview(danced.performance);setDancePreview(danced.dance);
@@ -452,8 +478,53 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
   undo.current={before:plan,after:JSON.stringify(result)};
   setCanUndo(true);
   updatePreferences({arenaShowPlanV1040:result});
-  setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);setEnergyPreview(null);setAudiencePreview(null);setFestivalPreview(null);setAtmospherePreview(null);setTransitionPreview(null);
+  setPreview(null);setStoryPreview(null);setConductorPreview(null);setPersonalityPreview(null);setPerformancePreview(null);setDancePreview(null);setVocalPreview(null);setInteractionPreview(null);setStagePreview(null);setHoloPreview(null);setCameraPreview(null);setLightingPreview(null);setEnergyPreview(null);setAudiencePreview(null);setFestivalPreview(null);setMasterPreview(null);setAtmospherePreview(null);setTransitionPreview(null);
   setStatus('Remix gespeichert. Die 360°-Showplan-Aktivierung bleibt unverändert – keine Geräte wurden gesteuert.');
+ };
+ const activateFestivalShowMaster=()=>{
+  if(busy||!masterPreview||!preview||signature!==baseSignature){
+   setStatus('Bitte zuerst eine aktuelle V1126-Master-Probe erstellen.');return;
+  }
+  if(preferences.reducedMotion){setStatus('Bewegungsreduktion aktiv: kein automatisches Show-Master-Preset.');return;}
+  if(!preferences.arenaShowDesignerEnabledV1040||!preferences.arenaConcertDirectorEnabledV1048||
+   !preferences.arenaAudienceEnabledV1032||!preferences.arenaPhoneSyncEnabledV1033||
+   !preferences.arenaLightsEnabledV1032||!preferences.arenaCameraEnabledV1032){
+   setStatus('V1126 benötigt 360°-Show Designer, Konzertdirektor, virtuelle Kamera, Licht und Publikum.');return;
+  }
+  if((preferences.arenaPhoneModeV1033??'wave')!=='wave'||
+   (preferences.arenaChoreographyFormationV1041??'auto')!=='auto'||
+   (preferences.arenaTransformingDeckModeV1037??'auto')!=='auto'||
+   (preferences.arenaFloatingStageModeV1038??'auto')!=='auto'||
+   (preferences.arenaHologramPatternV1039??'auto')!=='auto'||
+   (preferences.arenaFestivalFxModeV1084??'auto')!=='auto'||
+   (preferences.arenaLedWallPatternV1059??'auto')!=='auto'){
+   setStatus('V1126: manuelle Crowd-, Tanz-, Bühnen-, Hologramm- oder Lichtmuster haben Vorrang. Bitte zuerst Auto wählen.');return;
+  }
+  if(masterUndo.current||stageUndo.current||holoUndo.current||cameraUndo.current||
+   lightingUndo.current||transitionUndo.current||atmosphereUndo.current||
+   energyUndo.current||audienceUndo.current||festivalUndo.current){
+   setStatus('V1126: eine andere Regie ist noch rückgängig machbar. Bitte erst dort zurücksetzen.');return;
+  }
+  const preset=festivalShowMasterLivePresetV1126(masterOptions());
+  if(!preset){setStatus('V1126: ungültiges Intensitätslimit.');return;}
+  const projection=preferences.arenaProjectionModeV1085??'auto';
+  if(projection!=='auto'&&projection!==preset.arenaProjectionModeV1085){
+   setStatus('V1126: manueller Projektionsmodus hat Vorrang. Bitte zuerst Auto wählen.');return;
+  }
+  const before=Object.fromEntries(Object.keys(preset).map(k=>
+   [k,preferences[k as keyof typeof preferences]])) as Partial<typeof preferences>;
+  updatePreferences(preset as Partial<typeof preferences>);
+  masterUndo.current={before,after:preset};setMasterCanUndo(true);
+  setStatus('V1126: vorhandene virtuelle Bühnen-, Kamera-, Licht-, Crowd- und Atmosphärenmodule gemeinsam aktiviert. Ihre Live-Limits bleiben gültig; kein Hardwarezugriff.');
+ };
+ const revertFestivalShowMaster=()=>{
+  const saved=masterUndo.current;if(!saved)return;
+  if(!Object.entries(saved.after).every(([key,value])=>preferences[key as keyof typeof preferences]===value)){
+   masterUndo.current=null;setMasterCanUndo(false);
+   setStatus('V1126: eine Einstellung wurde manuell geändert; Rückgängig zum Schutz abgebrochen.');return;
+  }
+  updatePreferences(saved.before);masterUndo.current=null;setMasterCanUndo(false);
+  setStatus('V1126: vorherige virtuelle Regie-Einstellungen wiederhergestellt.');
  };
  const activateFestivalCrowd=()=>{
   if(busy||!festivalPreview||!preview||signature!==baseSignature){
@@ -1065,6 +1136,36 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
     Manuelle Animationen, bestehende Sängerzuordnungen und reduzierte Bewegung
     behalten Vorrang. Keine künstliche Audio-/Gesangserkennung, keine Govee-Befehle.</small>
   </fieldset>
+  <fieldset aria-label="V1126 AI Festival Show Master" className="arena-v1126-festival-master">
+   <legend>V1126 · AI Festival Show Master</legend>
+   <p>Eine gemeinsame Regieprobe koordiniert neun bestehende virtuelle Direktoren:
+    Bühne, Hologramm, Kamera, Licht, Übergänge, Atmosphäre, Energie, Publikum und
+    acht Crowd-Sektoren – mit sieben unveränderten Songphasen.</p>
+   <label>Master-Konzertstil
+    <select value={masterStyle} disabled={busy}
+     onChange={e=>{setMasterStyle(e.target.value as MasterStyleV1126);invalidate();}}>
+     {Object.entries(MASTER_LABELS_V1126).map(([key,label])=><option key={key} value={key}>{label}</option>)}
+    </select>
+   </label>
+   <label>Gemeinsame Show-Stärke {masterStrength}%
+    <input type="range" min="20" max="80" step="10" value={masterStrength} disabled={busy}
+     onChange={e=>{setMasterStrength(Number(e.target.value));invalidate();}}/>
+   </label>
+   <label><input type="checkbox" checked={masterEnabled} disabled={busy}
+    onChange={e=>{setMasterEnabled(e.target.checked);invalidate();}}/>
+    Master-Regie auch in neue Offline-/OpenAI-Entwürfe übernehmen
+   </label>
+   <button type="button" disabled={busy} onClick={()=>local(false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,true)}>
+    V1126 komplette Festivalshow jetzt proben
+   </button>
+   {masterCanUndo&&<button type="button" onClick={revertFestivalShowMaster}>
+    V1126 vorherige Show-Einstellungen wiederherstellen
+   </button>}
+   <small>Nur eine geplante Regiepartitur; keine Musik- oder Sängererkennung.
+    Erst eine zweite Freigabe aktiviert vorhandene virtuelle Effekte.
+    Manuelle Modi, Pause, Reduced Motion und GPU-Grenzen bleiben maßgebend.
+    Keine Govee-, Nebelmaschinen-, Stroboskop- oder Mikrofonbefehle.</small>
+  </fieldset>
   <fieldset aria-label="V1125 AI Festival Crowd Director 2.0" className="arena-v1125-festival-crowd">
    <legend>V1125 · Festival Crowd Director 2.0</legend>
    <p>Die vorhandene virtuelle Crowd reagiert in acht räumlichen Sektoren.
@@ -1371,6 +1472,36 @@ export function AiShowRemixPanelV1106({plan,prompt,genre,title,durationMs}:{
    niemals Lyrics, Audiodaten, Tokens oder Govee-Geräteinformationen. Offline bleibt alles lokal.</small>
   {status&&<p role="status" aria-live="polite">{status}</p>}
   {preview&&<section aria-label="V1106 Show Remix Vorschau">
+   {masterPreview&&<section aria-label="V1126 Festival Show Master Partitur">
+    <h3>V1126 · Eine Show, neun virtuelle Regiekanäle</h3>
+    <p role="note" aria-label="V1126 Master-Qualität">
+     {masterPreview.quality.scenes} abgestimmte Szenen ·
+     {masterPreview.quality.directors} vorhandene Regiemodule ·
+     {masterPreview.quality.transitions} Szenenwechsel ·
+     unveränderte Zeitmarken · ruhige Atempause · keine Hardwarebefehle.
+    </p>
+    {activeMaster&&<p role="status" aria-label="V1126 Aktuelle Showphase">
+     Szene {activeMaster.index+1}: {activeMaster.focus} · Energie {activeMaster.energy}% ·
+     Kamera {activeMaster.camera} · Licht {activeMaster.lighting} ·
+     Bühne {activeMaster.stage}.
+    </p>}
+    <ol aria-label="V1126 sieben koordinierte Szenen">
+     {masterPreview.scenes.map(c=><li key={c.index}>
+      <strong>Szene {c.index+1}: {c.scene}</strong> ·
+      {Math.round(c.start*100)}–{Math.round(c.end*100)}% · Energie {c.energy}% ·
+      Kamera {c.camera} · Bühne {c.stage} · Hologramm {c.hologram} ·
+      Licht {c.lighting} · Atmosphäre {c.atmosphere} ·
+      Publikum {c.audience} ({c.focus}) · Crowd-Spitzenlicht {c.maxCrowdLight}%.
+     </li>)}
+    </ol>
+    <button type="button" disabled={busy||preferences.reducedMotion}
+     onClick={activateFestivalShowMaster}>
+     V1126 vorhandene virtuelle Festivalregie aktivieren
+    </button>
+    <small>Der vollständige Regieplan benötigt deine gesonderte Bestätigung.
+     Die Kamera-, Licht-, Publikums- und Bühnenrenderer behalten ihre eigenen
+     Laufzeitgrenzen; keine eigenständigen sekundengenauen Effekt-Zeitspuren.</small>
+   </section>}
    {festivalPreview&&<section aria-label="V1125 Festival Crowd Director Partitur">
     <h3>V1125 · Acht Bereiche, drei Bühnenkünstler</h3>
     <p role="note" aria-label="V1125 Festival-Qualität">

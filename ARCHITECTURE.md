@@ -1,3 +1,26 @@
+## V1126 · AI Festival Show Master
+
+`lib/aiFestivalShowMasterV1126.ts` koordiniert neun vorhandene virtuelle Regiemodule
+(V1117–V1125) zu einer **siebenphasigen, lokalen Konzertpartitur** mit sechs
+Szenenwechseln. Vier verbindliche Profile (Kino, Festival, Deutschrap, Immersiv)
+reichen gemeinsame, begrenzte Stärke-/Intensitätswerte an alle neun Module weiter.
+Jedes Modul muss die unveränderten V1040-Szenengrenzen bestätigen; Widersprüche,
+kaputte Crowd-Sektoren oder fehlende Direktoren führen zum Abbruch der Vorschau.
+
+Der AI Show Designer bietet eine Offline-Probe und einen optionalen OpenAI-
+Entwurfspfad sowie eine **gesonderte Live-Freigabe**. Das gemeinsame Preset
+aktiviert ausschließlich bestehende virtuelle Licht-, Kamera-, Bühnen-,
+Atmosphären- und Crowd-Renderer. Die tatsächlichen Live-Zeitfenster bleiben
+bei deren jeweiligen, GPU- und Reduced-Motion-geschützten Engines.
+Der Show Master erstellt keine neuen Audio-/GLB-/Hardware-/Govee-Kommandos,
+behauptet keine Echtzeit-Hook-/Drop-/Sängererkennung und überschreibt nicht
+manuelle Crowd-, Hologramm-, Partikel- oder Bühnenmodi. Ein einziges, gegen
+manuelle Konflikte abgesichertes Rückgängig restauriert das komplette Preset.
+
+Tests: `tests/v1126-festival-show-master-regression.cjs`,
+`tests/tsconfig.v1126-core.json` sowie
+`tests/e2e/ai-festival-show-master-v1126.spec.cjs` für Desktop und Touch.
+
 ## V1125 · AI Festival Crowd Director 2.0
 
 `lib/aiFestivalCrowdDirectorV1125.ts` plant sieben lokale Szenen mit je acht
@@ -187,7 +210,7 @@ Im **360° AI Show Designer** kannst du jetzt die V1111-Konzertregie proben: Sie
 
 Das Drop-Radar wertet die **freiwillig gestartete lokale V1108-Mikrofonmessung** aus. Erst nach mindestens fünf Sekunden mit sauberem Signal werden ein bereits gemessener Einschlag oder ein möglicher Energieaufbau erkannt. Ein künftiger Drop-Zeitpunkt kann aus diesem Signal **nicht sicher vorhergesagt** werden. Nur nach Zustimmung kann eine Regieidee für die **nächste** V1106/V1109-Vorschau vorgemerkt werden. Die sieben Zeitgrenzen, die Intensitätsobergrenze und die manuelle Freigabe bleiben erhalten. Keine Audio-/Geräte-/Cloud-Übertragung; Tests: `npm run test:v1110`, `npm run test:v1110:types`.
 
-**Dokumentationsstand:** V1125
+**Dokumentationsstand:** V1126
 
 ## V1104 · Playwright Visual QA & Screenshot Reports
 

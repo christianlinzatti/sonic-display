@@ -1,0 +1,40 @@
+'use strict';
+const {test,expect,openSettings}=require('./fixtures.cjs');
+const STORE='sonic-display-ui-preferences-v1';
+// Both real Chromium desktop and touch: no microphone permission, AI API or hardware.
+test('V1126 Show Master rehearses nine directors over seven scenes without saving or cloud calls',async({page},info)=>{
+ const requests=[];
+ page.on('request',r=>{if(r.url().includes('/api/ai/show-remix'))requests.push(r.url());});
+ const dialog=await openSettings(page,'avatar');
+ await dialog.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const producer=dialog.getByRole('group',{name:'V1106 KI Show Remix'});
+ const master=producer.getByRole('group',{name:'V1126 AI Festival Show Master'});
+ await expect(master).toBeVisible();
+ await master.getByRole('combobox',{name:'Master-Konzertstil'}).selectOption('rap');
+ const before=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORE);
+ await master.getByRole('button',{name:'V1126 komplette Festivalshow jetzt proben'}).click();
+ const preview=producer.getByRole('region',{name:'V1126 Festival Show Master Partitur'});
+ await expect(preview).toBeVisible();
+ await expect(preview.getByRole('list',{name:'V1126 sieben koordinierte Szenen'}).locator('li')).toHaveCount(7);
+ await expect(preview.getByRole('note',{name:'V1126 Master-Qualität'})).toContainText('9 vorhandene Regiemodule');
+ await expect(preview.getByRole('status',{name:'V1126 Aktuelle Showphase'})).toContainText('Kamera');
+ await expect(producer.getByRole('region',{name:'V1125 Festival Crowd Director Partitur'})).toBeVisible();
+ await expect(producer.getByRole('region',{name:'V1123 Concert Energy Partitur'})).toBeVisible();
+ expect(await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaShowPlanV1040??null,STORE)).toEqual(before);
+ expect(requests).toEqual([]);
+ await info.attach('v1126-nine-director-show',{body:await preview.screenshot(),contentType:'image/png'});
+});
+test('V1126 refuses joint live activation unless all virtual stage prerequisites were approved',async({page})=>{
+ const dialog=await openSettings(page,'avatar');
+ await dialog.getByRole('combobox',{name:'Bühnenstil',exact:true}).selectOption('arena360');
+ const producer=dialog.getByRole('group',{name:'V1106 KI Show Remix'});
+ const master=producer.getByRole('group',{name:'V1126 AI Festival Show Master'});
+ const before=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaTransformingStageEnabledV1066??false,STORE);
+ await master.getByRole('button',{name:'V1126 komplette Festivalshow jetzt proben'}).click();
+ const preview=producer.getByRole('region',{name:'V1126 Festival Show Master Partitur'});
+ await expect(preview).toBeVisible();
+ await preview.getByRole('button',{name:'V1126 vorhandene virtuelle Festivalregie aktivieren'}).click();
+ await expect(producer.getByRole('status').filter({hasText:'V1126 benötigt 360°-Show Designer'})).toBeVisible();
+ const after=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)||'{}').arenaTransformingStageEnabledV1066??false,STORE);
+ expect(after).toBe(before);
+});

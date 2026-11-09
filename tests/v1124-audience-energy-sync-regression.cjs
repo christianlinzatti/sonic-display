@@ -151,7 +151,7 @@ try{
   for(const fragment of ['V1124 AI Audience Energy Sync','V1124 Publikumswellen jetzt proben',
    'V1124 Audience Energy Sync Partitur','V1124 sieben Publikumswellen',
    'V1124 vorhandene virtuelle Publikumsregie aktivieren','setAudiencePreview(audience)',
-   'audienceEnabled?directAudienceEnergySyncV1124','audienceLivePresetV1124',
+   'audienceEnabled||masterEnabled?directAudienceEnergySyncV1124','audienceLivePresetV1124',
    'setAudiencePreview(null)','audienceUndo.current','arenaPhoneModeV1033',
    'preferences.reducedMotion','V1124 Publikumseinstellungen wurden inzwischen manuell verändert'])
    assert(ui.includes(fragment),fragment);

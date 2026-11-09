@@ -3756,3 +3756,20 @@ V1125 ist mit der bestehenden V1124-Publikumsvorschau kombinierbar.
 Prüfen mit `npm run test:v1125` und `npm run test:v1125:types`.
 Die vollständige Freigabe erfolgt nach GitHub-Import über Ubuntu/Windows
 Build, TypeScript und Playwright Desktop/Touch.
+
+
+### V1126 – AI Festival Show Master
+
+Im **AI Show Designer → V1126 Festival Show Master** stehen vier Konzertprofile
+zur Auswahl: Kino-Konzert, Festival, Deutschrap und Immersiv. Mit **Komplette
+Festivalshow jetzt proben** werden die V1117–V1125-Direktoren gemeinsam über
+sieben Bühnenphasen geplant. Die V1126-Partitur zeigt Kamera, Bühne,
+Hologramme, Licht, Nebel, Energie und Crowd-Fokus nebeneinander an.
+
+Die Vorschau ist rein lokal und überschreibt keine gespeicherten Showzeiten.
+Die Live-Freigabe erfordert die bereits aktivierten Grundmodule und einen
+**zweiten Klick**. Sie setzt nur geprüfte virtuelle Presets, kein Govee,
+Stroboskop oder physisches Gerät; jederzeit ist ein konfliktgeschütztes
+Rückgängig möglich. Opt-in für kommende Offline-/OpenAI-Remixes ist getrennt.
+
+Prüfen mit `npm run test:v1126` und `npm run test:v1126:types`.

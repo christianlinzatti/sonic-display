@@ -133,7 +133,7 @@ try{
   for(const fragment of ['V1125 AI Festival Crowd Director 2.0','V1125 Acht-Sektoren-Festival jetzt proben',
    'V1125 Festival Crowd Director Partitur','V1125 sieben Festival-Szenen',
    'V1125 virtuelle Acht-Sektoren-Regie aktivieren','festivalUndo.current','festivalCrowdLivePresetV1125',
-   'setFestivalPreview(festival)','festivalEnabled?directFestivalCrowdV1125',
+   'setFestivalPreview(festival)','festivalEnabled||masterEnabled?directFestivalCrowdV1125',
    'V1125 Publikumseinstellungen wurden manuell verändert'])assert(ui.includes(fragment),fragment);
   const lib=fs.readFileSync(path.join(root,'lib/aiFestivalCrowdDirectorV1125.ts'),'utf8');
   assert(!/\bfetch\s*\(|localStorage|navigator\.mediaDevices|setInterval|Math\.random|api\/govee|new\s+WebGLRenderer/i.test(lib));

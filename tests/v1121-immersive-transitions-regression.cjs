@@ -134,7 +134,7 @@ try{
   for(const needle of ['V1121 AI Immersive Scene Transitions','V1121 Übergänge jetzt proben',
    'V1121 Immersive Scene Transitions Partitur','V1121 sechs Szenenübergänge',
    'V1121 vorhandene virtuelle Übergangsregie aktivieren','transitionLivePresetV1121',
-   'transitionUndo.current','transitionEnabled?directImmersiveTransitionsV1121',
+   'transitionUndo.current','transitionEnabled||masterEnabled?directImmersiveTransitionsV1121',
    'transitionPreview','preferences.reducedMotion','arenaHologramPatternV1039',
    'V1121 Übergangseinstellungen wurden inzwischen manuell geändert']){
     assert(ui.includes(needle),needle);

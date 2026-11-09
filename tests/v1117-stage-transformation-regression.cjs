@@ -133,7 +133,7 @@ try{
   for(const token of ['V1117 AI Stage Transformation','V1117 Bühnenverwandlung jetzt proben',
    'V1117 Stage Transformation Partitur','V1117 sieben Bühnenverwandlungen',
    'V1117 vorhandene virtuelle Bühnenverwandlung aktivieren',
-   'stageLivePresetV1117','stageUndo.current','stageEnabled?directStageTransformationV1117',
+   'stageLivePresetV1117','stageUndo.current','stageEnabled||masterEnabled?directStageTransformationV1117',
    'stage?.remix??finalRemix','preferences.reducedMotion','arenaConcertDirectorEnabledV1048',
    'Bühneneinstellungen wurden manuell geändert'])assert(ui.includes(token),token);
   const code=fs.readFileSync(path.join(root,'lib/aiStageTransformationV1117.ts'),'utf8');

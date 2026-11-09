@@ -114,7 +114,7 @@ try{
   for(const needle of ['V1119 AI Cinematic Camera Director','V1119 Kamerafahrt jetzt proben',
    'V1119 Cinematic Camera Partitur','V1119 sieben Kameraszenen',
    'V1119 vorhandene filmische Kamerafahrten aktivieren','cameraLivePresetV1119',
-   'cameraUndo.current','cameraEnabled?directCinematicCameraV1119',
+   'cameraUndo.current','cameraEnabled||masterEnabled?directCinematicCameraV1119',
    'camera?.remix??holo?.remix??stage?.remix??finalRemix',
    'arenaCameraEnabledV1032','preferences.reducedMotion','arenaConcertDirectorEnabledV1048',
    'Kamera-Einstellungen wurden inzwischen manuell geändert'])assert(ui.includes(needle),needle);

@@ -121,7 +121,7 @@ try{
   for(const needle of ['V1118 AI Holographic Stage Director','V1118 Hologramm-Show jetzt proben',
    'V1118 Holographic Stage Partitur','V1118 sieben holografische Szenen',
    'V1118 vorhandene virtuelle Hologramm-Show aktivieren','hologramLivePresetV1118',
-   'holoUndo.current','holoEnabled?directHolographicShowV1118',
+   'holoUndo.current','holoEnabled||masterEnabled?directHolographicShowV1118',
    'holo?.remix??stage?.remix??finalRemix','arenaHologramPatternV1039',
    'arenaProjectionModeV1085','preferences.reducedMotion','arenaConcertDirectorEnabledV1048',
    'Hologramm-Einstellungen wurden inzwischen manuell geändert'])assert(ui.includes(needle),needle);

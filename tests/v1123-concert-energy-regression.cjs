@@ -128,7 +128,7 @@ try{
   for(const k of ['V1123 AI Concert Energy Director','V1123 Konzertenergie jetzt proben',
    'V1123 Concert Energy Partitur','V1123 sieben Energieszenen',
    'V1123 vorhandene virtuelle Konzertregie aktivieren','energyLivePresetV1123',
-   'energyEnabled?directConcertEnergyV1123','energyUseMeasurement&&!sampling&&canSample',
+   'energyEnabled||masterEnabled?directConcertEnergyV1123','energyUseMeasurement&&!sampling&&canSample',
    'energyUndo.current','setEnergyPreview(null)','V1123 Energieeinstellungen wurden inzwischen manuell verändert',
    "(preferences.arenaChoreographyFormationV1041??'auto')!=='auto'",'energyPreview&&<section',
    'arenaConcertDirectorEnabledV1048'])assert(ui.includes(k),k);

@@ -109,7 +109,7 @@ try{
    'V1122 Concert Atmosphere Partitur','V1122 sieben Atmosphärenszenen',
    'V1122 vorhandene virtuelle Atmosphäre aktivieren','atmosphereLivePresetV1122',
    "(preferences.arenaFestivalFxModeV1084??'auto')!=='auto'",'atmosphereUndo.current',
-   'atmosphereEnabled?directConcertAtmosphereV1122','setAtmospherePreview(null)',
+   'atmosphereEnabled||masterEnabled?directConcertAtmosphereV1122','setAtmospherePreview(null)',
    'V1122 Atmosphäre wurde inzwischen manuell geändert'])assert(ui.includes(k),k);
   const lib=fs.readFileSync(path.join(root,'lib/aiConcertAtmosphereDirectorV1122.ts'),'utf8');
   assert(!/\bfetch\s*\(|localStorage|navigator\.mediaDevices|setInterval|Math\.random|new\s+WebGLRenderer\s*\(|api\/govee/i.test(lib));

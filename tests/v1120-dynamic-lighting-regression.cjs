@@ -110,7 +110,7 @@ try{
   for(const needle of ['V1120 AI Dynamic Lighting Conductor','V1120 Lichtshow jetzt proben',
    'V1120 Dynamic Lighting Partitur','V1120 sieben Lichtszenen',
    'V1120 vorhandene virtuelle Lichtregie aktivieren','lightingLivePresetV1120',
-   'lightingUndo.current','lightingEnabled?directDynamicLightingV1120',
+   'lightingUndo.current','lightingEnabled||masterEnabled?directDynamicLightingV1120',
    'lighting?.remix??camera?.remix??holo?.remix??stage?.remix??finalRemix',
    'arenaLightsEnabledV1032','preferences.reducedMotion','arenaConcertDirectorEnabledV1048',
    'V1120 Licht-Einstellungen wurden inzwischen manuell geändert'])assert(src.includes(needle),needle);
