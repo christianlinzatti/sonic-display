@@ -316,6 +316,24 @@
           ]
         },
         {
+          "name": "GoveeMusicSyncStartIntent",
+          "samples": [
+            "starte govee musiksynchronisation",
+            "aktiviere govee musiklicht",
+            "starte govee licht zur musik",
+            "govee musik sync starten"
+          ]
+        },
+        {
+          "name": "GoveeMusicSyncPauseIntent",
+          "samples": [
+            "pausiere govee musiksynchronisation",
+            "stoppe govee musiklicht",
+            "halte govee musik sync an",
+            "govee musiksynchronisation pausieren"
+          ]
+        },
+        {
           "name": "GoveePowerOnIntent",
           "samples": [
             "schalte die govee lichter ein",
