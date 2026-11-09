@@ -1,4 +1,5 @@
 "use client";
+import {readingCameraBlendV1136} from '@/lib/showContinuityV1136';
 import {lyricSpotlightV1133} from '@/lib/lyricSpotlightV1133';
 import {composeScoreCameraV1134,newScoreCameraV1134} from '@/lib/concertScoreV1134';
 import {useConcertStoryV1131} from './useConcertStoryV1131';
@@ -95,7 +96,7 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
 }) {
  const scoreCameraV1134=useRef(newScoreCameraV1134());
  const lyricPriorityV1133=lyricSpotlightV1133(lipSync?.lyrics,lipSync?.progressMs??progressMs).protectCamera;
-  const storyV1131=useConcertStoryV1131({durationMs:lipSync?.storyDurationMsV1131,progressMs,lyrics:lipSync?.lyrics,genre,bpm:audio?.bpm,energy:audio?.energyEnvelope,count:lipSync?.cameraCastCountV377??(duo?2:1),section:lipSync?.lyrics?.synced?undefined:section});
+  const storyV1131=useConcertStoryV1131({trackId:lipSync?.storyTrackIdV1136,playback:lipSync?.storyPlaybackV1136,durationMs:lipSync?.storyDurationMsV1131,progressMs,lyrics:lipSync?.lyrics,genre,bpm:audio?.bpm,energy:audio?.energyEnvelope,count:lipSync?.cameraCastCountV377??(duo?2:1),section:lipSync?.lyrics?.synced?undefined:section});
   const camera = useThree(state => state.camera as PerspectiveCamera);
   const liveEditPose = useRef<CameraPose|null>(null);
   useEffect(()=>{
@@ -1052,15 +1053,16 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
       arenaFramedV1047,arenaCinematicCameraCueV1053,flyoverProtectedV1033||!automaticShot);
     const priorV1131=composeConcertCameraDirectorV1072(
       arenaFramedV1053,concertCameraCueV1072,flyoverProtectedV1033||!automaticShot);
-    const arenaFramedV1072=composeScoreCameraV1134(priorV1131,storyV1131,scoreCameraV1134.current,{playing,reducedMotion,protectedShot:!!(editingPose||userHasPreset||manual!=="auto"||timelineCue?.active||authoredCueV400||cameraNarrativeV605?.manualCamera||lipSync?.cameraManualStagePriorityV377||liveCueV400||cutToCameraCueV400)||!automaticShot},{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:camera.fov,targetX:target.current.x,targetY:target.current.y,targetZ:target.current.z} as typeof priorV1131);
-    camera.position.x += (arenaFramedV1072.x-camera.position.x)*alpha;
-    camera.position.y += (arenaFramedV1072.y-camera.position.y)*alpha;
-    camera.position.z += (arenaFramedV1072.z-camera.position.z)*alpha;
-    camera.fov += (arenaFramedV1072.fov-camera.fov)*alpha;
+    const arenaFramedV1072=composeScoreCameraV1134(priorV1131,storyV1131,scoreCameraV1134.current,{playing,reducedMotion,nowMs:_.clock.elapsedTime*1000,protectedShot:!!(editingPose||userHasPreset||manual!=="auto"||timelineCue?.active||authoredCueV400||cameraNarrativeV605?.manualCamera||lipSync?.cameraManualStagePriorityV377||liveCueV400||cutToCameraCueV400)||!automaticShot},{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:camera.fov,targetX:target.current.x,targetY:target.current.y,targetZ:target.current.z} as typeof priorV1131);
+    const readingAlphaV1136=readingCameraBlendV1136(alpha,dt,scoreCameraV1134.current.key==='reading');
+    camera.position.x += (arenaFramedV1072.x-camera.position.x)*readingAlphaV1136;
+    camera.position.y += (arenaFramedV1072.y-camera.position.y)*readingAlphaV1136;
+    camera.position.z += (arenaFramedV1072.z-camera.position.z)*readingAlphaV1136;
+    camera.fov += (arenaFramedV1072.fov-camera.fov)*readingAlphaV1136;
     camera.updateProjectionMatrix();
-    target.current.x += ((arenaFramedV1072.targetX??0)-target.current.x)*alpha;
-    target.current.y += (arenaFramedV1072.targetY-target.current.y)*alpha;
-    target.current.z += ((arenaFramedV1072.targetZ??0)-target.current.z)*alpha;
+    target.current.x += ((arenaFramedV1072.targetX??0)-target.current.x)*readingAlphaV1136;
+    target.current.y += (arenaFramedV1072.targetY-target.current.y)*readingAlphaV1136;
+    target.current.z += ((arenaFramedV1072.targetZ??0)-target.current.z)*readingAlphaV1136;
     camera.lookAt(target.current);
     statusInterval.current -= Math.max(0,dt);
     if(statusInterval.current<=0 && typeof window!=="undefined") {
@@ -1068,7 +1070,7 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
       const preset = library.current.enabled && library.current.presets.find(p=>p.id===library.current.assignments[section]);
       const isKeyframe = !!(preset && liveEnabled.current && motionFrames.current[preset.id]?.length);
       const source = editingPose?"Live-Editor":!playing?"Pausiert":reducedMotion?"Reduced Motion":manual!=="auto"?`Manuell: ${manual}`:isKeyframe?(preset && cinematicPaths.current[preset.id]?.enabled?"Cinematic Camera Path":"Keyframe-Fahrt"):preset?`Preset: ${preset.name}`:"Automatische Regie";
-      window.dispatchEvent(new CustomEvent(CAMERA_STUDIO_STATUS_EVENT,{detail:{section,mode:manual,playing,reducedMotion,intensity,source,composer:composerSettings.current.enabled,tracking:trackingEnabled.current,progressMs,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:camera.fov,targetX:target.current.x,targetY:target.current.y,targetZ:target.current.z}}}));
+      window.dispatchEvent(new CustomEvent(CAMERA_STUDIO_STATUS_EVENT,{detail:{scoreSourceV1136:storyV1131?.sourceKey,scoreHoldV1136:scoreCameraV1134.current.key,section,mode:manual,playing,reducedMotion,intensity,source,composer:composerSettings.current.enabled,tracking:trackingEnabled.current,progressMs,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:camera.fov,targetX:target.current.x,targetY:target.current.y,targetZ:target.current.z}}}));
     }
   });
   return null;

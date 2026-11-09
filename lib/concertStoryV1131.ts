@@ -1,8 +1,9 @@
+import type {PlaybackSampleV1136} from './showContinuityV1136';
 import type {Lyrics} from '../types/playbackCore';
 import {showCueV1130,lyricDensityV1130,lyricSectionV1130,type ShowCueV1130} from './showIntelligenceV1130';
 export const FOOTWORK_CLIPS_V1131=['Dance_SideGlide','Dance_DiagonalStep','Dance_HeelToe','Dance_PivotStep'] as const;
 export type InteractionV1131='rest'|'solo'|'duel'|'answer'|'unison';
-export type StoryInputV1131={progressMs:number;durationMs?:number;bpm?:number|null;genre?:string|null;
+export type StoryInputV1131={progressMs:number;trackId?:string|null;playback?:PlaybackSampleV1136;durationMs?:number;bpm?:number|null;genre?:string|null;
  section?:string|null;energy?:number|null;lyrics?:Lyrics|null;lyricDensity?:number;count?:number};
 export type StoryCueV1131=ShowCueV1130 & {chorusVisit:number;chapter:string;interaction:InteractionV1131;
  leader:number;partner:number;cameraScale:number;cameraSide:number;lightGain:number;lyricGain:number;};

@@ -1,10 +1,11 @@
+import {showJumpV1136,sampledJumpV1136,validPlaybackSampleV1136,type ShowClockV1136,type PlaybackSampleV1136} from './showContinuityV1136';
 import type {Lyrics} from '../types/playbackCore';
 import {concertStoryV1131,type StoryInputV1131,type StoryCueV1131} from './concertStoryV1131';
 import {lyricSpotlightV1133} from './lyricSpotlightV1133';
 import {normalizeLyricTimingV1134} from './lyricTimingV1134';
 export type ConcertScoreV1134=StoryCueV1131 & {
  staging:'opening'|'verse'|'anticipation'|'chorus'|'reading'|'breath'|'finale';
- reading:boolean;accent:number;beamGain:number;motionGain:number;exchange:number;scoreKey:string;
+ positionMs:number;sourceKey:string;playback?:PlaybackSampleV1136;reading:boolean;accent:number;beamGain:number;motionGain:number;exchange:number;scoreKey:string;
 };
 const cache=new WeakMap<Lyrics,Lyrics|null>();
 function safeLyrics(lyrics:Lyrics|null|undefined){if(!lyrics)return null;if(!cache.has(lyrics))cache.set(lyrics,normalizeLyricTimingV1134(lyrics));return cache.get(lyrics)!;}
@@ -39,7 +40,7 @@ export function concertScoreV1134(input:StoryInputV1131):ConcertScoreV1134{
  const keyActive=spotlight.mode==='anthem'&&spotlight.currentWord>=0&&spotlight.currentWord===spotlight.keyWord;
  const accent=reading||act==='breathe'||anticipation?0:Math.min(1,envelope*(act==='lift'||act==='finale'?.8:.28)+(keyActive?.18:0));
  const chapter=reading?'Text im Fokus · ruhige Begleitung':anticipation?'Vor dem Refrain · Spannung sammeln':opening?'Die Crew betritt die Bühne':cue.chapter;
- return {...cue,phrase,act,mode,leader,partner,interaction,chapter,staging,reading,accent,exchange,
+ return {...cue,positionMs:pos,playback:input.playback,sourceKey:input.trackId?`track:${input.trackId}`:`lyrics:${input.durationMs??0}:${lyrics?.plainText??lyrics?.lines[0]?.text??''}`,phrase,act,mode,leader,partner,interaction,chapter,staging,reading,accent,exchange,
  scoreKey:reading?`reading-${Math.floor((line?.startMs??pos)/16000)}`:`${staging}-${exchange}`,
  reason:reading?'Schnelle Lyrics: ruhige Kamera und zurückhaltende Crew':anticipation?'Refrain-Vorschau aus vorhandenen Lyrics':cue.reason,
  intensity:reading?.36:anticipation?.46:opening?.2:cue.intensity,
@@ -51,15 +52,31 @@ export function concertScoreV1134(input:StoryInputV1131):ConcertScoreV1134{
  lyricGain:reading?1:cue.lyricGain};
 }
 export type ScoreCameraV1134={x:number;y:number;z:number;fov:number};
-export type ScoreCameraStateV1134={key:string;anchor:ScoreCameraV1134|null};
+export type ScoreCameraStateV1134={key:string;anchor:ScoreCameraV1134|null;clock?:ShowClockV1136|null;clockAtMs?:number;clockPlaying?:boolean;playback?:PlaybackSampleV1136|null};
 export const newScoreCameraV1134=():ScoreCameraStateV1134=>({key:'',anchor:null});
 /** Last automatic composition, before existing smoothing. Explicit camera ownership always wins. */
 export function composeScoreCameraV1134<T extends ScoreCameraV1134>(base:T,cue:ConcertScoreV1134|null,state:ScoreCameraStateV1134,
- guard:{playing:boolean;reducedMotion:boolean;protectedShot:boolean},current:ScoreCameraV1134):T{
- if(!cue||guard.protectedShot||guard.reducedMotion){state.key='';state.anchor=null;return base;}
+ guard:{playing:boolean;reducedMotion:boolean;protectedShot:boolean;nowMs?:number},current:ScoreCameraV1134):T{
+ if(!cue||guard.protectedShot||guard.reducedMotion){state.key='';state.anchor=null;state.clock=null;state.clockAtMs=undefined;state.clockPlaying=undefined;state.playback=null;return base;}
+ const nextClock={source:cue.sourceKey,positionMs:cue.positionMs};
+ const now=Number.isFinite(guard.nowMs)?guard.nowMs!:undefined;
+ const elapsed=guard.playing&&state.clockPlaying!==false&&now!==undefined&&state.clockAtMs!==undefined?Math.max(0,now-state.clockAtMs):0;
+ const sourceChanged=!!state.clock&&state.clock.source!==nextClock.source;
+ const playback=cue.playback;
+ let jumped=sourceChanged;
+ if(validPlaybackSampleV1136(playback)){
+  jumped=jumped||sampledJumpV1136(state.playback,playback);
+  if(sourceChanged||!state.playback||playback.fetchedAt>=state.playback.fetchedAt)state.playback={...playback};
+ }else if(state.clock)jumped=jumped||showJumpV1136(state.clock,nextClock,elapsed);
+ const reacquire=jumped&&!!state.anchor;
+ if(Number.isFinite(cue.positionMs)){
+  if(!state.clock||state.clock.positionMs!==nextClock.positionMs||state.clock.source!==nextClock.source||state.clockPlaying!==guard.playing)state.clockAtMs=now;
+  state.clock=nextClock;state.clockPlaying=guard.playing;
+ }
+ if(jumped){state.key='';state.anchor=null;}
  if(cue.reading||!guard.playing){
   const key=guard.playing?'reading':'pause';
-  if(state.key!==key||!state.anchor){state.key=key;state.anchor={...current};}
+  if(state.key!==key||!state.anchor){state.key=key;state.anchor={...(reacquire?base:current)};}
   return {...base,...state.anchor};
  }
  state.key='';state.anchor=null;

@@ -1,6 +1,6 @@
 {
   "name": "sonic-display",
-  "version": "0.1.0-v1135",
+  "version": "0.1.0-v1136",
   "private": true,
   "scripts": {
     "test:vercel:parity": "node tests/vercel-production-parity-regression.cjs",
@@ -2421,7 +2421,9 @@
     "test:v1134": "npm run test:v1133 && node tests/v1134-concert-score.cjs",
     "test:v1134:browser": "playwright test --config=config/playwright.production.cjs tests/e2e/concert-score-v1134.spec.cjs tests/e2e/whole-body-lyrics-v1133.spec.cjs tests/e2e/performer-personality-v1132.spec.cjs tests/e2e/concert-story-v1131.spec.cjs tests/e2e/intelligent-concert-v1130.spec.cjs --project=chromium-desktop",
     "test:v1135": "npm run test:v1134 && node tests/v1135-stage-presence.cjs && node tests/v1135-stage-contact.mjs",
-    "test:v1135:browser": "playwright test --config=config/playwright.production.cjs tests/e2e/stage-presence-v1135.spec.cjs tests/e2e/concert-score-v1134.spec.cjs tests/e2e/whole-body-lyrics-v1133.spec.cjs tests/e2e/performer-personality-v1132.spec.cjs tests/e2e/concert-story-v1131.spec.cjs tests/e2e/intelligent-concert-v1130.spec.cjs --project=chromium-desktop"
+    "test:v1135:browser": "playwright test --config=config/playwright.production.cjs tests/e2e/stage-presence-v1135.spec.cjs tests/e2e/concert-score-v1134.spec.cjs tests/e2e/whole-body-lyrics-v1133.spec.cjs tests/e2e/performer-personality-v1132.spec.cjs tests/e2e/concert-story-v1131.spec.cjs tests/e2e/intelligent-concert-v1130.spec.cjs --project=chromium-desktop",
+    "test:v1136": "npm run test:v1135 && node tests/v1136-show-continuity.cjs && node tests/v1136-preview-resilience.mjs",
+    "test:v1136:browser": "playwright test --config=config/playwright.production.cjs tests/e2e/show-continuity-v1136.spec.cjs tests/e2e/stage-presence-v1135.spec.cjs tests/e2e/concert-score-v1134.spec.cjs tests/e2e/whole-body-lyrics-v1133.spec.cjs tests/e2e/performer-personality-v1132.spec.cjs tests/e2e/concert-story-v1131.spec.cjs tests/e2e/intelligent-concert-v1130.spec.cjs --project=chromium-desktop"
   },
   "engines": {
     "node": "24.x"
@@ -2450,8 +2452,8 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v1135",
-  "sonicFeatureRelease": "v1135",
+  "sonicRoadmapRelease": "v1136",
+  "sonicFeatureRelease": "v1136",
   "overrides": {
     "postcss": "^8.5.32",
     "@vercel/cli-config": {

@@ -15,6 +15,8 @@ export class PreviewClipPlayer {
   get transitioning() { return this.snapshot !== null; }
 
   select(clip: AnimationClip, start: number, fadeSeconds: number): AnimationAction {
+    if(!Number.isFinite(clip.duration)||clip.duration<=0)throw new RangeError('Animation clip must have a finite positive duration');
+    const safeStart=Number.isFinite(start)?Math.max(0,Math.min(clip.duration,start)):0;
     const duration = Number.isFinite(fadeSeconds) ? Math.max(0, Math.min(1.5, fadeSeconds)) : 0;
     // Read before stopping either action: this also captures a rapid A → B → C switch.
     const snapshot = this.action && duration > 0 ? this.capturePose(clip) : null;
@@ -23,7 +25,7 @@ export class PreviewClipPlayer {
     this.action = this.mixer.clipAction(clip, this.root);
     this.action.reset().setLoop(LoopOnce, 1);
     this.action.clampWhenFinished = true;
-    this.action.time = Math.max(0, Math.min(clip.duration, start));
+    this.action.time = safeStart;
     this.action.play();
     this.elapsed = 0;
     this.fadeSeconds = duration;
@@ -39,7 +41,7 @@ export class PreviewClipPlayer {
 
   /** Set the selected clip clock without advancing or rewinding unrelated mixer actions. */
   update(time: number, delta: number) {
-    if (!this.action) return;
+    if (!this.action || !Number.isFinite(time)) return;
     this.action.enabled = true;
     this.action.paused = false;
     this.action.time = Math.max(0, Math.min(this.action.getClip().duration, time));
@@ -55,6 +57,7 @@ export class PreviewClipPlayer {
   }
 
   seek(time: number) {
+    if(!Number.isFinite(time))return;
     this.releaseSnapshot();
     this.update(time, 0);
   }

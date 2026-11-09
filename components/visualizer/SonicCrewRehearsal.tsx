@@ -1,4 +1,5 @@
 'use client';
+import {previewSampleV1136,type ShowClockV1136} from '@/lib/showContinuityV1136';
 import {SonicFootContactV1135} from './SonicFootContactV1135';
 import {useConcertStoryV1131} from './useConcertStoryV1131';
 import type {Lyrics} from '@/types/playbackCore';
@@ -17,7 +18,7 @@ import {PreviewClipPlayer} from './previewClipPlayer';
 import {newCrewState,stepCrew,crewClipTime,type CrewSettings} from './sonicCrewDirector';
 import {prepareCrewReaction,applyCrewReaction} from './sonicCrewReaction';
 export type CrewScenario={section:string;genre:string;energy:number;bpm:number;lyrics?:Lyrics|null;durationMs?:number;trackId?:string};
-export type CrewReading={slot:number;clip:string;time:number;leader:boolean;role?:string;chapter?:string;persona?:string;sequence?:string;bodyStyle?:string;contact?:number};
+export type CrewReading={slot:number;clip:string;time:number;leader:boolean;role?:string;chapter?:string;persona?:string;sequence?:string;bodyStyle?:string;contact?:number;evaluatedClip?:string};
 import {getAvatarModel} from './avatarModels';
 function Clock({clock,playing,maxSeconds}:{clock:{current:number};playing:boolean;maxSeconds:number}){useFrame((_,dt)=>{if(playing)clock.current=Math.min(maxSeconds,clock.current+Math.min(dt,.1));});return null;}
 function Performer({slot,modelId,clock,playing,settings,scenario,onReading}:{slot:number;modelId:string;clock:{current:number};playing:boolean;settings:CrewSettings;scenario:CrewScenario;onReading:(reading:CrewReading)=>void}){
@@ -28,18 +29,27 @@ function Performer({slot,modelId,clock,playing,settings,scenario,onReading}:{slo
  const player=useMemo(()=>new PreviewClipPlayer(mixer,model),[mixer,model]);
  const reaction=useMemo(()=>prepareCrewReaction(model),[model]);
  const feetV1135=useMemo(()=>['LeftFoot','RightFoot'].map(name=>({node:model.getObjectByName(name),point:new Vector3()})),[model]);
+ const sampledClockV1136=useRef<ShowClockV1136|null>(null);
  const state=useRef(newCrewState()),selected=useRef(''),time=useRef(0),lastReport=useRef(-1);
  useEffect(()=>()=>{player.dispose();mixer.stopAllAction();mixer.uncacheRoot(model);disposeClonedAvatarSkeletonsV654(model);},[player,mixer,model]);
  useFrame((frame,dt)=>{
-  const next=stepCrew(state.current,{...scenario,section:scenario.section==='auto'?undefined:scenario.section,modelId,clips:animations,trackId:scenario.trackId??'sonic-crew-rehearsal',progressMs:clock.current*1000,slot,count:3,playing,reducedMotion:false,manualPriority:false,settings});
+  const point={source:scenario.trackId??'sonic-crew-rehearsal',positionMs:clock.current*1000};
+  const sample=previewSampleV1136(sampledClockV1136.current,point,playing);
+  const next=stepCrew(state.current,{...scenario,section:scenario.section==='auto'?undefined:scenario.section,modelId,clips:animations,trackId:scenario.trackId??'sonic-crew-rehearsal',progressMs:clock.current*1000,slot,count:3,playing:sample.sample,reducedMotion:false,manualPriority:false,settings});
   state.current=next.state;
   if(next.plan.active){
    const clip=animations.find(c=>c.name===next.plan.clip);
-   if(clip){if(selected.current!==clip.name){player.select(clip,0,.55);selected.current=clip.name;}time.current=crewClipTime(next.plan,clip.duration);}
+   if(clip){
+    const target=crewClipTime(next.plan,clip.duration);
+    if(selected.current!==clip.name){player.select(clip,target,sample.cut?0:.55);selected.current=clip.name;}
+    if(sample.cut)player.seek(target);
+    time.current=target;
+   }
   }
+  if(sample.sample)sampledClockV1136.current=point;
   player.update(time.current,playing?Math.min(dt,.1):0);
-  applyCrewReaction(reaction,next.plan,next.plan.beat,scenario.energy,dt);
-  if(frame.clock.elapsedTime-lastReport.current>.35){lastReport.current=frame.clock.elapsedTime;const contact=Math.min(...feetV1135.filter(f=>!!f.node).map(f=>f.node!.getWorldPosition(f.point).y+1-.12));onReading({contact:Number.isFinite(contact)?contact:undefined,slot,clip:next.plan.active?selected.current:'Pausiert',time:time.current,leader:next.plan.leader===slot,role:next.plan.interaction?.role,chapter:next.plan.story?.chapter,persona:next.plan.persona?.label,sequence:next.plan.sequence?.label,bodyStyle:next.plan.bodyStyle});}
+  applyCrewReaction(reaction,playing?next.plan:{...next.plan,active:false},next.plan.beat,scenario.energy,dt);
+  if(frame.clock.elapsedTime-lastReport.current>.35){lastReport.current=frame.clock.elapsedTime;const contact=Math.min(...feetV1135.filter(f=>!!f.node).map(f=>f.node!.getWorldPosition(f.point).y+1-.12));onReading({evaluatedClip:selected.current,contact:Number.isFinite(contact)?contact:undefined,slot,clip:playing&&next.plan.active?selected.current:'Pausiert',time:time.current,leader:next.plan.leader===slot,role:next.plan.interaction?.role,chapter:next.plan.story?.chapter,persona:next.plan.persona?.label,sequence:next.plan.sequence?.label,bodyStyle:next.plan.bodyStyle});}
  });
  return <group position={[(slot-1)*1.4,0,0]}><primitive object={model}/><SonicFootContactV1135 model={model} floorY={-1}/></group>;
 }

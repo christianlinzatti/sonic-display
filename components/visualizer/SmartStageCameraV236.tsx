@@ -1,4 +1,5 @@
 "use client";
+import {readingCameraBlendV1136} from '@/lib/showContinuityV1136';
 import {lyricSpotlightV1133} from '@/lib/lyricSpotlightV1133';
 import {composeScoreCameraV1134,newScoreCameraV1134} from '@/lib/concertScoreV1134';
 import {useConcertStoryV1131} from './useConcertStoryV1131';
@@ -26,7 +27,7 @@ export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,comp
  arena360?:boolean;arenaCameraEnabled?:boolean;arenaCameraMode?:ArenaCameraModeV1032;arenaFlyoverEnabled?:boolean;arenaSectionCameraEnabled?:boolean;arenaShowCameraCueV1043?:ArenaShowCameraCueV1043;arenaImmersiveCameraCueV1047?:ArenaImmersiveCameraCueV1047;arenaCinematicCameraCueV1053?:ConcertCameraCueV1053;concertCameraCueV1072?:CameraCueV1072;section?:string;audio:AudioFeatures;genre?:string|null;playing:boolean;reducedMotion:boolean;duo:boolean;composition?:SmartStageCueV351;genreCue?:GenreVisualCueV352;timelineCue?:ShowTimelineCueV354;lipSync?:VisualizerProps["lipSync"]}){
  const scoreCameraV1134=useRef(newScoreCameraV1134());
  const lyricPriorityV1133=lyricSpotlightV1133(lipSync?.lyrics,lipSync?.progressMs??0).protectCamera;
- const storyV1131=useConcertStoryV1131({durationMs:lipSync?.storyDurationMsV1131,progressMs:lipSync?.progressMs??0,lyrics:lipSync?.lyrics,genre,bpm:audio.bpm,energy:audio.energyEnvelope,count:lipSync?.cameraCastCountV377??(duo?2:1),section:lipSync?.lyrics?.synced?undefined:section});
+ const storyV1131=useConcertStoryV1131({trackId:lipSync?.storyTrackIdV1136,playback:lipSync?.storyPlaybackV1136,durationMs:lipSync?.storyDurationMsV1131,progressMs:lipSync?.progressMs??0,lyrics:lipSync?.lyrics,genre,bpm:audio.bpm,energy:audio.energyEnvelope,count:lipSync?.cameraCastCountV377??(duo?2:1),section:lipSync?.lyrics?.synced?undefined:section});
  const director=useRef(createStageDirectorState());
  const arenaFlyoverV1033=useRef({...INITIAL_ARENA_FLYOVER_V1033});
  const focusV369=useRef(0);
@@ -73,8 +74,8 @@ export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,comp
   const safeV1047=composeArenaImmersiveCameraV1047(safeV1043,arenaImmersiveCameraCueV1047,protectedShotV1033);
   const safeV1053=composeArenaCinematicCameraV1053(safeV1047,arenaCinematicCameraCueV1053,protectedShotV1033);
   const priorV1131=composeConcertCameraDirectorV1072(safeV1053,concertCameraCueV1072,protectedShotV1033);
-  const safeV1072=composeScoreCameraV1134(priorV1131,storyV1131,scoreCameraV1134.current,{playing,reducedMotion,protectedShot:!!timelineCue?.active||focusV369.current>.01},{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:(camera as PerspectiveCamera).fov,targetY:lookV369.current} as typeof priorV1131);
-  const t=1-Math.exp(-Math.min(Math.max(delta,0),.1)*3);
+  const safeV1072=composeScoreCameraV1134(priorV1131,storyV1131,scoreCameraV1134.current,{playing,reducedMotion,nowMs:clock.elapsedTime*1000,protectedShot:!!timelineCue?.active||focusV369.current>.01},{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:(camera as PerspectiveCamera).fov,targetY:lookV369.current} as typeof priorV1131);
+  const t=readingCameraBlendV1136(1-Math.exp(-Math.min(Math.max(delta,0),.1)*3),delta,scoreCameraV1134.current.key==='reading');
   camera.position.x+=(safeV1072.x-camera.position.x)*t;
   camera.position.y+=(safeV1072.y-camera.position.y)*t;
   camera.position.z+=(safeV1072.z-camera.position.z)*t;

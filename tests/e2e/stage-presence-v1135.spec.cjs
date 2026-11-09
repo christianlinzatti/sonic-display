@@ -1,5 +1,5 @@
 const {test,expect}=require('./fixtures.cjs');
-const {installConcertMocksV1130}=require('../fixtures/concertMocksV1130.cjs');
+const {installConcertMocksV1130,lyrics:concertLyrics}=require('../fixtures/concertMocksV1130.cjs');
 async function seed(page,live=false){await page.addInitScript(({live})=>{
  localStorage.setItem('sonic-stage-crew-v4',JSON.stringify({enabled:true,reactions:true,mode:'adaptive',expression:'bold'}));
  localStorage.setItem('sonic-display-ui-preferences-v1',JSON.stringify({visualizerMode:live?'avatar':'wave',stageTheme:'classic',lyricsVisible:true,
@@ -24,7 +24,9 @@ test('real three-person rehearsal keeps a planted foot on the floor and releases
 });
 test('grounded live crew and dramatic refrain render with mocked Spotify and readable lyrics',async({page},testInfo)=>{
  test.setTimeout(180000);const loaded=new Set();page.on('response',r=>{if(r.ok()&&r.url().endsWith('.glb'))loaded.add(new URL(r.url()).pathname);});
- await installConcertMocksV1130(page,{position:65000,playing:true});await seed(page,true);await page.goto('/');
+ // Keep the whole five-second mocked playback polling window inside this refrain.
+ const lyricPayload={...concertLyrics,lines:concertLyrics.lines.map(l=>l.startMs===64000?{...l,endMs:74000}:l)};
+ await installConcertMocksV1130(page,{position:65000,playing:true,lyricPayload});await seed(page,true);await page.goto('/');
  await expect(page.locator('.immersive-stage canvas')).toBeVisible({timeout:90000});
  await expect.poll(()=>['neon-pulse','luna-flow','quantum-bass'].every(s=>loaded.has(`/avatars/sonic/${s}.glb`)),{timeout:90000}).toBe(true);
  await expect(page.getByRole('complementary',{name:'Intelligente Show-Regie'})).toHaveAttribute('data-show-staging','chorus');

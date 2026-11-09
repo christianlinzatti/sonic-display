@@ -1,3 +1,11 @@
+## V1136 – Saubere Positionswechsel und erweiterte Tests
+
+Die pausierte Crew-Probe zeigt beim Verschieben des Positionsreglers direkt die tatsächliche Zielpose. Seek und Trackwechsel beenden alte Vorschau-Übergänge; normale Clipwechsel bleiben weich. Die ruhige Rap-Kamera verwirft ihren bisherigen Leseanker bei einer neuen Quelle oder einem deutlichen Positionssprung und ordnet die Aufnahme neu ein.
+
+Der Vorschau-Mixer ist gegen nicht endliche Uhrwerte geschützt. Neue Prüfungen decken 3.000 Positions-/Quellenwechsel und jeweils 180 unterbrochene Übergänge für alle elf echten GLB-Avatare ab. Die Browser-Suite prüft zusätzlich pausiertes Scrubbing sowie einen laufenden Trackwechsel ohne Reload mit Spotify-/Lyrics-Mocks.
+
+**Prüfen:** `npm run test:v1136`, Produktionsbuild und danach `npm run test:v1136:browser`. Bedienung, Grenzen und Architektur: [V1136-Dokumentation](docs/versions/V1136-SHOW-KONTINUITAET.md). Die ZIP enthält keine Playwright-Testberichte.
+
 ## V1135 – Natürlichere Bühnenpräsenz
 
 Die adaptive Sonic-Crew steht nun größenabhängig auf dem tatsächlichen Bühnenboden. Weiche Kontaktschatten verbinden die Füße mit der Bühne; zusätzliche Root-Sprünge über gebackener Beinarbeit entfallen. Kleine vorbereitende Bewegungen, atmende Brust und gedämpft nachlaufende Kopf-/Armreaktionen geben den elf Persönlichkeiten mehr Körperlichkeit.

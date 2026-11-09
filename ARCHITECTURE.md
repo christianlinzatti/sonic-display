@@ -1,6 +1,16 @@
+## V1136 – Quellengebundene Kameraanker und explizite Vorschau-Seeks
+
+**Aktueller Dokumentationsstand: V1136.** Details: [V1136-SHOW-KONTINUITAET.md](docs/versions/V1136-SHOW-KONTINUITAET.md).
+
+`showContinuityV1136.ts` trennt fortlaufende Positionsupdates, deutliche Sprünge und pausiertes Scrubbing. Der bestehende Concert Score trägt Track-/Quellenkennung und Position. Die Visualizer-Anbindung reicht Track-ID und bestätigte Provider-Probe aus dem vorhandenen Music-Context ausdrücklich an die Szene weiter; der gemeinsame Story-Hook benötigt dafür kein zusätzliches Context-Abonnement im Canvas. Die Kamera-Komposition wertet bestätigte Provider-Proben aus und verwendet nur ohne diese Songfortschritt und monotone Renderzeit. Sie setzt die Fallback-Zeitreferenz bei Pause/Wiederaufnahme zurück und verwirft veraltete Leseanker bei einer neuen Quelle oder einem deutlichen Sprung, übernimmt den neu komponierten Zielausschnitt und behält die vorhandene Glättung bei. Manuelle/gespeicherte Kameras und Reduced Motion bleiben vorrangig.
+
+Die Probe wertet eine Pose auch ohne laufende Wiedergabe aus, wenn die Position geändert wurde. Solche Auswertungen beenden alte Snapshot-Übergänge; normale Clipwechsel starten dagegen aus der tatsächlich dargestellten Pose. Der Preview-Player verwirft nicht endliche Update-/Seek-Zeiten und prüft eine neue Clipdauer vor dem Stoppen der aktuellen Aktion. Private Übergangsclips und Aktionen werden weiterhin freigegeben.
+
+Neue Prüfungen: `tests/v1136-show-continuity.cjs`, `tests/v1136-preview-resilience.mjs` und `tests/e2e/show-continuity-v1136.spec.cjs`. Die Tests erfassen tatsächliche GLB-Weltpositionen, pausierte Zielzeiten und reale Kamera-Statusposen. Die bestehende Statusmeldung erhält Quellenkennung und Haltemodus; zusätzliche Netzwerkabfragen, Timer oder Kamera-Schreiber entstehen nicht. Dokumentation liegt unter `docs/versions/`; generierte Playwright-Berichte bleiben vom ZIP ausgeschlossen.
+
 ## V1135 – Bodenkontakt und gedämpfte Bühnenreaktionen
 
-**Aktueller Dokumentationsstand: V1135.** Details und Grenzen: [docs/versions/V1135-BUEHNENPRAESENZ.md](docs/versions/V1135-BUEHNENPRAESENZ.md).
+**Historischer Dokumentationsstand: V1135.** Details und Grenzen: [docs/versions/V1135-BUEHNENPRAESENZ.md](docs/versions/V1135-BUEHNENPRAESENZ.md).
 
 `stagePresenceV1135.ts` gleicht die verifizierte Sohlenhöhe der eingebauten GLBs mit dem sichtbaren Bühnenboden ab. Eine konstante äußere Platzierung berücksichtigt die Avatargröße; der bestehende Mixer bleibt im unveränderten Modellraum. Automatische Crew-Clips erhalten keinen weiteren Root-Bounce oder Root-Yaw. Manuelle Quellen, externe Modelle und explizite Avatar-Offsets verhindern die automatische Platzierung.
 
