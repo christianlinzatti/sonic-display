@@ -6,6 +6,7 @@ import {ALEXA_LOCAL_ENABLED_KEY_V967} from '@/lib/alexaConcertV967';
 import {parseArtistVoiceConsentV1007} from '@/lib/alexaArtistV1007';
 import {ALEXA_GOVEE_CONSENT_EVENT_V970,ALEXA_GOVEE_RESET_EVENT_V970,loadAlexaGoveeConsentV970,saveAlexaGoveeConsentV970} from '@/lib/alexaGoveeV970';
 import model from '../integrations/alexa/interaction-model.de-DE.json';
+import {ALEXA_GOVEE_RECEIVER_EVENT_V1139,readAlexaGoveeReceiverTokenV1139,saveAlexaGoveeReceiverTokenV1139} from '@/lib/alexaGoveeReceiverClientV1139';
 import {GoveePowerQuickControlsV1138,GoveePowerPermissionV1138} from './GoveePowerControlsV1138';
 
 const LOCAL_EVENT='sonic-display:alexa-local-status-v971';
@@ -59,10 +60,12 @@ export function AlexaSettingsV1137(){
  const [enabled,setEnabled]=useState(false);
  const [goveeEnabled,setGoveeEnabled]=useState(false);
  const [notice,setNotice]=useState('');
+ const [receiverToken,setReceiverToken]=useState('');
+ const [receiverSaved,setReceiverSaved]=useState(false);
  useEffect(()=>{
   const refresh=()=>{try{setEnabled(parseArtistVoiceConsentV1007(localStorage.getItem(ALEXA_LOCAL_ENABLED_KEY_V967)).enabled);}catch{setEnabled(false);}};
   const refreshGovee=()=>setGoveeEnabled(loadAlexaGoveeConsentV970().enabled);
-  refresh();refreshGovee();
+  refresh();refreshGovee();setReceiverSaved(Boolean(readAlexaGoveeReceiverTokenV1139()));
   window.addEventListener(LOCAL_EVENT,refresh);
   window.addEventListener('storage',refresh);
   window.addEventListener('storage',refreshGovee);
@@ -84,7 +87,7 @@ export function AlexaSettingsV1137(){
  };
  return <section aria-label="Alexa Einstellungen">
   <h3>Alexa · Sprachsteuerung</h3>
-  <p className="settings-note">Die private Alexa-Custom-Skill-Verbindung nutzt AWS Lambda, eine signierte Bridge und Upstash. Alle Freigaben gelten nur für diesen Browser. Für Konzert- und Govee-Kommandos muss das Konzertstudio geöffnet sein; für Künstler- und Anzeigebefehle muss Sonic Display sichtbar geöffnet und mit Spotify verbunden sein.</p>
+  <p className="settings-note">Die private Alexa-Custom-Skill-Verbindung nutzt AWS Lambda, eine signierte Bridge und Upstash. Alle Freigaben gelten nur für diesen Browser. Für Konzert- und Govee-Kommandos muss das Konzertstudio geöffnet sein; für Künstler- und Anzeigebefehle muss Sonic Display sichtbar geöffnet und mit Spotify verbunden sein. Govee Ein/Aus funktioniert optional auch ohne Spotify mit einem separaten Empfänger-Token.</p>
   <fieldset><legend>Alexa-Empfang</legend>
    <label className="setting-check"><input type="checkbox" checked={enabled} onChange={event=>toggle(event.target.checked)}/> Alexa-Sprachbefehle auf diesem Display empfangen</label>
    <small>Standardmäßig aus. Die Berechtigungen für Spotify-Künstler, Anzeige und Govee werden zusätzlich und getrennt erteilt.</small>
@@ -96,6 +99,17 @@ export function AlexaSettingsV1137(){
    <p className="settings-note">Nur für bereits ausgewählte Lampen mit laufendem Govee-Musik-Sync. Keine Lampen einschalten, keine Änderung an der Spotify-Wiedergabe; bestehende Show-Timelines haben Vorrang.</p>
   </fieldset>
   <GoveePowerPermissionV1138/>
+  <details><summary>V1139 · Govee-Alexa auch ohne Spotify konfigurieren</summary>
+   <p className="settings-note">Optionaler, separater Empfänger-Token für Govee-Schaltbefehle ohne Spotify-Anmeldung. Dieselbe zufällig erzeugte Zeichenfolge (mindestens 32 Zeichen) als geschützte Vercel-Umgebungsvariable <code>ALEXA_GOVEE_RECEIVER_TOKEN</code> hinterlegen. Der Browser-Token berechtigt ausschließlich zum Empfang und zur Bestätigung von Govee-Power-Befehlen, nicht zu Spotify-Aktionen. Das Display muss geöffnet bleiben.</p>
+   <label>Govee-Empfänger-Token
+    <input type="password" autoComplete="off" value={receiverToken} onChange={e=>setReceiverToken(e.target.value)} placeholder={receiverSaved?'Token auf diesem Display gespeichert':'Mindestens 32 zufällige Zeichen'}/>
+   </label>
+   <div className="govee-v958-settings">
+    <button type="button" onClick={()=>{try{saveAlexaGoveeReceiverTokenV1139(receiverToken);setReceiverSaved(Boolean(receiverToken.trim()));setReceiverToken('');setNotice('Empfänger-Token lokal gespeichert.');}catch(e){setNotice(e instanceof Error?e.message:'Token ungültig.');}}}>Token speichern</button>
+    <button type="button" onClick={()=>{try{saveAlexaGoveeReceiverTokenV1139('');setReceiverToken('');setReceiverSaved(false);setNotice('Empfänger-Token von diesem Display entfernt.');}catch{setNotice('Token konnte nicht gelöscht werden.');}}}>Token entfernen</button>
+   </div>
+   <small role="status">{receiverSaved?'Token lokal hinterlegt':'Kein Token hinterlegt'} · Spotify-Zugriff bleibt unverändert.</small>
+  </details>
   <GoveePowerQuickControlsV1138/>
   {notice&&<p role="status">{notice}</p>}
   <AlexaCommandHelpV1137/>

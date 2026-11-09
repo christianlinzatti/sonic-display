@@ -4,6 +4,7 @@ import {useEffect,useRef,useState} from 'react';
 import {useMusic} from '@/context/MusicContext';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
 import {ALEXA_LOCAL_ENABLED_KEY_V967} from '@/lib/alexaConcertV967';
+import {ALEXA_GOVEE_RECEIVER_EVENT_V1139,readAlexaGoveeReceiverTokenV1139,alexaGoveeReceiverHeadersV1139} from '@/lib/alexaGoveeReceiverClientV1139';
 import {GOVEE_POWER_CONSENT_EVENT_V1138,loadGoveePowerConsentV1138,isGoveePowerCommandV1138,executeAlexaGoveePowerV1138} from '@/lib/goveePowerV1138';
 import {ALEXA_ARTIST_KEY_V1007,ALEXA_ARTIST_EVENT_V1007,parseArtistVoiceConsentV1007} from '@/lib/alexaArtistV1007';
 import {VOICE_DISPLAY_KEY_V1008,VOICE_SETTINGS_EVENT_V1008,freshVoiceV1008,isArtistVoiceV1008,
@@ -22,25 +23,25 @@ export function AlexaVoiceControlV1008(){
  const seen=useRef(new Set<string>()),undo=useRef<VoiceUndoV1008|null>(null);
  useEffect(()=>{try{undo.current=JSON.parse(sessionStorage.getItem(UNDO)||'null');}catch{/* no history */}
   const refresh=()=>setSettings(permissions());refresh();
-  const events=['storage',VOICE_SETTINGS_EVENT_V1008,ALEXA_ARTIST_EVENT_V1007,GOVEE_POWER_CONSENT_EVENT_V1138,'sonic-display:alexa-local-status-v971'];
+  const events=['storage',VOICE_SETTINGS_EVENT_V1008,ALEXA_ARTIST_EVENT_V1007,GOVEE_POWER_CONSENT_EVENT_V1138,ALEXA_GOVEE_RECEIVER_EVENT_V1139,'sonic-display:alexa-local-status-v971'];
   events.forEach(e=>window.addEventListener(e,refresh));return()=>events.forEach(e=>window.removeEventListener(e,refresh));
  },[]);
  useEffect(()=>{if(!status)return;const timer=window.setTimeout(()=>setStatus(''),18000);return()=>window.clearTimeout(timer);},[status]);
  useEffect(()=>{
-  if(!connected||!settings.general.enabled)return;
+  if(!settings.general.enabled||(!connected&&(!settings.power.enabled||!readAlexaGoveeReceiverTokenV1139())))return;
   let disposed=false,flight=false;const abort=new AbortController();
   const visible=()=>!disposed&&!abort.signal.aborted&&document.visibilityState==='visible';
   const notify=(value:{artistId:string;following:boolean})=>window.dispatchEvent(new CustomEvent('sonic:artist-follow-changed-v359',{detail:value}));
   const saveUndo=(value:VoiceUndoV1008|null)=>{undo.current=value;try{if(value)sessionStorage.setItem(UNDO,JSON.stringify(value));else sessionStorage.removeItem(UNDO);}catch{/* keep in-memory undo */}};
-  const post=async(value:object)=>backgroundJsonV1009('/api/alexa/voice-result',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(value),signal:abort.signal});
+  const post=async(value:object)=>backgroundJsonV1009(connected?'/api/alexa/voice-result':'/api/alexa/govee-result',{method:'POST',headers:{'Content-Type':'application/json',...(!connected?alexaGoveeReceiverHeadersV1139():{})},body:JSON.stringify(value),signal:abort.signal});
   const poll=async()=>{
    if(flight||!visible())return;flight=true;
    try{
-    const response=await backgroundJsonV1009('/api/alexa/voice-pending',{cache:'no-store',signal:abort.signal});
-    if(!response.ok){if(response.status===401)setStatus('Spotify-Anmeldung fehlt. Bitte Spotify neu verbinden.');else if(response.status===503)setStatus('Alexa-Weiterleitung nicht erreichbar. Unter Einstellungen die Verbindung prüfen.');return;}
+    const response=await backgroundJsonV1009(connected?'/api/alexa/voice-pending':'/api/alexa/govee-pending',{cache:'no-store',signal:abort.signal,...(!connected?{headers:alexaGoveeReceiverHeadersV1139()}:{})});
+    if(!response.ok){if(response.status===401)setStatus(connected?'Spotify-Anmeldung fehlt. Bitte Spotify neu verbinden.':'Govee-Empfänger-Token stimmt nicht mit der Vercel-Einstellung überein.');else if(response.status===503)setStatus('Alexa-Weiterleitung nicht erreichbar. Unter Einstellungen die Verbindung prüfen.');return;}
     const data=await response.json();if(!Array.isArray(data.commands)||!visible())return;
     for(const raw of data.commands.slice(0,20)){
-     const p=permissions();if(!p.general.enabled||!freshVoiceV1008(raw,p.general.since,Date.now())||seen.current.has(raw.id)||!visible())continue;
+     const p=permissions();if(!p.general.enabled||(!connected&&!isGoveePowerCommandV1138(raw?.command))||!freshVoiceV1008(raw,p.general.since,Date.now())||seen.current.has(raw.id)||!visible())continue;
      const message:VoiceMessageV1008=raw;seen.current.add(message.id);if(seen.current.size>100)seen.current.delete(seen.current.values().next().value!);
      const claim=await post({id:message.id,phase:'claim'});if(!claim.ok)continue;
      const {token}=await claim.json();let result:VoiceResultV1008;
