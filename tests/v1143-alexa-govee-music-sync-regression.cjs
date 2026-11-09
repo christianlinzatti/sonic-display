@@ -9,6 +9,7 @@ assert.equal(result.diagnostics.filter(d=>d.category===ts.DiagnosticCategory.Err
 vm.runInNewContext(result.outputText,{module:mod,exports:mod.exports,require:id=>{
  if(id==='./goveeLanV909')return {loadGoveeConfigV909:()=>({...config,selectedIps:[...config.selectedIps]}),saveGoveeConfigV909:x=>{config=x;}};
  if(id==='./goveePowerV1138')return {canExecuteGoveePowerV1138:x=>x.enabled&&!!x.token&&x.selectedIps.length>0,isGoveePowerCommandV1138:c=>['govee-power-on','govee-power-off'].includes(c)};
+ if(id==='./goveeVoiceLookV1146')return {isGoveeVoiceLookCommandV1146:c=>c==='govee-brightness'||c==='govee-color'};
  throw Error(id);
 },window,localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,String(v))},Date,JSON,Number,Event});
 const lib=mod.exports;
