@@ -4,7 +4,7 @@ const ts=require('./typescript-loader.cjs');
 const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
 const source=ts.transpileModule(read('lib/goveeLiveStatusV1140.ts'),{fileName:'lib/goveeLiveStatusV1140.ts',compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 const mod={exports:{}};
-vm.runInNewContext(source,{module:mod,exports:mod.exports,require:()=>{throw Error('No runtime import expected for classifier');}});
+vm.runInNewContext(source,{module:mod,exports:mod.exports,require:id=>{assert.equal(id,'./goveeLanV909');return {goveeBridgeRequestV909:async()=>{throw Error('LAN should not be invoked by pure status classifier');}};}});
 const classify=mod.exports.classifyGoveeStatusV1140;
 const ip='192.168.1.50',device={ip,name:'Test Strip',online:true,status:{on:true,brightness:60}};
 assert.equal(classify(ip,{device,fresh:false}).on,null,'stale UDP status cannot be claimed as confirmed');
