@@ -133,6 +133,7 @@ try {
   run('V1010 central network governor','tests/v1010-network-coordination-regression.cjs');
   run('V1009 private avatar resources','tests/v1009-avatar-resources-regression.cjs');
   run('V1009 native providers and background deadlines','tests/v1009-network-regression.cjs');
+  run('V1144 Govee bounded status retry','tests/v1144-govee-status-retry-regression.cjs');
   run('V1143 Alexa Govee music-sync opt-in','tests/v1143-alexa-govee-music-sync-regression.cjs');
   run('V1139 Govee-only receiver security','tests/v1139-govee-receiver-regression.cjs');
   run('V1140–V1142 Govee confirmed status and light dashboard','tests/v1140-v1142-govee-dashboard-regression.cjs');

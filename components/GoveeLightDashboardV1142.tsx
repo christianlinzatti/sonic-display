@@ -6,8 +6,9 @@ import {GOVEE_CONFIG_EVENT_V909,GOVEE_CONFIG_KEY_V909,loadGoveeConfigV909,
 import {GOVEE_GROUPS_EVENT_V915} from '@/lib/goveeDeviceGroupsV915';
 import {sendGoveePowerV1138,canExecuteGoveePowerV1138} from '@/lib/goveePowerV1138';
 import {sendTargetedGoveePowerV1141} from '@/lib/goveePowerRoutingV1141';
-import {readGoveeStatusV1140,type GoveeConfirmedStatusV1140} from '@/lib/goveeLiveStatusV1140';
+import {type GoveeConfirmedStatusV1140} from '@/lib/goveeLiveStatusV1140';
 import {GoveeMusicVoiceControlsV1143} from './GoveeMusicVoiceControlsV1143';
+import {readGoveeStatusWithRetryV1144} from '@/lib/goveeStatusRetryV1144';
 
 type Scene='hardtekk'|'calm'|'night';
 const looks:Record<Scene,{label:string;brightness:number;color:{r:number;g:number;b:number}}>={
@@ -22,6 +23,8 @@ export function GoveeLightDashboardV1142({onActivity}:{onActivity?:()=>void}={})
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('Status noch nicht geprüft.');
  const [brightness,setBrightness]=useState(65);
+ const [lastStatusAt,setLastStatusAt]=useState<number|null>(null);
+ const [failedChecks,setFailedChecks]=useState(0);
  useEffect(()=>{
   const refresh=()=>{const cfg=loadGoveeConfigV909();setConfig(cfg);setBrightness(cfg.masterBrightness);};
   const onStorage=(event:StorageEvent)=>{if(!event.key||event.key===GOVEE_CONFIG_KEY_V909)refresh();};
@@ -44,13 +47,14 @@ export function GoveeLightDashboardV1142({onActivity}:{onActivity?:()=>void}={})
   const inventory=await goveeBridgeRequestV909<{devices:GoveeDeviceV909[]}>(cfg,'/devices');
   setNames(Object.fromEntries(inventory.devices.filter(d=>cfg.selectedIps.includes(d.ip)).map(d=>[d.ip,d.name?.trim()||d.sku||d.ip])));
   const next:Record<string,GoveeConfirmedStatusV1140>={};
+  let issues=0;
   for(const ip of cfg.selectedIps.slice(0,32)){
-   try{next[ip]=await readGoveeStatusV1140(cfg,ip);}
-   catch{next[ip]={ip,name:ip,online:false,confirmed:false,on:null,brightness:null};}
+   try{const attempt=await readGoveeStatusWithRetryV1144(cfg,ip);next[ip]=attempt.status;if(attempt.warning)issues++;}
+   catch{issues++;next[ip]={ip,name:ip,online:false,confirmed:false,on:null,brightness:null};}
   }
-  setStatuses(next);
+  setStatuses(next);setLastStatusAt(Date.now());setFailedChecks(issues);
   const verified=Object.values(next).filter(v=>v.confirmed);
-  return `Status abgefragt: ${verified.length} von ${cfg.selectedIps.length} Geräten mit frischer Statusantwort; ${verified.filter(v=>v.on).length} davon eingeschaltet.`;
+  return `Status abgefragt: ${verified.length} von ${cfg.selectedIps.length} Geräten mit frischer Statusantwort; ${verified.filter(v=>v.on).length} davon eingeschaltet. ${issues?`${issues} ohne aktuelle Bestätigung.`:'Alle verfügbaren Geräteantworten bestätigt.'}`;
  },[]);
  const all=async(on:boolean)=>{const result=await sendGoveePowerV1138(on);markUnknown();return result;};
  const one=async(index:number,on:boolean)=>{const result=await sendTargetedGoveePowerV1141(on,{fixtureNumber:index+1});markUnknown();return result;};
@@ -112,6 +116,7 @@ export function GoveeLightDashboardV1142({onActivity}:{onActivity?:()=>void}={})
   </label>
   <button type="button" disabled={!configured||busy} onClick={()=>void operation(()=>manual('brightness',brightness))}>Helligkeit an ausgewählte Lampen senden</button>
   <p role="status" className="settings-note">{notice}</p>
+  {lastStatusAt!==null&&<small>Letzte manuelle Statusprüfung: {new Date(lastStatusAt).toLocaleTimeString("de-AT")} · {failedChecks} ungeklärte Geräte · maximal 2 lesende Abfragen pro Gerät; keine automatischen Schaltwiederholungen.</small>}
   {!configured&&<p className="settings-note">Bitte unter Einstellungen → Govee LAN aktivieren, Bridge-Token eintragen und Lampen auswählen.</p>}
  </section>;
 }
