@@ -133,6 +133,7 @@ try {
   run('V1010 central network governor','tests/v1010-network-coordination-regression.cjs');
   run('V1009 private avatar resources','tests/v1009-avatar-resources-regression.cjs');
   run('V1009 native providers and background deadlines','tests/v1009-network-regression.cjs');
+  run('V1146 Alexa Govee brightness and color','tests/v1146-alexa-govee-look-regression.cjs');
   run('V1145 Alexa full 360 concert voice director','tests/v1145-alexa-full-concert-regression.cjs');
   run('V1144 Govee bounded status retry','tests/v1144-govee-status-retry-regression.cjs');
   run('V1143 Alexa Govee music-sync opt-in','tests/v1143-alexa-govee-music-sync-regression.cjs');

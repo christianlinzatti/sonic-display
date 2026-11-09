@@ -1,7 +1,7 @@
 'use strict';
 const {createHmac,randomUUID}=require('node:crypto');
 const COMMANDS={LikeArtistIntent:'artist-follow',UnlikeArtistIntent:'artist-unfollow',FollowAllArtistsIntent:'artist-follow-all',ArtistStatusIntent:'artist-status',UndoArtistIntent:'artist-undo',
- FollowPrimaryArtistIntent:'artist-follow-primary',UnfollowPrimaryArtistIntent:'artist-unfollow-primary',LyricsOnIntent:'lyrics-on',LyricsOffIntent:'lyrics-off',NextAvatarIntent:'avatar-next',CalmDisplayIntent:'display-calm',NormalDisplayIntent:'display-normal',GoveePowerOnIntent:'govee-power-on',GoveePowerOffIntent:'govee-power-off',GoveeFixtureOnIntent:'govee-power-on',GoveeFixtureOffIntent:'govee-power-off',GoveeGroupOnIntent:'govee-power-on',GoveeGroupOffIntent:'govee-power-off',GoveeMusicSyncStartIntent:'govee-sync-start',GoveeMusicSyncPauseIntent:'govee-sync-pause',FullConcertStartIntent:'concert-show-start',FullConcertStopIntent:'concert-show-stop',StatusIntent:'connection-status'};
+ FollowPrimaryArtistIntent:'artist-follow-primary',UnfollowPrimaryArtistIntent:'artist-unfollow-primary',LyricsOnIntent:'lyrics-on',LyricsOffIntent:'lyrics-off',NextAvatarIntent:'avatar-next',CalmDisplayIntent:'display-calm',NormalDisplayIntent:'display-normal',GoveePowerOnIntent:'govee-power-on',GoveePowerOffIntent:'govee-power-off',GoveeFixtureOnIntent:'govee-power-on',GoveeFixtureOffIntent:'govee-power-off',GoveeGroupOnIntent:'govee-power-on',GoveeGroupOffIntent:'govee-power-off',GoveeMusicSyncStartIntent:'govee-sync-start',GoveeMusicSyncPauseIntent:'govee-sync-pause',FullConcertStartIntent:'concert-show-start',FullConcertStopIntent:'concert-show-stop',GoveeBrightnessIntent:'govee-brightness',GoveeColorIntent:'govee-color',StatusIntent:'connection-status'};
 const CHOICES={SelectFirstArtistIntent:1,SelectSecondArtistIntent:2,SelectThirdArtistIntent:3};
 const id=v=>typeof v==='string'&&/^[a-zA-Z0-9]{10,32}$/.test(v);
 function validSelection(v){return v?.kind==='selection'&&['artist-follow','artist-unfollow','artist-status'].includes(v.action)&&id(v.trackId)&&Array.isArray(v.choices)&&v.choices.length>=2&&v.choices.length<=10&&v.choices.every(c=>id(c?.id)&&typeof c.name==='string'&&c.name.length<=120)&&typeof v.text==='string'&&v.text.length<=1200;}
@@ -20,7 +20,19 @@ async function runVoiceV1008(event,{origin,secret,fetcher=fetch,clock=Date.now,s
  };
  try{
   if(intent==='LastVoiceResultIntent'){const data=await send({read:'latest'});return data.result?output(data.result):output({kind:'error',text:'Noch kein Ergebnis verfügbar. Prüfe, ob dein Display sichtbar geöffnet und mit Spotify verbunden ist.'});}
-  let command=COMMANDS[intent],target,goveeTarget;
+  let command=COMMANDS[intent],target,goveeTarget,goveeLook;
+  if(intent==='GoveeBrightnessIntent'){
+   const raw=String(event?.request?.intent?.slots?.GoveeBrightness?.value??'');
+   if(!/^(?:[1-9]|[1-9][0-9]|100)$/.test(raw))return output({kind:'error',text:'Bitte eine Helligkeit von eins bis einhundert Prozent angeben.'});
+   goveeLook={brightness:Number(raw)};
+  }
+  if(intent==='GoveeColorIntent'){
+   const raw=String(event?.request?.intent?.slots?.GoveeColor?.value||'').trim().toLocaleLowerCase('de-DE');
+   const accepted={rot:'red',blau:'blue',grün:'green',gruen:'green',violett:'violet',lila:'violet',türkis:'cyan',tuerkis:'cyan',orange:'amber',weiß:'white',weiss:'white',warmweiß:'warmwhite',warmweiss:'warmwhite'};
+   const color=Object.hasOwn(accepted,raw)?accepted[raw]:undefined;
+   if(!color)return output({kind:'error',text:'Bitte Rot, Blau, Grün, Violett, Türkis, Orange, Weiß oder Warmweiß wählen.'});
+   goveeLook={color};
+  }
   if(['GoveeFixtureOnIntent','GoveeFixtureOffIntent'].includes(intent)){
    const value=String(event?.request?.intent?.slots?.FixtureNumber?.value||'');
    const number=Number(value);
@@ -44,7 +56,7 @@ async function runVoiceV1008(event,{origin,secret,fetcher=fetch,clock=Date.now,s
    command=selection.action;target={artistId:selection.choices[number-1].id,trackId:selection.trackId};
   }
   if(!command)return null;
-  const queued=await send({command,...(target?{target}:{}),...(goveeTarget?{goveeTarget}:{})});
+  const queued=await send({command,...(target?{target}:{}),...(goveeTarget?{goveeTarget}:{}),...(goveeLook?{goveeLook}:{})});
   if(queued.queued!==true)return output({kind:'error',text:'Sonic Display hat die Anfrage nicht angenommen.'});
   if(typeof queued.id!=='string')return output(null);
   for(let tries=0;tries<12&&clock()<deadline-100;tries++){

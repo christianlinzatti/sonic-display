@@ -355,6 +355,36 @@
           ]
         },
         {
+          "name": "GoveeBrightnessIntent",
+          "slots": [
+            {
+              "name": "GoveeBrightness",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "stelle govee helligkeit auf {GoveeBrightness} prozent",
+            "mache govee licht {GoveeBrightness} prozent hell",
+            "dimme govee auf {GoveeBrightness} prozent",
+            "govee helligkeit {GoveeBrightness} prozent"
+          ]
+        },
+        {
+          "name": "GoveeColorIntent",
+          "slots": [
+            {
+              "name": "GoveeColor",
+              "type": "GoveeVoiceColorsV1146"
+            }
+          ],
+          "samples": [
+            "stelle govee auf {GoveeColor}",
+            "mache govee licht {GoveeColor}",
+            "ändere govee farbe auf {GoveeColor}",
+            "govee lichtfarbe {GoveeColor}"
+          ]
+        },
+        {
           "name": "GoveePowerOnIntent",
           "samples": [
             "schalte die govee lichter ein",
@@ -630,6 +660,66 @@
                 "synonyms": [
                   "Bass",
                   "Rhythm"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GoveeVoiceColorsV1146",
+          "values": [
+            {
+              "name": {
+                "value": "Rot"
+              }
+            },
+            {
+              "name": {
+                "value": "Blau"
+              }
+            },
+            {
+              "name": {
+                "value": "Grün",
+                "synonyms": [
+                  "Gruen"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Violett",
+                "synonyms": [
+                  "Lila"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Türkis",
+                "synonyms": [
+                  "Tuerkis"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Orange"
+              }
+            },
+            {
+              "name": {
+                "value": "Weiß",
+                "synonyms": [
+                  "Weiss"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "Warmweiß",
+                "synonyms": [
+                  "Warmweiss"
                 ]
               }
             }
