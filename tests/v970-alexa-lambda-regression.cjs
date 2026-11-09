@@ -26,13 +26,24 @@ const event=name=>({session:{application:{applicationId:skill},user:{userId:'pri
    const signature=createHmac('sha256',secret).update(`${h['x-sonic-timestamp']}.${h['x-sonic-nonce']}.${sent.opts.body}`).digest('hex');
    assert.equal(h['x-sonic-signature'],signature);
   }
+  // Real LAN power uses the separately consented V1008 voice queue, not V970 looks.
+  for(const [intent,command] of Object.entries({GoveePowerOnIntent:'govee-power-on',GoveePowerOffIntent:'govee-power-off'})){
+   assert(!Object.hasOwn(ACTIONS,intent),'Power commands must use the guarded voice relay');
+   assert(model.intents.some(x=>x.name===intent&&x.samples.length>=3));
+   await handler(event(intent));
+   const sent=traffic.at(-1);
+   assert.equal(sent.url,'https://sonic-display.test/api/alexa/voice');
+   assert.equal(JSON.parse(sent.opts.body).command,command);
+   const h=sent.opts.headers;
+   assert.equal(h['x-sonic-signature'],createHmac('sha256',secret).update(`${h['x-sonic-timestamp']}.${h['x-sonic-nonce']}.${sent.opts.body}`).digest('hex'));
+  }
   const count=traffic.length;
   const otherUser=event('GoveeFestivalIntent');otherUser.session.user.userId='stranger';await handler(otherUser);
   const otherSkill=event('GoveeArenaIntent');otherSkill.session.application.applicationId='fake';await handler(otherSkill);
   const stale=event('GoveeCalmIntent');stale.request.timestamp='2021-01-01T00:00:00Z';await handler(stale);
-  await handler(event('GoveePowerOnIntent'));await handler(event('SpotifyPlayIntent'));
+  await handler(event('SpotifyPlayIntent'));
   assert.equal(traffic.length,count,'Rejected identity or unsupported commands reached the network');
-  console.log('V970 Lambda PASS 6 signed intents, German skill model and identity/replay protection');
+  console.log('V970 Lambda PASS 6 room-light intents and 2 signed LAN power intents, German skill model and identity/replay protection');
  }catch(e){console.error(e);process.exitCode=1;}
  finally{global.fetch=oldFetch;process.env=oldEnv;}
 })();
