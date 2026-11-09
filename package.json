@@ -1,6 +1,6 @@
 {
   "name": "sonic-display",
-  "version": "0.1.0-v1134",
+  "version": "0.1.0-v1135",
   "private": true,
   "scripts": {
     "test:vercel:parity": "node tests/vercel-production-parity-regression.cjs",
@@ -2419,7 +2419,9 @@
     "test:v1133": "npm run test:v1132 && node tests/v1133-lyrics-body-policy.cjs && node tests/v1133-body-kinematics.mjs",
     "test:v1133:browser": "playwright test --config=config/playwright.production.cjs tests/e2e/whole-body-lyrics-v1133.spec.cjs tests/e2e/performer-personality-v1132.spec.cjs tests/e2e/concert-story-v1131.spec.cjs tests/e2e/intelligent-concert-v1130.spec.cjs --project=chromium-desktop",
     "test:v1134": "npm run test:v1133 && node tests/v1134-concert-score.cjs",
-    "test:v1134:browser": "playwright test --config=config/playwright.production.cjs tests/e2e/concert-score-v1134.spec.cjs tests/e2e/whole-body-lyrics-v1133.spec.cjs tests/e2e/performer-personality-v1132.spec.cjs tests/e2e/concert-story-v1131.spec.cjs tests/e2e/intelligent-concert-v1130.spec.cjs --project=chromium-desktop"
+    "test:v1134:browser": "playwright test --config=config/playwright.production.cjs tests/e2e/concert-score-v1134.spec.cjs tests/e2e/whole-body-lyrics-v1133.spec.cjs tests/e2e/performer-personality-v1132.spec.cjs tests/e2e/concert-story-v1131.spec.cjs tests/e2e/intelligent-concert-v1130.spec.cjs --project=chromium-desktop",
+    "test:v1135": "npm run test:v1134 && node tests/v1135-stage-presence.cjs && node tests/v1135-stage-contact.mjs",
+    "test:v1135:browser": "playwright test --config=config/playwright.production.cjs tests/e2e/stage-presence-v1135.spec.cjs tests/e2e/concert-score-v1134.spec.cjs tests/e2e/whole-body-lyrics-v1133.spec.cjs tests/e2e/performer-personality-v1132.spec.cjs tests/e2e/concert-story-v1131.spec.cjs tests/e2e/intelligent-concert-v1130.spec.cjs --project=chromium-desktop"
   },
   "engines": {
     "node": "24.x"
@@ -2448,8 +2450,8 @@
     "typescript": "^5.8.0"
   },
   "sonicHotfix": "v679-intelligent-song-arc",
-  "sonicRoadmapRelease": "v1134",
-  "sonicFeatureRelease": "v1134",
+  "sonicRoadmapRelease": "v1135",
+  "sonicFeatureRelease": "v1135",
   "overrides": {
     "postcss": "^8.5.32",
     "@vercel/cli-config": {

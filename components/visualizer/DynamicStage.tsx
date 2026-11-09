@@ -1,4 +1,5 @@
 "use client";
+import {portraitContrastV1135} from '@/lib/stagePresenceV1135';
 import {lyricSpotlightV1133} from '@/lib/lyricSpotlightV1133';
 import {useConcertStoryV1131} from './useConcertStoryV1131';
 import type {SmartStageCueV351} from "@/services/stageContent/smartStageCompositionV351";
@@ -2002,8 +2003,9 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       timelineCue.scale>0&&timelineGainV354>0&&showCue?.lightingEnabled!==false;
     const vocalKeyV797=vocalSafeV797?(vocalSpotlightV797?.keyGain??1):1;
     const vocalFillV797=vocalSafeV797?(vocalSpotlightV797?.fillGain??1):1;
-    const keyTargetV462=Math.min(3,Math.max(lightingV542.faceFloor||lightingV462.faceFloor,directed(cue.key)*lightScale*showGain*lightingV462.keyGain*lightingV542.keyGain*lightingV551.keyGain*lightingV608.key*lightingMixV749Now.key*concertGenreV610.key*lightingV621.key*concertContinuityV611.key*cinematicKeyV497)*performerPlanV557.keyGain*vocalKeyV797);
-    const fillTargetV462=Math.min(2.4,Math.max(Math.max(lightingV462.faceFloor,lightingV542.faceFloor)*.75,directed(cue.fill)*lightScale*showGain*lightingV462.fillGain*lightingV542.fillGain*lightingV551.fillGain*lightingV608.fill*lightingMixV749Now.fill*concertGenreV610.fill*lightingV621.fill*concertContinuityV611.fill)*performerPlanV557.fillGain*vocalFillV797);
+    const portraitV1135=portraitContrastV1135(storyV1131,{playing:isPlaying&&reactive,reducedMotion,manual:manualLightingV763||authoredLightsV386||vocalSafeV797,blackout:timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0});
+    const keyTargetV462=Math.min(3,Math.max(lightingV542.faceFloor||lightingV462.faceFloor,directed(cue.key)*lightScale*showGain*lightingV462.keyGain*lightingV542.keyGain*lightingV551.keyGain*lightingV608.key*lightingMixV749Now.key*concertGenreV610.key*lightingV621.key*concertContinuityV611.key*cinematicKeyV497)*performerPlanV557.keyGain*vocalKeyV797*portraitV1135.key);
+    const fillTargetV462=Math.min(2.4,Math.max(Math.max(lightingV462.faceFloor,lightingV542.faceFloor)*.75,directed(cue.fill)*lightScale*showGain*lightingV462.fillGain*lightingV542.fillGain*lightingV551.fillGain*lightingV608.fill*lightingMixV749Now.fill*concertGenreV610.fill*lightingV621.fill*concertContinuityV611.fill)*performerPlanV557.fillGain*vocalFillV797*portraitV1135.fill);
     // V559 applies only capped percentages to existing V462/V557 light targets.
     // These factors never overpower a manual cue, low tier, pause, or blackout.
     const beatKeyTargetV559=Math.min(3,keyTargetV462*(1+beatPortraitPlanV559.keyLift*beatScaleV559+cinematicPlanV566.keyLift*cinematicScaleV566));

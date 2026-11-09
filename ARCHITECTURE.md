@@ -1,6 +1,20 @@
+## V1135 – Bodenkontakt und gedämpfte Bühnenreaktionen
+
+**Aktueller Dokumentationsstand: V1135.** Details und Grenzen: [docs/versions/V1135-BUEHNENPRAESENZ.md](docs/versions/V1135-BUEHNENPRAESENZ.md).
+
+`stagePresenceV1135.ts` gleicht die verifizierte Sohlenhöhe der eingebauten GLBs mit dem sichtbaren Bühnenboden ab. Eine konstante äußere Platzierung berücksichtigt die Avatargröße; der bestehende Mixer bleibt im unveränderten Modellraum. Automatische Crew-Clips erhalten keinen weiteren Root-Bounce oder Root-Yaw. Manuelle Quellen, externe Modelle und explizite Avatar-Offsets verhindern die automatische Platzierung.
+
+`SonicFootContactV1135` zeichnet zwei analytische Kontaktflächen aus den tatsächlichen Fuß-Bone-Positionen. Höhe verändert Breite und Deckkraft; angehobene Gruppenpositionen verschieben den Live-Schatten nicht vom Weltboden weg. Es entstehen zwei einfache Draw Calls pro Figur, keine Shadow-Maps oder Texturen. Die Bühne und Probe verwenden weiterhin ihre vorhandenen Canvas-/Renderloops.
+
+`performerDynamicsV1135.ts` berechnet kleine Vorbereitungs-/Rückbewegungen aus der bestehenden Beat-Uhr. Eine analytische kritisch gedämpfte Feder ersetzt bei Persönlichkeits-Overlays die einfache Rotationseinfahrt. Die vorhandene Besitzprüfung stellt nur noch eigene, unverändert anliegende Werte zurück. Brust, Kopf und Arme werden ergänzt; Standfüße und Becken bleiben unverändert. Pause und fremde Pose-Schreiber behalten die Kontrolle.
+
+Der bestehende Concert Score staffelt den Kameraausschnitt über Refrains/Finale. Die vorhandene Lichtkomposition erhält begrenzte Haupt-/Fülllichtfaktoren, geschützt durch manuelle, Blackout-, Vocal- und Reduced-Motion-Regeln. Es gibt keinen zweiten Kamera-Schreiber und keine neuen Hardwarebefehle.
+
+Neue Prüfungen: `tests/v1135-stage-presence.cjs`, `tests/v1135-stage-contact.mjs`, `tests/e2e/stage-presence-v1135.spec.cjs`. Die realen Skinned-Mesh-Sohlen werden bei drei Größen gegen den sichtbaren Boden geprüft. Die Probe publiziert ihren tatsächlichen Sohlenabstand in den bestehenden Clip-Zeilen, damit die Browserprüfung echte 3D-Wiedergabe abdeckt.
+
 ## V1134 – Gemeinsamer Score für Song, Crew und Text
 
-**Aktueller Dokumentationsstand: V1134.** Bedienung, Stress-Tests und Grenzen: [V1134-SONGREGIE-CREW.md](docs/versions/V1134-SONGREGIE-CREW.md).
+**Historischer Dokumentationsstand: V1134.** Bedienung, Stress-Tests und Grenzen: [V1134-SONGREGIE-CREW.md](docs/versions/V1134-SONGREGIE-CREW.md).
 
 `lib/concertScoreV1134.ts` erweitert die V1131-Story um Auftakt, Refrain-Vorschau, Lesepassagen, Rollenrotation und begrenzte Lichtakzente. Das bestehende `useConcertStoryV1131` liefert diesen erweiterten Score an Kamera, Bühne, Lyrics und Probenbeleuchtung. Der Live-Regieindikator und `sonicCrewDirector` verwenden dieselbe reine Planung. Rollen und Phrasen sind aus festen Songzeitblöcken rekonstruierbar und springen nicht bei BPM-Updates. Die tatsächlich abgespielte Tanzuhr integriert weiterhin geglättete BPM und weiche Phasenkorrekturen.
 

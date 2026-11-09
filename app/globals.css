@@ -5022,3 +5022,5 @@
  .screen:has(>.layout>.lyrics:is(.v1133-rap,.v1133-anthem)) .show-v1130-status{display:none}
 }
 .lyrics.v1133-rap .kinetic-word[data-v1133-current="true"],.lyrics.v1133-anthem .kinetic-word[data-v1133-keyword="true"]{-webkit-text-fill-color:#fff!important;background:none!important}
+/* Keep the genuine separators inside word-timed chorus spans visible. */
+.lyrics.v1133-anthem .kinetic-word{white-space:pre-wrap!important}

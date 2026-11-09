@@ -23,7 +23,7 @@ export function SonicCrewControls(){
  const labels=cast.map(id=>getAvatarModel(id).label);
  const clock=useRef(0);
  useEffect(()=>{if(!settings.enabled||preferences.reducedMotion)setPlaying(false);},[settings.enabled,preferences.reducedMotion]);
- const onReading=useCallback((reading:CrewReading)=>{setReadings(old=>{const previous=old.find(r=>r.slot===reading.slot);return previous?.clip===reading.clip&&previous.leader===reading.leader&&previous.role===reading.role&&previous.chapter===reading.chapter&&previous.persona===reading.persona&&previous.sequence===reading.sequence&&previous.bodyStyle===reading.bodyStyle&&Math.abs(previous.time-reading.time)<.01?old:[...old.filter(r=>r.slot!==reading.slot),reading].sort((a,b)=>a.slot-b.slot);});setPosition(clock.current);if(clock.current>=maxSeconds)setPlaying(false);},[maxSeconds]);
+ const onReading=useCallback((reading:CrewReading)=>{setReadings(old=>{const previous=old.find(r=>r.slot===reading.slot);return previous?.clip===reading.clip&&previous.leader===reading.leader&&previous.role===reading.role&&previous.chapter===reading.chapter&&previous.persona===reading.persona&&previous.sequence===reading.sequence&&previous.bodyStyle===reading.bodyStyle&&Math.abs((previous.contact??0)-(reading.contact??0))<.002&&Math.abs(previous.time-reading.time)<.01?old:[...old.filter(r=>r.slot!==reading.slot),reading].sort((a,b)=>a.slot-b.slot);});setPosition(clock.current);if(clock.current>=maxSeconds)setPlaying(false);},[maxSeconds]);
  const setup=()=>{
   setSaved({group:readGroupV326(),preferences:{avatarModelId:preferences.avatarModelId,secondaryAvatarModelId:preferences.secondaryAvatarModelId,visualizerMode:preferences.visualizerMode},crew:settings});
   writeGroupV326({...readGroupV326(),enabled:true,count:3,songSync:false,trackId:'',minSpacing:1.2,modelIds:[cast[0],cast[1],cast[2],''],cues:[{id:'sonic-crew-row',at:0,formation:'wide',focus:-1,drop:false,transition:.8,positions:layoutV326('wide',3)}]});
@@ -43,6 +43,7 @@ export function SonicCrewControls(){
   <label>Charakterausdruck <select aria-label="Charakterausdruck" value={settings.expression??'balanced'} onChange={e=>writeCrewSettings({...settings,expression:e.target.value})}>
    <option value="subtle">Dezent</option><option value="balanced">Ausgewogen</option><option value="bold">Bühnenstark</option>
   </select></label>
+  <p>Natürlichere Bühnenpräsenz: weiche Kopf- und Schulterreaktionen, vorbereitete Akzente und sichtbarer Bodenkontakt. In der automatischen Show stehen die Sonic-Figuren auf dem Bühnenboden; angehobene Füße erhalten weichere Kontaktschatten.</p>
   <p>Neu: Ganzkörper-Stile mit Kniearbeit, Gewichtsverlagerung und Drehungen. Roboter, fließende Tänzer und Frontleute verwenden unterschiedliche Körperabläufe. Die neuen Clips sind prozedural erstellt; es sind keine Motion-Capture-Aufnahmen.</p>
   <p>Jede Figur hat einen eigenen Ausdruck. Genreabhängige Folgen verbinden Groove, Schritte, Akzente und Signaturen. Die Figuren wechseln sanft zwischen gemeinsamem Tanz und Antwortbewegungen.</p>
   <label>Gemeinsame Choreografie <select value={settings.mode} onChange={e=>writeCrewSettings({...settings,mode:e.target.value as CrewMode})}>
@@ -62,7 +63,7 @@ export function SonicCrewControls(){
    <label>Simulierte Position <input type="range" min={0} max={maxSeconds} step={1} value={position} onChange={e=>{clock.current=Number(e.target.value);setPosition(clock.current);}}/></label>
    <button type="button" disabled={preferences.reducedMotion||!settings.enabled} aria-pressed={playing} onClick={()=>{if(!playing&&clock.current>=maxSeconds){clock.current=0;setPosition(0);}setPlaying(v=>!v);}}>{playing?'Show-Simulation pausieren':'Show-Simulation starten'}</button>
    <Rehearsal modelIds={cast} clock={clock} playing={playing&&!preferences.reducedMotion} settings={settings} scenario={{...scenario,lyrics:music.lyrics,durationMs:music.track?.durationMs,trackId:music.track?.id}} onReading={onReading}/>
-   <ul aria-label="Wiedergegebene Show-Clips">{readings.map(r=><li key={r.slot}>{labels[r.slot]} · {r.clip} · {r.time.toFixed(2)} s{r.role?` · ${roleLabels[r.role]??r.role}`:''}{r.chapter?` · ${r.chapter}`:''}{r.persona?` · ${r.persona}`:''}{r.bodyStyle?` · ${r.bodyStyle}`:''}{r.sequence?` · ${r.sequence}`:''}{settings.mode==='spotlight'&&r.leader&&r.clip!=='Pausiert'?' · Solo':''}</li>)}</ul>
+   <ul aria-label="Wiedergegebene Show-Clips">{readings.map(r=><li key={r.slot} data-sole-gap={r.contact?.toFixed(4)}>{labels[r.slot]} · {r.clip} · {r.time.toFixed(2)} s{r.role?` · ${roleLabels[r.role]??r.role}`:''}{r.chapter?` · ${r.chapter}`:''}{r.persona?` · ${r.persona}`:''}{r.bodyStyle?` · ${r.bodyStyle}`:''}{r.sequence?` · ${r.sequence}`:''}{settings.mode==='spotlight'&&r.leader&&r.clip!=='Pausiert'?' · Solo':''}</li>)}</ul>
   </section>}
  </fieldset>;
 }

@@ -1,4 +1,7 @@
 "use client";
+import {stagePlacementV1135} from '@/lib/stagePresenceV1135';
+import {CREW_IDS} from './sonicCrewDirector';
+import {SonicFootContactV1135} from './SonicFootContactV1135';
 import {lyricDensityV1130,lyricSectionV1130} from '@/lib/showIntelligenceV1130';
 import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
@@ -797,8 +800,9 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     const learnedAccent = isPlaying && !reducedMotion && (audio.rhythmConfidence ?? 0) >= 0.5
       ? (audio.rhythmPhraseAccent ?? 0) * (audio.rhythmConfidence ?? 0) * Math.max(0, audio.beatStrength) * 0.22 : 0;
     const smooth = Math.min(1, delta * (danceMotionStyle === "sharp" ? 15 : danceMotionStyle === "smooth" ? 4 : 8));
-    avatarRoot.rotation.y += ((motion.bodySway + natural.hipSway * 0.35 + (audio.kickPattern === "syncopated" ? patternAccent * 0.055 : 0)) * performance.danceMultiplier - avatarRoot.rotation.y) * smooth;
-    avatarRoot.position.y += (motion.bodyBounce * performance.danceMultiplier - preKick * 0.065 - avatarRoot.position.y) * smooth;
+    const bakedCrewV1135=crew.plan.active&&selectedClip===crew.plan.clip;
+    avatarRoot.rotation.y += ((bakedCrewV1135?0:(motion.bodySway + natural.hipSway * 0.35 + (audio.kickPattern === "syncopated" ? patternAccent * 0.055 : 0)) * performance.danceMultiplier) - avatarRoot.rotation.y) * smooth;
+    avatarRoot.position.y += ((bakedCrewV1135?avatarOffsetY:motion.bodyBounce * performance.danceMultiplier - preKick * 0.065) - avatarRoot.position.y) * smooth;
 
     if (updateComplexMotion || !cachedFullBody.current) {
       fullBodyDance.current = updateFullBodyDance(fullBodyDance.current, audio, state.clock.elapsedTime, avatarDancePreset);
@@ -1337,6 +1341,12 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     !!lowClipV481||!!clipChoiceV328||!!phraseChoiceV329||!!autoMotionV356||
     !!groupClockV328?.settings.enabled||!!groupPhraseV329?.settings.enabled||
     rapLiveEnabledV412||!!rapLiveCandidateV412;
+  const crewManualV1135=avatarMotionMode!=='hybrid'||Math.abs(avatarClipSpeed-1)>.001||!!animationUrl||sharedMotionV531||!!activeSequence||
+      !!activeLoop||timelineEnabled||avatarBlendEnabled||!!stableLibraryClip||!!smartDanceOverride||
+      !!lowClipV481||!!clipChoiceV328||!!phraseChoiceV329||!!groupClockV328?.settings.enabled||
+      !!groupPhraseV329?.settings.enabled||!!rapLiveEnabledV412||!!rapLiveCandidateV412||
+      !!evolutionMotion||!!adaptiveMotion||!!preferredMotionUrlV440;
+  const placementV1135=stagePlacementV1135({bundled:CREW_IDS.some(id=>id===avatarModelId),adaptive:crewSettings.enabled&&crewSettings.mode==='adaptive',manual:crewManualV1135,scale:avatarScale,offsetY:avatarOffsetY});
   const crew = useCrewDirector({
     modelId:avatarModelId??'',clips:embeddedCandidatesV530,trackId:track?.id,
     progressMs:cameraDirectorProgressMs??propsLipSyncV367?.progressMs,
@@ -1345,11 +1355,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     count:ensembleCountV745??propsLipSyncV367?.ensembleCountV374??1,
     playing:isPlaying,reducedMotion,settings:crewSettings,durationMs:track?.durationMs,lyrics:propsLipSyncV367?.lyrics,
     lyricDensity:lyricDensityV1130(propsLipSyncV367?.lyrics,cameraDirectorProgressMs??propsLipSyncV367?.progressMs??0),
-    manualPriority:avatarMotionMode!=='hybrid'||Math.abs(avatarClipSpeed-1)>.001||!!animationUrl||sharedMotionV531||!!activeSequence||
-      !!activeLoop||timelineEnabled||avatarBlendEnabled||!!stableLibraryClip||!!smartDanceOverride||
-      !!lowClipV481||!!clipChoiceV328||!!phraseChoiceV329||!!groupClockV328?.settings.enabled||
-      !!groupPhraseV329?.settings.enabled||!!rapLiveEnabledV412||!!rapLiveCandidateV412||
-      !!evolutionMotion||!!adaptiveMotion||!!preferredMotionUrlV440,
+    manualPriority:crewManualV1135,
   });
   const embeddedMotionV530=useEmbeddedMotionDirectorV530({
     clips:embeddedCandidatesV530,modelKey:`${url}|${assetUrl??url}|${sharedMotionV531?"shared":"embedded"}`,trackId:track?.id,
@@ -1710,9 +1716,9 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   });
   useAnimatedCollisionSamplingV508({model,root,profile:bodyProfileV507,workloadSlot,
     modelUrl:url,assetUrl,avatarScale,isPlaying,reducedMotion,castCount:propsLipSyncV367?.ensembleCountV374??1});
-  return <group ref={root} userData={{sonicV592GlbActor:true}} scale={avatarScale} position={[0, avatarOffsetY, 0]}><primitive object={model} /><GlbMaterialQualityV560 session={materialSessionV560}
+  return <group name="sonic-grounded-stage-v1135" position={[0,placementV1135.y,0]}><group ref={root} userData={{sonicV592GlbActor:true}} scale={avatarScale} position={[0, avatarOffsetY, 0]}><primitive object={model} /><GlbMaterialQualityV560 session={materialSessionV560}
     enabled={groovePreferences.concertGlbMaterialQualityV560??true}
-    strength={groovePreferences.concertGlbMaterialStrengthV560??65}/><VocalRigV368 model={model} trackId={track?.id??""} sectionV503={showCue?.enabled?showCue.section:null} authoredPriorityV499={avatarMotionMode==="choreography"||!!stableLibraryClip} footIKV618={footIK} footIKEnabledV618={avatarFootIKEnabled} lipSync={propsLipSyncV367} audio={audio} genre={genre} reducedMotion={reducedMotion} avatarSlot={workloadSlot} profileV370={propsLipSyncV367?.profilesV370?.[avatarModelId??""]} arenaRapPerformanceEnabledV1062={arenaRapPerformanceEnabledV1062&&stageTheme==='arena360'} arenaRapPerformanceStrengthV1062={arenaRapPerformanceStrengthV1062}/><AvatarSmartLOD model={model} /></group>;
+    strength={groovePreferences.concertGlbMaterialStrengthV560??65}/><VocalRigV368 model={model} trackId={track?.id??""} sectionV503={showCue?.enabled?showCue.section:null} authoredPriorityV499={avatarMotionMode==="choreography"||!!stableLibraryClip} footIKV618={footIK} footIKEnabledV618={avatarFootIKEnabled} lipSync={propsLipSyncV367} audio={audio} genre={genre} reducedMotion={reducedMotion} avatarSlot={workloadSlot} profileV370={propsLipSyncV367?.profilesV370?.[avatarModelId??""]} arenaRapPerformanceEnabledV1062={arenaRapPerformanceEnabledV1062&&stageTheme==='arena360'} arenaRapPerformanceStrengthV1062={arenaRapPerformanceStrengthV1062}/><AvatarSmartLOD model={model} /></group>{placementV1135.enabled&&<SonicFootContactV1135 model={model} floorY={placementV1135.floor} scale={avatarScale} worldFloor={-1.95}/>}</group>;
 }
 
 /** Each dancer receives its own animation mixer and cloned GLB scene. */

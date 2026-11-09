@@ -1,3 +1,11 @@
+## V1135 – Natürlichere Bühnenpräsenz
+
+Die adaptive Sonic-Crew steht nun größenabhängig auf dem tatsächlichen Bühnenboden. Weiche Kontaktschatten verbinden die Füße mit der Bühne; zusätzliche Root-Sprünge über gebackener Beinarbeit entfallen. Kleine vorbereitende Bewegungen, atmende Brust und gedämpft nachlaufende Kopf-/Armreaktionen geben den elf Persönlichkeiten mehr Körperlichkeit.
+
+Soli und Duelle bekommen mehr Lichtkontrast. Der automatische Kameraausschnitt wächst über wiederkehrende Refrains bis zum Finale; schnelle Lyrics bleiben ruhig lesbar. Manuelle Bewegungen, eigene Avatare, gespeicherte Kameras und explizite Avatar-Höhen bleiben geschützt.
+
+**Bedienung:** Settings → Avatar → Intelligente Show aktivieren. **Prüfen:** `npm run test:v1135`, Produktionsbuild und anschließend `npm run test:v1135:browser`. Anleitung, Grenzen und Architektur: [V1135-Dokumentation](docs/versions/V1135-BUEHNENPRAESENZ.md). Die ZIP enthält keine Playwright-Testberichte.
+
 ## V1134 – Songdramaturgie und Crew-Dialog
 
 Die adaptive Show sammelt vor wiederkehrenden Refrains Spannung, wechselt Solisten und Duellpartner und setzt gemeinsame Höhepunkte. Bei schnellen Lyrics werden Crew, automatische Kamera und Bühnenlicht zurückgenommen. Eine Pause bewahrt die Tanzphase; neue Tempoangaben werden weiterhin geglättet.
