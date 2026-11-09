@@ -260,6 +260,24 @@
           ]
         },
         {
+          "name": "GoveePowerOnIntent",
+          "samples": [
+            "schalte die govee lichter ein",
+            "govee lampen einschalten",
+            "mach die govee lichter an",
+            "schalte alle ausgewählten govee lampen ein"
+          ]
+        },
+        {
+          "name": "GoveePowerOffIntent",
+          "samples": [
+            "schalte die govee lichter aus",
+            "govee lampen ausschalten",
+            "mach die govee lichter aus",
+            "schalte alle ausgewählten govee lampen aus"
+          ]
+        },
+        {
           "name": "GoveeArenaIntent",
           "samples": [
             "aktiviere Govee Arena Raumlicht",

@@ -4,6 +4,7 @@ import {useEffect,useRef,useState} from 'react';
 import {useMusic} from '@/context/MusicContext';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
 import {ALEXA_LOCAL_ENABLED_KEY_V967} from '@/lib/alexaConcertV967';
+import {GOVEE_POWER_CONSENT_EVENT_V1138,loadGoveePowerConsentV1138,isGoveePowerCommandV1138,executeAlexaGoveePowerV1138} from '@/lib/goveePowerV1138';
 import {ALEXA_ARTIST_KEY_V1007,ALEXA_ARTIST_EVENT_V1007,parseArtistVoiceConsentV1007} from '@/lib/alexaArtistV1007';
 import {VOICE_DISPLAY_KEY_V1008,VOICE_SETTINGS_EVENT_V1008,freshVoiceV1008,isArtistVoiceV1008,
  executeArtistVoiceV1008,executeDisplayVoiceV1008,type VoiceUndoV1008,type VoiceResultV1008,type VoiceMessageV1008} from '@/lib/alexaVoiceV1008';
@@ -12,7 +13,8 @@ function permissions(){try{return {
  general:parseArtistVoiceConsentV1007(localStorage.getItem(ALEXA_LOCAL_ENABLED_KEY_V967)),
  artist:parseArtistVoiceConsentV1007(localStorage.getItem(ALEXA_ARTIST_KEY_V1007)),
  display:parseArtistVoiceConsentV1007(localStorage.getItem(VOICE_DISPLAY_KEY_V1008)),
-};}catch{return {general:{enabled:false,since:0},artist:{enabled:false,since:0},display:{enabled:false,since:0}};}}
+ power:loadGoveePowerConsentV1138(),
+};}catch{return {general:{enabled:false,since:0},artist:{enabled:false,since:0},display:{enabled:false,since:0},power:{enabled:false,since:0}};}}
 export function AlexaVoiceControlV1008(){
  const {connected}=useMusic();const {preferences,updatePreferences}=useUiPreferences();
  const current=useRef(preferences);current.current=preferences;
@@ -20,7 +22,7 @@ export function AlexaVoiceControlV1008(){
  const seen=useRef(new Set<string>()),undo=useRef<VoiceUndoV1008|null>(null);
  useEffect(()=>{try{undo.current=JSON.parse(sessionStorage.getItem(UNDO)||'null');}catch{/* no history */}
   const refresh=()=>setSettings(permissions());refresh();
-  const events=['storage',VOICE_SETTINGS_EVENT_V1008,ALEXA_ARTIST_EVENT_V1007,'sonic-display:alexa-local-status-v971'];
+  const events=['storage',VOICE_SETTINGS_EVENT_V1008,ALEXA_ARTIST_EVENT_V1007,GOVEE_POWER_CONSENT_EVENT_V1138,'sonic-display:alexa-local-status-v971'];
   events.forEach(e=>window.addEventListener(e,refresh));return()=>events.forEach(e=>window.removeEventListener(e,refresh));
  },[]);
  useEffect(()=>{if(!status)return;const timer=window.setTimeout(()=>setStatus(''),18000);return()=>window.clearTimeout(timer);},[status]);
@@ -43,7 +45,7 @@ export function AlexaVoiceControlV1008(){
      const claim=await post({id:message.id,phase:'claim'});if(!claim.ok)continue;
      const {token}=await claim.json();let result:VoiceResultV1008;
      try{
-      const category=isArtistVoiceV1008(message.command)?'artist':'display';
+      const category=isArtistVoiceV1008(message.command)?'artist':isGoveePowerCommandV1138(message.command)?'power':'display';
       const consent=p[category];const since=Math.max(p.general.since,consent.since);
       const allowed=()=>{const latest=permissions();return visible()&&latest.general.enabled&&latest.general.since===p.general.since&&latest[category].enabled&&latest[category].since===consent.since;};
       if(message.command==='connection-status'){
@@ -51,8 +53,9 @@ export function AlexaVoiceControlV1008(){
        if(!response.ok||health.spotify!==true||health.relay!=='ready')throw Error(health.spotify===false?'Spotify-Verbindung fehlt oder ist nicht erreichbar. Bitte auf dem Display prüfen.':'Die Alexa-Weiterleitung ist noch nicht bereit. Bitte auf dem Display prüfen.');
        result={kind:'complete',text:`Das Display ist erreichbar. Spotify und die Alexa-Weiterleitung sind verbunden.${health.artistScopes?'':' Für Künstleraktionen Spotify bitte neu verbinden.'}`};
       }
-      else if(!consent.enabled||!freshVoiceV1008(message,since,Date.now()))throw Error(category==='artist'?'Bitte zuerst die Künstlersteuerung auf diesem Display freigeben.':'Bitte zuerst die Anzeigesteuerung auf diesem Display freigeben.');
+      else if(!consent.enabled||!freshVoiceV1008(message,since,Date.now()))throw Error(category==='artist'?'Bitte zuerst die Künstlersteuerung auf diesem Display freigeben.':category==='power'?'Bitte zuerst Alexa Govee Ein/Aus separat freigeben.':'Bitte zuerst die Anzeigesteuerung auf diesem Display freigeben.');
       else if(category==='artist')result=await executeArtistVoiceV1008(message,{since,now:Date.now,allowed,fetcher:fetch,signal:abort.signal,undo:undo.current,saveUndo,notify});
+      else if(category==='power')result=await executeAlexaGoveePowerV1138(message,{since,now:Date.now,allowed,signal:abort.signal});
       else result=await executeDisplayVoiceV1008(message.command,{current:current.current.avatarModelId,fetcher:fetch,update:updatePreferences,allowed,signal:abort.signal});
      }catch(error){result={kind:'error',text:error instanceof Error?error.message.slice(0,1000):'Sprachbefehl konnte nicht ausgeführt werden.'};}
      if(disposed||abort.signal.aborted)return;

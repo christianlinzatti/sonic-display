@@ -1,7 +1,7 @@
 import {backgroundJsonV1009} from './backgroundJsonV1009';
 import {validArtistId} from './artist-follow-v359';
 import type {UiPreferences} from '@/types/music';
-export const VOICE_COMMANDS_V1008=['artist-follow','artist-follow-all','artist-unfollow','artist-status','artist-undo','artist-follow-primary','artist-unfollow-primary','lyrics-on','lyrics-off','avatar-next','display-calm','display-normal','connection-status'] as const;
+export const VOICE_COMMANDS_V1008=['artist-follow','artist-follow-all','artist-unfollow','artist-status','artist-undo','artist-follow-primary','artist-unfollow-primary','lyrics-on','lyrics-off','avatar-next','display-calm','display-normal','connection-status','govee-power-on','govee-power-off'] as const;
 export type VoiceCommandV1008=typeof VOICE_COMMANDS_V1008[number];
 export type VoiceTargetV1008={artistId:string;trackId:string};
 export type VoiceMessageV1008={id:string;command:VoiceCommandV1008;createdAt:number;target?:VoiceTargetV1008};

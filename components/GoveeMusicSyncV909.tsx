@@ -726,6 +726,8 @@ export function GoveeMusicSyncV909(){
        savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
        recovering:recoveringDevices.has(ip)}).look;
       if(!changedGoveeLookV911(previous,finalLook))continue;
+      // A concurrent explicit Power OFF must stop pending automatic color sends.
+      if(!loadGoveeConfigV909().autoSync)break;
       await goveeBridgeRequestV909(config,'/command','POST',{ip,action:'look',value:finalLook});
       if(!cancelled){
        sent.set(ip,finalLook);deviceFailures.delete(ip);recoveringDevices.delete(ip);

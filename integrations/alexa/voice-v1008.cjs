@@ -1,7 +1,7 @@
 'use strict';
 const {createHmac,randomUUID}=require('node:crypto');
 const COMMANDS={LikeArtistIntent:'artist-follow',UnlikeArtistIntent:'artist-unfollow',FollowAllArtistsIntent:'artist-follow-all',ArtistStatusIntent:'artist-status',UndoArtistIntent:'artist-undo',
- FollowPrimaryArtistIntent:'artist-follow-primary',UnfollowPrimaryArtistIntent:'artist-unfollow-primary',LyricsOnIntent:'lyrics-on',LyricsOffIntent:'lyrics-off',NextAvatarIntent:'avatar-next',CalmDisplayIntent:'display-calm',NormalDisplayIntent:'display-normal',StatusIntent:'connection-status'};
+ FollowPrimaryArtistIntent:'artist-follow-primary',UnfollowPrimaryArtistIntent:'artist-unfollow-primary',LyricsOnIntent:'lyrics-on',LyricsOffIntent:'lyrics-off',NextAvatarIntent:'avatar-next',CalmDisplayIntent:'display-calm',NormalDisplayIntent:'display-normal',GoveePowerOnIntent:'govee-power-on',GoveePowerOffIntent:'govee-power-off',StatusIntent:'connection-status'};
 const CHOICES={SelectFirstArtistIntent:1,SelectSecondArtistIntent:2,SelectThirdArtistIntent:3};
 const id=v=>typeof v==='string'&&/^[a-zA-Z0-9]{10,32}$/.test(v);
 function validSelection(v){return v?.kind==='selection'&&['artist-follow','artist-unfollow','artist-status'].includes(v.action)&&id(v.trackId)&&Array.isArray(v.choices)&&v.choices.length>=2&&v.choices.length<=10&&v.choices.every(c=>id(c?.id)&&typeof c.name==='string'&&c.name.length<=120)&&typeof v.text==='string'&&v.text.length<=1200;}

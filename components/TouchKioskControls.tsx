@@ -10,6 +10,7 @@ const DisplayCalibrationStudioV389 = dynamic(() => import("./DisplayCalibrationS
 import {setKioskActiveV388,useDisplayProfileV388} from "./DisplayPerformanceV388";
 import {isTouchReadabilityV648,nextTouchReadabilityV648,resolveTouchViewportV648,type TouchReadabilityV648} from "./touchDisplayPolicyV648";
 import {useSmartPresetAutomationV651} from "./useSmartPresetAutomationV651";
+import {GoveePowerQuickControlsV1138} from './GoveePowerControlsV1138';
 
 export type KioskView = "stage" | "lyrics" | "split";
 const EXPERIENCE_KEY = "sonic-display:v275:experience2";
@@ -90,6 +91,7 @@ export function TouchKioskControls({ kiosk, ambient, theme, trackId }: { kiosk: 
             <option value="off">Standard (unverändert)</option><option value="auto">Adaptiv</option><option value="eco">Energiesparen</option><option value="sharp">Schärfer</option>
           </select>
         </label>
+        <GoveePowerQuickControlsV1138 compact onActivity={kiosk.show}/>
         <button type="button" aria-expanded={calibrationOpenV389} onClick={()=>{setCalibrationOpenV389(v=>!v);kiosk.show();}}>V389 · Kalibrieren</button>
         <button type="button" aria-expanded={productionOpenV403} onClick={()=>{setProductionOpenV403(v=>!v);kiosk.show();}}>V403 · Produktionsdiagnose</button>
         <button type="button" aria-expanded={productionOpenV395} onClick={()=>{setProductionOpenV395(v=>!v);kiosk.show();}}>V395 · Stabilität {productionV395.phase==='ready'?'':'⚠'}</button>
