@@ -1,3 +1,4 @@
+import {dialogueClip,type CrewDialogue} from './crewDialogue';
 import {creativeBodyClip} from './creativeChoreography';
 import type {StoryCueV1131} from './concertStoryV1131';
 import {musicFamilyV1129} from './musicPerformanceV1129';
@@ -11,9 +12,11 @@ const PERSONAL:Record<string,string>={
  'sonic-rio-carnival':'Dance_CrossStep','sonic-quantum-bass':'Dance_RobotGroove',
 };
 /** Whole-body choices from actual available clips; keep quiet/dense passages and shared canon intact. */
-export function fullBodyClipV1133(input:{trackId?:string;recent?:readonly string[];modelId:string;genre?:string|null;cue:StoryCueV1131 & {reading?:boolean};count:number;available:ReadonlySet<string>;fallback:string|null}):string|null{
+export function fullBodyClipV1133(input:{slot?:number;trackId?:string;recent?:readonly string[];modelId:string;genre?:string|null;cue:StoryCueV1131 & {reading?:boolean;dialogue?:CrewDialogue};count:number;available:ReadonlySet<string>;fallback:string|null}):string|null{
  const {cue}=input;
  if(cue.reading||cue.act==='breathe'||cue.act==='build'||cue.lyricDensity>.7||input.count>1&&cue.interaction==='answer')return input.fallback;
+ if(cue.dialogue)return dialogueClip({dialogue:cue.dialogue,trackId:input.trackId??'sonic-show',genre:input.genre,
+  slot:input.slot??0,available:input.available,fallback:input.fallback});
  const family=musicFamilyV1129(input.genre),shared=input.count>1&&cue.interaction==='unison';
  // The opening establishes each personality; later phrases develop contrasting motifs.
  if(cue.phrase>=2){

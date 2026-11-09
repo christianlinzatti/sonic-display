@@ -1,7 +1,7 @@
 import {musicFamilyV1129,type MusicFamilyV1129} from './musicPerformanceV1129';
 import type {StoryCueV1131} from './concertStoryV1131';
 type Motif={clip:string;energy:number;families:readonly MusicFamilyV1129[]};
-const MOTIFS:readonly Motif[]=[
+export const CREATIVE_MOTIFS:readonly Motif[]=[
  {clip:'Dance_RobotGroove',energy:.58,families:['electronic','urban','hard']},
  {clip:'Dance_FluidArc',energy:.25,families:['ambient','classical','electronic']},
  {clip:'Dance_FrontmanDrive',energy:.9,families:['rock','hard']},
@@ -19,7 +19,7 @@ export function creativeBodyClip(input:{trackId:string;modelId:string;genre?:str
  const phrase=Math.max(2,Math.min(10800,Math.floor(input.cue.phrase)||0));
  const power=!soft&&(input.cue.act==='impact'||input.cue.act==='finale')&&input.cue.intensity>=.7;
  const target=soft?Math.min(.4,input.cue.intensity):input.cue.intensity;
- let pool=MOTIFS.filter(m=>(!soft||m.clip!=='Dance_FrontmanDrive'&&m.clip!=='Dance_RobotGroove')&&
+ let pool=CREATIVE_MOTIFS.filter(m=>(!soft||m.clip!=='Dance_FrontmanDrive'&&m.clip!=='Dance_RobotGroove')&&
   (!power||m.energy>=.45)&&(input.shared||input.available.has(m.clip)));
  if(!pool.length)return null;
  if(!input.shared&&pool.length>1)pool=pool.filter(m=>m.clip!==input.recent?.[0]);

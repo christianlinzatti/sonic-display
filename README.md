@@ -1,3 +1,11 @@
+## V1136 – Update: Tanzdialoge mit gemeinsamem Motiv
+
+Die lokale Regie plant Motiv, Antwort und gemeinsame Rückkehr. Ein anderer
+Avatar übernimmt den zuvor vorgestellten Clip, während die Crew den Kontrast
+begleitet. Der Ablauf bleibt nach Seeks reproduzierbar; Lyrics und wichtige
+Songabschnitte behalten Vorrang. Details und Tests:
+[Tanzdialoge](docs/versions/V1136-TANZDIALOGE.md).
+
 ## V1136 – Update: Kreativere Crew-Regie
 
 Die lokale Regie entwickelt nach dem persönlichen Auftakt abwechslungsreiche
