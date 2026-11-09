@@ -10,9 +10,11 @@ import {ALEXA_GOVEE_RECEIVER_EVENT_V1139,readAlexaGoveeReceiverTokenV1139,saveAl
 import {GoveePowerQuickControlsV1138,GoveePowerPermissionV1138} from './GoveePowerControlsV1138';
 import {GoveeLightDashboardV1142} from './GoveeLightDashboardV1142';
 import {GoveeMusicVoiceControlsV1143} from './GoveeMusicVoiceControlsV1143';
+import {FullConcertVoiceControlsV1145} from './FullConcertVoiceControlsV1145';
 
 const LOCAL_EVENT='sonic-display:alexa-local-status-v971';
 const GROUPS:{title:string;permission:string;intents:readonly string[]}[]=[
+ {title:'Komplette 360-Grad-Konzertshow',permission:'Alexa-Empfang, eigene Konzertshow-Freigabe, Spotify-Wiedergabe und sichtbares Display',intents:['FullConcertStartIntent','FullConcertStopIntent']},
  {title:'Konzertmodi',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['ArenaIntent','FestivalIntent','ClubIntent','CalmIntent','StopShowIntent']},
  {title:'Smart Concert Presets',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['RapPresetIntent','HardtekkPresetIntent','RockPresetIntent','CinemaPresetIntent','AutoPresetIntent']},
  {title:'Bühnenbereiche und Lichtfarben',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['StageZoneIntent','BackdropZoneIntent','AudienceZoneIntent','AllZonesIntent','WarmMoodIntent','CoolMoodIntent','NeonMoodIntent','AutoMoodIntent']},
@@ -95,6 +97,7 @@ export function AlexaSettingsV1137(){
    <label className="setting-check"><input type="checkbox" checked={enabled} onChange={event=>toggle(event.target.checked)}/> Alexa-Sprachbefehle auf diesem Display empfangen</label>
    <small>Standardmäßig aus. Die Berechtigungen für Spotify-Künstler, Anzeige und Govee werden zusätzlich und getrennt erteilt.</small>
   </fieldset>
+  <FullConcertVoiceControlsV1145/>
   <AlexaArtistPermissionV1007/>
   <AlexaToolsV1008/>
   <fieldset><legend>Govee-Raumlicht per Alexa</legend>

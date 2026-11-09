@@ -334,6 +334,27 @@
           ]
         },
         {
+          "name": "FullConcertStartIntent",
+          "samples": [
+            "starte die komplette konzertshow",
+            "starte eine komplette show",
+            "starte das volle konzert",
+            "starte die große konzertshow",
+            "starte meine 360 grad konzertshow",
+            "starte die immersive konzertshow"
+          ]
+        },
+        {
+          "name": "FullConcertStopIntent",
+          "samples": [
+            "beende die komplette konzertshow",
+            "stoppe die volle konzertshow",
+            "beende die große konzertshow",
+            "stoppe meine 360 grad show",
+            "stoppe die immersive konzertshow"
+          ]
+        },
+        {
           "name": "GoveePowerOnIntent",
           "samples": [
             "schalte die govee lichter ein",
