@@ -20,3 +20,8 @@ laufen; sie ersetzt keine Tests und verändert keine freigegebenen Workflows.
 Der maschinenlesbare Dokumentationsstand in `ARCHITECTURE.md` ist ebenfalls
 auf V1136 aktualisiert; die Architekturprüfung verifiziert weiterhin sämtliche
 Quellreferenzen und erforderlichen Abschnitte.
+
+Die vollständige Browser-Suite umfasst inzwischen 218 Desktop-/Touch-Fälle.
+Ihr serieller Gesamtprozess erhält 45 statt 30 Minuten, damit der gewachsene
+Umfang nicht trotz bestandener Einzeltests abgebrochen wird. Die Einzeltest-
+Limits, fehlende Wiederholungen und strikten Ergebnisprüfungen bleiben bestehen.
