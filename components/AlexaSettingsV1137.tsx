@@ -16,7 +16,7 @@ import {AlexaConcertScenePreviewV1147} from './AlexaConcertScenePreviewV1147';
 
 const LOCAL_EVENT='sonic-display:alexa-local-status-v971';
 const GROUPS:{title:string;permission:string;intents:readonly string[]}[]=[
- {title:'Komplette 360-Grad-Konzertshow',permission:'Alexa-Empfang, eigene Konzertshow-Freigabe, Spotify-Wiedergabe und sichtbares Display',intents:['FullConcertStartIntent','FullConcertStopIntent']},
+ {title:'Komplette 360-Grad-Konzertshow',permission:'Alexa-Empfang, eigene Konzertshow-Freigabe, Spotify-Wiedergabe und sichtbares Display',intents:['FullConcertStartIntent','FullConcertStopIntent','ConcertSceneCalmIntent','ConcertSceneIntenseIntent','ConcertSceneFinaleIntent']},
  {title:'Konzertmodi',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['ArenaIntent','FestivalIntent','ClubIntent','CalmIntent','StopShowIntent']},
  {title:'Smart Concert Presets',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['RapPresetIntent','HardtekkPresetIntent','RockPresetIntent','CinemaPresetIntent','AutoPresetIntent']},
  {title:'Bühnenbereiche und Lichtfarben',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['StageZoneIntent','BackdropZoneIntent','AudienceZoneIntent','AllZonesIntent','WarmMoodIntent','CoolMoodIntent','NeonMoodIntent','AutoMoodIntent']},
