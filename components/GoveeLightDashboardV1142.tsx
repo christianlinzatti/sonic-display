@@ -7,6 +7,7 @@ import {GOVEE_GROUPS_EVENT_V915} from '@/lib/goveeDeviceGroupsV915';
 import {sendGoveePowerV1138,canExecuteGoveePowerV1138} from '@/lib/goveePowerV1138';
 import {sendTargetedGoveePowerV1141} from '@/lib/goveePowerRoutingV1141';
 import {readGoveeStatusV1140,type GoveeConfirmedStatusV1140} from '@/lib/goveeLiveStatusV1140';
+import {GoveeMusicVoiceControlsV1143} from './GoveeMusicVoiceControlsV1143';
 
 type Scene='hardtekk'|'calm'|'night';
 const looks:Record<Scene,{label:string;brightness:number;color:{r:number;g:number;b:number}}>={
@@ -100,6 +101,7 @@ export function GoveeLightDashboardV1142({onActivity}:{onActivity?:()=>void}={})
    })}
   </div>
   {(config?.selectedIps.length||0)>4&&<small>Weitere Leuchten können über „Alle EIN/AUS“ bedient werden; die Kacheln zeigen die ersten vier ausgewählten Geräte.</small>}
+  <GoveeMusicVoiceControlsV1143 compact/>
   <div className="govee-v958-settings" aria-label="Govee Favoriten">
    <button type="button" disabled={!configured||busy} onClick={()=>void operation(concert)}>Konzert · Musik-Sync</button>
    {(Object.keys(looks) as Scene[]).map(id=><button key={id} type="button" disabled={!configured||busy}

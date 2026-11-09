@@ -23,7 +23,7 @@ const deps={
   {...command,goveeTarget:{fixtureNumber:2}},{...command,goveeTarget:{ip:'8.8.8.8'}}],
   readVoiceMessageV1008:async()=>command,claimVoiceV1008:async()=> 'b2345678-1234-1234-1234-123456789abc',
   completeVoiceV1008:async()=>true},
- '@/lib/goveePowerV1138':{isGoveePowerCommandV1138:v=>v==='govee-power-on'||v==='govee-power-off'},
+ '@/lib/goveeMusicVoiceV1143':{isGoveeOnlyVoiceCommandV1143:v=>['govee-power-on','govee-power-off','govee-sync-start','govee-sync-pause'].includes(v)},
  '@/lib/goveeVoiceTargetV1141':{validGoveeVoiceTargetV1141:valid},
  '@/lib/alexaVoiceV1008':{voiceIdV1008:v=>typeof v==='string'&&/^[a-f0-9-]{36}$/i.test(v),validVoiceResultV1008:v=>v?.kind==='complete'&&typeof v.text==='string'}
 };

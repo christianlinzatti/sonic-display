@@ -9,6 +9,7 @@ import model from '../integrations/alexa/interaction-model.de-DE.json';
 import {ALEXA_GOVEE_RECEIVER_EVENT_V1139,readAlexaGoveeReceiverTokenV1139,saveAlexaGoveeReceiverTokenV1139} from '@/lib/alexaGoveeReceiverClientV1139';
 import {GoveePowerQuickControlsV1138,GoveePowerPermissionV1138} from './GoveePowerControlsV1138';
 import {GoveeLightDashboardV1142} from './GoveeLightDashboardV1142';
+import {GoveeMusicVoiceControlsV1143} from './GoveeMusicVoiceControlsV1143';
 
 const LOCAL_EVENT='sonic-display:alexa-local-status-v971';
 const GROUPS:{title:string;permission:string;intents:readonly string[]}[]=[
@@ -16,7 +17,7 @@ const GROUPS:{title:string;permission:string;intents:readonly string[]}[]=[
  {title:'Smart Concert Presets',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['RapPresetIntent','HardtekkPresetIntent','RockPresetIntent','CinemaPresetIntent','AutoPresetIntent']},
  {title:'Bühnenbereiche und Lichtfarben',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['StageZoneIntent','BackdropZoneIntent','AudienceZoneIntent','AllZonesIntent','WarmMoodIntent','CoolMoodIntent','NeonMoodIntent','AutoMoodIntent']},
  {title:'Virtuelle Bühneneffekte',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['VirtualFxOnIntent','VirtualFxOffIntent','BeamsEffectIntent','FogEffectIntent','ConfettiEffectIntent','StreamersEffectIntent','AutoEffectIntent','EffectsOffIntent']},
- {title:'Govee-Raumlicht',permission:'Für Lichtfarben: separate Govee-Freigabe und Musik-Sync. Für echtes Ein/Aus: eigene Alexa-Power-Freigabe, LAN-Bridge und ausgewählte Lampen',intents:['GoveeArenaIntent','GoveeFestivalIntent','GoveeClubIntent','GoveeCalmIntent','GoveeDimIntent','GoveeAutoIntent','GoveePowerOnIntent','GoveePowerOffIntent','GoveeFixtureOnIntent','GoveeFixtureOffIntent','GoveeGroupOnIntent','GoveeGroupOffIntent']},
+ {title:'Govee-Raumlicht',permission:'Für Lichtfarben: separate Govee-Freigabe und Musik-Sync. Für echtes Ein/Aus: eigene Alexa-Power-Freigabe, LAN-Bridge und ausgewählte Lampen',intents:['GoveeArenaIntent','GoveeFestivalIntent','GoveeClubIntent','GoveeCalmIntent','GoveeDimIntent','GoveeAutoIntent','GoveePowerOnIntent','GoveePowerOffIntent','GoveeFixtureOnIntent','GoveeFixtureOffIntent','GoveeGroupOnIntent','GoveeGroupOffIntent','GoveeMusicSyncStartIntent','GoveeMusicSyncPauseIntent']},
  {title:'Spotify-Künstler',permission:'Zusätzliche Künstlerfreigabe und Spotify-Follow-Berechtigung',intents:['LikeArtistIntent','UnlikeArtistIntent','FollowAllArtistsIntent','ArtistStatusIntent','UndoArtistIntent','FollowPrimaryArtistIntent','UnfollowPrimaryArtistIntent','SelectFirstArtistIntent','SelectSecondArtistIntent','SelectThirdArtistIntent','SelectArtistIntent']},
  {title:'Anzeige und Avatar',permission:'Zusätzliche Anzeigefreigabe',intents:['LyricsOnIntent','LyricsOffIntent','NextAvatarIntent','CalmDisplayIntent','NormalDisplayIntent']},
  {title:'Status und Hilfe',permission:'Alexa-Empfang; Hilfe, Abbrechen und Stopp funktionieren auch ohne Displayverbindung',intents:['StatusIntent','LastVoiceResultIntent','AllCommandsIntent','AMAZON.HelpIntent','AMAZON.CancelIntent','AMAZON.StopIntent']}
@@ -101,6 +102,7 @@ export function AlexaSettingsV1137(){
    <p className="settings-note">Nur für bereits ausgewählte Lampen mit laufendem Govee-Musik-Sync. Keine Lampen einschalten, keine Änderung an der Spotify-Wiedergabe; bestehende Show-Timelines haben Vorrang.</p>
   </fieldset>
   <GoveePowerPermissionV1138/>
+  <fieldset><legend>V1143 · Musik-Sync per Alexa</legend><GoveeMusicVoiceControlsV1143/></fieldset>
   <details><summary>V1139 · Govee-Alexa auch ohne Spotify konfigurieren</summary>
    <p className="settings-note">Optionaler, separater Empfänger-Token für Govee-Schaltbefehle ohne Spotify-Anmeldung. Dieselbe zufällig erzeugte Zeichenfolge (mindestens 32 Zeichen) als geschützte Vercel-Umgebungsvariable <code>ALEXA_GOVEE_RECEIVER_TOKEN</code> hinterlegen. Der Browser-Token berechtigt ausschließlich zum Empfang und zur Bestätigung von Govee-Power-Befehlen, nicht zu Spotify-Aktionen. Das Display muss geöffnet bleiben.</p>
    <label>Govee-Empfänger-Token

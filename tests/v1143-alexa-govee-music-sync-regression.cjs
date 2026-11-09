@@ -1,0 +1,42 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const ts=require('./typescript-loader.cjs');
+const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+let config={enabled:true,autoSync:false,selectedIps:['192.168.1.10'],token:'unit-token'};
+const storage=new Map(),window=new EventTarget(),mod={exports:{}};
+const result=ts.transpileModule(read('lib/goveeMusicVoiceV1143.ts'),{fileName:'lib/goveeMusicVoiceV1143.ts',reportDiagnostics:true,compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}});
+assert.equal(result.diagnostics.filter(d=>d.category===ts.DiagnosticCategory.Error).length,0);
+vm.runInNewContext(result.outputText,{module:mod,exports:mod.exports,require:id=>{
+ if(id==='./goveeLanV909')return {loadGoveeConfigV909:()=>({...config,selectedIps:[...config.selectedIps]}),saveGoveeConfigV909:x=>{config=x;}};
+ if(id==='./goveePowerV1138')return {canExecuteGoveePowerV1138:x=>x.enabled&&!!x.token&&x.selectedIps.length>0,isGoveePowerCommandV1138:c=>['govee-power-on','govee-power-off'].includes(c)};
+ throw Error(id);
+},window,localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,String(v))},Date,JSON,Number,Event});
+const lib=mod.exports;
+assert(!lib.loadGoveeSyncConsentV1143().enabled);
+assert(!lib.isGoveeOnlyVoiceCommandV1143('artist-follow'));
+assert(lib.isGoveeOnlyVoiceCommandV1143('govee-power-on'));
+assert(lib.isGoveeOnlyVoiceCommandV1143('govee-sync-start'));
+const since=Date.now()-2000,msg=(command,createdAt=Date.now())=>({command,createdAt});
+const allowed=()=>lib.loadGoveeSyncConsentV1143().enabled;
+const opts={since,now:Date.now,allowed};
+assert.throws(()=>lib.executeAlexaGoveeMusicSyncV1143(msg('govee-sync-start'),opts),/widerrufen/);
+lib.saveGoveeSyncConsentV1143(true);
+assert.equal(lib.executeAlexaGoveeMusicSyncV1143(msg('govee-sync-start'),opts).kind,'complete');
+assert.equal(config.autoSync,true);
+assert.match(lib.executeAlexaGoveeMusicSyncV1143(msg('govee-sync-pause'),opts).text,/pausiert/);
+assert.equal(config.autoSync,false);
+config={...config,enabled:false};
+assert.throws(()=>lib.executeAlexaGoveeMusicSyncV1143(msg('govee-sync-start'),opts),/Govee LAN/);
+lib.saveGoveeSyncConsentV1143(false);
+assert.throws(()=>lib.executeAlexaGoveeMusicSyncV1143(msg('govee-sync-pause'),opts),/widerrufen/);
+const model=require('../integrations/alexa/interaction-model.de-DE.json').interactionModel.languageModel.intents;
+const voice=require('../integrations/alexa/voice-v1008.cjs');
+for(const [intent,cmd] of [['GoveeMusicSyncStartIntent','govee-sync-start'],['GoveeMusicSyncPauseIntent','govee-sync-pause']]){
+ assert.equal(voice.COMMANDS[intent],cmd);assert(model.some(x=>x.name===intent&&x.samples.length>=3));
+}
+assert(read('components/AlexaVoiceControlV1008.tsx').includes("category==='sync'"));
+assert(read('app/api/alexa/govee-pending/route.ts').includes('isGoveeOnlyVoiceCommandV1143'));
+assert(read('app/api/alexa/govee-result/route.ts').includes('isGoveeOnlyVoiceCommandV1143'));
+assert(read('components/AlexaSettingsV1137.tsx').includes('GoveeMusicVoiceControlsV1143'));
+assert(read('scripts/vercel-production-build.cjs').includes('v1143-alexa-govee-music-sync-regression.cjs'));
+console.log('PASS V1143: separately authorized Alexa Govee music-sync start/pause; no physical power or Spotify mutation');

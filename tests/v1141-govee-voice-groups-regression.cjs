@@ -21,7 +21,7 @@ const names=['GoveeFixtureOnIntent','GoveeFixtureOffIntent','GoveeGroupOnIntent'
 const model=require('../integrations/alexa/interaction-model.de-DE.json').interactionModel.languageModel;
 for(const name of names){assert(lambda.COMMANDS[name]);assert(model.intents.some(v=>v.name===name&&v.slots.length===1));}
 for(const marker of ['goveeTarget','validGoveeVoiceTargetV1141','isGoveePowerCommandV1138'])assert(read('app/api/alexa/voice/route.ts').includes(marker));
-assert(read('app/api/alexa/govee-pending/route.ts').includes('isGoveePowerCommandV1138'));
+assert(read('app/api/alexa/govee-pending/route.ts').includes('isGoveeOnlyVoiceCommandV1143'));
 assert(read('app/api/alexa/govee-result/route.ts').includes('Not a Govee command'));
 assert(read('components/AlexaVoiceControlV1008.tsx').includes('executeAlexaGoveePowerV1141'));
 assert(read('components/AlexaSettingsV1137.tsx').includes("'GoveeGroupOnIntent'"));
