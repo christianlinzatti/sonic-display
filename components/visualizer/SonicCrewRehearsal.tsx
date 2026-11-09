@@ -35,7 +35,8 @@ function Performer({slot,modelId,clock,playing,settings,scenario,onReading}:{slo
  useFrame((frame,dt)=>{
   const point={source:scenario.trackId??'sonic-crew-rehearsal',positionMs:clock.current*1000};
   const sample=previewSampleV1136(sampledClockV1136.current,point,playing);
-  const next=stepCrew(state.current,{...scenario,section:scenario.section==='auto'?undefined:scenario.section,modelId,clips:animations,trackId:scenario.trackId??'sonic-crew-rehearsal',progressMs:clock.current*1000,slot,count:3,playing:sample.sample,reducedMotion:false,manualPriority:false,settings});
+  // Explicit paused scrubs reconstruct the beat; provider jitter tolerance is for live playback.
+  const next=stepCrew(!playing&&sample.cut?newCrewState():state.current,{...scenario,section:scenario.section==='auto'?undefined:scenario.section,modelId,clips:animations,trackId:scenario.trackId??'sonic-crew-rehearsal',progressMs:clock.current*1000,slot,count:3,playing:sample.sample,reducedMotion:false,manualPriority:false,settings});
   state.current=next.state;
   if(next.plan.active){
    const clip=animations.find(c=>c.name===next.plan.clip);

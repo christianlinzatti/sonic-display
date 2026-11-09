@@ -46,9 +46,11 @@ export function crewInteractionV1131(cue:StoryCueV1131,slot:number,count:number)
  const role=cue.interaction==='rest'?'rest':cue.interaction==='unison'?'together':lead?'lead':cue.interaction==='duel'&&partner?'partner':'echo';
  const target=lead?cue.partner:cue.leader;
  const direction=target>slot?1:target<slot?-1:0;
+ const reverse=cue.chorusVisit>0?cue.chorusVisit%2===0:Math.floor(cue.phrase/4)%2===1;
+ const responseRank=reverse?(cue.leader-slot+safeCount)%safeCount:(slot-cue.leader+safeCount)%safeCount;
  return {role,yaw:safeCount>1&&cue.interaction!=='unison'&&cue.interaction!=='rest'?direction*(lead?.045:.09):0,
  armAccent:role==='lead'||role==='partner'?.055:role==='echo'?.025:0,
- beatOffset:cue.interaction==='answer'&&!lead?-((slot-cue.leader+safeCount)%safeCount)*2:cue.interaction==='duel'&&partner?-2:0};
+ beatOffset:cue.interaction==='answer'&&!lead?-responseRank*2:cue.interaction==='duel'&&partner?-2:0};
 }
 export function storyFootworkV1131(cue:StoryCueV1131,slot:number):string|null{
  if(cue.act==='breathe'||cue.lyricDensity>.8&&cue.act==='story')return null;

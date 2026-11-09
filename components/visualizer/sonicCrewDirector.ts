@@ -97,7 +97,7 @@ export function stepCrew(previous:CrewState,input:CrewInput):{state:CrewState;pl
  const baseCandidate=input.settings.mode==='adaptive'&&featureStep&&step&&available.has(step)?step:rankedCandidate;
  const sequence=performanceSequenceV1132({genre:input.genre,trackId:input.trackId,modelId:input.modelId,cue:adaptiveCue,available,
  recent:reset?[]:previous.recent??[],slot,count,fallback:baseCandidate});
- const bodyCandidate=input.settings.mode==='adaptive'?fullBodyClipV1133({modelId:input.modelId,genre:input.genre,cue:adaptiveCue,count,available,fallback:sequence.clip}):baseCandidate;
+ const bodyCandidate=input.settings.mode==='adaptive'?fullBodyClipV1133({trackId:input.trackId,recent:reset?[]:previous.recent??[],modelId:input.modelId,genre:input.genre,cue:adaptiveCue,count,available,fallback:sequence.clip}):baseCandidate;
  const supporting=input.settings.mode==='adaptive'&&(adaptiveCue.reading||adaptiveCue.act==='build')&&slot!==leader;
  const candidate=supporting?(available.has('Dance_Groove')?'Dance_Groove':bodyCandidate):bodyCandidate;
  if(!candidate)return off('missing-clips');

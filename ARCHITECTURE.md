@@ -1,3 +1,11 @@
+## V1136 – Update: Kreativere Crew-Regie
+
+Die lokale Regie entwickelt nach dem persönlichen Auftakt abwechslungsreiche
+Ganzkörper-Motive aus Genre, Energie und Bewegungs-Kontrasten. Gemischte Crews
+bleiben bei gemeinsamen Hits synchron; spätere Refrains wechseln die Richtung
+der Antwortwelle. Details, Grenzen und Tests:
+[Kreative Regie](docs/versions/V1136-KREATIVE-REGIE.md).
+
 ## V1136 – Update: Weicher Refrain-Aufbau
 
 Die Crew bereitet den kommenden Refrain-Solisten bereits im Aufbau vor. Licht,
