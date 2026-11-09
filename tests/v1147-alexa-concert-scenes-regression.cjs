@@ -23,4 +23,19 @@ for(const genre of ['deutschrap','hardtekk','deutschrock','other'])
   assert(x.brightnessCap<=base.masterBrightness);
   assert(Object.values(x.lightColor).every(v=>v>=0&&v<=255));
  }
+let starts=0;
+const activated=mod.exports.activateConcertSceneV1147(base,()=>{starts++;return 'Show gestartet.';});
+assert.equal(starts,1);assert.match(activated.message,/Show gestartet/);
+assert.throws(()=>mod.exports.activateConcertSceneV1147({...base,showConsent:false},()=>{starts++;}),/freigabe/);
+assert.equal(starts,1,'no show start without consent');
+const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+assert(read('components/AlexaVoiceControlV1008.tsx').includes("activateConcertSceneV1147"));
+assert(read('components/AlexaVoiceControlV1008.tsx').includes("runFullConcertV1145('concert-show-start'"));
+assert(read('scripts/vercel-production-build.cjs').includes('v1147-alexa-concert-scenes-regression.cjs'));
+const lambda=require('../integrations/alexa/voice-v1008.cjs');
+const model=require('../integrations/alexa/interaction-model.de-DE.json').interactionModel.languageModel.intents;
+for(const [intent,command] of [['ConcertSceneCalmIntent','concert-scene-calm'],['ConcertSceneIntenseIntent','concert-scene-intense'],['ConcertSceneFinaleIntent','concert-scene-finale']]){
+ assert.equal(lambda.COMMANDS[intent],command);
+ assert(model.some(x=>x.name===intent&&x.samples.length>=4));
+}
 console.log('PASS V1147: scene planning, opt-in gates, brightness caps, reduced motion, genre palettes');
