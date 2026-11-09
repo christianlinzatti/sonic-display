@@ -5,6 +5,8 @@ const CREW = [
   { id: 'sonic-chrome-beat', label: 'Chrome Beat', slug: 'chrome-beat', preset: 'robot' },
 ];
 const CLIPS = ['Dance_Groove','Dance_Techno','Idle_Breathe','Dance_House','Dance_HipHop','Dance_Disco','Dance_Shuffle','Dance_Robot','Dance_FestivalBounce','Gesture_Wave'];
+const MANIFEST = require('../../public/avatars/sonic/manifest.json');
+const crewClips = slug => MANIFEST.find(asset => asset.file === `${slug}.glb`).clips;
 const PREFS = 'sonic-display-ui-preferences-v1';
 test('stage crew catalog serves local models and original previews once each', async ({ request }) => {
   const response = await request.get('/api/avatars'); expect(response.status()).toBe(200);
@@ -14,9 +16,12 @@ test('stage crew catalog serves local models and original previews once each', a
     expect(all.filter(m => m.url === `/avatars/sonic/${crew.slug}.glb`)).toHaveLength(1);
     const model = all.find(m => m.id === crew.id);
     expect(model).toMatchObject({ label: crew.label, category: 'Sonic Stage Crew', defaultDancePreset: crew.preset });
-    expect(model.genre.length).toBeGreaterThan(0); expect(model.tags).toContain('12 Animationen');
+    expect(model.genre.length).toBeGreaterThan(0); expect(model.tags).toContain(`${crewClips(crew.slug).length} Animationen`);
     const asset = await request.get(model.url); expect(asset.status()).toBe(200);
-    expect((await asset.body()).toString('ascii',0,4)).toBe('glTF');
+    const bytes = await asset.body();
+    expect(bytes.toString('ascii',0,4)).toBe('glTF');
+    const gltf = JSON.parse(bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString('utf8'));
+    expect(gltf.animations.map(clip => clip.name)).toEqual(crewClips(crew.slug).map(clip => clip.name));
     const preview = await request.get(model.preview); expect(preview.status()).toBe(200);
     expect(preview.headers()['content-type']).toContain('image/png');
   }
@@ -32,9 +37,10 @@ for (const crew of CREW) test(`${crew.label}: gallery, all clips, visible animat
   await expect(dialog.locator('.settings-avatar-preview').getByRole('heading', { name: crew.label, exact: true })).toBeVisible();
   const studio = dialog.getByRole('group', { name: 'Dance Studio · Animation Timeline V93', exact: true });
   const animation = studio.getByRole('combobox', { name: 'Animation', exact: true });
-  await expect(animation).toBeEnabled(); await expect(animation.locator('option')).toHaveCount(12);
+  await expect(animation).toBeEnabled(); await expect(animation.locator('option')).toHaveCount(crewClips(crew.slug).length);
   const signatures = { 'neon-pulse': ['Dance_NeonCircuit','Dance_LaserStep'], 'festival-nova': ['Dance_FestivalFlow','Dance_DiscoStar'], 'chrome-beat': ['Dance_PopLock','Dance_Clockwork'] };
-  const expectedClips = [...CLIPS, ...signatures[crew.slug]];
+  const expectedClips = crewClips(crew.slug).map(clip => clip.name);
+  expect(expectedClips.slice(0, 12)).toEqual([...CLIPS, ...signatures[crew.slug]]);
   expect((await animation.locator('option').allTextContents()).map(text => text.replace(/ \(.*$/, ''))).toEqual(expectedClips);
   for (const name of signatures[crew.slug]) await expect(animation.locator('option').filter({ hasText: name })).toContainText(name === 'Dance_Clockwork' ? '16.0 s' : '12.0 s');
   const scrubber = studio.getByLabel('Animation scrubben');
@@ -78,7 +84,7 @@ test('playing signature changes and rapid switches keep the studio running; fine
   await dialog.getByRole('button', { name: /^Neon Pulse/ }).click();
   const studio=dialog.getByRole('group', { name: 'Dance Studio · Animation Timeline V93', exact: true });
   const animation=studio.getByRole('combobox', { name:'Animation', exact:true });
-  await expect(animation.locator('option')).toHaveCount(12);
+  await expect(animation.locator('option')).toHaveCount(crewClips('neon-pulse').length);
   await studio.getByRole('button',{ name:'▶ Tanz testen',exact:true }).click();
   await animation.selectOption('embedded:10');
   await animation.selectOption('embedded:11');
@@ -103,7 +109,7 @@ test('reduced-motion preferences keep clip changes paused', async ({ page }) => 
   const dialog=await openSettings(page,'avatar');
   const studio=dialog.getByRole('group',{name:'Dance Studio · Animation Timeline V93',exact:true});
   const animation=studio.getByRole('combobox',{name:'Animation',exact:true});
-  await expect(animation.locator('option')).toHaveCount(12);
+  await expect(animation.locator('option')).toHaveCount(crewClips('neon-pulse').length);
   await animation.selectOption('embedded:10');
   await expect(studio.getByRole('button',{name:'▶ Tanz testen',exact:true})).toBeDisabled();
   await expect(studio.getByLabel('Animation scrubben')).toHaveValue('0');

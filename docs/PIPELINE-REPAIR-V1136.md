@@ -25,3 +25,10 @@ Die vollständige Browser-Suite umfasst inzwischen 218 Desktop-/Touch-Fälle.
 Ihr serieller Gesamtprozess erhält 45 statt 30 Minuten, damit der gewachsene
 Umfang nicht trotz bestandener Einzeltests abgebrochen wird. Die Einzeltest-
 Limits, fehlende Wiederholungen und strikten Ergebnisprüfungen bleiben bestehen.
+
+Der erste vollständige GitHub-Browserlauf erreichte 206 bestandene Fälle.
+Zwölf Fälle scheiterten an festen Erwartungen von zwölf Avatar-Animationen.
+Die Crew-Browsertests lesen nun die erwarteten Clips aus dem Asset-Manifest,
+vergleichen dieses zusätzlich mit den tatsächlich ausgelieferten GLB-Daten
+und scrubben sämtliche Clips. Die ursprünglichen zwölf Clips bleiben als
+Kompatibilitätsprüfung ausdrücklich enthalten.
