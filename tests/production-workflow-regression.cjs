@@ -49,6 +49,16 @@ assert.ok(workflows['v965-deployment-smoke.yml'].jobs['deployed-site-smoke'].env
 const commands = production.jobs['v965-production'].steps.map(x => x.run || '').join('\n');
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json')));
 for (const match of commands.matchAll(/npm run ([a-z0-9:_-]+)/g)) assert.ok(pkg.scripts[match[1]], `Missing script ${match[1]}`);
+// The pre-install release gate and dynamically selected CI command must agree.
+const activeVersion = /^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1];
+assert.ok(activeVersion, 'Active package version is required');
+const activeRegression = `test:v${activeVersion}`;
+const activeTypes = `${activeRegression}:types`;
+assert.ok(pkg.scripts[activeRegression], `Missing active regression ${activeRegression}`);
+assert.ok(pkg.scripts[activeTypes], `Missing active TypeScript check ${activeTypes}`);
+assert.deepEqual(pkg.scripts.prebuild.split(/\s*&&\s*/).slice(0, 2),
+  [`npm run ${activeRegression}`, `npm run ${activeTypes}`],
+  'Prebuild must begin with the active release regression and TypeScript check');
 for (const version of [982,983,984,985,986,987,988,989,990,991,992,993,994,995,996,997,998,999,1000,1001,1002,1003])
   assert.ok(pkg.scripts.prebuild.includes('npm run test:v'+version),'Inherited regression V'+version+' removed');
 assert.ok(commands.includes('node node_modules/typescript/bin/tsc --noEmit'));
