@@ -30,7 +30,7 @@ const reset=()=>{requests=[];config={...config,enabled:true,autoSync:true,select
  reset();
  const result=await power.executeAlexaGoveePowerV1138(message(),opts);
  assert.equal(result.kind,'complete');assert.match(result.text,/gesendet/);assert.equal(requests.length,4);
- assert.deepEqual(requests.filter(r=>r.url==='/command').map(r=>r.data),[
+ assert.deepEqual(JSON.parse(JSON.stringify(requests.filter(r=>r.url==='/command').map(r=>r.data))),[
  {ip:'192.168.1.45',action:'power',value:true},{ip:'192.168.1.46',action:'power',value:true}]);
  assert.equal(config.autoSync,false,'power command stops automatic lighting');
  reset();
