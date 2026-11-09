@@ -10,6 +10,7 @@ import type {VoiceMessageV1008,VoiceResultV1008} from './alexaVoiceV1008';
 
 export const ALEXA_FULL_CONCERT_KEY_V1145='sonic-display:alexa-full-concert-v1145';
 export const ALEXA_FULL_CONCERT_EVENT_V1145='sonic-display:alexa-full-concert-changed-v1145';
+export const ALEXA_FULL_CONCERT_ACTIVE_EVENT_V1145='sonic-display:alexa-full-concert-active-v1145';
 export const ALEXA_FULL_CONCERT_ACTIVE_KEY_V1145='sonic-display:alexa-full-concert-active-v1145';
 export type FullConcertVoiceCommandV1145='concert-show-start'|'concert-show-stop';
 export type FullConcertConsentV1145={enabled:boolean;since:number;includeGovee:boolean};
@@ -115,7 +116,7 @@ export function runFullConcertV1145(command:FullConcertVoiceCommandV1145,options
    if(g.autoSync)saveGoveeConfigV909({...g,autoSync:false});
   }
   localStorage.removeItem(ALEXA_FULL_CONCERT_ACTIVE_KEY_V1145);
-  window.dispatchEvent(new Event(ALEXA_FULL_CONCERT_EVENT_V1145));
+  window.dispatchEvent(new Event(ALEXA_FULL_CONCERT_ACTIVE_EVENT_V1145));
   return 'Die Alexa-Konzertshow wurde beendet. Vorherige Bühnen- und Regieeinstellungen sind wiederhergestellt, soweit sie zwischenzeitlich nicht manuell geändert wurden. Govee-Lampen bleiben eingeschaltet, Spotify läuft weiter.';
  }
  if(!options.connected||!options.playing||!options.trackId?.trim())
@@ -139,7 +140,7 @@ export function runFullConcertV1145(command:FullConcertVoiceCommandV1145,options
     JSON.stringify(fresh.selectedIps)===JSON.stringify(govee.selectedIps))
     saveGoveeConfigV909({...fresh,autoSync:true});
   }
-  window.dispatchEvent(new Event(ALEXA_FULL_CONCERT_EVENT_V1145));
+  window.dispatchEvent(new Event(ALEXA_FULL_CONCERT_ACTIVE_EVENT_V1145));
  }catch(e){
   // Do not remove the snapshot after a partial application: manual Stop can still restore it.
   throw e;

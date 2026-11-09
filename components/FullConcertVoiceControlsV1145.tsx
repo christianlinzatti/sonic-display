@@ -2,7 +2,7 @@
 import {useEffect,useState} from 'react';
 import {useMusic} from '@/context/MusicContext';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
-import {ALEXA_FULL_CONCERT_EVENT_V1145,loadFullConcertConsentV1145,saveFullConcertConsentV1145,
+import {ALEXA_FULL_CONCERT_EVENT_V1145,ALEXA_FULL_CONCERT_ACTIVE_EVENT_V1145,loadFullConcertConsentV1145,saveFullConcertConsentV1145,
  readFullConcertSnapshotV1145,runFullConcertV1145} from '@/lib/alexaFullConcertV1145';
 
 export function FullConcertVoiceControlsV1145(){
@@ -13,8 +13,8 @@ export function FullConcertVoiceControlsV1145(){
  useEffect(()=>{
   const refresh=()=>{const consent=loadFullConcertConsentV1145();setEnabled(consent.enabled);
    setWithGovee(consent.includeGovee);setActive(Boolean(readFullConcertSnapshotV1145()));};
-  refresh();window.addEventListener('storage',refresh);window.addEventListener(ALEXA_FULL_CONCERT_EVENT_V1145,refresh);
-  return()=>{window.removeEventListener('storage',refresh);window.removeEventListener(ALEXA_FULL_CONCERT_EVENT_V1145,refresh);};
+  refresh();window.addEventListener('storage',refresh);window.addEventListener(ALEXA_FULL_CONCERT_EVENT_V1145,refresh);window.addEventListener(ALEXA_FULL_CONCERT_ACTIVE_EVENT_V1145,refresh);
+  return()=>{window.removeEventListener('storage',refresh);window.removeEventListener(ALEXA_FULL_CONCERT_EVENT_V1145,refresh);window.removeEventListener(ALEXA_FULL_CONCERT_ACTIVE_EVENT_V1145,refresh);};
  },[]);
  const consent=(on:boolean,govee:boolean)=>{
   try{const next=saveFullConcertConsentV1145(on,govee);setEnabled(next.enabled);setWithGovee(next.includeGovee);
