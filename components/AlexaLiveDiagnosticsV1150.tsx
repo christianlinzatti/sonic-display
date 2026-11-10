@@ -120,7 +120,7 @@ export function AlexaLiveDiagnosticsV1150(){
   };
  },[live,check]);
  const sum=summarizeLiveDiagnosticsV1150(snapshot.server.spotify,snapshot.server.relay,snapshot.bridge,snapshot.fixtures);
- const rows:[
+ const rows=[
   {id:'spotify',title:'Spotify-Verbindung',diag:snapshot.server.spotify},
   {id:'relay',title:'Alexa-Relay / Redis',diag:snapshot.server.relay},
   {id:'bridge',title:'Govee LAN Bridge',diag:snapshot.bridge}
