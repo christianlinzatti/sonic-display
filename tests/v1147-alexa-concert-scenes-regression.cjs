@@ -28,6 +28,11 @@ const activated=mod.exports.activateConcertSceneV1147(base,()=>{starts++;return 
 assert.equal(starts,1);assert.match(activated.message,/Show gestartet/);
 assert.throws(()=>mod.exports.activateConcertSceneV1147({...base,showConsent:false},()=>{starts++;}),/freigabe/);
 assert.equal(starts,1,'no show start without consent');
+assert.match(activated.message,/Vorschau berechnet/);
+assert.match(activated.message,/nicht an Bühne oder Lampen übertragen/);
+const existing=mod.exports.activateConcertSceneV1147(base,()=> 'Die Alexa-Konzertshow ist bereits gestartet.');
+assert.match(existing.message,/nicht verändert/);
+assert.doesNotMatch(existing.message,/als Vorschau berechnet/);
 const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 assert(read('components/AlexaVoiceControlV1008.tsx').includes("activateConcertSceneV1147"));
 assert(read('components/AlexaVoiceControlV1008.tsx').includes("runFullConcertV1145('concert-show-start'"));
