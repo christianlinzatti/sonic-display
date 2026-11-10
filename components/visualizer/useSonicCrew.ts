@@ -60,7 +60,7 @@ export function useCrewDirector(input:CrewInput){
   // The crew uses existing observed song/lyric context for expression only.
   // No unverified crew observation ever authorizes a physical light phase.
   verified:Boolean(input.section||input.lyrics?.synced),
-  transition:Math.min(1,Math.max(0,((input.progressMs??0)%3200)/3200)),
+  transition:Math.min(1,Math.max(0,((input.progressMs??0)-result.state.switched)/3200)),
   playing:input.playing,reducedMotion:input.reducedMotion,manualPriority:input.manualPriority,
   lyricsFocus:result.plan.story?.reading===true,genre:input.genre
  });
