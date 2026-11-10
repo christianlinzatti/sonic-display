@@ -15,6 +15,7 @@ import {GOVEE_ZONE_MIXER_KEY_V1100,GOVEE_ZONE_MIXER_EVENT_V1100,loadGoveeZoneMix
 import {GOVEE_TRANSITION_KEY_V1101,GOVEE_TRANSITION_EVENT_V1101,loadGoveeTransitionV1101,planGoveeSceneTransitionV1101,applyGoveeSceneTransitionV1101} from '@/lib/goveeSceneTransitionV1101';
 import {GOVEE_CHOREOGRAPHER_KEY_V1102,GOVEE_CHOREOGRAPHER_EVENT_V1102,loadGoveeChoreographerV1102,planGoveeSceneZoneV1102,applyGoveeSceneZoneV1102} from '@/lib/goveeSceneZoneChoreographerV1102';
 import {useAudioAnalysis} from '@/context/AudioAnalysisContext';
+import {CONCERT_COORDINATION_EVENT_V1154,CONCERT_COORDINATION_KEY_V1154,loadConcertCoordinationV1154,planConcertCoordinationV1154,applyConcertLightV1154} from '@/lib/aiConcertCoordinationV1154';
 import {GOVEE_CONFIG_EVENT_V909,GOVEE_CONFIG_KEY_V909,loadGoveeConfigV909,goveeBridgeRequestV909,planGoveeLookV909,
  type GoveeConfigV909,type GoveeLookV909,type GoveeDeviceV909} from '@/lib/goveeLanV909';
 import {resolveGoveePhaseV911,resolveGoveeRoleV911,planGoveeConcertLookV911,
@@ -98,6 +99,13 @@ export function GoveeMusicSyncV909(){
  const [transitionSettingsV1101,setTransitionSettingsV1101]=useState(loadGoveeTransitionV1101);
  const [choreographerSettingsV1102,setChoreographerSettingsV1102]=useState(loadGoveeChoreographerV1102);
  const [roadmapSettings,setRoadmapSettings]=useState<ConcertSettingsV958>(loadConcertRoadmapV958);
+ const [coordinationV1154,setCoordinationV1154]=useState(loadConcertCoordinationV1154);
+ useEffect(()=>{
+  const refresh=()=>setCoordinationV1154(loadConcertCoordinationV1154());
+  const storage=(e:StorageEvent)=>{if(e.key===CONCERT_COORDINATION_KEY_V1154||e.key===null)refresh();};
+  window.addEventListener(CONCERT_COORDINATION_EVENT_V1154,refresh);window.addEventListener('storage',storage);
+  return()=>{window.removeEventListener(CONCERT_COORDINATION_EVENT_V1154,refresh);window.removeEventListener('storage',storage);};
+ },[]);
  const stageCueV921=useRef<GoveeStageCueV921|null>(null);
  const roomAtmosphereV987=useRef<RoomAtmosphereSessionV987|null>(null);
  useEffect(()=>{
@@ -720,7 +728,22 @@ export function GoveeMusicSyncV909(){
       roomDecisionV1096=applyGoveeSceneZoneV1102(roomDecisionV1096,sceneZoneDecisionV1102);
       const roomLookV1096=applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,
        Math.min(config.masterBrightness,festivalDeliveredLook.brightness,showLookV1042.brightness));
-      const finalLook=governConcertLookV961(previous,roomLookV1096,{
+      // V1154: dim-only, verified section smoothing in the existing authorized sender.
+      // Manual shows, recovery, the V961 governor and fixture caps retain priority.
+      const coordinationDecisionV1154=planConcertCoordinationV1154({
+       settings:coordinationV1154,trackId:state.track.id,progressMs:progress,
+       durationMs:state.track.durationMs,phase:verifiedPhaseV1027.phase,
+       verified:verifiedPhaseV1027.verified,transition:verifiedPhaseV1027.transition,
+       playing:state.isPlaying,reducedMotion:reducedMotionV1042||Boolean(stage?.reducedMotion)||
+        Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches),
+       manualPriority:Boolean(show)||stage?.source==='authored'||recoveringDevices.has(ip)||
+        roomDecisionV987.active||syncDecisionV1027.active||authoredDecisionV1042.active||
+        Boolean(alexaGoveeCueV970.current),
+       lyricsFocus:stage?.lyricsVisible===true,genre:state.genre
+      });
+      const coordinatedLookV1154=applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,
+       Math.min(config.masterBrightness,festivalDeliveredLook.brightness,showLookV1042.brightness));
+      const finalLook=governConcertLookV961(previous,coordinatedLookV1154,{
        enabled:roadmapSettings.enabled&&roadmapSettings.hardwareSync&&roadmapSettings.lightGovernorV961,
        playing:state.isPlaying,verified:Boolean(roadmapScene?.verified),
        savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
@@ -750,6 +773,6 @@ export function GoveeMusicSyncV909(){
    :bassSettings.enabled||shockSettings.enabled?window.setInterval(()=>void tick(),900)
    :neonBassEnabled?window.setInterval(()=>void tick(),900):window.setInterval(()=>void tick(),1700);
   return()=>{cancelled=true;window.clearInterval(interval);window.clearInterval(sampler);};
- },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings,syncSettingsV1027,roomSettingsV1096,waveSettingsV1097,journeySettingsV1098,beatAccentSettingsV1099,zoneMixerSettingsV1100,transitionSettingsV1101,choreographerSettingsV1102,goveeShowEnabledV1042,goveeShowStrengthV1042,concertDirectorEnabledV1048,concertDirectorStrengthV1048,liveConcertEnabledV1049,liveConcertStrengthV1049,arenaShowEnabledV1040,arenaShowPlanV1040,showStageIsArenaV1042,reducedMotionV1042]);
+ },[config,showLibrary,groups,bassSettings,beatSettings,sectionSettings,genreSettings,cinematicSettings,shockSettings,neonSettings,energySettings,festivalSettings,spatialSettings,calibrationSettings,roadmapSettings,syncSettingsV1027,roomSettingsV1096,waveSettingsV1097,journeySettingsV1098,beatAccentSettingsV1099,zoneMixerSettingsV1100,transitionSettingsV1101,choreographerSettingsV1102,coordinationV1154,goveeShowEnabledV1042,goveeShowStrengthV1042,concertDirectorEnabledV1048,concertDirectorStrengthV1048,liveConcertEnabledV1049,liveConcertStrengthV1049,arenaShowEnabledV1040,arenaShowPlanV1040,showStageIsArenaV1042,reducedMotionV1042]);
  return null;
 }
