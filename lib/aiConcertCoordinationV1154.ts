@@ -59,13 +59,15 @@ export function planConcertCoordinationV1154(input:{
 }
 export function applyConcertCrewV1154<T extends {active:boolean;expressionGain?:number}>(
  plan:T,decision:ConcertCoordinationV1154,manualPriority=false):T{
- if(!decision.active||!plan.active||manualPriority||typeof plan.expressionGain!=='number'||
-  !Number.isFinite(plan.expressionGain))return plan;
+ if(!decision?.active||!plan.active||manualPriority||typeof plan.expressionGain!=='number'||
+  !Number.isFinite(plan.expressionGain)||!Number.isFinite(decision.crewFactor)||
+  decision.crewFactor<0||decision.crewFactor>1)return plan;
  return {...plan,expressionGain:Math.max(0,plan.expressionGain)*decision.crewFactor};
 }
 export function applyConcertLightV1154<T extends {brightness:number;color:{r:number;g:number;b:number}}>(
  look:T,decision:ConcertCoordinationV1154,ceiling:number):T{
- if(!decision.active||!Number.isFinite(look.brightness)||look.brightness<0||
+ if(!decision?.active||!Number.isFinite(decision.lightFactor)||
+  decision.lightFactor<0||decision.lightFactor>1||!Number.isFinite(look.brightness)||look.brightness<0||
   !Number.isFinite(ceiling)||ceiling<0)return look;
  return {...look,brightness:Math.max(0,Math.min(Math.round(look.brightness),
   Math.round(clamp(ceiling,0,100)),Math.round(look.brightness*decision.lightFactor)))};
