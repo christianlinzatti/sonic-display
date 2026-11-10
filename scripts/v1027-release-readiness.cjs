@@ -25,7 +25,9 @@ function inspectReleaseV1027(root){
    sender.includes('applyGoveeShowV1042(syncedLookV1027,previous,')&&
    (sender.includes('governConcertLookV961(previous,showLookV1042,')||
     (sender.includes('applyGoveeRoomV1096(showLookV1042,previous,')&&
-     sender.includes('governConcertLookV961(previous,roomLookV1096,'))));
+     (sender.includes('governConcertLookV961(previous,roomLookV1096,')||
+      (sender.includes('applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,')&&
+       sender.includes('governConcertLookV961(previous,coordinatedLookV1154,'))))));
   check('settings-ui',read('components/GoveeLanPanelV909.tsx').includes('<GoveeConcertSyncStudioV1027 config={config} devices={devices} onConfig={update}/>'));
   check('no-extra-lan-command',(sender.match(/goveeBridgeRequestV909\(config,'\/command','POST',\{ip,action:'look',value:finalLook\}\)/g)||[]).length===1);
   check('v931-gate',read('scripts/v931-production-gate.cjs').includes('tests/v1027-govee-concert-sync-regression.cjs'));
