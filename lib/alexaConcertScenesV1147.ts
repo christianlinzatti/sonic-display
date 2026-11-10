@@ -46,5 +46,7 @@ export function activateConcertSceneV1147(
 ):{plan:ConcertScenePlanV1147;message:string}{
  const plan=planConcertSceneV1147(input);
  const started=startShow();
- return {plan,message:started+' Konzertphase '+plan.scene+' ausgewählt; Lichtfarben sind weiterhin nur Vorschau.'};
+ // V1145 may report an already running show; do not claim a new phase was applied.
+ const alreadyRunning=started.includes('bereits gestartet');
+ return {plan,message:started+(alreadyRunning?' Die bestehende Show wurde nicht verändert.':' Konzertphase '+plan.scene+' als Vorschau berechnet.')+' Szenenfarben und Intensität werden nicht an Bühne oder Lampen übertragen.'};
 }
