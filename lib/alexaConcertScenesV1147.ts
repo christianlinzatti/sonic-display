@@ -50,3 +50,22 @@ export function activateConcertSceneV1147(
  const alreadyRunning=started.includes('bereits gestartet');
  return {plan,message:started+(alreadyRunning?' Die bestehende Show wurde nicht verändert.':' Konzertphase '+plan.scene+' als Vorschau berechnet.')+' Szenenfarben und Intensität werden nicht an Bühne oder Lampen übertragen.'};
 }
+
+/** Virtual-only interpolation for a future scene director.
+ * No timers, DOM, storage, Govee commands or mutation of live show settings.
+ * Reduced motion uses a single settled frame, never a rotating transition.
+ */
+export function interpolateConcertSceneV1147(
+ from:ConcertScenePlanV1147,to:ConcertScenePlanV1147,progress:number,
+ reducedMotion:boolean
+):Readonly<{stageIntensity:number;brightnessCap:number;lightColor:Readonly<{r:number;g:number;b:number}>;rotationAllowed:boolean}>{
+ if(!Number.isFinite(progress))throw Error('Ungültiger Übergangsfortschritt.');
+ const t=reducedMotion?1:Math.max(0,Math.min(1,progress));
+ const mix=(a:number,b:number)=>Math.round(a+(b-a)*t);
+ return {
+  stageIntensity:mix(from.stageIntensity,to.stageIntensity),
+  brightnessCap:mix(from.brightnessCap,to.brightnessCap),
+  lightColor:{r:mix(from.lightColor.r,to.lightColor.r),g:mix(from.lightColor.g,to.lightColor.g),b:mix(from.lightColor.b,to.lightColor.b)},
+  rotationAllowed:!reducedMotion&&from.rotationAllowed&&to.rotationAllowed
+ };
+}
