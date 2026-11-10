@@ -14,6 +14,7 @@ import {GoveeVoiceLookControlsV1146} from './GoveeVoiceLookControlsV1146';
 import {FullConcertVoiceControlsV1145} from './FullConcertVoiceControlsV1145';
 import {AlexaConcertScenePreviewV1147} from './AlexaConcertScenePreviewV1147';
 import {AlexaConnectionWizardV1149} from './AlexaConnectionWizardV1149';
+import {AlexaLiveDiagnosticsV1150} from './AlexaLiveDiagnosticsV1150';
 import {useMusic} from '@/context/MusicContext';
 import {classifyAlexaIntentV1148,type AlexaAvailabilityContextV1148} from '@/lib/alexaCommandAvailabilityV1148';
 import {ALEXA_ARTIST_KEY_V1007,ALEXA_ARTIST_EVENT_V1007} from '@/lib/alexaArtistV1007';
@@ -150,6 +151,7 @@ export function AlexaSettingsV1137(){
    <small>Standardmäßig aus. Die Berechtigungen für Spotify-Künstler, Anzeige und Govee werden zusätzlich und getrennt erteilt.</small>
   </fieldset>
   <AlexaConnectionWizardV1149/>
+  <AlexaLiveDiagnosticsV1150/>
   <FullConcertVoiceControlsV1145/>
   <AlexaConcertScenePreviewV1147/>
   <AlexaArtistPermissionV1007/>
