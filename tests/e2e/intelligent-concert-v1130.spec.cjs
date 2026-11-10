@@ -35,16 +35,12 @@ test('all headliners load real clips in the intelligent rehearsal',async({page},
  await page.getByRole('button',{name:'⚙ Settings',exact:true}).click();await page.locator('[data-v571-tab="avatar"]').click();
  const box=page.getByRole('group',{name:'Sonic Stage Crew – Musik und gemeinsame Show',exact:true});
  await expect(box.getByLabel('Figur 1').locator('option')).toHaveCount(11);
- // The touch layout can remount the lazy avatar tab after the first render.
- // Reacquire the control after each selection and assert the chosen value.
+ // The accessible label may include extra descriptive text. Do not require an exact match.
+ // Check that each headliner option is available before selecting it.
  for(const [slot,id] of ['sonic-atlas-prism','sonic-rio-carnival','sonic-quantum-bass'].entries()){
-  const label=`Figur ${slot+1}`;
-  const select=box.getByLabel(label,{exact:true});
-  if(await select.count()===0){
-   const avatarTab=page.locator('[data-v571-tab="avatar"]');
-   await avatarTab.click();
-  }
-  await expect(select,`${label} must be present in the avatar tab`).toBeAttached();
+  const select=box.getByLabel(`Figur ${slot+1}`);
+  await expect(select).toBeVisible();
+  await expect(select.locator(`option[value="${id}"]`)).toHaveCount(1);
   await select.selectOption(id);
   await expect(select).toHaveValue(id);
  }
