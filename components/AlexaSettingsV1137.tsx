@@ -13,6 +13,15 @@ import {GoveeMusicVoiceControlsV1143} from './GoveeMusicVoiceControlsV1143';
 import {GoveeVoiceLookControlsV1146} from './GoveeVoiceLookControlsV1146';
 import {FullConcertVoiceControlsV1145} from './FullConcertVoiceControlsV1145';
 import {AlexaConcertScenePreviewV1147} from './AlexaConcertScenePreviewV1147';
+import {useMusic} from '@/context/MusicContext';
+import {classifyAlexaIntentV1148,type AlexaAvailabilityContextV1148} from '@/lib/alexaCommandAvailabilityV1148';
+import {ALEXA_ARTIST_KEY_V1007,ALEXA_ARTIST_EVENT_V1007} from '@/lib/alexaArtistV1007';
+import {VOICE_DISPLAY_KEY_V1008,VOICE_SETTINGS_EVENT_V1008} from '@/lib/alexaVoiceV1008';
+import {GOVEE_CONFIG_EVENT_V909,loadGoveeConfigV909} from '@/lib/goveeLanV909';
+import {canExecuteGoveePowerV1138,GOVEE_POWER_CONSENT_EVENT_V1138,loadGoveePowerConsentV1138} from '@/lib/goveePowerV1138';
+import {GOVEE_SYNC_CONSENT_EVENT_V1143,loadGoveeSyncConsentV1143} from '@/lib/goveeMusicVoiceV1143';
+import {GOVEE_LOOK_CONSENT_EVENT_V1146,loadGoveeLookConsentV1146} from '@/lib/goveeVoiceLookV1146';
+import {ALEXA_FULL_CONCERT_EVENT_V1145,loadFullConcertConsentV1145} from '@/lib/alexaFullConcertV1145';
 
 const LOCAL_EVENT='sonic-display:alexa-local-status-v971';
 const GROUPS:{title:string;permission:string;intents:readonly string[]}[]=[
@@ -33,28 +42,68 @@ const commands=model.interactionModel.languageModel.intents.filter(intent=>inten
 const grouped=new Set(GROUPS.flatMap(group=>group.intents));
 const CATALOG=[...GROUPS,{title:'Weitere Sprachbefehle',permission:'Je nach Befehl passende Freigabe erforderlich',intents:commands.filter(command=>!grouped.has(command.name)).map(command=>command.name)}];
 
+const DEFAULT_AVAILABILITY_V1148:AlexaAvailabilityContextV1148={
+ general:false,artist:false,display:false,power:false,sync:false,look:false,show:false,roomLooks:false,
+ spotifyConnected:false,spotifyPlaying:false,goveeConfigured:false,goveeAutoSync:false,receiverToken:false
+};
 export function AlexaCommandHelpV1137(){
+ const {connected,isPlaying}=useMusic();
  const [query,setQuery]=useState('');
+ const [onlyPrepared,setOnlyPrepared]=useState(false);
+ const [local,setLocal]=useState<AlexaAvailabilityContextV1148>(DEFAULT_AVAILABILITY_V1148);
+ useEffect(()=>{
+  const refresh=()=>{
+   try{
+    const read=(key:string)=>parseArtistVoiceConsentV1007(localStorage.getItem(key)).enabled;
+    const cfg=loadGoveeConfigV909();
+    setLocal({
+     general:read(ALEXA_LOCAL_ENABLED_KEY_V967),artist:read(ALEXA_ARTIST_KEY_V1007),
+     display:read(VOICE_DISPLAY_KEY_V1008),power:loadGoveePowerConsentV1138().enabled,
+     sync:loadGoveeSyncConsentV1143().enabled,look:loadGoveeLookConsentV1146().enabled,
+     show:loadFullConcertConsentV1145().enabled,roomLooks:loadAlexaGoveeConsentV970().enabled,
+     spotifyConnected:false,spotifyPlaying:false,
+     goveeConfigured:canExecuteGoveePowerV1138(cfg),goveeAutoSync:cfg.autoSync,
+     receiverToken:Boolean(readAlexaGoveeReceiverTokenV1139())
+    });
+   }catch{setLocal(DEFAULT_AVAILABILITY_V1148);}
+  };
+  const events=['storage',LOCAL_EVENT,ALEXA_ARTIST_EVENT_V1007,VOICE_SETTINGS_EVENT_V1008,
+   GOVEE_POWER_CONSENT_EVENT_V1138,GOVEE_SYNC_CONSENT_EVENT_V1143,
+   GOVEE_LOOK_CONSENT_EVENT_V1146,ALEXA_FULL_CONCERT_EVENT_V1145,
+   ALEXA_GOVEE_CONSENT_EVENT_V970,GOVEE_CONFIG_EVENT_V909,ALEXA_GOVEE_RECEIVER_EVENT_V1139];
+  refresh();events.forEach(event=>window.addEventListener(event,refresh));
+  return()=>events.forEach(event=>window.removeEventListener(event,refresh));
+ },[]);
+ const context={...local,spotifyConnected:connected,spotifyPlaying:connected&&isPlaying};
  const term=query.trim().toLocaleLowerCase('de-DE');
- const matching=commands.filter(command=>[command.name,...command.samples,BUILTIN_EXAMPLES[command.name]||''].some(value=>value.toLocaleLowerCase('de-DE').includes(term)));
+ const matchingBase=commands.filter(command=>[command.name,...command.samples,BUILTIN_EXAMPLES[command.name]||''].some(value=>value.toLocaleLowerCase('de-DE').includes(term)));
+ const matching=matchingBase.filter(command=>!onlyPrepared||classifyAlexaIntentV1148(command.name,context).kind==='local-ready');
+ const preparedCount=commands.filter(command=>classifyAlexaIntentV1148(command.name,context).kind==='local-ready').length;
  return <details className="govee-v958" aria-label="Alexa Hilfe und Befehlsliste">
   <summary>Alexa-Hilfe: alle {commands.length} Sprachbefehle anzeigen</summary>
   <p className="settings-note">Sprich zuerst „Alexa, sage Sonic Display, …“. Die Beispiele stammen aus dem deutschen Alexa-Interaktionsmodell. Das Sprachmodell und die AWS-Lambda-Funktion müssen bei Änderungen separat im Alexa Developer-Konto aktualisiert werden.</p>
   <label>Sprachbefehle suchen
    <input type="search" aria-label="Alexa-Befehle durchsuchen" placeholder="z. B. Hardtekk, Lyrics, Govee" value={query} onChange={event=>setQuery(event.target.value)}/>
   </label>
-  <p className="settings-note" role="status">{matching.length} von {commands.length} Befehlen</p>
+  <label className="setting-check"><input type="checkbox" checked={onlyPrepared} onChange={event=>setOnlyPrepared(event.target.checked)}/>
+   Nur lokal vorbereitete Befehle anzeigen</label>
+  <p className="settings-note" role="status">V1148 · {preparedCount} von {commands.length} Befehlen lokal vorbereitet; {matching.length} angezeigt.</p>
+  <p className="settings-note">„Lokal vorbereitet“ bedeutet nur, dass die hier prüfbaren Freigaben und Voraussetzungen erfüllt sind. Die AWS-Lambda-Funktion, der veröffentlichte Alexa-Skill, Spotify-Berechtigungen und die tatsächliche Hardware-Reaktion sind dadurch nicht bestätigt.</p>
   {CATALOG.map(group=>{
    const visible=matching.filter(command=>group.intents.includes(command.name));
    return visible.length?<section key={group.title} aria-label={group.title}>
     <h4>{group.title} ({visible.length})</h4>
     <p className="settings-note">Voraussetzung: {group.permission}.</p>
-    <ul>{visible.map(command=><li key={command.name}>
-     <strong>„{command.samples[0]||BUILTIN_EXAMPLES[command.name]||command.name}“</strong>
-     {command.samples.length>1&&<details><summary>{command.samples.length-1} weitere Formulierungen</summary>
-      <ul>{command.samples.slice(1).map(sample=><li key={sample}>„{sample}“</li>)}</ul>
-     </details>}
-    </li>)}</ul>
+    <ul>{visible.map(command=>{
+     const availability=classifyAlexaIntentV1148(command.name,context);
+     return <li key={command.name}>
+      <strong>„{command.samples[0]||BUILTIN_EXAMPLES[command.name]||command.name}“</strong>
+      <small style={{display:'block'}}>{availability.label} · {availability.reason}</small>
+      {command.samples.length>1&&<details><summary>{command.samples.length-1} weitere Formulierungen</summary>
+       <ul>{command.samples.slice(1).map(sample=><li key={sample}>„{sample}“</li>)}</ul>
+      </details>}
+     </li>;
+    })}</ul>
    </section>:null;
   })}
   {!matching.length&&<p role="status">Kein Sprachbefehl passt zur Suche.</p>}
