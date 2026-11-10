@@ -23,6 +23,20 @@ for(const genre of ['deutschrap','hardtekk','deutschrock','other'])
   assert(x.brightnessCap<=base.masterBrightness);
   assert(Object.values(x.lightColor).every(v=>v>=0&&v<=255));
  }
+const interpolate=mod.exports.interpolateConcertSceneV1147;
+const calm=plan({...base,scene:'calm',genre:'deutschrap',goveeConsent:false});
+const finale=plan({...base,scene:'finale',genre:'hardtekk',goveeConsent:false});
+const before=JSON.stringify(calm),after=JSON.stringify(finale);
+assert.equal(interpolate(calm,finale,0,false).stageIntensity,calm.stageIntensity);
+assert.equal(interpolate(calm,finale,1,false).stageIntensity,finale.stageIntensity);
+assert.equal(interpolate(calm,finale,0.5,false).stageIntensity,60);
+assert.equal(interpolate(calm,finale,-2,false).stageIntensity,calm.stageIntensity);
+assert.equal(interpolate(calm,finale,2,false).stageIntensity,finale.stageIntensity);
+assert.equal(interpolate(calm,finale,0,true).stageIntensity,finale.stageIntensity);
+assert.equal(interpolate(calm,finale,0,true).rotationAllowed,false);
+assert.throws(()=>interpolate(calm,finale,NaN,false),/Übergangsfortschritt/);
+assert.equal(JSON.stringify(calm),before,'source plan stays immutable');
+assert.equal(JSON.stringify(finale),after,'target plan stays immutable');
 let starts=0;
 const activated=mod.exports.activateConcertSceneV1147(base,()=>{starts++;return 'Show gestartet.';});
 assert.equal(starts,1);assert.match(activated.message,/Show gestartet/);
