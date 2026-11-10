@@ -123,8 +123,16 @@ test('only existing V909 sender performs I/O; no independent driver is created',
  assert(sender.includes('planRoomAtmosphereV987(roomAtmosphereV987.current'));
  assert(sender.includes('applyRoomAtmosphereV987(recoveryLookV961,previous,roomDecisionV987'));
  assert(sender.includes("goveeBridgeRequestV909(config,'/command','POST'"));
- assert(sender.indexOf('applyRoomAtmosphereV987(recoveryLookV961')<sender.indexOf('governConcertLookV961(previous,roomLookV1096,'),
-  'V987 overlay must reach the existing final V961 governor after V1042/V1096 room overlays');
+ const atmosphereAt=sender.indexOf('applyRoomAtmosphereV987(recoveryLookV961');
+ const roomAt=sender.indexOf('applyGoveeRoomV1096(showLookV1042,previous,');
+ const coordinationAt=sender.indexOf('applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,');
+ const governorAt=sender.indexOf('governConcertLookV961(previous,coordinatedLookV1154,');
+ const sendAt=sender.indexOf("goveeBridgeRequestV909(config,'/command','POST',{ip,action:'look',value:finalLook})");
+ assert(atmosphereAt>=0&&atmosphereAt<roomAt&&roomAt<coordinationAt&&
+  coordinationAt<governorAt&&governorAt<sendAt,
+  'V987 overlay must pass through V1096, dim-only V1154 and final V961 governor before the single V909 LAN send');
+ assert.equal((sender.match(/goveeBridgeRequestV909\\(config,'\\/command','POST',\\{ip,action:'look',value:finalLook\\}\\)/g)||[]).length,1,
+  'V1154 does not add another network send');
 });
 test('UI requires a second explicit click and allows immediate revocation',()=>{
  const ui=read('components/visualizer/AtmosphereDesignerV986.tsx');
