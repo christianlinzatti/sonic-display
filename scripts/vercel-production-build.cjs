@@ -134,6 +134,7 @@ try {
   run('V1009 private avatar resources','tests/v1009-avatar-resources-regression.cjs');
   run('V1009 native providers and background deadlines','tests/v1009-network-regression.cjs');
   run('V1147 Alexa concert scenes','tests/v1147-alexa-concert-scenes-regression.cjs');
+  run('V1148 context-aware Alexa command help','tests/v1148-alexa-context-help-regression.cjs');
   run('V1146 Alexa Govee brightness and color','tests/v1146-alexa-govee-look-regression.cjs');
   run('V1145 Alexa full 360 concert voice director','tests/v1145-alexa-full-concert-regression.cjs');
   run('V1144 Govee bounded status retry','tests/v1144-govee-status-retry-regression.cjs');
