@@ -28,7 +28,7 @@ function inspectReleaseV1097(root){
   add('new-wave',sender.includes('planGoveeSpatialWaveV1097({settings:waveSettingsV1097'));
   add('new-apply',sender.includes('applyGoveeSpatialWaveV1097(roomDecisionV1096,waveDecisionV1097)'));
   add('same-look',sender.includes('applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,'));
-  add('same-governor',sender.includes('governConcertLookV961(previous,roomLookV1096,'));
+  add('same-governor',(sender.includes('governConcertLookV961(previous,roomLookV1096,')||(sender.includes('applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,')&&sender.includes('governConcertLookV961(previous,coordinatedLookV1154,'))));
   add('same-sender',sender.includes("goveeBridgeRequestV909(config,'/command','POST'"));
   add('cleanup',sender.includes('window.removeEventListener(GOVEE_WAVES_EVENT_V1097,refresh)'));
   add('ui',read('components/GoveeLanPanelV909.tsx').includes('<GoveeSpatialWavesStudioV1097 config={config} devices={devices}/>'));

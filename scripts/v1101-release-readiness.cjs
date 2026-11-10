@@ -26,8 +26,8 @@ function inspectReleaseV1101(root){
   add('route',sender.includes('planGoveeSceneTransitionV1101({settings:transitionSettingsV1101')&&
    sender.includes('applyGoveeSceneTransitionV1101(roomDecisionV1096,transitionDecisionV1101)'));
   add('old-lan-sender',sender.includes("goveeBridgeRequestV909(config,'/command','POST'"));
-  add('old-governor',sender.includes('governConcertLookV961(previous,roomLookV1096,'));
-  add('live-settings',sender.includes('zoneMixerSettingsV1100,transitionSettingsV1101,choreographerSettingsV1102,goveeShowEnabledV1042'));
+  add('old-governor',(sender.includes('governConcertLookV961(previous,roomLookV1096,')||(sender.includes('applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,')&&sender.includes('governConcertLookV961(previous,coordinatedLookV1154,'))));
+  add('live-settings',sender.includes('zoneMixerSettingsV1100,transitionSettingsV1101,choreographerSettingsV1102,coordinationV1154,goveeShowEnabledV1042'));
   add('event-cleanup',sender.includes('window.removeEventListener(GOVEE_TRANSITION_EVENT_V1101,refresh)'));
   add('panel',read('components/GoveeLanPanelV909.tsx').includes('<GoveeSceneTransitionStudioV1101 config={config} devices={devices}/>'));
   add('preview-only',read('components/GoveeSceneTransitionStudioV1101.tsx').includes('Reine Vorschau'));

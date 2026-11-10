@@ -26,7 +26,7 @@ function inspectReleaseV1100(root){
   add('route',sender.includes('planGoveeZoneMixV1100({settings:zoneMixerSettingsV1100')&&
    sender.includes('applyGoveeZoneMixV1100(roomDecisionV1096,zoneMixDecisionV1100)'));
   add('old-lan-sender',sender.includes("goveeBridgeRequestV909(config,'/command','POST'"));
-  add('old-governor',sender.includes('governConcertLookV961(previous,roomLookV1096,'));
+  add('old-governor',(sender.includes('governConcertLookV961(previous,roomLookV1096,')||(sender.includes('applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,')&&sender.includes('governConcertLookV961(previous,coordinatedLookV1154,'))));
   add('same-tick',sender.includes('zoneMixerSettingsV1100,')&&sender.includes('goveeShowEnabledV1042')); 
   add('event-cleanup',sender.includes('window.removeEventListener(GOVEE_ZONE_MIXER_EVENT_V1100,refresh)'));
   add('panel',read('components/GoveeLanPanelV909.tsx').includes('<GoveeRoomZoneMixerStudioV1100 config={config} devices={devices}/>'));

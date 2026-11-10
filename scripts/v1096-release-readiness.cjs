@@ -27,7 +27,7 @@ function inspectReleaseV1096(root){
   const runtime=read('components/GoveeMusicSyncV909.tsx');
   add('live-plan',runtime.includes('planGoveeRoomV1096({settings:roomSettingsV1096'));
   add('live-apply',runtime.includes('applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,'));
-  add('last-governor',runtime.includes('governConcertLookV961(previous,roomLookV1096,'));
+  add('last-governor',(runtime.includes('governConcertLookV961(previous,roomLookV1096,')||(runtime.includes('applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,')&&runtime.includes('governConcertLookV961(previous,coordinatedLookV1154,'))));
   add('precedence',runtime.includes('syncDecisionV1027.active||authoredDecisionV1042.active'));
   add('no-second-sender',!core.includes('goveeBridgeRequestV909('));
   const ui=read('components/GoveeRoomLightingStudioV1096.tsx');

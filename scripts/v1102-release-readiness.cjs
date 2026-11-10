@@ -24,8 +24,8 @@ function inspectReleaseV1102(root){
   const sender=read('components/GoveeMusicSyncV909.tsx');
   add('route',sender.includes('planGoveeSceneZoneV1102({settings:choreographerSettingsV1102')&&
    sender.includes('applyGoveeSceneZoneV1102(roomDecisionV1096,sceneZoneDecisionV1102)'));
-  add('same-tick',sender.includes('transitionSettingsV1101,choreographerSettingsV1102,goveeShowEnabledV1042'));
-  add('last-governor',sender.includes('governConcertLookV961(previous,roomLookV1096,'));
+  add('same-tick',sender.includes('transitionSettingsV1101,choreographerSettingsV1102,coordinationV1154,goveeShowEnabledV1042'));
+  add('last-governor',(sender.includes('governConcertLookV961(previous,roomLookV1096,')||(sender.includes('applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,')&&sender.includes('governConcertLookV961(previous,coordinatedLookV1154,'))));
   add('last-sender',sender.includes("goveeBridgeRequestV909(config,'/command','POST'"));
   add('listener-cleanup',sender.includes('window.removeEventListener(GOVEE_CHOREOGRAPHER_EVENT_V1102,refresh)'));
   add('panel',read('components/GoveeLanPanelV909.tsx').includes('<GoveeSceneZoneStudioV1102 config={config} devices={devices}/>'));
