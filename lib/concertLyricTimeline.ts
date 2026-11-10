@@ -52,3 +52,11 @@ export function nextConcertRefrain(lyrics:Lyrics|null|undefined,position:number)
  if(!Number.isFinite(position))return null;
  const data=timeline(lyrics);return data?.refrains[after(data.refrains,position)]?.start??null;
 }
+/** Only bounded gaps between known lyric lines can justify an instrumental picture. */
+export function concertInstrumentalGap(lyrics:Lyrics|null|undefined,position:number):{start:number;end:number}|null{
+ if(!Number.isFinite(position))return null;
+ const data=timeline(lyrics);if(!data)return null;
+ const next=after(data.entries,position),previous=data.entries[next-1],following=data.entries[next];
+ if(!previous||!following||position<previous.end||following.start-previous.end<10000)return null;
+ return {start:previous.end,end:following.start};
+}

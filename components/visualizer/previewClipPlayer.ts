@@ -1,3 +1,4 @@
+import {crewBlendWeight} from '../../lib/crewMotionQuality';
 import { AnimationClip, AnimationMixer, InterpolateLinear, LoopOnce, PropertyBinding, type AnimationAction, type Object3D } from 'three';
 
 /** Smooth preview changes from the pose actually on screen, including interrupted fades.
@@ -48,7 +49,7 @@ export class PreviewClipPlayer {
     if (this.snapshot) {
       this.elapsed += Number.isFinite(delta) ? Math.max(0, delta) : 0;
       const u = Math.min(1, this.elapsed / this.fadeSeconds);
-      const weight = u*u*(3-2*u); // zero slope at either end of the blend
+      const weight = crewBlendWeight(u); // zero velocity and acceleration at either end
       this.action.setEffectiveWeight(weight);
       this.snapshot.action.setEffectiveWeight(1-weight);
       if (u >= 1) this.releaseSnapshot();

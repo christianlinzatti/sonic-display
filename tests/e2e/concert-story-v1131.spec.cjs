@@ -22,7 +22,7 @@ test('mocked whole-song story escalates choruses and restores the right chapter 
  await expect(page.getByRole('heading',{name:'Second Mock Concert',exact:true})).toBeVisible();
  await expect(director).toHaveAttribute('data-show-chapter','0');
 });
-test('mixed original/headliner crew rehearses real footwork with answer roles from mocked song lyrics',async({page},testInfo)=>{
+test('mixed original/headliner crew reprises whole-body motifs with answer roles from mocked song lyrics',async({page},testInfo)=>{
  test.setTimeout(180000);await installConcertMocksV1130(page,{position:65000,playing:false});await seed(page);await page.goto('/');
  await page.getByRole('button',{name:'⚙ Settings',exact:true}).click();await page.locator('[data-v571-tab="avatar"]').click();
  const box=page.getByRole('group',{name:'Sonic Stage Crew – Musik und gemeinsame Show',exact:true});
@@ -32,7 +32,7 @@ test('mixed original/headliner crew rehearses real footwork with answer roles fr
  await box.getByRole('button',{name:'Show-Simulation starten',exact:true}).click();
  const canvas=box.locator('canvas');await canvas.scrollIntoViewIfNeeded();
  const rows=box.getByRole('list',{name:'Wiedergegebene Show-Clips'}).locator('li');await expect(rows).toHaveCount(3);
- await expect.poll(async()=>(await rows.allTextContents()).every(s=>/Dance_(SideGlide|DiagonalStep|HeelToe|PivotStep)/.test(s))).toBe(true);
+ await expect.poll(async()=>(await rows.allTextContents()).every(s=>/Dance_(RobotGroove|FluidArc|FrontmanDrive|JazzRebound|CrossStep|TurnPhrase)/.test(s))).toBe(true);
  await expect.poll(async()=>(await rows.allTextContents()).filter(s=>s.includes(' · Antwort ·')).length).toBe(2);
  await expect(rows.first()).toContainText('Refrain 2');
  await testInfo.attach('mixed-crew-footwork-answer',{body:await canvas.screenshot(),contentType:'image/png'});

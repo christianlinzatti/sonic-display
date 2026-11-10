@@ -1,3 +1,12 @@
+## Update – Song-Gedächtnis, Finale und persönlicher Stil
+
+Ein frühes Song-Motiv kehrt in den Refrains wieder. Das Finale verbindet Motiv,
+Antwort und gemeinsamen Abschluss. Lokale „Mehr davon / Weniger davon“-Vorlieben
+beeinflussen die Auswahl; wichtige Lyrics, Kamerafahrten und Licht werden enger
+abgestimmt. Weichere Überblendungen und eine korrekte Eingangsphase ergänzen die
+bestehende Fuß-/Beinplanung. Bedienung, Grenzen und Tests:
+[Song-Gedächtnis und Vorlieben](docs/versions/V1151-SONG-GEDAECHTNIS.md).
+
 ## V1136 – Update: Tanzdialoge mit gemeinsamem Motiv
 
 Die lokale Regie plant Motiv, Antwort und gemeinsame Rückkehr. Ein anderer

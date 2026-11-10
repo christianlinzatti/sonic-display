@@ -1,3 +1,4 @@
+import {tasteGain,type MotifTaste} from './showTaste';
 import {musicFamilyV1129,type MusicFamilyV1129} from './musicPerformanceV1129';
 import type {StoryCueV1131} from './concertStoryV1131';
 type Motif={clip:string;energy:number;families:readonly MusicFamilyV1129[]};
@@ -14,7 +15,7 @@ const hash=(text:string)=>{let value=2166136261;for(const c of text)value=Math.i
  * Reconstruct a short motif history from song phrases so seeks and shared casts agree.
  */
 export function creativeBodyClip(input:{trackId:string;modelId:string;genre?:string|null;cue:StoryCueV1131;
- available:ReadonlySet<string>;recent?:readonly string[];shared:boolean;personal:string}):string|null{
+ taste?:MotifTaste;available:ReadonlySet<string>;recent?:readonly string[];shared:boolean;personal:string}):string|null{
  const family=musicFamilyV1129(input.genre),soft=family==='ambient'||family==='classical';
  const phrase=Math.max(2,Math.min(10800,Math.floor(input.cue.phrase)||0));
  const power=!soft&&(input.cue.act==='impact'||input.cue.act==='finale')&&input.cue.intensity>=.7;
@@ -30,7 +31,7 @@ export function creativeBodyClip(input:{trackId:string;modelId:string;genre?:str
   for(const motif of pool){
    const age=recent.indexOf(motif.clip),played=input.shared?-1:(input.recent??[]).indexOf(motif.clip);
    const novelty=hash(`${seed}:${p}:${motif.clip}`)/4294967295;
-   const score=3-Math.abs(motif.energy-target)*2+(motif.families.includes(family)?1.1:0)+
+   const score=3+tasteGain(input.taste,motif.clip)-Math.abs(motif.energy-target)*2+(motif.families.includes(family)?1.1:0)+
     (!input.shared&&motif.clip===input.personal?.7:0)+novelty*1.6-(age<0?0:(3-age)*1.4)-(played<0?0:Math.max(0,3-played)*1.5);
    if(score>best){selected=motif.clip;best=score;}
   }

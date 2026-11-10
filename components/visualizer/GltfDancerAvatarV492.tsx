@@ -1422,7 +1422,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   });
   const activeLiveBlendV492=liveBlendAllowedV492?directorBlendV493:null;
 
-  useGltfClipTransitionsV492({actions,selectedClip,audio,genre,isPlaying,reducedMotion,
+  useGltfClipTransitionsV492({crewEntrySeconds:crew.plan.active&&selectedClip===crew.plan.clip&&selectedClip&&actions[selectedClip]?crewClipTime(crew.plan,actions[selectedClip]!.getClip().duration):undefined,actions,selectedClip,audio,genre,isPlaying,reducedMotion,
     activeSequence,rapLiveEnabledV412,timelineEnabled,timeline,avatarBlendEnabled,avatarBlendClip,
     maskedOverlay,liveTransition,stableLibraryClip,sequenceCrossfade,lowClipV481,smartDanceOverride,
     avatarMotionMode,activeLoop,autoUpperGestureV490,activeLiveBlendV492,

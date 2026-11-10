@@ -1,5 +1,6 @@
 "use client";
 /** GLB selected-clip crossfades, V489 low-pose alignment and foot-plant protection. */
+import {applyCrewClockEntry} from "@/lib/crewMotionQuality";
 import {useEffect,useRef} from "react";
 import type {AnimationAction,AnimationClip} from "three";
 import type {VisualizerProps} from "./registry";
@@ -22,7 +23,7 @@ import type {getActiveChoreography} from "./avatarChoreographies";
 import type {resolveEvolutionCrossfade} from "./smartChoreographyEvolution";
 
 type Args={
-  actions:Record<string,AnimationAction|null|undefined>;selectedClip:string|undefined;
+  crewEntrySeconds?:number;actions:Record<string,AnimationAction|null|undefined>;selectedClip:string|undefined;
   audio:VisualizerProps['audio'];genre:VisualizerProps['genre'];isPlaying:boolean;reducedMotion:boolean;
   activeSequence:ReturnType<typeof getActiveChoreography>;rapLiveEnabledV412:boolean;
   timelineEnabled:boolean;timeline:{segments:unknown[]};
@@ -35,7 +36,7 @@ type Args={
   footIK:GltfFootIKRefV492;beatFlowData:{current:BeatFlowResult};musicSectionV565?:string|null;manualSelectionV565?:boolean;
   trackIdV614?:string|null;progressMsV614?:number|null;energyV614?:number|null;
 };
-export function useGltfClipTransitionsV492({actions,selectedClip,audio,genre,isPlaying,reducedMotion,
+export function useGltfClipTransitionsV492({crewEntrySeconds,actions,selectedClip,audio,genre,isPlaying,reducedMotion,
   activeSequence,rapLiveEnabledV412,timelineEnabled,timeline,avatarBlendEnabled,avatarBlendClip,
   maskedOverlay,liveTransition,stableLibraryClip,sequenceCrossfade,lowClipV481,smartDanceOverride,
   avatarMotionMode,activeLoop,autoUpperGestureV490,activeLiveBlendV492,avatarCrossfadeSeconds,
@@ -145,6 +146,8 @@ export function useGltfClipTransitionsV492({actions,selectedClip,audio,genre,isP
       // V630 reads real lower-body GLB keyframes at the EXISTING V537/V492 seek.
       // Only a supported mismatch can extend the already approved automatic fade.
       // Manual clip selection, low-pose transitions and locked IK anchors are untouched.
+      // Crew music time owns this entry; measure the existing leg protection at that phase.
+      if(autoV565&&!manualSelectionV565)applyCrewClockEntry(nextAction,crewEntrySeconds);
       const naturalPerformanceV630=planNaturalDancePerformanceV630({
         outgoing:outgoingClip,incoming:incomingClip,
         outgoingSeconds:previousAction?.time,incomingSeconds:nextAction.time,

@@ -1,0 +1,51 @@
+const assert=require('node:assert/strict'),load=require('./helpers/load-stage-typescript.cjs');
+const {concertScoreV1134,composeScoreCameraV1134,newScoreCameraV1134}=load('lib/concertScoreV1134.ts');
+const {songShowMemory}=load('lib/songShowMemory.ts');
+const {normalizeShowTaste,voteShowTaste}=load('lib/showTaste.ts');
+const {dialogueMotifs}=load('lib/crewDialogue.ts');
+const {stepCrew,newCrewState,normalizeCrewSettings}=load('components/visualizer/sonicCrewDirector.ts');
+const {crewBlendWeight}=load('lib/crewMotionQuality.ts');
+const {lyrics}=require('./fixtures/concertMocksV1130.cjs');
+const base={trackId:'whole-song',lyrics,durationMs:100000,genre:'house',count:3,energy:.65,bpm:120};
+const seed=concertScoreV1134({...base,progressMs:17000});assert.equal(seed.memory.phase,'seed');
+const hook=concertScoreV1134({...base,progressMs:24600});assert.equal(hook.memory.clip,seed.memory.theme);assert(hook.memory.gain>seed.memory.gain);
+const hook2=concertScoreV1134({...base,progressMs:65000});assert.equal(hook2.memory.clip,seed.memory.contrast);
+const finale=[.1,.5,.9].map(p=>songShowMemory({trackId:base.trackId,genre:'house',positionMs:90000+p*10000,durationMs:100000,act:'finale',chorusVisit:3,reading:false,anticipation:false}));
+assert.deepEqual(finale.map(m=>m.phase),['recall','response','unite']);assert.deepEqual(finale.map(m=>m.clip),[seed.memory.theme,seed.memory.contrast,seed.memory.theme]);
+for(const ms of [17000,24600,65000,95000,99000])assert.deepEqual(concertScoreV1134({...base,progressMs:ms}),concertScoreV1134({...base,progressMs:ms}));
+assert.equal(concertScoreV1134({...base,progressMs:99000}).memory.phase,'unite','A one-second lyric tail keeps the planned closing motif');
+assert.equal(concertScoreV1134({...base,progressMs:99000,section:'outro'}).memory,undefined);
+assert.equal(concertScoreV1134({...base,progressMs:99000,energy:.1}).memory,undefined);
+const longOutro={...lyrics,lines:lyrics.lines.map((l,i)=>i===lyrics.lines.length-1?{...l,startMs:90000,endMs:94000}:l)};
+assert.equal(concertScoreV1134({...base,lyrics:longOutro,progressMs:99000}).memory,undefined,'A longer outro keeps room to breathe');
+let taste={};for(let n=0;n<10;n++)taste=voteShowTaste(taste,'Dance_JazzRebound',1);assert.equal(taste.Dance_JazzRebound,3);
+for(let n=0;n<20;n++)taste=voteShowTaste(taste,'Dance_JazzRebound',-1);assert.equal(taste.Dance_JazzRebound,-3);
+assert.deepEqual(normalizeShowTaste({bad:10,Dance_RobotGroove:Infinity,Dance_FluidArc:.1}),{});
+assert.equal(normalizeCrewSettings({mode:'adaptive',taste:{Dance_JazzRebound:50}}).taste.Dance_JazzRebound,3);
+assert.deepEqual(voteShowTaste({},'__proto__',1),{});
+const favorite={Dance_JazzRebound:3,Dance_RobotGroove:-3,Dance_FluidArc:-3,Dance_CrossStep:-3,Dance_TurnPhrase:-3,Dance_FrontmanDrive:-3};
+assert.equal(dialogueMotifs(base.trackId,'house',0,favorite).call,'Dance_JazzRebound');
+assert.equal(songShowMemory({trackId:base.trackId,genre:'house',taste:favorite,positionMs:17000,act:'story',chorusVisit:0,reading:false,anticipation:false}).theme,'Dance_JazzRebound');
+assert.equal(dialogueMotifs(base.trackId,'house',0).call,seed.memory.theme,'Preference cache must not contaminate neutral plans');
+for(const genre of ['ambient','classical'])assert(!['Dance_RobotGroove','Dance_FrontmanDrive'].includes(dialogueMotifs('soft',genre,0,{Dance_FrontmanDrive:3}).call));
+const gapLyrics={synced:true,provider:'lrclib',lines:[{startMs:0,endMs:5000,text:'Der erste leise Klang'},{startMs:24000,endMs:29000,text:'Unser Licht trägt diese Nacht'},{startMs:64000,endMs:69000,text:'Unser Licht trägt diese Nacht'}]};
+const gap=concertScoreV1134({...base,lyrics:gapLyrics,progressMs:12000});assert.equal(gap.staging,'instrumental');assert(gap.cameraScale>1);
+assert.equal(concertScoreV1134({...base,lyrics:gapLyrics,progressMs:22000}).staging,'anticipation');
+assert.equal(concertScoreV1134({...base,lyrics:gapLyrics,progressMs:12000,section:'break'}).staging,'breath');
+assert.notEqual(concertScoreV1134({...base,lyrics:null,progressMs:12000}).staging,'instrumental');
+const key=concertScoreV1134({...base,progressMs:65000});assert(key.lyricFocus);
+const camera={x:0,y:1,z:6,fov:40},state=newScoreCameraV1134();
+const held=composeScoreCameraV1134(camera,key,state,{playing:true,reducedMotion:false,protectedShot:false},camera);
+assert.deepEqual(composeScoreCameraV1134({...camera,x:10},key,state,{playing:true,reducedMotion:false,protectedShot:false},camera),held);
+assert.strictEqual(composeScoreCameraV1134(camera,key,state,{playing:true,reducedMotion:false,protectedShot:true},camera),camera);
+for(const t of [0,1]){assert.equal(crewBlendWeight(t),t);const e=1e-4;assert(Math.abs(crewBlendWeight(t?1-e:e)-t)<1e-9,'Blend has no endpoint velocity or acceleration impulse');}
+for(let n=0;n<=100;n++){const w=crewBlendWeight(n/100);assert(w>=0&&w<=1);if(n)assert(w>=crewBlendWeight((n-1)/100));}
+const asset=require('../public/avatars/sonic/manifest.json').find(a=>a.file==='neon-pulse.glb');
+let stateCrew=newCrewState(),phases=new Set();
+for(let ms=150000;ms<180000;ms+=50){
+ const next=stepCrew(stateCrew,{modelId:'sonic-neon-pulse',clips:asset.clips.map(c=>({name:c.name,duration:c.seconds})),trackId:'long-finale',durationMs:180000,section:'hook',progressMs:ms,bpm:120,energy:.7,count:3,slot:0,playing:true,reducedMotion:false,manualPriority:false,settings:{enabled:true,reactions:true,mode:'adaptive'}});
+ if(next.state.clip!==stateCrew.clip&&stateCrew.key)assert.notEqual(Math.floor((next.state.beat+1e-7)/4),Math.floor((stateCrew.beat+1e-7)/4));
+ if(next.state.memoryPhase)phases.add(next.state.memoryPhase);stateCrew=next.state;
+}
+for(const phase of ['recall','response','unite'])assert(phases.has(phase),'The actual mixer scheduler must perform every finale part');
+console.log('PASS song memory: seed/refrain callbacks, three-part performed finale, seek reconstruction, learned preferences, protected focus, instrumental gaps and smooth motion envelopes');

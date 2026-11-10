@@ -1,3 +1,4 @@
+import {normalizeShowTaste,type MotifTaste} from '../../lib/showTaste';
 import {concertScoreV1134,type ConcertScoreV1134} from '../../lib/concertScoreV1134';
 import {fullBodyClipV1133,bodyStyleV1133} from '../../lib/fullBodyPerformanceV1133';
 import {performerPersonaV1132,performanceSequenceV1132,expressionGainV1132,approachCrewOffsetV1132,type ExpressionV1132,type PersonaV1132} from '../../lib/performerPersonalityV1132';
@@ -8,7 +9,7 @@ import {ENCORE_AVATARS_V1129,genreClipsV1129,variedClipV1129} from '../../lib/mu
 /** All bundled performers. Pure clock/clip planning; no scene or audio ownership. */
 export const CREW_IDS = ['sonic-neon-pulse','sonic-festival-nova','sonic-chrome-beat',...ENCORE_AVATARS_V1129.map(a=>a.id),...HEADLINERS_V1130.map(a=>a.id)] as const;
 export type CrewMode = 'individual'|'unison'|'canon'|'spotlight'|'story'|'adaptive';
-export type CrewSettings = { enabled:boolean; reactions:boolean; mode:CrewMode;expression?:ExpressionV1132 };
+export type CrewSettings = { enabled:boolean; reactions:boolean; mode:CrewMode;taste?:MotifTaste;expression?:ExpressionV1132 };
 export const CREW_DEFAULT: CrewSettings = Object.freeze({enabled:true,reactions:true,mode:'individual'});
 export type CrewInput = {
  modelId:string; clips:readonly {name:string;duration:number}[]; trackId?:string|null;
@@ -16,14 +17,15 @@ export type CrewInput = {
  genre?:string|null; slot:number; count:number; playing:boolean; reducedMotion:boolean;
  manualPriority:boolean; settings:CrewSettings;lyricDensity?:number;durationMs?:number;lyrics?:Lyrics|null;
 };
-export type CrewState = {key:string;position:number;beat:number;bpm:number;clip:string|null;switched:number;phrase:number;clipPhrase?:number;leader?:number;part?:CrewPlan['part'];recent?:string[];ensembleMode?:CrewMode;clockOffset?:number;offsetTarget?:number};
+export type CrewState = {memoryPhase?:string;key:string;position:number;beat:number;bpm:number;clip:string|null;switched:number;phrase:number;clipPhrase?:number;leader?:number;part?:CrewPlan['part'];recent?:string[];ensembleMode?:CrewMode;clockOffset?:number;offsetTarget?:number};
 export const newCrewState = ():CrewState => ({key:'',position:0,beat:0,bpm:120,clip:null,switched:-Infinity,phrase:-1});
 export type CrewPlan = {active:boolean;clip:string|null;part:'quiet'|'verse'|'hook'|'drop';beat:number;bpm:number;
  offset:number;offsetTarget?:number;leader:number;reaction:'nod'|'welcome'|'led'|'none';reason:string;bodyStyle?:string;persona?:PersonaV1132;expressionGain?:number;sequence?:{label:string;step:number};story?:ConcertScoreV1134;interaction?:ReturnType<typeof crewInteractionV1131>};
 export const normalizeCrewSettings = (v:unknown):CrewSettings => {
  const x=v && typeof v==='object'?v as Partial<CrewSettings>:{};
  const expression=x.expression==='subtle'||x.expression==='balanced'||x.expression==='bold'?x.expression:undefined;
- return {...(expression?{expression}:{}),enabled:typeof x.enabled==='boolean'?x.enabled:true,reactions:typeof x.reactions==='boolean'?x.reactions:true,
+ const taste=normalizeShowTaste(x.taste);
+ return {...(Object.keys(taste).length?{taste}:{}),...(expression?{expression}:{}),enabled:typeof x.enabled==='boolean'?x.enabled:true,reactions:typeof x.reactions==='boolean'?x.reactions:true,
  mode:x.mode==='unison'||x.mode==='canon'||x.mode==='spotlight'||x.mode==='story'||x.mode==='adaptive'?x.mode:'individual'};
 };
 const clamp=(x:number,a:number,b:number)=>Math.min(b,Math.max(a,x));
@@ -60,7 +62,7 @@ export function stepCrew(previous:CrewState,input:CrewInput):{state:CrewState;pl
  // V1114: a single user-enabled mode switches the ACTUAL embedded GLB
  // choreography by the observed song section. This does not detect the
  // section itself. Manual clip/timeline/reduced-motion rules still win.
- const adaptiveCue=concertScoreV1134({...input,bpm,progressMs:pos});
+ const adaptiveCue=concertScoreV1134({...input,taste:input.settings.taste,bpm,progressMs:pos});
  if(input.settings.mode==='adaptive')part=adaptiveCue.act==='breathe'?'quiet':adaptiveCue.act==='lift'?'hook':adaptiveCue.act==='impact'||adaptiveCue.act==='finale'?'drop':'verse';
  if(input.settings.mode==='adaptive')phrase=adaptiveCue.phrase;
  const effectiveMode:CrewMode=input.settings.mode==='adaptive'?adaptiveCue.mode:input.settings.mode==='story'
@@ -97,7 +99,7 @@ export function stepCrew(previous:CrewState,input:CrewInput):{state:CrewState;pl
  const baseCandidate=input.settings.mode==='adaptive'&&featureStep&&step&&available.has(step)?step:rankedCandidate;
  const sequence=performanceSequenceV1132({genre:input.genre,trackId:input.trackId,modelId:input.modelId,cue:adaptiveCue,available,
  recent:reset?[]:previous.recent??[],slot,count,fallback:baseCandidate});
- const bodyCandidate=input.settings.mode==='adaptive'?fullBodyClipV1133({slot,trackId:input.trackId,recent:reset?[]:previous.recent??[],modelId:input.modelId,genre:input.genre,cue:adaptiveCue,count,available,fallback:sequence.clip}):baseCandidate;
+ const bodyCandidate=input.settings.mode==='adaptive'?fullBodyClipV1133({taste:input.settings.taste,slot,trackId:input.trackId,recent:reset?[]:previous.recent??[],modelId:input.modelId,genre:input.genre,cue:adaptiveCue,count,available,fallback:sequence.clip}):baseCandidate;
  const supporting=input.settings.mode==='adaptive'&&(adaptiveCue.reading||adaptiveCue.act==='build')&&slot!==leader;
  const candidate=supporting?(available.has('Dance_Groove')?'Dance_Groove':bodyCandidate):bodyCandidate;
  if(!candidate)return off('missing-clips');
@@ -108,13 +110,14 @@ export function stepCrew(previous:CrewState,input:CrewInput):{state:CrewState;pl
  const roleChanged=barBoundary&&ensemble&&effectiveMode==='spotlight'&&!!old.key&&old.phrase!==phrase&&(slot===leader||slot===(old.leader??old.phrase%count));
  const phraseChanged=phrase!==(old.clipPhrase??old.phrase);
  const regroup=input.settings.mode==='adaptive'&&old.ensembleMode!==effectiveMode&&barBoundary;
- const keep=!!old.clip&&available.has(old.clip)&&!roleChanged&&!regroup&&(!barBoundary||pos-old.switched<hold-.001||(!phraseChanged&&old.part===part&&part!=='quiet'));
+ const finaleHandoff=adaptiveCue.act==='finale'&&!!adaptiveCue.memory&&old.memoryPhase!==adaptiveCue.memory.phase&&barBoundary;
+ const keep=!!old.clip&&available.has(old.clip)&&!roleChanged&&!regroup&&!finaleHandoff&&(!barBoundary||pos-old.switched<hold-.001||(!phraseChanged&&old.part===part&&part!=='quiet'));
  const clip=keep?old.clip!:candidate;
  const desiredOffset=input.settings.mode==='adaptive'?crewInteractionV1131(adaptiveCue,slot,count).beatOffset:ensemble&&effectiveMode==='canon'?-slot*2:0;
  const clockOffset=input.settings.mode==='adaptive'&&!reset&&clip===old.clip?approachCrewOffsetV1132(old.clockOffset??desiredOffset,old.offsetTarget??desiredOffset,dt,bpm):desiredOffset;
- const state={clockOffset,offsetTarget:desiredOffset,key,position:pos,beat,bpm,clip,switched:clip!==old.clip?pos:old.switched,phrase,clipPhrase:keep?(old.clipPhrase??old.phrase):phrase,leader,part,ensembleMode:keep?old.ensembleMode:effectiveMode,recent:clip!==old.clip?[clip,...(old.recent??[])].slice(0,3):old.recent};
+ const state={memoryPhase:keep?old.memoryPhase:adaptiveCue.memory?.phase,clockOffset,offsetTarget:desiredOffset,key,position:pos,beat,bpm,clip,switched:clip!==old.clip?pos:old.switched,phrase,clipPhrase:keep?(old.clipPhrase??old.phrase):phrase,leader,part,ensembleMode:keep?old.ensembleMode:effectiveMode,recent:clip!==old.clip?[clip,...(old.recent??[])].slice(0,3):old.recent};
  return {state,plan:{active:true,clip,part,beat,bpm,offset:clockOffset,offsetTarget:input.settings.mode==='adaptive'?desiredOffset:undefined,leader,
- bodyStyle:bodyStyleV1133(clip),persona:input.settings.mode==='adaptive'?performerPersonaV1132(input.modelId):undefined,expressionGain:expressionGainV1132(input.settings.expression)*(adaptiveCue.reading?(slot===leader?.65:.30):supporting?.55:1),sequence:input.settings.mode==='adaptive'?{label:sequence.label,step:sequence.step}:undefined,
+ bodyStyle:bodyStyleV1133(clip),persona:input.settings.mode==='adaptive'?performerPersonaV1132(input.modelId):undefined,expressionGain:expressionGainV1132(input.settings.expression)*(adaptiveCue.memory?.gain??1)*(adaptiveCue.reading?(slot===leader?.65:.30):supporting?.55:1),sequence:input.settings.mode==='adaptive'?{label:sequence.label,step:sequence.step}:undefined,
  story:input.settings.mode==='adaptive'?adaptiveCue:undefined,interaction:input.settings.mode==='adaptive'?crewInteractionV1131(adaptiveCue,slot,count):undefined,
  reaction:input.settings.reactions?(['nod','welcome','led'] as const)[model]:'none',reason:knownBpm?'music':'tempo-fallback'}};
 }

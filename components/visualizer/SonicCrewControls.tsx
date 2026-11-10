@@ -1,4 +1,5 @@
 'use client';
+import {voteShowTaste,TASTE_MOTIFS} from '@/lib/showTaste';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import dynamic from 'next/dynamic';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
@@ -18,6 +19,8 @@ export function SonicCrewControls(){
  const [show,setShow]=useState(false),[playing,setPlaying]=useState(false),[position,setPosition]=useState(0);
  const [scenario,setScenario]=useState<CrewScenario>({section:'verse',genre:'house',energy:.55,bpm:120});
  const [readings,setReadings]=useState<CrewReading[]>([]),[saved,setSaved]=useState<{group:GroupStudioV326;preferences:Pick<UiPreferences,'avatarModelId'|'secondaryAvatarModelId'|'visualizerMode'>;crew:CrewSettings}|null>(null);
+ const [tasteNotice,setTasteNotice]=useState('');
+ const vote=(clip:string,direction:1|-1)=>{writeCrewSettings({...settings,taste:voteShowTaste(settings.taste,clip,direction)});setTasteNotice(direction===1?'Dieses Motiv wird häufiger berücksichtigt.':'Dieses Motiv wird seltener berücksichtigt.');};
  const [cast,setCast]=useState<string[]>(originalCast);
  const maxSeconds=Math.max(120,Math.min(3600,Math.ceil((music.track?.durationMs??0)/1000)));
  const labels=cast.map(id=>getAvatarModel(id).label);
@@ -33,6 +36,9 @@ export function SonicCrewControls(){
  const undo=()=>{if(!saved)return;writeGroupV326(saved.group);updatePreferences(saved.preferences);writeCrewSettings(saved.crew);setSaved(null);};
  return <fieldset aria-label="Sonic Stage Crew – Musik und gemeinsame Show"><legend>Sonic Stage Crew · Musik &amp; gemeinsame Show</legend>
   <p>Die adaptive Regie verteilt Soli, Tanzduelle und Antworten über den Song. Vor Refrains sammelt die Crew Spannung; schnelle Lyrics bekommen eine ruhige Begleitung. Elf eingebaute Figuren wählen abwechslungsreiche Genre-Clips anhand der vorhandenen Songposition, Abschnitts- und Energiedaten. Ohne Tempoangabe wird 120 BPM verwendet. Dies ergänzt die bestehende Analyse; es ist keine neue Musikerkennung.</p>
+  <p>Song-Gedächtnis: Ein Motiv aus der Strophe kehrt in Refrains wieder. Das Finale verbindet Motiv, Antwort und gemeinsamen Abschluss. Deine Motiv-Vorlieben bleiben lokal auf diesem Gerät.</p>
+  <button type="button" disabled={!Object.keys(settings.taste??{}).length} onClick={()=>{writeCrewSettings({...settings,taste:undefined});setTasteNotice('Motiv-Vorlieben zurückgesetzt.');}}>Vorlieben zurücksetzen</button>
+  <p role="status" aria-live="polite">{tasteNotice}</p>
   <p>Tanzdialoge: Eine Figur stellt ein Motiv vor, die zweite übernimmt es als Antwort. Danach findet die Crew im gemeinsamen Motiv zusammen. Schnelle Lyrics und ruhige Songteile bekommen weiterhin Platz.</p>
   <p>Kreative Regie: Nach dem persönlichen Auftakt entwickelt die Crew neue Ganzkörper-Motive aus Genre, Energie und Bewegungskontrasten. Spätere Refrains schicken die Antwortwelle auch in die Gegenrichtung. Gemeinsame Höhepunkte bleiben synchron.</p>
   <p>Encore: Ember Rock, Luna Flow, Sol Groove und Velvet Jazz bringen vier neue Looks und je sechs zusätzliche Genre-Tänze. Die lokale Musikregie wechselt Moves an musikalischen Übergängen; ruhige Songteile bekommen bewusst weniger Bewegung.</p>
@@ -65,7 +71,7 @@ export function SonicCrewControls(){
    <label>Simulierte Position <input type="range" min={0} max={maxSeconds} step={1} value={position} onChange={e=>{clock.current=Number(e.target.value);setPosition(clock.current);}}/></label>
    <button type="button" disabled={preferences.reducedMotion||!settings.enabled} aria-pressed={playing} onClick={()=>{if(!playing&&clock.current>=maxSeconds){clock.current=0;setPosition(0);}setPlaying(v=>!v);}}>{playing?'Show-Simulation pausieren':'Show-Simulation starten'}</button>
    <Rehearsal modelIds={cast} clock={clock} playing={playing&&!preferences.reducedMotion} settings={settings} scenario={{...scenario,lyrics:music.lyrics,durationMs:music.track?.durationMs,trackId:music.track?.id}} onReading={onReading}/>
-   <ul aria-label="Wiedergegebene Show-Clips">{readings.map(r=><li key={r.slot} data-evaluated-clip={r.evaluatedClip} data-clip-time={r.time.toFixed(4)} data-sole-gap={r.contact?.toFixed(4)}>{labels[r.slot]} · {r.clip} · {r.time.toFixed(2)} s{r.role?` · ${roleLabels[r.role]??r.role}`:''}{r.chapter?` · ${r.chapter}`:''}{r.persona?` · ${r.persona}`:''}{r.bodyStyle?` · ${r.bodyStyle}`:''}{r.sequence?` · ${r.sequence}`:''}{settings.mode==='spotlight'&&r.leader&&r.clip!=='Pausiert'?' · Solo':''}</li>)}</ul>
+   <ul aria-label="Wiedergegebene Show-Clips">{readings.map(r=><li key={r.slot} data-evaluated-clip={r.evaluatedClip} data-clip-time={r.time.toFixed(4)} data-sole-gap={r.contact?.toFixed(4)}>{labels[r.slot]} · {r.clip} · {r.time.toFixed(2)} s{r.role?` · ${roleLabels[r.role]??r.role}`:''}{r.chapter?` · ${r.chapter}`:''}{r.persona?` · ${r.persona}`:''}{r.bodyStyle?` · ${r.bodyStyle}`:''}{r.sequence?` · ${r.sequence}`:''}{settings.mode==='spotlight'&&r.leader&&r.clip!=='Pausiert'?' · Solo':''}{r.evaluatedClip&&TASTE_MOTIFS.includes(r.evaluatedClip as typeof TASTE_MOTIFS[number])&&<span> <button type="button" aria-label={`Mehr davon: ${labels[r.slot]}`} onClick={()=>vote(r.evaluatedClip!,1)}>Mehr davon</button> <button type="button" aria-label={`Weniger davon: ${labels[r.slot]}`} onClick={()=>vote(r.evaluatedClip!,-1)}>Weniger davon</button> <output aria-label={`Motiv-Vorliebe: ${labels[r.slot]}`}>{settings.taste?.[r.evaluatedClip as keyof NonNullable<typeof settings.taste>]??0}</output></span>}</li>)}</ul>
   </section>}
  </fieldset>;
 }
