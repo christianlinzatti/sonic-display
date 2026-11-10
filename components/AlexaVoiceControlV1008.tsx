@@ -4,7 +4,7 @@ import {useEffect,useRef,useState} from 'react';
 import {useMusic} from '@/context/MusicContext';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
 import {ALEXA_LOCAL_ENABLED_KEY_V967} from '@/lib/alexaConcertV967';
-import {activateConcertSceneV1147,type ConcertSceneV1147} from '@/lib/alexaConcertScenesV1147';
+import {activateConcertSceneV1147,applyVirtualConcertSceneV1147,type ConcertSceneV1147} from '@/lib/alexaConcertScenesV1147';
 import {ALEXA_FULL_CONCERT_EVENT_V1145,loadFullConcertConsentV1145,isFullConcertVoiceCommandV1145,executeAlexaFullConcertV1145,runFullConcertV1145} from '@/lib/alexaFullConcertV1145';
 import {ALEXA_GOVEE_RECEIVER_EVENT_V1139,readAlexaGoveeReceiverTokenV1139,alexaGoveeReceiverHeadersV1139} from '@/lib/alexaGoveeReceiverClientV1139';
 import {executeAlexaGoveePowerV1141} from '@/lib/goveePowerRoutingV1141';
@@ -73,7 +73,8 @@ export function AlexaVoiceControlV1008(){
        const activation=activateConcertSceneV1147({scene,genre:'other',showConsent:p.show.enabled,
         goveeConsent:p.show.includeGovee&&p.look.enabled,musicSyncConsent:p.sync.enabled,
         reducedMotion:current.current.reducedMotion,masterBrightness:50},()=>runFullConcertV1145('concert-show-start',{preferences:current.current,updatePreferences,connected,playing:isPlaying,trackId:track?.id,allowed,signal:abort.signal}));
-       result={kind:'complete',text:activation.message};
+       applyVirtualConcertSceneV1147(activation.plan,allowed);
+       result={kind:'complete',text:activation.message+' Virtuelle Bühnenintensität und Lichtstimmung wurden übernommen.'};
       }
       else if(category==='show')result=executeAlexaFullConcertV1145(message,{since,now:Date.now,allowed,signal:abort.signal,preferences:current.current,updatePreferences,connected,playing:isPlaying,trackId:track?.id});
       else if(category==='power')result=message.goveeTarget?
