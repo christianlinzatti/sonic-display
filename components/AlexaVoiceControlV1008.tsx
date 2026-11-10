@@ -74,7 +74,7 @@ export function AlexaVoiceControlV1008(){
         goveeConsent:p.show.includeGovee&&p.look.enabled,musicSyncConsent:p.sync.enabled,
         reducedMotion:current.current.reducedMotion,masterBrightness:50},()=>runFullConcertV1145('concert-show-start',{preferences:current.current,updatePreferences,connected,playing:isPlaying,trackId:track?.id,allowed,signal:abort.signal}));
        applyVirtualConcertSceneV1147(activation.plan,allowed);
-       result={kind:'complete',text:activation.message+' Virtuelle Bühnenintensität und Lichtstimmung wurden übernommen.'};
+       result={kind:'complete',text:'Virtuelle Konzertphase '+scene+' aktiviert. Bühne und Lichtstimmung angepasst; Govee-Lampen bleiben unverändert.'};
       }
       else if(category==='show')result=executeAlexaFullConcertV1145(message,{since,now:Date.now,allowed,signal:abort.signal,preferences:current.current,updatePreferences,connected,playing:isPlaying,trackId:track?.id});
       else if(category==='power')result=message.goveeTarget?
