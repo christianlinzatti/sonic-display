@@ -1348,7 +1348,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       !!evolutionMotion||!!adaptiveMotion||!!preferredMotionUrlV440;
   const placementV1135=stagePlacementV1135({bundled:CREW_IDS.some(id=>id===avatarModelId),adaptive:crewSettings.enabled&&crewSettings.mode==='adaptive',manual:crewManualV1135,scale:avatarScale,offsetY:avatarOffsetY});
   const crew = useCrewDirector({
-    modelId:avatarModelId??'',clips:embeddedCandidatesV530,trackId:track?.id,
+    stance:{left:footIK.current.left?.contact.phase==='planted',right:footIK.current.right?.contact.phase==='planted'},modelId:avatarModelId??'',clips:sharedMotionV531?embeddedCandidatesV530:animations,trackId:track?.id,
     progressMs:cameraDirectorProgressMs??propsLipSyncV367?.progressMs,
     section:(showCue?.enabled?showCue.section:cameraDirectorSection)??lyricSectionV1130(propsLipSyncV367?.lyrics,cameraDirectorProgressMs??propsLipSyncV367?.progressMs??0),
     genre,energy:audio.energyEnvelope,bpm:audio.bpm,slot:workloadSlot,

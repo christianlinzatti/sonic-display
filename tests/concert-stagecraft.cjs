@@ -1,0 +1,18 @@
+const assert=require('node:assert/strict'),load=require('./helpers/load-stage-typescript.cjs');
+const {stepCrewStage,crewStageTarget}=load('lib/crewStagecraft.ts');
+const {choosePoseAwareCrew}=load('lib/poseAwareCrew.ts');
+const {concertScoreV1134,composeScoreCameraV1134,newScoreCameraV1134}=load('lib/concertScoreV1134.ts');
+const current={x:0,z:0},target={x:0,z:.36};
+assert.strictEqual(stepCrewStage(current,target,[],.05,false,1),current);
+assert.strictEqual(stepCrewStage(current,target,[{x:0,z:.2}],.05,true,1),current);
+assert.strictEqual(stepCrewStage(current,{x:NaN,z:0},[],.05,true,1),current);
+const next=stepCrewStage(current,target,[],1,true,1);assert(Math.hypot(next.x,next.z)<=.0040001);
+let positions=[{x:-1.4,z:0},{x:0,z:0},{x:1.4,z:0}];
+for(let frame=0;frame<2000;frame++)positions=positions.map((p,i)=>stepCrewStage(p,crewStageTarget({x:(i-1)*1.4,z:0},i,3,1,0,false),positions.filter((_,j)=>i!==j),1/60,frame%8<4,1.1));
+assert(positions[1].z>.3&&positions[2].z<-.15);assert(positions[0].x<positions[1].x&&positions[1].x<positions[2].x);
+assert.equal(choosePoseAwareCrew({clips:[],outgoing:'A',candidate:'Dance_CrossStep',outTime:0,time:()=>0,left:true,right:false}),'Dance_CrossStep');
+const base={progressMs:33000,section:'verse',energy:.7,count:3},camera={x:0,y:1,z:8,fov:40};
+const cue=concertScoreV1134({...base,concert:true});
+assert(composeScoreCameraV1134(camera,cue,newScoreCameraV1134(),{playing:true,reducedMotion:false,protectedShot:false},camera).z<8);
+assert.strictEqual(composeScoreCameraV1134(camera,cue,newScoreCameraV1134(),{playing:true,reducedMotion:false,protectedShot:true},camera),camera);
+console.log('PASS concert stagecraft: bounded role paths, single-support gate, spacing, invalid data, missing-pose fallback, concert framing and manual camera priority');

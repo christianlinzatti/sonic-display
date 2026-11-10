@@ -1,4 +1,7 @@
 "use client";
+import {crewStageTarget,stepCrewStage} from '@/lib/crewStagecraft';
+import {useCrewSettings} from './useSonicCrew';
+import {useConcertStoryV1131} from './useConcertStoryV1131';
 import type {EnsembleCueV1063} from '@/lib/arena360EnsembleChoreographyV1063';
 import {isSafeStageRouteV1064,stepStageTravelV1064,type StagePathCueV1064,type StagePathSlotV1064} from '@/lib/arena360StageMovementV1064';
 import {getNaturalDuetModeV664} from "./naturalDuetFeatureInteractionV664";
@@ -73,9 +76,12 @@ import { readFootLockV322, FOOT_LOCK_EVENT_V322 } from "./intelligentFootLockV32
 import { getActivePerformanceTier } from "./adaptivePerformance";
 import { stepMultiAvatarFormationV495, newFormationStateV495, safeFormationTravelV495 } from './multiAvatarFormationDirectorV495';
 import { Dancer } from './DanceFormationActorsV492';
-import { GroupDanceMotionContextV485, GroupFootSupportContextV486, GroupFootworkContextV486, GroupGroundObservationContextV487, GroupLowPoseContextV481, GroupMotionClockContextV328, GroupPhraseContextV329, PartnerCalibrationContext, PartnerGestureContext, PartnerLookContext, AvatarBodyContextV507, AnimatedBodyContextV508 } from './ThreeAvatarContextsV492';
+import { CrewTravelContext,GroupDanceMotionContextV485, GroupFootSupportContextV486, GroupFootworkContextV486, GroupGroundObservationContextV487, GroupLowPoseContextV481, GroupMotionClockContextV328, GroupPhraseContextV329, PartnerCalibrationContext, PartnerGestureContext, PartnerLookContext, AvatarBodyContextV507, AnimatedBodyContextV508 } from './ThreeAvatarContextsV492';
 
 export function GroupDancersV326({props,settings,vocalDuetV838,ensembleV1063,stageMovementV1064}:{props:VisualizerProps;settings:GroupStudioV326;vocalDuetV838?:VocalDuetPlanV838;ensembleV1063?:EnsembleCueV1063|null;stageMovementV1064?:StagePathCueV1064|null}){
+ const crewSettings=useCrewSettings();
+ const crewStory=useConcertStoryV1131({trackId:props.track?.id,progressMs:props.cameraDirectorProgressMs??0,durationMs:props.track?.durationMs,lyrics:props.lipSync?.lyrics,genre:props.genre,count:settings.count,bpm:props.audio.bpm,energy:props.audio.energyEnvelope});
+ const lastCrewReport=useRef(-1),travelPhase=useRef(0),travelSteps=useRef(Array.from({length:4},()=>({current:{pending:false,phase:0}})));
  const refs=useRef<(Group|null)[]>([null,null,null,null]);
  const routeOffsetsV1064=useRef<StagePathSlotV1064[]>(Array.from({length:4},()=>({x:0,z:0})));
  const bodyRegistryV507=useRef(createBodyRegistryV507());
@@ -166,6 +172,7 @@ export function GroupDancersV326({props,settings,vocalDuetV838,ensembleV1063,sta
  },[selectedIdsV531]);
  const urls=useMemo(()=>settings.modelIds.map(id=>id?(remoteModelsV531[id]??getAvatarModel(id)):null),[settings.modelIds,remoteModelsV531]);
  useFrame((_state,delta)=>{
+  if(props.isPlaying)travelPhase.current=(travelPhase.current+Math.min(.1,Math.max(0,delta))*(props.audio.bpm??120)/240)%1;
   if(props.isPlaying)time.current+=Math.min(.15,Math.max(0,delta));
   const seconds=settings.songSync ? (Number.isFinite(props.cameraDirectorProgressMs)?(props.cameraDirectorProgressMs??0)/1000:null):time.current;
   if(seconds===null)return;
@@ -669,6 +676,7 @@ export function GroupDancersV326({props,settings,vocalDuetV838,ensembleV1063,sta
       props.artistBubblePlanV441?.source==='manual-stage',
     tier:getActivePerformanceTier(),
   });
+  if(crewSettings.stagecraft&&_state.clock.elapsedTime-lastCrewReport.current>1&&typeof window!=='undefined'){lastCrewReport.current=_state.clock.elapsedTime;window.dispatchEvent(new CustomEvent('sonic:crew-stagecraft',{detail:{loaded:supportV486.current.slice(0,settings.count).map(s=>s.current.tracked),positions:refs.current.slice(0,settings.count).map(g=>g?{x:g.position.x,z:g.position.z,target:g.userData.crewTarget,allowed:g.userData.crewTravelAllowed}:null),leader:crewStory?.leader}}));}
   recordStageSafetyV511({at:Date.now(),source:"group",avatars:settings.count,plan:motionV508,playing:props.isPlaying,visible:!props.reducedMotion,positions:Array.from({length:settings.count},(_,i)=>{const pos=refs.current[i]?.position;return pos?[pos.x,pos.y,pos.z]:pose.positions[i]??[NaN,NaN,NaN];})});
   const collisionSlotsV508=Array.from({length:settings.count},(_,i)=>
     mergeAnimatedSlotV508(collisionV506.slots[i],motionV508.slots[i]));
@@ -1117,8 +1125,18 @@ export function GroupDancersV326({props,settings,vocalDuetV838,ensembleV1063,sta
    routeOffsetsV1064.current[i]=routeManualSafeV1064?nextRouteV1064:{x:0,z:0};
    // V452 accents are stage-root translations, below 5 cm; spacing preserved
    // for hooks (all dancers receive the same lateral offset).
+   const automaticCrew=crewSettings.stagecraft===true&&crewSettings.mode==='adaptive'&&crewSettings.enabled&&settings.cues.length===1&&settings.cues[0].id==='concert-auto'&&!settings.trackId&&!settings.songSync&&props.avatarMotionMode==='hybrid'&&!props.avatarTimelineEnabled&&!props.smartDanceOverride&&!props.avatarBlendEnabled&&!props.avatarAnimationUrl&&!props.avatarSharedMotionUrlV531&&!props.preferredMotionUrlV440&&!manualCueV385.active&&!timeCueV496.active&&!legacyDuetCueV416.active&&!displayPerformanceV375.enabled;
+   if(automaticCrew&&crewStory){
+    const target=crewStageTarget({x:p[0],z:p[2]},i,settings.count,crewStory.leader,crewStory.partner,crewStory.interaction==='unison');
+    travelSteps.current[i].current={pending:props.isPlaying&&!props.reducedMotion&&!crewStory.reading&&!crewStory.lyricFocus&&!footLock&&Math.hypot(target.x-g.position.x,target.z-g.position.z)>.015,phase:(travelPhase.current+i*.08)%1};
+    const allowed=props.isPlaying&&!props.reducedMotion&&!crewStory.reading&&!crewStory.lyricFocus&&canRepositionWithObservationV808(groundV487.current[i].current,footLock,false)&&!(collisionSlotsV508[i]?.risk>.25);
+    const next=stepCrewStage({x:g.position.x,z:g.position.z},target,refs.current.filter((ref,index)=>!!ref&&index!==i).map(ref=>({x:ref!.position.x,z:ref!.position.z})),delta,allowed,settings.minSpacing);
+    g.position.x=next.x;g.position.z=next.z;g.userData.crewTarget=target;g.userData.crewTravelAllowed=allowed;
+   }else{
+   travelSteps.current[i].current.pending=false;
    g.position.x=formationApproach(g.position.x,targetX+routeOffsetsV1064.current[i].x+(ensembleActiveV1063?ensembleV1063!.slots[i].spreadX:0)+Math.sign(i-(settings.count-1)/2)*groupSpreadV899+(crewV458.slots[i]?.offsetX??0)*accentScaleV506+groundDecisionsV494[i].offsetX,delta,speed*finalFootworkV839.slots[i].rootSpeed*(groundTravelV487[i]??1));
    g.position.z=formationApproach(g.position.z,targetZ+routeOffsetsV1064.current[i].z+(ensembleActiveV1063?ensembleV1063!.slots[i].depth:0)+(crewV458.slots[i]?.offsetZ??0)*accentScaleV506+groundDecisionsV494[i].offsetZ+roleTravelV495+finalDepthV506+depthV509+depthV638+depthV760+(stageBlockingResultV840.active?stageBlockingResultV840.offsets[i]:(stageBlockingResultV840.reason==='existing-v808'?stageBlockingResultV840.offsets[i]:0)),delta,speed*finalFootworkV839.slots[i].rootSpeed*(groundTravelV487[i]??1));
+   }
    g.position.y=0;
    g.rotation.y=formationApproach(g.rotation.y,(ensembleActiveV1063?ensembleV1063!.slots[i].turnY:0)+ensembleV392.yaw[i]+(spotlightV443.slots[i]?.turnY??0)+(crewV458.slots[i]?.turnY??0)+(formationV495.slots[i]?.turnY??0)*(spatialV505.slots[i]?.turnFactor??1)*accentScaleV506+(ensembleV509.slots[i]?.turnY??0)+(groupV517.slots[i]?.turnY??0)+(ensembleV638.slots[i]?.turnY??0)+(ensembleV760.slots[i]?.turnY??0)+(cinematicV527.slots[i]?.turnY??0),delta,props.reducedMotion?20:3.1);
    const desiredScale=present?1:.001;
@@ -1148,7 +1166,7 @@ export function GroupDancersV326({props,settings,vocalDuetV838,ensembleV1063,sta
       <GroupGroundObservationContextV487.Provider value={groundV487.current[i]}>
       <PartnerLookContext.Provider value={looksV444.current[i]}>
        <PartnerGestureContext.Provider value={gesturesV444.current[i]}>
-        <Dancer props={groupProps} slot={i}/>
+        <CrewTravelContext.Provider value={travelSteps.current[i]}><Dancer props={groupProps} slot={i}/></CrewTravelContext.Provider>
        </PartnerGestureContext.Provider>
       </PartnerLookContext.Provider>
       </GroupGroundObservationContextV487.Provider>

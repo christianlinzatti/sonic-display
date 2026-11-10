@@ -1,3 +1,5 @@
+import {choosePoseAwareCrew} from '../../lib/poseAwareCrew';
+import type {MotionKeyframeClipV630} from './naturalDancePerformanceV630';
 import {normalizeShowHistory,type ShowHistory} from '../../lib/showExperience';
 import type {MusicalEvidence} from '../../lib/musicalEvidence';
 import {normalizeShowTaste,type MotifTaste} from '../../lib/showTaste';
@@ -11,10 +13,10 @@ import {ENCORE_AVATARS_V1129,genreClipsV1129,variedClipV1129} from '../../lib/mu
 /** All bundled performers. Pure clock/clip planning; no scene or audio ownership. */
 export const CREW_IDS = ['sonic-neon-pulse','sonic-festival-nova','sonic-chrome-beat',...ENCORE_AVATARS_V1129.map(a=>a.id),...HEADLINERS_V1130.map(a=>a.id)] as const;
 export type CrewMode = 'individual'|'unison'|'canon'|'spotlight'|'story'|'adaptive';
-export type CrewSettings = { enabled:boolean; reactions:boolean; mode:CrewMode;history?:ShowHistory;remember?:boolean;taste?:MotifTaste;expression?:ExpressionV1132 };
+export type CrewSettings = { enabled:boolean; reactions:boolean; mode:CrewMode;poseAware?:boolean;stagecraft?:boolean;history?:ShowHistory;remember?:boolean;taste?:MotifTaste;expression?:ExpressionV1132 };
 export const CREW_DEFAULT: CrewSettings = Object.freeze({enabled:true,reactions:true,mode:'individual'});
 export type CrewInput = {
- audioEvidence?:MusicalEvidence;modelId:string; clips:readonly {name:string;duration:number}[]; trackId?:string|null;
+ stance?:{left:boolean;right:boolean};audioEvidence?:MusicalEvidence;modelId:string; clips:readonly {name:string;duration:number;tracks?:MotionKeyframeClipV630['tracks']}[]; trackId?:string|null;
  progressMs?:number|null; bpm?:number|null; energy?:number|null; section?:string|null;
  genre?:string|null; slot:number; count:number; playing:boolean; reducedMotion:boolean;
  manualPriority:boolean; settings:CrewSettings;lyricDensity?:number;durationMs?:number;lyrics?:Lyrics|null;
@@ -27,7 +29,7 @@ export const normalizeCrewSettings = (v:unknown):CrewSettings => {
  const x=v && typeof v==='object'?v as Partial<CrewSettings>:{};
  const expression=x.expression==='subtle'||x.expression==='balanced'||x.expression==='bold'?x.expression:undefined;
  const taste=normalizeShowTaste(x.taste),history=normalizeShowHistory(x.history);
- return {...(x.remember===false?{remember:false}:{}),...(history.length?{history}:{}),...(Object.keys(taste).length?{taste}:{}),...(expression?{expression}:{}),enabled:typeof x.enabled==='boolean'?x.enabled:true,reactions:typeof x.reactions==='boolean'?x.reactions:true,
+ return {...(x.poseAware===true?{poseAware:true}:{}),...(x.stagecraft===true?{stagecraft:true}:{}),...(x.remember===false?{remember:false}:{}),...(history.length?{history}:{}),...(Object.keys(taste).length?{taste}:{}),...(expression?{expression}:{}),enabled:typeof x.enabled==='boolean'?x.enabled:true,reactions:typeof x.reactions==='boolean'?x.reactions:true,
  mode:x.mode==='unison'||x.mode==='canon'||x.mode==='spotlight'||x.mode==='story'||x.mode==='adaptive'?x.mode:'individual'};
 };
 const clamp=(x:number,a:number,b:number)=>Math.min(b,Math.max(a,x));
@@ -114,7 +116,8 @@ export function stepCrew(previous:CrewState,input:CrewInput):{state:CrewState;pl
  const regroup=input.settings.mode==='adaptive'&&old.ensembleMode!==effectiveMode&&barBoundary;
  const finaleHandoff=adaptiveCue.act==='finale'&&!!adaptiveCue.memory&&old.memoryPhase!==adaptiveCue.memory.phase&&barBoundary;
  const keep=!!old.clip&&available.has(old.clip)&&!roleChanged&&!regroup&&!finaleHandoff&&(!barBoundary||pos-old.switched<hold-.001||(!phraseChanged&&old.part===part&&part!=='quiet'));
- const clip=keep?old.clip!:candidate;
+ const flexible=input.settings.poseAware&&input.settings.mode==='adaptive'&&!keep&&!!old.clip&&!adaptiveCue.memory&&!adaptiveCue.reading&&adaptiveCue.act==='story'&&adaptiveCue.interaction!=='unison'&&adaptiveCue.interaction!=='answer'&&(!adaptiveCue.dialogue||slot!==adaptiveCue.leader&&slot!==adaptiveCue.partner);
+ const clip=keep?old.clip!:flexible?choosePoseAwareCrew({clips:input.clips,outgoing:old.clip!,candidate,outTime:((old.beat+(old.clockOffset??0))/2)%(input.clips.find(c=>c.name===old.clip)?.duration??1),time:duration=>((beat+(old.clockOffset??0))/2)%duration,genre:input.genre,left:input.stance?.left??false,right:input.stance?.right??false}):candidate;
  const desiredOffset=input.settings.mode==='adaptive'?crewInteractionV1131(adaptiveCue,slot,count).beatOffset:ensemble&&effectiveMode==='canon'?-slot*2:0;
  const clockOffset=input.settings.mode==='adaptive'&&!reset&&clip===old.clip?approachCrewOffsetV1132(old.clockOffset??desiredOffset,old.offsetTarget??desiredOffset,dt,bpm):desiredOffset;
  const state={memoryPhase:keep?old.memoryPhase:adaptiveCue.memory?.phase,clockOffset,offsetTarget:desiredOffset,key,position:pos,beat,bpm,clip,switched:clip!==old.clip?pos:old.switched,phrase,clipPhrase:keep?(old.clipPhrase??old.phrase):phrase,leader,part,ensembleMode:keep?old.ensembleMode:effectiveMode,recent:clip!==old.clip?[clip,...(old.recent??[])].slice(0,3):old.recent};

@@ -133,7 +133,7 @@ function solveLeg(leg: Leg, target: Vector3, weight: number, constraints?: Joint
 
 export function updateFootIK(
   state: FootIKState, root: Object3D, delta: number, active: boolean, strength = 0.7, contactSensitivity = 0.5, lockStrength = 0.5, constraints?: JointConstraintMap, cue?: BeatFootworkCue, optionsV322?:FootLockSettingsV322, contextV322?:{trackId?:string;playheadMs?:number},
-  hipAssistV737?:{enabled:boolean;intensity:number},
+  hipAssistV737?:{enabled:boolean;intensity:number},navigation?:{pending:boolean;phase:number},
 ): boolean {
   const legs = [state.left, state.right].filter((leg): leg is Leg => leg !== null);
   if (!legs.length) return false;
@@ -155,6 +155,19 @@ export function updateFootIK(
     // Old planted contacts must not survive a track switch or seek.
     for(const leg of legs){leg.contact=createFootContactTracker();leg.weight=0;}
     state.balance=createBalanceState();state.initialized=false;
+  }
+  // The same two-bone solver lifts one swing foot for a requested stage step.
+  // Real post-solve observations authorize root travel; contact is never invented.
+  if(navigation?.pending&&state.initialized&&!optionsV322?.enabled&&Number.isFinite(navigation.phase)){
+    const phase=((navigation.phase%1)+1)%1,index=phase<.5?0:1,local=(phase% .5)/.5;
+    const swing=index===0?state.left:state.right,support=index===0?state.right:state.left;
+    if(swing&&support&&support.contact.phase==='planted'&&support.contact.confidence>.6){
+      const lift=local>.15&&local<.85?Math.sin(Math.PI*(local-.15)/.7)**2:0;
+      const target=swing.ankle.getWorldPosition(new Vector3());
+      target.y+=Math.min(.16,(swing.upperLength+swing.lowerLength)*.17)*lift;
+      solveLeg(swing,target,Math.min(1,Math.max(0,strength)),constraints);
+      solveLeg(swing,target,Math.min(1,Math.max(0,strength)),constraints);
+    }
   }
   const positions = legs.map(leg => leg.ankle.getWorldPosition(new Vector3()));
   if (!state.initialized) {

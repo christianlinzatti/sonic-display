@@ -24,6 +24,7 @@ export const GroupMotionClockContextV328=createContext<{settings:MotionSyncV328;
 export const GroupLowPoseContextV481=createContext<{current:LowPoseSlotV481}|null>(null);
 export const GroupDanceMotionContextV485=createContext<{current:NaturalDanceSlotV485}|null>(null);
 export const GroupFootworkContextV486=createContext<{current:FootworkSlotV486}|null>(null);
+export const CrewTravelContext=createContext<{current:{pending:boolean;phase:number}}|null>(null);
 export const GroupFootSupportContextV486=createContext<{current:FootSupportV486}|null>(null);
 export const GroupGroundObservationContextV487=createContext<{current:GroundObservationV487}|null>(null);
 export const GroupPhraseContextV329=createContext<{settings:PhraseSettingsV329;plan:PhraseMatchV329;register:(slot:number,profiles:readonly PhraseSignatureV329[])=>void}|null>(null);

@@ -36,6 +36,7 @@ export function SonicCrewControls(){
  const undo=()=>{if(!saved)return;writeGroupV326(saved.group);updatePreferences(saved.preferences);writeCrewSettings(saved.crew);setSaved(null);};
  return <fieldset aria-label="Sonic Stage Crew – Musik und gemeinsame Show"><legend>Sonic Stage Crew · Musik &amp; gemeinsame Show</legend>
   <p>Die adaptive Regie verteilt Soli, Tanzduelle und Antworten über den Song. Vor Refrains sammelt die Crew Spannung; schnelle Lyrics bekommen eine ruhige Begleitung. Elf eingebaute Figuren wählen abwechslungsreiche Genre-Clips anhand der vorhandenen Songposition, Abschnitts- und Energiedaten. Ohne Tempoangabe wird 120 BPM verwendet. Dies ergänzt die bestehende Analyse; es ist keine neue Musikerkennung.</p>
+  <label><input type="checkbox" checked={settings.poseAware===true} onChange={e=>writeCrewSettings({...settings,poseAware:e.target.checked})}/> Körperhaltung bei freien Tanzwechseln berücksichtigen</label>
   <p>Song-Gedächtnis: Ein Motiv aus der Strophe kehrt in Refrains wieder. Das Finale verbindet Motiv, Antwort und gemeinsamen Abschluss. Deine Motiv-Vorlieben bleiben lokal auf diesem Gerät.</p>
   <button type="button" disabled={!Object.keys(settings.taste??{}).length} onClick={()=>{writeCrewSettings({...settings,taste:undefined});setTasteNotice('Motiv-Vorlieben zurückgesetzt.');}}>Vorlieben zurücksetzen</button>
   <p role="status" aria-live="polite">{tasteNotice}</p>

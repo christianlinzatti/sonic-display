@@ -5,7 +5,7 @@
  */
 import { useContext, useEffect, useRef, type RefObject } from "react";
 import { Vector3, type Group, type Object3D } from "three";
-import { GroupFootSupportContextV486, GroupGroundObservationContextV487 } from "./ThreeAvatarContextsV492";
+import { CrewTravelContext,GroupFootSupportContextV486, GroupGroundObservationContextV487 } from "./ThreeAvatarContextsV492";
 import { createFootContactState, updateFootContact } from "./avatarFootContact";
 import { createFootIKState, initializeFootIK, updateFootIK } from "./avatarFootIK";
 import { createBeatFootworkState, updateBeatFootwork } from "./beatPerfectFootworkV234";
@@ -32,6 +32,7 @@ type GroundingArgs = {
   activeHandCue:Parameters<typeof updatePartnerHandIK>[2];
 };
 export function useGltfFootContactV492(root:RefObject<Group|null>,model:Object3D,rigTargets:{current:AvatarRigTargets},profile:AvatarRigProfileId) {
+  const crewTravel=useContext(CrewTravelContext);
   const groupSupportV486=useContext(GroupFootSupportContextV486);
   const groupGroundV487=useContext(GroupGroundObservationContextV487);
   const groundProbeV487=useRef(new Vector3());
@@ -57,7 +58,7 @@ export function useGltfFootContactV492(root:RefObject<Group|null>,model:Object3D
       bpm: audio.bpm ?? undefined, genre, playing: isPlaying, reducedMotion, delta,
     });
     const enableIK = avatarFootIKEnabled && isPlaying && !reducedMotion;
-    const activeIK = measureProfilerPhase("footIK", () => updateFootIK(footIK.current, avatarRoot, delta, enableIK, avatarFootIKStrength / 100, Math.min(1, avatarFootIKContact / 100 + footCueV234.contactBoost), Math.min(1, avatarFootIKLock / 100 + footCueV234.lockBoost), ikConstraints.current, footCueV234, readFootLockV322(), {trackId,playheadMs:progressMs},hipFootLockV737));
+    const activeIK = measureProfilerPhase("footIK", () => updateFootIK(footIK.current, avatarRoot, delta, enableIK, avatarFootIKStrength / 100, Math.min(1, avatarFootIKContact / 100 + footCueV234.contactBoost), Math.min(1, avatarFootIKLock / 100 + footCueV234.lockBoost), ikConstraints.current, footCueV234, readFootLockV322(), {trackId,playheadMs:progressMs},hipFootLockV737,crewTravel?.current));
     if(activeIK&&readFootLockV322().enabled&&elapsed-footLockLastReportV322.current>=1&&typeof window!=='undefined'){
       footLockLastReportV322.current=elapsed;
       window.dispatchEvent(new CustomEvent(FOOT_LOCK_DIAGNOSTIC_EVENT_V322,{detail:groundLockReportV322(footIK.current.groundV322)}));

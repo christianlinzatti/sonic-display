@@ -1,3 +1,11 @@
+## Update – Konzertmodus und körperbezogene Crew-Regie
+
+Der Konzertmodus zeigt eine größere Bühne mit fester Lyrics-Zone und blendet
+Bedienflächen aus. Freie Tanzwechsel berücksichtigen reale Beinposen und
+Hüftrichtung. Die automatische Crew verteilt Solisten und Partner auf sichere,
+langsame Bühnenwege mit Standkontakt- und Abstandskontrolle.
+[Bedienung, Grenzen und Tests](docs/versions/V1153-KONZERTMODUS-UND-KOERPERREGIE.md).
+
 ## Update – Natürlichere Crew und überprüfbare Showqualität
 
 Die adaptive Crew stabilisiert Standfüße mit dem bestehenden IK-Solver und
