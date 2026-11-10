@@ -653,6 +653,18 @@
             "starte die finale Konzertphase",
             "schalte auf Konzertfinale"
           ]
+        },
+        {
+          "name": "AvailableCommandsIntent",
+          "samples": [
+            "was kann ich gerade steuern",
+            "was kannst du jetzt machen",
+            "welche befehle sind jetzt freigegeben",
+            "was ist momentan möglich",
+            "was kann ich mit sonic display machen",
+            "welche sprachbefehle funktionieren jetzt",
+            "was darfst du aktuell steuern"
+          ]
         }
       ],
       "types": [

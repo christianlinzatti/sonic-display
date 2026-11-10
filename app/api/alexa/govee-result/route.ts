@@ -5,6 +5,7 @@ import {voiceIdV1008,validVoiceResultV1008} from '@/lib/alexaVoiceV1008';
 import {isGoveeOnlyVoiceCommandV1143} from '@/lib/goveeMusicVoiceV1143';
 import {validGoveeVoiceTargetV1141} from '@/lib/goveeVoiceTargetV1141';
 import {isGoveeVoiceLookCommandV1146,validGoveeVoiceLookV1146} from '@/lib/goveeVoiceLookV1146';
+import {isAlexaSpokenHelpCommandV1151} from '@/lib/alexaSpokenHelpV1151';
 import {readVoiceMessageV1008,claimVoiceV1008,completeVoiceV1008} from '@/lib/alexaVoiceStoreV1008';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const json=(v:object,status=200)=>Response.json(v,{status,headers:{'Cache-Control':'no-store'}});
@@ -20,7 +21,7 @@ export async function POST(request:Request){
  if(!voiceIdV1008(input.id)||!['claim','complete'].includes(String(input.phase)))return json({error:'Invalid request'},400);
  try{
   const message=await readVoiceMessageV1008(input.id);
-  if(!message||!isGoveeOnlyVoiceCommandV1143(message.command)||
+  if(!message||!(isGoveeOnlyVoiceCommandV1143(message.command)||isAlexaSpokenHelpCommandV1151(message.command))||
    (message.goveeTarget!==undefined&&(!['govee-power-on','govee-power-off'].includes(message.command)||!validGoveeVoiceTargetV1141(message.goveeTarget)))||
    (isGoveeVoiceLookCommandV1146(message.command)?!validGoveeVoiceLookV1146(message.command,message.goveeLook):message.goveeLook!==undefined))return json({error:'Not a Govee command'},403);
   if(message.createdAt>Date.now()||Date.now()-message.createdAt>180000)return json({error:'Expired'},410);

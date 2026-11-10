@@ -30,6 +30,8 @@ const requireReceiver=(c:AlexaAvailabilityContextV1148)=>c.spotifyConnected||c.r
 export function classifyAlexaIntentV1148(intent:string,c:AlexaAvailabilityContextV1148):AlexaAvailabilityV1148{
  if(SKILL_ONLY.has(intent))return {kind:'skill-only',label:'Alexa-Skill erforderlich',
   reason:'Funktion wird durch den Alexa-Skill verarbeitet; dessen Veröffentlichung und Erreichbarkeit sind hier nicht überprüfbar.'};
+ if(intent==='AvailableCommandsIntent')return make([...requireGeneral(c),...requireReceiver(c)],
+  'Nur lokal verfügbare Sprachbefehle werden vorgelesen. Der veröffentlichte Skill und die Empfangsverbindung sind separat zu prüfen.');
  if(intent==='StatusIntent')return make([...requireGeneral(c),...requireSpotify(c)],
   'Statusabfrage lokal möglich; der Alexa-Skill und die Relay-Verbindung müssen separat funktionieren.');
  if(ARTIST.has(intent))return make([...requireGeneral(c),...requireSpotify(c),...(c.artist?[]:['Künstlersteuerung freigeben'])],

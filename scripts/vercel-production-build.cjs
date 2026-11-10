@@ -134,6 +134,7 @@ try {
   run('V1009 private avatar resources','tests/v1009-avatar-resources-regression.cjs');
   run('V1009 native providers and background deadlines','tests/v1009-network-regression.cjs');
   run('V1147 Alexa concert scenes','tests/v1147-alexa-concert-scenes-regression.cjs');
+  run('V1151 on-demand Alexa spoken help from local opt-ins','tests/v1151-alexa-spoken-help-regression.cjs');
   run('V1150 Alexa and four-Govee-lamp live diagnostics','tests/v1150-alexa-live-diagnostics-regression.cjs');
   run('V1149 guided Alexa Spotify and Govee connection tests','tests/v1149-alexa-connection-wizard-regression.cjs');
   run('V1148 context-aware Alexa command help','tests/v1148-alexa-context-help-regression.cjs');

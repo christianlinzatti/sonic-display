@@ -5,6 +5,7 @@ import {pendingVoiceV1008} from '@/lib/alexaVoiceStoreV1008';
 import {isGoveeOnlyVoiceCommandV1143} from '@/lib/goveeMusicVoiceV1143';
 import {validGoveeVoiceTargetV1141} from '@/lib/goveeVoiceTargetV1141';
 import {isGoveeVoiceLookCommandV1146,validGoveeVoiceLookV1146} from '@/lib/goveeVoiceLookV1146';
+import {isAlexaSpokenHelpCommandV1151} from '@/lib/alexaSpokenHelpV1151';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const json=(v:object,status=200)=>Response.json(v,{status,headers:{'Cache-Control':'no-store'}});
 export async function GET(request:Request){
@@ -15,7 +16,7 @@ export async function GET(request:Request){
   return json({commands:values.filter(v=>{
    if(!v||typeof v!=='object'||Array.isArray(v))return false;
    const msg=v as {command?:unknown;goveeTarget?:unknown;goveeLook?:unknown};
-   return isGoveeOnlyVoiceCommandV1143(msg.command)&&
+   return (isGoveeOnlyVoiceCommandV1143(msg.command)||isAlexaSpokenHelpCommandV1151(msg.command))&&
     (msg.goveeTarget===undefined||(['govee-power-on','govee-power-off'].includes(String(msg.command))&&validGoveeVoiceTargetV1141(msg.goveeTarget)))&&
     (isGoveeVoiceLookCommandV1146(msg.command)?validGoveeVoiceLookV1146(msg.command,msg.goveeLook):msg.goveeLook===undefined);
   })});
