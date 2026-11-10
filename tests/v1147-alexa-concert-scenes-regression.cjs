@@ -1,0 +1,72 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const ts=require('./typescript-loader.cjs');
+const source=fs.readFileSync(path.join(__dirname,'../lib/alexaConcertScenesV1147.ts'),'utf8');
+const result=ts.transpileModule(source,{fileName:'alexaConcertScenesV1147.ts',compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022},reportDiagnostics:true});
+assert.equal(result.diagnostics.filter(x=>x.category===ts.DiagnosticCategory.Error).length,0);
+const mod={exports:{}};vm.runInNewContext(result.outputText,{module:mod,exports:mod.exports,Object,Number,Math,Error});
+const plan=mod.exports.planConcertSceneV1147;
+const base={scene:'intense',genre:'hardtekk',showConsent:true,goveeConsent:false,musicSyncConsent:true,reducedMotion:false,masterBrightness:50};
+assert.throws(()=>plan({...base,showConsent:false}),/freigabe/);
+assert.throws(()=>plan({...base,scene:'strobe'}),/Unbekannte/);
+assert.throws(()=>plan({...base,masterBrightness:101}),/Helligkeit/);
+assert.equal(plan(base).brightnessCap,50);
+assert.equal(plan(base).goveeAllowed,false);
+assert.equal(plan({...base,goveeConsent:true}).goveeAllowed,true);
+assert.equal(plan({...base,goveeConsent:true,musicSyncConsent:false}).goveeAllowed,false);
+assert.equal(plan({...base,reducedMotion:true}).rotationAllowed,false);
+assert(plan({...base,reducedMotion:true,scene:'finale'}).stageIntensity<=40);
+for(const genre of ['deutschrap','hardtekk','deutschrock','other'])
+ for(const scene of ['calm','intense','finale']){
+  const x=plan({...base,genre,scene});
+  assert(x.brightnessCap<=base.masterBrightness);
+  assert(Object.values(x.lightColor).every(v=>v>=0&&v<=255));
+ }
+const interpolate=mod.exports.interpolateConcertSceneV1147;
+const calm=plan({...base,scene:'calm',genre:'deutschrap',goveeConsent:false});
+const finale=plan({...base,scene:'finale',genre:'hardtekk',goveeConsent:false});
+const before=JSON.stringify(calm),after=JSON.stringify(finale);
+assert.equal(interpolate(calm,finale,0,false).stageIntensity,calm.stageIntensity);
+assert.equal(interpolate(calm,finale,1,false).stageIntensity,finale.stageIntensity);
+assert.equal(interpolate(calm,finale,0.5,false).stageIntensity,60);
+assert.equal(interpolate(calm,finale,-2,false).stageIntensity,calm.stageIntensity);
+assert.equal(interpolate(calm,finale,2,false).stageIntensity,finale.stageIntensity);
+assert.equal(interpolate(calm,finale,0,true).stageIntensity,finale.stageIntensity);
+assert.equal(interpolate(calm,finale,0,true).rotationAllowed,false);
+assert.throws(()=>interpolate(calm,finale,NaN,false),/Übergangsfortschritt/);
+assert.equal(JSON.stringify(calm),before,'source plan stays immutable');
+assert.equal(JSON.stringify(finale),after,'target plan stays immutable');
+const cue=mod.exports.virtualStageCueV1147(finale);
+assert.equal(cue.strength,finale.stageIntensity);
+assert.equal(cue.hardwareSync,false);
+assert.equal(cue.voiceMoodV968,'neon');
+assert.equal(mod.exports.virtualStageCueV1147(calm).voiceMoodV968,'cool');
+assert(readStageIntegrationV1147());
+function readStageIntegrationV1147(){
+ const voice=fs.readFileSync(path.join(__dirname,'../components/AlexaVoiceControlV1008.tsx'),'utf8');
+ const stop=fs.readFileSync(path.join(__dirname,'../lib/alexaFullConcertV1145.ts'),'utf8');
+ return voice.includes('applyVirtualConcertSceneV1147(activation.plan,allowed)')&&
+  stop.includes('restoreVirtualConcertSceneV1147();');
+}
+let starts=0;
+const activated=mod.exports.activateConcertSceneV1147(base,()=>{starts++;return 'Show gestartet.';});
+assert.equal(starts,1);assert.match(activated.message,/Show gestartet/);
+assert.throws(()=>mod.exports.activateConcertSceneV1147({...base,showConsent:false},()=>{starts++;}),/freigabe/);
+assert.equal(starts,1,'no show start without consent');
+assert.match(activated.message,/Vorschau berechnet/);
+assert.match(activated.message,/nicht an Bühne oder Lampen übertragen/);
+const existing=mod.exports.activateConcertSceneV1147(base,()=> 'Die Alexa-Konzertshow ist bereits gestartet.');
+assert.match(existing.message,/nicht verändert/);
+assert.doesNotMatch(existing.message,/als Vorschau berechnet/);
+const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+assert(read('components/AlexaVoiceControlV1008.tsx').includes("activateConcertSceneV1147"));
+assert(read('components/AlexaVoiceControlV1008.tsx').includes("runFullConcertV1145('concert-show-start'"));
+assert(read('scripts/vercel-production-build.cjs').includes('v1147-alexa-concert-scenes-regression.cjs'));
+const lambda=require('../integrations/alexa/voice-v1008.cjs');
+const model=require('../integrations/alexa/interaction-model.de-DE.json').interactionModel.languageModel.intents;
+for(const [intent,command] of [['ConcertSceneCalmIntent','concert-scene-calm'],['ConcertSceneIntenseIntent','concert-scene-intense'],['ConcertSceneFinaleIntent','concert-scene-finale']]){
+ assert.equal(lambda.COMMANDS[intent],command);
+ assert(model.some(x=>x.name===intent&&x.samples.length>=4));
+}
+console.log('PASS V1147: scene planning, opt-in gates, brightness caps, reduced motion, genre palettes');
