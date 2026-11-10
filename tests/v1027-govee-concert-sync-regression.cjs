@@ -90,11 +90,9 @@ assert(sender.indexOf('applyGoveeShowV1042(syncedLookV1027,previous,') <
  (sender.includes('governConcertLookV961(previous,showLookV1042,')?
  sender.indexOf('governConcertLookV961(previous,showLookV1042,'):
  sender.indexOf('applyGoveeRoomV1096(showLookV1042,previous,')));
-assert(sender.includes('governConcertLookV961(previous,showLookV1042,')||
- (sender.includes('applyGoveeRoomV1096(showLookV1042,previous,')&&
- (sender.includes('governConcertLookV961(previous,roomLookV1096,')||
-  (sender.includes('applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,')&&
-   sender.includes('governConcertLookV961(previous,coordinatedLookV1154,'))));
+assert(sender.includes('applyGoveeRoomV1096(showLookV1042,previous,')&&
+ sender.includes('applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,')&&
+ sender.includes('governConcertLookV961(previous,coordinatedLookV1154,'));
 assert.equal((sender.match(/goveeBridgeRequestV909\(config,'\/command','POST',\{ip,action:'look',value:finalLook\}\)/g)||[]).length,1);
 assert(sender.includes('visualAdvanceV1027(syncSettingsV1027,ip,visualAdvance)'));
 assert(sender.includes('savedShowActive:Boolean(show),authoredStageActive:stage?.source===\'authored\''));

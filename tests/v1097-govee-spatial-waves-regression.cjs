@@ -96,7 +96,7 @@ for(const mark of ['planGoveeRoomV1096({settings:roomSettingsV1096',
  'planGoveeSpatialWaveV1097({settings:waveSettingsV1097',
  'applyGoveeSpatialWaveV1097(roomDecisionV1096,waveDecisionV1097)',
  'applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,',
- 'governConcertLookV961(previous,roomLookV1096,',
+ 'governConcertLookV961(previous,coordinatedLookV1154,',
  'GOVEE_WAVES_EVENT_V1097','window.removeEventListener(GOVEE_WAVES_EVENT_V1097,refresh)'])
  assert(runtime.includes(mark),'missing connection to the existing LAN governor: '+mark);
 assert(runtime.indexOf('planGoveeSpatialWaveV1097({settings:waveSettingsV1097')<

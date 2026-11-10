@@ -77,7 +77,7 @@ const ordered=['applyGoveeBeatAccentV1099(roomDecisionV1096,beatAccentDecisionV1
  'planGoveeZoneMixV1100({settings:zoneMixerSettingsV1100',
  'applyGoveeZoneMixV1100(roomDecisionV1096,zoneMixDecisionV1100)',
  'applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,',
- 'governConcertLookV961(previous,roomLookV1096,',
+ 'governConcertLookV961(previous,coordinatedLookV1154,',
  "goveeBridgeRequestV909(config,'/command','POST'"];
 const positions=ordered.map(token=>sender.indexOf(token));
 assert(positions.every((p,i)=>p>=0&&(!i||p>positions[i-1])),'V961 and V909 must remain final');

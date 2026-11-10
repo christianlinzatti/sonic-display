@@ -92,11 +92,11 @@ const ordered=['applyGoveeZoneMixV1100(roomDecisionV1096,zoneMixDecisionV1100)',
  'planGoveeSceneTransitionV1101({settings:transitionSettingsV1101',
  'applyGoveeSceneTransitionV1101(roomDecisionV1096,transitionDecisionV1101)',
  'applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,',
- 'governConcertLookV961(previous,roomLookV1096,',
+ 'governConcertLookV961(previous,coordinatedLookV1154,',
  "goveeBridgeRequestV909(config,'/command','POST'"];
 const positions=ordered.map(x=>sender.indexOf(x));
 assert(positions.every((pos,i)=>pos>=0&&(!i||pos>positions[i-1])),`old V961 and V909 must remain final: ${positions}`);
-assert(sender.includes('zoneMixerSettingsV1100,transitionSettingsV1101,choreographerSettingsV1102,goveeShowEnabledV1042'));
+assert(sender.includes('zoneMixerSettingsV1100,transitionSettingsV1101,choreographerSettingsV1102,coordinationV1154,goveeShowEnabledV1042'));
 assert(sender.includes('window.removeEventListener(GOVEE_TRANSITION_EVENT_V1101,refresh)'));
 assert(read('components/GoveeLanPanelV909.tsx').includes('<GoveeSceneTransitionStudioV1101 config={config} devices={devices}/>'));
 const ui=read('components/GoveeSceneTransitionStudioV1101.tsx');

@@ -109,7 +109,7 @@ test('no additional polling or bridge call: integration is in pre-existing Govee
  assert(g.includes('applyAlexaGoveeLookV970(roomLookV987,previous'));
  assert(g.includes('applyRoomAtmosphereV987(recoveryLookV961,previous'));
  assert(g.indexOf('applyAlexaGoveeLookV970(')<g.indexOf('applyGoveeSyncV1027(voiceLookV970,previous'));
- assert(g.indexOf('applyGoveeSyncV1027(voiceLookV970,previous')>=0&&g.indexOf('governConcertLookV961(previous,roomLookV1096,')>g.indexOf('applyGoveeSyncV1027(voiceLookV970,previous'));
+ assert(g.indexOf('applyGoveeSyncV1027(voiceLookV970,previous')>=0&&g.indexOf('governConcertLookV961(previous,coordinatedLookV1154,')>g.indexOf('applyGoveeSyncV1027(voiceLookV970,previous'));
  assert(g.includes("goveeBridgeRequestV909(config,'/command','POST'"));
  assert(g.includes('!config?.enabled||!config.autoSync')); 
  const lib=read('lib/alexaGoveeV970.ts').toLowerCase();

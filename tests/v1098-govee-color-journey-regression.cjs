@@ -101,7 +101,7 @@ for(const marker of ['planGoveeRoomV1096({settings:roomSettingsV1096',
  'planGoveeColorJourneyV1098({settings:journeySettingsV1098',
  'applyGoveeColorJourneyV1098(roomDecisionV1096,journeyDecisionV1098)',
  'applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,',
- 'governConcertLookV961(previous,roomLookV1096,',
+ 'governConcertLookV961(previous,coordinatedLookV1154,',
  'waveSettingsV1097,journeySettingsV1098',
  'window.removeEventListener(GOVEE_JOURNEY_EVENT_V1098,refresh)'])
  assert(runtime.includes(marker),'missing authorized runtime route: '+marker);
