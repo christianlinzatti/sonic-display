@@ -53,11 +53,11 @@ async function handler(event){
   return reply('Die Sonic Display Alexa Verbindung ist noch nicht vollständig eingerichtet.');
  if(incomingSkill!==skill||incomingUser!==allowed||!Number.isFinite(time)||Math.abs(now-time)>150000)
   return reply('Für diese Alexa Identität ist Sonic Display nicht freigeschaltet.');
- if(event?.request?.type==='LaunchRequest')return reply('Sonic Display ist bereit. Sage zum Beispiel: starte den Festivalmodus.',false);
+ if(event?.request?.type==='LaunchRequest')return reply('Sonic Display ist bereit. Frage zum Beispiel: Was kann ich gerade steuern?',false);
  const intent=event?.request?.intent?.name;
  if(event?.request?.type!=='IntentRequest')return reply('Sonic Display unterstützt Konzertmodi, komplette 360 Grad Konzertshows und virtuelle Effekte.');
- if(intent==='AllCommandsIntent')return reply('Alle Sprachbefehle findest du in Sonic Display unter Einstellungen, Alexa, Alexa-Hilfe. Dort kannst du auch nach Befehlen suchen. Du kannst Konzertmodi, Bühnenbereiche, virtuelle Effekte, Govee-Raumlicht, eine komplette 360 Grad Konzertshow starten und stoppen, das Govee-Licht ein- und ausschalten, Künstler und die Anzeige steuern.',false);
- if(intent==='AMAZON.HelpIntent')return reply('Die vollständige Befehlsliste findest du auf dem Display in Einstellungen, Alexa, Alexa-Hilfe. Du kannst auch sagen: bitte like den Künstler, bitte allen Künstlern folgen, folge ich diesem Künstler schon oder letzte Künstleraktion rückgängig. Für die Anzeige: Lyrics ausblenden, Avatar wechseln oder ruhige Darstellung. Sage zum Beispiel: starte Festival, beleuchte das Publikum, aktiviere Neon, zeige virtuellen Nebel starte den Hardtekk-Reaktor, aktiviere die Rock-Arena, nutze Govee Festival Raumlicht, schalte die Govee-Lichter ein oder aus oder starte die komplette Konzertshow.',false);
+ if(intent==='AllCommandsIntent')return reply('Den vollständigen Befehlskatalog findest du in Sonic Display unter Einstellungen, Alexa, Alexa-Hilfe. Das bedeutet nicht, dass alle Funktionen freigegeben sind. Frage: Was kann ich gerade steuern? Dann nennt dein geöffnetes Display nur lokal vorbereitete Befehle.',false);
+ if(intent==='AMAZON.HelpIntent')return reply('Die vollständige Befehlsliste findest du auf dem Display unter Einstellungen, Alexa, Alexa-Hilfe. Für aktuell freigegebene Beispiele frage: Was kann ich gerade steuern? Dein geöffnetes Display gibt dann nur lokal vorbereitete Befehle zurück.',false);
  if(intent==='AMAZON.CancelIntent'||intent==='AMAZON.StopIntent')return reply('Bis bald.');
  if(voiceV1008.COMMANDS[intent]||voiceV1008.CHOICES[intent]||intent==='SelectArtistIntent'||intent==='LastVoiceResultIntent')return voiceV1008.runVoiceV1008(event,{origin,secret});
  if(intent==='StatusIntent')return reply('Der Alexa Skill ist eingerichtet. Ob das Display den nächsten Befehl übernimmt, siehst du im Konzertstudio.');
