@@ -102,7 +102,7 @@ export function AlexaLiveDiagnosticsV1150(){
   const tick=()=>{if(document.visibilityState==='visible'&&navigator.onLine)void check();};
   tick();
   const timer=window.setInterval(tick,ALEXA_LIVE_INTERVAL_MS_V1150);
-  window.addEventListener('visibilitychange',tick);
+  document.addEventListener('visibilitychange',tick);
   window.addEventListener('online',tick);
   const onConfig=()=>{
    // Immediately invalidate a stale lamp view, but never trigger a new network check.
@@ -114,7 +114,7 @@ export function AlexaLiveDiagnosticsV1150(){
   window.addEventListener(GOVEE_CONFIG_EVENT_V909,onConfig);
   return()=>{
    window.clearInterval(timer);
-   window.removeEventListener('visibilitychange',tick);
+   document.removeEventListener('visibilitychange',tick);
    window.removeEventListener('online',tick);
    window.removeEventListener(GOVEE_CONFIG_EVENT_V909,onConfig);
   };
