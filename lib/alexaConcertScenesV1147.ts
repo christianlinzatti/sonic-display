@@ -1,3 +1,4 @@
+import {loadConcertRoadmapV958,saveConcertRoadmapV958,type ConcertSettingsV958} from './ultimateConcertRoadmapV958';
 /** V1147 – deterministic, side-effect-free concert scene planning.
  * This module does not send hardware commands, change Spotify or grant consent.
  * The caller must authenticate the Alexa message and verify V1145/V1143 opt-ins.
@@ -86,4 +87,51 @@ export function virtualStageCueV1147(plan:ConcertScenePlanV1147):Readonly<{
   voiceMoodV968:plan.genre==='deutschrock'?'warm':plan.genre==='hardtekk'?'neon':'cool',
   hardwareSync:false
  };
+}
+
+const SCENE_SNAPSHOT_KEY_V1147='sonic-display:alexa-scene-snapshot-v1147';
+const STAGE_KEYS_V1147=['strength','energyArcStrengthV975','atmosphereStrengthV978','transitionStrengthV976','liveShowStrengthV979','voiceMoodV968'] as const;
+type StageKeyV1147=typeof STAGE_KEYS_V1147[number];
+type StageSnapshotV1147={schema:'scene-v1147';before:Pick<ConcertSettingsV958,StageKeyV1147>;applied:Pick<ConcertSettingsV958,StageKeyV1147>};
+function selectStageKeysV1147(s:ConcertSettingsV958):Pick<ConcertSettingsV958,StageKeyV1147>{
+ const result={} as Pick<ConcertSettingsV958,StageKeyV1147>;
+ for(const key of STAGE_KEYS_V1147) (result as unknown as Record<string,unknown>)[key]=s[key];
+ return result;
+}
+/** Only updates virtual V958 controls. Snapshot must persist before any change. */
+export function applyVirtualConcertSceneV1147(plan:ConcertScenePlanV1147,allowed:()=>boolean):void{
+ if(!allowed())throw Error('Konzertfreigabe widerrufen.');
+ const current=loadConcertRoadmapV958();
+ const cue=virtualStageCueV1147(plan);
+ const next={...current,...cue,hardwareSync:false};
+ const existing=localStorage.getItem(SCENE_SNAPSHOT_KEY_V1147);
+ let before=selectStageKeysV1147(current);
+ if(existing){
+  const parsed:unknown=JSON.parse(existing);
+  if(!parsed||typeof parsed!=='object'||(parsed as StageSnapshotV1147).schema!=='scene-v1147')
+   throw Error('Ungültige Szenensicherung.');
+  const snapshot=parsed as StageSnapshotV1147;
+  if(!snapshot.before||!snapshot.applied)throw Error('Unvollständige Szenensicherung.');
+  before=snapshot.before;
+ }
+ const snapshot:StageSnapshotV1147={schema:'scene-v1147',before,applied:selectStageKeysV1147(next)};
+ if(!allowed())throw Error('Konzertfreigabe widerrufen.');
+ localStorage.setItem(SCENE_SNAPSHOT_KEY_V1147,JSON.stringify(snapshot));
+ saveConcertRoadmapV958(next);
+}
+/** Restore only values still owned by the voice scene, preserving manual edits. */
+export function restoreVirtualConcertSceneV1147():void{
+ const raw=localStorage.getItem(SCENE_SNAPSHOT_KEY_V1147);
+ if(!raw)return;
+ const snapshot=JSON.parse(raw) as StageSnapshotV1147;
+ if(snapshot?.schema!=='scene-v1147'||!snapshot.before||!snapshot.applied)
+  throw Error('Ungültige Szenensicherung.');
+ const current=loadConcertRoadmapV958();
+ const restored={...current};
+ for(const key of STAGE_KEYS_V1147){
+  if(current[key]===snapshot.applied[key])
+   (restored as unknown as Record<string,unknown>)[key]=snapshot.before[key];
+ }
+ saveConcertRoadmapV958({...restored,hardwareSync:false});
+ localStorage.removeItem(SCENE_SNAPSHOT_KEY_V1147);
 }
