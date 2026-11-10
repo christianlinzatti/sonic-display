@@ -69,3 +69,21 @@ export function interpolateConcertSceneV1147(
   rotationAllowed:!reducedMotion&&from.rotationAllowed&&to.rotationAllowed
  };
 }
+
+/** A virtual stage cue for the V958 director; intentionally excludes hardwareSync.
+ * The existing concert renderer consumes these settings through its normal event.
+ * Applying/restoring storage is handled separately by the caller.
+ */
+export function virtualStageCueV1147(plan:ConcertScenePlanV1147):Readonly<{
+ strength:number;energyArcStrengthV975:number;atmosphereStrengthV978:number;
+ transitionStrengthV976:number;liveShowStrengthV979:number;
+ voiceMoodV968:'cool'|'warm'|'neon';hardwareSync:false
+}>{
+ const strength=Math.max(0,Math.min(100,Math.round(plan.stageIntensity)));
+ return {
+  strength,energyArcStrengthV975:strength,atmosphereStrengthV978:strength,
+  transitionStrengthV976:strength,liveShowStrengthV979:strength,
+  voiceMoodV968:plan.genre==='deutschrock'?'warm':plan.genre==='hardtekk'?'neon':'cool',
+  hardwareSync:false
+ };
+}
