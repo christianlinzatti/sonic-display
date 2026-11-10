@@ -45,6 +45,15 @@ assert(delivered.brightness<=65&&delivered.brightness>=0);
 assert.deepEqual(delivered.color,look.color);
 assert.equal(api.applyConcertLightV1154(look,make({verified:false}),65),look,'unverified must stay unchanged');
 assert.equal(api.applyConcertLightV1154(look,active,-1),look);
+for(const factor of [NaN,Infinity,-.01,1.01]){
+ const invalid={...active,crewFactor:factor,lightFactor:factor};
+ assert.equal(api.applyConcertCrewV1154(previous,invalid),previous,
+  'invalid AI crew factor must not amplify the avatar');
+ assert.equal(api.applyConcertLightV1154(look,invalid,65),look,
+  'invalid AI light factor must not reach the bridge');
+}
+assert.equal(api.applyConcertCrewV1154(previous,null),previous,'missing AI decision');
+assert.equal(api.applyConcertLightV1154(look,null,65),look,'missing AI decision');
 const quiet=make({phase:'break',lyricsFocus:true});
 assert(quiet.lightFactor<=active.lightFactor);
 assert(quiet.crewFactor<=active.crewFactor);
