@@ -84,7 +84,8 @@ for(let i=0;i<180000;i++){
 const runtime=read('components/GoveeMusicSyncV909.tsx');
 for(const text of ['planGoveeRoomV1096({settings:roomSettingsV1096',
  'const roomLookV1096=applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,',
- 'governConcertLookV961(previous,roomLookV1096,',
+ 'applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,',
+  'governConcertLookV961(previous,coordinatedLookV1154,',
  'syncDecisionV1027.active||authoredDecisionV1042.active',
  'roomAtmosphereActive:roomDecisionV987.active','savedShowActive:Boolean(show)',
  'groupUnisonActive:group?.mode',
