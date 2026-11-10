@@ -24,7 +24,8 @@ import {GOVEE_CONFIG_EVENT_V909,loadGoveeConfigV909} from '@/lib/goveeLanV909';
 import {canExecuteGoveePowerV1138,GOVEE_POWER_CONSENT_EVENT_V1138,loadGoveePowerConsentV1138} from '@/lib/goveePowerV1138';
 import {GOVEE_SYNC_CONSENT_EVENT_V1143,loadGoveeSyncConsentV1143} from '@/lib/goveeMusicVoiceV1143';
 import {GOVEE_LOOK_CONSENT_EVENT_V1146,loadGoveeLookConsentV1146} from '@/lib/goveeVoiceLookV1146';
-import {ALEXA_FULL_CONCERT_EVENT_V1145,loadFullConcertConsentV1145} from '@/lib/alexaFullConcertV1145';
+import {ALEXA_FULL_CONCERT_EVENT_V1145,ALEXA_FULL_CONCERT_ACTIVE_EVENT_V1145,loadFullConcertConsentV1145,readFullConcertSnapshotV1145} from '@/lib/alexaFullConcertV1145';
+import {ALEXA_DIRECTOR_CONSENT_EVENT_V1153,loadDirectorConsentV1153} from '@/lib/alexaConcertVoiceDirectorV1153';
 
 const LOCAL_EVENT='sonic-display:alexa-local-status-v971';
 const GROUPS:{title:string;permission:string;intents:readonly string[]}[]=[
@@ -48,7 +49,8 @@ const CATALOG=[...GROUPS,{title:'Weitere Sprachbefehle',permission:'Je nach Befe
 
 const DEFAULT_AVAILABILITY_V1148:AlexaAvailabilityContextV1148={
  general:false,artist:false,display:false,power:false,sync:false,look:false,show:false,roomLooks:false,
- spotifyConnected:false,spotifyPlaying:false,goveeConfigured:false,goveeAutoSync:false,receiverToken:false
+ spotifyConnected:false,spotifyPlaying:false,goveeConfigured:false,goveeAutoSync:false,receiverToken:false,
+ director:false,concertActive:false
 };
 export function AlexaCommandHelpV1137(){
  const {connected,isPlaying}=useMusic();
@@ -67,13 +69,14 @@ export function AlexaCommandHelpV1137(){
      show:loadFullConcertConsentV1145().enabled,roomLooks:loadAlexaGoveeConsentV970().enabled,
      spotifyConnected:false,spotifyPlaying:false,
      goveeConfigured:canExecuteGoveePowerV1138(cfg),goveeAutoSync:cfg.autoSync,
-     receiverToken:Boolean(readAlexaGoveeReceiverTokenV1139())
+     receiverToken:Boolean(readAlexaGoveeReceiverTokenV1139()),
+     director:loadDirectorConsentV1153().enabled,concertActive:Boolean(readFullConcertSnapshotV1145())
     });
    }catch{setLocal(DEFAULT_AVAILABILITY_V1148);}
   };
   const events=['storage',LOCAL_EVENT,ALEXA_ARTIST_EVENT_V1007,VOICE_SETTINGS_EVENT_V1008,
    GOVEE_POWER_CONSENT_EVENT_V1138,GOVEE_SYNC_CONSENT_EVENT_V1143,
-   GOVEE_LOOK_CONSENT_EVENT_V1146,ALEXA_FULL_CONCERT_EVENT_V1145,
+   GOVEE_LOOK_CONSENT_EVENT_V1146,ALEXA_FULL_CONCERT_EVENT_V1145,ALEXA_FULL_CONCERT_ACTIVE_EVENT_V1145,ALEXA_DIRECTOR_CONSENT_EVENT_V1153,
    ALEXA_GOVEE_CONSENT_EVENT_V970,GOVEE_CONFIG_EVENT_V909,ALEXA_GOVEE_RECEIVER_EVENT_V1139];
   refresh();events.forEach(event=>window.addEventListener(event,refresh));
   return()=>events.forEach(event=>window.removeEventListener(event,refresh));

@@ -105,10 +105,10 @@ export function runFullConcertV1145(command:FullConcertVoiceCommandV1145,options
  if(command==='concert-show-stop'){
   const snap=readFullConcertSnapshotV1145();
   if(!snap)return 'Keine von Alexa gestartete Konzertshow aktiv. Manuell eingerichtete Shows bleiben unverändert.';
-  restoreVoiceDirectorV1153({preferences:options.preferences,updatePreferences:options.updatePreferences});
+  const directorUiRestored=restoreVoiceDirectorV1153({preferences:options.preferences,updatePreferences:options.updatePreferences});
   restoreVirtualConcertSceneV1147();
   const current=loadConcertRoadmapV958();
-  const ui=restoreOwned(options.preferences as unknown as Record<string,unknown>,
+  const ui=restoreOwned({...options.preferences,...directorUiRestored} as unknown as Record<string,unknown>,
    snap.uiBefore as Record<string,unknown>,snap.uiApplied as Record<string,unknown>,OWNED_UI_KEYS_V1145);
   const road=restoreOwned(current as unknown as Record<string,unknown>,
    snap.roadmapBefore as Record<string,unknown>,snap.roadmapApplied as Record<string,unknown>,ROADMAP_KEYS_V1145);

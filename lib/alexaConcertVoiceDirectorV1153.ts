@@ -78,7 +78,8 @@ type Snapshot={schema:'alexa-director-v1153';since:number;uiBefore:Partial<Pick<
  roadApplied:Partial<Pick<ConcertSettingsV958,RoadKey>>;
 };
 function isAllowedValue(key:string,value:unknown):boolean{
- if(key==='stageTheme')return ['arena360','festival','neon','classic','minimal','cyberpunk','vaporwave','galaxy','white','rock'].includes(String(value));
+ if(value===null)return true; // Sentinel for an optional preference previously unset.
+ if(key==='stageTheme')return typeof value==='string'&&/^[a-z][a-z0-9-]{0,40}$/.test(value);
  if(key==='concertPresetV969')return ['off','auto','arena','festival','club','cinematic','hardtekk','rock'].includes(String(value));
  if(key==='liveShowStyleV979')return ['adaptive','cinematic','festival','club'].includes(String(value));
  if(key==='voiceMoodV968')return ['auto','warm','cool','neon'].includes(String(value));
@@ -112,7 +113,7 @@ function readSnapshot():Snapshot|null{
 }
 const ownedPatch=(current:Record<string,unknown>,before:Record<string,unknown>,applied:Record<string,unknown>)=>{
  const patch:Record<string,unknown>={};
- for(const [key,value] of Object.entries(applied))if(current[key]===value)patch[key]=before[key];
+ for(const [key,value] of Object.entries(applied))if(current[key]===value)patch[key]=before[key]===null?undefined:before[key];
  return patch;
 };
 /** Prevents a manual modification from being overwritten by a later restore. */
@@ -136,7 +137,7 @@ export function applyVoiceDirectorV1153(command:AlexaDirectorCommandV1153,option
  for(const key of UI_KEYS)if(Object.prototype.hasOwnProperty.call(planned.ui,key)){
   const now=options.preferences[key],old=snapshot.uiApplied[key];
   if(!Object.prototype.hasOwnProperty.call(snapshot.uiBefore,key)||now!==old)
-   (snapshot.uiBefore as Record<string,unknown>)[key]=now;
+   (snapshot.uiBefore as Record<string,unknown>)[key]=now===undefined?null:now;
   (snapshot.uiApplied as Record<string,unknown>)[key]=planned.ui[key];
  }
  for(const key of ROAD_KEYS)if(Object.prototype.hasOwnProperty.call(planned.road,key)){
@@ -156,8 +157,8 @@ export function applyVoiceDirectorV1153(command:AlexaDirectorCommandV1153,option
 /** Must run BEFORE V1147 and V1145 restoration, preserving manual changes made after Alexa cues. */
 export function restoreVoiceDirectorV1153(options:{
  preferences:UiPreferences;updatePreferences:(patch:Partial<UiPreferences>)=>void;
-}):void{
- const snapshot=readSnapshot();if(!snapshot)return;
+}):Partial<UiPreferences>{
+ const snapshot=readSnapshot();if(!snapshot)return {};
  const currentRoad=loadConcertRoadmapV958();
  const road=ownedPatch(currentRoad as unknown as Record<string,unknown>,
   snapshot.roadBefore as Record<string,unknown>,snapshot.roadApplied as Record<string,unknown>);
@@ -166,6 +167,7 @@ export function restoreVoiceDirectorV1153(options:{
  if(Object.keys(road).length)saveConcertRoadmapV958({...currentRoad,...road,hardwareSync:false});
  if(Object.keys(ui).length)options.updatePreferences(ui as Partial<UiPreferences>);
  localStorage.removeItem(ALEXA_DIRECTOR_SNAPSHOT_KEY_V1153);
+ return ui as Partial<UiPreferences>;
 }
 export function executeAlexaDirectorV1153(message:VoiceMessageV1008,options:{
  since:number;now:()=>number;allowed:()=>boolean;signal?:AbortSignal;

@@ -69,6 +69,7 @@ export function AlexaVoiceControlV1008(){
        const help=buildAlexaSpokenHelpV1151({
         general:p.general.enabled,artist:p.artist.enabled,display:p.display.enabled,
         power:p.power.enabled,sync:p.sync.enabled,look:p.look.enabled,show:p.show.enabled,roomLooks:false,
+        director:p.director.enabled,
         spotifyConnected:connected,spotifyPlaying:connected&&isPlaying,
         goveeConfigured:canExecuteGoveePowerV1138(cfg),goveeAutoSync:cfg.autoSync,
         receiverToken:Boolean(readAlexaGoveeReceiverTokenV1139()),
