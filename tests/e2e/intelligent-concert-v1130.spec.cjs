@@ -35,7 +35,19 @@ test('all headliners load real clips in the intelligent rehearsal',async({page},
  await page.getByRole('button',{name:'⚙ Settings',exact:true}).click();await page.locator('[data-v571-tab="avatar"]').click();
  const box=page.getByRole('group',{name:'Sonic Stage Crew – Musik und gemeinsame Show',exact:true});
  await expect(box.getByLabel('Figur 1').locator('option')).toHaveCount(11);
- for(const [slot,id] of ['sonic-atlas-prism','sonic-rio-carnival','sonic-quantum-bass'].entries())await box.getByLabel(`Figur ${slot+1}`).selectOption(id);
+ // The touch layout can remount the lazy avatar tab after the first render.
+ // Reacquire the control after each selection and assert the chosen value.
+ for(const [slot,id] of ['sonic-atlas-prism','sonic-rio-carnival','sonic-quantum-bass'].entries()){
+  const label=`Figur ${slot+1}`;
+  const select=box.getByLabel(label,{exact:true});
+  if(await select.count()===0){
+   const avatarTab=page.locator('[data-v571-tab="avatar"]');
+   await avatarTab.click();
+  }
+  await expect(select,`${label} must be present in the avatar tab`).toBeAttached();
+  await select.selectOption(id);
+  await expect(select).toHaveValue(id);
+ }
  await box.getByRole('button',{name:'Intelligente Show aktivieren',exact:true}).click();
  await box.getByRole('button',{name:'Show-Simulation öffnen',exact:true}).click();
  await box.getByLabel('Simulierter Abschnitt').selectOption('drop');
