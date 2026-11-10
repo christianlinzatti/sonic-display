@@ -1303,9 +1303,9 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       progressMs:cameraDirectorProgressMs,rigTargets,constraints:ikConstraints,
       avatarKey:avatarModelId??url,ikQualitySampler,handIK,activeHandCue,
       hipFootLockV737:{enabled:!hipManualPriorityV735&&isPlaying&&!reducedMotion&&
-        hipTorsoGainV735>0&&hipSettingsV735.mode!=='off'&&hipSettingsV735.strength>0&&hipStudioFrameV738.effectiveStrength>0,
+        hipTorsoGainV735>0&&hipSettingsV735.mode!=='off'&&hipSettingsV735.strength>0&&hipStudioFrameV738.effectiveStrength>0||bakedCrewV1135&&crewSettings.mode==='adaptive',
         
-        intensity:hipStudioFrameV738.effectiveStrength}});
+        intensity:bakedCrewV1135?.55:hipStudioFrameV738.effectiveStrength}});
     } finally {
       if (v251StartedAt >= 0) recordAvatarFrame(schedulerInstance, `GLTF: ${avatarModelId ?? url.split("/").pop() ?? "Avatar"}`, performance.now() - v251StartedAt, performance.now());
     }

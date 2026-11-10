@@ -1,3 +1,4 @@
+import {crewConversation} from '../../lib/crewConversation';
 import {performerDynamicsV1135,jointSpringV1135} from '../../lib/performerDynamicsV1135';
 import {Quaternion,Vector3,type Object3D} from 'three';
 import type {CrewPlan} from './sonicCrewDirector';
@@ -13,7 +14,7 @@ export function applyCrewReaction(nodes:ReturnType<typeof prepareCrewReaction>,p
  const dt=Number.isFinite(delta)?Math.max(0,Math.min(.1,delta)):0;
  const blend=1-Math.exp(-dt*9),safeBeat=Number.isFinite(beat)?beat:0;
  const e=Number.isFinite(energy)?Math.min(1,Math.max(0,energy)):.35;
- const dynamics=performerDynamicsV1135(plan,safeBeat);
+ const dynamics=performerDynamicsV1135(plan,safeBeat),conversation=crewConversation(plan,safeBeat);
  for(const item of nodes){
   const {node,channels}=item;
   if(item.owned){if(sameRotationV1131(node.quaternion,item.appliedQ))node.quaternion.copy(item.baseQ);if(node.scale.distanceTo(item.appliedScale)<1e-5)node.scale.copy(item.baseScale);}
@@ -25,14 +26,14 @@ export function applyCrewReaction(nodes:ReturnType<typeof prepareCrewReaction>,p
   const wave=Math.sin((safeBeat+plan.offset)*Math.PI/2+phase),pulse=.5-.5*Math.cos(safeBeat*Math.PI*2);
   let x=0,y=0,z=0,led=0;
   if(node.name==='Head'){
-   y=plan.interaction?.yaw??0;
+   y=conversation.gaze;
    if(plan.reaction==='nod')x=.025*(.3+e)*Math.sin(safeBeat*Math.PI*2);
    if(plan.reaction==='welcome')y+=.035*Math.sin(safeBeat*Math.PI/4);
    if(plan.reaction==='led')z=.018*Math.sin(safeBeat*Math.PI);
-   if(p){x=x*p.head+dynamics.settle*.55-dynamics.prepare*.4;z+=p.flow*.012*Math.sin(safeBeat*Math.PI/4+phase);}
+   if(p){x=x*p.head+conversation.answer+dynamics.settle*.55-dynamics.prepare*.4;z+=p.flow*.012*Math.sin(safeBeat*Math.PI/4+phase);}
   }else if(node.name==='Chest'){
    y=(plan.interaction?.yaw??0)*.55;
-   if(p){z=.022*p.shoulders*wave;x=.012*p.flow*Math.sin(safeBeat*Math.PI/4+phase)+dynamics.breath+dynamics.prepare-dynamics.settle;}
+   if(p){z=.022*p.shoulders*wave+conversation.shoulder;x=.012*p.flow*Math.sin(safeBeat*Math.PI/4+phase)+dynamics.breath+dynamics.prepare-dynamics.settle;}
   }else if(node.name==='LeftArm'||node.name==='RightArm'){
    x=(plan.interaction?.armAccent??0)*Math.sin((safeBeat+plan.offset)*Math.PI/2)*(p?.arms??1);
    if(p){z=(node.name==='LeftArm'?-1:1)*.018*p.flow*wave;x+=dynamics.settle*.7-dynamics.prepare*.5;}

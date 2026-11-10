@@ -1,3 +1,5 @@
+import {musicalDirection} from './musicalEvidence';
+import {chooseShowShot} from './showExperience';
 import {songShowMemory,type SongShowMemory} from './songShowMemory';
 import {crewDialogue,type CrewDialogue} from './crewDialogue';
 import {concertInstrumentalGap,nextConcertRefrain,concertRefrainVisit,concertLyricSection} from './concertLyricTimeline';
@@ -8,13 +10,14 @@ import {lyricSpotlightV1133} from './lyricSpotlightV1133';
 import {normalizeLyricTimingV1134} from './lyricTimingV1134';
 export type ConcertScoreV1134=StoryCueV1131 & {
  staging:'opening'|'verse'|'anticipation'|'chorus'|'reading'|'breath'|'finale'|'instrumental';
- memory?:SongShowMemory;lyricFocus:boolean;phraseEnvelope:number;dialogue?:CrewDialogue;anticipationProgress:number;positionMs:number;sourceKey:string;playback?:PlaybackSampleV1136;reading:boolean;accent:number;beamGain:number;motionGain:number;exchange:number;scoreKey:string;
+ music:ReturnType<typeof musicalDirection>;shot:number;memory?:SongShowMemory;lyricFocus:boolean;phraseEnvelope:number;dialogue?:CrewDialogue;anticipationProgress:number;positionMs:number;sourceKey:string;playback?:PlaybackSampleV1136;reading:boolean;accent:number;beamGain:number;motionGain:number;exchange:number;scoreKey:string;
 };
 const cache=new WeakMap<Lyrics,Lyrics|null>();
 function safeLyrics(lyrics:Lyrics|null|undefined){if(!lyrics)return null;if(!cache.has(lyrics))cache.set(lyrics,normalizeLyricTimingV1134(lyrics));return cache.get(lyrics)!;}
 /** Shared, seekable score. Lyric repetition is a structural hint, not audio/semantic AI analysis. */
 export function concertScoreV1134(input:StoryInputV1131):ConcertScoreV1134{
  const lyrics=safeLyrics(input.lyrics),pos=Number.isFinite(input.progressMs)?Math.max(0,input.progressMs):0;
+ const music=musicalDirection(input.audioEvidence),shot=chooseShowShot(input.history,input.trackId??'sonic-show');
  const cue=concertStoryV1131({...input,progressMs:pos,lyrics});
  const spotlight=lyricSpotlightV1133(lyrics,pos);
  const count=Math.max(1,Math.min(4,Math.round(input.count??1)||1));
@@ -35,7 +38,7 @@ export function concertScoreV1134(input:StoryInputV1131):ConcertScoreV1134{
  const reading=spotlight.mode==='rap';
  const staging:ConcertScoreV1134['staging']=reading?'reading':closingTail?'finale':instrumental?'instrumental':cue.act==='finale'?'finale':cue.act==='lift'?'chorus':anticipation?'anticipation':opening?'opening':cue.act==='breathe'?'breath':'verse';
  const act=closingTail?'finale':reading||instrumental?'story':anticipation?'build':opening?'breathe':cue.act;
- const memory=songShowMemory({trackId:input.trackId??'sonic-show',genre:input.genre,taste:input.taste,positionMs:pos,durationMs:input.durationMs,
+ const memory=songShowMemory({trackId:input.trackId??'sonic-show',genre:input.genre,taste:input.taste,history:input.history,positionMs:pos,durationMs:input.durationMs,
   act,chorusVisit:cue.chorusVisit,reading,anticipation});
  const dialogue=!reading&&act==='story'&&staging==='verse'&&cue.lyricDensity<=.55?crewDialogue(phrase,count):null;
  let interaction:StoryCueV1131['interaction']=reading?'solo':act==='breathe'?'rest':act==='impact'||act==='finale'||act==='lift'&&cue.chorusVisit>=3?'unison':
@@ -59,14 +62,14 @@ export function concertScoreV1134(input:StoryInputV1131):ConcertScoreV1134{
  const accent=reading||act==='breathe'||anticipation?0:Math.min(1,envelope*(act==='lift'||act==='finale'?.8:.28)+(keyActive?.18:0));
  const lyricFocus=reading||keyActive;
  const chapter=memory?.phase==='seed'?'Das Song-Motiv entsteht':memory&&act==='finale'?`Das große Finale · ${memory.phase==='recall'?'Das Motiv kehrt zurück':memory.phase==='response'?'Die Antwort der Crew':'Alle zusammen'}`:instrumental?'Instrumental · Bühne im Fokus':dialogue?`Tanzdialog · ${dialogue.phase==='call'?'Motiv vorstellen':dialogue.phase==='reply'?'Antwort übernehmen':'Wieder zusammen'}`:reading?'Text im Fokus · ruhige Begleitung':anticipation?'Vor dem Refrain · Spannung sammeln':opening?'Die Crew betritt die Bühne':cue.chapter;
- return {...cue,...(memory?{memory}:{}),lyricFocus,phraseEnvelope,...(dialogue?{dialogue}:{}),anticipationProgress,positionMs:pos,playback:input.playback,sourceKey:input.trackId?`track:${input.trackId}`:`lyrics:${input.durationMs??0}:${lyrics?.plainText??lyrics?.lines[0]?.text??''}`,phrase,act,mode,leader,partner,interaction,chapter,staging,reading,accent,exchange,
+ return {...cue,music,shot,...(memory?{memory}:{}),lyricFocus,phraseEnvelope,...(dialogue?{dialogue}:{}),anticipationProgress,positionMs:pos,playback:input.playback,sourceKey:input.trackId?`track:${input.trackId}`:`lyrics:${input.durationMs??0}:${lyrics?.plainText??lyrics?.lines[0]?.text??''}`,phrase,act,mode,leader,partner,interaction,chapter,staging,reading,accent,exchange,
  scoreKey:reading?`reading-${Math.floor((line?.startMs??pos)/16000)}`:`${staging}-${exchange}`,
  reason:dialogue?'Ein Motiv wandert zwischen den Figuren und kehrt gemeinsam zurück':reading?'Schnelle Lyrics: ruhige Kamera und zurückhaltende Crew':anticipation?'Refrain-Vorschau aus vorhandenen Lyrics':cue.reason,
  intensity:reading?.36:anticipation?.32+anticipationProgress*.18:opening?.2:closingTail?.8:cue.intensity,
  cameraSide:lyricFocus||anticipation||interaction==='unison'?0:count>1?(leader-(count-1)/2)*.10*phraseEnvelope:0,
  cameraScale:reading?1:instrumental?1.03+gapEnvelope*.04:staging==='finale'?1.10+(memory?.finaleProgress??1)*.03:staging==='chorus'?1.05+Math.min(3,Math.max(1,cue.chorusVisit))*.02:dialogue?.phase==='reunion'?1.035:anticipation?1.01+anticipationProgress*.03:interaction==='duel'?1.035:act==='breathe'?1.02:1,
- motionGain:reading?.12:anticipation?.22+anticipationProgress*.18:act==='breathe'?.25:1,
- lightGain:reading?.68:closingTail?1.14:instrumental?.95+gapEnvelope*.15:anticipation?.60+anticipationProgress*.20:cue.lightGain*(1+accent*.10)*(dialogue?.phase==='reunion'?1.04:1),
+ motionGain:music.quiet?.12:reading?.12:anticipation?.22+anticipationProgress*.18:act==='breathe'?.25:1,
+ lightGain:music.quiet?.60:reading?.68:closingTail?1.14:instrumental?.95+gapEnvelope*.15:anticipation?.60+anticipationProgress*.20:cue.lightGain*(1+accent*.10)*(lyricFocus?1:1+music.pulse*.10)*(dialogue?.phase==='reunion'?1.04:1),
  beamGain:reading?.38:lyricFocus?.75:instrumental?.9+gapEnvelope*.2:anticipation?.35+anticipationProgress*.30:act==='breathe'?.55:(1+accent*.22)*(dialogue?.phase==='reunion'?1.03:1),
  lyricGain:reading?1:cue.lyricGain};
 }
@@ -99,5 +102,6 @@ export function composeScoreCameraV1134<T extends ScoreCameraV1134>(base:T,cue:C
   return {...base,...state.anchor};
  }
  state.key='';state.anchor=null;
- return {...base,x:base.x+cue.cameraSide,y:base.y,z:base.z*cue.cameraScale,fov:Math.max(28,Math.min(65,base.fov+(cue.cameraScale-1)*14))};
+ const shotSide=cue.interaction==='unison'||cue.act==='breathe'||cue.act==='build'?0:([0,.045,-.045,0][cue.shot]??0)*cue.phraseEnvelope;
+ return {...base,x:base.x+cue.cameraSide+shotSide,y:base.y,z:base.z*cue.cameraScale*(cue.shot===3?1+cue.phraseEnvelope*.008:1),fov:Math.max(28,Math.min(65,base.fov+(cue.cameraScale-1)*14))};
 }

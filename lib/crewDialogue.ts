@@ -1,3 +1,4 @@
+import {experiencePenalty,type ShowHistory} from './showExperience';
 import {tasteGain,tasteKey,type MotifTaste} from './showTaste';
 import {CREATIVE_MOTIFS} from './creativeChoreography';
 import {musicFamilyV1129} from './musicPerformanceV1129';
@@ -15,8 +16,8 @@ const memory=new Map<string,Readonly<{call:string;contrast:string}>>();
 /** Evaluate complete call/contrast pairs. Shared constraints take priority over variety.
  * This is local candidate planning, without remote models or invented audio observations.
  */
-export function dialogueMotifs(trackId:string,genre:string|null|undefined,scene:number,taste?:MotifTaste){
- const family=musicFamilyV1129(genre),seed=hash(trackId),key=`${seed}:${family}:${scene}:${tasteKey(taste)}`;
+export function dialogueMotifs(trackId:string,genre:string|null|undefined,scene:number,taste?:MotifTaste,history?:ShowHistory){
+ const family=musicFamilyV1129(genre),seed=hash(trackId),key=`${seed}:${family}:${scene}:${tasteKey(taste)}:${JSON.stringify(history??[])}`;
  const cached=memory.get(key);if(cached){memory.delete(key);memory.set(key,cached);return cached;}
  const soft=family==='ambient'||family==='classical';
  const target=soft?.32:family==='rock'||family==='hard'?.78:family==='jazz'?.48:.6;
@@ -26,7 +27,7 @@ export function dialogueMotifs(trackId:string,genre:string|null|undefined,scene:
   if(a.clip===b.clip)continue;
   const score=(a.families.includes(family)?1.6:0)+(b.families.includes(family)?.6:0)-Math.abs(a.energy-target)*2+
    Math.min(.65,Math.abs(a.energy-b.energy))*.75+
-   tasteGain(taste,a.clip)+tasteGain(taste,b.clip)*.35+
+   tasteGain(taste,a.clip)+tasteGain(taste,b.clip)*.35-experiencePenalty(history,trackId,a.clip)-experiencePenalty(history,trackId,b.clip)*.35+
    hash(`${seed}:${scene}:${a.clip}`)/4294967295*.7+hash(`${seed}:${scene}:${b.clip}:answer`)/4294967295*.35;
   if(score>best){best=score;pair={call:a.clip,contrast:b.clip};}
  }
@@ -34,8 +35,8 @@ export function dialogueMotifs(trackId:string,genre:string|null|undefined,scene:
  return pair;
 }
 export function dialogueClip(input:{dialogue:CrewDialogue;trackId:string;genre?:string|null;slot:number;
- available:ReadonlySet<string>;taste?:MotifTaste;fallback:string|null}):string|null{
- const {dialogue}=input,pair=dialogueMotifs(input.trackId,input.genre,dialogue.scene,input.taste);
+ available:ReadonlySet<string>;history?:ShowHistory;taste?:MotifTaste;fallback:string|null}):string|null{
+ const {dialogue}=input,pair=dialogueMotifs(input.trackId,input.genre,dialogue.scene,input.taste,input.history);
  const lead=dialogue.phase==='reply'?dialogue.responder:dialogue.caller;
  const partner=dialogue.phase==='reply'?dialogue.caller:dialogue.responder;
  const clip=dialogue.phase==='reunion'||input.slot===lead?pair.call:input.slot===partner?pair.contrast:'Dance_Groove';

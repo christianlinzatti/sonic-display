@@ -1,3 +1,12 @@
+## Update – Natürlichere Crew und überprüfbare Showqualität
+
+Die adaptive Crew stabilisiert Standfüße mit dem bestehenden IK-Solver und
+antwortet mit persönlicher Körpersprache. Sichere Mikrofon-Beats ergänzen die
+Regie; ein abschaltbarer lokaler Verlauf vermeidet häufige Motiv- und
+Kamerawiederholungen über mehrere Songs. Die Probe zeigt gemessene
+Bewegungshinweise. Umsetzung, Grenzen, Mixamo-Anleitung und Tests stehen unter
+[Natürliche Crew und Showqualität](docs/versions/V1152-NATUERLICHE-CREW-UND-SHOWQUALITAET.md).
+
 ## Update – Song-Gedächtnis, Finale und persönlicher Stil
 
 Ein frühes Song-Motiv kehrt in den Refrains wieder. Das Finale verbindet Motiv,

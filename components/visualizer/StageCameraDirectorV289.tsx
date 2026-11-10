@@ -2,6 +2,8 @@
 import {readingCameraBlendV1136} from '@/lib/showContinuityV1136';
 import {lyricSpotlightV1133} from '@/lib/lyricSpotlightV1133';
 import {composeScoreCameraV1134,newScoreCameraV1134} from '@/lib/concertScoreV1134';
+import {newShowAudit,sampleShowAudit} from '@/lib/showQualityAudit';
+import {rememberCrewCamera} from './useSonicCrew';
 import {useConcertStoryV1131} from './useConcertStoryV1131';
 
 import {composeConcertSceneCameraV528} from "./cinematicConcertCoordinationV528";
@@ -95,6 +97,7 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
   section: StageSection; progressMs: number; intensity: number; playing: boolean; reducedMotion: boolean; duo: boolean; showCue?: ShowCue; concertShowCueV387?:ConcertShowCueV387; concertShowCameraV387?:boolean;festivalShowCueV394?:FestivalShowCueV394;festivalShowCameraV394?:boolean; composition?:SmartStageCueV351; genreCue?:GenreVisualCueV352; timelineCue?:ShowTimelineCueV354; lipSync?:VisualizerProps["lipSync"];genre?:string|null;cinematicCueV497?:CinematicConcertCueV497;cameraNarrativeV605?:{plan:NarrativePlanV604;cue:NarrativeCueV604;manualCamera:boolean};concertFlowV654?:ConcertFlowCueV654;transitionV791?:SceneTransitionCueV791;choreographyV792?:CameraChoreographyCueV792;vocalSpotlightV797?:MultiVocalSpotlightCueV797;vocalDuetV838?:VocalDuetPlanV838;
 }) {
  const scoreCameraV1134=useRef(newScoreCameraV1134());
+ const showAuditV1152=useRef(newShowAudit()),auditSourceV1152=useRef(''),auditPositionV1152=useRef<number|undefined>(undefined);
  const lyricPriorityV1133=lyricSpotlightV1133(lipSync?.lyrics,lipSync?.progressMs??progressMs).protectCamera;
   const storyV1131=useConcertStoryV1131({trackId:lipSync?.storyTrackIdV1136,playback:lipSync?.storyPlaybackV1136,durationMs:lipSync?.storyDurationMsV1131,progressMs,lyrics:lipSync?.lyrics,genre,bpm:audio?.bpm,energy:audio?.energyEnvelope,count:lipSync?.cameraCastCountV377??(duo?2:1),section:lipSync?.lyrics?.synced?undefined:section});
   const camera = useThree(state => state.camera as PerspectiveCamera);
@@ -1054,6 +1057,7 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
     const priorV1131=composeConcertCameraDirectorV1072(
       arenaFramedV1053,concertCameraCueV1072,flyoverProtectedV1033||!automaticShot);
     const arenaFramedV1072=composeScoreCameraV1134(priorV1131,storyV1131,scoreCameraV1134.current,{playing,reducedMotion,nowMs:_.clock.elapsedTime*1000,protectedShot:!!(editingPose||userHasPreset||manual!=="auto"||timelineCue?.active||authoredCueV400||cameraNarrativeV605?.manualCamera||lipSync?.cameraManualStagePriorityV377||liveCueV400||cutToCameraCueV400)||!automaticShot},{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:camera.fov,targetX:target.current.x,targetY:target.current.y,targetZ:target.current.z} as typeof priorV1131);
+    if(storyV1131&&playing&&!reducedMotion&&!storyV1131.lyricFocus&&!editingPose&&!userHasPreset&&manual==="auto"&&!timelineCue?.active&&!authoredCueV400&&!cameraNarrativeV605?.manualCamera&&!lipSync?.cameraManualStagePriorityV377&&!liveCueV400&&!cutToCameraCueV400&&automaticShot)rememberCrewCamera(lipSync?.storyTrackIdV1136,storyV1131.shot);
     const readingAlphaV1136=readingCameraBlendV1136(alpha,dt,scoreCameraV1134.current.key==='reading');
     camera.position.x += (arenaFramedV1072.x-camera.position.x)*readingAlphaV1136;
     camera.position.y += (arenaFramedV1072.y-camera.position.y)*readingAlphaV1136;
@@ -1065,12 +1069,17 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
     target.current.z += ((arenaFramedV1072.targetZ??0)-target.current.z)*readingAlphaV1136;
     camera.lookAt(target.current);
     statusInterval.current -= Math.max(0,dt);
+    if(auditSourceV1152.current!==storyV1131?.sourceKey){showAuditV1152.current=newShowAudit();auditSourceV1152.current=storyV1131?.sourceKey??'';}
+    if(auditPositionV1152.current!==undefined&&(progressMs<auditPositionV1152.current-180||progressMs-auditPositionV1152.current>2500))showAuditV1152.current.last=undefined;
+    auditPositionV1152.current=progressMs;
+    if(storyV1131&&playing&&!reducedMotion&&!lipSync?.cameraManualStagePriorityV377&&automaticShot&&manual==="auto"&&!editingPose&&!userHasPreset&&!timelineCue?.active&&!authoredCueV400&&!cameraNarrativeV605?.manualCamera&&!liveCueV400&&!cutToCameraCueV400)sampleShowAudit(showAuditV1152.current,{time:_.clock.elapsedTime,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z}});
+    else showAuditV1152.current.last=undefined;
     if(statusInterval.current<=0 && typeof window!=="undefined") {
       statusInterval.current=.5;
       const preset = library.current.enabled && library.current.presets.find(p=>p.id===library.current.assignments[section]);
       const isKeyframe = !!(preset && liveEnabled.current && motionFrames.current[preset.id]?.length);
       const source = editingPose?"Live-Editor":!playing?"Pausiert":reducedMotion?"Reduced Motion":manual!=="auto"?`Manuell: ${manual}`:isKeyframe?(preset && cinematicPaths.current[preset.id]?.enabled?"Cinematic Camera Path":"Keyframe-Fahrt"):preset?`Preset: ${preset.name}`:"Automatische Regie";
-      window.dispatchEvent(new CustomEvent(CAMERA_STUDIO_STATUS_EVENT,{detail:{scoreSourceV1136:storyV1131?.sourceKey,scoreHoldV1136:scoreCameraV1134.current.key,section,mode:manual,playing,reducedMotion,intensity,source,composer:composerSettings.current.enabled,tracking:trackingEnabled.current,progressMs,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:camera.fov,targetX:target.current.x,targetY:target.current.y,targetZ:target.current.z}}}));
+      window.dispatchEvent(new CustomEvent(CAMERA_STUDIO_STATUS_EVENT,{detail:{showQualityV1152:{samples:showAuditV1152.current.samples,cameraCuts:showAuditV1152.current.cameraCuts,frequentCuts:showAuditV1152.current.recentCuts.length>=4},scoreSourceV1136:storyV1131?.sourceKey,scoreHoldV1136:scoreCameraV1134.current.key,section,mode:manual,playing,reducedMotion,intensity,source,composer:composerSettings.current.enabled,tracking:trackingEnabled.current,progressMs,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:camera.fov,targetX:target.current.x,targetY:target.current.y,targetZ:target.current.z}}}));
     }
   });
   return null;

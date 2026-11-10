@@ -1,3 +1,4 @@
+import type {ShowHistory} from './showExperience';
 import type {MotifTaste} from './showTaste';
 import type {SongShowMemory} from './songShowMemory';
 import {dialogueClip,type CrewDialogue} from './crewDialogue';
@@ -14,18 +15,18 @@ const PERSONAL:Record<string,string>={
  'sonic-rio-carnival':'Dance_CrossStep','sonic-quantum-bass':'Dance_RobotGroove',
 };
 /** Whole-body choices from actual available clips; keep quiet/dense passages and shared canon intact. */
-export function fullBodyClipV1133(input:{taste?:MotifTaste;slot?:number;trackId?:string;recent?:readonly string[];modelId:string;genre?:string|null;cue:StoryCueV1131 & {reading?:boolean;dialogue?:CrewDialogue;memory?:SongShowMemory};count:number;available:ReadonlySet<string>;fallback:string|null}):string|null{
+export function fullBodyClipV1133(input:{history?:ShowHistory;taste?:MotifTaste;slot?:number;trackId?:string;recent?:readonly string[];modelId:string;genre?:string|null;cue:StoryCueV1131 & {reading?:boolean;dialogue?:CrewDialogue;memory?:SongShowMemory};count:number;available:ReadonlySet<string>;fallback:string|null}):string|null{
  const {cue}=input;
  if(cue.reading||cue.act==='breathe'||cue.act==='build'||cue.lyricDensity>.7)return input.fallback;
  if(cue.memory)return input.available.has(cue.memory.clip)?cue.memory.clip:input.fallback;
  if(input.count>1&&cue.interaction==='answer')return input.fallback;
  if(cue.dialogue)return dialogueClip({dialogue:cue.dialogue,trackId:input.trackId??'sonic-show',genre:input.genre,
-  taste:input.taste,slot:input.slot??0,available:input.available,fallback:input.fallback});
+  history:input.history,taste:input.taste,slot:input.slot??0,available:input.available,fallback:input.fallback});
  const family=musicFamilyV1129(input.genre),shared=input.count>1&&cue.interaction==='unison';
  // The opening establishes each personality; later phrases develop contrasting motifs.
  if(cue.phrase>=2){
   const creative=creativeBodyClip({trackId:input.trackId??'sonic-show',modelId:input.modelId,genre:input.genre,cue,
-   taste:input.taste,available:input.available,recent:input.recent,shared,personal:PERSONAL[input.modelId]??'Dance_CrossStep'});
+   history:input.history,taste:input.taste,available:input.available,recent:input.recent,shared,personal:PERSONAL[input.modelId]??'Dance_CrossStep'});
   if(creative)return creative;
   if(shared)return input.fallback;
  }

@@ -18,7 +18,7 @@ export function performerDynamicsV1135(plan:CrewPlan,beat:number){
  const gain=roleGain*reading;
  const ease=(x:number)=>{const t=Math.max(0,Math.min(1,x));return t*t*(3-2*t);};
  return {breath:Math.sin(b*Math.PI/8+p.phase)*(.003+.003*flow)*gain,
- prepare:ease((phase-7.1)/.9)*.018*gain,
+ prepare:(ease((phase-7.1)/.9)*.018+(plan.story?.music?.prepare??0)*.008)*gain,
  settle:(phase<1.5?Math.sin(Math.PI*phase/1.5)*Math.exp(-phase*1.5):0)*.024*gain,
  frequency:20-flow*6};
 }

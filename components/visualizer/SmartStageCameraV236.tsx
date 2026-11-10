@@ -2,6 +2,9 @@
 import {readingCameraBlendV1136} from '@/lib/showContinuityV1136';
 import {lyricSpotlightV1133} from '@/lib/lyricSpotlightV1133';
 import {composeScoreCameraV1134,newScoreCameraV1134} from '@/lib/concertScoreV1134';
+import {newShowAudit,sampleShowAudit} from '@/lib/showQualityAudit';
+import {CAMERA_STUDIO_STATUS_EVENT} from './cameraStudioHelpersV299';
+import {rememberCrewCamera} from './useSonicCrew';
 import {useConcertStoryV1131} from './useConcertStoryV1131';
 import {composeArenaShowCameraV1043,type ArenaShowCameraCueV1043} from "@/lib/arena360ShowCameraV1043";
 import {composeArenaImmersiveCameraV1047,type ArenaImmersiveCameraCueV1047} from "@/lib/arena360ImmersiveArenaV1047";
@@ -26,6 +29,7 @@ import {advanceStageDirector,createStageDirectorState} from "./smartStageDirecto
 export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,composition,genreCue,timelineCue,lipSync,arena360=false,arenaCameraEnabled=true,arenaCameraMode="arc",arenaFlyoverEnabled=true,arenaSectionCameraEnabled=true,arenaShowCameraCueV1043,arenaImmersiveCameraCueV1047,arenaCinematicCameraCueV1053,concertCameraCueV1072,section="verse"}:{
  arena360?:boolean;arenaCameraEnabled?:boolean;arenaCameraMode?:ArenaCameraModeV1032;arenaFlyoverEnabled?:boolean;arenaSectionCameraEnabled?:boolean;arenaShowCameraCueV1043?:ArenaShowCameraCueV1043;arenaImmersiveCameraCueV1047?:ArenaImmersiveCameraCueV1047;arenaCinematicCameraCueV1053?:ConcertCameraCueV1053;concertCameraCueV1072?:CameraCueV1072;section?:string;audio:AudioFeatures;genre?:string|null;playing:boolean;reducedMotion:boolean;duo:boolean;composition?:SmartStageCueV351;genreCue?:GenreVisualCueV352;timelineCue?:ShowTimelineCueV354;lipSync?:VisualizerProps["lipSync"]}){
  const scoreCameraV1134=useRef(newScoreCameraV1134());
+ const showAudit=useRef(newShowAudit()),auditSource=useRef(''),auditPosition=useRef<number|undefined>(undefined),lastStatus=useRef(-1);
  const lyricPriorityV1133=lyricSpotlightV1133(lipSync?.lyrics,lipSync?.progressMs??0).protectCamera;
  const storyV1131=useConcertStoryV1131({trackId:lipSync?.storyTrackIdV1136,playback:lipSync?.storyPlaybackV1136,durationMs:lipSync?.storyDurationMsV1131,progressMs:lipSync?.progressMs??0,lyrics:lipSync?.lyrics,genre,bpm:audio.bpm,energy:audio.energyEnvelope,count:lipSync?.cameraCastCountV377??(duo?2:1),section:lipSync?.lyrics?.synced?undefined:section});
  const director=useRef(createStageDirectorState());
@@ -75,6 +79,7 @@ export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,comp
   const safeV1053=composeArenaCinematicCameraV1053(safeV1047,arenaCinematicCameraCueV1053,protectedShotV1033);
   const priorV1131=composeConcertCameraDirectorV1072(safeV1053,concertCameraCueV1072,protectedShotV1033);
   const safeV1072=composeScoreCameraV1134(priorV1131,storyV1131,scoreCameraV1134.current,{playing,reducedMotion,nowMs:clock.elapsedTime*1000,protectedShot:!!timelineCue?.active||focusV369.current>.01},{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:(camera as PerspectiveCamera).fov,targetY:lookV369.current} as typeof priorV1131);
+  if(storyV1131&&playing&&!reducedMotion&&!storyV1131.lyricFocus&&!timelineCue?.active&&focusV369.current<=.01)rememberCrewCamera(lipSync?.storyTrackIdV1136,storyV1131.shot);
   const t=readingCameraBlendV1136(1-Math.exp(-Math.min(Math.max(delta,0),.1)*3),delta,scoreCameraV1134.current.key==='reading');
   camera.position.x+=(safeV1072.x-camera.position.x)*t;
   camera.position.y+=(safeV1072.y-camera.position.y)*t;
@@ -84,6 +89,16 @@ export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,comp
   if(Math.abs(pc.fov-safeV1072.fov)>.015){pc.fov+=(safeV1072.fov-pc.fov)*t;pc.updateProjectionMatrix();}
   lookV369.current+=(safeV1072.targetY-lookV369.current)*t;
   camera.lookAt(0,lookV369.current,0);
+  const position=lipSync?.progressMs??0;
+  if(auditSource.current!==storyV1131?.sourceKey){showAudit.current=newShowAudit();auditSource.current=storyV1131?.sourceKey??'';}
+  if(auditPosition.current!==undefined&&(position<auditPosition.current-180||position-auditPosition.current>2500))showAudit.current.last=undefined;
+  auditPosition.current=position;
+  if(storyV1131&&playing&&!reducedMotion&&!timelineCue?.active&&!lipSync?.cameraManualStagePriorityV377)sampleShowAudit(showAudit.current,{time:clock.elapsedTime,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z}});
+  else showAudit.current.last=undefined;
+  if(clock.elapsedTime-lastStatus.current>=.5&&typeof window!=='undefined'){
+   lastStatus.current=clock.elapsedTime;
+   window.dispatchEvent(new CustomEvent(CAMERA_STUDIO_STATUS_EVENT,{detail:{showQualityV1152:{samples:showAudit.current.samples,cameraCuts:showAudit.current.cameraCuts,frequentCuts:showAudit.current.recentCuts.length>=4},scoreSourceV1136:storyV1131?.sourceKey,scoreHoldV1136:scoreCameraV1134.current.key,section,mode:'auto',playing,reducedMotion,intensity:55,source:'Automatische Basisregie',composer:false,tracking:false,progressMs:position,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:pc.fov,targetX:0,targetY:lookV369.current,targetZ:0}}}));
+  }
  });
  return null;
 }
