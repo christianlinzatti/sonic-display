@@ -4,6 +4,7 @@ import {CREW_DEFAULT,normalizeCrewSettings,newCrewState,stepCrew,type CrewSettin
 import {rememberShow} from '@/lib/showExperience';
 import {measuredMusic} from '@/lib/musicalEvidence';
 import {useAudioAnalysis} from '@/context/AudioAnalysisContext';
+import {CONCERT_COORDINATION_KEY_V1154,CONCERT_COORDINATION_EVENT_V1154,loadConcertCoordinationV1154,planConcertCoordinationV1154,applyConcertCrewV1154} from '@/lib/aiConcertCoordinationV1154';
 export const CREW_KEY='sonic-stage-crew-v4';
 const EVENT='sonic:stage-crew-v4';
 let raw:string|null|undefined,snapshot: CrewSettings = CREW_DEFAULT;
@@ -31,6 +32,13 @@ export function rememberCrewCamera(track:string|undefined|null,shot:number){
 }
 export function useCrewDirector(input:CrewInput){
  const analysis=useAudioAnalysis(),evidence=measuredMusic(analysis.active,analysis.metrics);
+ const [coordination,setCoordination]=useState(loadConcertCoordinationV1154);
+ useEffect(()=>{
+  const refresh=()=>setCoordination(loadConcertCoordinationV1154());
+  const storage=(e:StorageEvent)=>{if(e.key===CONCERT_COORDINATION_KEY_V1154||e.key===null)refresh();};
+  window.addEventListener(CONCERT_COORDINATION_EVENT_V1154,refresh);window.addEventListener('storage',storage);
+  return()=>{window.removeEventListener(CONCERT_COORDINATION_EVENT_V1154,refresh);window.removeEventListener('storage',storage);};
+ },[]);
  input={...input,audioEvidence:evidence};
  const previous=useRef(newCrewState());
  const [result,setResult]=useState(()=>stepCrew(previous.current,input));
@@ -44,5 +52,17 @@ export function useCrewDirector(input:CrewInput){
  // Immediately suppress a stale action when playback/ownership changes.
  if(!input.playing||input.reducedMotion||input.manualPriority||!input.settings.enabled||result.state.key!==`${input.trackId}|${input.modelId}|${input.settings.mode}|${input.count}|${input.slot}`)
   return stepCrew(newCrewState(),{...input,manualPriority:true});
- return result;
+ const cue=planConcertCoordinationV1154({
+  settings:coordination,trackId:input.trackId,progressMs:input.progressMs??NaN,
+  durationMs:input.durationMs,
+  phase:result.plan.part==='quiet'?'quiet':result.plan.part==='drop'?'drop':
+   result.plan.part==='hook'?'hook':'verse',
+  // The crew uses existing observed song/lyric context for expression only.
+  // No unverified crew observation ever authorizes a physical light phase.
+  verified:Boolean(input.section||input.lyrics?.synced),
+  transition:Math.min(1,Math.max(0,((input.progressMs??0)%3200)/3200)),
+  playing:input.playing,reducedMotion:input.reducedMotion,manualPriority:input.manualPriority,
+  lyricsFocus:result.plan.story?.reading===true,genre:input.genre
+ });
+ return {...result,plan:applyConcertCrewV1154(result.plan,cue,input.manualPriority)};
 }

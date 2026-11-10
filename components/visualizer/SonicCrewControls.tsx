@@ -11,6 +11,7 @@ import type {CrewReading,CrewScenario} from './SonicCrewRehearsal';
 const Rehearsal=dynamic(()=>import('./SonicCrewRehearsal'),{ssr:false,loading:()=><p>3D-Vorschau wird geladen…</p>});
 import {getAvatarModel} from './avatarModels';
 import {useMusic} from '@/context/MusicContext';
+import {CONCERT_COORDINATION_EVENT_V1154,CONCERT_COORDINATION_KEY_V1154,loadConcertCoordinationV1154,saveConcertCoordinationV1154} from '@/lib/aiConcertCoordinationV1154';
 const roleLabels:Record<string,string>={lead:'Solo',partner:'Duett',echo:'Antwort',together:'Gemeinsam',rest:'Ruhe'};
 const originalCast=[...CREW_IDS.slice(0,3)];
 export function SonicCrewControls(){
@@ -20,6 +21,13 @@ export function SonicCrewControls(){
  const [scenario,setScenario]=useState<CrewScenario>({section:'verse',genre:'house',energy:.55,bpm:120});
  const [readings,setReadings]=useState<CrewReading[]>([]),[saved,setSaved]=useState<{group:GroupStudioV326;preferences:Pick<UiPreferences,'avatarModelId'|'secondaryAvatarModelId'|'visualizerMode'>;crew:CrewSettings}|null>(null);
  const [tasteNotice,setTasteNotice]=useState('');
+ const [coordination,setCoordination]=useState(loadConcertCoordinationV1154);
+ useEffect(()=>{
+  const refresh=()=>setCoordination(loadConcertCoordinationV1154());
+  const storage=(e:StorageEvent)=>{if(e.key===CONCERT_COORDINATION_KEY_V1154||e.key===null)refresh();};
+  window.addEventListener(CONCERT_COORDINATION_EVENT_V1154,refresh);window.addEventListener('storage',storage);
+  return()=>{window.removeEventListener(CONCERT_COORDINATION_EVENT_V1154,refresh);window.removeEventListener('storage',storage);};
+ },[]);
  const vote=(clip:string,direction:1|-1)=>{writeCrewSettings({...settings,taste:voteShowTaste(settings.taste,clip,direction)});setTasteNotice(direction===1?'Dieses Motiv wird häufiger berücksichtigt.':'Dieses Motiv wird seltener berücksichtigt.');};
  const [cast,setCast]=useState<string[]>(originalCast);
  const maxSeconds=Math.max(120,Math.min(3600,Math.ceil((music.track?.durationMs??0)/1000)));
@@ -36,6 +44,17 @@ export function SonicCrewControls(){
  const undo=()=>{if(!saved)return;writeGroupV326(saved.group);updatePreferences(saved.preferences);writeCrewSettings(saved.crew);setSaved(null);};
  return <fieldset aria-label="Sonic Stage Crew – Musik und gemeinsame Show"><legend>Sonic Stage Crew · Musik &amp; gemeinsame Show</legend>
   <p>Die adaptive Regie verteilt Soli, Tanzduelle und Antworten über den Song. Vor Refrains sammelt die Crew Spannung; schnelle Lyrics bekommen eine ruhige Begleitung. Elf eingebaute Figuren wählen abwechslungsreiche Genre-Clips anhand der vorhandenen Songposition, Abschnitts- und Energiedaten. Ohne Tempoangabe wird 120 BPM verwendet. Dies ergänzt die bestehende Analyse; es ist keine neue Musikerkennung.</p>
+  <fieldset aria-label="V1154 KI-Konzertregie 3.0">
+   <legend>V1154 · KI-Konzertregie 3.0</legend>
+   <label className="setting-check"><input type="checkbox" checked={coordination.enabled}
+    onChange={e=>saveConcertCoordinationV1154({...coordination,enabled:e.target.checked})}/>
+    Sanfte Crew- und Govee-Koordination aktivieren</label>
+   <label>Stärke ({coordination.strength} %)
+    <input type="range" min="0" max="100" step="5" value={coordination.strength}
+     onChange={e=>saveConcertCoordinationV1154({...coordination,strength:Number(e.target.value)})}/>
+   </label>
+   <p className="settings-note">Standardmäßig aus. Der Avatar-Ausdruck wird bei ruhigen oder textreichen Passagen zurückhaltender. Govee-Helligkeit wird nur bei bestätigten Songabschnitten im bestehenden freigegebenen Musik-Sync geglättet; keine zusätzlichen Lampenbefehle oder künstlichen Beats. Manuelle Choreografien, eigene Lichtshows und reduzierte Bewegung haben Vorrang.</p>
+  </fieldset>
   <label><input type="checkbox" checked={settings.poseAware===true} onChange={e=>writeCrewSettings({...settings,poseAware:e.target.checked})}/> Körperhaltung bei freien Tanzwechseln berücksichtigen</label>
   <p>Song-Gedächtnis: Ein Motiv aus der Strophe kehrt in Refrains wieder. Das Finale verbindet Motiv, Antwort und gemeinsamen Abschluss. Deine Motiv-Vorlieben bleiben lokal auf diesem Gerät.</p>
   <button type="button" disabled={!Object.keys(settings.taste??{}).length} onClick={()=>{writeCrewSettings({...settings,taste:undefined});setTasteNotice('Motiv-Vorlieben zurückgesetzt.');}}>Vorlieben zurücksetzen</button>
