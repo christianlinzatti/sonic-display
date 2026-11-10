@@ -30,7 +30,8 @@ export function AlexaConnectionWizardV1149(){
   });
   const server=async()=>{
    try{
-    const response=await backgroundJsonV1009('/api/alexa/status',{cache:'no-store',signal:controller.signal},12000);
+    // User-initiated diagnostics must fetch fresh status, not V1010's normal 60-second GET cache.
+    const response=await backgroundJsonV1009('/api/alexa/status',{cache:'no-store',signal:controller.signal},12000,(input,init)=>fetch(input,init));
     const data:unknown=await response.json();
     put(classifyAlexaServerV1149(response.status,data));
    }catch{put(classifyAlexaServerErrorV1149());}
