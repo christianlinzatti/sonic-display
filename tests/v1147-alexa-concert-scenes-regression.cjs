@@ -37,6 +37,18 @@ assert.equal(interpolate(calm,finale,0,true).rotationAllowed,false);
 assert.throws(()=>interpolate(calm,finale,NaN,false),/Übergangsfortschritt/);
 assert.equal(JSON.stringify(calm),before,'source plan stays immutable');
 assert.equal(JSON.stringify(finale),after,'target plan stays immutable');
+const cue=mod.exports.virtualStageCueV1147(finale);
+assert.equal(cue.strength,finale.stageIntensity);
+assert.equal(cue.hardwareSync,false);
+assert.equal(cue.voiceMoodV968,'neon');
+assert.equal(mod.exports.virtualStageCueV1147(calm).voiceMoodV968,'cool');
+assert(readStageIntegrationV1147());
+function readStageIntegrationV1147(){
+ const voice=fs.readFileSync(path.join(__dirname,'../components/AlexaVoiceControlV1008.tsx'),'utf8');
+ const stop=fs.readFileSync(path.join(__dirname,'../lib/alexaFullConcertV1145.ts'),'utf8');
+ return voice.includes('applyVirtualConcertSceneV1147(activation.plan,allowed)')&&
+  stop.includes('restoreVirtualConcertSceneV1147();');
+}
 let starts=0;
 const activated=mod.exports.activateConcertSceneV1147(base,()=>{starts++;return 'Show gestartet.';});
 assert.equal(starts,1);assert.match(activated.message,/Show gestartet/);
