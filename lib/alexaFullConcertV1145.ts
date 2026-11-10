@@ -1,6 +1,7 @@
 /** V1145: explicit Alexa opt-in for the existing V958 concert and V1031+ 360° stage.
  * Never starts Spotify, issues LAN power commands, changes manual timelines or selects devices.
  */
+import {restoreVirtualConcertSceneV1147} from './alexaConcertScenesV1147';
 import type {UiPreferences} from '@/types/music';
 import {loadConcertRoadmapV958,saveConcertRoadmapV958,type ConcertSettingsV958} from './ultimateConcertRoadmapV958';
 import {loadGoveeConfigV909,saveGoveeConfigV909} from './goveeLanV909';
@@ -103,6 +104,7 @@ export function runFullConcertV1145(command:FullConcertVoiceCommandV1145,options
  if(command==='concert-show-stop'){
   const snap=readFullConcertSnapshotV1145();
   if(!snap)return 'Keine von Alexa gestartete Konzertshow aktiv. Manuell eingerichtete Shows bleiben unverändert.';
+  restoreVirtualConcertSceneV1147();
   const current=loadConcertRoadmapV958();
   const ui=restoreOwned(options.preferences as unknown as Record<string,unknown>,
    snap.uiBefore as Record<string,unknown>,snap.uiApplied as Record<string,unknown>,OWNED_UI_KEYS_V1145);
