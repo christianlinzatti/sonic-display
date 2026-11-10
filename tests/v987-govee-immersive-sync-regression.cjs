@@ -131,7 +131,7 @@ test('only existing V909 sender performs I/O; no independent driver is created',
  assert(atmosphereAt>=0&&atmosphereAt<roomAt&&roomAt<coordinationAt&&
   coordinationAt<governorAt&&governorAt<sendAt,
   'V987 overlay must pass through V1096, dim-only V1154 and final V961 governor before the single V909 LAN send');
- assert.equal((sender.match(/goveeBridgeRequestV909\\(config,'\\/command','POST',\\{ip,action:'look',value:finalLook\\}\\)/g)||[]).length,1,
+ assert.equal(sender.split("goveeBridgeRequestV909(config,'/command','POST',{ip,action:'look',value:finalLook})").length-1,1,
   'V1154 does not add another network send');
 });
 test('UI requires a second explicit click and allows immediate revocation',()=>{
