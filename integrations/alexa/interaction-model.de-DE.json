@@ -665,6 +665,86 @@
             "welche sprachbefehle funktionieren jetzt",
             "was darfst du aktuell steuern"
           ]
+        },
+        {
+          "name": "DirectorStageArenaIntent",
+          "samples": [
+            "wechsle die konzertbühne zur arena",
+            "stelle die konzertbühne auf 360 grad arena",
+            "nutze die arena bühne für das konzert"
+          ]
+        },
+        {
+          "name": "DirectorStageFestivalIntent",
+          "samples": [
+            "wechsle die konzertbühne zur festivalbühne",
+            "stelle die konzertbühne auf festival",
+            "nutze die festivalbühne für das konzert"
+          ]
+        },
+        {
+          "name": "DirectorStageClubIntent",
+          "samples": [
+            "wechsle die konzertbühne zum neon club",
+            "stelle die konzertbühne auf neon club",
+            "nutze die club bühne für das konzert"
+          ]
+        },
+        {
+          "name": "DirectorMoodWarmIntent",
+          "samples": [
+            "setze die konzertlichtstimmung auf warm",
+            "gib der konzertbühne warmes licht",
+            "mache die virtuelle bühne warm"
+          ]
+        },
+        {
+          "name": "DirectorMoodCoolIntent",
+          "samples": [
+            "setze die konzertlichtstimmung auf kühl",
+            "gib der konzertbühne kühles licht",
+            "mache die virtuelle bühne kühl"
+          ]
+        },
+        {
+          "name": "DirectorMoodNeonIntent",
+          "samples": [
+            "setze die konzertlichtstimmung auf neon",
+            "gib der konzertbühne neon licht",
+            "mache die virtuelle bühne neonfarben"
+          ]
+        },
+        {
+          "name": "DirectorMoodAutoIntent",
+          "samples": [
+            "setze die konzertlichtstimmung auf automatisch",
+            "aktiviere automatische konzertlichtstimmung",
+            "steuere das virtuelle konzertlicht automatisch"
+          ]
+        },
+        {
+          "name": "DirectorEnergyCalmIntent",
+          "samples": [
+            "mache die konzertshow ruhiger",
+            "setze die konzertintensität auf ruhig",
+            "reduziere die virtuelle showintensität"
+          ]
+        },
+        {
+          "name": "DirectorEnergyBalancedIntent",
+          "samples": [
+            "mache die konzertshow ausgeglichen",
+            "setze die konzertintensität auf mittel",
+            "nutze eine mittlere showintensität"
+          ]
+        },
+        {
+          "name": "DirectorEnergyIntenseIntent",
+          "samples": [
+            "mach die konzertshow intensiver",
+            "setze die konzertintensität auf hoch",
+            "erhöhe die virtuelle showintensität"
+          ]
         }
       ],
       "types": [

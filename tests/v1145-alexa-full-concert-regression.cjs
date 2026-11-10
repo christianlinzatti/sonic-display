@@ -21,6 +21,7 @@ const mod={exports:{}};
 vm.runInNewContext(src.outputText,{module:mod,exports:mod.exports,window,localStorage,Event,Date,Number,Object,JSON,
  require:id=>{
   if(id==='./alexaConcertScenesV1147')return {restoreVirtualConcertSceneV1147:()=>{}};
+  if(id==='./alexaConcertVoiceDirectorV1153')return {restoreVoiceDirectorV1153:()=>{}};
   if(id==='./ultimateConcertRoadmapV958')return {loadConcertRoadmapV958:()=>({...roadmap}),
    saveConcertRoadmapV958:value=>{roadmap=value;roadmapWrites++;}};
   if(id==='./goveeLanV909')return {loadGoveeConfigV909:()=>({...govee,selectedIps:[...govee.selectedIps]}),

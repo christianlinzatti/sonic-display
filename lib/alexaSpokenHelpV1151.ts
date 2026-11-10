@@ -5,7 +5,7 @@ import {classifyAlexaIntentV1148,type AlexaAvailabilityContextV1148} from './ale
 
 export const isAlexaSpokenHelpCommandV1151=(v:unknown):v is 'voice-context-help'=>v==='voice-context-help';
 export type AlexaSpokenHelpContextV1151=AlexaAvailabilityContextV1148&{
- visible:boolean;trackAvailable:boolean;concertActive:boolean;
+ visible:boolean;trackAvailable:boolean;concertActive:boolean;director?:boolean;
 };
 export type AlexaSpokenHelpV1151={examples:string[];text:string};
 export function buildAlexaSpokenHelpV1151(c:AlexaSpokenHelpContextV1151):AlexaSpokenHelpV1151{
@@ -17,6 +17,8 @@ export function buildAlexaSpokenHelpV1151(c:AlexaSpokenHelpContextV1151):AlexaSp
  };
  const spotifyTrack=c.spotifyConnected&&c.trackAvailable;
  if(c.concertActive){
+  add('DirectorStageFestivalIntent','wechsle die Konzertbühne zur Festivalbühne',c.director===true&&c.spotifyPlaying&&spotifyTrack);
+  add('DirectorEnergyIntenseIntent','mach die Konzertshow intensiver',c.director===true&&c.spotifyPlaying&&spotifyTrack);
   add('FullConcertStopIntent','beende die komplette Konzertshow',c.spotifyConnected);
  }else{
   add('FullConcertStartIntent','starte die komplette Konzertshow',spotifyTrack&&c.spotifyPlaying);

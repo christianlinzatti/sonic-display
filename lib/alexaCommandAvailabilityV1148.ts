@@ -6,11 +6,15 @@ export type AlexaAvailabilityV1148={kind:AlexaAvailabilityKindV1148;label:string
 export type AlexaAvailabilityContextV1148={
  general:boolean;artist:boolean;display:boolean;power:boolean;sync:boolean;look:boolean;show:boolean;roomLooks:boolean;
  spotifyConnected:boolean;spotifyPlaying:boolean;goveeConfigured:boolean;goveeAutoSync:boolean;receiverToken:boolean;
+ director?:boolean;concertActive?:boolean;
 };
 const SKILL_ONLY=new Set(['AllCommandsIntent','LastVoiceResultIntent','AMAZON.HelpIntent','AMAZON.CancelIntent','AMAZON.StopIntent']);
 const ARTIST=new Set(['LikeArtistIntent','UnlikeArtistIntent','FollowAllArtistsIntent','ArtistStatusIntent','UndoArtistIntent','FollowPrimaryArtistIntent','UnfollowPrimaryArtistIntent','SelectFirstArtistIntent','SelectSecondArtistIntent','SelectThirdArtistIntent','SelectArtistIntent']);
 const DISPLAY=new Set(['LyricsOnIntent','LyricsOffIntent','NextAvatarIntent','CalmDisplayIntent','NormalDisplayIntent']);
 const FULL_SHOW=new Set(['FullConcertStartIntent','FullConcertStopIntent','ConcertSceneCalmIntent','ConcertSceneIntenseIntent','ConcertSceneFinaleIntent']);
+const DIRECTOR=new Set(['DirectorStageArenaIntent','DirectorStageFestivalIntent','DirectorStageClubIntent',
+ 'DirectorMoodWarmIntent','DirectorMoodCoolIntent','DirectorMoodNeonIntent','DirectorMoodAutoIntent',
+ 'DirectorEnergyCalmIntent','DirectorEnergyBalancedIntent','DirectorEnergyIntenseIntent']);
 const STUDIO=new Set(['ArenaIntent','FestivalIntent','ClubIntent','CalmIntent','StopShowIntent',
  'RapPresetIntent','HardtekkPresetIntent','RockPresetIntent','CinemaPresetIntent','AutoPresetIntent',
  'StageZoneIntent','BackdropZoneIntent','AudienceZoneIntent','AllZonesIntent','WarmMoodIntent','CoolMoodIntent','NeonMoodIntent','AutoMoodIntent',
@@ -42,6 +46,10 @@ export function classifyAlexaIntentV1148(intent:string,c:AlexaAvailabilityContex
   ...(c.show?[]:['V1145 Konzertshow freigeben']),
   ...((intent==='FullConcertStopIntent'||c.spotifyPlaying)?[]:['Spotify-Titel abspielen'])],
   '360°-Show lokal freigegeben; ein bereits laufender Titel und der veröffentlichte Alexa-Skill bleiben erforderlich.');
+ if(DIRECTOR.has(intent))return make([...requireGeneral(c),...requireSpotify(c),
+  ...(c.spotifyPlaying?[]:['Spotify-Titel abspielen']),...(c.show?[]:['V1145 Konzertshow freigeben']),
+  ...(c.director?[]:['V1153 Konzertregie freigeben']),...(c.concertActive?[]:['Alexa-Konzertshow starten'])],
+  'Nur virtuelle Regieänderungen; bestehende manuelle Shows und Govee-Leuchten bleiben unberührt.');
  if(STUDIO.has(intent))return make([...requireGeneral(c),...requireSpotify(c)],
   'Konzertstudio muss sichtbar geöffnet sein; AWS-Alexa-Skill ist nicht geprüft.');
  if(POWER.has(intent))return make([...requireGeneral(c),...requireReceiver(c),...requireGovee(c),

@@ -2,6 +2,7 @@
  * Never starts Spotify, issues LAN power commands, changes manual timelines or selects devices.
  */
 import {restoreVirtualConcertSceneV1147} from './alexaConcertScenesV1147';
+import {restoreVoiceDirectorV1153} from './alexaConcertVoiceDirectorV1153';
 import type {UiPreferences} from '@/types/music';
 import {loadConcertRoadmapV958,saveConcertRoadmapV958,type ConcertSettingsV958} from './ultimateConcertRoadmapV958';
 import {loadGoveeConfigV909,saveGoveeConfigV909} from './goveeLanV909';
@@ -104,6 +105,7 @@ export function runFullConcertV1145(command:FullConcertVoiceCommandV1145,options
  if(command==='concert-show-stop'){
   const snap=readFullConcertSnapshotV1145();
   if(!snap)return 'Keine von Alexa gestartete Konzertshow aktiv. Manuell eingerichtete Shows bleiben unverändert.';
+  restoreVoiceDirectorV1153({preferences:options.preferences,updatePreferences:options.updatePreferences});
   restoreVirtualConcertSceneV1147();
   const current=loadConcertRoadmapV958();
   const ui=restoreOwned(options.preferences as unknown as Record<string,unknown>,

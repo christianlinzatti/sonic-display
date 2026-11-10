@@ -13,6 +13,7 @@ import {GoveeMusicVoiceControlsV1143} from './GoveeMusicVoiceControlsV1143';
 import {GoveeVoiceLookControlsV1146} from './GoveeVoiceLookControlsV1146';
 import {FullConcertVoiceControlsV1145} from './FullConcertVoiceControlsV1145';
 import {AlexaConcertScenePreviewV1147} from './AlexaConcertScenePreviewV1147';
+import {AlexaConcertVoiceDirectorV1153} from './AlexaConcertVoiceDirectorV1153';
 import {AlexaConnectionWizardV1149} from './AlexaConnectionWizardV1149';
 import {AlexaLiveDiagnosticsV1150} from './AlexaLiveDiagnosticsV1150';
 import {useMusic} from '@/context/MusicContext';
@@ -28,6 +29,7 @@ import {ALEXA_FULL_CONCERT_EVENT_V1145,loadFullConcertConsentV1145} from '@/lib/
 const LOCAL_EVENT='sonic-display:alexa-local-status-v971';
 const GROUPS:{title:string;permission:string;intents:readonly string[]}[]=[
  {title:'Komplette 360-Grad-Konzertshow',permission:'Alexa-Empfang, eigene Konzertshow-Freigabe, Spotify-Wiedergabe und sichtbares Display',intents:['FullConcertStartIntent','FullConcertStopIntent','ConcertSceneCalmIntent','ConcertSceneIntenseIntent','ConcertSceneFinaleIntent']},
+ {title:'Alexa-Konzertregie 2.0',permission:'V1145 Konzertshow plus V1153 Regie-Freigabe, laufende Spotify-Wiedergabe und aktive Alexa-Show',intents:['DirectorStageArenaIntent','DirectorStageFestivalIntent','DirectorStageClubIntent','DirectorMoodWarmIntent','DirectorMoodCoolIntent','DirectorMoodNeonIntent','DirectorMoodAutoIntent','DirectorEnergyCalmIntent','DirectorEnergyBalancedIntent','DirectorEnergyIntenseIntent']},
  {title:'Konzertmodi',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['ArenaIntent','FestivalIntent','ClubIntent','CalmIntent','StopShowIntent']},
  {title:'Smart Concert Presets',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['RapPresetIntent','HardtekkPresetIntent','RockPresetIntent','CinemaPresetIntent','AutoPresetIntent']},
  {title:'Bühnenbereiche und Lichtfarben',permission:'Alexa-Empfang und geöffnetes Konzertstudio',intents:['StageZoneIntent','BackdropZoneIntent','AudienceZoneIntent','AllZonesIntent','WarmMoodIntent','CoolMoodIntent','NeonMoodIntent','AutoMoodIntent']},
@@ -154,6 +156,7 @@ export function AlexaSettingsV1137(){
   <AlexaLiveDiagnosticsV1150/>
   <FullConcertVoiceControlsV1145/>
   <AlexaConcertScenePreviewV1147/>
+  <AlexaConcertVoiceDirectorV1153/>
   <AlexaArtistPermissionV1007/>
   <AlexaToolsV1008/>
   <fieldset><legend>Govee-Raumlicht per Alexa</legend>
