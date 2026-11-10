@@ -5,7 +5,7 @@ const ts=require('./typescript-loader.cjs');
 const source=fs.readFileSync(path.join(__dirname,'../lib/alexaConcertScenesV1147.ts'),'utf8');
 const result=ts.transpileModule(source,{fileName:'alexaConcertScenesV1147.ts',compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022},reportDiagnostics:true});
 assert.equal(result.diagnostics.filter(x=>x.category===ts.DiagnosticCategory.Error).length,0);
-const mod={exports:{}};vm.runInNewContext(result.outputText,{module:mod,exports:mod.exports,Object,Number,Math,Error});
+const mod={exports:{}};vm.runInNewContext(result.outputText,{module:mod,exports:mod.exports,Object,Number,Math,Error,require:id=>{assert.equal(id,'./ultimateConcertRoadmapV958');return {loadConcertRoadmapV958:()=>({}),saveConcertRoadmapV958:()=>{throw Error('Unexpected stage mutation in pure planner test');}};}});
 const plan=mod.exports.planConcertSceneV1147;
 const base={scene:'intense',genre:'hardtekk',showConsent:true,goveeConsent:false,musicSyncConsent:true,reducedMotion:false,masterBrightness:50};
 assert.throws(()=>plan({...base,showConsent:false}),/freigabe/);
