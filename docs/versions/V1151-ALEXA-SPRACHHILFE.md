@@ -1,0 +1,9 @@
+# V1151 – Alexa sagt nur lokal freigegebene Befehle
+
+Im Alexa-Custom-Skill (de-DE) stehen nun die Beispiele „Was kann ich gerade steuern?“, „Welche Befehle sind jetzt freigegeben?“ und „Was kann ich mit Sonic Display machen?“ über `AvailableCommandsIntent` zur Verfügung.
+
+Die AWS-Lambda erzeugt keine pauschale Befehlsliste mehr für diese Frage. Sie stellt die signierte `voice-context-help`-Anfrage über die bestehende V1008-Queue; der geöffnete Browser berechnet zum Abfragezeitpunkt aus den **lokalen Opt-ins** und dem aktuellen Kontext maximal vier kurze Vorschläge. Beispiel: Bei laufendem Spotify-Titel und Show-Freigabe wird „Starte die komplette Konzertshow“ angeboten; während einer laufenden Alexa-Show wird die Stop-Variante vorgeschlagen. Govee-Beispiele erscheinen nur mit gültig konfigurierter Govee-LAN-Bridge, passenden Freigaben und erreichbarem Receiver-Pfad. Musik-Sync verwendet den aktuellen Schalter für Start/Pause; ohne Spotify bleiben alle Musiker-/Show-Beispiele verborgen.
+
+**Privatsphäre/Sicherheit:** Keine Spotify-Tracknamen, Interpreten, LAN-Adressen oder Tokens im Sprachergebnis. Die Hilfe führt keine Hardware-, Spotify- oder Show-Aktionen aus, verwendet keine KI-Netzwerkanfragen und verändert keine Einstellungen. Der vorhandene Govee-only Tokenempfänger darf ausschließlich diesen read-only Hilfebefehl zusätzlich zu den Govee-Aktionen lesen und abschließen; er erhält keine Spotify-/Künstlerbefehle. Alle Antworten markieren ausdrücklich: „lokal vorbereitet“ ist **nicht** gleich „AWS-Skill erfolgreich veröffentlicht“, „alle Spotify-Scopes bestätigt“ oder „Govee-Hardwareantwort bestätigt“.
+
+Den veränderten `interaction-model.de-DE.json` im Alexa Developer-Konto bauen und das aktualisierte `voice-v1008.cjs` gemeinsam mit `handler.cjs` auf AWS Lambda veröffentlichen; erst dann kann ein Echo diese neue Formulierung erkennen.
