@@ -1,5 +1,6 @@
+import {isProductionId,productionTake,type ProductionId} from './showProduction';
 import {TASTE_MOTIFS} from './showTaste';
-export type ShowExperience={track:string;motifs:string[];shots:number[]};
+export type ShowExperience={track:string;motifs:string[];shots:number[];production?:ProductionId;take?:number};
 export type ShowHistory=readonly ShowExperience[];
 const motifSet=new Set<string>(TASTE_MOTIFS);
 /** Bounded local observations. No lyrics, audio, titles or timestamps are retained. */
@@ -11,12 +12,13 @@ export function normalizeShowHistory(value:unknown):ShowExperience[]{
   seen.add(item.track);
   const motifs=Array.isArray(item.motifs)?[...new Set<string>(item.motifs.filter((m:unknown)=>typeof m==='string'&&motifSet.has(m)))].slice(0,6):[];
   const shots=Array.isArray(item.shots)?[...new Set<number>(item.shots.filter((n:unknown)=>typeof n==='number'&&Number.isInteger(n)&&n>=0&&n<4))].slice(0,4):[];
-  return motifs.length||shots.length?[{track:item.track,motifs,shots}]:[];
+  const production=isProductionId(item.production)?item.production:undefined;
+  return motifs.length||shots.length||production?[{track:item.track,motifs,shots,...(production?{production,take:productionTake(item.take)}:{})}]:[];
  });
 }
-export function rememberShow(history:ShowHistory|undefined,track:string,entry:{motif?:string;shot?:number}):ShowExperience[]{
+export function rememberShow(history:ShowHistory|undefined,track:string,entry:{motif?:string;shot?:number;production?:ProductionId;take?:number}):ShowExperience[]{
  const clean=normalizeShowHistory(history),old=clean.find(row=>row.track===track);
- return normalizeShowHistory([{track,motifs:[...(old?.motifs??[]),...(entry.motif?[entry.motif]:[])],shots:[...(old?.shots??[]),...(entry.shot===undefined?[]:[entry.shot])]},...clean.filter(row=>row.track!==track)]);
+ return normalizeShowHistory([{track,...(old?.production?{production:old.production,take:old.take}:{}),...(entry.production?{production:entry.production,take:entry.take}:{}),motifs:[...(old?.motifs??[]),...(entry.motif?[entry.motif]:[])],shots:[...(old?.shots??[]),...(entry.shot===undefined?[]:[entry.shot])]},...clean.filter(row=>row.track!==track)]);
 }
 /** The current song never penalizes itself, keeping seeks and the finale coherent. */
 export function experiencePenalty(history:ShowHistory|undefined,track:string,motif:string){

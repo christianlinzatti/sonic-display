@@ -1,3 +1,11 @@
+## Update – Abwechslungsreiche AI-Konzertshows mit Lyrics
+
+Vier Show-Konzepte verbinden Tanzmotive, Kamera, Licht und Lyrics zu einer
+zusammenhängenden Inszenierung. Die lokale Regie bewertet Genre, Lyrics-Struktur
+und frühere Shows. Mit **Neue Show-Version** kannst du eine andere Variante
+starten; schnelle Lyrics behalten eine ruhige Leseszene.
+[Bedienung, Grenzen und Tests](docs/versions/V1156-AI-SHOW-INSZENIERUNGEN.md).
+
 ## Update – Konzertmodus nach Reload und auf kleinen Displays
 
 Der Konzertmodus kann nach einem Reload im aktuellen Tab fortgesetzt werden.

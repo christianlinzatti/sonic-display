@@ -239,6 +239,7 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
   const stageLightTintV1026=useRef(new Color());
   const sceneFlags = sceneDetailFlags(useSceneDetail());
   const key = useRef<PointLight>(null);
+  const productionColor=useRef(new Color());
   const targetPrimary = useRef(new Color());
   const targetSecondary = useRef(new Color());
   const atmospherePrimaryV885=useRef(new Color());
@@ -1995,6 +1996,12 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
       targetPrimary.current.set(timelineCue.color ?? musicPalette?.primary ?? palette.primary),colorFade);
     if (beam.current) beam.current.color.lerp(
       targetSecondary.current.set(musicPalette?.secondary ?? palette.secondary),colorFade);
+    // Virtual key/fill only. Existing manual colors, consent and blackouts remain authoritative.
+    if(storyV1131?.production&&isPlaying&&reactive&&!reducedMotion&&!manualLightingV763&&!authoredLightsV386&&!timelineCue.color&&timelineCue.blackout<=0&&timelineCue.strobe<=0&&timelineCue.scale>0&&timelineGainV354>0&&showCue?.lightingEnabled!==false){
+      productionColor.current.set(storyV1131.production.color);
+      if(key.current)key.current.color.lerp(productionColor.current,colorFade*(storyV1131.lyricFocus?.06:.18));
+      if(fill.current)fill.current.color.lerp(productionColor.current,colorFade*(storyV1131.lyricFocus?.12:.42));
+    }
     // V797: only existing portrait lights, no new fixtures/renderer pass.
     // Cross-check the LIVE authored timeline and blackout, not only the UI flag.
     const vocalSafeV797=!!vocalSpotlightV797?.lightingActive&&!authoredLightsV386&&

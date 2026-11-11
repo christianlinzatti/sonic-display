@@ -20,7 +20,7 @@ export function fullBodyClipV1133(input:{history?:ShowHistory;taste?:MotifTaste;
  if(cue.reading||cue.act==='breathe'||cue.act==='build'||cue.lyricDensity>.7)return input.fallback;
  if(cue.memory)return input.available.has(cue.memory.clip)?cue.memory.clip:input.fallback;
  if(input.count>1&&cue.interaction==='answer')return input.fallback;
- if(cue.dialogue)return dialogueClip({dialogue:cue.dialogue,trackId:input.trackId??'sonic-show',genre:input.genre,
+ if(cue.dialogue)return dialogueClip({dialogue:cue.dialogue,seedKey:cue.showTakeSeed,preferredMotif:cue.showMotif,trackId:input.trackId??'sonic-show',genre:input.genre,
   history:input.history,taste:input.taste,slot:input.slot??0,available:input.available,fallback:input.fallback});
  const family=musicFamilyV1129(input.genre),shared=input.count>1&&cue.interaction==='unison';
  // The opening establishes each personality; later phrases develop contrasting motifs.

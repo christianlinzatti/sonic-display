@@ -51,7 +51,9 @@ die simulierten Daten maßgeblich; dort wird das Live-Mikrofon nicht eingemischt
 
 **Abwechslung über mehrere Songs merken** speichert bis zu 24 Song-Kennungen
 mit höchstens sechs tatsächlich gewählten Ganzkörper-Motiven und vier
-angewendeten automatischen Kameravarianten. Titel, Lyrics, Audiodaten und
+angewendeten automatischen Kameravarianten. Seit [V1156](V1156-AI-SHOW-INSZENIERUNGEN.md)
+kommen bei aktiver Show-Planung optional Konzept und Variantenummer hinzu.
+Titel, Lyrics, Audiodaten und
 Zeitstempel werden nicht gespeichert. Die letzten acht anderen Songs erhalten
 abgestufte Wiederholungsabzüge. Explizite Motiv-Vorlieben bleiben wirksam;
 ruhige Genre-Regeln werden nicht umgangen.

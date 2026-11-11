@@ -1,3 +1,11 @@
+## Update – Gemeinsamer Show-Plan für Crew und Lyrics
+
+`lib/showProduction.ts` bewertet vier lokale Inszenierungsprofile. Der gemeinsame
+Konzertscore verteilt Konzept, Motiv-Seed und Szenenparameter an Crew, Kamera,
+virtuelle Beleuchtung und Lyrics. Tatsächlich gespielte Varianten bleiben im
+begrenzten lokalen Verlauf stabil; manuelle und Leseschutz-Regeln gehen vor.
+[Architektur, Datenmodell und Tests](docs/versions/V1156-AI-SHOW-INSZENIERUNGEN.md).
+
 ## Update – Konzertmodus nach Reload und auf kleinen Displays
 
 Der Konzertmodus kann nach einem Reload im aktuellen Tab fortgesetzt werden.

@@ -1,3 +1,4 @@
+import {isProductionId,productionTake,type ProductionId} from '../../lib/showProduction';
 import {choosePoseAwareCrew} from '../../lib/poseAwareCrew';
 import type {MotionKeyframeClipV630} from './naturalDancePerformanceV630';
 import {normalizeShowHistory,type ShowHistory} from '../../lib/showExperience';
@@ -13,7 +14,7 @@ import {ENCORE_AVATARS_V1129,genreClipsV1129,variedClipV1129} from '../../lib/mu
 /** All bundled performers. Pure clock/clip planning; no scene or audio ownership. */
 export const CREW_IDS = ['sonic-neon-pulse','sonic-festival-nova','sonic-chrome-beat',...ENCORE_AVATARS_V1129.map(a=>a.id),...HEADLINERS_V1130.map(a=>a.id)] as const;
 export type CrewMode = 'individual'|'unison'|'canon'|'spotlight'|'story'|'adaptive';
-export type CrewSettings = { enabled:boolean; reactions:boolean; mode:CrewMode;poseAware?:boolean;stagecraft?:boolean;history?:ShowHistory;remember?:boolean;taste?:MotifTaste;expression?:ExpressionV1132 };
+export type CrewSettings = { enabled:boolean; reactions:boolean; mode:CrewMode;showPlans?:boolean;showStyle?:ProductionId;showTake?:number;poseAware?:boolean;stagecraft?:boolean;history?:ShowHistory;remember?:boolean;taste?:MotifTaste;expression?:ExpressionV1132 };
 export const CREW_DEFAULT: CrewSettings = Object.freeze({enabled:true,reactions:true,mode:'individual'});
 export type CrewInput = {
  stance?:{left:boolean;right:boolean};audioEvidence?:MusicalEvidence;modelId:string; clips:readonly {name:string;duration:number;tracks?:MotionKeyframeClipV630['tracks']}[]; trackId?:string|null;
@@ -29,7 +30,7 @@ export const normalizeCrewSettings = (v:unknown):CrewSettings => {
  const x=v && typeof v==='object'?v as Partial<CrewSettings>:{};
  const expression=x.expression==='subtle'||x.expression==='balanced'||x.expression==='bold'?x.expression:undefined;
  const taste=normalizeShowTaste(x.taste),history=normalizeShowHistory(x.history);
- return {...(x.poseAware===true?{poseAware:true}:{}),...(x.stagecraft===true?{stagecraft:true}:{}),...(x.remember===false?{remember:false}:{}),...(history.length?{history}:{}),...(Object.keys(taste).length?{taste}:{}),...(expression?{expression}:{}),enabled:typeof x.enabled==='boolean'?x.enabled:true,reactions:typeof x.reactions==='boolean'?x.reactions:true,
+ return {...(typeof x.showPlans==='boolean'?{showPlans:x.showPlans}:{}),...(isProductionId(x.showStyle)?{showStyle:x.showStyle}:{}),...(productionTake(x.showTake)?{showTake:productionTake(x.showTake)}:{}),...(x.poseAware===true?{poseAware:true}:{}),...(x.stagecraft===true?{stagecraft:true}:{}),...(x.remember===false?{remember:false}:{}),...(history.length?{history}:{}),...(Object.keys(taste).length?{taste}:{}),...(expression?{expression}:{}),enabled:typeof x.enabled==='boolean'?x.enabled:true,reactions:typeof x.reactions==='boolean'?x.reactions:true,
  mode:x.mode==='unison'||x.mode==='canon'||x.mode==='spotlight'||x.mode==='story'||x.mode==='adaptive'?x.mode:'individual'};
 };
 const clamp=(x:number,a:number,b:number)=>Math.min(b,Math.max(a,x));
@@ -66,7 +67,7 @@ export function stepCrew(previous:CrewState,input:CrewInput):{state:CrewState;pl
  // V1114: a single user-enabled mode switches the ACTUAL embedded GLB
  // choreography by the observed song section. This does not detect the
  // section itself. Manual clip/timeline/reduced-motion rules still win.
- const adaptiveCue=concertScoreV1134({...input,taste:input.settings.taste,history:input.settings.remember===false?undefined:input.settings.history,bpm,progressMs:pos});
+ const adaptiveCue=concertScoreV1134({...input,showPlans:input.settings.showPlans,showStyle:input.settings.showStyle,showTake:input.settings.showTake,taste:input.settings.taste,history:input.settings.remember===false?undefined:input.settings.history,bpm,progressMs:pos});
  if(input.settings.mode==='adaptive')part=adaptiveCue.act==='breathe'?'quiet':adaptiveCue.act==='lift'?'hook':adaptiveCue.act==='impact'||adaptiveCue.act==='finale'?'drop':'verse';
  if(input.settings.mode==='adaptive')phrase=adaptiveCue.phrase;
  const effectiveMode:CrewMode=input.settings.mode==='adaptive'?adaptiveCue.mode:input.settings.mode==='story'
@@ -122,7 +123,7 @@ export function stepCrew(previous:CrewState,input:CrewInput):{state:CrewState;pl
  const clockOffset=input.settings.mode==='adaptive'&&!reset&&clip===old.clip?approachCrewOffsetV1132(old.clockOffset??desiredOffset,old.offsetTarget??desiredOffset,dt,bpm):desiredOffset;
  const state={memoryPhase:keep?old.memoryPhase:adaptiveCue.memory?.phase,clockOffset,offsetTarget:desiredOffset,key,position:pos,beat,bpm,clip,switched:clip!==old.clip?pos:old.switched,phrase,clipPhrase:keep?(old.clipPhrase??old.phrase):phrase,leader,part,ensembleMode:keep?old.ensembleMode:effectiveMode,recent:clip!==old.clip?[clip,...(old.recent??[])].slice(0,3):old.recent};
  return {state,plan:{active:true,clip,part,beat,bpm,offset:clockOffset,offsetTarget:input.settings.mode==='adaptive'?desiredOffset:undefined,leader,
- bodyStyle:bodyStyleV1133(clip),persona:input.settings.mode==='adaptive'?performerPersonaV1132(input.modelId):undefined,expressionGain:expressionGainV1132(input.settings.expression)*(adaptiveCue.memory?.gain??1)*(adaptiveCue.music.quiet?.25:1+adaptiveCue.music.pulse*.08)*(adaptiveCue.reading?(slot===leader?.65:.30):supporting?.55:1),sequence:input.settings.mode==='adaptive'?{label:sequence.label,step:sequence.step}:undefined,
+ bodyStyle:bodyStyleV1133(clip),persona:input.settings.mode==='adaptive'?performerPersonaV1132(input.modelId):undefined,expressionGain:expressionGainV1132(input.settings.expression)*(adaptiveCue.memory?.gain??1)*(adaptiveCue.production?.crewGain??1)*(adaptiveCue.music.quiet?.25:1+adaptiveCue.music.pulse*.08)*(adaptiveCue.reading?(slot===leader?.65:.30):supporting?.55:1),sequence:input.settings.mode==='adaptive'?{label:sequence.label,step:sequence.step}:undefined,
  story:input.settings.mode==='adaptive'?adaptiveCue:undefined,interaction:input.settings.mode==='adaptive'?crewInteractionV1131(adaptiveCue,slot,count):undefined,
  reaction:input.settings.reactions?(['nod','welcome','led'] as const)[model]:'none',reason:knownBpm?'music':'tempo-fallback'}};
 }

@@ -31,9 +31,9 @@ export function ConcertMode(){
   const group=readGroupV326();
   const owned:ConcertPreferences={visualizerMode:'avatar',lyricsVisible:true,lyricsImmersiveEnabled:false,lyricsStyle:'cinematic',avatarModelId:CREW_IDS.some(id=>id===preferences.avatarModelId)?preferences.avatarModelId:'sonic-neon-pulse'};
   const before:Partial<UiPreferences>={};for(const key of Object.keys(owned) as (keyof ConcertPreferences)[])(before as Record<string,unknown>)[key]=preferences[key];
-  saved.current={version:1,preferences:before as ConcertPreferences,owned,crew:{enabled:crew.enabled,mode:crew.mode,poseAware:crew.poseAware,stagecraft:crew.stagecraft},group};
+  saved.current={version:1,preferences:before as ConcertPreferences,owned,crew:{enabled:crew.enabled,mode:crew.mode,poseAware:crew.poseAware,stagecraft:crew.stagecraft,showPlans:crew.showPlans},group};
   if(!group.songSync&&!group.trackId){const count=group.enabled?group.count:3;const next=writeGroupV326({...group,enabled:true,count,modelIds:group.enabled?group.modelIds:['sonic-neon-pulse','sonic-luna-flow','sonic-chrome-beat',''],cues:[{id:'concert-auto',at:0,formation:'wide',focus:-1,drop:false,transition:1,positions:layoutV326('wide',count)}]});saved.current.ownedGroup=next;}
-  saveConcertSession(saved.current);updatePreferences(owned);writeCrewSettings({...crew,enabled:true,mode:'adaptive',poseAware:true,stagecraft:true});setConcertPresentation(true);
+  saveConcertSession(saved.current);updatePreferences(owned);writeCrewSettings({...crew,enabled:true,mode:'adaptive',poseAware:true,stagecraft:true,showPlans:crew.showPlans!==false});setConcertPresentation(true);
  };
  return <button type="button" className="concert-mode-toggle" aria-pressed={active} onClick={active?exit:enter}>{active?'Konzertmodus verlassen':'Konzertmodus starten'}</button>;
 }

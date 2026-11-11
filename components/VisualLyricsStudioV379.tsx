@@ -127,7 +127,7 @@ export function VisualLyricsStudioV379() {
           <div className="v379-performers" aria-hidden="true"><span/><span/><span/></div>
           <div className="v379-safezone" aria-hidden="true" />
           <div className={`v379-captions ${(preferences.avatarLyricsContrastV378??true)?"v379-captions-contrast":""}`}>
-            <KineticLyrics lyrics={lyrics??null} progressMs={effectiveMs} activeIndex={active} playing={live?music.isPlaying:previewPlaying} genre={!live&&section==="drop"?"hardstyle":!live?"deutschrap":""}/>
+            <KineticLyrics trackId={live?music.track?.id:undefined} lyrics={lyrics??null} progressMs={effectiveMs} activeIndex={active} playing={live?music.isPlaying:previewPlaying} genre={!live&&section==="drop"?"hardstyle":!live?"deutschrap":""}/>
           </div>
           <span className="v379-shot-label">{!immersive?"2D-Karaoke":composition.shot==="none"?"3D-Layout":`Kamera: ${composition.shot}`} · Layout-Vorschau</span>
         </div>}

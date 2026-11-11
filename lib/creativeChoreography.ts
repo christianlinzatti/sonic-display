@@ -25,14 +25,14 @@ export function creativeBodyClip(input:{trackId:string;modelId:string;genre?:str
   (!power||m.energy>=.45)&&(input.shared||input.available.has(m.clip)));
  if(!pool.length)return null;
  if(!input.shared&&pool.length>1)pool=pool.filter(m=>m.clip!==input.recent?.[0]);
- const seed=hash(input.trackId+(input.shared?'':`:${input.modelId}`));
+ const seed=hash((input.cue.showTakeSeed??input.trackId)+(input.shared?'':`:${input.modelId}`));
  let selected=pool[0].clip;const recent:string[]=[];
  for(let p=Math.max(2,phrase-3);p<=phrase;p++){
   let best=-Infinity;
   for(const motif of pool){
    const age=recent.indexOf(motif.clip),played=input.shared?-1:(input.recent??[]).indexOf(motif.clip);
    const novelty=hash(`${seed}:${p}:${motif.clip}`)/4294967295;
-   const score=3+tasteGain(input.taste,motif.clip)-experiencePenalty(input.history,input.trackId,motif.clip)-Math.abs(motif.energy-target)*2+(motif.families.includes(family)?1.1:0)+
+   const score=3+(input.cue.showMotif===motif.clip?.45:0)+tasteGain(input.taste,motif.clip)-experiencePenalty(input.history,input.trackId,motif.clip)-Math.abs(motif.energy-target)*2+(motif.families.includes(family)?1.1:0)+
     (!input.shared&&motif.clip===input.personal?.7:0)+novelty*1.6-(age<0?0:(3-age)*1.4)-(played<0?0:Math.max(0,3-played)*1.5);
    if(score>best){selected=motif.clip;best=score;}
   }

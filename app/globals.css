@@ -5053,3 +5053,9 @@
  .concert-presentation .show-v1130{display:none!important}
 }
 @media(max-width:700px),(max-height:500px){.concert-presentation [data-v441-slot]{display:none!important}}
+
+/* Production color gives lyrics a shared scene identity while retaining white reading text. */
+.lyrics[data-show-production]:not([data-show-production="off"]){border-color:color-mix(in srgb,var(--production-color) 42%,transparent)!important;transition:border-color 1.4s ease,box-shadow 1.4s ease;box-shadow:0 0 24px color-mix(in srgb,var(--production-color) 12%,transparent)}
+.lyrics[data-show-production]:not([data-show-production="off"])[data-show-scene="refrain"]{box-shadow:0 0 34px color-mix(in srgb,var(--production-color) 22%,transparent)}
+@media(prefers-reduced-motion:reduce){.lyrics[data-show-production]{transition:none!important}}
+.lyrics[data-show-motion="still"]{transition:none!important}

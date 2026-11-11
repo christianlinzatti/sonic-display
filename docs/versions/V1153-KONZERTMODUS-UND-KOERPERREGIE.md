@@ -8,7 +8,9 @@ Entdecken-, Einstellungs- und Player-Flächen verschwinden. **Konzertmodus
 verlassen** und Escape führen zurück. Browser-Vollbild wird nicht angefordert.
 
 Die Ansicht aktiviert vorübergehend Avatar-Darstellung, sichtbare Cinematic-Lyrics
-und adaptive Crew-Regie. Generische Gruppen erhalten eine automatische Crew mit
+und adaptive Crew-Regie. Seit [V1156](V1156-AI-SHOW-INSZENIERUNGEN.md) wird
+zusätzlich die Show-Planung aktiviert, sofern sie nicht ausdrücklich abgeschaltet wurde.
+Generische Gruppen erhalten eine automatische Crew mit
 bis zu vier Figuren; songgebundene Gruppen werden erhalten. Beim Verlassen
 werden die eigenen Anzeigeänderungen und unveränderte temporäre Gruppen
 zurückgesetzt. Vorlieben und neu gesammelte Show-Erfahrung bleiben bestehen.

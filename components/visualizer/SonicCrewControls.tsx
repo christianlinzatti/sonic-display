@@ -1,4 +1,5 @@
 'use client';
+import {SHOW_PRODUCTIONS,productionTake,type ProductionId} from '@/lib/showProduction';
 import {voteShowTaste,TASTE_MOTIFS} from '@/lib/showTaste';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import dynamic from 'next/dynamic';
@@ -55,13 +56,19 @@ export function SonicCrewControls(){
    </label>
    <p className="settings-note">Standardmäßig aus. Der Avatar-Ausdruck wird bei ruhigen oder textreichen Passagen zurückhaltender. Deutschrap, Hardtekk/Hardstyle und Deutschrock erhalten unterschiedlich abgestimmte, weich einblendende Ausdrucks- und Lichtkurven. Govee-Helligkeit wird nur bei bestätigten Songabschnitten im bestehenden freigegebenen Musik-Sync gedämpft; keine zusätzlichen Lampenbefehle, neuen Bewegungsclips oder künstlichen Beats. Manuelle Choreografien, eigene Lichtshows und reduzierte Bewegung haben Vorrang.</p>
   </fieldset>
+  <fieldset aria-label="AI-Show-Inszenierung"><legend>Abwechslungsreiche Konzertshows</legend>
+   <label><input type="checkbox" checked={settings.showPlans===true} onChange={e=>writeCrewSettings({...settings,showPlans:e.target.checked})}/> AI-Show-Planung aktivieren</label>
+   <label>Show-Konzept <select aria-label="Show-Konzept" disabled={!settings.showPlans} value={settings.showStyle??'auto'} onChange={e=>writeCrewSettings({...settings,showStyle:e.target.value==='auto'?undefined:e.target.value as ProductionId})}><option value="auto">AI-Auswahl mit Abwechslung</option>{SHOW_PRODUCTIONS.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+   <button type="button" disabled={!settings.showPlans} onClick={()=>{writeCrewSettings({...settings,showTake:(productionTake(settings.showTake)+1)%1000});setTasteNotice('Neue Show-Version vorbereitet. Sichere Übergänge und Lyrics behalten Vorrang.');}}>Neue Show-Version</button>
+   <p>Die lokale Regie bewertet Genre, Lyrics-Struktur und frühere Shows. Ein Konzept verbindet Tanzmotive, Kamera, Licht und Textakzente über den Song. Mit „Neue Show-Version“ kannst du eine andere Inszenierung ausprobieren.</p>
+  </fieldset>
   <label><input type="checkbox" checked={settings.poseAware===true} onChange={e=>writeCrewSettings({...settings,poseAware:e.target.checked})}/> Körperhaltung bei freien Tanzwechseln berücksichtigen</label>
   <p>Song-Gedächtnis: Ein Motiv aus der Strophe kehrt in Refrains wieder. Das Finale verbindet Motiv, Antwort und gemeinsamen Abschluss. Deine Motiv-Vorlieben bleiben lokal auf diesem Gerät.</p>
   <button type="button" disabled={!Object.keys(settings.taste??{}).length} onClick={()=>{writeCrewSettings({...settings,taste:undefined});setTasteNotice('Motiv-Vorlieben zurückgesetzt.');}}>Vorlieben zurücksetzen</button>
   <p role="status" aria-live="polite">{tasteNotice}</p>
   <label><input type="checkbox" checked={settings.remember!==false} onChange={e=>writeCrewSettings({...settings,remember:e.target.checked})}/> Abwechslung über mehrere Songs merken</label>
   <button type="button" disabled={!settings.history?.length} onClick={()=>{writeCrewSettings({...settings,history:undefined});setTasteNotice('Show-Verlauf gelöscht. Deine Motiv-Vorlieben bleiben erhalten.');}}>Show-Verlauf löschen</button>
-  <p>Lokaler Show-Verlauf: {settings.history?.length??0} von höchstens 24 Songs. Gespeichert werden Song-Kennung, Tanzmotive und Kameravarianten. Aktuelle Songmotive bleiben bei Zeitsprüngen zusammenhängend.</p>
+  <p>Lokaler Show-Verlauf: {settings.history?.length??0} von höchstens 24 Songs. Gespeichert werden Song-Kennung, Tanzmotive, Kameravarianten und verwendete Show-Konzepte. Aktuelle Songmotive bleiben bei Zeitsprüngen zusammenhängend.</p>
   <p>Tanzdialoge: Eine Figur stellt ein Motiv vor, die zweite übernimmt es als Antwort. Danach findet die Crew im gemeinsamen Motiv zusammen. Schnelle Lyrics und ruhige Songteile bekommen weiterhin Platz.</p>
   <p>Kreative Regie: Nach dem persönlichen Auftakt entwickelt die Crew neue Ganzkörper-Motive aus Genre, Energie und Bewegungskontrasten. Spätere Refrains schicken die Antwortwelle auch in die Gegenrichtung. Gemeinsame Höhepunkte bleiben synchron.</p>
   <p>Encore: Ember Rock, Luna Flow, Sol Groove und Velvet Jazz bringen vier neue Looks und je sechs zusätzliche Genre-Tänze. Die lokale Musikregie wechselt Moves an musikalischen Übergängen; ruhige Songteile bekommen bewusst weniger Bewegung.</p>
