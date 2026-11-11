@@ -16,6 +16,8 @@ test.afterEach(async({page})=>expect(page.__stageShaderErrors).toEqual([]));
 test('concert is uncluttered, closes old dialogs, keeps lyrics separate and exposes only compact show controls',async({page},testInfo)=>{
  test.setTimeout(180000);await installConcertMocksV1130(page,{position:33000,playing:false,genre:'house'});await seed(page);await page.goto('/');
  await page.getByRole('button',{name:'⚙ Settings',exact:true}).click();await expect(page.getByRole('dialog',{name:'Sonic Display Einstellungen'})).toBeVisible();
+ // Leave the foreground settings dialog before using the concert launch control.
+ await page.getByRole('button',{name:'Einstellungen schließen',exact:true}).click();
  await page.getByRole('button',{name:'Konzertmodus starten',exact:true}).click();await active(page);await loaded(page);
  await expect(page.getByRole('dialog',{name:'Sonic Display Einstellungen'})).toHaveCount(0);await expect(page.getByRole('button')).toHaveCount(2);
  await expect(page.getByLabel('Aktueller Titel',{exact:true})).toContainText('Aurora Mock Concert');

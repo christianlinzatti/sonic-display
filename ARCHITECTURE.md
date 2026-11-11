@@ -1,5 +1,9 @@
 ## Update – Eine abgestimmte Konzert-Bühnenebene
 
+## Übersichtliche Einstellungen
+
+Schnellzugriff, gruppierte Navigation, Funktionssuche mit Direktlinks und eine nach Aufgaben gegliederte Konzertsteuerung vereinfachen die Bedienung. [Bedienung, Architektur und Tests](docs/versions/V1164-UEBERSICHTLICHE-EINSTELLUNGEN.md).
+
 ## Ensemble, Lyrics und Song-Outfits
 
 Bewusste Crew-Antworten und Abstände, vier Lyrics-Lichtmotive, songabhängige Stofflooks und passende Govee-Raumlichtbilder ergänzen die Konzertshow. [Bedienung, Architektur und Tests](docs/versions/V1163-ENSEMBLE-LYRICS-UND-OUTFITS.md).

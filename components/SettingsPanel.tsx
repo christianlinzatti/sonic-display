@@ -1,4 +1,6 @@
 "use client";
+import {SettingsOverview} from './SettingsOverview';
+import {SETTINGS_SECTIONS,SETTINGS_SHORTCUTS,settingsMatches,type SettingsTab,type SettingsShortcut} from '@/lib/settingsNavigation';
 import {invalidateAvatarCatalogV733} from "@/services/avatarCatalogV733";
 import {DEFAULT_HIP_STUDIO_V738,normalizeHipStudioV738} from "@/components/visualizer/hipMotionStudioV738";
 import {DEFAULT_NATURAL_DANCE_V758,normalizeNaturalDanceV758} from "@/components/visualizer/naturalDanceMotionV758";
@@ -240,21 +242,29 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
   const searchRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const sections = [
-    { id: "dashboard", label: "Dienste & Status", hint: "Dashboard Status Dienste Spotify Last.fm Lyrics Konfiguration Verbindung Mikrofon Automatik Übersicht" },
-    { id: "display", label: "Anzeige", hint: "Visualizer Lyrics Motion Bildschirm" },
-    { id: "avatar", label: "Avatar & Tanz", hint: "Avatar GLTF Vorschau Scale Rig Dance Preset Intensität Aggression Variation Motion Studio" },
-    { id: "audio", label: "Mikrofon & Beat", hint: "Audio BPM Mikrofon Sensitivity Calibration Cooldown Sync Offset" },
-    { id: "alexa", label: "Alexa", hint: "Alexa Sprachsteuerung Hilfe Befehle Voice Künstler Spotify Govee Skill Echo" },
-    { id: "govee", label: "Govee LAN", hint: "Govee Lichter WLAN LAN Geräte Licht Bühne Farben Beleuchtung Bridge" },
-    { id: "diagnostics", label: "Diagnose", hint: "Debug FPS Performance Beat Rhythm" },
-  ] as const;
-  const filteredSections = sections.filter(section => (section.label + " " + section.hint).toLowerCase().includes(search.trim().toLowerCase()));
+  const sections=SETTINGS_SECTIONS;
+  const shortcuts=SETTINGS_SHORTCUTS.filter(item=>settingsMatches(item.label+' '+item.hint,search));
+  const filteredSections=sections.filter(section=>settingsMatches(section.label+' '+section.hint,search)||shortcuts.some(item=>item.tab===section.id));
+  const contentRef=useRef<HTMLDivElement>(null);
+  const [jump,setJump]=useState<SettingsShortcut|null>(null);
+  const navigate=(item:SettingsShortcut)=>{setTab(item.tab);setSearch('');setJump({...item});};
+
 
   const [facialStudioOpen,setFacialStudioOpen]=useState(false);
   const [vocalSyncInspectorOpenV373,setVocalSyncInspectorOpenV373]=useState(false);
   const [rapEditorOpenV408,setRapEditorOpenV408]=useState(false);
-  const [tab, setTab] = useState<"dashboard" | "display" | "avatar" | "audio" | "govee" | "alexa" | "diagnostics">("dashboard");
+  const [tab, setTab] = useState<SettingsTab>("overview");
+  useEffect(()=>{
+   const content=contentRef.current;if(!content)return;
+   content.scrollTop=0;
+   if(!jump||jump.tab!==tab)return;
+   const frame=requestAnimationFrame(()=>{
+    const candidates=Array.from(content.querySelectorAll<HTMLElement>('legend,label,fieldset[aria-label],section[aria-label]'));
+    const match=jump.target?candidates.find(node=>settingsMatches(node.getAttribute('aria-label')??node.textContent??'',jump.target!)):null;
+    const target=(match?.matches('fieldset,section')?match:match?.closest<HTMLElement>('fieldset')??match)??content.querySelector<HTMLElement>('.settings-section-title');
+    if(target){let parent=target.parentElement;while(parent&&parent!==content){if(parent instanceof HTMLDetailsElement)parent.open=true;parent=parent.parentElement;}content.querySelector('[data-settings-target]')?.removeAttribute('data-settings-target');target.dataset.settingsTarget='true';target.tabIndex=-1;target.focus({preventScroll:true});target.scrollIntoView({block:'start'});}
+   });return()=>cancelAnimationFrame(frame);
+  },[tab,jump]);
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); };
@@ -265,10 +275,6 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
     if (open) searchRef.current?.focus();
     else triggerRef.current?.focus();
   }, [open]);
-  useEffect(() => {
-    if (!search.trim() || filteredSections.some(section => section.id === tab)) return;
-    if (filteredSections.length) setTab(filteredSections[0].id);
-  }, [search, tab, filteredSections.map(section => section.id).join(",")]);
   const { preferences, updatePreferences } = useUiPreferences();
   const hipStudioV738=normalizeHipStudioV738(preferences.avatarHipStudioV738);
   const naturalBodyV740=normalizeNaturalBodyV740(preferences.avatarNaturalBodyV740);
@@ -303,19 +309,24 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
   return <aside className="settings-panel">
     <button ref={triggerRef} className="settings-trigger" aria-expanded={open} onClick={() => setOpen(v => !v)}>⚙ Settings</button>
     {open && <section ref={dialogRef} className="settings-popover" role="dialog" aria-modal="true" aria-label="Sonic Display Einstellungen">
-      <div className="settings-heading"><div><span className="settings-eyebrow">SONIC DISPLAY</span><h2>Einstellungen</h2><p>Dein Display. Dein Sound. Dein Avatar.</p></div><button className="settings-close" onClick={() => setOpen(false)} aria-label="Einstellungen schließen">×</button></div>
+      <div className="settings-heading"><div><span className="settings-eyebrow">SONIC DISPLAY</span><h2>Einstellungen</h2><p>Show gestalten, Verbindungen einrichten und Probleme prüfen.</p></div><button className="settings-close" onClick={() => setOpen(false)} aria-label="Einstellungen schließen">×</button></div>
       {tab === "diagnostics" && <><RuntimePerformancePanelV285 /><LoadingMetricsPanel /></>}
       <div className="settings-workspace">
       <aside className="settings-sidebar">
         <label className="settings-search-label" htmlFor="settings-search">Einstellungen suchen</label>
-        <input id="settings-search" ref={searchRef} className="settings-search" type="search" placeholder="z. B. Beat, Avatar, Lyrics…" value={search} onChange={e => setSearch(e.target.value)} />
+        <input id="settings-search" ref={searchRef} className="settings-search" type="search" maxLength={120} placeholder="z. B. Beat, Avatar, Lyrics…" value={search} onChange={e => setSearch(e.target.value)} />
         <nav className="settings-tabs" aria-label="Einstellungsbereiche">
-          {filteredSections.map(section => <button type="button" key={section.id} data-v571-tab={section.id} className={tab === section.id ? "active" : ""} aria-current={tab === section.id ? "page" : undefined} onClick={() => setTab(section.id)}>{section.label}<span aria-hidden="true">›</span></button>)}
+          {['Start','Show gestalten','Verbindungen','Technik'].map(group=>{const items=filteredSections.filter(section=>section.group===group);return items.length?<div className="settings-nav-group" key={group}><span className="settings-nav-label">{group}</span>{items.map(section=><button type="button" key={section.id} data-v571-tab={section.id} className={tab===section.id?'active':''} aria-current={tab===section.id?'page':undefined} onClick={()=>{setJump(null);setSearch('');setTab(section.id);}}>{section.label}<span aria-hidden="true">›</span></button>)}</div>:null;})}
         </nav>
         {filteredSections.length === 0 && <p className="settings-no-results">Keine passende Kategorie. Suche nach „Avatar“, „Beat“ oder „Lyrics“.</p>}
         <div className="settings-sidebar-footer">Einstellungen werden auf diesem Gerät gespeichert.</div>
       </aside>
-      <div className="settings-content">
+      <div className="settings-content" ref={contentRef}>
+      <header className="settings-section-heading"><h3 className="settings-section-title" tabIndex={-1}>{search.trim()?'Suchergebnisse':sections.find(s=>s.id===tab)?.label}</h3><p>{search.trim()?'Funktionen finden und direkt zum passenden Bereich springen.':sections.find(s=>s.id===tab)?.description}</p></header>
+      {search.trim()?<div className="settings-search-results" aria-label="Direktlinks zur Suche"><p role="status">{shortcuts.length} passende Direktlinks</p>{shortcuts.map(item=><button type="button" key={item.id} onClick={()=>navigate(item)}>{item.label}<small>{sections.find(s=>s.id===item.tab)?.label}</small></button>)}</div>:tab!=='overview'&&<nav className="settings-shortcuts" aria-label="Direktlinks im Bereich">{SETTINGS_SHORTCUTS.filter(item=>item.tab===tab).map(item=><button type="button" key={item.id} onClick={()=>navigate(item)}>{item.label}</button>)}</nav>}
+      {!search.trim()&&tab==='overview'&&<SettingsOverview onNavigate={navigate}/>}
+
+      {!search.trim()&&<>
       {tab === "dashboard" && <ServiceStatusDashboardV667 onNavigate={setTab} />}
       {tab === "govee" && <GoveeLanPanelV909 />}
       {tab === "alexa" && <AlexaSettingsV1137 />}
@@ -1189,6 +1200,7 @@ export function SettingsPanel({ initiallyOpen = false }: { initiallyOpen?: boole
       {tab === "display" && <><PortableBackupV657 /><UnifiedSettingsBackup /><BackupMigrationAssistant /><BackupIntegrityDiagnostics /></>}
       {tab === "display" && <p className="settings-note">Without microphone, beat timing is synthetic and based on a genre tempo estimate, not actual Spotify beat data. With microphone, frequency analysis runs locally in your browser. Your preferences are saved on this device.</p>}
       {tab === "display" && <button className="settings-reset" onClick={() => { setMicrophone(false); updatePreferences({ rapExpressiveEnabledV425:false,rapExpressiveStrengthV425:65,rapDuetEnabledV416:false,rapDuetCameraV416:true,rapLyricsGestureEnabledV414:false,avatarRapLipEnabledV415:false,avatarRapLipPrecisionV415:70,avatarRapLipOffsetMsV415:0,avatarRapSyllableEnabledV419:false,avatarRapSyllableStrengthV419:65,avatarRapSyllableSmoothnessV419:70,rapSyllableEditsEnabledV420:false,rapAudioEnabledV423:false,rapAudioStrengthV423:45,rapAudioOffsetMsV423:0, visualizerMode: "avatar", lyricsVisible: true, avatarLipSyncEnabled: true, avatarLipSyncStrength: 90, rapPerformanceEditorV408:{enabled:false,head:100,gestures:100,verse:100,hook:100,kick:100,snare:100,lipSync:100}, avatarLipSyncMode: "lyrics", avatarVocalStyleV368:"auto", avatarFacialExpressionV368:55,avatarJawFollowV369:65,avatarFacialProfilesV370:{},avatarVocalCameraV369:"auto",avatarVocalCameraStrengthV369:55,avatarVocalBodyEnabledV371:true,avatarVocalBodyStrengthV371:60,avatarVocalEyeContactV371:true,avatarVocalGesturesV371:true, avatarVocalCoordinationEnabledV372:true,avatarVocalCoordinationStrengthV372:70,avatarVocalCoordinationOffsetMsV372:0,avatarVocalPerformanceModeV393:"off",avatarVocalPerformanceStrengthV393:55, avatarAdaptivePerformanceModeV375:"off",avatarAdaptivePerformanceStrengthV375:65,avatarVocalDuetModeV376:"off",avatarVocalDuetStrengthV376:60, avatarConcertDirectorModeV386:"off",avatarConcertDirectorStrengthV386:65,avatarConcertDirectorCameraV386:true,avatarConcertDirectorLightingV386:true,avatarVocalCameraModeV401:"off",avatarVocalCameraStrengthV401:55,avatarVisualDirectorModeV397:"off",avatarVisualDirectorStrengthV397:65,avatarCameraStudioV398:{enabled:false,holdMs:1150,scenes:{verse:{shot:"auto",distance:50,pan:0},hook:{shot:"auto",distance:50,pan:0},drop:{shot:"auto",distance:50,pan:0}}},avatarUnifiedModeV402:"off",avatarUnifiedStrengthV402:70,avatarUnifiedCameraV402:true,avatarUnifiedLightingV402:true,avatarUnifiedDanceV402:true,avatarUnifiedVocalV402:true,avatarExperienceModeV396:"off",avatarExperienceStrengthV396:65,avatarFestivalModeV394:"off",avatarFestivalStrengthV394:70,avatarFestivalCameraV394:true,avatarFestivalLightingV394:true,avatarFestivalAtmosphereV394:true,avatarFestivalLasersV394:false,avatarShowModeV387:"off",avatarShowStrengthV387:70,avatarShowCameraV387:true,avatarShowLightingV387:true,avatarShowAtmosphereV387:true,avatarManualVocalEnabledV385:false,avatarManualVocalCameraV385:true,avatarVocalAssignmentsV385:{}, avatarDuetCameraModeV377:"off",avatarDuetCameraStrengthV377:65,avatarLyricsCameraModeV378:"off",avatarLyricsCameraStrengthV378:70,avatarLyricsContrastV378:true, lyricsFocusMode: true, lyricsStyle: "kinetic", lyricsAnimationIntensity: 65, lyricsKineticPresetV382:"auto", lyricsKineticStrengthV382:65, lyricsKineticDropsV382:true, lyricsBeatReactive: true, lyricsReactiveIntensity: 60, lyricsKickReactive: true, lyricsBassReactive: true, lyricsDropReactive: true, lyricsWordHighlight: true, lyricsFontSize: 100, lyricsFontFamilyV379: "system", lyricsPosition: "center", lyricsGlow: 65, lyricsGradientFrom: "#79f7ff", lyricsGradientTo: "#d789ff", lyricsAnimationSpeed: 100, lyricsOffsetMs: 0, lyricsImmersiveEnabled: false, lyricsImmersiveSide: "right", lyricsImmersiveDepth: 45, reducedMotion: false, avatarModelId: "procedural", avatarScale: 1, avatarOffsetY: 0, avatarAnimationIntensity: 1, danceAggression: 0.5, danceVariation: 0.5, danceMotionStyle: "balanced", avatarMotionMode: "hybrid", avatarClipSpeed: 1, avatarCrossfadeSeconds: 0.35, avatarArmResponse: 1, avatarLegResponse: 1, avatarRigProfile: "auto", avatarDancePreset: "auto", autoAvatarByGenre: false, beatSensitivity: 1, beatCooldownMs: 180, beatSyncMode: "off", beatSyncOffsetMs: 0 }); }}>Reset preferences</button>}
+      </>}
       </div></div>
     </section>}
   </aside>;

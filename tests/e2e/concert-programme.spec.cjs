@@ -6,7 +6,7 @@ test('programme follows real song IDs, variants restore and tab video survives t
   Object.defineProperty(navigator.mediaDevices,'getDisplayMedia',{configurable:true,value:async()=>{const canvas=document.createElement('canvas');canvas.width=320;canvas.height=180;const ctx=canvas.getContext('2d'),stream=canvas.captureStream(10);let n=0;const timer=setInterval(()=>{ctx.fillStyle=n++%2?'#004488':'#442288';ctx.fillRect(0,0,320,180);if(stream.getVideoTracks()[0].readyState==='ended')clearInterval(timer);},100);return stream;}});
  });
  await page.goto('/');await page.getByRole('button',{name:'Konzertmodus starten',exact:true}).click();await page.getByRole('button',{name:'Show steuern',exact:true}).click();
- await page.getByLabel('Konzertprogramm',{exact:true}).fill('MockConcertV1130TrackA | Auftakt | neon');await page.getByRole('button',{name:'Programm speichern',exact:true}).click();
+ await page.getByText('Programm & Showvarianten',{exact:true}).click();await page.getByLabel('Konzertprogramm',{exact:true}).fill('MockConcertV1130TrackA | Auftakt | neon');await page.getByRole('button',{name:'Programm speichern',exact:true}).click();
  await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('sonic-stage-crew-v4')).showStyle)).toBe('neon');
  await page.getByRole('button',{name:'Showvariante speichern',exact:true}).click();await expect(page.getByLabel('Gespeicherte Showvariante')).toContainText('Aurora');
  await page.getByRole('button',{name:'Gewählte Variante laden',exact:true}).click();await expect(page.getByText(/Letzte Regievariante geladen/)).toBeVisible();

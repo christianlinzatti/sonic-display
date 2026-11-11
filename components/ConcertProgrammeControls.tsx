@@ -14,7 +14,8 @@ export function ConcertProgrammeControls(){
  function saveProgramme(){const rows=parseProgramme(text);try{localStorage.setItem('sonic-programme',text);window.dispatchEvent(new Event('sonic:programme'));setMessage(`${rows.length} Songs gespeichert`);}catch{setMessage('Speichern nicht möglich');}}
  function snapshot(){try{const rows=JSON.parse(localStorage.getItem('sonic-saved-shows')??'[]');const item={name:music.track?.title??'Show',crew,track:music.track?.id,position:music.progressMs};localStorage.setItem('sonic-saved-shows',JSON.stringify([item,...(Array.isArray(rows)?rows:[])].slice(0,8)));setMessage('Showvariante gespeichert');}catch{setMessage('Speichern nicht möglich');}}
  function restore(){try{const item=JSON.parse(localStorage.getItem('sonic-saved-shows')??'[]')[selection];if(!item?.crew)return;writeCrewSettings(item.crew);setMessage('Letzte Regievariante geladen. Für einen Vergleich denselben Song ab derselben Stelle spielen.');}catch{setMessage('Keine gültige Variante');}}
- return <fieldset><legend>Konzertprogramm & Aufnahme</legend>
+ return <div className="concert-programme-settings">
+ <details className="settings-disclosure"><summary>Programm & Showvarianten</summary><fieldset><legend>Konzertprogramm</legend>
  <label>Setlist: Song-ID | Titel | cinema, groove, neon oder festival<textarea aria-label="Konzertprogramm" value={text} onChange={e=>setText(e.target.value)} rows={3}/></label>
  <button type="button" onClick={saveProgramme}>Programm speichern</button>
  <button type="button" disabled={!music.track} onClick={()=>{const rows=parseProgramme(text);if(!music.track)return;const next=[...rows.filter(r=>r.track!==music.track!.id),{track:music.track.id,title:music.track.title,style:programmeStyle(rows.length,rows.length+2)}];setText(next.map(r=>`${r.track} | ${r.title} | ${r.style}`).join('\n'));}}>Aktuellen Song ergänzen</button>
@@ -22,12 +23,16 @@ export function ConcertProgrammeControls(){
  <p>Die Regie folgt gespeicherten Song-IDs. Die Spotify-Wiedergabe steuerst du weiterhin selbst.</p>
  <label>Gespeicherte Variante<select aria-label="Gespeicherte Showvariante" value={selection} onChange={e=>setSelection(Number(e.target.value))}>{variants.map((v,i)=><option key={i} value={i}>{v.name} · {Math.round((v.position??0)/1000)} s</option>)}</select></label>
  <button type="button" onClick={snapshot}>Showvariante speichern</button><button type="button" onClick={restore}>Gewählte Variante laden</button>
+ </fieldset></details>
+ <details className="settings-disclosure"><summary>Timing & Kalibrierung</summary><fieldset><legend>Musik und Bild abstimmen</legend>
  <BeatCalibrationAssistant/>
  <label>Anzeigeverzögerung in ms<input aria-label="Anzeigeverzögerung" type="range" min="0" max="500" step="10" value={Math.max(0,preferences.beatSyncOffsetMs)} onChange={e=>updatePreferences({beatSyncMode:'manual',beatSyncOffsetMs:Number(e.target.value)})}/></label>
+ </fieldset></details>
+ <fieldset className="concert-recording-settings"><legend>Showaufnahme</legend>
  <button type="button" onClick={()=>{if(recording.running)stopConcertRecording();else void startConcertRecording().catch(e=>setMessage(e.message));}}>{recording.running?'Aufnahme stoppen':'Showvideo aufnehmen'}</button>
  {recording.url&&<a href={recording.url} download="Sonic-Konzert.webm">Video herunterladen</a>}
  <p>Video ohne Ton: Im Browser den Konzert-Tab auswählen. Escape schließt die Steuerung während der Aufnahme. Maximal zehn Minuten; die Browser-Freigabe beendet die Aufnahme ebenfalls.</p>
- <output>{message}</output></fieldset>;
+ </fieldset><output aria-live="polite">{message}</output></div>;
 }
 /** Mounted independently of the drawer, so song changes are observed while controls are closed. */
 export function ConcertProgrammeDirector({active}:{active:boolean}){

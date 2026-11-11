@@ -5118,3 +5118,33 @@ body:has(main.concert-presentation) :is(div,section):has(>main.concert-presentat
 @media(prefers-reduced-motion:reduce){.ensemble-lyric-ornament{display:none!important}}
 /* Timed words retain their real separators in verse and rap as well as choruses. */
 .concert-presentation .lyrics .kinetic-word{white-space:pre-wrap!important}
+
+/* Task-based settings navigation and compact concert controls. */
+.settings-nav-group{display:flex;flex-direction:column;gap:5px;width:100%}
+.settings-nav-label{font-size:.67rem;letter-spacing:.10em;text-transform:uppercase;color:#93a6ba;margin:12px 10px 3px}
+.settings-section-heading h3{font-size:1.45rem;margin:0 0 6px;color:#e6f4ff}.settings-section-heading p{margin:0;color:#a6b5c7;line-height:1.5}
+.settings-quick-grid,.concert-control-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.settings-quick-grid fieldset,.concert-control-grid fieldset{min-width:0;margin:0;padding:14px;border:1px solid #ffffff20;border-radius:14px;background:#ffffff03}
+.settings-quick-grid fieldset>label,.concert-control-grid fieldset>label{display:block;margin:10px 0;line-height:1.5}
+.settings-quick-grid select,.settings-quick-grid input[type=range]{width:100%;max-width:100%}
+.settings-quick-grid button{margin:5px 6px 5px 0;max-width:100%}
+.settings-shortcuts{display:flex;flex-wrap:wrap;gap:8px}.settings-shortcuts button{padding:7px 11px;font-size:.8rem}
+.settings-search-results{display:grid;gap:8px}.settings-search-results>p{margin:0 0 8px;color:#a6b5c7}.settings-search-results button{display:flex;justify-content:space-between;gap:12px;text-align:left;padding:14px;border-radius:12px}.settings-search-results small{color:#9bb5c8}
+.settings-content [data-settings-target]{outline:2px solid #8de0ef;outline-offset:4px;scroll-margin-top:12px}
+.settings-disclosure{border:1px solid #ffffff20;border-radius:12px;padding:0 14px;margin:12px 0;background:#ffffff03}
+.settings-disclosure>summary{cursor:pointer;padding:13px 0;font-weight:600;color:#d8e7f5;line-height:1.5}.settings-disclosure>summary:focus-visible{outline:2px solid #8de0ef;outline-offset:3px}.settings-disclosure[open]>summary{border-bottom:1px solid #ffffff16;margin-bottom:12px}
+.settings-disclosure>fieldset{border:0;margin:0 0 10px;padding:4px}
+.concert-controls-heading h2{margin:0 0 5px;font-size:1.2rem}.concert-controls-heading p{margin:0 0 16px;color:#a6b5c7;font-size:.85rem;line-height:1.5}
+.concert-programme-settings>output{display:block;min-height:1.2em;color:#b5e4d7}.concert-recording-settings{margin-top:14px;border-radius:12px}.concert-recording-settings p,.concert-control-grid small{font-size:.78rem;line-height:1.5;color:#a6b5c7}
+@media(max-width:700px){.settings-nav-group{flex-direction:row;flex-wrap:wrap;gap:5px}.settings-nav-label{flex:0 0 100%;margin:5px 2px}.settings-quick-grid,.concert-control-grid{grid-template-columns:1fr}.settings-search-results button{flex-direction:column;gap:5px}.settings-quick-grid fieldset{padding:12px}}
+@media(max-width:700px){.settings-sidebar{min-width:0;flex-shrink:0}.settings-popover .settings-tabs{flex-wrap:nowrap;overflow-x:auto;align-items:center;padding-bottom:5px;scrollbar-width:thin}.settings-nav-group{width:auto;flex:0 0 auto;flex-direction:row;flex-wrap:nowrap}.settings-nav-label{display:none}.settings-popover .settings-tabs button{flex:0 0 auto;white-space:nowrap}}
+.settings-panel:has(.settings-popover){z-index:500}
+.settings-panel:has(.settings-popover)::before{content:"";position:fixed;inset:0;background:#020610b8;backdrop-filter:blur(5px);z-index:-1}
+.settings-sidebar{overflow-y:auto}
+.settings-popover .settings-section-heading,.settings-popover .concert-controls-heading{display:block;position:static;background:transparent;padding:0}
+.settings-quick-grid fieldset,.concert-control-grid fieldset{display:block}
+.settings-overview button,.settings-search-results button,.settings-shortcuts button,.concert-scenery-controls button{font:inherit;cursor:pointer;padding:9px 12px;border:1px solid #ffffff30;border-radius:9px;background:#202c3b;color:#e5f1fb;min-height:36px}
+.settings-overview button:hover,.settings-search-results button:hover,.settings-shortcuts button:hover,.concert-scenery-controls button:hover{background:#2c3e51;border-color:#8de0ef88}
+.settings-overview button:disabled,.concert-scenery-controls button:disabled{opacity:.5;cursor:default}
+.concert-scenery-controls button:focus-visible{outline:2px solid #8de0ef;outline-offset:3px}
+.settings-panel:has(.settings-popover)::before{pointer-events:none}
