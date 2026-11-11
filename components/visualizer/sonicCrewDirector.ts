@@ -1,3 +1,4 @@
+import {planDancePhrase,type DancePhrase} from '../../lib/concertDancePhrases';
 import {sceneryStrength} from '../../lib/concertStageShow';
 import {isProductionId,productionTake,type ProductionId} from '../../lib/showProduction';
 import {choosePoseAwareCrew} from '../../lib/poseAwareCrew';
@@ -15,7 +16,7 @@ import {ENCORE_AVATARS_V1129,genreClipsV1129,variedClipV1129} from '../../lib/mu
 /** All bundled performers. Pure clock/clip planning; no scene or audio ownership. */
 export const CREW_IDS = ['sonic-neon-pulse','sonic-festival-nova','sonic-chrome-beat',...ENCORE_AVATARS_V1129.map(a=>a.id),...HEADLINERS_V1130.map(a=>a.id)] as const;
 export type CrewMode = 'individual'|'unison'|'canon'|'spotlight'|'story'|'adaptive';
-export type CrewSettings = { enabled:boolean; reactions:boolean; mode:CrewMode;scenery?:boolean;sceneryLyrics?:boolean;sceneryStrength?:number;showPlans?:boolean;showStyle?:ProductionId;showTake?:number;poseAware?:boolean;stagecraft?:boolean;history?:ShowHistory;remember?:boolean;taste?:MotifTaste;expression?:ExpressionV1132 };
+export type CrewSettings = { enabled:boolean; reactions:boolean; mode:CrewMode;scenery?:boolean;musicalDance?:boolean;sceneryLyrics?:boolean;sceneryStrength?:number;showPlans?:boolean;showStyle?:ProductionId;showTake?:number;poseAware?:boolean;stagecraft?:boolean;history?:ShowHistory;remember?:boolean;taste?:MotifTaste;expression?:ExpressionV1132 };
 export const CREW_DEFAULT: CrewSettings = Object.freeze({enabled:true,reactions:true,mode:'individual'});
 export type CrewInput = {
  stance?:{left:boolean;right:boolean};audioEvidence?:MusicalEvidence;modelId:string; clips:readonly {name:string;duration:number;tracks?:MotionKeyframeClipV630['tracks']}[]; trackId?:string|null;
@@ -23,15 +24,15 @@ export type CrewInput = {
  genre?:string|null; slot:number; count:number; playing:boolean; reducedMotion:boolean;
  manualPriority:boolean; settings:CrewSettings;lyricDensity?:number;durationMs?:number;lyrics?:Lyrics|null;
 };
-export type CrewState = {memoryPhase?:string;key:string;position:number;beat:number;bpm:number;clip:string|null;switched:number;phrase:number;clipPhrase?:number;leader?:number;part?:CrewPlan['part'];recent?:string[];ensembleMode?:CrewMode;clockOffset?:number;offsetTarget?:number};
+export type CrewState = {danceKey?:string;memoryPhase?:string;key:string;position:number;beat:number;bpm:number;clip:string|null;switched:number;phrase:number;clipPhrase?:number;leader?:number;part?:CrewPlan['part'];recent?:string[];ensembleMode?:CrewMode;clockOffset?:number;offsetTarget?:number};
 export const newCrewState = ():CrewState => ({key:'',position:0,beat:0,bpm:120,clip:null,switched:-Infinity,phrase:-1});
-export type CrewPlan = {slot?:number;active:boolean;clip:string|null;part:'quiet'|'verse'|'hook'|'drop';beat:number;bpm:number;
+export type CrewPlan = {dance?:DancePhrase|null;slot?:number;active:boolean;clip:string|null;part:'quiet'|'verse'|'hook'|'drop';beat:number;bpm:number;
  offset:number;offsetTarget?:number;leader:number;reaction:'nod'|'welcome'|'led'|'none';reason:string;bodyStyle?:string;persona?:PersonaV1132;expressionGain?:number;sequence?:{label:string;step:number};story?:ConcertScoreV1134;interaction?:ReturnType<typeof crewInteractionV1131>};
 export const normalizeCrewSettings = (v:unknown):CrewSettings => {
  const x=v && typeof v==='object'?v as Partial<CrewSettings>:{};
  const expression=x.expression==='subtle'||x.expression==='balanced'||x.expression==='bold'?x.expression:undefined;
  const taste=normalizeShowTaste(x.taste),history=normalizeShowHistory(x.history);
- return {...(typeof x.scenery==='boolean'?{scenery:x.scenery}:{}),...(typeof x.sceneryLyrics==='boolean'?{sceneryLyrics:x.sceneryLyrics}:{}),...(typeof x.sceneryStrength==='number'&&Number.isFinite(x.sceneryStrength)?{sceneryStrength:sceneryStrength(x.sceneryStrength)}:{}),...(typeof x.showPlans==='boolean'?{showPlans:x.showPlans}:{}),...(isProductionId(x.showStyle)?{showStyle:x.showStyle}:{}),...(productionTake(x.showTake)?{showTake:productionTake(x.showTake)}:{}),...(x.poseAware===true?{poseAware:true}:{}),...(x.stagecraft===true?{stagecraft:true}:{}),...(x.remember===false?{remember:false}:{}),...(history.length?{history}:{}),...(Object.keys(taste).length?{taste}:{}),...(expression?{expression}:{}),enabled:typeof x.enabled==='boolean'?x.enabled:true,reactions:typeof x.reactions==='boolean'?x.reactions:true,
+ return {...(typeof x.musicalDance==='boolean'?{musicalDance:x.musicalDance}:{}),...(typeof x.scenery==='boolean'?{scenery:x.scenery}:{}),...(typeof x.sceneryLyrics==='boolean'?{sceneryLyrics:x.sceneryLyrics}:{}),...(typeof x.sceneryStrength==='number'&&Number.isFinite(x.sceneryStrength)?{sceneryStrength:sceneryStrength(x.sceneryStrength)}:{}),...(typeof x.showPlans==='boolean'?{showPlans:x.showPlans}:{}),...(isProductionId(x.showStyle)?{showStyle:x.showStyle}:{}),...(productionTake(x.showTake)?{showTake:productionTake(x.showTake)}:{}),...(x.poseAware===true?{poseAware:true}:{}),...(x.stagecraft===true?{stagecraft:true}:{}),...(x.remember===false?{remember:false}:{}),...(history.length?{history}:{}),...(Object.keys(taste).length?{taste}:{}),...(expression?{expression}:{}),enabled:typeof x.enabled==='boolean'?x.enabled:true,reactions:typeof x.reactions==='boolean'?x.reactions:true,
  mode:x.mode==='unison'||x.mode==='canon'||x.mode==='spotlight'||x.mode==='story'||x.mode==='adaptive'?x.mode:'individual'};
 };
 const clamp=(x:number,a:number,b:number)=>Math.min(b,Math.max(a,x));
@@ -107,14 +108,17 @@ export function stepCrew(previous:CrewState,input:CrewInput):{state:CrewState;pl
  recent:reset?[]:previous.recent??[],slot,count,fallback:baseCandidate});
  const bodyCandidate=input.settings.mode==='adaptive'?fullBodyClipV1133({history:input.settings.remember===false?undefined:input.settings.history,taste:input.settings.taste,slot,trackId:input.trackId,recent:reset?[]:previous.recent??[],modelId:input.modelId,genre:input.genre,cue:adaptiveCue,count,available,fallback:sequence.clip}):baseCandidate;
  const supporting=input.settings.mode==='adaptive'&&(adaptiveCue.reading||adaptiveCue.act==='build')&&slot!==leader;
- const candidate=supporting?(available.has('Dance_Groove')?'Dance_Groove':bodyCandidate):bodyCandidate;
+ const ordinaryCandidate=supporting?(available.has('Dance_Groove')?'Dance_Groove':bodyCandidate):bodyCandidate;
+ const dance=input.settings.mode==='adaptive'&&input.settings.scenery===true&&input.settings.musicalDance!==false?planDancePhrase({cue:adaptiveCue,beat,slot,count,clip:ordinaryCandidate,available,evidence:input.audioEvidence}):null;
+ const candidate=dance?.clip??ordinaryCandidate;
  if(!candidate)return off('missing-clips');
  const old=reset?newCrewState():previous;
  // Switch on a bar and hold >=8 seconds. Quiet sections may settle after one bar; greetings may finish after their own clip.
  const barBoundary=Math.floor((beat+1e-7)/4)!==Math.floor((old.beat+1e-7)/4);
- const hold=old.clip==='Gesture_Wave'?3000:part==='quiet'?2000:8000;
+ const hold=old.clip==='Gesture_Wave'?3000:part==='quiet'?2000:dance?Math.max(2500,8*60000/bpm):8000;
  const roleChanged=barBoundary&&ensemble&&effectiveMode==='spotlight'&&!!old.key&&old.phrase!==phrase&&(slot===leader||slot===(old.leader??old.phrase%count));
- const phraseChanged=phrase!==(old.clipPhrase??old.phrase);
+ const danceKey=dance?`${dance.block}:${dance.step}`:undefined;
+ const phraseChanged=phrase!==(old.clipPhrase??old.phrase)||!!dance&&danceKey!==old.danceKey;
  const regroup=input.settings.mode==='adaptive'&&old.ensembleMode!==effectiveMode&&barBoundary;
  const finaleHandoff=adaptiveCue.act==='finale'&&!!adaptiveCue.memory&&old.memoryPhase!==adaptiveCue.memory.phase&&barBoundary;
  const keep=!!old.clip&&available.has(old.clip)&&!roleChanged&&!regroup&&!finaleHandoff&&(!barBoundary||pos-old.switched<hold-.001||(!phraseChanged&&old.part===part&&part!=='quiet'));
@@ -122,8 +126,8 @@ export function stepCrew(previous:CrewState,input:CrewInput):{state:CrewState;pl
  const clip=keep?old.clip!:flexible?choosePoseAwareCrew({clips:input.clips,outgoing:old.clip!,candidate,bpm,outTime:((old.beat+(old.clockOffset??0))/2)%(input.clips.find(c=>c.name===old.clip)?.duration??1),time:duration=>((beat+(old.clockOffset??0))/2)%duration,genre:input.genre,left:input.stance?.left??false,right:input.stance?.right??false}):candidate;
  const desiredOffset=input.settings.mode==='adaptive'?crewInteractionV1131(adaptiveCue,slot,count).beatOffset:ensemble&&effectiveMode==='canon'?-slot*2:0;
  const clockOffset=input.settings.mode==='adaptive'&&!reset&&clip===old.clip?approachCrewOffsetV1132(old.clockOffset??desiredOffset,old.offsetTarget??desiredOffset,dt,bpm):desiredOffset;
- const state={memoryPhase:keep?old.memoryPhase:adaptiveCue.memory?.phase,clockOffset,offsetTarget:desiredOffset,key,position:pos,beat,bpm,clip,switched:clip!==old.clip?pos:old.switched,phrase,clipPhrase:keep?(old.clipPhrase??old.phrase):phrase,leader,part,ensembleMode:keep?old.ensembleMode:effectiveMode,recent:clip!==old.clip?[clip,...(old.recent??[])].slice(0,3):old.recent};
- return {state,plan:{slot,active:true,clip,part,beat,bpm,offset:clockOffset,offsetTarget:input.settings.mode==='adaptive'?desiredOffset:undefined,leader,
+ const state={danceKey:keep?old.danceKey:danceKey,memoryPhase:keep?old.memoryPhase:adaptiveCue.memory?.phase,clockOffset,offsetTarget:desiredOffset,key,position:pos,beat,bpm,clip,switched:clip!==old.clip?pos:old.switched,phrase,clipPhrase:keep?(old.clipPhrase??old.phrase):phrase,leader,part,ensembleMode:keep?old.ensembleMode:effectiveMode,recent:clip!==old.clip?[clip,...(old.recent??[])].slice(0,3):old.recent};
+ return {state,plan:{dance,slot,active:true,clip,part,beat,bpm,offset:clockOffset,offsetTarget:input.settings.mode==='adaptive'?desiredOffset:undefined,leader,
  bodyStyle:bodyStyleV1133(clip),persona:input.settings.mode==='adaptive'?performerPersonaV1132(input.modelId):undefined,expressionGain:expressionGainV1132(input.settings.expression)*(adaptiveCue.memory?.gain??1)*(adaptiveCue.production?.crewGain??1)*(adaptiveCue.music.quiet?.25:1+adaptiveCue.music.pulse*.08)*(adaptiveCue.reading?(slot===leader?.65:.30):supporting?.55:1),sequence:input.settings.mode==='adaptive'?{label:sequence.label,step:sequence.step}:undefined,
  story:input.settings.mode==='adaptive'?adaptiveCue:undefined,interaction:input.settings.mode==='adaptive'?crewInteractionV1131(adaptiveCue,slot,count):undefined,
  reaction:input.settings.reactions?(['nod','welcome','led'] as const)[model]:'none',reason:knownBpm?'music':'tempo-fallback'}};

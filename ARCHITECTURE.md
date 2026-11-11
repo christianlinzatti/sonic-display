@@ -1,5 +1,9 @@
 ## Update – Eine abgestimmte Konzert-Bühnenebene
 
+## Musikalische Tanzfolgen und Crew-Effekte
+
+Vier-/achttaktige Bewegungsbögen, gemessene Bass-/Perkussionsantworten, Crew-Wellen und beobachtete Hand-/Fußeffekte ergänzen den aufgeräumten Konzertmodus. Details, Grenzen und Tests: [Dokumentation](docs/versions/V1159-MUSIKALISCHE-TANZFOLGEN.md).
+
 `lib/concertStageShow.ts` plant Bilder, Textprojektion, einmalige Akzent-Termine,
 Effektbudget und Oberkörper-Zeremonien. `ConcertScenery` setzt sie im bestehenden
 R3F-Takt mit einer LED-Fläche, schattenfreien Spots und höchstens einem kleinen

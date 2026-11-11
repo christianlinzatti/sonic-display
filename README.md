@@ -1,5 +1,9 @@
 ## Update – Aufgeräumte Konzertshow mit LED-Bühne und Effekten
 
+## Musikalische Tanzfolgen und Crew-Effekte
+
+Vier-/achttaktige Bewegungsbögen, gemessene Bass-/Perkussionsantworten, Crew-Wellen und beobachtete Hand-/Fußeffekte ergänzen den aufgeräumten Konzertmodus. Details, Grenzen und Tests: [Dokumentation](docs/versions/V1159-MUSIKALISCHE-TANZFOLGEN.md).
+
 Der Konzertmodus zeigt Bühne und feste Lyrics-Zone mit einer kleinen Show-Steuerung.
 LED-Bilder wechseln mit dem Song, Spots folgen Solisten und Partnern, Refrains
 können zusätzlich hinter der Crew erscheinen. Gezielte Boden-/Partikel-Akzente,
