@@ -1,3 +1,11 @@
+## Update – Aufgeräumte Konzertshow mit LED-Bühne und Effekten
+
+Der Konzertmodus zeigt Bühne und feste Lyrics-Zone mit einer kleinen Show-Steuerung.
+LED-Bilder wechseln mit dem Song, Spots folgen Solisten und Partnern, Refrains
+können zusätzlich hinter der Crew erscheinen. Gezielte Boden-/Partikel-Akzente,
+ein gemeinsamer Schluss und ein adaptives Effektbudget ergänzen die Show.
+[Bedienung, Grenzen und Tests](docs/versions/V1158-KONZERTBUEHNE-UND-EFFEKTE.md).
+
 ## Update – Vorausschauende Regie, Crew-Beziehungen und Show-Check
 
 Die Show bereitet Refrains und Finale vor, führt wiederkehrende Tanzpaare durch

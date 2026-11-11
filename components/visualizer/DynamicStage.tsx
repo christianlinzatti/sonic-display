@@ -1,4 +1,7 @@
 "use client";
+import {ConcertScenery,type ConcertSceneryGate} from './ConcertScenery';
+import {useConcertPresentation} from '../concertPresentation';
+import {useCrewSettings} from './useSonicCrew';
 import {portraitContrastV1135} from '@/lib/stagePresenceV1135';
 import {lyricSpotlightV1133} from '@/lib/lyricSpotlightV1133';
 import {useConcertStoryV1131} from './useConcertStoryV1131';
@@ -230,6 +233,10 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
 }) {
   const lyricPriorityV1133=lyricSpotlightV1133(lyricsV813??concertLipSyncV386?.lyrics,concertLipSyncV386?.progressMs??performerLightingV557?.progressMs??0);
   const storyV1131=useConcertStoryV1131({trackId:concertLipSyncV386?.storyTrackIdV1136,playback:concertLipSyncV386?.storyPlaybackV1136,durationMs:concertLipSyncV386?.storyDurationMsV1131,progressMs:concertLipSyncV386?.progressMs??performerLightingV557?.progressMs??0,lyrics:lyricsV813??concertLipSyncV386?.lyrics,genre,bpm:audio.bpm,energy:audio.energyEnvelope,count:groupCountV542,section:lyricsV813?.synced?undefined:cameraSectionV608});
+  const concertPresentation=useConcertPresentation(),crewSettings=useCrewSettings();
+  const sceneryEnabled=concertPresentation&&crewSettings.scenery===true&&crewSettings.enabled&&crewSettings.mode==='adaptive';
+  const sceneryGate=useRef<ConcertSceneryGate>({manual:true,pressure:0,lights:false,pulse:false,tier:'low'});
+  const readSceneryGate=()=>({...sceneryGate.current,manual:sceneryGate.current.manual||manualLightingV763||timeline.current.cues.length>0||!reactive||showCue?.lightingEnabled!==undefined&&showCue?.lightingEnabled!==null});
   const palette = palettes[theme];
   const liveStageV882=useRef<ConcertStageCueV882>({...OFF_CONCERT_STAGE_V882});
   const livePyroV891=useRef<PyroCueV891>({...PYRO_OFF_V891});
@@ -2105,8 +2112,15 @@ export function DynamicStage({ theme = "classic", audio, isPlaying, reducedMotio
         (pulseMesh.current.material as MeshBasicMaterial).opacity = Math.min(.34, cue.glow * .3 * glowGainV353);
       }
     }
+    // The concert layer takes ownership only of un-authored decorative defaults.
+    sceneryGate.current={manual:manualLightingV763||authoredLightsV386||!!liveSignalV882.manual||showCue?.lightingEnabled===false||timelineCue.blackout>0||timelineCue.strobe>0||timelineCue.scale<=0||timelineGainV354<=0,pressure:fxPressureV980,lights:sceneFlags.extraLights,pulse:sceneFlags.pulse,tier};
+    if(sceneryEnabled&&!readSceneryGate().manual){
+      for(const mesh of [ledWallV635.current,laserMeshV811.current,lyricsWallV813.current,lyricsFloorV813.current,pulseMesh.current])if(mesh)mesh.visible=false;
+      if(beam.current)beam.current.visible=false;
+    }
   });
   return <group>
+    {sceneryEnabled&&storyV1131&&<ConcertScenery cue={storyV1131} lyrics={lyricsV813??concertLipSyncV386?.lyrics} playing={isPlaying} reducedMotion={reducedMotion} gate={readSceneryGate}/>}
     <ConcertStageFxV882 cueRef={liveStageV882}/>
     {/* V997: decorative, opt-in observed-track handover; never takes camera/light ownership. */}
     <ConcertFlowBridgeV997 allowed={isPlaying&&!reducedMotion&&!manualLightingV763&&!lyricsProtectedV542}

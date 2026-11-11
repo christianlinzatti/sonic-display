@@ -5028,7 +5028,7 @@
 /* Explicit concert presentation: stage and readable lyric lane own the viewport. */
 .concert-mode-toggle{position:fixed;z-index:120;top:16px;left:16px;padding:12px 18px;border:1px solid #9ff8df88;border-radius:24px;background:#101c2fee;color:#d9fff4;font-weight:700;cursor:pointer}
 .concert-presentation{position:fixed!important;inset:0!important;overflow:hidden!important;background:radial-gradient(ellipse at 50% 30%,#13263e,#03070e 75%)!important;isolation:isolate}
-.concert-presentation> :not(.concert-mode-toggle):not(.immersive-stage):not(.layout):not(.show-v1130){display:none!important}
+.concert-presentation> :not(.concert-mode-toggle):not(.concert-toolbar):not(.immersive-stage):not(.layout):not(.show-v1130){display:none!important}
 .concert-presentation>.immersive-stage{position:absolute!important;inset:3vh 0 auto!important;width:100%!important;max-width:none!important;height:65vh!important;margin:0!important;transform:none!important;border-radius:0!important}
 .concert-presentation .three-avatar-stage,.concert-presentation .visualizer-stage,.concert-presentation .immersive-stage>div{width:100%!important;height:100%!important;max-height:none!important;max-width:none!important}
 .concert-presentation>.layout{display:contents!important}
@@ -5069,3 +5069,31 @@
 .lyrics[data-show-production]:not([data-show-production="off"])[data-show-identity="verse"]{box-shadow:0 0 16px color-mix(in srgb,var(--production-color) 7%,transparent)}
 .concert-show-review{border:1px solid #ffffff30;border-radius:10px;padding:.8rem;margin-block:.8rem;font-size:.9rem}
 .concert-show-review summary{cursor:pointer;font-weight:600}
+
+/* The concert owns the screen, including sibling tools and portal launchers. */
+body:has(main.concert-presentation)>:not(main.concert-presentation):not(:has(main.concert-presentation)):not(script):not(style):not(link){display:none!important}
+body:has(main.concert-presentation) :is(div,section):has(>main.concert-presentation)>:not(main.concert-presentation):not(script):not(style):not(link){display:none!important}
+.concert-toolbar{position:fixed;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));max-width:calc(100vw - 24px);z-index:120;pointer-events:none}
+.concert-toolbar-buttons{display:flex;gap:8px;pointer-events:auto}
+.concert-toolbar-buttons>button{position:static!important;inset:auto!important;padding:9px 13px!important;border:1px solid #b8d7ed40!important;border-radius:20px!important;background:#071421d9!important;color:#dcecf5!important;font-size:12px!important;font-weight:500!important;cursor:pointer;backdrop-filter:blur(12px)}
+.concert-toolbar-buttons>button:hover{border-color:#c7f2ffb0!important}
+.concert-toolbar-buttons>button:focus-visible{outline:2px solid #b4edff;outline-offset:3px}
+.concert-track-title{position:fixed;top:20px;left:35vw;width:40vw;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;letter-spacing:.04em;color:#dcecf5b3;pointer-events:none}
+.concert-track-title span{color:#dcecf575}
+#concert-show-options{pointer-events:auto;position:absolute;top:calc(100% + 10px);left:0;width:min(350px,calc(100vw - 28px));max-height:60vh;overflow:auto;border:1px solid #afcfef35;border-radius:16px;background:#081421f2;backdrop-filter:blur(20px);padding:14px;box-shadow:0 16px 60px #0008;color:#dcecf5;font-size:12px}
+#concert-show-options>p{color:#b7c6d4;line-height:1.5;margin-bottom:0}
+.concert-scenery-controls{border:1px solid #ffffff25;border-radius:12px;padding:12px;min-width:0}
+.concert-scenery-controls legend{font-weight:600;padding-inline:6px}
+.concert-scenery-controls label{display:flex!important;flex-direction:row!important;align-items:center;flex-wrap:wrap;gap:8px;margin-block:12px;line-height:1.5}
+.concert-scenery-controls input[type="checkbox"]{width:16px!important;height:16px;flex:0 0 16px;accent-color:#8eeaff}
+.concert-scenery-controls input[type="range"]{width:100%;flex-basis:100%;accent-color:#8eeaff}
+.concert-scenery-controls p{font-size:12px;line-height:1.5;color:#b7c6d4}
+.concert-presentation .show-v1130{display:block!important;position:absolute!important;width:1px!important;height:1px!important;max-width:1px!important;overflow:hidden!important;clip-path:inset(50%);white-space:nowrap;padding:0!important;top:0!important;right:0!important}
+.concert-presentation [data-v441-slot]{display:none!important}
+@media(max-width:700px){.concert-track-title{top:57px;left:8vw;width:84vw;font-size:11px}.concert-toolbar-buttons>button{font-size:11px!important;padding:8px 11px!important}}
+@media(max-height:500px){.concert-track-title{display:none}.concert-toolbar-buttons>button{padding:6px 10px!important;font-size:11px!important}}
+
+.concert-presentation .lyrics-window{width:100%!important;max-width:100%!important}
+.concert-presentation .lyrics .v555-adlib-echo,.concert-presentation .lyrics .v549-vocal-caption,.concert-presentation .lyrics-v368-progress{display:none!important}
+.concert-presentation .lyrics.v1133-rap[data-concert-long-rap="true"] .lyric.active{font-size:clamp(16px,1.8vw,22px)!important;line-height:1.2!important}
+@media(max-height:500px){.concert-presentation .lyrics.v1133-rap[data-concert-long-rap="true"] .lyric.active{font-size:14px!important;line-height:1.15!important}}

@@ -1,3 +1,12 @@
+## Update – Eine abgestimmte Konzert-Bühnenebene
+
+`lib/concertStageShow.ts` plant Bilder, Textprojektion, einmalige Akzent-Termine,
+Effektbudget und Oberkörper-Zeremonien. `ConcertScenery` setzt sie im bestehenden
+R3F-Takt mit einer LED-Fläche, schattenfreien Spots und höchstens einem kleinen
+Akzent um. `ConcertMode` bietet eine kompakte Steuerung; die Darstellung blendet
+auch übergeordnete schwebende Bedienelemente aus. Manuelle Besitzer behalten
+Vorrang. [Datenfluss, Ressourcen und Tests](docs/versions/V1158-KONZERTBUEHNE-UND-EFFEKTE.md).
+
 ## Update – Szenenvorschau und gemessene Show-Bewertung
 
 `concertScenePlan` plant nächste Refrains/Finale und reproduzierbare Crew-Paare.

@@ -1,4 +1,5 @@
 'use client';
+import {ConcertSceneryControls} from '../ConcertSceneryControls';
 import {ConcertShowReview} from '../ConcertShowReview';
 import {SHOW_PRODUCTIONS,productionTake,type ProductionId} from '@/lib/showProduction';
 import {voteShowTaste,TASTE_MOTIFS} from '@/lib/showTaste';
@@ -63,6 +64,7 @@ export function SonicCrewControls(){
    <button type="button" disabled={!settings.showPlans} onClick={()=>{writeCrewSettings({...settings,showTake:(productionTake(settings.showTake)+1)%1000});setTasteNotice('Neue Show-Version vorbereitet. Sichere Übergänge und Lyrics behalten Vorrang.');}}>Neue Show-Version</button>
    <p>Die lokale Regie bewertet Genre, Lyrics-Struktur und frühere Shows. Ein Konzept verbindet Tanzmotive, Kamera, Licht und Textakzente über den Song. Mit „Neue Show-Version“ kannst du eine andere Inszenierung ausprobieren.</p>
   </fieldset>
+  <ConcertSceneryControls/>
   <ConcertShowReview/>
   <label><input type="checkbox" checked={settings.poseAware===true} onChange={e=>writeCrewSettings({...settings,poseAware:e.target.checked})}/> Körperhaltung bei freien Tanzwechseln berücksichtigen</label>
   <p>Song-Gedächtnis: Ein Motiv aus der Strophe kehrt in Refrains wieder. Das Finale verbindet Motiv, Antwort und gemeinsamen Abschluss. Deine Motiv-Vorlieben bleiben lokal auf diesem Gerät.</p>

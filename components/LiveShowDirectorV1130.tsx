@@ -17,7 +17,7 @@ export function LiveShowDirectorV1130({progressMs}:{progressMs:number}){
  const [group,setGroup]=useState(readGroupV326);
  useEffect(()=>{const update=()=>setGroup(readGroupV326());window.addEventListener(GROUP_EVENT_V326,update);return()=>window.removeEventListener(GROUP_EVENT_V326,update);},[]);
  const enabled=!!track&&crew.enabled&&crew.mode==='adaptive';
- const cue=enabled?concertScoreV1134({trackId:track?.id,showPlans:crew.showPlans,showStyle:crew.showStyle,showTake:crew.showTake,taste:crew.taste,history:crew.remember===false?undefined:crew.history,audioEvidence:measuredMusic(active,metrics),progressMs,durationMs:track?.durationMs,genre,
+ const cue=enabled?concertScoreV1134({trackId:track?.id,scenery:crew.scenery,showPlans:crew.showPlans,showStyle:crew.showStyle,showTake:crew.showTake,taste:crew.taste,history:crew.remember===false?undefined:crew.history,audioEvidence:measuredMusic(active,metrics),progressMs,durationMs:track?.durationMs,genre,
   lyrics,count:group.enabled?group.count:1,bpm:metrics.bpm,energy:active?metrics.energyEnvelope:undefined,
   section:lyrics?.synced?undefined:lyricSectionV1130(lyrics,progressMs),lyricDensity:lyricDensityV1130(lyrics,progressMs)}):null;
  useConcertShowReview(cue,isPlaying,preferences.reducedMotion,concert);
