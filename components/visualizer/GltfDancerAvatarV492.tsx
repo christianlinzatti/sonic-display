@@ -1290,7 +1290,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
         crewTelemetry.current={source,at:now};
         const action=selectedClip?actions[selectedClip]:null;
         const observed=isPlaying&&!reducedMotion&&!crewManualV1135&&crew.plan.active&&selectedClip===crew.plan.clip&&action?.enabled&&(action.getEffectiveWeight()??0)>.5;
-        window.dispatchEvent(new CustomEvent('sonic:crew-performance',{detail:{source,slot:workloadSlot,clip:observed?selectedClip:null,dance:observed&&crew.plan.dance?{phase:crew.plan.dance.phase,role:crew.plan.dance.role,bars:crew.plan.dance.bars,measured:crew.plan.dance.measured}:null,bond:crew.plan.story?.relationship?.id,progressMs:cameraDirectorProgressMs??propsLipSyncV367?.progressMs??0}}));
+        window.dispatchEvent(new CustomEvent('sonic:crew-performance',{detail:{source,slot:workloadSlot,costume:observed?model.userData.songCostume??null:null,ensemble:observed?{role:crew.plan.interaction?.role,gaze:crewReaction.find(item=>item.node.name==='Head')?.channels.y??0}:null,clip:observed?selectedClip:null,dance:observed&&crew.plan.dance?{phase:crew.plan.dance.phase,role:crew.plan.dance.role,bars:crew.plan.dance.bars,measured:crew.plan.dance.measured}:null,bond:crew.plan.story?.relationship?.id,progressMs:cameraDirectorProgressMs??propsLipSyncV367?.progressMs??0}}));
       }
     }
     applyGltfVocalPerformanceV492({propsLipSyncV367,trackId:track?.id??"",audio,genre,showCue,reducedMotion,isPlaying,

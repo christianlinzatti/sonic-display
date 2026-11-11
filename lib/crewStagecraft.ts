@@ -1,7 +1,13 @@
 export type StagePoint={x:number;z:number};
-export function crewStageTarget(base:StagePoint,slot:number,count:number,leader:number,partner:number,together:boolean,preparation?:{leader:number;partner:number;progress:number}):StagePoint{
+export function crewStageTarget(base:StagePoint,slot:number,count:number,leader:number,partner:number,together:boolean,preparation?:{leader:number;partner:number;progress:number},ensemble=false):StagePoint{
  const centre=(count-1)/2;
  const result={x:base.x+Math.sign(slot-centre)*.10,z:base.z+(together?-.16*Math.abs(slot-centre):slot===leader?.36:slot===partner?.12:-.18)};
+ if(ensemble){
+  // Preserve fixed lanes; supporting dancers give the central pair visual room.
+  const supporting=slot!==leader&&slot!==partner;
+  result.x+=together?0:Math.sign(slot-centre)*(supporting?.08:.025);
+  result.z+=together?.06:slot===leader?.10:slot===partner?.04:-.10;
+ }
  if(preparation&&Number.isFinite(preparation.progress)){
   const gain=Math.max(0,Math.min(.65,preparation.progress*.65));
   const depth=slot===preparation.leader?.36:slot===preparation.partner?.12:-.18;

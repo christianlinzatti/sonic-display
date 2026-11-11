@@ -1,4 +1,5 @@
 'use client';
+import {publishEnsembleLight,clearEnsembleLight} from '@/lib/concertEnsemble';
 import {ConcertAtmosphere,type ConcertAtmosphereHandle} from './ConcertAtmosphere';
 import {planConcertAtmosphere} from '@/lib/concertAtmosphere';
 import {useEffect,useMemo,useRef} from 'react';
@@ -46,7 +47,7 @@ export function ConcertScenery({cue,lyrics,playing,reducedMotion,gate}:{cue:Conc
  const motionFx=useRef(newMotionFxState());
  const trail=useMemo(()=>{const geometry=new BufferGeometry();geometry.setAttribute('position',new Float32BufferAttribute(new Float32Array(120),3));geometry.setDrawRange(0,0);return geometry;},[]);
  const trailMaterial=useRef<import('three').LineBasicMaterial>(null);
- useEffect(()=>()=>trail.dispose(),[trail]);
+ useEffect(()=>()=>{trail.dispose();clearEnsembleLight();},[trail]);
  const first=useRef<SpotLight>(null),second=useRef<SpotLight>(null),firstTarget=useRef<Object3D>(null),secondTarget=useRef<Object3D>(null);
  const weights=useMemo(()=>new Vector4(1,0,0,0),[]);
  const white=useMemo(()=>new Color('#ffffff'),[]);
@@ -87,7 +88,7 @@ export function ConcertScenery({cue,lyrics,playing,reducedMotion,gate}:{cue:Conc
   if(landing.current&&landingMaterial.current){landing.current.visible=!!motion.landing&&!burst;if(motion.landing){landing.current.position.set(motion.landing.point.x,motion.landing.point.y,motion.landing.point.z);landing.current.scale.setScalar(.5+motion.landing.age*2);landingMaterial.current.color.set(plan.secondary);landingMaterial.current.opacity=motion.landing.gain*.24*plan.scale;}}
   const roomBlend=reducedMotion?1:1-Math.exp(-Math.min(.1,Math.max(0,delta))*1.8);
   atmosphere.current?.update(room,plan.primary,plan.secondary,phase.current*16,roomBlend);
-  if(!plan.active){if(clock.elapsedTime-lastReport.current>=1){lastReport.current=clock.elapsedTime;window.dispatchEvent(new CustomEvent('sonic:concert-scenery',{detail:{source:cue.sourceKey,active:false,atmosphere:{backdrop:false,floor:false,moving:false},manual:guard.manual,led:false,projection:false,spotTargets:[],particles:0,moving:false}}));}return;}
+  if(!plan.active){publishEnsembleLight(cue,false,false);if(clock.elapsedTime-lastReport.current>=1){lastReport.current=clock.elapsedTime;window.dispatchEvent(new CustomEvent('sonic:concert-scenery',{detail:{source:cue.sourceKey,active:false,atmosphere:{backdrop:false,floor:false,moving:false},manual:guard.manual,led:false,projection:false,spotTargets:[],particles:0,moving:false}}));}return;}
   const fade=reducedMotion?1:1-Math.exp(-Math.min(.1,Math.max(0,delta))*2.5);
   if(plan.motion)phase.current=cue.positionMs/16000;
   if(material.current){
@@ -127,7 +128,7 @@ export function ConcertScenery({cue,lyrics,playing,reducedMotion,gate}:{cue:Conc
   }
   if(pulse.current&&pulseMaterial.current){pulse.current.visible=!!burst&&burst.kind==='floor'&&plan.budget.pulse;if(burst){pulse.current.scale.setScalar(1+burst.age*1.5);pulseMaterial.current.color.set(plan.primary);pulseMaterial.current.opacity=burst.gain*.26*plan.scale;}}
   if(wall.current)wall.current.visible=true;
-  if(clock.elapsedTime-lastReport.current>=1){lastReport.current=clock.elapsedTime;window.dispatchEvent(new CustomEvent('sonic:concert-scenery',{detail:{source:cue.sourceKey,active:true,atmosphere:{scene:room.scene,motif:room.motif,moving:room.moving,...atmosphere.current?.read()},refrainVisit:plan.refrainVisit,scene:afterglow>0?'afterglow':plan.scene,pattern:plan.pattern,mix:material.current?.uniforms.uWeights.value.toArray(),tier:plan.budget.tier,pressure,led:!!wall.current?.visible,projection:textDrawn.current&&plan.text.length>0&&(material.current?.uniforms.uTextOpacity.value??0)>.01,spotTargets:actualTargets,particles:particleCount,motionSegments:segments.length,landing:!!motion.landing&&!burst,accent:burst?.id??null,moving:plan.motion>0}}));}
+  if(clock.elapsedTime-lastReport.current>=1){lastReport.current=clock.elapsedTime;publishEnsembleLight(cue,playing,cue.concert===true&&!guard.manual&&settings.goveeEnsemble!==false);window.dispatchEvent(new CustomEvent('sonic:concert-scenery',{detail:{source:cue.sourceKey,active:true,atmosphere:{scene:room.scene,motif:room.motif,moving:room.moving,...atmosphere.current?.read()},refrainVisit:plan.refrainVisit,scene:afterglow>0?'afterglow':plan.scene,pattern:plan.pattern,mix:material.current?.uniforms.uWeights.value.toArray(),tier:plan.budget.tier,pressure,led:!!wall.current?.visible,projection:textDrawn.current&&plan.text.length>0&&(material.current?.uniforms.uTextOpacity.value??0)>.01,spotTargets:actualTargets,particles:particleCount,motionSegments:segments.length,landing:!!motion.landing&&!burst,accent:burst?.id??null,moving:plan.motion>0}}));}
  });
  return <group ref={group} name="concert-show-scenery" visible={false}>
   <ConcertAtmosphere ref={atmosphere}/>

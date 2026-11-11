@@ -1,3 +1,4 @@
+import type {SongCostume} from '../../lib/songWardrobe';
 import {CanvasTexture,Color,Material,Mesh,MeshStandardMaterial,Object3D,SRGBColorSpace,Texture} from 'three';
 export type WardrobeModeV468='off'|'album'|'custom';
 export type WardrobePatternV468='original'|'neon-grid'|'stripes';
@@ -7,7 +8,7 @@ export function isClothingMaterialV468(nodeName:string,materialName:string){
  const marker=`${nodeName} ${materialName}`;
  return CLOTHING.test(marker)&&!EXCLUDE.test(marker);
 }
-type Fabric={material:MeshStandardMaterial;baseColor:Color;baseEmissive:Color;tempColor:Color;tempEmissive:Color;baseIntensity:number;originalMap:Texture|null};
+type Fabric={roughness:number;metalness:number;material:MeshStandardMaterial;baseColor:Color;baseEmissive:Color;tempColor:Color;tempEmissive:Color;baseIntensity:number;originalMap:Texture|null};
 /** Replace only clothing materials on the SkeletonUtils instance; cached GLTF is untouched. */
 export function prepareAvatarWardrobeV468(model:Object3D){
  const fabrics:Fabric[]=[];
@@ -20,7 +21,7 @@ export function prepareAvatarWardrobeV468(model:Object3D){
    if(!(material as MeshStandardMaterial).isMeshStandardMaterial||!isClothingMaterialV468(mesh.name,material.name))return material;
    const original=material as MeshStandardMaterial;
    const copy=original.clone();clones.push(copy);
-   fabrics.push({material:copy,baseColor:original.color.clone(),baseEmissive:original.emissive.clone(),tempColor:new Color(),tempEmissive:new Color(),baseIntensity:original.emissiveIntensity,originalMap:original.map});
+   fabrics.push({roughness:original.roughness,metalness:original.metalness,material:copy,baseColor:original.color.clone(),baseEmissive:original.emissive.clone(),tempColor:new Color(),tempEmissive:new Color(),baseIntensity:original.emissiveIntensity,originalMap:original.map});
    return copy;
   });
   if(updated.some((m,i)=>m!==materials[i]))mesh.material=Array.isArray(mesh.material)?updated:updated[0];
@@ -44,7 +45,7 @@ export function prepareAvatarWardrobeV468(model:Object3D){
  };
  return {
   count:fabrics.length,
-  apply(mode:WardrobeModeV468,color:string,delta:number,playing:boolean,pattern:WardrobePatternV468='original',glow=35){
+  apply(mode:WardrobeModeV468,color:string,delta:number,playing:boolean,pattern:WardrobePatternV468='original',glow=35,costume?:SongCostume){
    const effectivePattern=mode==='off'?'original':pattern;
    if(effectivePattern!==currentPattern){
     patternTexture?.dispose();
@@ -58,6 +59,8 @@ export function prepareAvatarWardrobeV468(model:Object3D){
    target.set(color);
    const alpha=Math.min(1,1-Math.exp(-Math.max(0,Math.min(.1,delta))*3.2));
    for(const f of fabrics){
+    f.material.roughness+=((mode!=='off'&&costume?costume.roughness:f.roughness)-f.material.roughness)*alpha;
+    f.material.metalness+=((mode!=='off'&&costume?costume.metalness:f.metalness)-f.material.metalness)*alpha;
     const final=mode==='off'?f.baseColor:f.tempColor.copy(f.baseColor).lerp(target,.68);
     f.material.color.lerp(final,alpha);
     const emissive=mode==='off'?f.baseEmissive:f.tempEmissive.copy(f.baseEmissive).lerp(target,playing?.32:.12);

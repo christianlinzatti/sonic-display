@@ -1,5 +1,8 @@
 "use client";
 /** GLB wardrobe and music/vocal-reaction hooks, no additional render loop. */
+import {songWardrobe} from '@/lib/songWardrobe';
+import {useCrewSettings} from './useSonicCrew';
+import {useConcertPresentation} from '../concertPresentation';
 import {useMemo,useEffect,useRef} from "react";
 import {useFrame} from "@react-three/fiber";
 import type {Object3D} from "three";
@@ -43,13 +46,16 @@ export function useGltfVocalMotionV492({model,audio,isPlaying,reducedMotion,genr
   const motionCorrectionV515=useRef(createMotionCorrectionStateV515());
   const correctionTrackV515=useRef<string|null>(null);
   useEffect(()=>{resetMotionCorrectionV515(motionCorrectionV515.current);correctionTrackV515.current=null;},[model]);
+  const crew=useCrewSettings(),concert=useConcertPresentation();
+  const costume=useMemo(()=>concert&&crew.enabled&&crew.scenery===true&&crew.songOutfits!==false&&(wardrobeModeV468??'album')==='album'&&track?.id?songWardrobe(track.id,genre??'',workloadSlot):undefined,[concert,crew.enabled,crew.scenery,crew.songOutfits,wardrobeModeV468,track?.id,genre,workloadSlot]);
   const wardrobeV468=useMemo(()=>prepareAvatarWardrobeV468(model),[model]);
   useEffect(()=>()=>wardrobeV468.dispose(),[wardrobeV468]);
   const musicMotionV468=useAudioMotionEngine({intensity:(audioMotionStrengthV468??45)/100,protectFootIK:avatarFootIKEnabled});
   useEffect(()=>musicMotionV468.bindBones(model),[model,musicMotionV468.bindBones]);
   useFrame((_,delta)=>{
-    const palette=wardrobeModeV468==='custom'?(wardrobeColorV468??'#de38fa'):(stagePalette?.primary??'#628cf9');
-    wardrobeV468.apply(wardrobeModeV468==='album'&&!stagePalette?.primary?'off':(wardrobeModeV468??'album'),palette,delta,isPlaying,wardrobePatternV468??'original',wardrobeGlowV468??35);
+    model.userData.songCostume=costume?.name??null;
+    const palette=costume?.color??(wardrobeModeV468==='custom'?(wardrobeColorV468??'#de38fa'):(stagePalette?.primary??'#628cf9'));
+    wardrobeV468.apply(!costume&&wardrobeModeV468==='album'&&!stagePalette?.primary?'off':(wardrobeModeV468??'album'),palette,delta,isPlaying,costume&&(wardrobePatternV468??'original')==='original'?costume.pattern:(wardrobePatternV468??'original'),wardrobeGlowV468??35,costume);
     const genreCue=resolveGenreMotionV471({genre,fusion:genreFusion,section:showCue?.enabled?showCue.section:(cameraDirectorSection??'verse'),playing:isPlaying,reducedMotion,energy:audio.energyEnvelope,authored:avatarMotionMode==='choreography'});
     // V472: only timed lyric cues, with OPTIONAL authored singer/feature roles.
     // Anonymous features never become invented singer assignments.

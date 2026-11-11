@@ -11,6 +11,11 @@ export function ConcertSceneryControls(){
   <label><input type="checkbox" checked={settings.musicalDance!==false} disabled={!settings.scenery} onChange={e=>writeCrewSettings({...settings,musicalDance:e.target.checked})}/> Musikalische Tanzfolgen und Crew-Wellen</label>
   <label>Effektstärke · {sceneryStrength(settings.sceneryStrength)} %<input aria-label="Effektstärke" type="range" min="0" max="100" step="5" value={sceneryStrength(settings.sceneryStrength)} disabled={!settings.scenery} onChange={e=>writeCrewSettings({...settings,sceneryStrength:Number(e.target.value)})}/></label>
   <label><input type="checkbox" checked={settings.immersiveFx!==false} disabled={!settings.scenery} onChange={e=>writeCrewSettings({...settings,immersiveFx:e.target.checked})}/> Raum- und Bodeneffekte</label>
+  <label><input type="checkbox" checked={settings.ensemble!==false} disabled={!settings.scenery} onChange={e=>writeCrewSettings({...settings,ensemble:e.target.checked})}/> Ensemble: Blickwechsel und Antwortpausen</label>
+  <label><input type="checkbox" checked={settings.ensembleLyrics!==false} disabled={!settings.scenery} onChange={e=>writeCrewSettings({...settings,ensembleLyrics:e.target.checked})}/> Abwechslungsreiche Lyrics-Lichtbilder</label>
+  <label><input type="checkbox" checked={settings.songOutfits!==false} disabled={!settings.scenery} onChange={e=>writeCrewSettings({...settings,songOutfits:e.target.checked})}/> Songabhängige Outfit-Farben und Stofflooks</label>
+  <label><input type="checkbox" checked={settings.goveeEnsemble!==false} disabled={!settings.scenery} onChange={e=>writeCrewSettings({...settings,goveeEnsemble:e.target.checked})}/> Govee folgt Ensemble und Lyrics</label>
+  <small>Govee benötigt die konfigurierte LAN-Bridge, ausgewählte Lampen, Musik-Sync und den Konzertdirektor. Sanfte Raumlicht-Akzente im bestehenden Sendetakt; keine automatischen Ein-/Ausschaltbefehle. Eigene Lichtshows haben Vorrang. Outfit-Looks verändern die vorhandenen Kleidermaterialien; „Eigene Farbe“ und „Aus“ bleiben vorrangig.</small>
   <ConcertAnalysisStatus/>
   <ConcertProgrammeControls/>
   <p>Die Bühne folgt dem Song. Schnelle Lyrics bekommen Ruhe; die Effektmenge passt sich der Geräteleistung an. Eigene Lichtshows haben Vorrang.</p>

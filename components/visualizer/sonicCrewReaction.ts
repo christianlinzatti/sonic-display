@@ -45,7 +45,7 @@ export function applyCrewReaction(nodes:ReturnType<typeof prepareCrewReaction>,p
    x+=dance.armX;z+=dance.armZ*(node.name==='LeftArm'?1:-1);
    x+=ceremony.hello*(node.name==='RightArm'?.05:.015)+ceremony.finish*.012;
    x+=(plan.interaction?.armAccent??0)*Math.sin((safeBeat+plan.offset)*Math.PI/2)*(p?.arms??1);
-   if(p){z=(node.name==='LeftArm'?-1:1)*.018*p.flow*wave;x+=dynamics.settle*.7-dynamics.prepare*.5;}
+   if(p){z+=(node.name==='LeftArm'?-1:1)*.018*p.flow*wave;x+=dynamics.settle*.7-dynamics.prepare*.5;}
   }else if(node.name.startsWith('FaceLedBar')&&plan.reaction==='led')led=.12*e*pulse;
   const gain=p?expression*(.4+.6*intensity):1;
   if(p){

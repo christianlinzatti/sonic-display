@@ -1,5 +1,9 @@
 ## Update – Aufgeräumte Konzertshow mit LED-Bühne und Effekten
 
+## Ensemble, Lyrics und Song-Outfits
+
+Bewusste Crew-Antworten und Abstände, vier Lyrics-Lichtmotive, songabhängige Stofflooks und passende Govee-Raumlichtbilder ergänzen die Konzertshow. [Bedienung, Architektur und Tests](docs/versions/V1163-ENSEMBLE-LYRICS-UND-OUTFITS.md).
+
 ## Konzertprogramm und Showaufnahme
 
 Setlist-Regie, lokale Varianten, korrigierte Kalibrierung, bewegungsbezogene Bildwahl und WebM-Videoaufnahme erweitern die Konzertsteuerung. [Funktionen, Grenzen und Prüfung](docs/versions/V1162-KONZERTPROGRAMM-UND-AUFNAHME.md).

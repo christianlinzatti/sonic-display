@@ -5104,3 +5104,17 @@ body:has(main.concert-presentation) :is(div,section):has(>main.concert-presentat
  .audio-panel .audio-status,.audio-panel .audio-label{display:none}
  .audio-panel .audio-toggle{min-height:44px}
 }
+
+/* Ensemble lyrics: decoration stays inside the fixed reading lane. No text copies or layout motion. */
+.concert-presentation .lyrics .ensemble-lyric-ornament{position:absolute;inset:.5rem .7rem;pointer-events:none;border-radius:16px;overflow:hidden;opacity:.55;z-index:0}
+.concert-presentation .lyrics .lyrics-window{position:relative;z-index:1}
+.concert-presentation .lyrics[data-ensemble-lyrics="halo"] .ensemble-lyric-ornament{background:radial-gradient(ellipse at 50% 100%,color-mix(in srgb,var(--production-color) 23%,transparent),transparent 65%)}
+.concert-presentation .lyrics[data-ensemble-lyrics="ribbon"] .ensemble-lyric-ornament{border-bottom:3px solid var(--production-color);box-shadow:inset 0 -12px 24px -22px var(--production-color)}
+.concert-presentation .lyrics[data-ensemble-lyrics="brackets"] .ensemble-lyric-ornament{border-inline:2px solid var(--production-color);border-radius:8px;inset:1.1rem .6rem}
+.concert-presentation .lyrics[data-ensemble-lyrics="constellation"] .ensemble-lyric-ornament i{position:absolute;bottom:2px;width:4px;height:4px;border-radius:50%;background:var(--production-color);box-shadow:0 0 8px var(--production-color);left:calc(50% - 20px)}
+.concert-presentation .lyrics[data-ensemble-lyrics="constellation"] .ensemble-lyric-ornament i:nth-child(2){left:50%;width:6px;height:6px}
+.concert-presentation .lyrics[data-ensemble-lyrics="constellation"] .ensemble-lyric-ornament i:nth-child(3){left:calc(50% + 20px)}
+.concert-presentation .lyrics[data-ensemble-lyrics="ribbon"] [data-v1133-keyword="true"],.concert-presentation .lyrics[data-ensemble-lyrics="halo"] [data-v1133-keyword="true"]{text-decoration:underline;text-decoration-color:var(--production-color);text-underline-offset:.16em;text-decoration-thickness:2px}
+@media(prefers-reduced-motion:reduce){.ensemble-lyric-ornament{display:none!important}}
+/* Timed words retain their real separators in verse and rap as well as choruses. */
+.concert-presentation .lyrics .kinetic-word{white-space:pre-wrap!important}

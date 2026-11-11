@@ -1,4 +1,5 @@
 'use client';
+import {ensembleLightLook,getEnsembleLight} from '@/lib/concertEnsemble';
 import {useEffect,useRef,useState} from 'react';
 import {useMusic} from '@/context/MusicContext';
 import {useUiPreferences} from '@/context/UiPreferencesContext';
@@ -743,7 +744,14 @@ export function GoveeMusicSyncV909(){
       });
       const coordinatedLookV1154=applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,
        Math.min(config.masterBrightness,festivalDeliveredLook.brightness,showLookV1042.brightness));
-      const finalLook=governConcertLookV961(previous,coordinatedLookV1154,{
+      const ensembleLook=ensembleLightLook(coordinatedLookV1154,getEnsembleLight(),{
+       trackId:state.track.id,position:progress,now:Date.now(),role,
+       enabled:config.directorEnabledV911,
+       reduced:reducedMotionV1042||Boolean(stage?.reducedMotion)||Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches),
+       manual:Boolean(show)||stage?.source==='authored'||recoveringDevices.has(ip)||
+        roomDecisionV987.active||syncDecisionV1027.active||authoredDecisionV1042.active||Boolean(alexaGoveeCueV970.current)
+      });
+      const finalLook=governConcertLookV961(previous,ensembleLook,{
        enabled:roadmapSettings.enabled&&roadmapSettings.hardwareSync&&roadmapSettings.lightGovernorV961,
        playing:state.isPlaying,verified:Boolean(roadmapScene?.verified),
        savedShowActive:Boolean(show),authoredStageActive:stage?.source==='authored',
@@ -754,6 +762,7 @@ export function GoveeMusicSyncV909(){
       await goveeBridgeRequestV909(config,'/command','POST',{ip,action:'look',value:finalLook});
       if(!cancelled){
        sent.set(ip,finalLook);deviceFailures.delete(ip);recoveringDevices.delete(ip);
+       window.dispatchEvent(new CustomEvent('sonic:ensemble-light-delivered',{detail:{active:ensembleLook!==coordinatedLookV1154,role,brightness:finalLook.brightness}}));
        if(roadmapScene&&roadmapSettings.hardwareSync&&roadmapScene.verified&&!show&&stage?.source!=='authored'){
         window.dispatchEvent(new CustomEvent(CONCERT_SIGNAL_EVENT_V933,{detail:{
          fixture:config.selectedIps.indexOf(ip)+1,cue:roadmapScene.wall,phase:roadmapScene.phase,
