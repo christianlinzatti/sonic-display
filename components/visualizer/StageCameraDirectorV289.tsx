@@ -1072,14 +1072,15 @@ export function StageCameraDirectorV289({ section, progressMs, intensity, playin
     if(auditSourceV1152.current!==storyV1131?.sourceKey){showAuditV1152.current=newShowAudit();auditSourceV1152.current=storyV1131?.sourceKey??'';}
     if(auditPositionV1152.current!==undefined&&(progressMs<auditPositionV1152.current-180||progressMs-auditPositionV1152.current>2500))showAuditV1152.current.last=undefined;
     auditPositionV1152.current=progressMs;
-    if(storyV1131&&playing&&!reducedMotion&&!lipSync?.cameraManualStagePriorityV377&&automaticShot&&manual==="auto"&&!editingPose&&!userHasPreset&&!timelineCue?.active&&!authoredCueV400&&!cameraNarrativeV605?.manualCamera&&!liveCueV400&&!cutToCameraCueV400)sampleShowAudit(showAuditV1152.current,{time:_.clock.elapsedTime,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z}});
+    const showReviewEligible=!!(storyV1131&&playing&&!reducedMotion&&!lipSync?.cameraManualStagePriorityV377&&automaticShot&&manual==="auto"&&!editingPose&&!userHasPreset&&!timelineCue?.active&&!authoredCueV400&&!cameraNarrativeV605?.manualCamera&&!liveCueV400&&!cutToCameraCueV400);
+    if(showReviewEligible)sampleShowAudit(showAuditV1152.current,{time:_.clock.elapsedTime,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z}});
     else showAuditV1152.current.last=undefined;
     if(statusInterval.current<=0 && typeof window!=="undefined") {
       statusInterval.current=.5;
       const preset = library.current.enabled && library.current.presets.find(p=>p.id===library.current.assignments[section]);
       const isKeyframe = !!(preset && liveEnabled.current && motionFrames.current[preset.id]?.length);
       const source = editingPose?"Live-Editor":!playing?"Pausiert":reducedMotion?"Reduced Motion":manual!=="auto"?`Manuell: ${manual}`:isKeyframe?(preset && cinematicPaths.current[preset.id]?.enabled?"Cinematic Camera Path":"Keyframe-Fahrt"):preset?`Preset: ${preset.name}`:"Automatische Regie";
-      window.dispatchEvent(new CustomEvent(CAMERA_STUDIO_STATUS_EVENT,{detail:{showQualityV1152:{samples:showAuditV1152.current.samples,cameraCuts:showAuditV1152.current.cameraCuts,frequentCuts:showAuditV1152.current.recentCuts.length>=4},scoreSourceV1136:storyV1131?.sourceKey,scoreHoldV1136:scoreCameraV1134.current.key,section,mode:manual,playing,reducedMotion,intensity,source,composer:composerSettings.current.enabled,tracking:trackingEnabled.current,progressMs,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:camera.fov,targetX:target.current.x,targetY:target.current.y,targetZ:target.current.z}}}));
+      window.dispatchEvent(new CustomEvent(CAMERA_STUDIO_STATUS_EVENT,{detail:{showReviewEligible,showQualityV1152:{samples:showAuditV1152.current.samples,cameraCuts:showAuditV1152.current.cameraCuts,frequentCuts:showAuditV1152.current.recentCuts.length>=4},scoreSourceV1136:storyV1131?.sourceKey,scoreHoldV1136:scoreCameraV1134.current.key,section,mode:manual,playing,reducedMotion,intensity,source,composer:composerSettings.current.enabled,tracking:trackingEnabled.current,progressMs,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:camera.fov,targetX:target.current.x,targetY:target.current.y,targetZ:target.current.z}}}));
     }
   });
   return null;

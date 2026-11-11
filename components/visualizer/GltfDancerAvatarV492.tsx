@@ -188,6 +188,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   useEffect(() => () => releaseScheduledInstance(schedulerInstance), [schedulerInstance]);
   const {preferences: groovePreferences} = useUiPreferences();
   const crewSettings = useCrewSettings();
+  const crewTelemetry=useRef({source:"",at:-Infinity});
   const crewClock = useRef({key:"",position:-1,elapsed:0});
   const preferencesRap=useRef(groovePreferences.rapGroove??DEFAULT_RAP_GROOVE);
   preferencesRap.current=groovePreferences.rapGroove??DEFAULT_RAP_GROOVE;
@@ -1282,6 +1283,16 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     if(rigV1074.rightArm)rigV1074.rightArm.rotation.z-=nextV1074.rightLift-beforeV1074.rightLift;
     lastAudiencePoseV1074.current=nextV1074;
     applyCrewReaction(crewReaction,crew.plan,crew.plan.beat+Math.min(1,Math.max(0,state.clock.elapsedTime-crewClock.current.elapsed))*crew.plan.bpm/60,audio.energyEnvelope??.35,delta);
+    // Report only the actually selected, dominant loaded action. No planning preview is counted.
+    if(crewSettings.showPlans&&crewSettings.enabled&&crewSettings.mode==='adaptive'&&track?.id&&typeof window!=='undefined'){
+      const source=`track:${track.id}`,now=state.clock.elapsedTime;
+      if(crewTelemetry.current.source!==source||now-crewTelemetry.current.at>=.5){
+        crewTelemetry.current={source,at:now};
+        const action=selectedClip?actions[selectedClip]:null;
+        const observed=isPlaying&&!reducedMotion&&!crewManualV1135&&crew.plan.active&&selectedClip===crew.plan.clip&&action?.enabled&&(action.getEffectiveWeight()??0)>.5;
+        window.dispatchEvent(new CustomEvent('sonic:crew-performance',{detail:{source,slot:workloadSlot,clip:observed?selectedClip:null,bond:crew.plan.story?.relationship?.id,progressMs:cameraDirectorProgressMs??propsLipSyncV367?.progressMs??0}}));
+      }
+    }
     applyGltfVocalPerformanceV492({propsLipSyncV367,trackId:track?.id??"",audio,genre,showCue,reducedMotion,isPlaying,
       workloadSlot,avatarMotionMode,stableLibraryClip,partnerGesture,partnerLook,partnerHand,
       groovePreferences,rapLiveEnabledV412,rapLiveFrameV412,rapLyricsFrameV414,preferencesRap,

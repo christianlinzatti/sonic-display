@@ -1,3 +1,4 @@
+import {planConcertScenes,concertCrewRelationship} from './concertScenePlan';
 import {planShowProduction,type ProductionPlan} from './showProduction';
 import {musicalDirection} from './musicalEvidence';
 import {chooseShowShot} from './showExperience';
@@ -11,7 +12,7 @@ import {lyricSpotlightV1133} from './lyricSpotlightV1133';
 import {normalizeLyricTimingV1134} from './lyricTimingV1134';
 export type ConcertScoreV1134=StoryCueV1131 & {
  staging:'opening'|'verse'|'anticipation'|'chorus'|'reading'|'breath'|'finale'|'instrumental';
- production?:ProductionPlan;concert?:boolean;music:ReturnType<typeof musicalDirection>;shot:number;memory?:SongShowMemory;lyricFocus:boolean;phraseEnvelope:number;dialogue?:CrewDialogue;anticipationProgress:number;positionMs:number;sourceKey:string;playback?:PlaybackSampleV1136;reading:boolean;accent:number;beamGain:number;motionGain:number;exchange:number;scoreKey:string;
+ durationMs?:number;production?:ProductionPlan;concert?:boolean;music:ReturnType<typeof musicalDirection>;shot:number;memory?:SongShowMemory;lyricFocus:boolean;phraseEnvelope:number;dialogue?:CrewDialogue;anticipationProgress:number;positionMs:number;sourceKey:string;playback?:PlaybackSampleV1136;reading:boolean;accent:number;beamGain:number;motionGain:number;exchange:number;scoreKey:string;
 };
 const cache=new WeakMap<Lyrics,Lyrics|null>();
 function safeLyrics(lyrics:Lyrics|null|undefined){if(!lyrics)return null;if(!cache.has(lyrics))cache.set(lyrics,normalizeLyricTimingV1134(lyrics));return cache.get(lyrics)!;}
@@ -44,7 +45,11 @@ export function concertScoreV1134(input:StoryInputV1131):ConcertScoreV1134{
  const showTakeSeed=production?`${input.trackId??'sonic-show'}:${production.id}:${production.take}`:undefined;
  const memory=songShowMemory({trackId:input.trackId??'sonic-show',genre:input.genre,taste:input.taste,history:input.history,seedKey:showTakeSeed,preferredMotif:production?.motif,positionMs:pos,durationMs:input.durationMs,
   act,chorusVisit:cue.chorusVisit,reading,anticipation});
- const dialogue=!reading&&act==='story'&&staging==='verse'&&cue.lyricDensity<=.55?crewDialogue(phrase,count):null;
+ const dialogue=!reading&&act==='story'&&staging==='verse'&&cue.lyricDensity<=.55?crewDialogue(phrase,count,showTakeSeed):null;
+ const relationship=showTakeSeed?concertCrewRelationship(showTakeSeed,count,Math.max(0,Math.floor((phrase-3)/3)),act==='finale'):null;
+ const scenePlan=production?planConcertScenes({lyrics,positionMs:pos,durationMs:input.durationMs,count,reading,lyricFocus,act}):undefined;
+ if(scenePlan&&showTakeSeed){const finalPair=concertCrewRelationship(showTakeSeed,count,0,true);if(finalPair)for(const scene of scenePlan.upcoming)if(scene.kind==='finale'){scene.leader=finalPair.first;scene.partner=finalPair.second;}}
+ const preparation=scenePlan?.prepare??0;
  let interaction:StoryCueV1131['interaction']=reading?'solo':act==='breathe'?'rest':act==='impact'||act==='finale'||act==='lift'&&cue.chorusVisit>=3?'unison':
  count<2?'solo':act==='build'||act==='lift'?'answer':exchange%3===2?'solo':phrase%2?'duel':'answer';
  let leader=anticipation?Math.max(0,concertRefrainVisit(lyrics,nextHook!)-1)%count:
@@ -55,6 +60,7 @@ export function concertScoreV1134(input:StoryInputV1131):ConcertScoreV1134{
   leader=dialogue.phase==='reply'?dialogue.responder:dialogue.caller;
   partner=dialogue.phase==='reply'?dialogue.caller:dialogue.responder;
  }
+ if(relationship&&act==='finale'){leader=relationship.first;partner=relationship.second;}
  const mode=interaction==='unison'?'unison':interaction==='rest'?'individual':interaction==='answer'?'canon':'spotlight';
  const line=spotlight.lineIndex>=0?lyrics!.lines[spotlight.lineIndex]:null;
  const hookStart=act==='lift'&&line&&concertLyricSection(lyrics,pos)==='hook'?line.startMs:undefined;
@@ -64,15 +70,15 @@ export function concertScoreV1134(input:StoryInputV1131):ConcertScoreV1134{
  const envelope=age>=0&&age<1200?Math.sin(Math.PI*age/1200)**2:0;
  const accent=reading||act==='breathe'||anticipation?0:Math.min(1,envelope*(act==='lift'||act==='finale'?.8:.28)+(keyActive?.18:0));
  const chapter=memory?.phase==='seed'?'Das Song-Motiv entsteht':memory&&act==='finale'?`Das große Finale · ${memory.phase==='recall'?'Das Motiv kehrt zurück':memory.phase==='response'?'Die Antwort der Crew':'Alle zusammen'}`:instrumental?'Instrumental · Bühne im Fokus':dialogue?`Tanzdialog · ${dialogue.phase==='call'?'Motiv vorstellen':dialogue.phase==='reply'?'Antwort übernehmen':'Wieder zusammen'}`:reading?'Text im Fokus · ruhige Begleitung':anticipation?'Vor dem Refrain · Spannung sammeln':opening?'Die Crew betritt die Bühne':cue.chapter;
- return {...cue,...(production?{production,showTakeSeed,showMotif:production.motif,palette:production.color}:{}),concert:input.concert,music,shot,...(memory?{memory}:{}),lyricFocus,phraseEnvelope,...(dialogue?{dialogue}:{}),anticipationProgress,positionMs:pos,playback:input.playback,sourceKey:input.trackId?`track:${input.trackId}`:`lyrics:${input.durationMs??0}:${lyrics?.plainText??lyrics?.lines[0]?.text??''}`,phrase,act,mode,leader,partner,interaction,chapter,staging,reading,accent,exchange,
+ return {...cue,...(production?{production,scenePlan,...(relationship?{relationship}:{}),showTakeSeed,showMotif:production.motif,palette:production.color}:{}),durationMs:input.durationMs,concert:input.concert,music,shot,...(memory?{memory}:{}),lyricFocus,phraseEnvelope,...(dialogue?{dialogue}:{}),anticipationProgress,positionMs:pos,playback:input.playback,sourceKey:input.trackId?`track:${input.trackId}`:`lyrics:${input.durationMs??0}:${lyrics?.plainText??lyrics?.lines[0]?.text??''}`,phrase,act,mode,leader,partner,interaction,chapter,staging,reading,accent,exchange,
  scoreKey:reading?`reading-${Math.floor((line?.startMs??pos)/16000)}`:`${staging}-${exchange}`,
  reason:dialogue?'Ein Motiv wandert zwischen den Figuren und kehrt gemeinsam zurück':reading?'Schnelle Lyrics: ruhige Kamera und zurückhaltende Crew':anticipation?'Refrain-Vorschau aus vorhandenen Lyrics':cue.reason,
  intensity:reading?.36:anticipation?.32+anticipationProgress*.18:opening?.2:closingTail?.8:cue.intensity,
  cameraSide:lyricFocus||anticipation||interaction==='unison'?0:count>1?(leader-(count-1)/2)*.10*phraseEnvelope:0,
- cameraScale:reading?1:instrumental?1.03+gapEnvelope*.04:staging==='finale'?1.10+(memory?.finaleProgress??1)*.03:staging==='chorus'?1.05+Math.min(3,Math.max(1,cue.chorusVisit))*.02:dialogue?.phase==='reunion'?1.035:anticipation?1.01+anticipationProgress*.03:interaction==='duel'?1.035:act==='breathe'?1.02:1,
+ cameraScale:(reading?1:instrumental?1.03+gapEnvelope*.04:staging==='finale'?1.10+(memory?.finaleProgress??1)*.03:staging==='chorus'?1.05+Math.min(3,Math.max(1,cue.chorusVisit))*.02:dialogue?.phase==='reunion'?1.035:anticipation?1.01+anticipationProgress*.03:interaction==='duel'?1.035:act==='breathe'?1.02:1)*(1+preparation*.03),
  motionGain:music.quiet?.12:reading?.12:anticipation?.22+anticipationProgress*.18:act==='breathe'?.25:1,
- lightGain:music.quiet?.60:reading?.68:closingTail?1.14:instrumental?.95+gapEnvelope*.15:anticipation?.60+anticipationProgress*.20:cue.lightGain*(production?.lightGain??1)*(input.concert&&!lyricFocus?1.06:1)*(1+accent*.10)*(lyricFocus?1:1+music.pulse*.10)*(dialogue?.phase==='reunion'?1.04:1),
- beamGain:reading?.38:lyricFocus?.75:instrumental?.9+gapEnvelope*.2:anticipation?.35+anticipationProgress*.30:act==='breathe'?.55:(1+accent*.22)*(production?.beamGain??1)*(dialogue?.phase==='reunion'?1.03:1),
+ lightGain:music.quiet?.60:reading?.68:closingTail?1.14:instrumental?.95+gapEnvelope*.15:anticipation?.60+anticipationProgress*.20:cue.lightGain*(1+preparation*.07)*(production?.lightGain??1)*(input.concert&&!lyricFocus?1.06:1)*(1+accent*.10)*(lyricFocus?1:1+music.pulse*.10)*(dialogue?.phase==='reunion'?1.04:1),
+ beamGain:reading?.38:lyricFocus?.75:instrumental?.9+gapEnvelope*.2:anticipation?.35+anticipationProgress*.30:act==='breathe'?.55:(1+accent*.22)*(1+preparation*.05)*(production?.beamGain??1)*(dialogue?.phase==='reunion'?1.03:1),
  lyricGain:reading?1:cue.lyricGain};
 }
 export type ScoreCameraV1134={x:number;y:number;z:number;fov:number};

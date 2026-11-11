@@ -1,4 +1,6 @@
 'use client';
+import {useConcertShowReview} from './useConcertShowReview';
+import {useConcertPresentation} from './concertPresentation';
 import {useEffect,useState,type CSSProperties} from 'react';
 import {readGroupV326,GROUP_EVENT_V326} from './visualizer/multiAvatarStageDirectorV326';
 import {concertScoreV1134} from '@/lib/concertScoreV1134';
@@ -11,19 +13,22 @@ import {showCueV1130,lyricDensityV1130,lyricSectionV1130} from '@/lib/showIntell
 export function LiveShowDirectorV1130({progressMs}:{progressMs:number}){
  const {lyrics,genre,track,isPlaying}=useMusic(),{metrics,active}=useAudioAnalysis();
  const {preferences}=useUiPreferences(),crew=useCrewSettings();
+ const concert=useConcertPresentation();
  const [group,setGroup]=useState(readGroupV326);
  useEffect(()=>{const update=()=>setGroup(readGroupV326());window.addEventListener(GROUP_EVENT_V326,update);return()=>window.removeEventListener(GROUP_EVENT_V326,update);},[]);
- if(!track||!crew.enabled||crew.mode!=='adaptive')return null;
- const cue=concertScoreV1134({trackId:track.id,showPlans:crew.showPlans,showStyle:crew.showStyle,showTake:crew.showTake,taste:crew.taste,history:crew.remember===false?undefined:crew.history,audioEvidence:measuredMusic(active,metrics),progressMs,durationMs:track.durationMs,genre,
+ const enabled=!!track&&crew.enabled&&crew.mode==='adaptive';
+ const cue=enabled?concertScoreV1134({trackId:track?.id,showPlans:crew.showPlans,showStyle:crew.showStyle,showTake:crew.showTake,taste:crew.taste,history:crew.remember===false?undefined:crew.history,audioEvidence:measuredMusic(active,metrics),progressMs,durationMs:track?.durationMs,genre,
   lyrics,count:group.enabled?group.count:1,bpm:metrics.bpm,energy:active?metrics.energyEnvelope:undefined,
-  section:lyrics?.synced?undefined:lyricSectionV1130(lyrics,progressMs),lyricDensity:lyricDensityV1130(lyrics,progressMs)});
+  section:lyrics?.synced?undefined:lyricSectionV1130(lyrics,progressMs),lyricDensity:lyricDensityV1130(lyrics,progressMs)}):null;
+ useConcertShowReview(cue,isPlaying,preferences.reducedMotion,concert);
+ if(!cue)return null;
  const motion=isPlaying&&!preferences.reducedMotion;
  return <aside className={`show-v1130 show-v1130-${cue.act} ${motion?'show-v1130-moving':''}`}
-  aria-label="Intelligente Show-Regie" data-show-production={cue.production?.id??'off'} data-show-scene={cue.production?.scene??'off'} data-show-take={cue.production?.take??0} data-show-audio={cue.music.measured?'measured':'planned'} data-show-shot={cue.shot} data-show-genre={genre??''} data-show-memory={cue.memory?.phase??'none'} data-show-theme={cue.memory?.theme??''} data-show-dialogue={cue.dialogue?.phase??'none'} data-show-staging={cue.staging} data-show-build={cue.anticipationProgress.toFixed(3)} data-show-leader={cue.leader} data-show-accent={cue.accent.toFixed(3)} data-show-act={cue.act} data-show-chapter={cue.chorusVisit} data-show-interaction={cue.interaction}
+  aria-label="Intelligente Show-Regie" data-show-next={cue.scenePlan?.next?.kind??'none'} data-show-next-at={cue.scenePlan?.next?.atMs??0} data-show-prepare={(cue.scenePlan?.prepare??0).toFixed(3)} data-show-pair={cue.relationship?.id??'none'} data-show-pair-visit={cue.relationship?.visit??0} data-show-production={cue.production?.id??'off'} data-show-scene={cue.production?.scene??'off'} data-show-take={cue.production?.take??0} data-show-audio={cue.music.measured?'measured':'planned'} data-show-shot={cue.shot} data-show-genre={genre??''} data-show-memory={cue.memory?.phase??'none'} data-show-theme={cue.memory?.theme??''} data-show-dialogue={cue.dialogue?.phase??'none'} data-show-staging={cue.staging} data-show-build={cue.anticipationProgress.toFixed(3)} data-show-leader={cue.leader} data-show-accent={cue.accent.toFixed(3)} data-show-act={cue.act} data-show-chapter={cue.chorusVisit} data-show-interaction={cue.interaction}
   style={{'--show-color':cue.palette,'--show-gain':cue.intensity,'--show-light':cue.lightGain} as CSSProperties}>
   <div className="show-v1130-halo" aria-hidden="true"/>
   <div className="show-v1130-status"><span aria-hidden="true">✦</span> {cue.chapter}
-   <small>{isPlaying?'LIVE SHOW':'PAUSE'} · {cue.mode==='spotlight'?'Solo & Antwort':cue.mode==='canon'?'Kanon':cue.mode==='unison'?'Gemeinsamer Hit':'Ruhiger Moment'}{cue.production?` · ${cue.production.name}`:''}</small>
+   <small>{isPlaying?'LIVE SHOW':'PAUSE'} · {cue.mode==='spotlight'?'Solo & Antwort':cue.mode==='canon'?'Kanon':cue.mode==='unison'?'Gemeinsamer Hit':'Ruhiger Moment'}{cue.production?` · ${cue.production.name}`:''}{cue.scenePlan?.prepare?` · ${cue.scenePlan.next?.kind==='finale'?'Finale':'Refrain'} in Vorbereitung`:''}</small>
   </div>
  </aside>;
 }

@@ -1,4 +1,5 @@
 'use client';
+import {liveConcertContext} from '@/lib/concertScenePlan';
 import {useConcertPresentation} from '../concertPresentation';
 import {useMemo} from 'react';
 import {type StoryInputV1131} from '@/lib/concertStoryV1131';
@@ -9,6 +10,6 @@ import {measuredMusic} from '@/lib/musicalEvidence';
 export function useConcertStoryV1131(input:StoryInputV1131,useMeasured=true){
  const concert=useConcertPresentation(),settings=useCrewSettings(),enabled=settings.enabled&&settings.mode==='adaptive';
  const analysis=useAudioAnalysis(),evidence=input.audioEvidence??measuredMusic(useMeasured&&analysis.active,analysis.metrics);
- return useMemo(()=>enabled?concertScoreV1134({...input,concert,showPlans:settings.showPlans,showStyle:settings.showStyle,showTake:settings.showTake,audioEvidence:evidence,taste:settings.taste,history:settings.remember===false?undefined:settings.history}):null,[enabled,concert,settings.showPlans,settings.showStyle,settings.showTake,settings.taste,settings.history,settings.remember,evidence?.phase,evidence?.confidence,evidence?.energy,evidence?.onset,evidence?.anticipation,input.trackId,input.playback?.positionMs,input.playback?.fetchedAt,input.playback?.playing,input.progressMs,input.durationMs,input.bpm,
+ return useMemo(()=>enabled?concertScoreV1134({...input,concert,showPlans:settings.showPlans,showStyle:settings.showStyle,showTake:settings.showTake,...(useMeasured&&settings.showPlans?liveConcertContext(input,analysis.active):{}),audioEvidence:evidence,taste:settings.taste,history:settings.remember===false?undefined:settings.history}):null,[enabled,concert,useMeasured,analysis.active,settings.showPlans,settings.showStyle,settings.showTake,settings.taste,settings.history,settings.remember,evidence?.phase,evidence?.confidence,evidence?.energy,evidence?.onset,evidence?.anticipation,input.trackId,input.playback?.positionMs,input.playback?.fetchedAt,input.playback?.playing,input.progressMs,input.durationMs,input.bpm,
   input.genre,input.section,input.energy,input.lyrics,input.lyricDensity,input.count]);
 }

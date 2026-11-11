@@ -1,7 +1,13 @@
 export type StagePoint={x:number;z:number};
-export function crewStageTarget(base:StagePoint,slot:number,count:number,leader:number,partner:number,together:boolean):StagePoint{
+export function crewStageTarget(base:StagePoint,slot:number,count:number,leader:number,partner:number,together:boolean,preparation?:{leader:number;partner:number;progress:number}):StagePoint{
  const centre=(count-1)/2;
- return {x:base.x+Math.sign(slot-centre)*.10,z:base.z+(together?-.16*Math.abs(slot-centre):slot===leader?.36:slot===partner?.12:-.18)};
+ const result={x:base.x+Math.sign(slot-centre)*.10,z:base.z+(together?-.16*Math.abs(slot-centre):slot===leader?.36:slot===partner?.12:-.18)};
+ if(preparation&&Number.isFinite(preparation.progress)){
+  const gain=Math.max(0,Math.min(.65,preparation.progress*.65));
+  const depth=slot===preparation.leader?.36:slot===preparation.partner?.12:-.18;
+  result.z+=(base.z+depth-result.z)*gain;
+ }
+ return result;
 }
 /** Single-support steps only; one root owner, fixed lanes, bounded speed and distance checks. */
 export function stepCrewStage(current:StagePoint,target:StagePoint,others:readonly StagePoint[],dt:number,allowed:boolean,minSpacing:number):StagePoint{

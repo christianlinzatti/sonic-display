@@ -93,11 +93,12 @@ export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,comp
   if(auditSource.current!==storyV1131?.sourceKey){showAudit.current=newShowAudit();auditSource.current=storyV1131?.sourceKey??'';}
   if(auditPosition.current!==undefined&&(position<auditPosition.current-180||position-auditPosition.current>2500))showAudit.current.last=undefined;
   auditPosition.current=position;
-  if(storyV1131&&playing&&!reducedMotion&&!timelineCue?.active&&!lipSync?.cameraManualStagePriorityV377)sampleShowAudit(showAudit.current,{time:clock.elapsedTime,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z}});
+  const showReviewEligible=!!(storyV1131&&playing&&!reducedMotion&&!timelineCue?.active&&!lipSync?.cameraManualStagePriorityV377);
+  if(showReviewEligible)sampleShowAudit(showAudit.current,{time:clock.elapsedTime,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z}});
   else showAudit.current.last=undefined;
   if(clock.elapsedTime-lastStatus.current>=.5&&typeof window!=='undefined'){
    lastStatus.current=clock.elapsedTime;
-   window.dispatchEvent(new CustomEvent(CAMERA_STUDIO_STATUS_EVENT,{detail:{showQualityV1152:{samples:showAudit.current.samples,cameraCuts:showAudit.current.cameraCuts,frequentCuts:showAudit.current.recentCuts.length>=4},scoreSourceV1136:storyV1131?.sourceKey,scoreHoldV1136:scoreCameraV1134.current.key,section,mode:'auto',playing,reducedMotion,intensity:55,source:'Automatische Basisregie',composer:false,tracking:false,progressMs:position,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:pc.fov,targetX:0,targetY:lookV369.current,targetZ:0}}}));
+   window.dispatchEvent(new CustomEvent(CAMERA_STUDIO_STATUS_EVENT,{detail:{showReviewEligible,showQualityV1152:{samples:showAudit.current.samples,cameraCuts:showAudit.current.cameraCuts,frequentCuts:showAudit.current.recentCuts.length>=4},scoreSourceV1136:storyV1131?.sourceKey,scoreHoldV1136:scoreCameraV1134.current.key,section,mode:'auto',playing,reducedMotion,intensity:55,source:'Automatische Basisregie',composer:false,tracking:false,progressMs:position,camera:{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:pc.fov,targetX:0,targetY:lookV369.current,targetZ:0}}}));
   }
  });
  return null;

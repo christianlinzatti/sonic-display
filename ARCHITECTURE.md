@@ -1,3 +1,12 @@
+## Update – Szenenvorschau und gemessene Show-Bewertung
+
+`concertScenePlan` plant nächste Refrains/Finale und reproduzierbare Crew-Paare.
+Der gemeinsame Score verteilt die Vorbereitung an Kamera, Licht und sichere
+Bühnenziele. `crewTransitionEvidence` bewertet kommende Beinposen und Bewegung;
+`concertLyricIdentity` hält Refrain-Bilder stabil. `concertShowReview` trennt
+kontinuierliche Song-Abdeckung von tatsächlich beobachteten Kamera-, Layout-
+und Mixer-Daten. [Datenfluss, Grenzen und Tests](docs/versions/V1157-VORAUSSCHAUENDE-KONZERTREGIE.md).
+
 ## Update – Gemeinsamer Show-Plan für Crew und Lyrics
 
 `lib/showProduction.ts` bewertet vier lokale Inszenierungsprofile. Der gemeinsame

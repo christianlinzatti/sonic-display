@@ -1,7 +1,7 @@
 import type {Lyrics} from '../types/playbackCore';
 
 type Entry = {index:number;start:number;end:number;repeated:boolean};
-type Timeline = {entries:Entry[];refrains:{start:number;visit:number}[]};
+type Timeline = {entries:Entry[];refrains:{start:number;visit:number}[];starts:{start:number;visit:number}[]};
 // Provider updates replace the Lyrics object. Weak ownership releases old tracks.
 const timelines = new WeakMap<Lyrics,Timeline>();
 const normalize = (text:string) => text.toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
@@ -24,7 +24,8 @@ function timeline(lyrics:Lyrics|null|undefined):Timeline|null {
   if(entry.start-last>12000)visit++;
   refrains.push({start:entry.start,visit});last=entry.start;
  }
- const result={entries,refrains};timelines.set(lyrics,result);return result;
+ const starts=refrains.filter((entry,i)=>i===0||entry.visit!==refrains[i-1].visit);
+ const result={entries,refrains,starts};timelines.set(lyrics,result);return result;
 }
 function after<T extends {start:number}>(items:readonly T[],position:number):number {
  let low=0,high=items.length;
@@ -51,6 +52,10 @@ export function concertLyricSection(lyrics:Lyrics|null|undefined,position:number
 export function nextConcertRefrain(lyrics:Lyrics|null|undefined,position:number):number|null {
  if(!Number.isFinite(position))return null;
  const data=timeline(lyrics);return data?.refrains[after(data.refrains,position)]?.start??null;
+}
+/** Section entries only: several repeated lines within one refrain are one scene. */
+export function concertRefrainStarts(lyrics:Lyrics|null|undefined):readonly {start:number;visit:number}[]{
+ return timeline(lyrics)?.starts??[];
 }
 /** Only bounded gaps between known lyric lines can justify an instrumental picture. */
 export function concertInstrumentalGap(lyrics:Lyrics|null|undefined,position:number):{start:number;end:number}|null{

@@ -5059,3 +5059,13 @@
 .lyrics[data-show-production]:not([data-show-production="off"])[data-show-scene="refrain"]{box-shadow:0 0 34px color-mix(in srgb,var(--production-color) 22%,transparent)}
 @media(prefers-reduced-motion:reduce){.lyrics[data-show-production]{transition:none!important}}
 .lyrics[data-show-motion="still"]{transition:none!important}
+
+/* Stable refrain signatures share the same lyric seed on every reprise. No text movement. */
+.lyrics[data-show-identity="refrain"]{position:relative}
+.concert-lyric-signature{position:absolute;top:.55rem;right:1rem;width:2.5rem;height:3px;border-radius:3px;background:var(--production-color);opacity:.65;pointer-events:none}
+[data-show-lyric-motif="1"] .concert-lyric-signature{background:repeating-linear-gradient(90deg,var(--production-color) 0 8px,transparent 8px 12px)}
+[data-show-lyric-motif="2"] .concert-lyric-signature{height:6px;background:linear-gradient(var(--production-color) 0 2px,transparent 2px 4px,var(--production-color) 4px 6px)}
+[data-show-lyric-motif="3"] .concert-lyric-signature{background:repeating-linear-gradient(90deg,var(--production-color) 0 3px,transparent 3px 8px)}
+.lyrics[data-show-production]:not([data-show-production="off"])[data-show-identity="verse"]{box-shadow:0 0 16px color-mix(in srgb,var(--production-color) 7%,transparent)}
+.concert-show-review{border:1px solid #ffffff30;border-radius:10px;padding:.8rem;margin-block:.8rem;font-size:.9rem}
+.concert-show-review summary{cursor:pointer;font-weight:600}

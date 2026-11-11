@@ -1,3 +1,4 @@
+import type {ConcertScenePlan,CrewRelationship} from './concertScenePlan';
 import type {ProductionId} from './showProduction';
 import type {ShowHistory} from './showExperience';
 import type {MusicalEvidence} from './musicalEvidence';
@@ -10,7 +11,7 @@ export const FOOTWORK_CLIPS_V1131=['Dance_SideGlide','Dance_DiagonalStep','Dance
 export type InteractionV1131='rest'|'solo'|'duel'|'answer'|'unison';
 export type StoryInputV1131={showPlans?:boolean;showStyle?:ProductionId;showTake?:number;concert?:boolean;audioEvidence?:MusicalEvidence;history?:ShowHistory;taste?:MotifTaste;progressMs:number;trackId?:string|null;playback?:PlaybackSampleV1136;durationMs?:number;bpm?:number|null;genre?:string|null;
  section?:string|null;energy?:number|null;lyrics?:Lyrics|null;lyricDensity?:number;count?:number};
-export type StoryCueV1131=ShowCueV1130 & {showTakeSeed?:string;showMotif?:string;chorusVisit:number;chapter:string;interaction:InteractionV1131;
+export type StoryCueV1131=ShowCueV1130 & {scenePlan?:ConcertScenePlan;relationship?:CrewRelationship;showTakeSeed?:string;showMotif?:string;chorusVisit:number;chapter:string;interaction:InteractionV1131;
  leader:number;partner:number;cameraScale:number;cameraSide:number;lightGain:number;lyricGain:number;};
 /** Repeated lyric blocks supply structure, not measured beats or audio predictions. */
 export function chorusVisitsV1131(lyrics:Lyrics|null|undefined,progressMs:number):number{

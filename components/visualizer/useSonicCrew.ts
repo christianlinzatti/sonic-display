@@ -1,4 +1,5 @@
 'use client';
+import {liveConcertContext} from '@/lib/concertScenePlan';
 import type {ProductionId} from '@/lib/showProduction';
 import {useEffect,useRef,useState,useSyncExternalStore} from 'react';
 import {CREW_DEFAULT,normalizeCrewSettings,newCrewState,stepCrew,type CrewSettings,type CrewInput} from './sonicCrewDirector';
@@ -40,7 +41,8 @@ export function useCrewDirector(input:CrewInput){
   window.addEventListener(CONCERT_COORDINATION_EVENT_V1154,refresh);window.addEventListener('storage',storage);
   return()=>{window.removeEventListener(CONCERT_COORDINATION_EVENT_V1154,refresh);window.removeEventListener('storage',storage);};
  },[]);
- input={...input,audioEvidence:evidence};
+ // Inactive microphone metrics are placeholders, not evidence about this song.
+ input={...input,audioEvidence:evidence,...(input.settings.showPlans&&input.settings.mode==='adaptive'?liveConcertContext(input,analysis.active):{})};
  const previous=useRef(newCrewState());
  const [result,setResult]=useState(()=>stepCrew(previous.current,input));
  useEffect(()=>{

@@ -1,3 +1,11 @@
+## Update – Vorausschauende Regie, Crew-Beziehungen und Show-Check
+
+Die Show bereitet Refrains und Finale vor, führt wiederkehrende Tanzpaare durch
+den Song und wählt freie Übergänge mit Blick auf die folgende Körperpose.
+Refrains bekommen eine wiedererkennbare Lyrics-Signatur; Rap bleibt ruhig lesbar.
+Der neue Show-Check zeigt tatsächlich beobachtete Kamera-, Text- und Tanzdaten.
+[Bedienung, Grenzen und vollständige Mock-Song-Tests](docs/versions/V1157-VORAUSSCHAUENDE-KONZERTREGIE.md).
+
 ## Update – Abwechslungsreiche AI-Konzertshows mit Lyrics
 
 Vier Show-Konzepte verbinden Tanzmotive, Kamera, Licht und Lyrics zu einer

@@ -1,15 +1,16 @@
+import {concertCrewRelationship} from './concertScenePlan';
 import {experiencePenalty,type ShowHistory} from './showExperience';
 import {tasteGain,tasteKey,type MotifTaste} from './showTaste';
 import {CREATIVE_MOTIFS} from './creativeChoreography';
 import {musicFamilyV1129} from './musicPerformanceV1129';
 export type CrewDialogue={scene:number;phase:'call'|'reply'|'reunion';caller:number;responder:number};
 /** A seekable 24-second scene, introduced after the personal opening. */
-export function crewDialogue(phrase:number,count:number):CrewDialogue|null{
+export function crewDialogue(phrase:number,count:number,seedKey?:string):CrewDialogue|null{
  if(!Number.isFinite(phrase)||phrase<3||!Number.isFinite(count)||count<2)return null;
  const size=Math.max(2,Math.min(4,Math.round(count))),step=Math.floor(phrase)-3;
- const scene=Math.floor(step/3),caller=scene%size;
+ const scene=Math.floor(step/3),bond=seedKey?concertCrewRelationship(seedKey,size,scene):null,caller=bond?.first??scene%size;
  return {scene,phase:(['call','reply','reunion'] as const)[step%3],caller,
-  responder:(caller+1+Math.floor(scene/size)%(size-1))%size};
+  responder:bond?.second??(caller+1+Math.floor(scene/size)%(size-1))%size};
 }
 const hash=(text:string)=>{let h=2166136261;for(const c of text)h=Math.imul(h^c.charCodeAt(0),16777619)>>>0;return h;};
 const memory=new Map<string,Readonly<{call:string;contrast:string}>>();
@@ -17,6 +18,7 @@ const memory=new Map<string,Readonly<{call:string;contrast:string}>>();
  * This is local candidate planning, without remote models or invented audio observations.
  */
 export function dialogueMotifs(trackId:string,genre:string|null|undefined,scene:number,taste?:MotifTaste,history?:ShowHistory,seedKey?:string,preferredMotif?:string){
+ scene=seedKey?Math.floor(scene/3):scene;
  const family=musicFamilyV1129(genre),seed=hash(seedKey??trackId),key=`${seed}:${family}:${scene}:${tasteKey(taste)}:${preferredMotif??''}:${JSON.stringify(history??[])}`;
  const cached=memory.get(key);if(cached){memory.delete(key);memory.set(key,cached);return cached;}
  const soft=family==='ambient'||family==='classical';
