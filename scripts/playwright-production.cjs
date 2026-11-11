@@ -57,8 +57,7 @@ function runProductionTests({ existingBuildSince } = {}) {
     proof.buildId = fs.readFileSync(path.join(root, '.next/BUILD_ID'), 'utf8').trim();
     cleanupAvatar = stageReferenceAvatar(root);
     if (process.env.GITHUB_ACTIONS === 'true') {
-      run('Install Chromium and system dependencies', 'node_modules/@playwright/test/cli.js',
-        process.platform === 'linux' ? ['install', '--with-deps', 'chromium'] : ['install', 'chromium'], 10 * 60 * 1000);
+      run('Prepare and verify pinned Chromium runtime', 'scripts/prepare-playwright-chromium.cjs', [], 10 * 60 * 1000);
     }
     // The full desktop/touch suite exceeds 200 cases. Allow the serial
     // browser run enough time while retaining per-test limits and all evidence.

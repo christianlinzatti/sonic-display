@@ -2,6 +2,8 @@
 
 ## Musikalische Tanzfolgen und Crew-Effekte
 
+Die Chromium-Vorbereitung prüft jetzt einen echten Browserstart, bevor sie zusätzliche Linux-Pakete installiert: [CI-Dokumentation](docs/versions/V1159-PLAYWRIGHT-BOOTSTRAP.md).
+
 Vier-/achttaktige Bewegungsbögen, gemessene Bass-/Perkussionsantworten, Crew-Wellen und beobachtete Hand-/Fußeffekte ergänzen den aufgeräumten Konzertmodus. Details, Grenzen und Tests: [Dokumentation](docs/versions/V1159-MUSIKALISCHE-TANZFOLGEN.md).
 
 Der Konzertmodus zeigt Bühne und feste Lyrics-Zone mit einer kleinen Show-Steuerung.
