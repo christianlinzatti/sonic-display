@@ -12,4 +12,5 @@ test('programme follows real song IDs, variants restore and tab video survives t
  await page.getByRole('button',{name:'Gewählte Variante laden',exact:true}).click();await expect(page.getByText(/Letzte Regievariante geladen/)).toBeVisible();
  await page.getByRole('button',{name:'Showvideo aufnehmen',exact:true}).click();await expect(page.getByRole('button',{name:'Aufnahme stoppen',exact:true})).toBeVisible();await page.keyboard.press('Escape');await expect(page.getByRole('button')).toHaveCount(2);
  await page.getByRole('button',{name:'Show steuern',exact:true}).click();await page.getByRole('button',{name:'Aufnahme stoppen',exact:true}).click();await expect(page.getByRole('link',{name:'Video herunterladen',exact:true})).toHaveAttribute('href',/^blob:/);
+ const url=await page.getByRole('link',{name:'Video herunterladen',exact:true}).getAttribute('href');const media=await page.evaluate(async url=>{const bytes=new Uint8Array(await (await fetch(url)).arrayBuffer());return {size:bytes.length,magic:Array.from(bytes.slice(0,4))};},url);expect(media.size).toBeGreaterThan(200);expect(media.magic).toEqual([26,69,223,163]);
 });
