@@ -27,6 +27,29 @@ assert(active.lightFactor>=.75&&active.lightFactor<=1);
 assert.equal(make({transition:0}).lightFactor,1,'section entry should ease in');
 assert(make({transition:.5}).lightFactor<=1,'smoothed halfway through transition');
 assert.equal(make({}).lightFactor,active.lightFactor,'deterministic');
+assert(make({transition:.1}).blend<.01,'gentle transition entry must use quintic easing');
+assert(make({transition:.9}).blend>.99,'gentle transition exit must use quintic easing');
+assert(make({phase:'hook',genre:'deutschrap'}).crewFactor>
+ make({phase:'verse',genre:'deutschrap'}).crewFactor,'Deutschrap hook stays more expressive');
+assert(make({phase:'drop',genre:'hardtekk'}).crewFactor>
+ make({phase:'build',genre:'hardtekk'}).crewFactor,'Hardtekk drop retains stage presence');
+assert(make({phase:'hook',genre:'deutschrock'}).crewFactor>
+ make({phase:'verse',genre:'deutschrock'}).crewFactor,'Deutschrock hook opens the show');
+assert(make({phase:'verse',lyricsFocus:true}).crewFactor<
+ make({phase:'verse',lyricsFocus:false}).crewFactor,'lyrics always soften movement');
+const stages=['verse','hook','build','drop','break','outro','quiet','finale'];
+const genres=['deutschrap','hardtekk','hardstyle','deutschrock','pop'];
+for(let i=0;i<10000;i++){
+ const out=make({phase:stages[i%stages.length],genre:genres[i%genres.length],
+  transition:(i%101)/100,lyricsFocus:i%13===0});
+ assert(out.active,'valid measured section remains opt-in active');
+ assert(out.blend>=0&&out.blend<=1,'finite normalized phase envelope');
+ assert(out.crewFactor>=.5&&out.crewFactor<=1,'no movement amplification');
+ assert(out.lightFactor>=.75&&out.lightFactor<=1,'no light amplification');
+ const sent=api.applyConcertLightV1154({brightness:80,color:look.color},out,65);
+ assert(sent.brightness<=65&&sent.brightness>=0,'existing light ceiling remains enforced');
+}
+
 for(const change of [{settings:{...settings,enabled:false}},{playing:false},{manualPriority:true},
  {reducedMotion:true},{verified:false},{trackId:' '},{progressMs:NaN},{progressMs:-1},
  {phase:'invented'},{transition:2},{transition:NaN},{progressMs:180000}]){

@@ -53,7 +53,7 @@ export function SonicCrewControls(){
     <input type="range" min="0" max="100" step="5" value={coordination.strength}
      onChange={e=>saveConcertCoordinationV1154({...coordination,strength:Number(e.target.value)})}/>
    </label>
-   <p className="settings-note">Standardmäßig aus. Der Avatar-Ausdruck wird bei ruhigen oder textreichen Passagen zurückhaltender. Govee-Helligkeit wird nur bei bestätigten Songabschnitten im bestehenden freigegebenen Musik-Sync geglättet; keine zusätzlichen Lampenbefehle oder künstlichen Beats. Manuelle Choreografien, eigene Lichtshows und reduzierte Bewegung haben Vorrang.</p>
+   <p className="settings-note">Standardmäßig aus. Der Avatar-Ausdruck wird bei ruhigen oder textreichen Passagen zurückhaltender. Deutschrap, Hardtekk/Hardstyle und Deutschrock erhalten unterschiedlich abgestimmte, weich einblendende Ausdrucks- und Lichtkurven. Govee-Helligkeit wird nur bei bestätigten Songabschnitten im bestehenden freigegebenen Musik-Sync gedämpft; keine zusätzlichen Lampenbefehle, neuen Bewegungsclips oder künstlichen Beats. Manuelle Choreografien, eigene Lichtshows und reduzierte Bewegung haben Vorrang.</p>
   </fieldset>
   <label><input type="checkbox" checked={settings.poseAware===true} onChange={e=>writeCrewSettings({...settings,poseAware:e.target.checked})}/> Körperhaltung bei freien Tanzwechseln berücksichtigen</label>
   <p>Song-Gedächtnis: Ein Motiv aus der Strophe kehrt in Refrains wieder. Das Finale verbindet Motiv, Antwort und gemeinsamen Abschluss. Deine Motiv-Vorlieben bleiben lokal auf diesem Gerät.</p>

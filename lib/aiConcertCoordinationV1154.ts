@@ -46,12 +46,27 @@ export function planConcertCoordinationV1154(input:{
  if(!PHASES.includes(input.phase as ConcertCoordinationPhaseV1154)||!Number.isFinite(input.transition)||
   input.transition<0||input.transition>1)return off('unknown-phase');
  const phase=input.phase as ConcertCoordinationPhaseV1154;
- const blend=input.transition*input.transition*(3-2*input.transition);
- const amount=s.strength/100,rap=/rap|hip.?hop|trap/.test(String(input.genre??'').toLowerCase());
+ // Quintic ease: lower acceleration at both edges of a confirmed song section.
+ // No synthetic timing, altered clips or additional network commands.
+ const t=input.transition;
+ const blend=t*t*t*(t*(t*6-15)+10);
+ const amount=s.strength/100;
+ const genre=String(input.genre??'').toLowerCase();
+ const rap=/rap|hip.?hop|trap/.test(genre);
+ const hard=/hardtekk|hardstyle|hardcore|uptempo|gabber/.test(genre);
+ const rock=/deutschrock|industrial|metal|rock/.test(genre);
  const quiet=phase==='break'||phase==='quiet'||phase==='outro';
  const busy=phase==='drop'||phase==='finale';
- const targetCrew=input.lyricsFocus?.67:quiet?.72:rap&&phase==='verse'?.84:busy?.96:.90;
- const targetLight=input.lyricsFocus?.90:quiet?.86:busy?.98:phase==='build'?.93:.96;
+ // Genre and section alter only a bounded attenuation envelope: never a clip or power state.
+ // Lyrics have priority; hooks and drops retain the most stage presence.
+ const targetCrew=input.lyricsFocus?.67:quiet?(hard?.74:.72):
+  busy?(hard?.99:rock?.98:.96):
+  phase==='hook'?(hard?.97:rock?.95:rap?.94:.90):
+  phase==='build'?(hard?.88:rock?.91:.90):
+  rap&&phase==='verse'?.84:.90;
+ const targetLight=input.lyricsFocus?.88:quiet?(hard?.84:.86):
+  busy?.98:phase==='build'?(hard?.91:.93):
+  phase==='hook'&&rock?.98:.96;
  return {active:true,phase,blend,
   crewFactor:clamp(1-(1-targetCrew)*amount*blend,.5,1),
   lightFactor:clamp(1-(1-targetLight)*amount*blend,.75,1),
