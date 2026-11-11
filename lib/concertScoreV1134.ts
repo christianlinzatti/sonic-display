@@ -78,7 +78,7 @@ export type ScoreCameraStateV1134={key:string;anchor:ScoreCameraV1134|null;clock
 export const newScoreCameraV1134=():ScoreCameraStateV1134=>({key:'',anchor:null});
 /** Last automatic composition, before existing smoothing. Explicit camera ownership always wins. */
 export function composeScoreCameraV1134<T extends ScoreCameraV1134>(base:T,cue:ConcertScoreV1134|null,state:ScoreCameraStateV1134,
- guard:{playing:boolean;reducedMotion:boolean;protectedShot:boolean;nowMs?:number},current:ScoreCameraV1134):T{
+ guard:{playing:boolean;reducedMotion:boolean;protectedShot:boolean;nowMs?:number;viewportAspect?:number},current:ScoreCameraV1134):T{
  if(!cue||guard.protectedShot||guard.reducedMotion){state.key='';state.anchor=null;state.clock=null;state.clockAtMs=undefined;state.clockPlaying=undefined;state.playback=null;return base;}
  const nextClock={source:cue.sourceKey,positionMs:cue.positionMs};
  const now=Number.isFinite(guard.nowMs)?guard.nowMs!:undefined;
@@ -103,5 +103,6 @@ export function composeScoreCameraV1134<T extends ScoreCameraV1134>(base:T,cue:C
  }
  state.key='';state.anchor=null;
  const shotSide=cue.interaction==='unison'||cue.act==='breathe'||cue.act==='build'?0:([0,.045,-.045,0][cue.shot]??0)*cue.phraseEnvelope;
- return {...base,x:base.x+cue.cameraSide+shotSide,y:base.y,z:base.z*(cue.concert?.78:1)*cue.cameraScale*(cue.shot===3?1+cue.phraseEnvelope*.008:1),fov:Math.max(28,Math.min(65,base.fov+(cue.cameraScale-1)*14))};
+ const concertGain=cue.concert&&Number.isFinite(guard.viewportAspect)&&guard.viewportAspect!>=1.15?.78:1;
+ return {...base,x:base.x+cue.cameraSide+shotSide,y:base.y,z:base.z*concertGain*cue.cameraScale*(cue.shot===3?1+cue.phraseEnvelope*.008:1),fov:Math.max(28,Math.min(65,base.fov+(cue.cameraScale-1)*14))};
 }

@@ -78,7 +78,7 @@ export function SmartStageCameraV236({audio,genre,playing,reducedMotion,duo,comp
   const safeV1047=composeArenaImmersiveCameraV1047(safeV1043,arenaImmersiveCameraCueV1047,protectedShotV1033);
   const safeV1053=composeArenaCinematicCameraV1053(safeV1047,arenaCinematicCameraCueV1053,protectedShotV1033);
   const priorV1131=composeConcertCameraDirectorV1072(safeV1053,concertCameraCueV1072,protectedShotV1033);
-  const safeV1072=composeScoreCameraV1134(priorV1131,storyV1131,scoreCameraV1134.current,{playing,reducedMotion,nowMs:clock.elapsedTime*1000,protectedShot:!!timelineCue?.active||focusV369.current>.01},{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:(camera as PerspectiveCamera).fov,targetY:lookV369.current} as typeof priorV1131);
+  const safeV1072=composeScoreCameraV1134(priorV1131,storyV1131,scoreCameraV1134.current,{playing,reducedMotion,viewportAspect:(camera as PerspectiveCamera).aspect,nowMs:clock.elapsedTime*1000,protectedShot:!!timelineCue?.active||focusV369.current>.01},{x:camera.position.x,y:camera.position.y,z:camera.position.z,fov:(camera as PerspectiveCamera).fov,targetY:lookV369.current} as typeof priorV1131);
   if(storyV1131&&playing&&!reducedMotion&&!storyV1131.lyricFocus&&!timelineCue?.active&&focusV369.current<=.01)rememberCrewCamera(lipSync?.storyTrackIdV1136,storyV1131.shot);
   const t=readingCameraBlendV1136(1-Math.exp(-Math.min(Math.max(delta,0),.1)*3),delta,scoreCameraV1134.current.key==='reading');
   camera.position.x+=(safeV1072.x-camera.position.x)*t;

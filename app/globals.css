@@ -5041,3 +5041,15 @@
 .concert-mode-toggle{top:64px}.concert-presentation>.concert-mode-toggle{top:16px}
 .concert-presentation .immersive-stage button,.concert-presentation .immersive-stage input,.concert-presentation .immersive-stage select,.concert-presentation .lyrics-source,.concert-presentation .lyrics-v367-eyebrow{display:none!important}
 .concert-presentation .lyrics.v1133-rap .lyric.active{font-size:clamp(16px,2.2vw,28px)!important;line-height:1.25!important}
+
+/* Keep presentation controls clear of mobile safe areas and short landscape screens. */
+.concert-presentation>.concert-mode-toggle{top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left))}
+.concert-presentation .layout>.lyrics{overscroll-behavior:contain;padding-bottom:max(12px,env(safe-area-inset-bottom))!important}
+@media(max-height:500px){
+ .concert-presentation>.immersive-stage{top:5vh!important;height:57vh!important}
+ .concert-presentation .layout>.lyrics{bottom:2vh!important;height:34vh!important;max-height:34vh!important}
+ .concert-presentation .lyrics .lyric.active{font-size:clamp(18px,3vw,28px)!important}
+ .concert-presentation .lyrics.v1133-rap .lyric.active{font-size:clamp(14px,2.2vw,19px)!important;line-height:1.2!important}
+ .concert-presentation .show-v1130{display:none!important}
+}
+@media(max-width:700px),(max-height:500px){.concert-presentation [data-v441-slot]{display:none!important}}

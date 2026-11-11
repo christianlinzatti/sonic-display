@@ -13,6 +13,6 @@ assert(positions[1].z>.3&&positions[2].z<-.15);assert(positions[0].x<positions[1
 assert.equal(choosePoseAwareCrew({clips:[],outgoing:'A',candidate:'Dance_CrossStep',outTime:0,time:()=>0,left:true,right:false}),'Dance_CrossStep');
 const base={progressMs:33000,section:'verse',energy:.7,count:3},camera={x:0,y:1,z:8,fov:40};
 const cue=concertScoreV1134({...base,concert:true});
-assert(composeScoreCameraV1134(camera,cue,newScoreCameraV1134(),{playing:true,reducedMotion:false,protectedShot:false},camera).z<8);
+assert(composeScoreCameraV1134(camera,cue,newScoreCameraV1134(),{playing:true,reducedMotion:false,protectedShot:false,viewportAspect:2},camera).z<8);
 assert.strictEqual(composeScoreCameraV1134(camera,cue,newScoreCameraV1134(),{playing:true,reducedMotion:false,protectedShot:true},camera),camera);
 console.log('PASS concert stagecraft: bounded role paths, single-support gate, spacing, invalid data, missing-pose fallback, concert framing and manual camera priority');

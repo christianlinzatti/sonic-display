@@ -13,8 +13,8 @@ bis zu vier Figuren; songgebundene Gruppen werden erhalten. Beim Verlassen
 werden die eigenen Anzeigeänderungen und unveränderte temporäre Gruppen
 zurückgesetzt. Vorlieben und neu gesammelte Show-Erfahrung bleiben bestehen.
 Manuelle Clips und Kameraaufnahmen behalten ihre Priorität. Reduzierte Bewegung
-schaltet keine neue Reisebewegung ein. Der Modus wird nicht über Reloads hinweg
-aktiviert. Fehlende Lyrics bekommen einen ruhigen Hinweis in derselben Zone.
+schaltet keine neue Reisebewegung ein. Seit [V1155](V1155-KONZERT-SITZUNG-UND-MOBILANSICHT.md) wird der Modus
+im aktuellen Browser-Tab auch nach einem Reload fortgesetzt. Fehlende Lyrics bekommen einen ruhigen Hinweis in derselben Zone.
 
 Kamera und Licht nutzen weiterhin denselben Song-Score: freie Passagen erhalten
 ein näheres Bühnenbild und eine kleine Lichtverstärkung; Schlüsselwörter und Rap

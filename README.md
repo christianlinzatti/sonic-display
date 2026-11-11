@@ -1,3 +1,10 @@
+## Update – Konzertmodus nach Reload und auf kleinen Displays
+
+Der Konzertmodus kann nach einem Reload im aktuellen Tab fortgesetzt werden.
+Beim Verlassen bleiben neu gelernte Vorlieben und manuelle Änderungen erhalten.
+Schmale Bühnen behalten mehr Kameraabstand; Handy-Querformate bekommen eine
+angepasste Lyrics-Zone. [Details und Tests](docs/versions/V1155-KONZERT-SITZUNG-UND-MOBILANSICHT.md).
+
 ## Update – Konzertmodus und körperbezogene Crew-Regie
 
 Der Konzertmodus zeigt eine größere Bühne mit fester Lyrics-Zone und blendet
