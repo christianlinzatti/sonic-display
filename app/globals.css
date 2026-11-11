@@ -5097,3 +5097,10 @@ body:has(main.concert-presentation) :is(div,section):has(>main.concert-presentat
 .concert-presentation .lyrics .v555-adlib-echo,.concert-presentation .lyrics .v549-vocal-caption,.concert-presentation .lyrics-v368-progress{display:none!important}
 .concert-presentation .lyrics.v1133-rap[data-concert-long-rap="true"] .lyric.active{font-size:clamp(16px,1.8vw,22px)!important;line-height:1.2!important}
 @media(max-height:500px){.concert-presentation .lyrics.v1133-rap[data-concert-long-rap="true"] .lyric.active{font-size:14px!important;line-height:1.15!important}}
+
+/* Keep microphone activation clear of the centred kiosk toolbar on tablets/phones. */
+@media(max-width:1100px){
+ .audio-panel{left:max(16px,env(safe-area-inset-left,0px));right:auto;top:calc(116px + env(safe-area-inset-top,0px))}
+ .audio-panel .audio-status,.audio-panel .audio-label{display:none}
+ .audio-panel .audio-toggle{min-height:44px}
+}

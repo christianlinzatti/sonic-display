@@ -74,7 +74,7 @@ export function ConcertScenery({cue,lyrics,playing,reducedMotion,gate}:{cue:Conc
    }
   }
   // Pure sampler takes all hands first, then all feet.
-  const motion=sampleMotionEffects(motionFx.current,{source,position:cue.positionMs,now:clock.elapsedTime,allowed:movementAllowed,points:[observedPoints[0],observedPoints[1],observedPoints[4],observedPoints[5],observedPoints[2],observedPoints[3],observedPoints[6],observedPoints[7]]});
+  const motion=sampleMotionEffects(motionFx.current,{source:`${source}:${plan.leader}:${plan.partner}`,position:cue.positionMs,now:clock.elapsedTime,allowed:movementAllowed,points:[observedPoints[0],observedPoints[1],observedPoints[4],observedPoints[5],observedPoints[2],observedPoints[3],observedPoints[6],observedPoints[7]]});
   const segments=plan.budget.tier==='high'?motion.segments:motion.segments.slice(0,8);
   const attribute=trail.getAttribute('position');let vertex=0;
   for(const segment of segments)for(const point of segment)attribute.setXYZ(vertex++,point.x,point.y,point.z);
@@ -121,7 +121,7 @@ export function ConcertScenery({cue,lyrics,playing,reducedMotion,gate}:{cue:Conc
   }
   if(pulse.current&&pulseMaterial.current){pulse.current.visible=!!burst&&burst.kind==='floor'&&plan.budget.pulse;if(burst){pulse.current.scale.setScalar(1+burst.age*1.5);pulseMaterial.current.color.set(plan.primary);pulseMaterial.current.opacity=burst.gain*.26*plan.scale;}}
   if(wall.current)wall.current.visible=true;
-  if(clock.elapsedTime-lastReport.current>=1){lastReport.current=clock.elapsedTime;window.dispatchEvent(new CustomEvent('sonic:concert-scenery',{detail:{source:cue.sourceKey,active:true,scene:afterglow>0?'afterglow':plan.scene,pattern:plan.pattern,mix:material.current?.uniforms.uWeights.value.toArray(),tier:plan.budget.tier,pressure,led:!!wall.current?.visible,projection:textDrawn.current&&plan.text.length>0&&(material.current?.uniforms.uTextOpacity.value??0)>.01,spotTargets:actualTargets,particles:particleCount,motionSegments:segments.length,landing:!!motion.landing&&!burst,accent:burst?.id??null,moving:plan.motion>0}}));}
+  if(clock.elapsedTime-lastReport.current>=1){lastReport.current=clock.elapsedTime;window.dispatchEvent(new CustomEvent('sonic:concert-scenery',{detail:{source:cue.sourceKey,active:true,refrainVisit:plan.refrainVisit,scene:afterglow>0?'afterglow':plan.scene,pattern:plan.pattern,mix:material.current?.uniforms.uWeights.value.toArray(),tier:plan.budget.tier,pressure,led:!!wall.current?.visible,projection:textDrawn.current&&plan.text.length>0&&(material.current?.uniforms.uTextOpacity.value??0)>.01,spotTargets:actualTargets,particles:particleCount,motionSegments:segments.length,landing:!!motion.landing&&!burst,accent:burst?.id??null,moving:plan.motion>0}}));}
  });
  return <group ref={group} name="concert-show-scenery" visible={false}>
   <mesh ref={wall} name="concert-led-wall" position={[0,.05,-3.30]}><planeGeometry args={[6.8,3.8]}/><shaderMaterial ref={material} uniforms={uniforms} vertexShader={vertex} fragmentShader={fragment} toneMapped={false}/></mesh>

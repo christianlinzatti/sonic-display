@@ -1,5 +1,7 @@
 /** Normalized microphone-derived values. Every continuous value is in the 0..1 range. */
 export interface AudioFeatures {
+  /** Optional measured RMS and onset envelopes; absent on synthetic song-takt fallback. */
+  rms?: number; activity?: 'quiet'|'music';bassOnset?:number;snareOnset?:number;highOnset?:number;
   bass: number;
   mids: number;
   highs: number;

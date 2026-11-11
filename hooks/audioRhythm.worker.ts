@@ -15,7 +15,7 @@ const learning = new RhythmLearningEngine();
 let lastAt = -Infinity;
 self.onmessage = (event: MessageEvent<Input>) => {
   const msg = event.data;
-  if (msg.type === "reset") { tempo.reset(); learning.reset(); lastAt = -Infinity; return; }
+  if (msg.type === "reset") { tempo.reset(); phase.reset(); kick.reset(); pattern.reset(); learning.reset(); lastAt = -Infinity; return; }
   if (!Number.isFinite(msg.at) || msg.at < lastAt - 250) return;
   lastAt = Math.max(lastAt, msg.at);
   if (msg.type === "onset") {

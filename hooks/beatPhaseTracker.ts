@@ -1,7 +1,7 @@
 /** A microphone-onset phase-locked clock. Uses actual kick onsets as anchors,
  * predicts intervening beats only when tempo confidence is sufficient, and
  * slowly corrects phase rather than jumping on every noisy transient.
- * All timestamps are monotonic performance.now() milliseconds.
+ * All timestamps are monotonic capture-clock milliseconds.
  */
 export interface PhaseLockState {
   phase: number | null;

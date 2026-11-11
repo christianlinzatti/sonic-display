@@ -2,9 +2,9 @@ import type {AudioFeatures} from '../types/audio';
 export type MusicalEvidence={source:'microphone';confidence:number;phase:number;energy:number;onset:number;anticipation:number;bass?:number;snare?:number;highs?:number;attack?:number};
 /** Estimated Spotify metrics never become measured evidence. */
 export function measuredMusic(active:boolean,metrics:AudioFeatures):MusicalEvidence|undefined{
- if(!active||!metrics.phaseLocked||metrics.beatPhase==null)return undefined;
+ if(!active||metrics.activity==='quiet'||!metrics.phaseLocked||metrics.beatPhase==null)return undefined;
  return {source:'microphone',confidence:Math.min(metrics.phaseConfidence??0,metrics.bpmConfidence??0),phase:metrics.beatPhase,
-  energy:metrics.energyEnvelope,onset:metrics.kickAccentIntensity??0,anticipation:metrics.kickAnticipation??0,bass:metrics.bass,snare:metrics.snare,highs:metrics.highs,attack:metrics.attack};
+  energy:metrics.energyEnvelope,onset:metrics.kickAccentIntensity??0,anticipation:metrics.kickAnticipation??0,bass:metrics.bassOnset??metrics.bass,snare:metrics.snareOnset??metrics.snare,highs:metrics.highs,attack:metrics.attack};
 }
 export function musicalDirection(signal:MusicalEvidence|undefined){
  const neutral={measured:false,pulse:0,prepare:0,quiet:false,weight:0,snap:0,flow:0};

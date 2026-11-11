@@ -67,9 +67,10 @@ export function planConcertScenery(input:{cue:ConcertScoreV1134;lyrics?:Lyrics|n
  const scale=sceneryStrength(input.strength)/100;
  const lineIndex=activeConcertLyric(input.lyrics,cue.positionMs),line=lineIndex<0?null:input.lyrics!.lines[lineIndex];
  const projected=active&&input.wallLyrics!==false&&!cue.reading&&(cue.act==='lift'||cue.act==='finale')&&line&&line.text.length<=180?line:null;
+ const refrainVisit=cue.act==='lift'?Math.max(1,Math.min(8,Math.floor(cue.chorusVisit)||1)):0;
  const scene=cue.reading?'reading':cue.act==='finale'?'finale':cue.act==='lift'?'refrain':cue.act==='build'?'build':cue.staging==='instrumental'?'instrumental':cue.staging==='opening'?'opening':'verse';
- return {active:active&&scale>0,scene,pattern:scene==='refrain'?(pattern+1)%4:scene==='instrumental'?(pattern+2)%4:pattern,budget,primary:profile?.colors[0]??cue.palette,secondary:profile?.colors[1]??'#b59aff',
-  brightness:scale*(quiet?.16:scene==='finale'?.68:scene==='refrain'?.52:.30)*(budget.tier==='low'?.8:1),
+ return {active:active&&scale>0,scene,refrainVisit,pattern:scene==='refrain'?(pattern+1+(refrainVisit-1)%2)%4:scene==='instrumental'?(pattern+2)%4:pattern,budget,primary:profile?.colors[0]??cue.palette,secondary:profile?.colors[1]??'#b59aff',
+  brightness:scale*(quiet?.16:scene==='finale'?.68:scene==='refrain'?.48+Math.min(3,refrainVisit)*.04:.30)*(budget.tier==='low'?.8:1),
   motion:input.playing&&!input.reducedMotion&&!protectedText?1:0,openness:quiet?.15:scene==='refrain'||scene==='finale'?.9:.35+(cue.scenePlan?.prepare??0)*.2,
   text:projected?.text??'',textKey:projected?`${projected.startMs}:${projected.text}`:'',textOpacity:projected?(protectedText?.16:.34)*scale:0,
   lights:active&&!input.reducedMotion?Math.min(budget.lights,cue.interaction==='rest'?1:2):0,

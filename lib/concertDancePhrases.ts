@@ -17,7 +17,8 @@ export function planDancePhrase(input:{cue:ConcertScoreV1134;beat:number;slot:nu
  const length=bars*4,block=Math.floor(input.beat/length),within=input.beat%length,step=Math.min(3,Math.floor(within/(length/4)));
  const phase=(['seed','develop','contrast','resolve'] as const)[step],signal=musicalDirection(input.evidence);
  if(signal.quiet)return null;
- const distance=(slot-cue.leader+count)%count;
+ const returnVisit=Math.max(1,Math.floor(cue.chorusVisit)||1);
+ const distance=returnVisit%2===0?(cue.leader-slot+count)%count:(slot-cue.leader+count)%count;
  const role:DancePhrase['role']=cue.interaction==='unison'||phase==='resolve'?'together':slot===cue.leader?'lead':cue.interaction==='answer'?'ripple':'mirror';
  const delay=role==='ripple'?distance*.5:0;
  const pool=CONTRAST[style]??CONTRAST.groove,seed=hash(cue.showTakeSeed??cue.sourceKey);
@@ -25,7 +26,7 @@ export function planDancePhrase(input:{cue:ConcertScoreV1134;beat:number;slot:nu
  let clip=input.clip;
  if(!cue.memory&&!cue.dialogue){
   const driven=signal.measured&&signal.weight>.25?'Dance_HeelToe':signal.measured&&signal.snap>.25?'Dance_RobotGroove':null;
-  const wanted=step===0||step===3?motif:driven??pool[(seed+block+(step===2?1:0))%pool.length];
+  const wanted=step===0||step===3?motif:driven??pool[(seed+block+returnVisit-1+(step===2?1:0))%pool.length];
   if(wanted&&input.available.has(wanted))clip=wanted;
  }
  // Four-beat local waves, with a quiet pickup and a clear, shared resolution.

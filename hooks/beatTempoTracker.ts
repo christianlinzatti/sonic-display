@@ -1,4 +1,4 @@
-/** Tempo estimation from microphone kick onset timestamps (performance.now() milliseconds).
+/** Tempo estimation from microphone kick onset timestamps (monotonic capture-clock milliseconds).
  * No Spotify audio access is required. A confidence below 0.55 should not drive the dance tempo.
  */
 export interface TempoEstimate { bpm: number | null; confidence: number; sampleCount: number }
@@ -12,6 +12,16 @@ export class BeatTempoTracker {
     if (this.onsets.length && at <= this.onsets[this.onsets.length - 1]) return this.estimate;
     this.onsets.push(at);
     this.onsets = this.onsets.filter(t => at - t <= 16000).slice(-64);
+    // A coherent non-harmonic tempo change should not be buried in sixteen seconds of old beats.
+    // Exact half/double-time intervals remain ambiguous and preserve the established tempo.
+    if(this.estimate.bpm&&this.onsets.length>=7){
+      const recent=this.onsets.slice(-7),gaps=recent.slice(1).map((t,i)=>t-recent[i]);
+      const mean=gaps.reduce((sum,n)=>sum+n,0)/gaps.length,period=60000/this.estimate.bpm;
+      const ratio=mean/period,error=Math.min(...[.5,1,2,3].map(n=>Math.abs(ratio-n)));
+      if(gaps.every(n=>Math.abs(n-mean)/mean<.06)&&error>.14&&mean>=300&&mean<=850){
+        this.onsets=recent;this.estimate={bpm:null,confidence:0,sampleCount:0};
+      }
+    }
     this.estimate = this.calculate(at);
     return this.estimate;
   }

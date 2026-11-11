@@ -1,5 +1,9 @@
 ## Update – Aufgeräumte Konzertshow mit LED-Bühne und Effekten
 
+## Belastbarere Musikanalyse und Refrain-Abwechslung
+
+RMS-Lautstärke, getrennte Onset-Hüllkurven, Ruhe-/Worker-Schutz und schnellere Tempo-Neuerkennung verbessern die lokale Regie. Refrain-Bilder und Crew-Wellen variieren gemeinsam. [Dokumentation und Tests](docs/versions/V1160-MUSIKANALYSE-UND-REFRAIN-VARIATION.md).
+
 ## Musikalische Tanzfolgen und Crew-Effekte
 
 Die Chromium-Vorbereitung prüft jetzt einen echten Browserstart, bevor sie zusätzliche Linux-Pakete installiert: [CI-Dokumentation](docs/versions/V1159-PLAYWRIGHT-BOOTSTRAP.md).
