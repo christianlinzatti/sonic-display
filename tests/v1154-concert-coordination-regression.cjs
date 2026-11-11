@@ -46,7 +46,7 @@ for(let i=0;i<10000;i++){
  assert(out.blend>=0&&out.blend<=1,'finite normalized phase envelope');
  assert(out.crewFactor>=.5&&out.crewFactor<=1,'no movement amplification');
  assert(out.lightFactor>=.75&&out.lightFactor<=1,'no light amplification');
- const sent=api.applyConcertLightV1154({brightness:80,color:look.color},out,65);
+ const sent=api.applyConcertLightV1154({brightness:80,color:{r:100,g:50,b:220}},out,65);
  assert(sent.brightness<=65&&sent.brightness>=0,'existing light ceiling remains enforced');
 }
 
