@@ -1,5 +1,9 @@
 ## Update – Eine abgestimmte Konzert-Bühnenebene
 
+## Gemeinsame Bühnenräume und neue Effekte
+
+Aurora-Lichtbänder, Prisma-Fächer, Sternenraum und Halo gestalten Auftakt, Refrains und Finale zusammen mit einem passenden Lichtboden. Die klare Lyrics-Zone bleibt frei. [Dramaturgie, Budget und Tests](docs/versions/V1161-GEMEINSAME-BUEHNENRAEUME.md).
+
 ## Belastbarere Musikanalyse und Refrain-Abwechslung
 
 RMS-Lautstärke, getrennte Onset-Hüllkurven, Ruhe-/Worker-Schutz und schnellere Tempo-Neuerkennung verbessern die lokale Regie. Refrain-Bilder und Crew-Wellen variieren gemeinsam. [Dokumentation und Tests](docs/versions/V1160-MUSIKANALYSE-UND-REFRAIN-VARIATION.md).
