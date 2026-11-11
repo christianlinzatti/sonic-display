@@ -56,7 +56,7 @@ jobs:
     needs: release
     name: ${{ needs.release.outputs.release }} · ${{ matrix.os == 'windows-latest' && 'Windows smoke (TypeScript + build)' || 'Full production + Playwright' }} · ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 95
+    timeout-minutes: 150
     strategy:
       fail-fast: false
       matrix:

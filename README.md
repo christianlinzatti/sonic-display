@@ -1,5 +1,9 @@
 ## Update – Aufgeräumte Konzertshow mit LED-Bühne und Effekten
 
+## Konzertprogramm und Showaufnahme
+
+Setlist-Regie, lokale Varianten, korrigierte Kalibrierung, bewegungsbezogene Bildwahl und WebM-Videoaufnahme erweitern die Konzertsteuerung. [Funktionen, Grenzen und Prüfung](docs/versions/V1162-KONZERTPROGRAMM-UND-AUFNAHME.md).
+
 ## Gemeinsame Bühnenräume und neue Effekte
 
 Aurora-Lichtbänder, Prisma-Fächer, Sternenraum und Halo gestalten Auftakt, Refrains und Finale zusammen mit einem passenden Lichtboden. Die klare Lyrics-Zone bleibt frei. [Dramaturgie, Budget und Tests](docs/versions/V1161-GEMEINSAME-BUEHNENRAEUME.md).

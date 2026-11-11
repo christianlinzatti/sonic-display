@@ -11,7 +11,7 @@ import {concertStoryV1131,type StoryInputV1131,type StoryCueV1131} from './conce
 import {lyricSpotlightV1133} from './lyricSpotlightV1133';
 import {normalizeLyricTimingV1134} from './lyricTimingV1134';
 export type ConcertScoreV1134=StoryCueV1131 & {
- staging:'opening'|'verse'|'anticipation'|'chorus'|'reading'|'breath'|'finale'|'instrumental';
+ performanceShot?:'feet'|'duet';staging:'opening'|'verse'|'anticipation'|'chorus'|'reading'|'breath'|'finale'|'instrumental';
  durationMs?:number;production?:ProductionPlan;concert?:boolean;music:ReturnType<typeof musicalDirection>;shot:number;memory?:SongShowMemory;lyricFocus:boolean;phraseEnvelope:number;dialogue?:CrewDialogue;anticipationProgress:number;positionMs:number;sourceKey:string;playback?:PlaybackSampleV1136;reading:boolean;accent:number;beamGain:number;motionGain:number;exchange:number;scoreKey:string;
 };
 const cache=new WeakMap<Lyrics,Lyrics|null>();
@@ -113,5 +113,5 @@ export function composeScoreCameraV1134<T extends ScoreCameraV1134>(base:T,cue:C
  const shotSide=cue.interaction==='unison'||cue.act==='breathe'||cue.act==='build'?0:([0,.045,-.045,0][cue.shot]??0)*cue.phraseEnvelope;
  const concertGain=cue.concert&&Number.isFinite(guard.viewportAspect)&&guard.viewportAspect!>=1.15?.78:1;
  const sceneSide=cue.production?.scene==='dialogue'?cue.cameraSide*.2:0;
- return {...base,x:base.x+cue.cameraSide+shotSide+sceneSide,y:base.y,z:base.z*concertGain*cue.cameraScale*(cue.production?.cameraGain??1)*(cue.shot===3?1+cue.phraseEnvelope*.008:1),fov:Math.max(28,Math.min(65,base.fov+(cue.cameraScale-1)*14))};
+ return {...base,x:base.x+cue.cameraSide+shotSide+sceneSide,y:base.y,z:base.z*concertGain*cue.cameraScale*(cue.scenery?(cue.performanceShot==='feet'?1.045:cue.interaction==='duel'?1.025:1):1)*(cue.production?.cameraGain??1)*(cue.shot===3?1+cue.phraseEnvelope*.008:1),fov:Math.max(28,Math.min(65,base.fov+(cue.cameraScale-1)*14))};
 }

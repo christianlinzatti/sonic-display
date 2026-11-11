@@ -61,7 +61,7 @@ function runProductionTests({ existingBuildSince } = {}) {
     }
     // The full desktop/touch suite exceeds 200 cases. Allow the serial
     // browser run enough time while retaining per-test limits and all evidence.
-    run('Playwright against next start', 'node_modules/@playwright/test/cli.js', ['test', '--config=config/playwright.production.cjs'], 60 * 60 * 1000);
+    run('Playwright against next start', 'scripts/run-playwright-capture.cjs', [], 92 * 60 * 1000);
     results = JSON.parse(fs.readFileSync(path.join(directory, 'results.json'), 'utf8'));
     if (results.stats.expected < 1 || results.stats.unexpected !== 0 || results.stats.skipped !== 0 || results.stats.flaky !== 0)
       throw Error('No complete passing Playwright suite');

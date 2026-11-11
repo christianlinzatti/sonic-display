@@ -19,6 +19,7 @@ for(const worker of [true,false])test(`real Web Audio pulse train is measured an
  },worker);
  await page.goto('/');await page.getByRole('button',{name:'Mikrofon aktivieren',exact:true}).click();
  await expect.poll(()=>page.evaluate(()=>window.__analysis.some(f=>f.activity==='music'&&f.bpm>=115&&f.bpm<=125&&f.confidence>.65)),{timeout:25000}).toBe(true).catch(async error=>{console.error('AUDIO_EVIDENCE',JSON.stringify(await page.evaluate(()=>({frames:window.__analysis,context:window.__testAudioContext?.state,time:window.__testAudioContext?.currentTime,clocks:window.__audioClocks?.map(c=>({state:c.state,time:c.currentTime}))}))));throw error;});
+ if(worker){await page.getByRole('button',{name:'Konzertmodus starten',exact:true}).click();await page.getByRole('button',{name:'Show steuern',exact:true}).click();await page.getByRole('button',{name:'Kalibrierung starten',exact:true}).click();await expect(page.getByText('Empfohlene Empfindlichkeit:',{exact:false})).toBeVisible({timeout:20000});await page.keyboard.press('Escape');}
  await page.evaluate(()=>{window.__analysis=[];window.__stopTestAudio();});
  await expect.poll(()=>page.evaluate(()=>{const f=window.__analysis.at(-1);return f?.activity==='quiet'&&f.bpm===null&&f.locked===false;}),{timeout:10000}).toBe(true);
  await page.evaluate(()=>window.__testAudioContext.close());

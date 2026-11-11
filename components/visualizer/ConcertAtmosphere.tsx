@@ -37,7 +37,8 @@ void main(){
  float ring=exp(-abs(radius-1.-uSpread*.5-sin(uTime*.12)*.06)*40.);
  float field=dot(vec4(lane,diamond,grid,ring),uWeights);
  vec3 tint=mix(uPrimary,uSecondary,smoothstep(-2.,2.,p.x));
- gl_FragColor=vec4(tint,field*mask*uAmount);
+ float sheen=exp(-abs(p.y+.3)*1.7)*pow(.5+.5*cos(p.x*3.2),6.)*.14;
+ gl_FragColor=vec4(tint,(field+sheen)*mask*uAmount);
  #include <colorspace_fragment>
 }`;
 export type ConcertAtmosphereHandle={update:(plan:AtmospherePlan,primary:string,secondary:string,time:number,blend:number)=>void;read:()=>{backdrop:boolean;floor:boolean;time:number;mix:number[];amount:number}};

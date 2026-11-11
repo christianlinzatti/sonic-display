@@ -1,4 +1,5 @@
 'use client';
+import {ConcertProgrammeDirector} from './ConcertProgrammeControls';
 import {useMusic} from '@/context/MusicContext';
 import {ConcertSceneryControls} from './ConcertSceneryControls';
 import {useEffect,useRef,useState} from 'react';
@@ -42,7 +43,7 @@ export function ConcertMode(){
   saveConcertSession(saved.current);updatePreferences(owned);writeCrewSettings({...crew,enabled:true,mode:'adaptive',poseAware:true,stagecraft:true,showPlans:crew.showPlans!==false,scenery:crew.scenery!==false});setConcertPresentation(true);
  };
  if(!active)return <button type="button" className="concert-mode-toggle" aria-pressed={false} onClick={enter}>Konzertmodus starten</button>;
- return <div className="concert-toolbar">
+ return <div className="concert-toolbar"><ConcertProgrammeDirector active={active}/>
   <div className="concert-toolbar-buttons"><button type="button" className="concert-mode-toggle" aria-pressed={true} onClick={exit}>Konzertmodus verlassen</button><button type="button" ref={optionsButton} aria-expanded={options} aria-controls="concert-show-options" onClick={()=>setOptions(value=>!value)}>Show steuern</button></div>
   {track&&<div className="concert-track-title" aria-label="Aktueller Titel">{track.title}<span> · {track.artist}</span></div>}
   {options&&<div ref={panel} id="concert-show-options" role="dialog" aria-modal="false" aria-label="Konzertshow steuern"><ConcertSceneryControls/><p>Escape schließt die Steuerung. Ein weiteres Escape beendet den Konzertmodus.</p></div>}
