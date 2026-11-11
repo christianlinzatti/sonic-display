@@ -56,7 +56,11 @@ test('mock Govee bridge receives paced whole-lamp looks from the ensemble and st
  expect(commands.length).toBeGreaterThan(0);expect(commands.every(c=>c.action==='look'&&c.value.brightness<=50&&Object.values(c.value.color).every(v=>v>=0&&v<=255))).toBe(true);
  for(let i=1;i<commands.length;i++)expect(commands[i].at-commands[i-1].at).toBeGreaterThanOrEqual(850);
  await page.getByRole('button',{name:'Show steuern',exact:true}).click();await page.getByLabel('Govee folgt Ensemble und Lyrics',{exact:true}).uncheck();
- await page.evaluate(()=>{window.__ensembleLights=[];});await expect.poll(()=>page.evaluate(()=>window.__ensembleLights.some(f=>!f.active)),{timeout:30000}).toBe(true);
+ // Unchanged looks are intentionally suppressed. Expire the old stage cue, then
+ // request a real cap change so the next delivered command can prove the opt-out.
+ await page.waitForTimeout(2600);
+ await page.evaluate(()=>{window.__ensembleLights=[];const key='sonic-display:govee-lan-v909',c=JSON.parse(localStorage.getItem(key));c.masterBrightness=30;localStorage.setItem(key,JSON.stringify(c));window.dispatchEvent(new Event('sonic-display:govee-lan-config-changed'));});
+ await expect.poll(()=>page.evaluate(()=>window.__ensembleLights.some(f=>!f.active&&f.brightness<=30)),{timeout:30000}).toBe(true);
  await page.evaluate(()=>{const key='sonic-display:govee-lan-v909',c=JSON.parse(localStorage.getItem(key));c.autoSync=false;localStorage.setItem(key,JSON.stringify(c));window.dispatchEvent(new Event('sonic-display:govee-lan-config-changed'));});
  const stopped=commands.length;await page.waitForTimeout(2200);expect(commands.length).toBe(stopped);
 });
