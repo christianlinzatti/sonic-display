@@ -203,7 +203,7 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
         <fieldset aria-label="Fußstabilität: geschätzte Standphasen">
           <legend>Foot Stability Check · Phase 1</legend>
           {report.footPlant.status==="unavailable"||report.footPlant.status==="insufficient"
-            ?<p>Keine verlässlichen aufeinanderfolgenden Fußpositionen auswertbar.</p>
+            ?<p>Zu wenige verlässliche Standkandidaten für eine Aussage zur Fußstabilität.</p>
             :<><p>{report.footPlant.status==="inspect"?"Verdächtige Bodenverschiebung – in der Vorschau überprüfen.":"Keine auffällige seitliche Fußverschiebung in den untersuchten Standkandidaten."}</p>
               {(["left","right"] as const).map(side=><p key={side}><strong>{side==="left"?"Links":"Rechts"}:</strong> {report.footPlant[side].nearFloorSeconds.toFixed(2)} s mögliche Standphase · {report.footPlant[side].possibleSlidePairs} verdächtige Intervalle · {report.footPlant[side].possibleSlideSeconds.toFixed(2)} s mögliche Verschiebung</p>)}
             </>}
