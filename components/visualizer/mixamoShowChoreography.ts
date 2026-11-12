@@ -85,3 +85,15 @@ export function mixamoShowCueBias(input:{
   }
   return Math.max(-1.2,Math.min(1.2,bias));
 }
+
+/** Use one phrase-selection lane for duplicated dancers with the same model,
+ * eligible Mixamo repertoire and show input during hooks/drops. This aligns
+ * *which* clip is selected; V327/V328 remain the owners of physical beat
+ * accents and clip phase, and distinct rigs remain free to choose alternatives.
+ */
+export function mixamoEnsembleSelectionSlot(input:{
+  slot:number;ensembleCount:number;section:string|null|undefined;hasEligibleMixamo:boolean;
+}):number {
+  const cue=mixamoShowCue(input.section,input.slot,input.ensembleCount);
+  return cue.commonPhrase&&input.hasEligibleMixamo?0:input.slot;
+}
