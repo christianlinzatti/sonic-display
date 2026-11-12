@@ -2,7 +2,7 @@
  * Evaluates retargeted QUATERNION clips on a separately loaded/private avatar.
  * Never edits an installed avatar, clip, animation mixer, or stage foot IK.
  */
-import {AnimationMixer,Box3,LoopOnce,Vector3,type AnimationClip,type Object3D,type Bone} from "three";
+import {AnimationMixer,LoopOnce,Vector3,type AnimationClip,type Object3D,type Bone} from "three";
 import {retargetHumanoidClips,readRetargetCalibration,semantic,type RetargetCalibration} from "./avatarAnimationRetarget";
 import {withPrivateGltfV769} from "./privateGltfLifecycleV769";
 import {inspectFootPlantQuality,type FootPlantQualityReport} from "./estimatedFootPlantQuality";
