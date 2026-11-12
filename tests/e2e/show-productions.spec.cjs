@@ -43,7 +43,7 @@ test('dense rap keeps a stable reading scene for every concept without invented 
  await seed(page);await page.goto('/');await expect(lyrics(page)).toHaveAttribute('data-lyric-presentation','rap');const box=await controls(page);
  for(const id of ['neon','cinema','groove','festival']){
   await box.getByLabel('Show-Konzept',{exact:true}).selectOption(id);await expect(lyrics(page)).toHaveAttribute('data-show-production',id);await expect(lyrics(page)).toHaveAttribute('data-show-scene','reading');await expect(direction(page)).toHaveAttribute('data-show-scene','reading');
-  const animation=await lyrics(page).locator('.lyric.active').evaluate(el=>({animation:getComputedStyle(el).animationName,transform:getComputedStyle(el).transform}));expect(animation).toEqual({animation:'none',transform:'none'});
+  const active=lyrics(page).locator('.lyric.active');await expect(active).toHaveCSS('animation-name','none');await expect(active).toHaveCSS('transform','none');
  }
  await expect(lyrics(page).locator('[data-v1133-current="true"]')).toHaveCount(0);
 });
