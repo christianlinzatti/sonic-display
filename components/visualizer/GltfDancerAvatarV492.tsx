@@ -1395,7 +1395,8 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       if(!motion)return [];
       return [{name:c.name,label:motion.name,duration:c.duration,trackCount:c.tracks.length,
         source:'library' as const,category:motion.category??suggestMotionCategoryV535(motion.name),
-        favorite:motion.favorite===true}];
+        favorite:motion.favorite===true,taggedGenre:motion.genre,bpmMin:motion.bpmMin,bpmMax:motion.bpmMax,
+        assignedSection:motion.section}];
     });
     return [...embedded,...external];
   },[embeddedCandidatesV530,sharedMotionV531,library.automatic,installed,libraryClips]);
