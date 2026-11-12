@@ -1,6 +1,8 @@
 /** V536: deterministic, allocation-bounded genre director over ALREADY AVAILABLE actions.
  * Takes optional V535 metadata, never creates or rewrites a clip/GLB, never infers the singer.
  */
+import {mixamoGenreBias} from "./mixamoMotionDirector";
+
 export type GenreMotionCategoryV536 = 'idle' | 'rap' | 'dance' | 'energetic' | 'gesture' | 'locomotion' | 'other';
 export type GenreMotionCandidateV536 = {
   name: string; label: string; duration: number; trackCount: number;
@@ -107,6 +109,9 @@ export function rankGenreMotionsV536(input:GenreMotionInputV536,phrase:string,re
       if(energy>.78&&energetic&&section!=='quiet')score+=.8;
       if(c.favorite)score+=.7; // never overrules gross genre/section incompatibility
       if(c.source==='library')score+=.12; // tiny tie-break: favor added repertoire
+      // Mixamo-only hints supplement V536's existing category, section, and
+      // history scoring; never override manual selection or rig eligibility.
+      score+=mixamoGenreBias(c.label,family,section,energy);
       const wasRecent=recent.lastIndexOf(c.name);
       if(wasRecent>=0)score-=wasRecent===recent.length-1?2.5:1.1;
       // Stable per musical phrase and avatar slot, not per render/frame.
