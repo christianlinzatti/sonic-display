@@ -42,3 +42,36 @@ werden.
 **Architekturhinweis:** Die Umsetzung ist von `master` abgezweigt und
 ändert Pull Request #16 nicht. Nach dessen Freigabe kann der gemeinsame
 Qualitätsworkflow unverändert für importierte Mixamo-GLB genutzt werden.
+
+## Schritt 2 – Ziel-Avatar nach dem Retargeting prüfen
+
+Für externe GLB-Motions analysiert der vorhandene Button **Fußkontakt, Gelenke und
+Übergang analysieren** nun zusätzlich die auf den **gewählten Ziel-Avatar**
+übertragenen Rotationskurven. Die Quelle und das Ergebnis werden ausdrücklich
+getrennt ausgewiesen. Die Diagnose zeigt Anzahl zugeordneter Animationsspuren,
+die Zahl temporär geprüfter Posen sowie verdächtige Fußverschiebungen pro Seite.
+
+Die Auswertung lädt beide GLB-Dateien in kurzlebige, privat entsorgte Three.js-
+Szenen. Es werden nur der manuell ausgewählte Clip und maximal 81 Posen
+ausgewertet, bei sehr großen oder fehlenden Clips wird abgebrochen. Die
+originalen Animations- und Avatar-Dateien bleiben unverändert; auch der
+Laufzeit-Avatar in der Live-Konzertshow wird nicht angerührt.
+
+Unterschiedliche Avatar-Körperhöhen werden durch normierte horizontale
+Fußgeschwindigkeiten vergleichbar gemacht. Der Test ist **keine physikalische
+Fuß-Bodenkollision und kein optisches Qualitätsurteil**. Unbekannte Knochen
+oder nicht kompatible Rigs liefern explizit „nicht auswertbar“. Für
+Mixamo-FBX ohne Skin ist die zusätzliche Animation-only-Skelett-Unterstützung
+aus PR #16 erforderlich; bis zum Merge dieses Pull Requests kann bei diesen
+Quelldateien noch „nicht kompatibel“ erscheinen.
+
+Der Qualitätsbericht ist an die konkrete Kombination aus Clip, Übergang und
+Ziel-Avatar gebunden, sodass ein Avatar-Wechsel keine alte Diagnose anzeigt.
+
+```sh
+node tests/phase1-target-rig-quality-regression.cjs
+```
+
+Dieser synthetische Three.js-Test enthält zwei unterschiedlich große
+Ziel-Rigs und echte AnimationMixer-Samples, ersetzt aber weiterhin nicht
+den Sichttest einer realen Mixamo-FBX auf deinem Avatar.
