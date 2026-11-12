@@ -89,3 +89,29 @@ Anpassung ist bewusst konservativ.
 
 Der CI-Test `tests/mixamo-dance-director-regression.cjs` prüft Genre-Ranking,
 manuellen Vorrang, Beat-Grenzen und die Integration in den Avatar-Renderer.
+
+## Genre-Auswahl, Beat-Timing und Übergänge
+
+Nach dem Import können in der **Character & Motion Library** für jeden Clip
+**Genre**, **BPM min/max** und **Songabschnitt** gesetzt werden. Nur wenn
+**Automatische Motion-Auswahl** aktiv ist, darf der Live-Genre-Director
+entsprechende Library-Motions verwenden. Bei selbst zugewiesenen Grenzen
+werden fremde Genre-Familien, BPM außerhalb des eingestellten Bereichs und
+unpassende Songabschnitte aus der automatischen Auswahl ausgeschlossen.
+Ohne Kennzeichnung behalten ältere Clips ihr bisheriges Verhalten.
+
+Die bestehende Live-Bühne bevorzugt bei Deutschrap natürliche Rap-Grooves,
+bei Hardtekk Footwork/Hakken und bei Hardstyle Jumpstyle/Stomp-Moves.
+Dies sind nachvollziehbare **Namensheuristiken**, keine garantierte
+Stilerkennung aus den tatsächlichen Keyframes. Nutzerdefinierte Auswahl,
+Timeline/Loops, Pausen und `reducedMotion` haben Vorrang.
+
+Für passende automatisch spielende Mixamo-Loops wird die Abspielrate nur
+geringfügig verändert (maximal 12 Prozent), falls die Clip-Länge nahe an
+2, 4, 8 oder 16 Beats liegt und ein gültiges BPM vorliegt. Beim Wechsel auf
+manuelle Wiedergabe oder andere Clips wird diese Tempoanpassung zurückgenommen,
+sofern keine andere Steuerung die Abspielrate inzwischen selbst verändert hat.
+Die Übergänge erfolgen über die bestehenden Crossfade-, Pose-Matching-
+und Foot-IK-Systeme; es wird kein zweiter Animationsmixer erzeugt.
+
+Regressionen: `node tests/mixamo-dance-director-regression.cjs`.
