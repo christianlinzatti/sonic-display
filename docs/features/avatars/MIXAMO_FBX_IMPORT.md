@@ -171,3 +171,23 @@ Crossfades bei V492/V537 und den nachfolgenden Qualitätsstufen.
 
 CI-Regression:
 `node tests/mixamo-show-choreography-regression.cjs`.
+
+## Simulierter 3D-Skelett-Test
+
+Der CI-Smoke-Test `node tests/mixamo-3d-playback-smoke.cjs` erstellt zwei
+synthetische Mixamo-Animationsclips und einen 10-Gelenke-Humanoid-Rig.
+Er spielt die mittels vorhandener Retargeting-Logik umgeschriebenen Clips
+mit dem **echten Three.js AnimationMixer** ab und kontrolliert:
+
+- Gelenke werden über die passenden Bones tatsächlich animiert;
+- verbotene Root-Translationen können den Avatar nicht verschieben;
+- die Überblendung läuft mit endlichen, normierten Quaternionen und ohne
+  großen Einzelbild-Winkelsprung;
+- der neue Clip übernimmt nach dem Crossfade, inkompatible Rigs werden
+  nicht fälschlich akzeptiert.
+
+Dies ist ein **Headless-Skelett-Test**, keine GPU-Bildprüfung und kein
+Ersatz für den realen FBX→GLB-Import oder eine visuelle Mixamo-Vorschau.
+Für den Abschluss der praktischen Qualitätssicherung müssen ein echter,
+selbst heruntergeladener Mixamo-FBX-Clip und der konkrete Ziel-Avatar
+in der 3D-Vorschau getestet werden.
