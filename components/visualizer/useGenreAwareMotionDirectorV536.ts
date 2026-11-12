@@ -13,7 +13,7 @@ export function useGenreAwareMotionDirectorV536(input:GenreMotionInputV536):stri
   const varietyV615=useRef(newChoreographyVarietyStateV615());
   const libraryV639=useRef(newIntelligentMotionLibraryStateV639());
   const [published,setPublished]=useState({trackId:'',modelKey:'',selectedName:null as string|null});
-  const stageInput=input;
+  const {clips,trackId,modelKey,progressMs,section,genre,bpm,energy,slot,ensembleCount,playing,reducedMotion,manualPriority}=input;
   // Duplicate avatars sharing the same library choose compatible hooks/drops
   // in a common lane. Verses keep independent lead/support repertoire.
   const eligibleMixamo=useMemo(()=>clips.some(c=>
