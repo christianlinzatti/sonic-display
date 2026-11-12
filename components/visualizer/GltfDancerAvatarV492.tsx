@@ -105,6 +105,7 @@ import { publishTimelineObservation, explainTimelineDecision, normalizeTimelineE
 import { advanceDropPrediction, createDropPredictionState, type DropPhase } from "./advancedDropPredictor";
 import { initialStructureState, advanceStructureState, structureEvidence, choreographyPhase } from "./advancedMusicStructureV208";
 import { CHARACTER_MOTION_CHANGE_EVENT, loadCharacterMotionStore, chooseCharacterMotion } from "./characterMotionLibrary";
+import {isMixamoMotion,mixamoBeatAlignedSpeed,mixamoMinimumFade} from "./mixamoMotionDirector";
 import { AnimationClip, type Group } from "three";
 import { clone as cloneSkinnedScene } from "three/examples/jsm/utils/SkeletonUtils.js";
 import {disposeClonedAvatarSkeletonsV654} from "./disposeClonedAvatarSkeletonsV654";
@@ -1416,6 +1417,18 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   // Keep V481/V328/V329/V356 and every manually authored action above V530.
   // The existing V492 transition pipeline performs the real pose-matched crossfade.
   const selectedClip=lowClipV481 && actions[lowClipV481] && isPlaying&&!reducedMotion ? lowClipV481 : clipChoiceV328 && actions[clipChoiceV328] ? clipChoiceV328 : phraseChoiceV329 && actions[phraseChoiceV329]?phraseChoiceV329:crew.plan.active && crew.plan.clip && actions[crew.plan.clip]?crew.plan.clip:autoMotionV356 && actions[autoMotionV356]?autoMotionV356:genreMotionV536 && actions[genreMotionV536]?genreMotionV536:embeddedMotionV530 && actions[embeddedMotionV530]?embeddedMotionV530:selectedClipLegacy;
+  // Mixamo can refine only a currently loaded *automatic* library action.
+  // Every authored source, timeline, user speed, foot/ensemble clock and
+  // explicit animation continues to own playback unchanged.
+  const mixamoLibraryId=/^Library:([^:]+):/.exec(selectedClip??"")?.[1];
+  const mixamoEntry=installed.find(m=>m.id===mixamoLibraryId&&isMixamoMotion(m.name));
+  const automaticMixamo=!!mixamoEntry&&library.automatic&&isPlaying&&!reducedMotion&&
+    avatarMotionMode!=="choreography"&&!animationUrl&&!activeSequence&&!activeLoop&&
+    !timelineEnabled&&!avatarBlendEnabled&&!smartDanceOverride&&
+    !rapLiveEnabledV412&&!clipChoiceV328&&!phraseChoiceV329&&
+    !groupClockV328?.settings.enabled&&!groupPhraseV329?.settings.enabled;
+  const mixamoFade=automaticMixamo ? mixamoMinimumFade(mixamoEntry.name,
+    motionSectionV536(showCue?.enabled?showCue.section:cameraDirectorSection)) : 0;
   // V492: a saved combination activates only when its original *base* is
   // already the chosen live clip. Never hijack a manual selection / timeline.
   const liveBlendV492=preparedBlendsV492.find(p=>p.baseName===selectedClip)??null;
@@ -1438,7 +1451,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     activeSequence,rapLiveEnabledV412,timelineEnabled,timeline,avatarBlendEnabled,avatarBlendClip,
     maskedOverlay,liveTransition,stableLibraryClip,sequenceCrossfade,lowClipV481,smartDanceOverride,
     avatarMotionMode,activeLoop,autoUpperGestureV490,activeLiveBlendV492,
-    avatarCrossfadeSeconds:crew.plan.active && crew.plan.clip===selectedClip?Math.max(.55,avatarCrossfadeSeconds):genreMotionV536===selectedClip?Math.max(avatarCrossfadeSeconds,genreCrossfadeSecondsV536({section:showCue?.enabled?showCue.section:cameraDirectorSection,energy:audio.energyEnvelope})):embeddedMotionV530===selectedClip?Math.max(.55,avatarCrossfadeSeconds):avatarCrossfadeSeconds,
+    avatarCrossfadeSeconds:Math.max(mixamoFade,crew.plan.active && crew.plan.clip===selectedClip?Math.max(.55,avatarCrossfadeSeconds):genreMotionV536===selectedClip?Math.max(avatarCrossfadeSeconds,genreCrossfadeSecondsV536({section:showCue?.enabled?showCue.section:cameraDirectorSection,energy:audio.energyEnvelope})):embeddedMotionV530===selectedClip?Math.max(.55,avatarCrossfadeSeconds):avatarCrossfadeSeconds),
     footIK,beatFlowData,musicSectionV565:showCue?.enabled?showCue.section:cameraDirectorSection,
     trackIdV614:track?.id,progressMsV614:cameraDirectorProgressMs??propsLipSyncV367?.progressMs,
     energyV614:audio.energyEnvelope,
@@ -1644,6 +1657,16 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     const speed = Math.max(0.25, Math.min(2, activeLoop?.speed ?? avatarClipSpeed));
     Object.values(actions).forEach(action => { if (action) action.timeScale = speed; });
   }, [actions, avatarClipSpeed, activeLoop]);
+  // Quantize only near-natural-speed Mixamo loops to 2/4/8/16 beats.
+  // The existing V492 mixer advances time; V537/V630/V799 keep transition
+  // matching and planted-foot protection. No second mixer or frame timer.
+  useEffect(()=>{
+    if(!automaticMixamo||!mixamoEntry||!selectedClip||Math.abs(avatarClipSpeed-1)>.001)return;
+    const action=actions[selectedClip];
+    if(!action)return;
+    action.timeScale=mixamoBeatAlignedSpeed(mixamoEntry.name,
+      action.getClip().duration,audio.bpm,1);
+  },[actions,selectedClip,automaticMixamo,mixamoEntry?.name,audio.bpm,avatarClipSpeed]);
   // V328: absolute shared ensemble beat clock drives the *actual* selected
   // GLB action in each independent mixer; no source track or shared audio edits.
   useFrame(()=>{
