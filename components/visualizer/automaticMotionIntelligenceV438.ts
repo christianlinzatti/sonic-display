@@ -18,7 +18,7 @@ const bounded=(v:number,low:number,high:number)=>Math.max(low,Math.min(high,v));
 const hook=/\b(hook|refrain|chorus|singalong|anthem|hymne)\b/iu;
 const calm=/\b(idle|rest|relax|slow|soft|sway|chill|lofi|lo-fi|head\s?nod|nod|ruhig|break|intro|outro)\b/iu;
 const groove=/\b(rap|hip.?hop|groove|bounce|flow|step|walk|shuffle|krump|popping|freestyle|bop|verse|verse1)\b/iu;
-const intense=/\b(fast|strong|hard|jump|stomp|kick|power|energetic|energetisch|drop|intense|wild|tekk|rave|speed)\b/iu;
+const intense=/\b(fast|strong|hard|jump|stomp|kick|power|energetic|energetisch|drop|intense|wild|tekk|rave|speed|hakken|hakkuh|footwork|gabber|jumpstyle|rawstyle)\b/iu;
 const group=/\b(duet|duo|partner|group|sync|ensemble|mirror|pair)\b/iu;
 
 /** Cheap, offline motion *metadata* classification; no claim of 3D skeleton inspection. */
