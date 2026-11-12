@@ -66,6 +66,12 @@ export function inspectFootPlantQuality(poses:readonly SampledPoseV534[],bodyHei
     side.maxHorizontalSpeedBodyHeightsPerSec=Number(clamp(side.maxHorizontalSpeedBodyHeightsPerSec,0,1000).toFixed(2));
   }
   const observed=left.observedPairs+right.observedPairs;
+  const near=left.nearFloorPairs+right.nearFloorPairs;
   const suspected=left.possibleSlidePairs+right.possibleSlidePairs;
-  return report(observed===0?"insufficient":suspected>0?"inspect":"no-obvious-slip","sampled-lowest-foot");
+  // No "all clear" without enough near-floor evidence. The inferred lowest
+  // foot is not a real ground plane; sparse stance candidates remain unknown.
+  // The confidence threshold is diagnostic only, never a foot-lock trigger.
+  const enoughEvidence=observed>=8&&near>=4;
+  return report(!enoughEvidence?"insufficient":suspected>0?"inspect":"no-obvious-slip",
+    "sampled-lowest-foot");
 }
