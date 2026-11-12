@@ -71,8 +71,10 @@ test('user-visible action requires explicit confirmation; disabled stays disable
  const ui=fs.readFileSync('components/CharacterMotionBatchInstaller.tsx','utf8');
  assert(ui.includes('suggestFootLockFromQualityV322('));
  assert(ui.includes('writeFootLockV322('));
- assert(ui.includes('checked={footLockReviewConfirmedV322}'));
- assert(ui.includes('disabled={!footLockReviewConfirmedV322'));
+ assert(ui.includes('checked={footLockConfirmed}'));
+ assert(ui.includes('footLockReviewConfirmedV322===reviewKey'));
+ assert(ui.includes('Ich habe die Bewegung im 3D-Viewer geprüft'));
+ assert(ui.includes('disabled={!footLockConfirmed||advancedBusyV534||busy}'));
  assert(ui.includes('...proposed.settings,enabled:now.enabled'));
  assert(ui.includes('V322 ist danach weiterhin'));
  const workflow=fs.readFileSync('.github/workflows/v965-room-wave-production.yml','utf8');
