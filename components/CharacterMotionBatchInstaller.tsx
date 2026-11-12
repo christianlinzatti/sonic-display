@@ -102,7 +102,7 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
       for(const original of selected){
         if(!live.current)return;
         try{
-          if(kind==="motion"&&/\\.fbx$/i.test(original.name)){
+          if(kind==="motion"&&/\.fbx$/i.test(original.name)){
             const {convertMixamoFbxToGlb}=await import("@/components/visualizer/mixamoFbxImporter");
             ready.push(await convertMixamoFbxToGlb(original));
           }else{
