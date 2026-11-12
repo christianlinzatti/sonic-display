@@ -85,7 +85,7 @@ jobs:
       - name: Release reliability regressions
         run: npm run verify:v1004:focused
       - name: Phase 1 · foot lock and motion quality regressions
-        run: node tests/phase1-foot-contact-quality-regression.cjs && node tests/v322-foot-lock-ground-contact-regression.cjs
+        run: node tests/phase1-foot-contact-quality-regression.cjs && node tests/v322-foot-lock-ground-contact-regression.cjs && node tests/phase1-target-rig-quality-regression.cjs
       # Full historical regression coverage is already enforced by the inherited
       # Linux production gate. Avoid duplicating dozens of costly suites.
       - name: Active imported release (regression and isolated type checks)
