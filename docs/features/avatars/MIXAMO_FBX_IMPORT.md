@@ -57,3 +57,35 @@ Der normale TypeScript- und Production-Build bleibt ebenfalls aktiv.
 
 Der Integrationstest ersetzt keine Sichtprobe mit einer realen, selbst
 heruntergeladenen Mixamo-FBX auf dem jeweils gewählten Avatar.
+
+## Automatische Musiksteuerung
+
+Bei aktivierter automatischer Motion Library wertet die bestehende
+V536-Genreregie die importierten, **bereits geladenen und geeigneten** Clips aus.
+Zusätzliche Mixamo-Namenshinweise unterscheiden:
+
+- **Deutschrap:** Groove, Bounce, Hip-Hop, Head Nod und Swagger;
+- **Hardtekk:** Hakken, Footwork, Gabber, Stomp und Bounce;
+- **Hardstyle:** Jumpstyle, Jump, Power, Stomp und Kick.
+
+Explizit gewählte Avatar-/Genre-/Songabschnitt-Kennzeichnungen bleiben höher
+priorisiert als Dateinamen-Heuristiken. Neue Dateien werden nur nach
+Skelettprüfung und Installation berücksichtigt. Manuell aktivierte
+Choreografien, Loops und Timelines bleiben unverändert.
+
+Die vorhandene Song-Phrasensteuerung schaltet Clips an musikalischen Grenzen
+um; die vorhandene V492/V537/V630/V799-Engine übernimmt Crossfade,
+Pose-Matching und Fußkontakt. Neue Mixamo-Clips erhalten einen begrenzten
+Mindest-Crossfade je Songabschnitt, aber keine zweite AnimationMixer-Instanz.
+
+Ein automatischer Mixamo-Clip mit Originalgeschwindigkeit 1 kann auf eine
+**2-, 4-, 8- oder 16-Beat-Schleife** angepasst werden, wenn das mit einer
+Tempoänderung von maximal **12 Prozent** möglich ist. Die Synchronisation
+verändert keine Keyframes. Unbekannte BPM, manuelles Speed-Tuning, reduzierter
+Bewegungsmodus, eigene Timelines, Ensembles und ungeeignete Clip-Längen
+verwenden die ursprüngliche Geschwindigkeit. Der Takt einer fremden
+Motion-Capture-Aufnahme lässt sich damit nicht zuverlässig erkennen; die
+Anpassung ist bewusst konservativ.
+
+Der CI-Test `tests/mixamo-dance-director-regression.cjs` prüft Genre-Ranking,
+manuellen Vorrang, Beat-Grenzen und die Integration in den Avatar-Renderer.
