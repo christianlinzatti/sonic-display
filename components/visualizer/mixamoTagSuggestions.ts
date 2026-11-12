@@ -2,7 +2,6 @@
  * Never infer BPM from a clip title or overwrite manually curated metadata.
  */
 import type {InstalledCharacterMotion} from "./characterMotionLibrary";
-import {suggestMotionCategoryV535} from "./motionLibraryIntelligenceV535";
 
 export type MixamoSuggestedGenre = "deutschrap" | "hardtekk" | "hardstyle";
 export type MixamoSuggestedCategory = "rap" | "energetic" | "dance";
@@ -44,8 +43,9 @@ export function applyMixamoTagSuggestions(
     const hint=suggestMixamoMotionTags(m.name);
     if(!hint)return m;
     changed++;
-    const automaticCategory=suggestMotionCategoryV535(m.name);
-    return {...m,genre:hint.genre,category:!m.category||m.category===automaticCategory?hint.category:m.category};
+    // The store does not record whether a category was assigned manually.
+    // Therefore never change categories, even when they look auto-generated.
+    return {...m,genre:hint.genre};
   });
   return {motions:updated,changed};
 }
