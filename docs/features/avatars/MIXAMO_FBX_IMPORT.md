@@ -140,3 +140,34 @@ Der bereits vorhandene Genre-Director darf die gesetzten Tags bei aktivierter
 Automatik für die Auswahl geeigneter, geladener Clips berücksichtigen.
 
 Test: `node tests/mixamo-tag-suggestions-regression.cjs`.
+
+## Mixamo Konzert-Choreografie – Strophe, Hook, Build und Drop
+
+Die vorhandene **V536/V588/V615/V639-Choreografieregie** erhält zusätzliche,
+deterministische Mixamo-Hinweise. Sie greift nur auf **vorab geladene und für
+diesen Avatar gültige Library-Motions** zurück, wenn die automatische
+Motion-Auswahl aktiviert ist. Keine weiteren AnimationMixer, Netzwerkanfragen
+oder geänderten GLB-Keyframes:
+
+- **Strophe:** Die Hauptfigur bevorzugt Rap-Gestik/Performance bzw. im
+  Hardtekk-Kontext Footwork. Weitere Tänzer nutzen eher passende Grooves.
+- **Hook:** Groove/Bounce und stimmige Gruppenenergie. Bei mehreren Instanzen
+  **desselben Avatar-Modells mit kompatibler Library** wird dieselbe
+  automatische Auswahlspur für die Phrase verwendet.
+- **Build / Pre-Drop:** Vorbereitendes Shuffle, Step und Footwork statt zu
+  früh einsetzender harter Jump-/Stomp-Akzente.
+- **Drop:** Hardtekk bevorzugt Hakken/Gabber/Footwork, Hardstyle eher
+  Jumpstyle/Stomp/Power. Die Phrase wird über gleiche Modelle hinweg abgestimmt.
+- **Break/Intro:** Ruhige Clips werden gegenüber harten Moves bevorzugt.
+
+Die Bewertung ist bewusst ein kleiner Bonus innerhalb der bereits geeigneten
+Auswahl. Festgelegte Genres, BPM-Grenzen, Songabschnitte, manuelle Clips,
+Timelines, Loops, Gruppen-Clocks, Pause und reduzierter Bewegungsmodus bleiben
+vorrangig. Bei mehreren **verschiedenen** Avatar-Rigs oder unterschiedlich
+verfügbaren Animationen wird keine Identität der Clips behauptet. Die
+eigentliche Zeitsynchronisation der Avatare liegt weiterhin bei den vorhandenen
+Gruppen- und Beat-Systemen (V327/V328); die Fußkontakte, Pose-Matches und
+Crossfades bei V492/V537 und den nachfolgenden Qualitätsstufen.
+
+CI-Regression:
+`node tests/mixamo-show-choreography-regression.cjs`.
