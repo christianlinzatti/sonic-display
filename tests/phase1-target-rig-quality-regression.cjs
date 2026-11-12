@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
-const {Group,Bone,Quaternion,QuaternionKeyframeTrack,VectorKeyframeTrack,AnimationClip}=require('three');
+const {Group,Bone,Quaternion,Vector3,QuaternionKeyframeTrack,VectorKeyframeTrack,AnimationClip}=require('three');
 const {load}=require('./helpers/ts-loader-v404.cjs');
 const {assessTargetRigFootQuality:assess}=load('components/visualizer/retargetedFootQualityPhase1');
 
@@ -28,7 +28,7 @@ function rig(scale=1,names='target'){
  return {group,bones};
 }
 const original=()=>{
- const half=new Quaternion().setFromAxisAngle({x:0,y:1,z:0,clone(){return this},lengthSq(){return 1}},.72);
+ const half=new Quaternion().setFromAxisAngle(new Vector3(0,1,0),.72);
  // Construct values explicitly to avoid any external animation asset.
  const tracks=[
   new QuaternionKeyframeTrack('mixamorig:Hips.quaternion',
@@ -45,14 +45,15 @@ const original=()=>{
 function test(name,check){try{check();}catch(e){e.message='Target rig '+name+': '+e.message;throw e;}}
 test('retargeted movement evaluates real target joints, not source positions',()=>{
  const source=rig(1,'source'),target=rig();
- const clip=original(),originalSerialized=JSON.stringify(clip.toJSON());
+ const clip=original(),snapshot=()=>JSON.stringify(clip.tracks.map(t=>[t.name,[...t.times],[...t.values]]));
+ const originalSerialized=snapshot();
  const report=assess([clip],source.group,target.group,0);
  assert.equal(report.status,'analyzed');
  assert.equal(report.matchedTracks,3);assert.equal(report.skippedTracks,1);
  assert.equal(report.totalTracks,4);assert.equal(report.sampleCount,25);
  assert(report.footPlant.left.observedPairs>0&&report.footPlant.right.observedPairs>0);
  assert.equal(report.footPlant.left.nearFloorPairs>0,true);
- assert.equal(JSON.stringify(clip.toJSON()),originalSerialized,'original FBX animation stays unchanged');
+ assert.equal(snapshot(),originalSerialized,'original FBX animation stays unchanged');
  assert(Number.isFinite(report.footPlant.left.maxHorizontalSpeedBodyHeightsPerSec));
 });
 test('different avatar scale yields comparable relative foot quality',()=>{
