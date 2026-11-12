@@ -47,7 +47,7 @@ assert.equal(result.motions[0].bpmMin,77,'BPM is never inferred');
 assert.equal(result.motions[0].bpmMax,145,'BPM max stays');
 assert.equal(result.motions[0].section,'hook','manual song section stays');
 assert.equal(result.motions[1].genre,'hardtekk');
-assert.equal(result.motions[1].category,'energetic','default inferred category may improve');
+assert.equal(result.motions[1].category,'other','category provenance unknown: do not overwrite');
 assert.equal(result.motions[2].genre,'rock','manual genre never overwritten');
 assert.equal(result.motions[3].genre,'','ambiguous remains untagged');
 assert.equal(result.motions[4].genre,'','other avatar remains untouched');
