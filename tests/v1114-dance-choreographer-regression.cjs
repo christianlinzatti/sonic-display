@@ -111,7 +111,7 @@ try {
   const run=(section,slot=0,patch={})=>stepCrew(newCrewState(),{...base,...patch,slot,
    modelId:CREW_IDS[slot],section}).plan;
   assert.equal(run('intro').clip,'Idle_Breathe');
-  assert.equal(run('verse',0).clip,'Dance_Groove'); // spotlight supports only the leading slot
+  assert.equal(run('verse',0).clip,'Dance_House'); // non-leading spotlight slot uses the deterministic groove/house support pool
   assert.equal(run('hook',0).clip,'Dance_House');
   assert.equal(run('hook',1).offset,-2);
   assert.equal(run('hook',2).offset,-4);
