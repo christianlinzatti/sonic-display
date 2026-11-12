@@ -47,6 +47,11 @@ test('all headliners load real clips in the intelligent rehearsal',async({page},
  // The 3D preview can reflow this settings group while models load.
  // Keyboard activation is a real accessible interaction, without force-click
  // or bypassing the button's handler/actionability.
+ // Start from a disabled crew so Enter must actually change persisted
+ // settings; merely focusing the button cannot satisfy the assertion.
+ const crewEnabled=box.getByLabel('Musiksteuerung für Sonic Stage Crew');
+ await crewEnabled.uncheck();
+ await expect(crewEnabled).not.toBeChecked();
  const activate=box.getByRole('button',{name:'Intelligente Show aktivieren',exact:true});
  await expect(activate).toBeEnabled();
  await activate.focus();
