@@ -25,6 +25,18 @@ test('true airborne foot travel is not flagged as planted',()=>{
  assert.equal(result.left.nearFloorPairs,0);
  assert.equal(result.left.possibleSlidePairs,0);
 });
+test('sparse near-floor samples remain inconclusive, not reassuring',()=>{
+ const mostlyAirborne=Array.from({length:15},(_,i)=>step(i*.05,
+   point(.04*i,i===0?0:.7),point(0,i===0?0:.7)));
+ const report=foot.inspectFootPlantQuality(mostlyAirborne,1.8);
+ assert.equal(report.left.observedPairs,14);
+ assert.equal(report.right.observedPairs,14);
+ assert.equal(report.left.nearFloorPairs,0);
+ assert.equal(report.right.nearFloorPairs,0);
+ assert.equal(report.status,'insufficient');
+ const tooShort=[step(0,point(0),point(0)),step(.05,point(0),point(0))];
+ assert.equal(foot.inspectFootPlantQuality(tooShort,1.8).status,'insufficient');
+});
 test('when no foot landmarks exist results remain unavailable',()=>{
  assert.equal(foot.inspectFootPlantQuality([{time:0},{time:.05}],1.8).status,'unavailable');
  assert.equal(foot.inspectFootPlantQuality(moving,NaN).status,'unavailable');
