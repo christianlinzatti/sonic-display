@@ -4,6 +4,8 @@ import {ENCORE_AVATARS_V1129} from '@/lib/musicPerformanceV1129';
 
 import {HEADLINERS_V1130} from '@/lib/showIntelligenceV1130';
 
+import {importedAvatarModels} from "./avatarModels.imported";
+
 export const defaultAvatarModels: AvatarModel[] = [
   { id: "procedural", label: "Procedural", url: null, preview: "/avatars/procedural-preview.svg", description: "Built-in animated character" },
   {
@@ -36,6 +38,7 @@ export const defaultAvatarModels: AvatarModel[] = [
     description:'Headliner mit eigenem Bühnenlook · 32 Animationen inklusive Power Hit, Ripple, Turnout & Stomp',
     genre:[...avatar.genres],tags:['GLB','32 Animationen','Headliner','Genre-Moves'],defaultDancePreset:avatar.preset,
   })),
+  ...importedAvatarModels,
   { id: "custom", label: "Custom GLTF", url: process.env.NEXT_PUBLIC_AVATAR_MODEL_URL || null, preview: "/avatars/custom-preview.svg", description: "Model configured with NEXT_PUBLIC_AVATAR_MODEL_URL" },
   { id: "neon", label: "Neon avatar", url: process.env.NEXT_PUBLIC_AVATAR_NEON_URL || null, preview: "/avatars/neon-preview.svg", description: "Optional second model" },
   { id: "festival", label: "Festival avatar", url: process.env.NEXT_PUBLIC_AVATAR_FESTIVAL_URL || null, preview: "/avatars/festival-preview.svg", description: "Optional third model" },

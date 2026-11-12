@@ -3963,3 +3963,7 @@ Low-GPU-Modus schalten die Zusatzregie weiterhin ab. V1127 liefert keine
 FPS-Garantie ohne Hardwaremessung. Lokal: `npm run test:v1127` und
 `npm run test:v1127:types`; vollständige Freigabe über GitHub Actions
 (Windows/Ubuntu/Next.js/Playwright) nach ZIP-Import.
+
+## Importierte Avatar-Galerie
+
+13 zusätzliche hochgeladene Avatare stehen unter **Einstellungen → Avatar → Avatar-Bibliothek** bereit. Nach **Importierte Avatare** filtern, ein Modell auswählen und seine eingebetteten Animationen im Dance Studio testen. Alle Modelle besitzen eigene 3D-Vorschaubilder; die Originaldateien bleiben erhalten. Details: [Importierte Avatar-Galerie](docs/versions/V1166-IMPORTIERTE-AVATAR-GALERIE.md).
