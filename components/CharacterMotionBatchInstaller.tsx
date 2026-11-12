@@ -35,6 +35,8 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
   const live=useRef(true);
   const [active,setActive]=useState<string>("");
   const [busy,setBusy]=useState(false);
+  const [importBusy,setImportBusy]=useState(false);
+  const importRunning=useRef(false);
   const [message,setMessage]=useState("");
   const [replace,setReplace]=useState(false);
   const [inspections,setInspections]=useState<Record<string,MotionInspection>>({});
@@ -89,21 +91,43 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
   }
   async function addFiles(files:FileList|null,kind:"character"|"motion"){
     if(!files||files.length===0)return;
-    const next:Item[]=Array.from(files).slice(0,30).map(file=>({id:crypto.randomUUID(),file,kind,url:URL.createObjectURL(file),error:"",installed:false,target:modelOptions[0]?.id||""}));
-    for(const item of next)ownedBlobUrls.current.set(item.id,item.url);
-    const {kept,evicted}=retainImportQueueV654(queueRef.current,next,60);
-    queueRef.current=kept;
-    setItems(kept);
-    releaseQueueEntries(evicted);
-    setActive(next[0]?.id||"");setShowOriginalV531(false);setMessage("");
-    // Only the JSON chunk is inspected; do not decode 3D meshes or textures here.
-    // Scan one file at a time to avoid holding 30 GLBs in memory simultaneously.
-    for (const item of next.filter(item=>item.kind==="character")) {
-      try {
-        const report=await inspectEmbeddedAvatarFileV529(item.file);
-        if(live.current&&ownedBlobUrls.current.has(item.id))setEmbeddedBundles(old=>({...old,[item.id]:report}));
-      } catch(error) { update(item.id,{error:error instanceof Error?error.message:"GLB-Analyse fehlgeschlagen"}); }
-    }
+    if(importRunning.current){setMessage("Ein Import läuft bereits. Bitte erst diesen abschließen.");return;}
+    importRunning.current=true;setImportBusy(true);setMessage("");
+    // Convert strictly one FBX at a time. A queue never holds a second raw FBX
+    // blob in memory, and the existing GLB inspection/install pipeline stays intact.
+    try{
+      const selected=Array.from(files).slice(0,30);
+      const ready:File[]=[];
+      const failures:string[]=[];
+      for(const original of selected){
+        if(!live.current)return;
+        try{
+          if(kind==="motion"&&/\\.fbx$/i.test(original.name)){
+            const {convertMixamoFbxToGlb}=await import("@/components/visualizer/mixamoFbxImporter");
+            ready.push(await convertMixamoFbxToGlb(original));
+          }else{
+            await validGLB(original);
+            ready.push(original);
+          }
+        }catch(error){failures.push(`${original.name}: ${error instanceof Error?error.message:"Datei nicht lesbar"}`);}
+      }
+      if(!live.current)return;
+      const next:Item[]=ready.map(file=>({id:crypto.randomUUID(),file,kind,url:URL.createObjectURL(file),error:"",installed:false,target:modelOptions[0]?.id||""}));
+      for(const item of next)ownedBlobUrls.current.set(item.id,item.url);
+      const {kept,evicted}=retainImportQueueV654(queueRef.current,next,60);
+      queueRef.current=kept;
+      setItems(kept);
+      releaseQueueEntries(evicted);
+      if(next.length){setActive(next[0].id);setShowOriginalV531(false);}
+      setMessage(failures.length?`${failures.length} Datei(en) nicht importiert: ${failures.slice(0,3).join(" | ")}`:"");
+      // Inspecting character GLB metadata is deliberately bounded and sequential.
+      for (const item of next.filter(item=>item.kind==="character")) {
+        try {
+          const report=await inspectEmbeddedAvatarFileV529(item.file);
+          if(live.current&&ownedBlobUrls.current.has(item.id))setEmbeddedBundles(old=>({...old,[item.id]:report}));
+        } catch(error) { update(item.id,{error:error instanceof Error?error.message:"GLB-Analyse fehlgeschlagen"}); }
+      }
+    }finally{importRunning.current=false;if(live.current)setImportBusy(false);}
   }
   async function inspect(item:Item){
     if(item.kind!=="motion")return;
@@ -211,7 +235,7 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
     return result.url;
   }
   async function install(){
-    if(!admin||busy||available.length===0)return;
+    if(!admin||busy||importBusy||available.length===0)return;
     setBusy(true);setMessage("");setSavedBytesV531(0);setSharedCountV531(0);setAddedClipsV533(0);setDuplicatesSkippedV535(0);
     let savedTotal=0,sharedTotal=0;let success=0;let failure=0;let clipsAdded=0;let duplicatesSkipped=0;
     // Canonical motion sources must already exist on the server, or have just been
@@ -325,7 +349,7 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
     <small>Standardmäßig werden die Original-GLBs vollständig gespeichert, damit die Vorschau unverändert bleibt. Bei aktivierter Optimierung wird die erste vollständige GLB zur gemeinsamen Quelle. Weitere passende Avatare werden beim Upload ohne redundante Animationen gespeichert; ihre Originaldateien bleiben unverändert. Die Quelle darf nicht gelöscht werden, solange andere Avatare darauf verweisen. Bereits früher installierte GLBs werden nicht rückwirkend verändert.</small>
     {sharedCountV531>0&&<p role="status">{sharedCountV531} gemeinsame Avatar-Zuordnungen · {(savedBytesV531/1048576).toFixed(2)} MB eingespart</p>}
     {!admin&&<p role="status">Zum Installieren bitte als Administrator anmelden.</p>}
-    <label>Charaktere (.glb) auswählen<input aria-label="Mehrere Charaktere auswählen" type="file" multiple accept=".glb,model/gltf-binary" onChange={e=>{void addFiles(e.target.files,"character");e.target.value="";}} /></label>
+    <label>Charaktere (.glb) auswählen<input aria-label="Mehrere Charaktere auswählen" type="file" multiple accept=".glb,model/gltf-binary" disabled={!admin||busy||importBusy} onChange={e=>{void addFiles(e.target.files,"character");e.target.value="";}} /></label>
     <div className="avatar-metadata-editor" aria-label="V533 Erweiterbare Motion-Bibliothek">
       <h4>V533 · Später weitere Animationen hinzufügen</h4>
       <label className="setting-check"><input type="checkbox" checked={appendMotionsV533} onChange={e=>setAppendMotionsV533(e.target.checked)}/> Motions nur zur Bibliothek hinzufügen, aktive Animation und vorhandene Choreografien beibehalten</label>
@@ -333,7 +357,13 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
       <small>Die Sammlung ist nicht auf die bisherigen 20 Animationen begrenzt. Bei zusätzlichem Bibliotheksimport bleibt die aktuell aktive Motion unverändert. Neue Bewegungen müssen vor der Nutzung im 3D-Viewer auf saubere Gelenke und Fußkontakt geprüft werden. Unterschiedliche Skelette sind nicht automatisch kompatibel.</small>
       {addedClipsV533>0&&<p role="status">{addedClipsV533} neue Clips zur Bibliothek hinzugefügt.</p>}
     </div>
-    <label>Motions (.glb) auswählen<input aria-label="Mehrere Motions auswählen" type="file" multiple accept=".glb,model/gltf-binary" onChange={e=>{void addFiles(e.target.files,"motion");e.target.value="";}} /></label>
+    <div className="avatar-metadata-editor" aria-label="Mixamo FBX Import">
+      <strong>Mixamo · FBX-Animationen importieren</strong>
+      <p>In <a href="https://www.mixamo.com/" target="_blank" rel="noopener noreferrer">Adobe Mixamo</a> eine Animation auswählen, als FBX herunterladen (am besten „Without Skin“) und hier hinzufügen. Sonic Display wandelt die Datei lokal im Browser in GLB um. Kein Adobe-Login in Sonic Display und kein automatischer Zugriff auf dein Mixamo-Konto.</p>
+      <small>FBX maximal 25 MB, GLB maximal 35 MB, bis zu 64 Clips. Danach „Clips und Rig prüfen“, die 3D-Vorschau kontrollieren und erst dann installieren. Die Umwandlung kann auf Raspberry Pi oder Mobilgeräten aufwendig sein; bei Bedarf am PC importieren.</small>
+    </div>
+    <label>Motions (.glb oder Mixamo .fbx) auswählen<input aria-label="Mehrere Motions auswählen" type="file" multiple accept=".glb,.fbx,model/gltf-binary" disabled={!admin||busy||importBusy} onChange={e=>{void addFiles(e.target.files,"motion");e.target.value="";}} /></label>
+    {importBusy&&<p role="status">Prüfe Dateien und konvertiere Mixamo-FBX lokal in GLB…</p>}
     {items.length>0&&<div className="avatar-library-grid">{items.map(item=><button key={item.id} type="button" className={`avatar-card ${active===item.id?"selected":""}`} onClick={()=>{setActive(item.id);setShowOriginalV531(false);}} aria-pressed={active===item.id}>
       <strong>{item.kind==="character"?"Charakter":"Motion"}: {item.file.name}</strong><small>{(item.file.size/1048576).toFixed(2)} MB</small><small>{item.installed?"✓ Installiert":item.error?`Fehler: ${item.error}`:item.kind==="character"&&embeddedBundles[item.id]?`${embeddedBundles[item.id].animations.length} eingebettete Clips · ${embeddedBundles[item.id].joints} Gelenke`:"Bereit zur Vorschau"}</small>
     </button>)}</div>}
