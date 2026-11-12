@@ -1,0 +1,59 @@
+# Mixamo-FBX-Integration in Sonic Display
+
+Sonic Display kann selbst heruntergeladene Mixamo-Animationen **direkt als FBX**
+in die vorhandene Character & Motion Library importieren. Eine manuelle
+Zwischenkonvertierung in Blender ist für Animations-FBX nicht mehr nötig.
+
+## Import
+
+1. Auf [Adobe Mixamo](https://www.mixamo.com/) im eigenen Konto einloggen,
+   eine Animation wählen und **FBX** herunterladen, nach Möglichkeit
+   **Without Skin** (nur Animation, kleinere Datei).
+2. Sonic Display → **Einstellungen → Avatare → Character & Motion Library**
+   öffnen, als Administrator anmelden und unter **Mixamo · FBX-Animationen
+   importieren** eine oder mehrere `.fbx` auswählen. Alternativ bietet der
+   einfache Motion Installer denselben Import.
+3. Die Datei wird **lokal im Browser** über Three.js FBXLoader zu einer GLB
+   konvertiert (max. 25 MB FBX; max. 35 MB erzeugte GLB; max. 64 Clips).
+   Die Konvertierung führt keine Netzwerkanfrage an Mixamo aus, verwendet
+   keine Adobe-Zugangsdaten und wird erst bei einer FBX-Auswahl geladen.
+4. **Ziel-Avatar** auswählen, **Clips und Rig prüfen** betätigen, den Clip
+   sowie Fußkontakt und Gelenke **im 3D-Viewer** prüfen.
+5. Im Batch Installer optional **Motions nur zur Bibliothek hinzufügen**
+   aktivieren, damit die bisherige aktive Motion unverändert bleibt. Danach
+   Installation bestätigen; die Clips werden in der bestehenden Motion Library
+   für Genre-/Songabschnitt-Zuordnungen angeboten.
+
+## Technik und Beschränkungen
+
+- Importierte FBX-Daten bleiben auf dem Gerät, bis der Nutzer einen regulären
+  GLB-Upload in die eigene Sonic-Display-Instanz auslöst.
+- Die erzeugte GLB enthält weiterhin die Ausgangshierarchie/Restpose für das
+  bereits implementierte namensbasierte Retargeting. Bei **Without Skin**
+  können die Knochen als reine animierte GLB-Knoten vorliegen; diese werden
+  beim Retargeting zur Quellrig-Erkennung berücksichtigt. Ziel-Avatare müssen
+  weiter ein echtes Skelett besitzen.
+- Beibehaltung der Sicherheitsregeln: Translationen/Root Motion und
+  unbekannte Knochen-Spuren werden beim Retargeting verworfen.
+  Mixamo-Motion-Capture ist nicht für beliebige andere Rigs garantiert passend.
+- FBX mit umfangreichen eingebetteten Texturen oder Meshes kann das 35-MB-GLB-
+  Limit überschreiten. Für Animationen **Without Skin** empfehlen. Für komplette
+  **FBX-Charaktere** bleibt der bisherige lokale Blender-Import maßgeblich.
+- Auf Vercel ist der **Upload einer erzeugten GLB** nur mit korrekt
+  konfiguriertem Vercel Blob möglich. Ohne Blob ist der serverseitige GLB-
+  Import weiterhin auf die lokale Entwicklungsumgebung beschränkt.
+- Eine echte Mixamo-API/Adobe-Konto-Synchronisierung wird nicht angeboten.
+  Es werden **keine** fremden Animationen mitgeliefert; für eigene Downloads,
+  Nutzung und Weitergabe gelten die jeweils aktuellen Anbieterbedingungen.
+- Auf Raspberry Pi und Smartphones kann das Konvertieren großer FBX-Dateien
+  viel Speicher beanspruchen. Am besten einmal am Desktop importieren.
+
+## Qualitätssicherung
+
+Die bestehende CI-Pipeline `Production & Playwright` führt
+`node tests/mixamo-fbx-import-regression.cjs` aus. Sie prüft die Einbindung,
+Upload-Grenzen und Retargeting von Animation-only-Szenen auf echte Avatar-Bones.
+Der normale TypeScript- und Production-Build bleibt ebenfalls aktiv.
+
+Der Integrationstest ersetzt keine Sichtprobe mit einer realen, selbst
+heruntergeladenen Mixamo-FBX auf dem jeweils gewählten Avatar.
