@@ -82,7 +82,7 @@ export function assessTargetRigFootQuality(
         ?"Mögliche Fußverschiebung am gewählten Ziel-Avatar: in der 3D-Vorschau kontrollieren."
         :footPlant.status==="no-obvious-slip"
           ?"Keine deutliche horizontale Fußverschiebung in den geschätzten Standphasen. Sichtprüfung bleibt nötig."
-          :"Zu wenige auswertbare Fußpositionen auf diesem Avatar.",
+          :"Zu wenige aussagekräftige Standkandidaten auf diesem Avatar; keine Bewertung der Fußstabilität möglich.",
       matchedTracks,skippedTracks,totalTracks,sampleCount:poses.length,footPlant,
     };
   }finally{
