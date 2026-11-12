@@ -44,7 +44,22 @@ test('all headliners load real clips in the intelligent rehearsal',async({page},
   await select.selectOption(id);
   await expect(select).toHaveValue(id);
  }
- await box.getByRole('button',{name:'Intelligente Show aktivieren',exact:true}).click();
+ // The 3D preview can reflow this settings group while models load.
+ // Keyboard activation is a real accessible interaction, without force-click
+ // or bypassing the button's handler/actionability.
+ // Start from a disabled crew so Enter must actually change persisted
+ // settings; merely focusing the button cannot satisfy the assertion.
+ const crewEnabled=box.getByLabel('Musiksteuerung für Sonic Stage Crew');
+ await crewEnabled.uncheck();
+ await expect(crewEnabled).not.toBeChecked();
+ const activate=box.getByRole('button',{name:'Intelligente Show aktivieren',exact:true});
+ await expect(activate).toBeEnabled();
+ await activate.focus();
+ await activate.press('Enter');
+ await expect.poll(()=>page.evaluate(()=>{
+  const raw=localStorage.getItem('sonic-stage-crew-v4');
+  return raw?JSON.parse(raw).enabled===true&&JSON.parse(raw).mode==='adaptive':false;
+ })).toBe(true);
  await box.getByRole('button',{name:'Show-Simulation öffnen',exact:true}).click();
  await box.getByLabel('Simulierter Abschnitt').selectOption('drop');
  await box.getByRole('button',{name:'Show-Simulation starten',exact:true}).click();

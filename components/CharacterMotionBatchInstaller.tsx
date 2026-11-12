@@ -11,6 +11,9 @@ import { inspectMotion, isolateMotionClip, type MotionInspection, inspectSelecte
 import {duplicateInAvatarV535,suggestMotionCategoryV535,MOTION_CATEGORY_LABELS_V535} from "@/components/visualizer/motionLibraryIntelligenceV535";
 import type { ClipQualityReport } from "@/components/visualizer/glbMotionQualityAnalyzer";
 import { inspectAdvancedMotionV534, type AdvancedMotionReportV534 } from "@/components/visualizer/motionQualitySamplerV534";
+import type {TargetRigFootReview} from "@/components/visualizer/retargetedFootQualityPhase1";
+import {suggestFootLockFromQualityV322} from "@/components/visualizer/footLockReviewSuggestionsV322";
+import {readFootLockV322,refreshFootLockV322,writeFootLockV322} from "@/components/visualizer/intelligentFootLockV322";
 import { VisualDanceReviewPanelV589 } from "@/components/visualizer/VisualDanceReviewPanelV589";
 import { planAdditionalMotionClipsV533, validateMotionAssignmentV533, explainAdditionalMotionQualityV533 } from "@/components/visualizer/expandableMotionLibraryV533";
 import { inspectSharedMotionV531, stripDuplicateAnimationsV531, sameSharedMotionV531, type MotionIdentityV531 } from "@/components/visualizer/sharedEmbeddedMotionV531";
@@ -52,9 +55,12 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
   const [addedClipsV533,setAddedClipsV533]=useState(0);
   const [qualityReportsV533,setQualityReportsV533]=useState<Record<string,ClipQualityReport>>({});
   const [qualityBusyV533,setQualityBusyV533]=useState(false);
-  // V534: reports are keyed by GLB + selected clip + optional following clip.
-  const [advancedReportsV534,setAdvancedReportsV534]=useState<Record<string,AdvancedMotionReportV534>>({});
+  // Reports are scoped to selected clip, following clip AND target avatar.
+  const [advancedReportsV534,setAdvancedReportsV534]=useState<Record<string,AdvancedMotionReportV534 & {targetRig?:TargetRigFootReview;targetRigError?:string}>>({});
   const [advancedBusyV534,setAdvancedBusyV534]=useState(false);
+  // Review and global V322 settings are never changed by sampling alone.
+  const [footLockReviewConfirmedV322,setFootLockReviewConfirmedV322]=useState("");
+  const [footLockAppliedNoteV322,setFootLockAppliedNoteV322]=useState<{key:string;text:string}|null>(null);
   const [nextClipV534,setNextClipV534]=useState<Record<string,number>>({});
   const [previewSeekV534,setPreviewSeekV534]=useState<{seconds:number;seq:number}|undefined>();
   const [shareMotionsV531,setShareMotionsV531]=useState(false);
@@ -154,23 +160,55 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
     }catch(error){setMessage(error instanceof Error?error.message:"Qualitätsanalyse fehlgeschlagen");}
     finally{setQualityBusyV533(false);}
   }
-  const advancedKeyV534=(item:Item)=>`${item.id}:${clipIndices[item.id]??0}:${nextClipV534[item.id]??-1}`;
+  const advancedKeyV534=(item:Item)=>`${item.id}:${clipIndices[item.id]??0}:${nextClipV534[item.id]??-1}:${item.kind==="motion"?item.target:"original"}`;
   async function inspectAdvancedV534(item:Item){
     if(advancedBusyV534||busy)return;
     const index=clipIndices[item.id]??0;
     const following=nextClipV534[item.id];
-    setAdvancedBusyV534(true);setMessage("");
+    setAdvancedBusyV534(true);setMessage("");setFootLockReviewConfirmedV322("");
     try {
-      // Inspect the original GLB, not a modified asset. For separate motion GLBs
-      // these are source-rig diagnostics; final retarget quality is only visual.
+      // Source analysis is unchanged. The optional target review uses a private
+      // avatar rig, the existing retargeter and a separate short-lived mixer.
       const report=await inspectAdvancedMotionV534(item.url,index,following,item.kind==="character"?"original-glb":"separate-motion-glb");
-      if(ownedBlobUrls.current.has(item.id))setAdvancedReportsV534(old=>({...old,[advancedKeyV534(item)]:report}));
+      let targetRig:TargetRigFootReview|undefined;
+      let targetRigError:string|undefined;
+      const avatarUrl=item.kind==="motion"?modelOptions.find(m=>m.id===item.target)?.url:undefined;
+      if(avatarUrl){
+        try{
+          const {inspectTargetRigFootQuality}=await import("@/components/visualizer/retargetedFootQualityPhase1");
+          targetRig=await inspectTargetRigFootQuality(item.url,avatarUrl,index);
+        }catch(error){
+          targetRigError=error instanceof Error?error.message:"Ziel-Avatar konnte nicht geprüft werden.";
+        }
+      }
+      if(ownedBlobUrls.current.has(item.id))setAdvancedReportsV534(old=>({
+        ...old,[advancedKeyV534(item)]:{...report,targetRig,targetRigError}
+      }));
     }catch(error){setMessage(error instanceof Error?error.message:"Erweiterte Bewegungsanalyse fehlgeschlagen");}
     finally{setAdvancedBusyV534(false);}
+  }
+  function applyFootLockSuggestionV322(item:Item,targetRig:TargetRigFootReview){
+    const key=advancedKeyV534(item);
+    // Global opt-in requires both a valid retargeted report AND an explicit
+    // per-review confirmation. Re-read settings to honor external/manual edits.
+    if(footLockReviewConfirmedV322!==key||targetRig.status!=="analyzed")return;
+    const now=refreshFootLockV322();
+    const proposed=suggestFootLockFromQualityV322(targetRig.footPlant,now);
+    if(!proposed||!proposed.changeRequired)return;
+    // Never switch Foot Lock on: user must activate it in Stage Director.
+    writeFootLockV322({...proposed.settings,enabled:now.enabled});
+    setFootLockReviewConfirmedV322("");
+    setFootLockAppliedNoteV322({key,text:
+      "Konservative globale V322-Werte gespeichert. V322 ist danach weiterhin "+
+      (now.enabled?"eingeschaltet":"ausgeschaltet")+". Im Stage Director kannst du diese Einstellungen jederzeit ändern oder zurücksetzen."});
   }
   function advancedPanelV534(item:Item,clipNames:readonly string[]){
     const report=advancedReportsV534[advancedKeyV534(item)];
     const selected=clipIndices[item.id]??0;
+    const reviewKey=advancedKeyV534(item);
+    const suggestion=report?.targetRig?.status==="analyzed"
+      ?suggestFootLockFromQualityV322(report.targetRig.footPlant,readFootLockV322()):null;
+    const footLockConfirmed=footLockReviewConfirmedV322===reviewKey;
     return <div className="avatar-metadata-editor" aria-label="V534 Advanced Motion Quality Inspector">
       <strong>V534 · Advanced Motion Quality Inspector</strong>
       <p>Analysiert tatsächliche GLB-Skelettpositionen, Gelenkkurven und optional den Übergang zum nächsten Clip. Keine Änderung der Original-GLB.</p>
@@ -186,6 +224,38 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
         <p>{report.pose.samples} ausgewertete Posen · {report.pose.footSamples} Fußvergleiche · {report.keyframes.sampledTracks} Animationskanäle · {report.curveEvents.length} Kurvenhinweise</p>
         {report.pose.contactAssumption==="unavailable"&&<p>Kein vergleichbarer Fußknochen vorhanden – keine Aussage über Fußkontakt möglich.</p>}
         {report.pose.contactAssumption!=="unavailable"&&<p>Mögliche Fußrutscher: {report.pose.potentialSlideIntervals} · Auffällige Hüftbewegungen: {report.pose.rootJumps}</p>}
+        <fieldset aria-label="Fußstabilität: geschätzte Standphasen">
+          <legend>Foot Stability Check · Phase 1</legend>
+          {report.footPlant.status==="unavailable"||report.footPlant.status==="insufficient"
+            ?<p>Zu wenige verlässliche Standkandidaten für eine Aussage zur Fußstabilität.</p>
+            :<><p>{report.footPlant.status==="inspect"?"Verdächtige Bodenverschiebung – in der Vorschau überprüfen.":"Keine auffällige seitliche Fußverschiebung in den untersuchten Standkandidaten."}</p>
+              {(["left","right"] as const).map(side=><p key={side}><strong>{side==="left"?"Links":"Rechts"}:</strong> {report.footPlant[side].nearFloorSeconds.toFixed(2)} s mögliche Standphase · {report.footPlant[side].possibleSlidePairs} verdächtige Intervalle · {report.footPlant[side].possibleSlideSeconds.toFixed(2)} s mögliche Verschiebung</p>)}
+            </>}
+          <small>Nur Schätzung aus aufeinanderfolgenden Weltpositionen und der tiefsten abgetasteten Fußhöhe, keine echte Bodenberührung. Die Analyse verändert weder Clip noch Foot-IK.</small>
+        </fieldset>
+        {item.kind==="motion"&&<fieldset aria-label="Ziel-Avatar nach Retargeting prüfen">
+          <legend>Ziel-Avatar · Foot Stability Check</legend>
+          {report.targetRig?<>
+            <p>{report.targetRig.explanation}</p>
+            <p>{report.targetRig.matchedTracks} von {report.targetRig.totalTracks} Skelett-Spuren zugeordnet · {report.targetRig.sampleCount} Posen geprüft.</p>
+            {(["left","right"] as const).map(side=><p key={side}><strong>{side==="left"?"Links":"Rechts"}:</strong> {report.targetRig!.footPlant[side].nearFloorSeconds.toFixed(2)} s mögliche Standphase · {report.targetRig!.footPlant[side].possibleSlidePairs} verdächtige Intervalle</p>)}
+          </>:<p>{report.targetRigError||"Kein Ziel-Avatar für diese Prüfung ausgewählt."}</p>}
+          <small>Die Prüfung verwendet eine temporäre Avatar-GLB mit den retargeteten Rotationen. Ohne kompatible Knochen bleibt sie unverfügbar. Foot-IK, GLB-Originaldateien und die Konzertbühne werden nicht verändert.</small>
+          {report.targetRig?.status==="analyzed"&&<div aria-label="Empfehlung für vorhandene Foot-Lock-Einstellungen">
+            <strong>V322 · Vorschlag für Fußverankerung (optional)</strong>
+            {suggestion?<><p>{suggestion.explanation}</p>
+              <p>{suggestion.suspectedIntervals} auffällige von {suggestion.observedNearFloorIntervals} geschätzten Standintervallen. Vorschlag: Stärke {suggestion.settings.anchorStrength} %, Loslösen {suggestion.settings.releaseSpeed} %, Korrektur maximal {suggestion.settings.maxCorrectionCm} cm.</p>
+              {suggestion.changeRequired?<><label className="setting-check">
+                <input type="checkbox" checked={footLockConfirmed} onChange={e=>setFootLockReviewConfirmedV322(e.target.checked?reviewKey:"")}/>
+                Ich habe die Bewegung im 3D-Viewer geprüft und möchte die globalen V322-Werte anpassen.
+              </label>
+              <button type="button" disabled={!footLockConfirmed||advancedBusyV534||busy}
+                onClick={()=>applyFootLockSuggestionV322(item,report.targetRig!)}>Globale Foot-Lock-Werte übernehmen (nicht automatisch aktivieren)</button>
+              </>:<p>Die vorhandenen V322-Einstellungen liegen bereits im empfohlenen konservativen Bereich.</p>}
+            </>:<p>Keine ausreichend belastbare Auffälligkeit für eine Einstellungsempfehlung. Bitte die Bewegung visuell überprüfen.</p>}
+            {footLockAppliedNoteV322?.key===reviewKey&&<p role="status">{footLockAppliedNoteV322.text}</p>}
+          </div>}
+        </fieldset>}
         {report.transition&&<p>Übergang zu <strong>{report.transitionTo}</strong>: {report.transition.note} Vorschlag für Crossfade: {report.transition.recommendedCrossfadeSeconds.toFixed(2)} s.{report.transitionCurveDegrees!==null?` Durchschnittliche lokale Gelenkrotation: ${report.transitionCurveDegrees}°.`:""}</p>}
         {(report.pose.findings.length>0||report.curveEvents.length>0)&&<ul>
           {report.pose.findings.slice(0,5).map((finding,i)=><li key={`p-${i}`}><button type="button" onClick={()=>setPreviewSeekV534(old=>({seconds:finding.atSeconds,seq:(old?.seq??0)+1}))}>Bei {finding.atSeconds.toFixed(2)} s ansehen</button> {finding.label} – {finding.explanation}</li>)}
@@ -195,7 +265,7 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
           durationSeconds={item.kind==='motion'?inspections[item.id]?.durations[selected]??0:embeddedBundles[item.id]?.animations[selected]?.durationSeconds??0}
           hasFollowingClip={!!report.transition} sourceLabel={item.file.name}
           onSeek={seconds=>setPreviewSeekV534(old=>({seconds,seq:(old?.seq??0)+1}))}/>
-        <small>Die zeitlichen Markierungen springen in der 3D-Vorschau zum betreffenden Bild. „Am Boden“ wird nur aus der tiefsten Fußposition geschätzt, nicht durch eine Kontaktmessung erkannt. Der Inspector bewertet weder die Hautverformung noch die visuelle Ästhetik und führt keine Reparatur durch. Bei externen Motions wird das Quell-Skelett geprüft, nicht das spätere Retargeting.</small>
+        <small>Die zeitlichen Markierungen springen in der 3D-Vorschau zum betreffenden Bild. „Am Boden“ wird nur aus der tiefsten Fußposition geschätzt, nicht durch eine Kontaktmessung erkannt. Der Inspector bewertet weder die Hautverformung noch die visuelle Ästhetik und führt keine Reparatur durch. Quell-Skelett und Ziel-Avatar werden getrennt ausgewertet.</small>
       </div>}
     </div>;
   }

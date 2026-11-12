@@ -25,7 +25,11 @@ test('creative direction develops real contrasting body motifs and reunites the 
  await crew.getByRole('button',{name:'Show-Simulation pausieren',exact:true}).click();
  const slider=crew.getByLabel('Simulierte Position');
  const seek=async seconds=>{
-  await slider.focus();await slider.press('Home');await slider.press('ArrowRight');
+  await slider.focus();await slider.press('Home');
+  // The controlled React range must commit Home before ArrowRight; otherwise
+  // a rapidly batched input can be computed from the previous simulation time.
+  await expect(slider).toHaveValue('0');
+  await slider.press('ArrowRight');
   await expect(slider).toHaveValue('1');
   await expect.poll(()=>rows.evaluateAll(items=>items.every(item=>Math.abs(Number(item.dataset.clipTime)-1)<.01))).toBe(true);
   await slider.press('Home');await expect(slider).toHaveValue('0');
