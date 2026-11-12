@@ -162,6 +162,15 @@ export function CharacterMotionBatchInstaller({admin,blobEnabled,models,preferen
         <p>{report.pose.samples} ausgewertete Posen · {report.pose.footSamples} Fußvergleiche · {report.keyframes.sampledTracks} Animationskanäle · {report.curveEvents.length} Kurvenhinweise</p>
         {report.pose.contactAssumption==="unavailable"&&<p>Kein vergleichbarer Fußknochen vorhanden – keine Aussage über Fußkontakt möglich.</p>}
         {report.pose.contactAssumption!=="unavailable"&&<p>Mögliche Fußrutscher: {report.pose.potentialSlideIntervals} · Auffällige Hüftbewegungen: {report.pose.rootJumps}</p>}
+        <fieldset aria-label="Fußstabilität: geschätzte Standphasen">
+          <legend>Foot Stability Check · Phase 1</legend>
+          {report.footPlant.status==="unavailable"||report.footPlant.status==="insufficient"
+            ?<p>Keine verlässlichen aufeinanderfolgenden Fußpositionen auswertbar.</p>
+            :<><p>{report.footPlant.status==="inspect"?"Verdächtige Bodenverschiebung – in der Vorschau überprüfen.":"Keine auffällige seitliche Fußverschiebung in den untersuchten Standkandidaten."}</p>
+              {(["left","right"] as const).map(side=><p key={side}><strong>{side==="left"?"Links":"Rechts"}:</strong> {report.footPlant[side].nearFloorSeconds.toFixed(2)} s mögliche Standphase · {report.footPlant[side].possibleSlidePairs} verdächtige Intervalle · {report.footPlant[side].possibleSlideSeconds.toFixed(2)} s mögliche Verschiebung</p>)}
+            </>}
+          <small>Nur Schätzung aus aufeinanderfolgenden Weltpositionen und der tiefsten abgetasteten Fußhöhe, keine echte Bodenberührung. Die Analyse verändert weder Clip noch Foot-IK.</small>
+        </fieldset>
         {report.transition&&<p>Übergang zu <strong>{report.transitionTo}</strong>: {report.transition.note} Vorschlag für Crossfade: {report.transition.recommendedCrossfadeSeconds.toFixed(2)} s.{report.transitionCurveDegrees!==null?` Durchschnittliche lokale Gelenkrotation: ${report.transitionCurveDegrees}°.`:""}</p>}
         {(report.pose.findings.length>0||report.curveEvents.length>0)&&<ul>
           {report.pose.findings.slice(0,5).map((finding,i)=><li key={`p-${i}`}><button type="button" onClick={()=>setPreviewSeekV534(old=>({seconds:finding.atSeconds,seq:(old?.seq??0)+1}))}>Bei {finding.atSeconds.toFixed(2)} s ansehen</button> {finding.label} – {finding.explanation}</li>)}
