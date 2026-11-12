@@ -2,6 +2,7 @@ import type {CharacterMotionStore,InstalledCharacterMotion} from "./characterMot
 import type {MotionFeaturesV439} from "./glbMotionAnalyzerV439";
 import {danceSectionAt,danceSlot,emptyDanceSequence} from "./intelligentDanceCombinationV242";
 import type {DanceSection,DanceSequenceState} from "./intelligentDanceCombinationV242";
+import {mixamoGenreBias,type MixamoGenreFamily} from "./mixamoMotionDirector";
 
 export type MotionSceneV438="verse"|"hook"|"reply"|"duet"|"build"|"drop"|"break";
 export interface MotionProfileV438{
@@ -17,7 +18,7 @@ const bounded=(v:number,low:number,high:number)=>Math.max(low,Math.min(high,v));
 const hook=/\b(hook|refrain|chorus|singalong|anthem|hymne)\b/iu;
 const calm=/\b(idle|rest|relax|slow|soft|sway|chill|lofi|lo-fi|head\s?nod|nod|ruhig|break|intro|outro)\b/iu;
 const groove=/\b(rap|hip.?hop|groove|bounce|flow|step|walk|shuffle|krump|popping|freestyle|bop|verse|verse1)\b/iu;
-const intense=/\b(fast|strong|hard|jump|stomp|kick|power|energetic|energetisch|drop|intense|wild|tekk|rave|speed)\b/iu;
+const intense=/\b(fast|strong|hard|jump|stomp|kick|power|energetic|energetisch|drop|intense|wild|tekk|rave|speed|hakken|hakkuh|footwork|gabber|jumpstyle|rawstyle)\b/iu;
 const group=/\b(duet|duo|partner|group|sync|ensemble|mirror|pair)\b/iu;
 
 /** Cheap, offline motion *metadata* classification; no claim of 3D skeleton inspection. */
@@ -74,6 +75,10 @@ export function nextAutomaticRapShowV438(state:DanceSequenceState,store:Characte
   }
   const bpm=finite(input.bpm,0),energy=bounded(finite(input.energy,.5),0,1),variety=bounded(finite(input.variety,70),0,100)/100;
   const genre=input.genre.toLowerCase();
+  const family:MixamoGenreFamily=/hardtekk|tekk|tekno/.test(genre)?"hardtekk":
+    /hardstyle|rawstyle|jumpstyle/.test(genre)?"hardstyle":
+    /deutschrap|hip.?hop|rap|trap|drill/.test(genre)?"rap":"general";
+  const phase=section==="break"?"quiet":section==="build"?"verse":section;
   const eligible=store.motions.filter(m=>m.avatarId===input.avatarId&&
     (!m.genre||m.genre.toLowerCase()===genre||genre===""||genre==="unknown")&&
     (bpm<=0||(bpm>=m.bpmMin&&bpm<=m.bpmMax)));
@@ -91,7 +96,7 @@ export function nextAutomaticRapShowV438(state:DanceSequenceState,store:Characte
     const genreScore=m.genre?10:0;
     const repetitionPenalty=(recent.includes(m.id)?24:0)*variety+(previous===m.id?21:0)*variety;
     // Explicit incompatibilities never receive an artificially high score.
-    return {motion:m,profile,score:sceneScore+energyScore+bpmScore+genreScore-repetitionPenalty-(m.id===input.avoidMotionId&&!exact?24:0)};
+    return {motion:m,profile,score:sceneScore+energyScore+bpmScore+genreScore-repetitionPenalty-(m.id===input.avoidMotionId&&!exact?24:0)+mixamoGenreBias(m.name,family,phase,energy)};
   }).sort((a,b)=>b.score-a.score||a.motion.id.localeCompare(b.motion.id));
   const top=ranked[0];
   const cap=Math.min(4,Math.max(1,eligible.length-1));

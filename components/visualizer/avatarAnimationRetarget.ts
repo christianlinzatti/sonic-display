@@ -73,6 +73,13 @@ export function retargetHumanoidClips(
   clips: readonly AnimationClip[], sourceScene: Object3D, targetScene: Object3D, calibration: RetargetCalibration = defaultCalibration(),
 ): { clips: AnimationClip[]; report: RetargetReport } {
   const sourceBones = bonesByName(sourceScene);
+  // Mixamo "Without Skin" FBX exports animation nodes but no skinned mesh.
+  // After GLB conversion those nodes may load as Object3D rather than Bone.
+  // Only use named humanoid nodes when there are no actual source bones;
+  // the target still requires real Bones and the existing conservative mapping.
+  if (!sourceBones.size) sourceScene.traverse(object => {
+    if (object.name && semantic(object.name)) sourceBones.set(object.name, object as Bone);
+  });
   const targetBones = bonesByName(targetScene);
   const targetBySemantic = new Map<string, Bone>();
   for (const bone of targetBones.values()) {

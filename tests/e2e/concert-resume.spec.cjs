@@ -30,7 +30,20 @@ for(const viewport of [{width:390,height:844},{width:844,height:390}])test(`phon
  const lyricPayload={provider:'spotify',synced:true,plainText:text,lines:Array.from({length:28},(_,i)=>({startMs:i*4000,endMs:(i+1)*4000,text}))};
  await installConcertMocksV1130(page,{position:10000,playing:true,advancing:false,genre:'hip-hop',durationMs:120000,lyricPayload});await seed(page);await page.goto('/');await page.getByRole('button',{name:'Konzertmodus starten',exact:true}).click();await loaded(page);
  const region=page.getByRole('region',{name:'Songtext',exact:true});await expect(region).toHaveAttribute('data-lyric-presentation','rap');
- const stage=await page.locator('.immersive-stage').boundingBox(),lane=await region.boundingBox(),line=await region.locator('.lyric.active').boundingBox(),exit=await page.getByRole('button',{name:'Konzertmodus verlassen',exact:true}).boundingBox();
+ // React may paint the lyric lane before the active line has its first
+ // visible layout box. Poll the actual geometry (no fixed sleep), and keep
+ // the existing strict mobile clipping/exit-control assertions below.
+ let boxes;
+ await expect.poll(async()=>{
+  boxes=await Promise.all([
+   page.locator('.immersive-stage').boundingBox(),
+   region.boundingBox(),
+   region.locator('.lyric.active').boundingBox(),
+   page.getByRole('button',{name:'Konzertmodus verlassen',exact:true}).boundingBox(),
+  ]);
+  return boxes.every(rect=>rect!==null&&rect.width>0&&rect.height>0);
+ },{timeout:15000,message:'Phone concert must expose a visible stage, lyric lane, active lyric and exit control'}).toBe(true);
+ const [stage,lane,line,exit]=boxes;
  expect(stage.y+stage.height).toBeLessThanOrEqual(lane.y+2);expect(lane.y+lane.height).toBeLessThanOrEqual(viewport.height);expect(line.x).toBeGreaterThanOrEqual(lane.x);expect(line.x+line.width).toBeLessThanOrEqual(lane.x+lane.width+1);expect(line.y).toBeGreaterThanOrEqual(lane.y);expect(line.y+line.height).toBeLessThanOrEqual(lane.y+lane.height+1);expect(exit.x).toBeGreaterThanOrEqual(0);expect(exit.y+exit.height).toBeLessThan(lane.y);
  await expect(page.locator('.concert-presentation [data-v441-slot]').first()).not.toBeVisible();
  await testInfo.attach('phone-concert',{body:await page.screenshot(),contentType:'image/png'});await page.getByRole('button',{name:'Konzertmodus verlassen',exact:true}).click();

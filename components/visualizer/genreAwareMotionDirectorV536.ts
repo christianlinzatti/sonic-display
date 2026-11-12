@@ -1,12 +1,19 @@
 /** V536: deterministic, allocation-bounded genre director over ALREADY AVAILABLE actions.
  * Takes optional V535 metadata, never creates or rewrites a clip/GLB, never infers the singer.
  */
+import {mixamoGenreBias,isMixamoMotion} from "./mixamoMotionDirector";
+import {mixamoShowCue,mixamoShowCueBias} from "./mixamoShowChoreography";
+
 export type GenreMotionCategoryV536 = 'idle' | 'rap' | 'dance' | 'energetic' | 'gesture' | 'locomotion' | 'other';
 export type GenreMotionCandidateV536 = {
   name: string; label: string; duration: number; trackCount: number;
   source: 'embedded' | 'shared' | 'library';
   category: GenreMotionCategoryV536;
   favorite?: boolean;
+  // Optional user-defined eligibility from the existing Motion Library.
+  // Embedded/shared clips have no such metadata and keep legacy behavior.
+  taggedGenre?: string; bpmMin?: number; bpmMax?: number;
+  assignedSection?: 'any'|'build'|'drop'|'verse'|'hook';
 };
 export type GenreMotionInputV536 = {
   clips: readonly GenreMotionCandidateV536[];
@@ -14,7 +21,7 @@ export type GenreMotionInputV536 = {
   progressMs: number | null | undefined;
   section: string | null | undefined; genre: string | null | undefined;
   bpm: number | null | undefined; energy: number | null | undefined;
-  slot: number; playing: boolean; reducedMotion: boolean; manualPriority: boolean;
+  slot: number; ensembleCount?: number; playing: boolean; reducedMotion: boolean; manualPriority: boolean;
 };
 export type GenreMotionStateV536 = {
   trackId: string; modelKey: string; selectedName: string | null;
@@ -57,19 +64,44 @@ export function validGenreCandidateV536(c:GenreMotionCandidateV536):boolean {
     (c.source==='embedded'||c.source==='shared'||c.source==='library');
 }
 const norm=(value:string)=>value.toLowerCase().replace(/[\s_-]+/g,'');
+/** Never let automatic V536 selection bypass the user's library constraints. */
+export function libraryMotionEligibleV536(c:GenreMotionCandidateV536,input:Pick<GenreMotionInputV536,'bpm'|'genre'|'section'>):boolean {
+  if(c.source!=='library')return true;
+  const bpm=input.bpm;
+  if(typeof bpm==='number'&&Number.isFinite(bpm)){
+    if(typeof c.bpmMin==='number'&&Number.isFinite(c.bpmMin)&&bpm<c.bpmMin)return false;
+    if(typeof c.bpmMax==='number'&&Number.isFinite(c.bpmMax)&&bpm>c.bpmMax)return false;
+  }
+  const tag=c.taggedGenre?.trim();
+  if(tag){
+    const wanted=motionFamilyV536(input.genre),configured=motionFamilyV536(tag);
+    if(wanted!==configured)return false;
+    if(configured==='general'&&tag.toLowerCase()!==(input.genre??'').trim().toLowerCase())return false;
+  }
+  const assigned=c.assignedSection;
+  if(assigned&&assigned!=='any'){
+    const section=(input.section??'').toLowerCase();
+    const current=/(?:build|pre.?drop)/.test(section)?'build':
+      /(?:drop|climax|peak)/.test(section)?'drop':
+      /(?:hook|chorus|refrain)/.test(section)?'hook':
+      /(?:intro|outro|break|bridge|ambient|quiet|interlude|pause)/.test(section)?'quiet':'verse';
+    if(assigned!==current&&!(assigned==='verse'&&current==='hook'))return false;
+  }
+  return true;
+}
 export type RankedGenreMotionV536={name:string;score:number};
 /** Evaluate a short, already-loaded list; name tokens are hints only, library category overrides name heuristic. */
 export function rankGenreMotionsV536(input:GenreMotionInputV536,phrase:string,recent:readonly string[]=[]):RankedGenreMotionV536[] {
   const section=motionSectionV536(input.section),family=motionFamilyV536(input.genre);
   const energy=clamp(input.energy,.5,0,1),slot=Math.floor(clamp(input.slot,0,0,15));
   const seen=new Set<string>();
-  return input.clips.filter(c=>validGenreCandidateV536(c)&&!seen.has(c.name)&&!!seen.add(c.name))
+  return input.clips.filter(c=>validGenreCandidateV536(c)&&libraryMotionEligibleV536(c,input)&&!seen.has(c.name)&&!!seen.add(c.name))
     .map(c=>{
       const n=norm(c.label),category=c.category;
       const idle=category==='idle'||/idle|breath|standby/.test(n);
       const rap=category==='rap'||/rap|twostep|fingerflow|headnod|shoulderroll/.test(n);
       const dance=category==='dance'||/dance|groove|bounce|sidestep|shuffle|sway|roll/.test(n);
-      const energetic=category==='energetic'||/stomp|jump|armsup|punch|hardtekk|hardstyle|rawstyle/.test(n);
+      const energetic=category==='energetic'||/stomp|jump|armsup|punch|hardtekk|hardstyle|rawstyle|hakken|hakkuh|footwork|gabber/.test(n);
       const gesture=category==='gesture'||/gesture|point|finger|nod|shoulder/.test(n);
       let score=0;
       if(section==='quiet')score+=idle?6:dance?1:gesture?.7:-.3;
@@ -84,7 +116,7 @@ export function rankGenreMotionsV536(input:GenreMotionInputV536,phrase:string,re
       if(family==='hardstyle'||family==='hardtekk') {
         if(energetic)score+=section==='drop'?3.5:section==='hook'?2.1:energy>.75?1.1:0;
         if(dance&&section==='verse')score+=1.2;
-        if(family==='hardtekk'&&/tekk|shuffle|bounce|step/.test(n))score+=1.2;
+        if(family==='hardtekk'&&/tekk|hakken|hakkuh|footwork|gabber|shuffle|bounce|step/.test(n))score+=1.2;
         if(family==='hardstyle'&&/stomp|jump|hardstyle|armsup/.test(n))score+=.95;
       }
       // V666: Rock and Pop must not fall back to the same generic choreography.
@@ -107,10 +139,21 @@ export function rankGenreMotionsV536(input:GenreMotionInputV536,phrase:string,re
       if(energy>.78&&energetic&&section!=='quiet')score+=.8;
       if(c.favorite)score+=.7; // never overrules gross genre/section incompatibility
       if(c.source==='library')score+=.12; // tiny tie-break: favor added repertoire
+      // Mixamo-only hints supplement V536's existing category, section, and
+      // history scoring; never override manual selection or rig eligibility.
+      score+=mixamoGenreBias(c.label,family,section,energy);
+      // Section-specific Mixamo show cues; only real, loaded library actions.
+      // Hard eligibility, user-defined metadata and manual ownership stay above this preference.
+      if(c.source==="library")score+=mixamoShowCueBias({name:c.label,family,section:input.section,energy,slot,ensembleCount:input.ensembleCount??1});
       const wasRecent=recent.lastIndexOf(c.name);
       if(wasRecent>=0)score-=wasRecent===recent.length-1?2.5:1.1;
       // Stable per musical phrase and avatar slot, not per render/frame.
-      score+=(hash(`${input.trackId}:${input.modelKey}:${phrase}:${slot}:${c.name}`)%997)/997*.82;
+      const together=c.source==="library"&&isMixamoMotion(c.label)&&mixamoShowCue(input.section,slot,input.ensembleCount??1).commonPhrase;
+      // Dancers sharing a model/library use identical phrase tie-breaks on
+      // hook/drop, while verses retain per-performer variety. User group-clock
+      // and manually authored timing are still managed by V328/V327/V492.
+      const performerSeed=together?"ensemble":String(slot);
+      score+=(hash(`${input.trackId}:${input.modelKey}:${phrase}:${performerSeed}:${c.name}`)%997)/997*.82;
       return {name:c.name,score};
     }).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name));
 }

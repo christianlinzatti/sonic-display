@@ -16,6 +16,7 @@ import { MusicStructureTimelineDirector } from "@/components/visualizer/MusicStr
 import { MotionTransitionStudio } from "@/components/visualizer/MotionTransitionStudio";
 import { AvatarPreview3D } from "@/components/visualizer/AvatarPreview3D";
 import type {AvatarModel} from "@/components/visualizer/avatarModels";
+import {suggestMixamoMotionTags,applyMixamoTagSuggestions} from "@/components/visualizer/mixamoTagSuggestions";
 import type {UiPreferences} from "@/types/music";
 import {CHARACTER_MOTION_CHANGE_EVENT,loadCharacterMotionStore,saveCharacterMotionStore,type CharacterMotionStore} from "@/components/visualizer/characterMotionLibrary";
 const genres=["","deutschrap","hardtekk","hardstyle","techno","hip-hop","rock","ambient","pop","other"];
@@ -44,6 +45,15 @@ export function CharacterMotionLibraryPanel({models,preferences,admin}:{models:A
  const model=models.find(m=>m.id===avatar);const motions=store.motions.filter(m=>m.avatarId===avatar);
  const visibleMotionsV535=filterMotionsV535(motions,{avatarId:avatar,search:searchV535,category:categoryV535,favoritesOnly:favoritesOnlyV535});
  const duplicatesV535=countKnownDuplicatesV535(motions,avatar);
+ const mixamoSuggestions=motions.filter(m=>!m.genre&&!!suggestMixamoMotionTags(m.name));
+ function applyMixamoGenreSuggestions(){
+  if(!avatar)return;
+  const latest=loadCharacterMotionStore();
+  const updated=applyMixamoTagSuggestions(latest.motions,avatar);
+  if(!updated.changed)return;
+  saveCharacterMotionStore({...latest,motions:updated.motions});
+  setMessage(`${updated.changed} Mixamo-Motions nach eindeutigen Namenshinweisen zugeordnet. Manuelle Einstellungen, BPM-Grenzen und Songabschnitte wurden beibehalten.`);
+ }
  async function fingerprintExistingV535(){
   if(scanBusyV535||!avatar)return;
   setScanBusyV535(true);setMessage("");let updated=0;let skipped=0;
@@ -102,7 +112,17 @@ export function CharacterMotionLibraryPanel({models,preferences,admin}:{models:A
  <h3>Intelligent Motion Library · V535</h3><p>Deine Motion-Sammlung mit Suche, Kategorien, Favoriten und vorsichtiger Dublettenerkennung nach tatsächlichen Animationskurven. Bestehende Choreografien bleiben unverändert.</p>
  <label>Charakter<select value={avatar} onChange={e=>{setAvatar(e.target.value);setPreview("");setWarningV739("");setSearchV535("");setCategoryV535("all");setEmbeddedClipsV535([]);setEmbeddedPreviewIndexV535(undefined);setScanCursorV535(0);}}><option value="">Charakter auswählen</option>{models.filter(m=>m.url).map(m=><option key={m.id} value={m.id}>{m.label}</option>)}</select></label>
  <label className="setting-check"><input type="checkbox" checked={store.automatic} onChange={e=>change(s=>({...s,automatic:e.target.checked}))}/> Automatische Motion-Auswahl anhand Genre und Songabschnitt (standardmäßig aktiv)</label>
+ <small>Mixamo: Pro Motion kannst du weiter unten Genre, BPM-Bereich und Songabschnitt einstellen. Die automatische Konzertregie berücksichtigt diese Vorgaben, richtet passende kurze Loops behutsam am Beat aus und verwendet die vorhandenen weichen Übergänge. Manuell festgelegte Animationen und Geschwindigkeiten haben Vorrang.</small>
+ <small>Mixamo: Für Deutschrap werden Groove/Bounce-Moves, für Hardtekk Hakken/Footwork und für Hardstyle Jumpstyle/Stomp bevorzugt. Automatische Clipwechsel orientieren sich am Songtakt und nutzen geschützte Crossfades. Eine kleine Tempoanpassung (höchstens ±12 %) erfolgt nur bei eindeutiger Beat-Länge, normaler Clipgeschwindigkeit und ohne manuelle Choreografie; sonst bleibt die Originalgeschwindigkeit erhalten.</small>
  {model&&<>
+ <div className="avatar-metadata-editor" aria-label="Mixamo Genre-Zuordnung">
+  <strong>Mixamo · Genre-Zuordnung für Konzertshows</strong>
+  <p>Erkennt nur eindeutige Begriffe wie Rap, Hakken/Footwork und Jumpstyle. Vorschläge gelten als Dateinamen-Hinweise, nicht als Analyse der tatsächlichen Bewegungsqualität. Die automatische Choreografie beachtet anschließend die Genre-Zuordnung.</p>
+  <button type="button" disabled={busy||mixamoSuggestions.length===0} onClick={applyMixamoGenreSuggestions}>
+   {mixamoSuggestions.length} Mixamo-Genre-Vorschläge übernehmen
+  </button>
+  <small>Bereits gesetzte Genres und individuell angepasste Kategorien bleiben erhalten. Songabschnitt und BPM-Grenzen werden nicht geraten; die automatische Clip-Auswahl und die bisherige 3D-Sichtprüfung bleiben unverändert.</small>
+ </div>
  <div className="avatar-metadata-editor" aria-label="V535 Motion Library Filter">
   <strong>V535 · Motion-Bibliothek durchsuchen</strong>
   <p role="status">{motions.length} Motions für {model.label} · {motions.filter(m=>m.favorite).length} Favoriten · {duplicatesV535} durch Keyframes belegte Dubletten</p>
@@ -135,6 +155,7 @@ export function CharacterMotionLibraryPanel({models,preferences,admin}:{models:A
  </div>
  <p>{visibleMotionsV535.length} von {motions.length} separat gespeicherten Motions angezeigt.</p>
  {visibleMotionsV535.map(m=><div key={m.id} className="avatar-metadata-editor"><strong>{m.name}</strong>
+ {!m.genre&&suggestMixamoMotionTags(m.name)&&<p><small>Mixamo-Vorschlag: {suggestMixamoMotionTags(m.name)?.genre} · {suggestMixamoMotionTags(m.name)?.reason}. Mit „Genre-Vorschläge übernehmen“ zuordnen.</small></p>}
  <p><small>{MOTION_CATEGORY_LABELS_V535[m.category??suggestMotionCategoryV535(m.name)]} · {m.fingerprint?"Keyframe-Fingerabdruck vorhanden":"Noch nicht auf identische Bewegungsdaten geprüft"}</small></p>
  {m.fingerprint&&duplicateInAvatarV535(motions.filter(x=>x.id!==m.id),avatar,m.fingerprint)&&<p role="status">Gleiche Bewegungsdaten sind für diesen Avatar bereits in der Bibliothek vorhanden. Vorschau vor dem Entfernen prüfen.</p>}
  <button type="button" aria-pressed={m.favorite===true} onClick={()=>change(s=>({...s,motions:s.motions.map(x=>x.id===m.id?{...x,favorite:!x.favorite}:x)}))}>{m.favorite?"★ Favorit entfernen":"☆ Zu Favoriten hinzufügen"}</button>
