@@ -5,10 +5,12 @@ import { withPrivateGltfV769 } from "./privateGltfLifecycleV769";
 import { inspectSampledMotionV534, compareMotionTransitionV534, motionReviewLabelV534,
   type MotionPointV534, type SampledPoseV534, type MotionSampleReportV534, type PoseTransitionV534 } from "./advancedMotionInspectorV534";
 import { analyzeGLBMotionClip, type ClipQualityReport } from "./glbMotionQualityAnalyzer";
+import {inspectFootPlantQuality,type FootPlantQualityReport} from "./estimatedFootPlantQuality";
 import { inspectMotionQualityV321, transitionQualityV321, type MotionQualityEventV321 } from "./advancedMotionQualityV321";
 export type AdvancedMotionReportV534={clipName:string;source:"original-glb"|"separate-motion-glb";keyframes:ClipQualityReport;
   pose:MotionSampleReportV534;curveEvents:MotionQualityEventV321[];transition:PoseTransitionV534|null;
-  transitionCurveDegrees:number|null;transitionTo:string|null;summary:string};
+  transitionCurveDegrees:number|null;transitionTo:string|null;summary:string;
+  footPlant:FootPlantQualityReport};
 const match=(name:string,role:"hips"|"head"|"leftFoot"|"rightFoot")=>{
  const n=name.replace(/[^a-z0-9]/gi,"").toLowerCase();
  if(role==="hips")return /^(hips|pelvis|mixamorighips|roothips)$/.test(n);
@@ -50,13 +52,14 @@ export async function inspectAdvancedMotionV534(url:string,clipIndex:number,foll
   // Evaluate a complete clip even if 10s+; 81 bounded samples.
   for(let i=0;i<count;i++)poses.push(sample(clipIndex,seconds*i/(count-1)));
   const pose=inspectSampledMotionV534(poses,bodyHeight);
+  const footPlant=inspectFootPlantQuality(poses,bodyHeight);
   const keyframes=analyzeGLBMotionClip(clip),curveEvents=inspectMotionQualityV321(clip,48);
   let transition:PoseTransitionV534|null=null,transitionCurveDegrees:number|null=null;
   if(next){
    transition=compareMotionTransitionV534(poses[poses.length-1],sample(followingIndex!,0),bodyHeight);
    const curves=transitionQualityV321(clip,next);transitionCurveDegrees=curves.angleRad===null?null:Math.round(curves.angleRad*180/Math.PI);
   }
-  return {clipName:clip.name,source,keyframes,pose,curveEvents,transition,transitionCurveDegrees,transitionTo:next?.name??null,summary:motionReviewLabelV534(pose,transition??undefined)};
+  return {clipName:clip.name,source,keyframes,pose,curveEvents,transition,transitionCurveDegrees,transitionTo:next?.name??null,summary:motionReviewLabelV534(pose,transition??undefined),footPlant};
  }finally{mixer.stopAllAction();mixer.uncacheRoot(scene);}
  });
 }
