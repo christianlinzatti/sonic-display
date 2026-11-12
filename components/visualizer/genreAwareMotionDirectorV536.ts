@@ -9,6 +9,10 @@ export type GenreMotionCandidateV536 = {
   source: 'embedded' | 'shared' | 'library';
   category: GenreMotionCategoryV536;
   favorite?: boolean;
+  // Optional user-defined eligibility from the existing Motion Library.
+  // Embedded/shared clips have no such metadata and keep legacy behavior.
+  taggedGenre?: string; bpmMin?: number; bpmMax?: number;
+  assignedSection?: 'any'|'build'|'drop'|'verse'|'hook';
 };
 export type GenreMotionInputV536 = {
   clips: readonly GenreMotionCandidateV536[];
@@ -59,13 +63,38 @@ export function validGenreCandidateV536(c:GenreMotionCandidateV536):boolean {
     (c.source==='embedded'||c.source==='shared'||c.source==='library');
 }
 const norm=(value:string)=>value.toLowerCase().replace(/[\s_-]+/g,'');
+/** Never let automatic V536 selection bypass the user's library constraints. */
+export function libraryMotionEligibleV536(c:GenreMotionCandidateV536,input:Pick<GenreMotionInputV536,'bpm'|'genre'|'section'>):boolean {
+  if(c.source!=='library')return true;
+  const bpm=input.bpm;
+  if(typeof bpm==='number'&&Number.isFinite(bpm)){
+    if(typeof c.bpmMin==='number'&&Number.isFinite(c.bpmMin)&&bpm<c.bpmMin)return false;
+    if(typeof c.bpmMax==='number'&&Number.isFinite(c.bpmMax)&&bpm>c.bpmMax)return false;
+  }
+  const tag=c.taggedGenre?.trim();
+  if(tag){
+    const wanted=motionFamilyV536(input.genre),configured=motionFamilyV536(tag);
+    if(wanted!==configured)return false;
+    if(configured==='general'&&tag.toLowerCase()!==(input.genre??'').trim().toLowerCase())return false;
+  }
+  const assigned=c.assignedSection;
+  if(assigned&&assigned!=='any'){
+    const section=(input.section??'').toLowerCase();
+    const current=/(?:build|pre.?drop)/.test(section)?'build':
+      /(?:drop|climax|peak)/.test(section)?'drop':
+      /(?:hook|chorus|refrain)/.test(section)?'hook':
+      /(?:intro|outro|break|bridge|ambient|quiet|interlude|pause)/.test(section)?'quiet':'verse';
+    if(assigned!==current&&!(assigned==='verse'&&current==='hook'))return false;
+  }
+  return true;
+}
 export type RankedGenreMotionV536={name:string;score:number};
 /** Evaluate a short, already-loaded list; name tokens are hints only, library category overrides name heuristic. */
 export function rankGenreMotionsV536(input:GenreMotionInputV536,phrase:string,recent:readonly string[]=[]):RankedGenreMotionV536[] {
   const section=motionSectionV536(input.section),family=motionFamilyV536(input.genre);
   const energy=clamp(input.energy,.5,0,1),slot=Math.floor(clamp(input.slot,0,0,15));
   const seen=new Set<string>();
-  return input.clips.filter(c=>validGenreCandidateV536(c)&&!seen.has(c.name)&&!!seen.add(c.name))
+  return input.clips.filter(c=>validGenreCandidateV536(c)&&libraryMotionEligibleV536(c,input)&&!seen.has(c.name)&&!!seen.add(c.name))
     .map(c=>{
       const n=norm(c.label),category=c.category;
       const idle=category==='idle'||/idle|breath|standby/.test(n);
