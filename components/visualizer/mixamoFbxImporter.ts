@@ -52,6 +52,6 @@ export async function convertMixamoFbxToGlb(file: File): Promise<File> {
     throw new Error("Nach der Konvertierung sind keine abspielbaren Animationsspuren vorhanden.");
   }
 
-  const base = file.name.replace(/\.fbx$/i, "").replace(/[^a-zA-Z0-9_-]/g, "-").slice(0, 45) || "mixamo";
+  const base = file.name.replace(/\.fbx$/i, "").replace(/[^a-zA-Z0-9_-]/g, "-").slice(0, 38) || "mixamo";
   return new File([exported], `${base}-mixamo.glb`, { type: "model/gltf-binary" });
 }
