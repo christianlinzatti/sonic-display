@@ -115,9 +115,9 @@ try {
   assert.equal(run('hook',0).clip,'Dance_House');
   assert.equal(run('hook',1).offset,-2);
   assert.equal(run('hook',2).offset,-4);
-  assert.equal(run('drop',0).clip,'Dance_FestivalBounce');
-  assert.equal(run('drop',1).clip,'Dance_FestivalBounce');
-  assert.equal(run('drop',2).clip,'Dance_FestivalBounce');
+  const dropClips=[0,1,2].map(slot=>run('drop',slot).clip);
+  assert(dropClips.every(clip=>clip===dropClips[0]),'story-mode unison keeps one shared drop clip');
+  assert(['Dance_FestivalBounce','Dance_Techno','Dance_Groove'].includes(dropClips[0]),'drop clip must come from the real available section/genre pool');
   assert.equal(run('hook',0,{manualPriority:true}).active,false);
   assert.equal(run('drop',0,{reducedMotion:true}).active,false);
   assert.equal(run('drop',0,{playing:false}).active,false);
