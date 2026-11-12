@@ -1,6 +1,9 @@
 /** Conservative, user-confirmed labels for Mixamo motions.
  * Never infer BPM from a clip title or overwrite manually curated metadata.
  */
+import type {InstalledCharacterMotion} from "./characterMotionLibrary";
+import {suggestMotionCategoryV535} from "./motionLibraryIntelligenceV535";
+
 export type MixamoSuggestedGenre = "deutschrap" | "hardtekk" | "hardstyle";
 export type MixamoSuggestedCategory = "rap" | "energetic" | "dance";
 export type MixamoMotionSuggestion = {
@@ -26,4 +29,23 @@ export function suggestMixamoMotionTags(name: string): MixamoMotionSuggestion | 
   if (rap) return {genre:"deutschrap",category:"rap",reason:"Rap-/Hip-Hop-Motiv im Dateinamen"};
   if (tekk) return {genre:"hardtekk",category:"energetic",reason:"Hakken-/Hardtekk-Footwork im Dateinamen"};
   return {genre:"hardstyle",category:"energetic",reason:"Jumpstyle-/Hardstyle-Motiv im Dateinamen"};
+}
+
+/** Apply only explicit, unambiguous hints to one avatar's untagged motions.
+ * A copy is returned; saved user BPM/sections, category overrides and other
+ * avatars are not modified.
+ */
+export function applyMixamoTagSuggestions(
+  motions:readonly InstalledCharacterMotion[], avatarId:string,
+):{motions:InstalledCharacterMotion[];changed:number}{
+  let changed=0;
+  const updated=motions.map(m=>{
+    if(m.avatarId!==avatarId||m.genre)return m;
+    const hint=suggestMixamoMotionTags(m.name);
+    if(!hint)return m;
+    changed++;
+    const automaticCategory=suggestMotionCategoryV535(m.name);
+    return {...m,genre:hint.genre,category:!m.category||m.category===automaticCategory?hint.category:m.category};
+  });
+  return {motions:updated,changed};
 }
