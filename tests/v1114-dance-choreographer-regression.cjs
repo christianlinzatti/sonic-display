@@ -16,7 +16,7 @@ try {
   '--noEmit','false','--module','commonjs','--moduleResolution','node','--outDir',folder],
   {cwd:root,encoding:'utf8',timeout:90000,windowsHide:true});
  assert.equal(ts.status,0,ts.stdout+'\n'+ts.stderr+'\n'+(ts.error?.message||''));
- const {DANCE_STYLES_V1114,normalizeDanceOptionsV1114,choreographDanceV1114,
+ const {DANCE_STYLES_V1114,normalizeDanceOptionsV1114,choreographDanceV1114,resolveDanceClipSuggestionV1114,
   syncDancePerformanceV1114,sampleDanceCueV1114}=require(path.join(folder,'lib/aiDanceChoreographerV1114.js'));
  const {CREW_IDS,CREW_DEFAULT,normalizeCrewSettings,stepCrew,newCrewState}=require(path.join(folder,'components/visualizer/sonicCrewDirector.js'));
  const {directAvatarPersonalityV1112,AVATAR_CAST_V1112}=require(path.join(folder,'lib/aiAvatarPersonalityV1112.js'));
@@ -62,6 +62,33 @@ try {
      count++;
     }
   assert.equal(count,576);
+ });
+ check('per-avatar choreography suggestions resolve only to real loaded animation names',()=>{
+  const {plan,performance}=create('hard',70,'expressive');
+  const ids=performance.cues[0].performers.map(x=>x.id);
+  const availableClipsByMember={
+   [ids[0]]:['idle_breathe','Dance_House'],
+   [ids[1]]:['dance-house'],
+   [ids[2]]:['Dance_FestivalBounce'],
+  };
+  const dance=choreographDanceV1114(plan,performance,{
+   style:'expressive',intensityCap:70,availableClipsByMember,
+  });
+  assert(dance);
+  assert.equal(dance.cues[0].members[0].clipSuggestion,'idle_breathe');
+  assert.equal(dance.cues[0].members[1].clipSuggestion,'');
+  assert.equal(dance.cues[0].members[2].clipSuggestion,'');
+  assert.equal(dance.cues[1].members[0].clipSuggestion,'Dance_House');
+  assert.equal(dance.cues[1].members[1].clipSuggestion,'dance-house');
+  assert.equal(dance.cues[1].members[2].clipSuggestion,'Dance_FestivalBounce');
+  const realNames=new Set(Object.values(availableClipsByMember).flat());
+  assert(dance.cues.every(c=>c.members.every(m=>!m.clipSuggestion||realNames.has(m.clipSuggestion))));
+  assert.equal(resolveDanceClipSuggestionV1114(['Dance_HipHop','Dance_House'],['dance-house']),'dance-house');
+  assert.equal(resolveDanceClipSuggestionV1114(['Dance_HipHop'],['Idle_Breathe']),'');
+  assert.equal(normalizeDanceOptionsV1114({style:'festival',intensityCap:70,
+   availableClipsByMember:{avatar:['Dance_House',3]}}),null);
+  assert.equal(normalizeDanceOptionsV1114({style:'festival',intensityCap:70,
+   availableClipsByMember:{avatar:'Dance_House'}}),null);
  });
  check('four ensemble forms, meaningful spotlight rotation, read-only score sampling',()=>{
   const {dance}=create();assert(dance);
