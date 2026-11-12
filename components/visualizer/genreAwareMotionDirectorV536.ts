@@ -71,7 +71,7 @@ export function rankGenreMotionsV536(input:GenreMotionInputV536,phrase:string,re
       const idle=category==='idle'||/idle|breath|standby/.test(n);
       const rap=category==='rap'||/rap|twostep|fingerflow|headnod|shoulderroll/.test(n);
       const dance=category==='dance'||/dance|groove|bounce|sidestep|shuffle|sway|roll/.test(n);
-      const energetic=category==='energetic'||/stomp|jump|armsup|punch|hardtekk|hardstyle|rawstyle/.test(n);
+      const energetic=category==='energetic'||/stomp|jump|armsup|punch|hardtekk|hardstyle|rawstyle|hakken|hakkuh|footwork|gabber/.test(n);
       const gesture=category==='gesture'||/gesture|point|finger|nod|shoulder/.test(n);
       let score=0;
       if(section==='quiet')score+=idle?6:dance?1:gesture?.7:-.3;
@@ -86,7 +86,7 @@ export function rankGenreMotionsV536(input:GenreMotionInputV536,phrase:string,re
       if(family==='hardstyle'||family==='hardtekk') {
         if(energetic)score+=section==='drop'?3.5:section==='hook'?2.1:energy>.75?1.1:0;
         if(dance&&section==='verse')score+=1.2;
-        if(family==='hardtekk'&&/tekk|shuffle|bounce|step/.test(n))score+=1.2;
+        if(family==='hardtekk'&&/tekk|hakken|hakkuh|footwork|gabber|shuffle|bounce|step/.test(n))score+=1.2;
         if(family==='hardstyle'&&/stomp|jump|hardstyle|armsup/.test(n))score+=.95;
       }
       // V666: Rock and Pop must not fall back to the same generic choreography.
