@@ -115,3 +115,28 @@ Die Übergänge erfolgen über die bestehenden Crossfade-, Pose-Matching-
 und Foot-IK-Systeme; es wird kein zweiter Animationsmixer erzeugt.
 
 Regressionen: `node tests/mixamo-dance-director-regression.cjs`.
+
+## Mixamo-Genre-Vorschläge sicher übernehmen
+
+Unter **Einstellungen → Avatare → Character & Motion Library** gibt es nach
+der Avatar-Auswahl den Bereich **Mixamo · Genre-Zuordnung für Konzertshows**.
+Er zeigt die Anzahl noch nicht zugeordneter Mixamo-Motions mit eindeutigen
+Dateinamen-Hinweisen. Mit einem Klick werden passende Genres markiert:
+
+- Rap/Hip-Hop, Swagger, Breakdance → `deutschrap`
+- Hardtekk, Hakken, Gabber, Footwork → `hardtekk`
+- Hardstyle, Rawstyle, Jumpstyle → `hardstyle`
+
+Bei mehrdeutigen Bezeichnungen (z. B. *Hakken Hardstyle*) oder allgemeinen
+Wörtern wie *Bounce, Stomp, Groove* wird **keine** automatische Zuordnung
+vorgeschlagen. Ebenso werden Motion-Einträge anderer Avatare und bereits
+manuell zugeordnete Genres **nicht überschrieben**. Individuell veränderte
+Kategorien bleiben bestehen. BPM-Grenzen und Songabschnitte werden nie aus
+einem Dateinamen erfunden.
+
+Diese Zuordnung ist ein optionaler Metadatenvorgang, kein automatischer Upload,
+keine erneute Konvertierung und kein Hinweis auf bewiesene Bewegungsqualität.
+Der bereits vorhandene Genre-Director darf die gesetzten Tags bei aktivierter
+Automatik für die Auswahl geeigneter, geladener Clips berücksichtigen.
+
+Test: `node tests/mixamo-tag-suggestions-regression.cjs`.
