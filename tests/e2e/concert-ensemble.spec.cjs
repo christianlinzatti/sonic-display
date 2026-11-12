@@ -47,8 +47,10 @@ test('rap remains stable and pause/reduced motion remove lyric ornamentation',as
 test('mock Govee bridge receives paced whole-lamp looks from the ensemble and stops with music-sync off',async({page})=>{
  test.setTimeout(180000);await setup(page);
  await page.addInitScript(()=>localStorage.setItem('sonic-display:govee-lan-v909',JSON.stringify({endpoint:'http://127.0.0.1:8765',token:'mock-bridge-only',enabled:true,autoSync:true,selectedIps:['192.168.1.42'],masterBrightness:50,directorEnabledV911:true,deviceRolesV911:{'192.168.1.42':'ambient'}})));
- const commands=[];await page.route('http://127.0.0.1:8765/**',route=>{
+ const commands=[];await page.route('http://127.0.0.1:8765/**',async route=>{
   const req=route.request(),path=new URL(req.url()).pathname;
+  // Slow inventory must not compress the gap between actual look commands.
+  if(path==='/devices'&&req.method()==='GET')await new Promise(resolve=>setTimeout(resolve,1100));
   if(path==='/command'&&req.method()==='POST')commands.push({at:Date.now(),...req.postDataJSON()});
   return route.fulfill({status:200,headers:{'access-control-allow-origin':'*','access-control-allow-headers':'authorization,content-type','access-control-allow-methods':'GET,POST,OPTIONS'},contentType:'application/json',body:JSON.stringify(path==='/devices'?{devices:[{ip:'192.168.1.42',sku:'H6008'}]}:{ok:true,device:{ip:'192.168.1.42',sku:'H6008'}})});
  });

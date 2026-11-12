@@ -126,7 +126,7 @@ test('only existing V909 sender performs I/O; no independent driver is created',
  const atmosphereAt=sender.indexOf('applyRoomAtmosphereV987(recoveryLookV961');
  const roomAt=sender.indexOf('applyGoveeRoomV1096(showLookV1042,previous,');
  const coordinationAt=sender.indexOf('applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,');
- const governorAt=sender.indexOf('governConcertLookV961(previous,coordinatedLookV1154,');
+ const governorAt=sender.indexOf('governConcertLookV961(previous,ensembleLook,');
  const sendAt=sender.indexOf("goveeBridgeRequestV909(config,'/command','POST',{ip,action:'look',value:finalLook})");
  assert(atmosphereAt>=0&&atmosphereAt<roomAt&&roomAt<coordinationAt&&
   coordinationAt<governorAt&&governorAt<sendAt,
@@ -156,4 +156,6 @@ test('build and release metadata include V987 before V986',()=>{
  assert(read('.github/workflows/v832-continuous-validation.yml').includes('V987 Govee Immersive Sync 2.0'));
  assert(read('tests/tsconfig.v987-core.json').includes('goveeAtmosphereSyncV987.ts'));
 });
+assert(require('../lib/goveeSenderInvariant.cjs').hasFinalGoveeGovernor(require('node:fs').readFileSync(require('node:path').join(__dirname,'../components/GoveeMusicSyncV909.tsx'),'utf8')),'All overlays must feed the final governor before the sole LAN look send');
+
 console.log('V987 PASS '+checks+' regression groups + 10,000 deterministic lamp states');

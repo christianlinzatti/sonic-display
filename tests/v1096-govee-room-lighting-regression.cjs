@@ -85,7 +85,7 @@ const runtime=read('components/GoveeMusicSyncV909.tsx');
 for(const text of ['planGoveeRoomV1096({settings:roomSettingsV1096',
  'const roomLookV1096=applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,',
  'applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,',
-  'governConcertLookV961(previous,coordinatedLookV1154,',
+  'governConcertLookV961(previous,ensembleLook,',
  'syncDecisionV1027.active||authoredDecisionV1042.active',
  'roomAtmosphereActive:roomDecisionV987.active','savedShowActive:Boolean(show)',
  'groupUnisonActive:group?.mode',
@@ -105,4 +105,6 @@ assert(Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1]||0)>=1096);assert.equal(
 for(const p of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(p).includes('tests/v1096-govee-room-lighting-regression.cjs'));
 assert(read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1096(root)'));
+assert(require('../lib/goveeSenderInvariant.cjs').hasFinalGoveeGovernor(require('node:fs').readFileSync(require('node:path').join(__dirname,'../components/GoveeMusicSyncV909.tsx'),'utf8')),'All overlays must feed the final governor before the sole LAN look send');
+
 console.log('PASS V1096: '+samples+' bounded four-zone looks, explicit consent, manual priority, verified phases, capped color slew, no extra LAN sender');

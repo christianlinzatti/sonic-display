@@ -135,7 +135,7 @@ check('Govee integration retains exactly one existing request per changed lamp',
  const s=read('components/GoveeMusicSyncV909.tsx');
  assert.match(s,/const bridgeV963=planVerifiedConcertBridgeV963\(/);
  assert.match(s,/dimConcertBridgeLookV963\(narrativeLookV962,bridgeV963\)/);
- assert.ok(s.indexOf('dimConcertBridgeLookV963(narrativeLookV962,bridgeV963)')>=0&&s.indexOf('governConcertLookV961(previous,coordinatedLookV1154,')>s.indexOf('dimConcertBridgeLookV963(narrativeLookV962,bridgeV963)'));
+ assert.ok(s.indexOf('dimConcertBridgeLookV963(narrativeLookV962,bridgeV963)')>=0&&s.indexOf('governConcertLookV961(previous,ensembleLook,')>s.indexOf('dimConcertBridgeLookV963(narrativeLookV962,bridgeV963)'));
  assert.match(s,/if\(!changedGoveeLookV911\(previous,finalLook\)\)continue/);
  assert.match(s,/value:finalLook/);
  assert.equal((s.match(/await goveeBridgeRequestV909\(config,'\/command','POST',\{ip,action:'look',value:finalLook\}\)/g)||[]).length,1);
@@ -171,4 +171,6 @@ check('7500 representative song states remain bounded and deterministic',()=>{
   assert.ok(actual.brightness>=0&&actual.brightness<=brightness);
  }
 });
+assert(require('../lib/goveeSenderInvariant.cjs').hasFinalGoveeGovernor(require('node:fs').readFileSync(require('node:path').join(__dirname,'../components/GoveeMusicSyncV909.tsx'),'utf8')),'All overlays must feed the final governor before the sole LAN look send');
+
 console.log('V963 PASS '+checks+' groups + 7500 deterministic sections/light states');

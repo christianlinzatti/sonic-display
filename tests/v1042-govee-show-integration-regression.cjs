@@ -55,7 +55,7 @@ for(const term of ['sampleArenaShowPlanV1040','planGoveeShowV1042','applyGoveeSh
 ] )assert(govee.includes(term),'existing LAN integration: '+term);
 assert(govee.includes('governConcertLookV961(previous,showLookV1042,')||
  (govee.includes('applyGoveeRoomV1096(showLookV1042,previous,')&&
- govee.includes('governConcertLookV961(previous,coordinatedLookV1154,')),
+ govee.includes('governConcertLookV961(previous,ensembleLook,')),
  'existing V1042 look must still reach the final V961 safety governor');
 assert.equal((govee.match(/goveeBridgeRequestV909\(config,'\/command'/g)||[]).length,1,
  'V1042 never introduces a second LAN send');
@@ -67,4 +67,6 @@ for(const term of ['V1042 · Intelligent Govee','goveeShowSyncEnabledV1042','gov
 assert(!read('.github/workflows/v1042-intelligent-govee-show-validation.yml').includes('  push:'),
  'No duplicate CI push workflow');
 assert(read('components/visualizer/DynamicStage.tsx').includes('arena360: {base:'), 'keep V1038 palette fix');
+assert(require('../lib/goveeSenderInvariant.cjs').hasFinalGoveeGovernor(require('node:fs').readFileSync(require('node:path').join(__dirname,'../components/GoveeMusicSyncV909.tsx'),'utf8')),'All overlays must feed the final governor before the sole LAN look send');
+
 console.log('V1042 Intelligent Govee Concert Integration PASS: four zones, verified phase, user priority, safe brightness/color, exact one existing LAN sender');

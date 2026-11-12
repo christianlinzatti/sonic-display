@@ -12,6 +12,7 @@ export function ConcertSceneryControls(){
   <label><input type="checkbox" checked={settings.scenery===true} onChange={e=>writeCrewSettings({...settings,scenery:e.target.checked})}/> Konzert-Bühnenbilder und Effekte</label>
   <label>Effektstärke · {sceneryStrength(settings.sceneryStrength)} %<input aria-label="Effektstärke" type="range" min="0" max="100" step="5" value={sceneryStrength(settings.sceneryStrength)} disabled={!settings.scenery} onChange={e=>writeCrewSettings({...settings,sceneryStrength:Number(e.target.value)})}/></label>
   <label><input type="checkbox" checked={settings.immersiveFx!==false} disabled={!settings.scenery} onChange={e=>writeCrewSettings({...settings,immersiveFx:e.target.checked})}/> Raum- und Bodeneffekte</label>
+  <label><input type="checkbox" checked={settings.sceneryScreens!==false} disabled={!settings.scenery} onChange={e=>writeCrewSettings({...settings,sceneryScreens:e.target.checked})}/> Albumcover & Titel auf Bühnen-Screens</label>
    </fieldset>
    <fieldset><legend>Crew & Outfits</legend>
   <label><input type="checkbox" checked={settings.musicalDance!==false} disabled={!settings.scenery} onChange={e=>writeCrewSettings({...settings,musicalDance:e.target.checked})}/> Musikalische Tanzfolgen und Crew-Wellen</label>

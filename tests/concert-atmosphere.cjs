@@ -16,3 +16,12 @@ for(const style of ['cinema','neon','groove','festival'])for(const act of ['brea
 }
 assert.equal(normalizeCrewSettings({immersiveFx:false}).immersiveFx,false);assert.equal(normalizeCrewSettings({immersiveFx:'yes'}).immersiveFx,undefined);
 console.log('PASS concert atmosphere: coherent opening/build/refrain/finale, four bounded motifs, reprise blend, safe lyric/rap/pause/reduced/tier/manual guards, floor ownership and persisted opt-out');
+const heroes=new Set();
+for(let visit=1;visit<=3;visit++){
+ const p=plan({cue:{...cue,reading:false,lyricFocus:false,act:'lift',chorusVisit:visit}});heroes.add(p.hero);assert(p.heroGain>0&&p.heroGain<=.55);assert(p.heroPulse>=.85&&p.heroPulse<=1);
+}
+assert.equal(heroes.size,3,'Repeated refrains get three distinct, bounded stage accents');
+for(const extra of [{playing:false},{reducedMotion:true},{tier:'low'},{enabled:false},{active:false},{cue:{...cue,act:'lift',reading:true}},{cue:{...cue,act:'lift',lyricFocus:true}}]){
+ const p=plan(extra);assert.equal(p.hero,'off');assert.equal(p.heroGain,0);
+}
+console.log('PASS hero stage: portals, meteors and orbital fans; bounded phrase accents, pause, text, opt-out and low-tier guards');

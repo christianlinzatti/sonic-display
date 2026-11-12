@@ -92,7 +92,7 @@ const ordered=['applyGoveeZoneMixV1100(roomDecisionV1096,zoneMixDecisionV1100)',
  'planGoveeSceneTransitionV1101({settings:transitionSettingsV1101',
  'applyGoveeSceneTransitionV1101(roomDecisionV1096,transitionDecisionV1101)',
  'applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,',
- 'governConcertLookV961(previous,coordinatedLookV1154,',
+ 'governConcertLookV961(previous,ensembleLook,',
  "goveeBridgeRequestV909(config,'/command','POST'"];
 const positions=ordered.map(x=>sender.indexOf(x));
 assert(positions.every((pos,i)=>pos>=0&&(!i||pos>positions[i-1])),`old V961 and V909 must remain final: ${positions}`);
@@ -106,4 +106,6 @@ assert(Number(/^0\.1\.0-v(\d+)$/.exec(pkg.version)?.[1]||0)>=1101);assert.equal(
 for(const f of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(f).includes('tests/v1101-govee-scene-transition-regression.cjs'));
 assert(read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1101(root)'));
+assert(require('../lib/goveeSenderInvariant.cjs').hasFinalGoveeGovernor(require('node:fs').readFileSync(require('node:path').join(__dirname,'../components/GoveeMusicSyncV909.tsx'),'utf8')),'All overlays must feed the final governor before the sole LAN look send');
+
 console.log('PASS V1101: '+tested+' bounded scene-transition states, 303 monotonic fade samples, V909/V961 single authorized path');

@@ -31,3 +31,12 @@ test('room opt-out persists; rap and reduced motion remove floor movement and au
  await page.evaluate(()=>localStorage.setItem('sonic-display:light-timeline-v172:MockConcertV1130TrackA',JSON.stringify([{id:'manual-room',atMs:0,kind:'color',color:'#ff0000',strength:.5,durationMs:120000}])));await page.reload();
  await expect.poll(async()=>!!(await frame(page))?.manual,{timeout:90000}).toBe(true);expect((await frame(page)).atmosphere.backdrop).toBe(false);expect((await frame(page)).atmosphere.floor).toBe(false);
 });
+test('refrains reveal different real shader accents and pause clears their uniforms',async({page},testInfo)=>{
+ test.setTimeout(180000);const mock=await installConcertMocksV1130(page,{position:26000,playing:true,advancing:false,genre:'house',durationMs:180000});await seed(page);await page.goto('/');await page.getByRole('button',{name:'Konzertmodus starten',exact:true}).click();
+ const seen=()=>page.evaluate(()=>window.__roomFrames.filter(f=>f.atmosphere?.heroAmount>.01).map(f=>f.atmosphere.hero));
+ await expect.poll(seen,{timeout:90000}).toContain('portal');await testInfo.attach('portal-stage',{body:await page.screenshot({path:testInfo.outputPath('portal-stage.png')}),contentType:'image/png'});
+ mock.setPlayback({position:66000});await page.reload();await expect.poll(seen,{timeout:90000}).toContain('meteors');
+ mock.setPlayback({position:94000});await page.reload();await expect.poll(seen,{timeout:90000}).toContain('orbit');
+ mock.setPlayback({playing:false});await expect.poll(async()=>(await frame(page))?.atmosphere?.heroAmount,{timeout:30000}).toBe(0);
+ const lane=await page.getByRole('region',{name:'Songtext',exact:true}).boundingBox(),stage=await page.locator('.immersive-stage').boundingBox();expect(stage.y+stage.height).toBeLessThanOrEqual(lane.y+2);await expect(page.getByRole('button')).toHaveCount(2);
+});

@@ -28,7 +28,7 @@ async function installConcertMocksV1130(page,initial={}){
   if(state.spotifyStatus!==200)return json(route,{error:'Mock Spotify unavailable'},state.spotifyStatus);
   return json(route,{connected:true,accountScope:'aaaaaaaaaaaaaaaaaaaaaaaa',track:{id:state.trackId,
    title:state.title??(state.missingLyrics?'Silent Mock Concert':'Aurora Mock Concert'),artist:'Sonic Test Ensemble',artists:['Sonic Test Ensemble'],album:'Original Test Show',
-   albumCoverUrl:'/avatars/sonic/aurora-synth.png',spotifyUrl:'https://open.spotify.com/track/mock',durationMs:state.durationMs},
+   albumCoverUrl:Object.hasOwn(state,'albumCoverUrl')?state.albumCoverUrl:'/avatars/sonic/aurora-synth.png',spotifyUrl:'https://open.spotify.com/track/mock',durationMs:state.durationMs},
    progressMs:Math.min(state.durationMs,state.position+(state.playing&&state.advancing?Date.now()-anchor:0)),isPlaying:state.playing,fetchedAt:Date.now()});
  });
  await page.route('**/api/lyrics?*',route=>{calls.lyrics++;return state.lyricsStatus!==200?json(route,{error:'Mock lyrics unavailable'},state.lyricsStatus):json(route,state.missingLyrics?null:state.lyricPayload??lyrics);});

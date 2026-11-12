@@ -77,7 +77,7 @@ const ordered=['applyGoveeBeatAccentV1099(roomDecisionV1096,beatAccentDecisionV1
  'planGoveeZoneMixV1100({settings:zoneMixerSettingsV1100',
  'applyGoveeZoneMixV1100(roomDecisionV1096,zoneMixDecisionV1100)',
  'applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,',
- 'governConcertLookV961(previous,coordinatedLookV1154,',
+ 'governConcertLookV961(previous,ensembleLook,',
  "goveeBridgeRequestV909(config,'/command','POST'"];
 const positions=ordered.map(token=>sender.indexOf(token));
 assert(positions.every((p,i)=>p>=0&&(!i||p>positions[i-1])),'V961 and V909 must remain final');
@@ -92,4 +92,6 @@ assert.equal(lock.packages[''].version,pkg.version);
 for(const file of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(file).includes('tests/v1100-govee-room-zone-mixer-regression.cjs'));
 assert(read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1100(root)'));
+assert(require('../lib/goveeSenderInvariant.cjs').hasFinalGoveeGovernor(require('node:fs').readFileSync(require('node:path').join(__dirname,'../components/GoveeMusicSyncV909.tsx'),'utf8')),'All overlays must feed the final governor before the sole LAN look send');
+
 console.log('PASS V1100: '+tested+' bounded zone-weight cases, '+strengths.size+' independent weights, single LAN sender and V961 governor');

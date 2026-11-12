@@ -109,7 +109,7 @@ test('no additional polling or bridge call: integration is in pre-existing Govee
  assert(g.includes('applyAlexaGoveeLookV970(roomLookV987,previous'));
  assert(g.includes('applyRoomAtmosphereV987(recoveryLookV961,previous'));
  assert(g.indexOf('applyAlexaGoveeLookV970(')<g.indexOf('applyGoveeSyncV1027(voiceLookV970,previous'));
- assert(g.indexOf('applyGoveeSyncV1027(voiceLookV970,previous')>=0&&g.indexOf('governConcertLookV961(previous,coordinatedLookV1154,')>g.indexOf('applyGoveeSyncV1027(voiceLookV970,previous'));
+ assert(g.indexOf('applyGoveeSyncV1027(voiceLookV970,previous')>=0&&g.indexOf('governConcertLookV961(previous,ensembleLook,')>g.indexOf('applyGoveeSyncV1027(voiceLookV970,previous'));
  assert(g.includes("goveeBridgeRequestV909(config,'/command','POST'"));
  assert(g.includes('!config?.enabled||!config.autoSync')); 
  const lib=read('lib/alexaGoveeV970.ts').toLowerCase();
@@ -138,4 +138,6 @@ test('versioned release and production gates include V970 checks',()=>{
   assert(read(f).includes('v970-alexa-lambda-regression.cjs'));
  }
 });
+assert(require('../lib/goveeSenderInvariant.cjs').hasFinalGoveeGovernor(require('node:fs').readFileSync(require('node:path').join(__dirname,'../components/GoveeMusicSyncV909.tsx'),'utf8')),'All overlays must feed the final governor before the sole LAN look send');
+
 console.log(`V970 PASS ${passed} regression groups + 10,000 deterministic room-light states`);

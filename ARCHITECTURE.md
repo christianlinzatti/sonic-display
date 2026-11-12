@@ -1,5 +1,9 @@
 ## Update – Eine abgestimmte Konzert-Bühnenebene
 
+## Pipeline-Reparatur und neue Bühnenhöhepunkte
+
+Eine gemeinsame Prüfung erkennt den aktuellen Govee-Ensemble-Pfad bis zum abschließenden Governor und einzigen LAN-Versand. Lichtportale, Meteorspuren und kreisende Lichtfächer verstärken Refrains und Finale. Seitliche Bühnen-Screens zeigen Albumcover, Titel und freigegebene Lyrics. [Ursache, Umsetzung und Tests](docs/versions/V1165-PIPELINE-UND-SHOW-HOEHEPUNKTE.md).
+
 ## Übersichtliche Einstellungen
 
 Schnellzugriff, gruppierte Navigation, Funktionssuche mit Direktlinks und eine nach Aufgaben gegliederte Konzertsteuerung vereinfachen die Bedienung. [Bedienung, Architektur und Tests](docs/versions/V1164-UEBERSICHTLICHE-EINSTELLUNGEN.md).

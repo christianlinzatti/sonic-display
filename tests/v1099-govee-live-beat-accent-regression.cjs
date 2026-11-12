@@ -101,7 +101,7 @@ for(const marker of ['planGoveeRoomV1096({settings:roomSettingsV1096',
  'planGoveeBeatAccentV1099({settings:beatAccentSettingsV1099',
  'applyGoveeBeatAccentV1099(roomDecisionV1096,beatAccentDecisionV1099)',
  'applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,',
- 'governConcertLookV961(previous,coordinatedLookV1154,',
+ 'governConcertLookV961(previous,ensembleLook,',
  'waveSettingsV1097,journeySettingsV1098,beatAccentSettingsV1099',
  'window.removeEventListener(GOVEE_BEAT_ACCENT_EVENT_V1099,refresh)'])
  assert(runtime.includes(marker),'missing safe existing route: '+marker);
@@ -109,7 +109,7 @@ const positions=['applyGoveeSpatialWaveV1097(roomDecisionV1096,waveDecisionV1097
  'applyGoveeColorJourneyV1098(roomDecisionV1096,journeyDecisionV1098)',
  'applyGoveeBeatAccentV1099(roomDecisionV1096,beatAccentDecisionV1099)',
  'applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,',
- 'governConcertLookV961(previous,coordinatedLookV1154,'].map(x=>runtime.indexOf(x));
+ 'governConcertLookV961(previous,ensembleLook,'].map(x=>runtime.indexOf(x));
 assert(positions.every((p,i)=>p>=0&&(!i||p>positions[i-1])),'existing governor must remain last');
 const ui=read('components/GoveeBeatAccentStudioV1099.tsx');
 assert(ui.includes('Reine Vorschau')&&!ui.includes('goveeBridgeRequestV909('));
@@ -120,4 +120,6 @@ assert.equal(lock.packages[''].version,pkg.version);
 for(const p of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(p).includes('tests/v1099-govee-live-beat-accent-regression.cjs'));
 assert(read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1099(root)'));
+assert(require('../lib/goveeSenderInvariant.cjs').hasFinalGoveeGovernor(require('node:fs').readFileSync(require('node:path').join(__dirname,'../components/GoveeMusicSyncV909.tsx'),'utf8')),'All overlays must feed the final governor before the sole LAN look send');
+
 console.log('PASS V1099: '+cases+' bounded live beat samples, '+activeCases+' valid accents, four zones, all Govee opt-in priorities and existing LAN governor');

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const {hasFinalGoveeGovernor}=require('../lib/goveeSenderInvariant.cjs');
 const fs=require('node:fs'),path=require('node:path');
 function inspectReleaseV1099(root){
  const checks=[],add=(id,ok)=>checks.push({id,ok:!!ok});
@@ -26,7 +27,7 @@ function inspectReleaseV1099(root){
   const sender=read('components/GoveeMusicSyncV909.tsx');
   add('route',sender.includes('planGoveeBeatAccentV1099({settings:beatAccentSettingsV1099')&&
    sender.includes('applyGoveeBeatAccentV1099(roomDecisionV1096,beatAccentDecisionV1099)'));
-  add('governor',(sender.includes('governConcertLookV961(previous,roomLookV1096,')||(sender.includes('applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,')&&sender.includes('governConcertLookV961(previous,coordinatedLookV1154,'))));
+  add('governor',hasFinalGoveeGovernor(sender));
   add('sender',sender.includes("goveeBridgeRequestV909(config,'/command','POST'"));
   add('settings-update',sender.includes('waveSettingsV1097,journeySettingsV1098,beatAccentSettingsV1099'));
   add('listener-cleanup',sender.includes('window.removeEventListener(GOVEE_BEAT_ACCENT_EVENT_V1099,refresh)'));

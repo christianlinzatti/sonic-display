@@ -92,7 +92,7 @@ assert(sender.indexOf('applyGoveeShowV1042(syncedLookV1027,previous,') <
  sender.indexOf('applyGoveeRoomV1096(showLookV1042,previous,')));
 assert(sender.includes('applyGoveeRoomV1096(showLookV1042,previous,')&&
  sender.includes('applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,')&&
- sender.includes('governConcertLookV961(previous,coordinatedLookV1154,'));
+ sender.includes('governConcertLookV961(previous,ensembleLook,'));
 assert.equal((sender.match(/goveeBridgeRequestV909\(config,'\/command','POST',\{ip,action:'look',value:finalLook\}\)/g)||[]).length,1);
 assert(sender.includes('visualAdvanceV1027(syncSettingsV1027,ip,visualAdvance)'));
 assert(sender.includes('savedShowActive:Boolean(show),authoredStageActive:stage?.source===\'authored\''));
@@ -111,4 +111,6 @@ assert(pkg.scripts.prebuild.includes('npm run test:v1027 &&'));
 for(const script of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(script).includes('tests/v1027-govee-concert-sync-regression.cjs'));
 assert(read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1027(root)'));
+assert(require('../lib/goveeSenderInvariant.cjs').hasFinalGoveeGovernor(require('node:fs').readFileSync(require('node:path').join(__dirname,'../components/GoveeMusicSyncV909.tsx'),'utf8')),'All overlays must feed the final governor before the sole LAN look send');
+
 console.log('PASS V1027 4 opt-in zones, validated LAN IPs, verified song sections, manual priority, visual lag cap, rate-limited in-place overlay and CI');

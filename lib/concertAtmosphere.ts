@@ -1,7 +1,8 @@
 import type {ConcertScoreV1134} from './concertScoreV1134';
 import type {ConcertTier} from './concertStageShow';
 export type AtmosphereMotif='aurora'|'prism'|'stars'|'halo';
-export type AtmospherePlan={active:boolean;scene:string;motif:AtmosphereMotif;weights:[number,number,number,number];amount:number;floor:boolean;floorGain:number;moving:boolean;still:boolean;spread:number};
+export type AtmosphereHero='portal'|'meteors'|'orbit'|'off';
+export type AtmospherePlan={hero:AtmosphereHero;heroGain:number;heroPulse:number;active:boolean;scene:string;motif:AtmosphereMotif;weights:[number,number,number,number];amount:number;floor:boolean;floorGain:number;moving:boolean;still:boolean;spread:number};
 const motifs:AtmosphereMotif[]=['aurora','prism','stars','halo'];
 const clamp=(v:number)=>Number.isFinite(v)?Math.max(0,Math.min(1,v)):0;
 const base={cinema:0,groove:3,neon:1,festival:2};
@@ -21,5 +22,9 @@ export function planConcertAtmosphere(input:{cue:ConcertScoreV1134;active:boolea
  const gain=protectedText?0:opening?.15:quiet?.12:scene==='suspense'?.16+clamp(cue.anticipationProgress)*.12:scene==='refrain'?.48+Math.min(3,visit)*.06:scene==='reprise'?.72:scene==='instrumental'?.5:.30;
  const amount=active?clamp(input.scale)*gain*(input.reducedMotion?.18:input.tier==='low'?.55:input.tier==='balanced'?.7:1)*(input.playing?1:.3):0;
  const floor=active&&input.floorAllowed&&moving&&scene!=='suspense';
- return {active,scene,motif:motifs[index],weights,amount,floor,floorGain:floor?amount*.42:0,moving,still:input.reducedMotion||quiet||input.tier==='low',spread:quiet?.25:scene==='suspense'?.35+clamp(cue.anticipationProgress)*.35:scene==='refrain'||scene==='reprise'?1:.6};
+ const heroAllowed=moving&&['refrain','reprise','instrumental'].includes(scene);
+ const hero:AtmosphereHero=heroAllowed?(['portal','meteors','orbit'] as const)[(start+visit-1+(scene==='reprise'?2:0))%3]:'off';
+ const heroGain=heroAllowed?Math.min(.55,amount*(scene==='reprise'?1.05:.65+Math.min(3,visit)*.07)):0;
+ const heroPulse=.85+.15*clamp(cue.phraseEnvelope);
+ return {hero,heroGain,heroPulse,active,scene,motif:motifs[index],weights,amount,floor,floorGain:floor?amount*.42:0,moving,still:input.reducedMotion||quiet||input.tier==='low',spread:quiet?.25:scene==='suspense'?.35+clamp(cue.anticipationProgress)*.35:scene==='refrain'||scene==='reprise'?1:.6};
 }

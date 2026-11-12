@@ -114,7 +114,7 @@ check('Govee request count unchanged, V961 remains final sender governor',()=>{
  const source=read('components/GoveeMusicSyncV909.tsx');
  assert.match(source,/const narrativeV962=continuousSceneV960\?planConcertNarrativeV962\(/);
  assert.match(source,/const narrativeLookV962=narrativeV962\?dimConcertNarrativeLookV962\(mixed,narrativeV962\):mixed/);
- assert.ok(source.indexOf('dimConcertNarrativeLookV962(mixed,narrativeV962)')>=0&&source.indexOf('governConcertLookV961(previous,coordinatedLookV1154,')>source.indexOf('dimConcertNarrativeLookV962(mixed,narrativeV962)'));
+ assert.ok(source.indexOf('dimConcertNarrativeLookV962(mixed,narrativeV962)')>=0&&source.indexOf('governConcertLookV961(previous,ensembleLook,')>source.indexOf('dimConcertNarrativeLookV962(mixed,narrativeV962)'));
  assert.match(source,/if\(!changedGoveeLookV911\(previous,finalLook\)\)continue/);
  assert.match(source,/value:finalLook/);assert.match(source,/sent\.set\(ip,finalLook\)/);
 });
@@ -152,4 +152,6 @@ check('6000 cases are finite, stable and never exceed existing caps',()=>{
   assert.ok(look.brightness>=0&&look.brightness<=brightness);
  }
 });
+assert(require('../lib/goveeSenderInvariant.cjs').hasFinalGoveeGovernor(require('node:fs').readFileSync(require('node:path').join(__dirname,'../components/GoveeMusicSyncV909.tsx'),'utf8')),'All overlays must feed the final governor before the sole LAN look send');
+
 console.log('V962 PASS '+checks+' groups + 6000 deterministic song/light cases');

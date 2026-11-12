@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const {hasFinalGoveeGovernor}=require('../lib/goveeSenderInvariant.cjs');
 const fs=require('node:fs'),path=require('node:path');
 function inspectReleaseV1098(root){
  const checks=[],add=(id,ok)=>checks.push({id,ok:!!ok});
@@ -25,7 +26,7 @@ function inspectReleaseV1098(root){
   const sender=read('components/GoveeMusicSyncV909.tsx');
   add('authorized-route',sender.includes('planGoveeColorJourneyV1098({settings:journeySettingsV1098')&&
    sender.includes('applyGoveeColorJourneyV1098(roomDecisionV1096,journeyDecisionV1098)'));
-  add('existing-governor',(sender.includes('governConcertLookV961(previous,roomLookV1096,')||(sender.includes('applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,')&&sender.includes('governConcertLookV961(previous,coordinatedLookV1154,'))));
+  add('existing-governor',hasFinalGoveeGovernor(sender));
   add('existing-sender',sender.includes("goveeBridgeRequestV909(config,'/command','POST'"));
   add('live-update',sender.includes('waveSettingsV1097,journeySettingsV1098'));
   add('cleanup',sender.includes('window.removeEventListener(GOVEE_JOURNEY_EVENT_V1098,refresh)'));

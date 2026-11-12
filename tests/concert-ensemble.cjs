@@ -36,3 +36,12 @@ assert.equal(ensembleLightLook(look,{...cue,playing:false},input),look);
 publishEnsembleLight({sourceKey:'track:a',positionMs:20,reading:false,lyricFocus:true,interaction:'solo',palette:'#44aaff'},true,true,1000);assert(getEnsembleLight().protected);
 publishEnsembleLight({},false,false);assert.equal(getEnsembleLight(),null);
 console.log('PASS ensemble: delayed replies, gaze release, bounded staging, five fabric families, four lyric motifs, rap/pause guards, Govee identity/freshness/manual/caps');
+
+const {beginGoveeLook,finishGoveeLook}=load('lib/goveeLookPacing.ts');
+const pacing=new Map(),fixture='bridge|lamp';
+assert(beginGoveeLook(pacing,fixture,100));assert(!beginGoveeLook(pacing,fixture,2000),'A slow in-flight request cannot overlap after a settings restart');
+finishGoveeLook(pacing,fixture,2000);assert(!beginGoveeLook(pacing,fixture,2700));assert(beginGoveeLook(pacing,fixture,2900));
+finishGoveeLook(pacing,fixture,3000);assert(!beginGoveeLook(pacing,fixture,1000),'Monotonic time regression fails closed');
+assert(!beginGoveeLook(pacing,fixture,NaN));assert(beginGoveeLook(pacing,'bridge|other',3000),'Independent fixtures keep their existing cadence');
+const busy=new Map();for(let i=0;i<64;i++)assert(beginGoveeLook(busy,'fixture'+i,0));assert(!beginGoveeLook(busy,'overflow',10000));finishGoveeLook(busy,'fixture0',10000);assert(!beginGoveeLook(busy,'replacement',10000),'Recent cooldown history must not be evicted');assert(beginGoveeLook(busy,'replacement',10900));assert.equal(busy.size,64);
+console.log('PASS actual Govee dispatch pacing: slow responses, effect restarts, independent fixtures, monotonic time and bounded in-flight state');

@@ -102,7 +102,7 @@ const order=['applyGoveeZoneMixV1100(roomDecisionV1096,zoneMixDecisionV1100)',
  'applyGoveeSceneZoneV1102(roomDecisionV1096,sceneZoneDecisionV1102)',
  'applyGoveeRoomV1096(showLookV1042,previous,roomDecisionV1096,',
  'applyConcertLightV1154(roomLookV1096,coordinationDecisionV1154,',
- 'governConcertLookV961(previous,coordinatedLookV1154,',
+ 'governConcertLookV961(previous,ensembleLook,',
  "goveeBridgeRequestV909(config,'/command','POST'"];
 const positions=order.map(x=>sender.indexOf(x));
 assert(positions.every((pos,i)=>pos>=0&&(!i||pos>positions[i-1])),`final V1096,V961,V909 gates kept: ${positions}`);
@@ -116,4 +116,6 @@ assert(/^0\.1\.0-v\d+$/.test(pkg.version)&&Number(pkg.version.split('-v')[1])>=1
 for(const f of ['scripts/v931-production-gate.cjs','scripts/vercel-production-build.cjs'])
  assert(read(f).includes('tests/v1102-govee-scene-zone-regression.cjs'));
 assert(read('scripts/v959-source-preflight.cjs').includes('inspectReleaseV1102(root)'));
+assert(require('../lib/goveeSenderInvariant.cjs').hasFinalGoveeGovernor(require('node:fs').readFileSync(require('node:path').join(__dirname,'../components/GoveeMusicSyncV909.tsx'),'utf8')),'All overlays must feed the final governor before the sole LAN look send');
+
 console.log('PASS V1102: '+tested+' bounded scene-zone states; 60 zone/phase/style combinations; V961/V909 final security path');
