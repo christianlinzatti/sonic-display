@@ -22,7 +22,7 @@ import {crewClipTime} from "./sonicCrewDirector";
 import {prepareCrewReaction,applyCrewReaction} from "./sonicCrewReaction";
 import {useEmbeddedMotionDirectorV530} from "./useEmbeddedMotionDirectorV530";
 import {useGenreAwareMotionDirectorV536} from "./useGenreAwareMotionDirectorV536";
-import {genreCrossfadeSecondsV536,type GenreMotionCandidateV536} from "./genreAwareMotionDirectorV536";
+import {genreCrossfadeSecondsV536,motionSectionV536,type GenreMotionCandidateV536} from "./genreAwareMotionDirectorV536";
 import {suggestMotionCategoryV535} from "./motionLibraryIntelligenceV535";
 // Extracted unchanged from ThreeAvatar.tsx (V492 modular refactor).
 // --- Extracted dependencies (V492 refactor) ---
@@ -1427,7 +1427,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     !timelineEnabled&&!avatarBlendEnabled&&!smartDanceOverride&&
     !rapLiveEnabledV412&&!clipChoiceV328&&!phraseChoiceV329&&
     !groupClockV328?.settings.enabled&&!groupPhraseV329?.settings.enabled;
-  const mixamoFade=automaticMixamo ? mixamoMinimumFade(mixamoEntry.name,
+  const mixamoFade=automaticMixamo && mixamoEntry ? mixamoMinimumFade(mixamoEntry.name,
     motionSectionV536(showCue?.enabled?showCue.section:cameraDirectorSection)) : 0;
   // V492: a saved combination activates only when its original *base* is
   // already the chosen live clip. Never hijack a manual selection / timeline.
