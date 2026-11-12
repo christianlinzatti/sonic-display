@@ -87,10 +87,21 @@ export interface FootTargetV322 extends PointV322 {weight:number;locked:boolean;
 export function updateFootLockTargetV322(state:FootAnchorV322,p:FootLockProbeV322,settings:FootLockSettingsV322):FootTargetV322 {
   const position=p.position;
   const safePos={x:num(position.x,0),y:num(position.y,0),z:num(position.z,0)};
-  const dt=clamp(num(p.delta,0),0,.1),length=clamp(num(p.legLength,1),.1,4);
-  const conf=clamp(num(p.confidence,0),0,1);
-  const groundDistance=Math.abs(safePos.y-num(p.floorY,safePos.y));
-  const grounded=p.phase==='planted'&&conf>.30&&groundDistance<Math.max(.035,length*.095)&&num(p.verticalSpeed,0)<length*.9;
+  // Invalid sensors must never acquire a new anchor or reuse a stale one.
+  // A zero/NaN frame step cannot describe a valid contact transition.
+  const validSample=[position.x,position.y,position.z,p.verticalSpeed,p.floorY,
+    p.legLength,p.delta,p.confidence].every(Number.isFinite) &&
+    p.legLength>.1&&p.delta>0&&p.delta<=.25;
+  if(!validSample){
+    state.active=false;state.blend=0;state.lastSlip=0;
+    return {...safePos,weight:0,locked:false,slip:0};
+  }
+  const dt=clamp(p.delta,0,.1),length=clamp(p.legLength,.1,4);
+  const conf=clamp(p.confidence,0,1);
+  const groundDistance=Math.abs(safePos.y-p.floorY);
+  // Fast downstrokes (as well as upward swings) are not planted contacts.
+  const grounded=p.phase==='planted'&&conf>.30&&groundDistance<Math.max(.035,length*.095)&&
+    Math.abs(p.verticalSpeed)<length*.9;
   const radius=length*clamp(settings.maxCorrectionCm/180, .005,.09);
   if(!grounded&&state.active)state.active=false;
   if(grounded&&!state.active){state.point={...safePos};state.active=true;state.maxSlip=0;}
