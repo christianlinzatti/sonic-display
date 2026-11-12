@@ -1,4 +1,5 @@
 "use client";
+import {fitImportedAvatar} from "@/lib/importedAvatarPresentation";
 import {useOwnedAvatarResourcesV1009} from './useOwnedAvatarResourcesV1009';
 import {ModelPreviewBoundaryV733} from "./ModelPreviewBoundaryV733";
 import {usePreviewGltfCacheV654} from "./usePreviewGltfCacheV654";
@@ -106,7 +107,7 @@ function GltfPreview({ url, animationUrl, sharedMotionUrlV531, timeline, blendV4
   const ik = useRef(createFootIKState());
   const { scene, animations } = useGLTF(url);
   usePreviewGltfCacheV654(url);
-  const model = useMemo(() => cloneSkinnedScene(scene), [scene]);
+  const model = useMemo(() => fitImportedAvatar(cloneSkinnedScene(scene),url), [scene,url]);
   useOwnedAvatarResourcesV1009(model);
   useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(model);},[model]);
   const mixer = useMemo(() => new AnimationMixer(model), [model]);

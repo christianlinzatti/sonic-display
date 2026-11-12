@@ -67,7 +67,8 @@ const group=fs.readFileSync(dir+'GroupDancersV326SceneV492.tsx','utf8');
 const duo=fs.readFileSync(dir+'DanceFormationActorsV492.tsx','utf8');
 const context=fs.readFileSync(dir+'ThreeAvatarContextsV492.tsx','utf8');
 const reader=fs.readFileSync(dir+'measureGlbBodyV507.ts','utf8');
-assert(glb.includes('measureGlbBodyV507(scene,avatarScale)')&&glb.includes('bodyRegistryV507?.set(workloadSlot')&&glb.includes('bodyRegistryV507?.clear(workloadSlot'));
+assert(glb.includes('measureGlbBodyV507(isImportedAvatarUrl(assetUrl??url)?model:scene,avatarScale)')&&glb.includes('bodyRegistryV507?.set(workloadSlot')&&glb.includes('bodyRegistryV507?.clear(workloadSlot'));
+assert(glb.indexOf('fitImportedAvatar(instance,assetUrl??url)')<glb.indexOf('const bodyProfileV507='),'Imported actor placement precedes cached rest-pose measurement');
 assert(reader.includes('new WeakMap')&&reader.includes('scene.traverse')&&reader.includes('isBone')&&reader.includes('new Box3'));
 assert(context.includes('AvatarBodyContextV507=createContext'));
 for(const source of [group,duo]){

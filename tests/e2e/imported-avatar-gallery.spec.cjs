@@ -39,7 +39,17 @@ test('imported gallery filters all models, renders their rigs and saves the sele
   const canvas=studio.locator('canvas');await expect(canvas).toBeVisible();await canvas.scrollIntoViewIfNeeded();
   const before=await canvas.screenshot();await scrubber.press('PageUp');
   await expect.poll(async()=>!(await canvas.screenshot()).equals(before)).toBe(true);
-  await info.attach(entry.id,{body:await canvas.screenshot(),contentType:'image/png'});
+  const screenshot=await canvas.screenshot();
+  const visible=await page.evaluate(async source=>{
+   const image=new Image();image.src=source;await image.decode();
+   const target=document.createElement('canvas');target.width=image.width;target.height=image.height;
+   const context=target.getContext('2d');context.drawImage(image,0,0);
+   const pixels=context.getImageData(0,0,target.width,target.height).data;let minY=target.height,maxY=-1,count=0;
+   for(let i=0;i<pixels.length;i+=4)if(Math.max(pixels[i],pixels[i+1],pixels[i+2])>80){const y=Math.floor(i/4/target.width);minY=Math.min(minY,y);maxY=Math.max(maxY,y);count++;}
+   return {minY,maxY,count,height:target.height};
+  },`data:image/png;base64,${screenshot.toString('base64')}`);
+  expect(visible.count).toBeGreaterThan(100);expect(visible.minY).toBeGreaterThan(4);expect(visible.maxY).toBeLessThan(visible.height-4);
+  await info.attach(entry.id,{body:screenshot,contentType:'image/png'});
  }
  await page.reload();const again=await openSettings(page,'avatar');
  await expect(again.locator('.settings-avatar-preview').getByRole('heading',{name:'Performer V2',exact:true})).toBeVisible();

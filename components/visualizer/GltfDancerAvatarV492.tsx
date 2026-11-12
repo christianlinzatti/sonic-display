@@ -1,4 +1,5 @@
 "use client";
+import {fitImportedAvatar,isImportedAvatarUrl} from "@/lib/importedAvatarPresentation";
 import {stagePlacementV1135} from '@/lib/stagePresenceV1135';
 import {CREW_IDS} from './sonicCrewDirector';
 import {SonicFootContactV1135} from './SonicFootContactV1135';
@@ -290,15 +291,6 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
   const phraseMotionState = useRef(createPhraseMotionState());
   const { scene, animations } = useGLTF(assetUrl ?? url);
  usePreviewGltfCacheV654(assetUrl ?? url);
-  // V507: rest-pose analysis only when a decoded GLB/scale changes; no frame tax.
-  // Stage-local registry is keyed by dancer slot and cleaned on asset switch.
-  const bodyRegistryV507=useContext(AvatarBodyContextV507);
-  const bodyProfileV507=useMemo(()=>measureGlbBodyV507(scene,avatarScale),[scene,avatarScale]);
-  useEffect(()=>{
-    const identity=`${url}|${assetUrl??url}|${avatarScale}|${workloadSlot}`;
-    bodyRegistryV507?.set(workloadSlot,identity,bodyProfileV507);
-    return ()=>bodyRegistryV507?.clear(workloadSlot,identity);
-  },[bodyRegistryV507,bodyProfileV507,url,assetUrl,avatarScale,workloadSlot]);
   // Clone only when the model changes. SkeletonUtils preserves skinned-mesh
   // bone bindings; cloning inside JSX on every React render breaks caching.
   // Cached originals stay untouched; the owned-resource hook isolates renderer resources.
@@ -308,8 +300,17 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
       if ("castShadow" in node) node.castShadow = false;
       if ("receiveShadow" in node) node.receiveShadow = false;
     });
-    return instance;
-  }, [scene]);
+    return fitImportedAvatar(instance,assetUrl??url);
+  }, [scene,assetUrl,url]);
+  // V507: rest-pose analysis only when a decoded GLB/scale changes; no frame tax.
+  // Stage-local registry is keyed by dancer slot and cleaned on asset switch.
+  const bodyRegistryV507=useContext(AvatarBodyContextV507);
+  const bodyProfileV507=useMemo(()=>measureGlbBodyV507(isImportedAvatarUrl(assetUrl??url)?model:scene,avatarScale),[scene,model,avatarScale,assetUrl,url]);
+  useEffect(()=>{
+    const identity=`${url}|${assetUrl??url}|${avatarScale}|${workloadSlot}`;
+    bodyRegistryV507?.set(workloadSlot,identity,bodyProfileV507);
+    return ()=>bodyRegistryV507?.clear(workloadSlot,identity);
+  },[bodyRegistryV507,bodyProfileV507,url,assetUrl,avatarScale,workloadSlot]);
   useEffect(()=>()=>{disposeClonedAvatarSkeletonsV654(model);},[model]);
   useOwnedAvatarResourcesV1009(model);
   const gluteRigV741=useMemo(()=>collectGluteRigV741(model),[model]);

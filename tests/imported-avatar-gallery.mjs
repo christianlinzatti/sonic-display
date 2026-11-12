@@ -1,12 +1,17 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-import {AnimationMixer,Box3} from 'three';
+import {AnimationMixer,Box3,Group} from 'three';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {clone} from 'three/examples/jsm/utils/SkeletonUtils.js';
 import load from './helpers/load-stage-typescript.cjs';
 
 const manifest=JSON.parse(readFileSync(new URL('../public/avatars/imported/manifest.json',import.meta.url)));
 const {importedAvatarModels}=load('config/avatarModels.imported.ts');
+const {fitImportedAvatar}=load('lib/importedAvatarPresentation.ts');
+const legacy=new Group();legacy.position.set(1,2,3);legacy.scale.setScalar(3);
+fitImportedAvatar(legacy,'/avatars/sonic/neon-pulse.glb');
+assert.deepEqual(legacy.position.toArray(),[1,2,3]);assert.deepEqual(legacy.scale.toArray(),[3,3,3]);
 assert.equal(manifest.length,13);
 assert.equal(new Set(importedAvatarModels.map(model=>model.id)).size,13);
 for(const entry of manifest){
@@ -23,13 +28,18 @@ for(const entry of manifest){
  const gltf=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'');
  assert.deepEqual(gltf.animations.map(clip=>clip.name),entry.clips);
  assert(model.tags.includes(`${gltf.animations.length} Animationen`));
- const skins=[];gltf.scene.traverse(object=>{if(object.isSkinnedMesh)skins.push(object);});
+ const originalPosition=gltf.scene.position.toArray(),originalScale=gltf.scene.scale.toArray();
+ const actor=fitImportedAvatar(clone(gltf.scene),model.url);
+ assert.deepEqual(gltf.scene.position.toArray(),originalPosition,'Cached originals retain their placement');
+ assert.deepEqual(gltf.scene.scale.toArray(),originalScale);
+ const skins=[];actor.traverse(object=>{if(object.isSkinnedMesh)skins.push(object);});
  assert(skins.length>0);
- const bounds=new Box3().setFromObject(gltf.scene);
+ const bounds=new Box3().setFromObject(actor,true);
  assert([bounds.min,bounds.max].flatMap(v=>v.toArray()).every(Number.isFinite));
  assert(bounds.max.y>bounds.min.y);
- const mixer=new AnimationMixer(gltf.scene);
- const sample=()=>{gltf.scene.updateMatrixWorld(true);return skins.flatMap(mesh=>{mesh.skeleton.update();return Array.from(mesh.skeleton.boneMatrices);});};
+ assert(Math.abs(bounds.min.y+1)<1e-5&&Math.abs(bounds.max.y-1)<1e-5,'Imported figures fit the centered stage envelope');
+ const mixer=new AnimationMixer(actor);
+ const sample=()=>{actor.updateMatrixWorld(true);return skins.flatMap(mesh=>{mesh.skeleton.update();return Array.from(mesh.skeleton.boneMatrices);});};
  for(const clip of gltf.animations){
   assert(clip.duration>0&&Number.isFinite(clip.duration));
   assert(clip.tracks.every(track=>Array.from(track.values).every(Number.isFinite)));
