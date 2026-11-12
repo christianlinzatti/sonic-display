@@ -75,3 +75,34 @@ node tests/phase1-target-rig-quality-regression.cjs
 Dieser synthetische Three.js-Test enthält zwei unterschiedlich große
 Ziel-Rigs und echte AnimationMixer-Samples, ersetzt aber weiterhin nicht
 den Sichttest einer realen Mixamo-FBX auf deinem Avatar.
+
+## Schritt 3 – Konservative Foot-Lock-Empfehlung nach Sichtprüfung
+
+Wenn der Ziel-Avatar mit mindestens acht untersuchten Posen und ausreichend
+geschätzten Standphasen mehrere auffällige Seitwärtsverschiebungen zeigt,
+schlägt der Import-Inspector eine **optionale** Anpassung der bereits
+existierenden V322-Fußverankerung vor. Es wird kein neues IK-System aktiviert:
+
+- Erhöht bei Bedarf die Ankerstärke auf mindestens **75 %**.
+- Erhöht bei Bedarf das Freigabetempo beim Abheben auf mindestens **70 %**.
+- Begrenzt die maximale Korrektur auf höchstens **6 cm** (Avatar-Referenzmaß).
+- Verändert weder die vorhandene Bodenhöhen-Nachführung noch bereits stärker
+  eingestellte Anker-/Freigabewerte.
+- **Wichtig:** Das bisherige `enabled` bleibt unverändert. Wenn V322 aus war,
+  bleibt es aus. Eine spätere Aktivierung ist nur manuell in den
+  Stage-Director-Fußkontakt-Einstellungen möglich.
+
+Die Knöpfe erscheinen **nur nach der Analyse eines kompatiblen Ziel-Avatars**.
+Zum Speichern muss die Person die 3D-Vorschau bestätigen und dann ausdrücklich
+**Globale Foot-Lock-Werte übernehmen** wählen. Direkt vor dem Speichern
+werden aktuelle Werte erneut eingelesen; zuvor manuell geänderte Werte
+werden respektiert. Ohne ausreichend belastbare Hinweise bietet die
+Oberfläche bewusst keine automatische Empfehlung an.
+
+Diese Einstellungen gelten **global**, nicht nur für den analysierten
+Avatar. Darauf weist die Oberfläche hin. Bei ungünstigem sichtbaren
+Verhalten können die Werte in den vorhandenen V322-Reglern zurückgesetzt
+werden. Die durch niedrige Fußhöhen vermuteten Kontakte sind keine
+physikalisch nachgewiesenen Standphasen.
+
+Regression: `node tests/phase1-foot-lock-advice-regression.cjs`.
