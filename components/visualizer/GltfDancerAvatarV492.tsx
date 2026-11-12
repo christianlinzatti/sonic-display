@@ -1664,8 +1664,16 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     if(!automaticMixamo||!mixamoEntry||!selectedClip||Math.abs(avatarClipSpeed-1)>.001)return;
     const action=actions[selectedClip];
     if(!action)return;
-    action.timeScale=mixamoBeatAlignedSpeed(mixamoEntry.name,
+    // Restore the previous mixer speed when the automatic clip, song BPM or
+    // playback mode changes. A manual/timeline speed applied in the meantime
+    // must never be overwritten by this cleanup.
+    const previousSpeed=action.timeScale;
+    const alignedSpeed=mixamoBeatAlignedSpeed(mixamoEntry.name,
       action.getClip().duration,audio.bpm,1);
+    action.timeScale=alignedSpeed;
+    return ()=>{
+      if(Math.abs(action.timeScale-alignedSpeed)<.0005)action.timeScale=previousSpeed;
+    };
   },[actions,selectedClip,automaticMixamo,mixamoEntry?.name,audio.bpm,avatarClipSpeed]);
   // V328: absolute shared ensemble beat clock drives the *actual* selected
   // GLB action in each independent mixer; no source track or shared audio edits.
