@@ -52,7 +52,9 @@ ok('settings tab and persistent music-sync root integration',()=>{
  const page=fs.readFileSync(path.join(__dirname,'../app/page.tsx'),'utf8');
  const panel=fs.readFileSync(path.join(__dirname,'../components/GoveeLanPanelV909.tsx'),'utf8');
  const sync=fs.readFileSync(path.join(__dirname,'../components/GoveeMusicSyncV909.tsx'),'utf8');
- assert.match(settings,/id: "govee"/);assert.match(settings,/tab === "govee" && <GoveeLanPanelV909/);
+ const {SETTINGS_SECTIONS}=require('./helpers/load-stage-typescript.cjs')(path.join(__dirname,'../lib/settingsNavigation.ts'));
+ assert(SETTINGS_SECTIONS.some(section=>section.id==='govee'),'Govee remains in the registered settings navigation');
+ assert.match(settings,/const\s+sections\s*=\s*SETTINGS_SECTIONS/);assert.match(settings,/tab === "govee" && <GoveeLanPanelV909/);
  assert.match(page,/<GoveeMusicSyncV909\/>/);assert.match(panel,/if\(config\.autoSync\)update\(\{autoSync:false\}\)/);
  assert.match(sync,/if\(!state\.isPlaying\|\|!state\.track\)return/);
 });
