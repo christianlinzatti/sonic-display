@@ -45,3 +45,5 @@ Die Performance-Regie erlaubt auf hoher Stufe zwei, auf mittlerer Stufe einen un
 Die bestehenden Raum-Effekte behalten ihre zwei Shader-Zeichenflächen; die neuen Bildschirme benötigen zusätzlich höchstens zwei einfache Flächen. Sie haben keine eigenen Frame-Schleifen oder Netzwerk-Timer. Die Cover-Textur wird bei Metadaten-/Bildwechsel, die Textkarte bei einem echten Zeilenwechsel neu gezeichnet.
 
 `tests/concert-stage-screens.cjs` prüft Identität, Budgets, Leseschutz, URL-Regeln und die tatsächlichen Canvas-Zeichenaufrufe einschließlich unbeschnittener Bildproportionen. `tests/e2e/concert-stage-screens.spec.cjs` prüft die geladenen Bildschirme, Songwechsel, Bild-Fallback, Rap-Dimmung, Abstände zur Lyrics-Zone und den gespeicherten Opt-out. Die Tests sind in die aktive Release-Suite aufgenommen.
+
+Der Shader-Szenentest verwendet längere, normal laufende Mock-Refrains. Dadurch verlassen langsamere Geräte die Textstelle nicht schon während des Bühnenstarts. Browseruhren, Timer, Live-Pause und Polling laufen unverändert. Die tatsächliche Szenenauswahl und die drei Akzente werden zusätzlich aus diesen Lyrics im Pure-Test geprüft.

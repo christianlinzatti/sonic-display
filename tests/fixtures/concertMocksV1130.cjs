@@ -13,6 +13,12 @@ const originalLines=[
 ];
 const lyrics={provider:'spotify',synced:true,plainText:originalLines.map(x=>x[2]).join('\n'),
  lines:originalLines.map(([startMs,endMs,text])=>({startMs,endMs,text,words:text.split(' ').map((word,i,all)=>({text:word,startMs:Math.round(startMs+(endMs-startMs)*i/all.length),endMs:Math.round(startMs+(endMs-startMs)*(i+1)/all.length)}))}))};
+// Longer, normally advancing refrain windows for shader screenshots on slow renderers.
+const showcaseLines=[[0,20000,originalLines[0][2]],[24000,46000,originalLines[3][2]],
+ [48000,60000,originalLines[5][2]],[64000,86000,originalLines[3][2]],
+ [88000,90000,originalLines[8][2]],[92000,120000,originalLines[3][2]]];
+const showcaseLyrics={...lyrics,plainText:showcaseLines.map(x=>x[2]).join('\n'),
+ lines:showcaseLines.map(([startMs,endMs,text])=>({startMs,endMs,text,words:text.split(' ').map((word,i,all)=>({text:word,startMs:Math.round(startMs+(endMs-startMs)*i/all.length),endMs:Math.round(startMs+(endMs-startMs)*(i+1)/all.length)}))}))};
 async function installConcertMocksV1130(page,initial={}){
  const state={position:8000,playing:true,trackId:'MockConcertV1130TrackA',missingLyrics:false,genre:'pop',advancing:false,spotifyStatus:200,lyricsStatus:200,durationMs:100000,...initial};
  let anchor=Date.now();const calls={spotify:0,lyrics:0,genre:0};
@@ -35,4 +41,4 @@ async function installConcertMocksV1130(page,initial={}){
  await page.route('**/api/genre?*',route=>{calls.genre++;return json(route,{genre:state.genre,source:'track',confidence:.98,reason:'Controlled test fixture'});});
  return {calls,lyrics,setPlayback(patch){Object.assign(state,patch);anchor=Date.now();},state};
 }
-module.exports={installConcertMocksV1130,lyrics};
+module.exports={installConcertMocksV1130,lyrics,showcaseLyrics};

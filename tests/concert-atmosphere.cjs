@@ -25,3 +25,9 @@ for(const extra of [{playing:false},{reducedMotion:true},{tier:'low'},{enabled:f
  const p=plan(extra);assert.equal(p.hero,'off');assert.equal(p.heroGain,0);
 }
 console.log('PASS hero stage: portals, meteors and orbital fans; bounded phrase accents, pause, text, opt-out and low-tier guards');
+const {showcaseLyrics}=require('./fixtures/concertMocksV1130.cjs');
+for(const [position,hero] of [[34000,'portal'],[74000,'meteors'],[104000,'orbit']])for(const elapsed of [0,3000,6000]){
+ const actualCue=concertScoreV1134({trackId:'MockConcertV1130TrackA',progressMs:position+elapsed,genre:'house',lyrics:showcaseLyrics,durationMs:180000,count:3,scenery:true,showPlans:true,showStyle:'cinema'});
+ assert.equal(plan({cue:actualCue}).hero,hero,'Normally advancing mock refrain retains its actual score and accent during stage startup');
+}
+console.log('PASS real showcase lyrics: three score-selected accents remain stable through normal playback');
