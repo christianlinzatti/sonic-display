@@ -85,7 +85,7 @@ jobs:
       - name: Release reliability regressions
         run: npm run verify:v1004:focused
       - name: Mixamo FBX import and retargeting regression
-        run: node tests/mixamo-fbx-import-regression.cjs && node tests/mixamo-dance-director-regression.cjs
+        run: node tests/mixamo-fbx-import-regression.cjs && node tests/mixamo-dance-director-regression.cjs && node tests/mixamo-tag-suggestions-regression.cjs
       # Full historical regression coverage is already enforced by the inherited
       # Linux production gate. Avoid duplicating dozens of costly suites.
       - name: Active imported release (regression and isolated type checks)
