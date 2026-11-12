@@ -1413,6 +1413,7 @@ export function GltfAvatar({ importedClips = [], importedAnimationScene, animati
     trackId:track?.id,progressMs:cameraDirectorProgressMs??propsLipSyncV367?.progressMs,
     section:showCue?.enabled?showCue.section:cameraDirectorSection,
     genre,energy:audio.energyEnvelope,bpm:audio.bpm,slot:workloadSlot,
+    ensembleCount:ensembleCountV745??propsLipSyncV367?.ensembleCountV374??1,
     playing:isPlaying,reducedMotion,manualPriority:manualGenrePriorityV536,
   });
   // Keep V481/V328/V329/V356 and every manually authored action above V530.
