@@ -1,7 +1,8 @@
 /** V536: deterministic, allocation-bounded genre director over ALREADY AVAILABLE actions.
  * Takes optional V535 metadata, never creates or rewrites a clip/GLB, never infers the singer.
  */
-import {mixamoGenreBias} from "./mixamoMotionDirector";
+import {mixamoGenreBias,isMixamoMotion} from "./mixamoMotionDirector";
+import {mixamoShowCue,mixamoShowCueBias} from "./mixamoShowChoreography";
 
 export type GenreMotionCategoryV536 = 'idle' | 'rap' | 'dance' | 'energetic' | 'gesture' | 'locomotion' | 'other';
 export type GenreMotionCandidateV536 = {
@@ -20,7 +21,7 @@ export type GenreMotionInputV536 = {
   progressMs: number | null | undefined;
   section: string | null | undefined; genre: string | null | undefined;
   bpm: number | null | undefined; energy: number | null | undefined;
-  slot: number; playing: boolean; reducedMotion: boolean; manualPriority: boolean;
+  slot: number; ensembleCount?: number; playing: boolean; reducedMotion: boolean; manualPriority: boolean;
 };
 export type GenreMotionStateV536 = {
   trackId: string; modelKey: string; selectedName: string | null;
@@ -141,10 +142,18 @@ export function rankGenreMotionsV536(input:GenreMotionInputV536,phrase:string,re
       // Mixamo-only hints supplement V536's existing category, section, and
       // history scoring; never override manual selection or rig eligibility.
       score+=mixamoGenreBias(c.label,family,section,energy);
+      // Section-specific Mixamo show cues; only real, loaded library actions.
+      // Hard eligibility, user-defined metadata and manual ownership stay above this preference.
+      if(c.source==="library")score+=mixamoShowCueBias({name:c.label,family,section:input.section,energy,slot,ensembleCount:input.ensembleCount??1});
       const wasRecent=recent.lastIndexOf(c.name);
       if(wasRecent>=0)score-=wasRecent===recent.length-1?2.5:1.1;
       // Stable per musical phrase and avatar slot, not per render/frame.
-      score+=(hash(`${input.trackId}:${input.modelKey}:${phrase}:${slot}:${c.name}`)%997)/997*.82;
+      const together=c.source==="library"&&isMixamoMotion(c.label)&&mixamoShowCue(input.section,slot,input.ensembleCount??1).commonPhrase;
+      // Dancers sharing a model/library use identical phrase tie-breaks on
+      // hook/drop, while verses retain per-performer variety. User group-clock
+      // and manually authored timing are still managed by V328/V327/V492.
+      const performerSeed=together?"ensemble":String(slot);
+      score+=(hash(`${input.trackId}:${input.modelKey}:${phrase}:${performerSeed}:${c.name}`)%997)/997*.82;
       return {name:c.name,score};
     }).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name));
 }
