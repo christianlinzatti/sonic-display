@@ -86,6 +86,8 @@ jobs:
         run: npm run verify:v1004:focused
       - name: Mixamo FBX import and retargeting regression
         run: node tests/mixamo-fbx-import-regression.cjs && node tests/mixamo-dance-director-regression.cjs && node tests/mixamo-tag-suggestions-regression.cjs && node tests/mixamo-show-choreography-regression.cjs && node tests/mixamo-3d-playback-smoke.cjs
+      - name: Phase 2 · AI dance choreographer and per-avatar loaded clip regressions
+        run: npm run test:v1114 && npm run test:v1114:types
       - name: Phase 1 · foot lock and motion quality regressions
         run: node tests/phase1-foot-contact-quality-regression.cjs && node tests/v322-foot-lock-ground-contact-regression.cjs && node tests/phase1-target-rig-quality-regression.cjs && node tests/phase1-foot-lock-advice-regression.cjs
       # Full historical regression coverage is already enforced by the inherited

@@ -18,7 +18,11 @@ export const DANCE_STYLE_LABELS_V1114:Record<DanceStyleV1114,string>={
 };
 export type DanceFormV1114='solo'|'duet'|'canon'|'unison';
 export type DanceCrewModeV1114='individual'|'unison'|'canon'|'spotlight';
-export type DanceOptionsV1114={style:DanceStyleV1114;intensityCap:number};
+export type DanceOptionsV1114={style:DanceStyleV1114;intensityCap:number;
+ /** Actual animation names loaded for each avatar. When supplied, suggestions
+  * are resolved only against that member's repertoire; no match means no clip.
+  */
+ availableClipsByMember?:Record<string,readonly string[]>};
 export type DanceMemberV1114={id:string;label:string;role:'lead'|'support'|'echo'|'rest';
  energy:number;clipSuggestion:string;beatOffset:number;lead:boolean};
 export type DanceCueV1114={index:number;scene:string;start:number;end:number;
@@ -52,7 +56,25 @@ export function normalizeDanceOptionsV1114(raw:unknown):DanceOptionsV1114|null{
  if(!DANCE_STYLES_V1114.includes(x.style as DanceStyleV1114)||
   typeof x.intensityCap!=='number'||!Number.isInteger(x.intensityCap)||
   x.intensityCap<30||x.intensityCap>85)return null;
- return {style:x.style as DanceStyleV1114,intensityCap:x.intensityCap};
+ const available=x.availableClipsByMember;
+ if(available!==undefined&&(!available||typeof available!=='object'||Array.isArray(available)||
+  Object.values(available as Record<string,unknown>).some(v=>!Array.isArray(v)||
+   v.some(name=>typeof name!=='string'||!name.trim()))))return null;
+ return {style:x.style as DanceStyleV1114,intensityCap:x.intensityCap,
+  ...(available!==undefined?{availableClipsByMember:available as Record<string,readonly string[]>}:{})};
+}
+/** Resolve a preference to the exact spelling of an animation loaded by
+ * one avatar. Matching is case/spacing/separator insensitive; the returned
+ * value is always the original loaded clip name, never a fabricated alias.
+ */
+export function resolveDanceClipSuggestionV1114(
+ preferred:readonly string[],available:readonly string[],
+):string {
+ const key=(value:string)=>value.toLowerCase().replace(/[^a-z0-9]+/g,'');
+ const loaded=new Map<string,string>();
+ for(const name of available)if(typeof name==='string'&&name.trim()&&!loaded.has(key(name)))loaded.set(key(name),name);
+ for(const name of preferred){const match=loaded.get(key(name));if(match)return match;}
+ return '';
 }
 /** The existing three real GLB performers remain the only cast members.
  * Mode and clip suggestion apply to a real crew player if separately enabled.
@@ -94,9 +116,14 @@ export function choreographDanceV1114(baseRaw:unknown,performance:PerformanceSho
    const role:DanceMemberV1114['role']=ensemble?'lead':isLead?'lead':form==='duet'?'support':m.role;
    const desired=quiet?'Idle_Breathe':ensemble&&i===6?'Dance_FestivalBounce':
     form==='canon'?'Dance_House':clipOptions[opts.style][j];
+   const fallback=quiet?['Idle_Breathe','Idle','Idle_Standing']:
+    [...clipOptions[opts.style], 'Dance_Groove','Dance_House','Dance_FestivalBounce'];
+   const clipSuggestion=opts.availableClipsByMember?
+    resolveDanceClipSuggestionV1114([desired,...fallback.filter(x=>x!==desired)],
+     opts.availableClipsByMember[m.id]??[]):desired;
    const energy=quiet?Math.min(m.energy,Math.round(opts.intensityCap*.32)):
     clamp(m.energy+(isLead?5:-3),0,opts.intensityCap);
-   return {id:m.id,label:m.label,role,energy,clipSuggestion:desired,
+   return {id:m.id,label:m.label,role,energy,clipSuggestion,
     beatOffset:form==='canon'?j*2:0,lead:isLead};
   });
   return {index:i,scene:p.scene,start:p.start,end:p.end,form,crewMode,

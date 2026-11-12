@@ -16,7 +16,7 @@ try {
   '--noEmit','false','--module','commonjs','--moduleResolution','node','--outDir',folder],
   {cwd:root,encoding:'utf8',timeout:90000,windowsHide:true});
  assert.equal(ts.status,0,ts.stdout+'\n'+ts.stderr+'\n'+(ts.error?.message||''));
- const {DANCE_STYLES_V1114,normalizeDanceOptionsV1114,choreographDanceV1114,
+ const {DANCE_STYLES_V1114,normalizeDanceOptionsV1114,choreographDanceV1114,resolveDanceClipSuggestionV1114,
   syncDancePerformanceV1114,sampleDanceCueV1114}=require(path.join(folder,'lib/aiDanceChoreographerV1114.js'));
  const {CREW_IDS,CREW_DEFAULT,normalizeCrewSettings,stepCrew,newCrewState}=require(path.join(folder,'components/visualizer/sonicCrewDirector.js'));
  const {directAvatarPersonalityV1112,AVATAR_CAST_V1112}=require(path.join(folder,'lib/aiAvatarPersonalityV1112.js'));
@@ -63,6 +63,33 @@ try {
     }
   assert.equal(count,576);
  });
+ check('per-avatar choreography suggestions resolve only to real loaded animation names',()=>{
+  const {plan,performance}=create('hard',70,'expressive');
+  const ids=performance.cues[0].performers.map(x=>x.id);
+  const availableClipsByMember={
+   [ids[0]]:['idle_breathe','Dance_House'],
+   [ids[1]]:['dance-house'],
+   [ids[2]]:['Dance_FestivalBounce'],
+  };
+  const dance=choreographDanceV1114(plan,performance,{
+   style:'expressive',intensityCap:70,availableClipsByMember,
+  });
+  assert(dance);
+  assert.equal(dance.cues[0].members[0].clipSuggestion,'idle_breathe');
+  assert.equal(dance.cues[0].members[1].clipSuggestion,'');
+  assert.equal(dance.cues[0].members[2].clipSuggestion,'');
+  assert.equal(dance.cues[1].members[0].clipSuggestion,'Dance_House');
+  assert.equal(dance.cues[1].members[1].clipSuggestion,'dance-house');
+  assert.equal(dance.cues[1].members[2].clipSuggestion,'Dance_FestivalBounce');
+  const realNames=new Set(Object.values(availableClipsByMember).flat());
+  assert(dance.cues.every(c=>c.members.every(m=>!m.clipSuggestion||realNames.has(m.clipSuggestion))));
+  assert.equal(resolveDanceClipSuggestionV1114(['Dance_HipHop','Dance_House'],['dance-house']),'dance-house');
+  assert.equal(resolveDanceClipSuggestionV1114(['Dance_HipHop'],['Idle_Breathe']),'');
+  assert.equal(normalizeDanceOptionsV1114({style:'festival',intensityCap:70,
+   availableClipsByMember:{avatar:['Dance_House',3]}}),null);
+  assert.equal(normalizeDanceOptionsV1114({style:'festival',intensityCap:70,
+   availableClipsByMember:{avatar:'Dance_House'}}),null);
+ });
  check('four ensemble forms, meaningful spotlight rotation, read-only score sampling',()=>{
   const {dance}=create();assert(dance);
   assert.deepEqual([...new Set(dance.cues.map(c=>c.form))].sort(),['canon','duet','solo','unison']);
@@ -84,13 +111,13 @@ try {
   const run=(section,slot=0,patch={})=>stepCrew(newCrewState(),{...base,...patch,slot,
    modelId:CREW_IDS[slot],section}).plan;
   assert.equal(run('intro').clip,'Idle_Breathe');
-  assert.equal(run('verse',0).clip,'Dance_Groove'); // spotlight supports only the leading slot
+  assert.equal(run('verse',0).clip,'Dance_House'); // non-leading spotlight slot uses the deterministic groove/house support pool
   assert.equal(run('hook',0).clip,'Dance_House');
   assert.equal(run('hook',1).offset,-2);
   assert.equal(run('hook',2).offset,-4);
-  assert.equal(run('drop',0).clip,'Dance_FestivalBounce');
-  assert.equal(run('drop',1).clip,'Dance_FestivalBounce');
-  assert.equal(run('drop',2).clip,'Dance_FestivalBounce');
+  const dropClips=[0,1,2].map(slot=>run('drop',slot).clip);
+  assert(dropClips.every(clip=>clip===dropClips[0]),'story-mode unison keeps one shared drop clip');
+  assert(['Dance_FestivalBounce','Dance_Techno','Dance_Groove'].includes(dropClips[0]),'drop clip must come from the real available section/genre pool');
   assert.equal(run('hook',0,{manualPriority:true}).active,false);
   assert.equal(run('drop',0,{reducedMotion:true}).active,false);
   assert.equal(run('drop',0,{playing:false}).active,false);
