@@ -58,6 +58,7 @@ export function mixamoShowCueBias(input:{
   const s=normalizedWords(input.name);
   const calm=match(s,/\b(idle|relax|breathing|rest|slow|chill|sway)\b/);
   const performance=match(s,/\b(rap|freestyle|swagger|emcee|mc|nod|head nod|point|gesture|popping)\b/);
+  const expressive=match(s,/\b(freestyle|swagger|emcee|mc|nod|head nod|point|gesture|popping)\b/);
   const groove=match(s,/\b(groove|bounce|dance|step|two step|twostep|shuffle|sway|flow|sidestep)\b/);
   const footwork=match(s,/\b(hakken|hakkuh|gabber|footwork|tekk|rave|shuffle)\b/);
   const power=match(s,/\b(jump|jumpstyle|stomp|power|kick|hardstyle|rawstyle|hardtekk)\b/);
@@ -70,7 +71,7 @@ export function mixamoShowCueBias(input:{
   }else if(cue.phase==="verse"){
     if(input.family==="rap")bias=cue.role==="support"?
       groove?1.05:performance?.4:power?-.65:0:
-      performance?1.05:groove?.7:power?-.65:0;
+      expressive?1.1:groove?.7:performance?.45:power?-.65:0;
     else bias=cue.role==="support"?
       groove?.9:footwork?.65:power?-.15:0:
       footwork?.95:groove?.55:power?.2:0;
