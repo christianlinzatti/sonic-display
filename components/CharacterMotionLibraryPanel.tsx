@@ -16,7 +16,7 @@ import { MusicStructureTimelineDirector } from "@/components/visualizer/MusicStr
 import { MotionTransitionStudio } from "@/components/visualizer/MotionTransitionStudio";
 import { AvatarPreview3D } from "@/components/visualizer/AvatarPreview3D";
 import type {AvatarModel} from "@/components/visualizer/avatarModels";
-import {suggestMixamoMotionTags} from "@/components/visualizer/mixamoTagSuggestions";
+import {suggestMixamoMotionTags,applyMixamoTagSuggestions} from "@/components/visualizer/mixamoTagSuggestions";
 import type {UiPreferences} from "@/types/music";
 import {CHARACTER_MOTION_CHANGE_EVENT,loadCharacterMotionStore,saveCharacterMotionStore,type CharacterMotionStore} from "@/components/visualizer/characterMotionLibrary";
 const genres=["","deutschrap","hardtekk","hardstyle","techno","hip-hop","rock","ambient","pop","other"];
@@ -48,17 +48,11 @@ export function CharacterMotionLibraryPanel({models,preferences,admin}:{models:A
  const mixamoSuggestions=motions.filter(m=>!m.genre&&!!suggestMixamoMotionTags(m.name));
  function applyMixamoGenreSuggestions(){
   if(!avatar)return;
-  let changed=0;
-  change(s=>({...s,motions:s.motions.map(m=>{
-   if(m.avatarId!==avatar||m.genre)return m;
-   const hint=suggestMixamoMotionTags(m.name);
-   if(!hint)return m;
-   changed++;
-   // Preserve explicitly customized categories and manually set genres.
-   const original=suggestMotionCategoryV535(m.name);
-   return {...m,genre:hint.genre,category:m.category===original||!m.category?hint.category:m.category};
-  })}));
-  setMessage(changed+` Mixamo-Motions nach eindeutigen Namenshinweisen zugeordnet. Manuell vergebene Genres und Kategorien wurden beibehalten. BPM bleibt unverändert.`);
+  const latest=loadCharacterMotionStore();
+  const updated=applyMixamoTagSuggestions(latest.motions,avatar);
+  if(!updated.changed)return;
+  saveCharacterMotionStore({...latest,motions:updated.motions});
+  setMessage(`${updated.changed} Mixamo-Motions nach eindeutigen Namenshinweisen zugeordnet. Manuelle Einstellungen, BPM-Grenzen und Songabschnitte wurden beibehalten.`);
  }
  async function fingerprintExistingV535(){
   if(scanBusyV535||!avatar)return;
