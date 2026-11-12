@@ -126,3 +126,27 @@ assert(avatar.includes('useGltfClipTransitionsV492('));
 const importer=read('components/visualizer/mixamoFbxImporter.ts');
 assert(importer.includes('-mixamo.glb'));
 console.log('PASS Mixamo genre, beat-loop, manual-priority and transition regression');
+
+// Phase 2 foundation: section-aware Mixamo ensemble selection is restricted
+// to the real, eligible library repertoire. Hooks/drops share phrase choice;
+// verses preserve individual variation and non-Mixamo clips are unaffected.
+const show=load('components/visualizer/mixamoShowChoreography');
+for(const section of ['hook','chorus','drop','climax']){
+ const cue=show.mixamoShowCue(section,2,3);
+ assert.equal(cue.commonPhrase,true,section);
+ assert.equal(cue.role,'unison',section);
+ assert.equal(show.mixamoEnsembleSelectionSlot({slot:2,ensembleCount:3,section,hasEligibleMixamo:true}),0,section);
+ assert.equal(show.mixamoEnsembleSelectionSlot({slot:2,ensembleCount:3,section,hasEligibleMixamo:false}),2,section);
+}
+for(const section of ['verse','build','intro','break']){
+ const cue=show.mixamoShowCue(section,2,3);
+ assert.equal(cue.commonPhrase,false,section);
+ assert.equal(show.mixamoEnsembleSelectionSlot({slot:2,ensembleCount:3,section,hasEligibleMixamo:true}),2,section);
+}
+assert.equal(show.mixamoShowCue('verse',0,3).role,'lead');
+assert.equal(show.mixamoShowCue('verse',1,3).role,'support');
+assert.equal(show.mixamoShowCue('hook',1,3).commonPhrase,true);
+assert.equal(show.mixamoShowCueBias({name:'Mixamo Hakken Footwork',family:'hardtekk',section:'drop',energy:.95,slot:0,ensembleCount:3})>
+ show.mixamoShowCueBias({name:'Mixamo Rap Groove',family:'hardtekk',section:'drop',energy:.95,slot:0,ensembleCount:3}),true);
+assert.equal(show.mixamoShowCueBias({name:'ordinary Dance Groove',family:'hardtekk',section:'drop',energy:.95,slot:0,ensembleCount:3}),0);
+console.log('PASS Phase 2 Mixamo ensemble phrase, role and real-library eligibility regression');
