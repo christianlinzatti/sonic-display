@@ -1,4 +1,5 @@
 import type { CharacterMotionStore, InstalledCharacterMotion } from "./characterMotionLibrary";
+import {mixamoGenreBias,type MixamoGenreFamily} from "./mixamoMotionDirector";
 
 /** A deterministic phrase-aware live playlist. Never edits assets or user-authored library metadata. */
 export type DanceSection = "verse" | "hook" | "build" | "drop" | "break";
@@ -36,7 +37,14 @@ export function nextDanceCombination(state:DanceSequenceState,store:CharacterMot
   if(sameTrack&&state.slot===slot&&state.eventSlot===(params.eventSlot??"")){const selected=candidates.find(m=>m.id===state.motionId);if(selected)return {state,url:selected.url,section};}
   const recent=sameTrack&&slot>=state.slot?state.recent:[];
   const previous=sameTrack&&slot>=state.slot?state.motionId:null;
-  const rank=(m:InstalledCharacterMotion)=>sectionFit(m,section)*8+(m.genre?10:0)+((m.bpmMax-m.bpmMin)<80?2:0)-(recent.includes(m.id)?24:0)-(m.id===previous?18:0);
+  const lowered=params.genre.toLowerCase();
+  const family:MixamoGenreFamily=/hardtekk|tekk|tekno/.test(lowered)?"hardtekk":
+    /hardstyle|jumpstyle|rawstyle/.test(lowered)?"hardstyle":
+    /deutschrap|hip.?hop|rap|trap|drill/.test(lowered)?"rap":"general";
+  const phase=section==="break"?"quiet":section==="build"?"verse":section;
+  const rank=(m:InstalledCharacterMotion)=>sectionFit(m,section)*8+(m.genre?10:0)+
+    ((m.bpmMax-m.bpmMin)<80?2:0)-(recent.includes(m.id)?24:0)-
+    (m.id===previous?18:0)+mixamoGenreBias(m.name,family,phase,params.energy);
   const ordered=candidates.slice().sort((a,b)=>rank(b)-rank(a)||a.id.localeCompare(b.id));
   const chosen=ordered[0];
   const history=[...recent,chosen.id].slice(-Math.min(3,Math.max(1,candidates.length-1)));
