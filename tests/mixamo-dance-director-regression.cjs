@@ -87,8 +87,38 @@ for(let bpm=60;bpm<=230;bpm+=5)for(let duration=.5;duration<=15;duration+=.1){
  const speed=director.mixamoBeatAlignedSpeed('Mixamo Rap',duration,bpm,1);
  assert(Number.isFinite(speed)&&speed>=.88&&speed<=1.12);
 }
+// User-defined genre/BPM/section restrictions must gate the automatic live
+// selection. A clip imported without metadata retains the existing fallback.
+const tagged={...clip('Mixamo Hakken Footwork'),taggedGenre:'hardtekk',
+  bpmMin:145,bpmMax:170,assignedSection:'drop'};
+const baseInput={bpm:155,genre:'hardtekk',section:'drop'};
+assert.equal(v536.libraryMotionEligibleV536(tagged,baseInput),true);
+assert.equal(v536.libraryMotionEligibleV536(tagged,{...baseInput,bpm:140}),false);
+assert.equal(v536.libraryMotionEligibleV536(tagged,{...baseInput,bpm:171}),false);
+assert.equal(v536.libraryMotionEligibleV536(tagged,{...baseInput,genre:'hardstyle'}),false);
+assert.equal(v536.libraryMotionEligibleV536(tagged,{...baseInput,section:'verse'}),false);
+assert.equal(v536.libraryMotionEligibleV536({...tagged,assignedSection:'any'},baseInput),true);
+assert.equal(v536.libraryMotionEligibleV536({...tagged,taggedGenre:''},baseInput),true);
+assert.equal(v536.libraryMotionEligibleV536({...tagged,assignedSection:'verse'},
+  {...baseInput,section:'hook'}),true,'legacy verse fallback remains available during hooks');
+assert.equal(v536.libraryMotionEligibleV536({...tagged,source:'embedded'},
+  {...baseInput,bpm:30,genre:'pop'}),true,'embedded clips remain unaffected');
+
+const filtered=v536.rankGenreMotionsV536({
+  clips:[tagged,{...clip('Mixamo Rap Groove'),taggedGenre:'deutschrap',bpmMin:80,bpmMax:120}],
+  trackId:'song',modelKey:'avatar',progressMs:10000,section:'drop',
+  genre:'hardtekk',bpm:155,energy:.9,slot:0,playing:true,reducedMotion:false,manualPriority:false,
+},'drop:1');
+assert.deepEqual(filtered.map(c=>c.name),[tagged.name],
+  'genre and BPM restrictions override attractive but incompatible clips');
+
 const avatar=read('components/visualizer/GltfDancerAvatarV492.tsx');
 assert(avatar.includes('mixamoBeatAlignedSpeed('));
+assert(avatar.includes('const previousSpeed=action.timeScale'));
+assert(avatar.includes('action.timeScale=previousSpeed'),'changing back to manual restores original speed');
+assert(avatar.includes('Math.abs(action.timeScale-alignedSpeed)<.0005'),'manual playback changes are not overwritten');
+assert(avatar.includes('taggedGenre:motion.genre'));
+assert(avatar.includes('assignedSection:motion.section'));
 assert(avatar.includes('Math.abs(avatarClipSpeed-1)>.001'));
 assert(avatar.includes('!groupClockV328?.settings.enabled'));
 assert(avatar.includes('Math.max(mixamoFade,'));
